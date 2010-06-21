@@ -1,0 +1,73 @@
+#!/usr/bin/python
+
+"""
+=========
+mysqlproc
+=========
+
+----------------------------------------------------------
+Search for processes on a MySQL server and perform actions 
+----------------------------------------------------------
+
+
+SYNOPSIS
+========
+
+  mysqlproc <options> [ [user@]host[:port] ] ...
+
+DESCRIPTION
+===========
+
+The utility scan the process lists for all the servers provided on the
+command line and will either print the result (the default) or execute
+certain actions on it. The match conditions are given as options to
+the tool and in order for a row to match, all the conditions given
+have to match.
+
+Options
+-------
+
+--user=PATTEN
+  Match all rows where the User field matches PATTERN
+
+--time=PERIOD
+  Match all rows where the time matches the given period
+
+Specifying time periods
+-----------------------
+
+A time period specification consists of a number with an optional
+suffix denoting the size of the period and there can be an optional +
+or - sign as prefix. A + sign before the period means greater than the
+given period, a - sign means less than the given period, while no sign
+means within that period.
+
+EXAMPLES
+========
+
+To kill all processes created by user "mats" that are older than 1 day.
+
+  mysqlproc --user=mats --time=+1d --kill
+
+"""
+
+import optparse, mysql
+
+# Parse options
+
+parser = optparse.OptionParser()
+parser.add_option("--user", dest="user",
+                  help="Match the user column of the PROCESSLIST table")
+(options, args) = parser.parse_args()
+
+# Construct execution object
+command = mysql.commands.proc(options)
+
+# Execute command, which return a list of tuples representing the rows
+rows = command.execute(args)
+
+# Print a nice output
+theFormat = "%4s %-10s %-10s %-10s %-6s %8s %-10s %s" 
+print theFormat % ('ID','USER','HOST','DB','COMMAND','TIME','STATE','INFO')
+for row in rows:
+    print theFormat % row
