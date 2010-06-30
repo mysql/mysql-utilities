@@ -4,3 +4,15 @@ administering MySQL servers.
 INSTALLATION
 ------------
 
+To install the scripts together with the libraries::
+
+    python setup.py install
+
+
+UNIT TESTS
+----------
+
+To run the existing unit tests::
+
+    python setup.py test
+
