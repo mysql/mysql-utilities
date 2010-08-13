@@ -121,10 +121,10 @@ class ProcessListProcessor(object):
     def execute(self, args):
         if self.__socket:
             conn = MySQLdb.connect(unix_socket=self.__socket,
-                                   user=self.__user, password=self.__password)
+                                   user=self.__user, passwd=self.__password)
         else:
             conn = MySQLdb.connect(host=self.__host, port=self.__port,
-                                   user=self.__user, password=self.__password)
+                                   user=self.__user, passwd=self.__password)
             
         rows = self.__ask_one_server(conn)
         for action in self.__action_list:
