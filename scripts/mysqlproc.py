@@ -13,16 +13,16 @@ Search for processes on a MySQL server and perform actions
 SYNOPSIS
 ========
 
-  mysqlproc <options> user[:password]@host[:port] ...
+  mysqlproc [options] 
 
 DESCRIPTION
 ===========
 
-The utility scan the process lists for all the servers provided on the
-command line and will either print the result (the default) or execute
-certain actions on it. The match conditions are given as options to
-the tool and in order for a row to match, all the conditions given
-have to match.
+This utility scan the process lists for all the servers provided on
+the command line and will either print the result (the default) or
+execute certain actions on it. The match conditions are given as
+options to the tool and in order for a row to match, all the
+conditions given have to match.
 
 
 Options
@@ -74,7 +74,8 @@ Options
   Print information about the matching processes
 
 --verbose
-  Be more verbose and print messages about execution.
+  Be more verbose and print messages about execution. Can be given
+  multiple times, in which case the verbosity level increases.
 
 --help
   Print help
@@ -88,14 +89,24 @@ or - sign as prefix. A + sign before the period means greater than the
 given period, a - sign means less than the given period, while no sign
 means within that period.
 
+The allowable suffixes are ``s`` (second), ``m`` (minute), ``h``
+(hour), ``d`` (day), and ``w`` (week).
+
 
 EXAMPLES
 ========
 
-To kill all processes created by user "mats" that are older than 1 day.
+For all the examples, we assume that the ``root`` user on
+``localhost`` has sufficient privileges to kill queries and
+connections.
 
-  mysqlproc --user=mats --time=+1d --kill root@localhost
+To kill all connections created by user "mats" that are younger than 1 minute::
 
+  mysqlproc --user=root --host=localhost --match-user=mats --match-time=-1m --kill-query
+
+To kill all queries that has been idle for more than 1 hour::
+
+  mysqlproc --user=root --host=localhost --match-command=sleep --match-time=+1h --kill
 """
 
 import optparse
