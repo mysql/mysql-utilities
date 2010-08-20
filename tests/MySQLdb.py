@@ -76,10 +76,10 @@ def add_command_result(connection, command, resultset):
     _connection[connection._key()]._store_result(command.upper(), resultset)
 
 
-def connect(user, password="", host="localhost", port=3306):
+def connect(user, passwd="", host="localhost", port=3306):
     "Mock connect function mimicing the real MySQLdb.connect."
     global _connection
-    server_key = _userkey(user, password, host, port)
+    server_key = _userkey(user, passwd, host, port)
     try:
         return _connection[server_key]
     except KeyError:

@@ -1,10 +1,9 @@
 import sys
 import os
-import distutils.core
-import cx_Freeze
+from distutils.core import Command
+from cx_Freeze import setup, Executable
 
 META_INFO = {
-    'name':             'mysql-utilities',
     'description':      'MySQL Command-line Utilities',
     'maintainer':       'MySQL',         # !!!
     'maintainer_email': "internals@lists.mysql.com", # !!!
@@ -21,6 +20,11 @@ META_INFO = {
         ],
     }
 
+if sys.platform.startswith("win32"):
+    META_INFO['name'] = 'MySQL Utilities'
+else:
+    META_INFO['name'] = 'mysql-utilities'
+
 INSTALL = {
     'packages': ["mysql"],
     'scripts': [
@@ -28,7 +32,10 @@ INSTALL = {
         ],
     }
 
-class TestCommand(distutils.core.Command):
+class CheckCommand(Command):
+    """
+    Command to execute all unit tests in the tree.
+    """
     user_options = [ ]
 
     def initialize_options(self):
@@ -52,14 +59,14 @@ class TestCommand(distutils.core.Command):
         runner.run(suite)
 
 COMMANDS = {
-    'cmdclass': { 'test': TestCommand },
+    'cmdclass': { 'check': CheckCommand },
     }
 
 ARGS = {
-    'executables': [cx_Freeze.Executable(exe) for exe in INSTALL['scripts']],
+    'executables': [Executable(exe) for exe in INSTALL['scripts']],
     }
     
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
-cx_Freeze.setup(**ARGS)
+setup(**ARGS)
