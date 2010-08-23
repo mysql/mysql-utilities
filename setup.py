@@ -63,7 +63,12 @@ COMMANDS = {
     }
 
 ARGS = {
-    'executables': [Executable(exe) for exe in INSTALL['scripts']],
+    'executables': [Executable(exe, base="Console") for exe in INSTALL['scripts']],
+    'options': {
+        'bdist_msi': {
+            'add_to_path': True,
+            },
+        },
     }
     
 ARGS.update(META_INFO)
