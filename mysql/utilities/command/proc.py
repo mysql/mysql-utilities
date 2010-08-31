@@ -66,33 +66,33 @@ class ProcessListProcessor(object):
                         return int(val) == int(sec)
                 self.__matches[pos] = match_func
 
-    def __init__(self, options):
+    def __init__(self, option):
         # PROCESSLIST files are: Id, User, Host, Db, Command, Time, State, Info
         self.__matches = 8 * [lambda x: True]
-        self.__string_matcher(options.match_user, 1)
-        self.__string_matcher(options.match_host, 2)
-        self.__string_matcher(options.match_db,   3)
-        self.__string_matcher(options.match_command, 4)
-        self.__period_matcher(options.match_time, 5)
-        self.__string_matcher(options.match_state, 6)
-        self.__string_matcher(options.match_info, 7)
+        self.__string_matcher(option.match_user, 1)
+        self.__string_matcher(option.match_host, 2)
+        self.__string_matcher(option.match_db,   3)
+        self.__string_matcher(option.match_command, 4)
+        self.__period_matcher(option.match_time, 5)
+        self.__string_matcher(option.match_state, 6)
+        self.__string_matcher(option.match_info, 7)
 
         self.__port = 3306
         self.__password = ""
-        self.__socket = options.socket
-        self.__user = options.user
+        self.__socket = option.socket
+        self.__user = option.user
 
-        if options.port:
-            self.__port = options.port
-        if options.password:
-            self.__password = options.password
-        if options.host:
-            self.__host = options.host
+        if option.port:
+            self.__port = option.port
+        if option.password:
+            self.__password = option.password
+        if option.host:
+            self.__host = option.host
 
         # If there were no action option supplied, we print all
         # matching processes
-        if options.action_list:
-            self.__action_list = options.action_list
+        if option.action_list:
+            self.__action_list = option.action_list
         else:
             self.__action_list = [PRINT_PROCESS]
 

@@ -11,7 +11,7 @@ import copy
 
 import tests.common       # Have to be before import of mysql.command
 
-import mysql.command
+from mysql.utilities import command
 
 _server = [dict(user="mats", host="localhost"),
            dict(user="chuck", host="remotehost")]
@@ -65,14 +65,14 @@ class TestCommands(unittest.TestCase):
         Helper function to check that the options and the function
         does the same job
         """
-        cmd = mysql.command.ProcessListProcessor(options)
+        cmd = command.ProcessListProcessor(options)
         collector = Collector()
-        saved_print = mysql.command._action_map[mysql.command.PRINT_PROCESS]
-        mysql.command._action_map[mysql.command.PRINT_PROCESS] = collector
+        saved_print = command.proc._action_map[command.PRINT_PROCESS]
+        command.proc._action_map[command.PRINT_PROCESS] = collector
         collector.reset()
         cmd.execute([])
         self.assertEqual(collector.rows, filter(func, resultset))
-        mysql.command._action_map[mysql.command.PRINT_PROCESS] = saved_print
+        command.proc._action_map[command.PRINT_PROCESS] = saved_print
 
     def testNormalCall(self):
         for i in range(0, len(_server)):
