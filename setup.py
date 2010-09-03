@@ -28,7 +28,9 @@ else:
 INSTALL = {
     'packages': ["mysql"],
     'scripts': [
-        'scripts/mysqlproc.py'
+        'scripts/mysqlproc.py',
+        'scripts/mysqlserverclone.py',
+        'scripts/mysqldbcopy.py'
         ],
     }
 
