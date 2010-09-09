@@ -52,10 +52,3 @@ class test(clone_user.test):
         return clone_user.test.cleanup(self)
 
 
-# Don't allow this file to execute as a script       
-if (__name__ == '__main__'):
-    print "ERROR: This is not an executable file!"
-    exit(1)
-
-
-

@@ -75,7 +75,7 @@ parser.add_option("-f", "--force", action="store_true", dest="overwrite",
 parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
                   help="display additional information during operation")
 
-# Verbose mode
+# Silent mode
 parser.add_option("--silent", action="store_true", dest="silent",
                   help="do not display feedback information during operation")
 
@@ -105,11 +105,13 @@ new_user_list = args[1:]
 source_values = parse_connection(opt.source)
 if source_values is None:
     print "ERROR: Source connection values invalid or cannot be parsed."
+    exit(1)
 
 # Parse destination connection values
 dest_values = parse_connection(opt.destination)
 if dest_values is None:
     print "ERROR: Destination connection values invalid or cannot be parsed."
+    exit(1)
 
 try:
     res = userclone.clone_user(source_values, dest_values, base_user,

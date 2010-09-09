@@ -66,7 +66,8 @@ def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
 
     servers = connect_servers(src_val, dest_val, silent, "5.1.0")
     if servers == (None, None):
-        exit(1)
+        raise MySQLUtilError("No servers specified!")
+
     source = servers[0]
     destination = servers[1]
     

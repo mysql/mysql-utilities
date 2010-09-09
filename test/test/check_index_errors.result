@@ -1,0 +1,6 @@
+Test case 1 - error: no login user
+# Source: root@localhost: ... ERROR: Cannot connect to the source server.
+Error 1045: Access denied for user 'root'@'localhost' (using password: NO)
+Test case 2 - error: invalid login to server
+# Source: nope@localhost: ... ERROR: Cannot connect to the source server.
+Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)

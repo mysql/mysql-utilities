@@ -94,7 +94,7 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
     if not silent:
         if not cloning:
             _print_connection("Destination", dest_val)
-        else:
+        elif dest_val is not None:
             _print_connection("Destination", src_val)
 
     if not cloning:
@@ -110,7 +110,7 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
         except MySQLUtilError, e:
             raise e
         
-    if not silent:
+    if not silent and dest_val is not None:
         sys.stdout.write("connected.\n")
         
     servers = (source, destination)
@@ -427,9 +427,11 @@ class Server(object):
     
         Returns MySQLdb result set
         """
-    
-        return self.exec_query("SHOW INDEXES FROM %s", tbl)
-        
+        try:
+            res = self.exec_query("SHOW INDEXES FROM %s" % tbl)
+        except MySQLUtilError, e:
+            raise e
+        return res
 
     def read_and_exec_SQL(self, input_file, verbose=False, suppress=False):
         """Read an input file containing SQL statements and execute them.

@@ -127,10 +127,6 @@ class test(mysql_test.System_test):
         return True
 
 
-# Don't allow this file to execute as a script       
-if (__name__ == '__main__'):
-    print "ERROR: This is not an executable file!"
-    exit(1)
 
 
 
