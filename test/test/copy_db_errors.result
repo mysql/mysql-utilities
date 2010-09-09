@@ -10,7 +10,7 @@ Test case 4 - error: old database doesn't exist
 # Copying database NOT_THERE_AT_ALL renamed as util_db_clone
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 5 - error: cannot connect to source
-# Source: nope@localhost: ... ERROR: Cannot connect to the source server.
+# Source: nope@localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: cannot connect to destination
 # Source: root@localhost: ... connected.

@@ -1,5 +1,5 @@
 Test case 1 - error: invalid login to source server
-# Source: noone@localhost: ... ERROR: Cannot connect to the source server.
+# Source: noone@localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
 Test case 2 - error: invalid login to destination server
 # Source: root@localhost: ... connected.
