@@ -16,6 +16,14 @@ INSERT INTO util_test.t2 VALUES ("11 Test Basic database example");
 INSERT INTO util_test.t2 VALUES ("12 Test Basic database example"); 
 INSERT INTO util_test.t2 VALUES ("13 Test Basic database example"); 
 
+CREATE TABLE util_test.t3 (a int not null auto_increment, b char(30), primary key(a)) ENGINE=InnoDB;
+INSERT INTO util_test.t3 (b) VALUES ("14 test fkeys");
+INSERT INTO util_test.t3 (b) VALUES ("15 test fkeys");
+INSERT INTO util_test.t3 (b) VALUES ("16 test fkeys");
+
+CREATE TABLE util_test.t4 (c int not null, d int not null, CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES util_test.t3(a)) ENGINE=InnoDB;
+INSERT INTO util_test.t4 VALUES (3, 2);
+
 CREATE PROCEDURE util_test.p1(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
 
 CREATE TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');

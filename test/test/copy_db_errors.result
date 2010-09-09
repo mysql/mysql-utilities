@@ -24,6 +24,10 @@ Test case 7 - users with minimal privileges
 # Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying data for TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying data for TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
@@ -32,15 +36,15 @@ Test case 7 - users with minimal privileges
 Test case 8 - source user not enough privileges needed
 # Source: sam@localhost: ... connected.
 # Destination: joe@localhost:[] ... connected
-ERROR: User sam on the source server does not have permissions to read all objects in ('util_test', 'util_db_clone'). User needs SELECT privilege on util_test.
+ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - source user has some privileges needed
 # Source: sam@localhost: ... connected.
 # Destination: joe@localhost:[] ... connected
-ERROR: User sam on the source server does not have permissions to read all objects in ('util_test', 'util_db_clone'). User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 10 - source user has some privileges needed
 # Source: sam@localhost: ... connected.
 # Destination: joe@localhost:[] ... connected
-ERROR: User sam on the source server does not have permissions to read all objects in ('util_test', 'util_db_clone'). User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 11 - source user has privileges needed
 # Source: sam@localhost: ... connected.
 # Destination: joe@localhost:[] ... connected
@@ -49,6 +53,10 @@ Test case 11 - source user has privileges needed
 # Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying data for TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying data for TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
@@ -74,6 +82,10 @@ Test case 15 - dest user has privileges needed
 # Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying data for TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying data for TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1

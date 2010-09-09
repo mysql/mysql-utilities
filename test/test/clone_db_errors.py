@@ -2,6 +2,7 @@
 
 import os
 import clone_db
+from mysql.utilities.common import MySQLUtilError
 
 class test(clone_db.test):
     """check errors for clone db
@@ -46,7 +47,61 @@ class test(clone_db.test):
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             return False
+
+        try:
+            self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+        except MySQLUtilError, e:
+            return False
+
+        if os.name == "posix" and self.server1.socket is not None:
+            from_conn = "--source=joe@localhost:%s:%s" % \
+                        (self.server1.port, self.server1.socket)
+        else:
+            from_conn = "--source=joe@localhost:%s" % self.server1.port
+
+        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_opts = "util_test:util_db_clone --force"
+        comment = "Test case 4 - error: user with % - not enough permissions"
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            return False
+                
+        try:
+            self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%%'")
+        except MySQLUtilError, e:
+            return False
+        try:
+            self.server1.exec_query("GRANT SELECT ON mysql.* TO 'joe'@'%%'")
+        except MySQLUtilError, e:
+            return False
         
+        comment = "Test case 5 - No error: user with % - has permissions"
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            return False
+        
+        try:
+            self.server1.exec_query("CREATE USER 'will'@'127.0.0.1'")
+        except MySQLUtilError, e:
+            return False
+        try:
+            self.server1.exec_query("GRANT ALL ON *.* TO 'will'@'127.0.0.1'")
+        except MySQLUtilError, e:
+            return False
+        
+        if os.name == "posix" and self.server1.socket is not None:
+            from_conn = "--source=will@127.0.0.1:%s:%s" % \
+                        (self.server1.port, self.server1.socket)
+        else:
+            from_conn = "--source=will@127.0.0.1:%s" % self.server1.port
+
+        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_opts = "util_test:util_db_clone --force"
+        comment = "Test case 6 - show user@127.0.0.1 works"
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            return False
+             
         return res
   
     def get_result(self):
@@ -56,6 +111,18 @@ class test(clone_db.test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
+        try:
+            self.server1.exec_query("DROP USER 'joe'@'localhost'")
+        except:
+            pass
+        try:
+            self.server1.exec_query("DROP USER 'joe'")
+        except:
+            pass
+        try:
+            self.server1.exec_query("DROP USER 'will'@'127.0.0.1'")
+        except:
+            pass
         return clone_db.test.cleanup(self)
 
 

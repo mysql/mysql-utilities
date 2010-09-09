@@ -37,7 +37,7 @@ def _print_connection(prefix, conn_val):
                      (prefix, conn_val["user"], conn_val["host"]))
 
 
-def connect_servers(src_val, dest_val, silent=False):
+def connect_servers(src_val, dest_val, silent=False, version=None):
     """ Connect to a source and destination server.
     
     This method takes two groups of --server=user:password@host:port:socket
@@ -53,6 +53,9 @@ def connect_servers(src_val, dest_val, silent=False):
                        (user, passwd, host, port, socket)
     silent[in]         do not print any information during the operation
                        (default is False)
+    version[in]        if specified (default is None), perform version
+                       checking and fail if server version is < version
+                       specified - an exception is raised
 
     Returns tuple (source, destination) where
             source = connection to source server
@@ -63,6 +66,8 @@ def connect_servers(src_val, dest_val, silent=False):
     source = None
     destination = None
     cloning = (src_val == dest_val) or dest_val is None
+    if version is not None:
+        major, minor, rel = version.split(".")
 
     # If we're cloning so use same server for faster copy
     if not cloning and dest_val is None:
@@ -75,6 +80,11 @@ def connect_servers(src_val, dest_val, silent=False):
     source = Server(src_val, "source")
     try:
         source.connect()
+        if version is not None:
+            if not source.check_version_compat(major, minor, rel):
+                raise MySQLUtilError("Source version is incompatible. Utility "
+                                     "requires version %s or higher." %
+                                     version)
     except MySQLUtilError, e:
         raise e
         
@@ -92,6 +102,11 @@ def connect_servers(src_val, dest_val, silent=False):
         destination = Server(dest_val, "destination")
         try:
             destination.connect()
+            if version is not None:
+                if not source.check_version_compat(major, minor, rel):
+                    raise MySQLUtilError("Destination version is incompatible."
+                                         " Utility requires version %s or "
+                                         "higher." % version)
         except MySQLUtilError, e:
             raise e
         
@@ -204,6 +219,31 @@ class Server(object):
         else:
             return None
         
+    def check_version_compat(self, t_major, t_minor, t_rel):
+        """ Checks version of the server against requested version.
+        
+        This method can be used to check for version compatibility.
+        
+        t_major[in]        target server version (major)
+        t_minor[in]        target server version (minor)
+        t_rel[in]          target server version (release)
+
+        Returns bool True if server version is GE (>=) version specified,
+                     False if server version is LT (<) version specified
+        """
+        res = self.show_server_variable("VERSION")
+        if res:
+            major, minor, rel = res[0][1].split(".")
+            if int(t_major) > int(major):
+                return False
+            elif int(t_major) == int(major):
+                if int(t_minor) > int(minor):
+                    return False
+                elif int(t_minor) == int(minor):
+                    if int(t_rel) > int(rel):
+                        return False
+        return True
+    
     
     def get_table_data(self, db, name, output_file,
                        verbose=False, new_db=None):
