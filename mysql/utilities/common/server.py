@@ -147,7 +147,7 @@ class Server(object):
         self.user = conn_val["user"]
         self.passwd = conn_val["passwd"]
         self.socket = conn_val["socket"]
-        self.port = 0
+        self.port = 3306
         if conn_val["port"] is not None:
             self.port = int(conn_val["port"])
         self.connect_error = None
@@ -173,11 +173,13 @@ class Server(object):
         Raises MySQLUtilError if error during connect
         """
         try:
-            parameters = {'user':self.user, 'host':self.host}
+            parameters = {
+                'user': self.user,
+                'host': self.host,
+                'port': self.port,
+                }
             if self.socket:
                 parameters['unix_socket'] = self.socket
-            else:
-                parameters['port'] = self.port
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
             self.db_conn = MySQLdb.connect(**parameters)
