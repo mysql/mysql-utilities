@@ -78,8 +78,44 @@ Options
   Be more verbose and print messages about execution. Can be given
   multiple times, in which case the verbosity level increases.
 
+--emit-body
+  Emit SQL statements for performing the search or kill of the
+  ``INFORMATION_SCHEMA.PROCESSLIST`` table.  This is useful together
+  with ``mysqlcron`` to generate an event for the server scheduler.
+
+  When used with the ``--kill`` option, code for killing the matching
+  queries are generated. Note that it is not possible to execute the
+  emitted code unless it is put in a stored routine, event, or
+  trigger. For example, the following code could be generated to kill
+  all connections for user ``www-data`` that has been idle for more
+  than 30 seconds::
+
+     DECLARE kill_cursor CURSOR FOR
+       SELECT id FROM INFORMATION_SCHEMA.PROCESSLIST
+        WHERE user = 'www-data' AND state = 'Sleep' AND time > 30;
+     OPEN kill_cursor;
+     BEGIN
+        DECLARE id_to_kill BIGINT;
+        DECLARE EXIT HANDLER FOR NOT FOUND SET kill_done = 1;
+        kill_loop: LOOP
+           FETCH kill_cursor INTO id_to_kill;
+           KILL id_to_kill;
+        END LOOP kill_loop;
+     END;
+     CLOSE kill_cursor;
+
+  **Not Yet Implemented!**
+
+--emit-procedure
+  Emit the definition of a stored procedure for matching or killing
+  the queries. If the ``--kill`` option is given, a routine for
+  killing the queries are generated.
+
+  **Not Yet Implemented!**
+
 --help
   Print help
+
 
 Specifying time periods
 -----------------------
