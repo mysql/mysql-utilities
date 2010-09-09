@@ -1,0 +1,13 @@
+Test case 1 - error: invalid login to source server
+# Source: noone@localhost: ... ERROR: Cannot connect to the source server.
+Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
+Test case 2 - error: invalid login to destination server
+# Source: root@localhost: ... connected.
+# Destination: noone@localhost: ... ERROR: Cannot connect to the destination server.
+Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
+Test case 3 - error: no arguments
+ERROR: No arguments found. Use --help for available options.
+Test case 4 - error: no new user
+ERROR: wrong parameter combination or no new users.
+Test case 5 - error: cannot use dump and silent together
+ERROR: You cannot use --silent and --dump together.

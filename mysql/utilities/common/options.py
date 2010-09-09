@@ -88,7 +88,7 @@ def parse_connection(connection_values):
     Returns dictionary (user, passwd, host, port, socket)
             or None if parsing error
     """
-    grp = re.match("(\w+)(?:\:(\w+))?@(\w+)(?:\:(\d+))?" +
+    grp = re.match("(\w+)(?:\:(\w+))?@([\w+|\d+|.]+)(?:\:(\d+))?" +
                    "(?:\:([\/\\w+.\w+.\-]+))?", connection_values)
     if not grp:
         return None

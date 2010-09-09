@@ -89,7 +89,7 @@ def _check_access(source, destination, s_user, s_host, d_user, d_host,
         if not _check_user_permissions(source, s_user, s_host, priv):
             raise MySQLUtilError("User %s on the source server does not have "
                                  "permissions to read all objects in %s. " %
-                                 (s_user, db) + "User needs %s privilege "
+                                 (s_user, db[0]) + "User needs %s privilege "
                                  "on %s." % (priv[1], priv[0]))
         
     # Build minimal list of privileges for destination access
@@ -154,7 +154,8 @@ def copy_db(src_val, dest_val, db_list, options):
     from mysql.utilities.common import connect_servers
 
     try:
-        servers = connect_servers(src_val, dest_val, options["silent"])
+        servers = connect_servers(src_val, dest_val, options["silent"],
+                                  "5.1.0")
         #print servers
     except MySQLUtilError, e:
         raise e

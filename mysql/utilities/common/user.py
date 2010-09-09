@@ -94,13 +94,13 @@ class User(object):
         finally:
             cur.close()
 
-    def drop(self, user_name=None):
+    def drop(self, new_user=None):
         """Drop user from the server
 
         Attempts to drop the user. If the operation fails, an error is
         generated and printed.
 
-        user_name[in]      MySQL user string (user@host:passwd)
+        new_user[in]       MySQL user string (user@host:passwd)
                            (optional) If omitted, operation is performed
                            on the class instance user name.
         """
@@ -108,7 +108,7 @@ class User(object):
         cur = self.server1.cursor()
         query_str = "DROP USER "
         if new_user:
-            user, passwd, host = parse_user_host(user_name)
+            user, passwd, host = parse_user_host(new_user)
             query_str += "'%s'@'%s' " % (user, host)
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
@@ -152,78 +152,40 @@ class User(object):
         
         returns MySQLdb.result set or None if no grants defined
         """
-        
+        grants = []
         try:
-            res = self.server1.exec_query("SHOW GRANTS FOR '%s'@'%s'" %
+            res = self.server1.exec_query("SHOW GRANTS FOR '%s'@'%s'" % 
                                           (self.user, self.host))
-            #print "get_grants:", res
-        except:
-            return None # Error here is ok - no grants found.
-        return res
+            for grant in res:
+                grants.append(grant)
+        except MySQLUtilError, e:
+            pass # Error here is ok - no grants found.
+        try:
+            res = self.server1.exec_query("SHOW GRANTS FOR '%s'" % self.user +
+                                          "@'%%'")
+            for grant in res:
+                grants.append(grant)
+        except MySQLUtilError, e:
+            pass # Error here is ok - no grants found.
+        return grants
 
-
-    def has_privilege(self, db, name, access):
+    def has_privilege(self, db, obj, access):
         """Check to see user has a specific access to a db.object
         
  
         db[in]             Name of database
-        name[in]           Name of object
+        obj[in]            Name of object
         access[in]         MySQL access to test (e.g. SELECT)
 
         Returns True if user has access, False if not
-
-        TODO: Replace method with below optional implementation and fully
-              test with mysqluserclone utility.
-            regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|%s)\b.*ON\s+"
-                               r"(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
-                               % (access, db, tbl), re.IGNORECASE)
-            for grant in self.get_grants():
-                if regex.match(grant):
-                    return True
-            return False
         """
-        grants = self.get_grants()
-        if not grants:
-            return False
         
-        # Build list of possible combinations for db in grant statement
-        grant_keys = []
-        grant_keys.append(" ON `%s`.%s" % (db, name))
-        grant_keys.append(" ON %s.`%s`" % (db, name))
-        grant_keys.append(" ON `%s`.`%s`" % (db, name))
-        grant_keys.append(" ON '%s'.%s" % (db, name))
-        grant_keys.append(" ON %s.'%s'" % (db, name))
-        grant_keys.append(" ON '%s'.'%s'" % (db, name))
-        grant_keys.append(" ON %s.%s" % (db, name))        
-        grant_keys.append(" ON `%s`.*" % db)
-        grant_keys.append(" ON '%s'.*" % db)
-        grant_keys.append(" ON %s.*" % db)
-        grant_keys.append(" ON *.*")
-        
-        for grant_tuple in grants:
-            # first, find database in keys
-            for key in grant_keys:
-                pos = grant_tuple[0].find(key)
-                if pos > 0: # Found it!
-                    # key found, now check for access
-                    pos = grant_tuple[0].find(access)
-                    if pos > 0:
-                        return True
-
-        # Build list of possible combinations for grant statement
-        root_keys = []
-        root_keys.append("ALL PRIVILEGES ON *.*")
-        root_keys.append("ALL PRIVILEGES ON %s.*" % db)
-        root_keys.append("ALL PRIVILEGES ON `%s`.*" % db)
-        root_keys.append("ALL PRIVILEGES ON '%s'.*" % db)
-
-        # Check for root-like privileges
-        for grant_tuple in grants:
-            for key in root_keys:
-                pos = grant_tuple[0].find(key)
-                if pos > 0: # Found it!
-                    return True
-        return False
+        regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|%s)\b.*"
+                           r"ON\s+(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
+                           % (re.escape(access), re.escape(db), re.escape(obj)))
+        for grant in self.get_grants():
+            if regex.match(grant[0]):
+                return True
 
     def print_grants(self):
         """Display grants for the current user"""

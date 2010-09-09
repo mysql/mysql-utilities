@@ -97,7 +97,7 @@ class Database(object):
             
         res = cur.execute("SELECT SCHEMA_NAME " +
                           "FROM INFORMATION_SCHEMA.SCHEMATA " +
-                          "WHERE SCHEMA_NAME = '%s'" % (db))
+                          "WHERE SCHEMA_NAME = '%s'" % db)
         cur.close()
         
         if res:
@@ -319,8 +319,10 @@ class Database(object):
         except:
             pass
         try:
+            if create_str.find("'%'"):
+                create_str = re.sub("'%'", "'%%'", create_str)
             res = self.destination.exec_query(create_str)
-        except:
+        except Exception, e:
             raise MySQLUtilError("Cannot operate on %s object with: %s" % 
                                  (obj_type, create_str))
 
@@ -346,6 +348,7 @@ class Database(object):
             self.source.exec_query(query_str)
         except MySQLUtilError, e:
             raise e
+        
     
     def copy(self, new_db, input_file, options, new_server=None):
         """Copy a database.
@@ -391,7 +394,25 @@ class Database(object):
         else:
             self.destination = self.source
 
-        # Check to see if dtabase exists
+        try:
+            res = self.destination.show_server_variable("foreign_key_checks")
+            if res:
+                fkey = (res[0][1] == "ON")
+            else:
+                fkey = False
+        except MySQLUtilError, e:
+            raise e
+            
+        fkey_query = "SET foreign_key_checks = %s"
+            
+        # First, turn off foreign keys if turned on
+        if fkey:
+            try:
+                res = self.destination.exec_query(fkey_query, "OFF")
+            except MySQLUtilError, e:
+                raise e
+        
+        # Check to see if database exists
         exists = False
         drop_server = None
         if self.cloning:
@@ -462,4 +483,11 @@ class Database(object):
         if copy_file:
             if os.access(copy_file, os.F_OK):
                 os.remove(copy_file)
+
+        # Now, turn on foreign keys if they were on at the start
+        if fkey:
+            try:
+                res = self.destination.exec_query(fkey_query, "ON")
+            except MySQLUtilError, e:
+                raise e
 
