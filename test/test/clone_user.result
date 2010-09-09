@@ -1,0 +1,37 @@
+Test case 1 - clone a single user joe_pass@user to a single user: jill@user
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user jill:duh@user 
+# ...done.
+GRANT USAGE ON *.* TO 'jill'@'user'
+GRANT SELECT ON `util_test`.* TO 'jill'@'user'
+Test case 2 - clone a single user amy_nopass@user to multiple users: jack@user and john@user
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+# Cloning 2 users...
+# Cloning amy_nopass@user to user jack:duh@user 
+# Cloning amy_nopass@user to user john@user 
+# ...done.
+GRANT USAGE ON *.* TO 'jack'@'user'
+GRANT INSERT ON `util_test`.* TO 'jack'@'user'
+GRANT USAGE ON *.* TO 'john'@'user'
+GRANT INSERT ON `util_test`.* TO 'john'@'user'
+Test case 3 - attempt to clone a non-existant user
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+ERROR: Base user does not exist!
+Test case 4 - attempt to clone a user to a user that already exists
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+ERROR: User joe_nopass@user already exists. Use --force to drop and recreate user.
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
+Test case 5 - attempt to clone a user to a user that already exists with --force
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user joe_nopass@user 
+# ...done.
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
