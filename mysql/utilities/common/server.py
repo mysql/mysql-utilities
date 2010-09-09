@@ -37,7 +37,8 @@ def _print_connection(prefix, conn_val):
                      (prefix, conn_val["user"], conn_val["host"]))
 
 
-def connect_servers(src_val, dest_val, silent=False, version=None):
+def connect_servers(src_val, dest_val, silent=False, version=None,
+                    src_name="Source", dest_name="Destination"):
     """ Connect to a source and destination server.
     
     This method takes two groups of --server=user:password@host:port:socket
@@ -56,6 +57,10 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
     version[in]        if specified (default is None), perform version
                        checking and fail if server version is < version
                        specified - an exception is raised
+    src_name[in]       name to use for source server
+                       (default is "Source")
+    dest_name[in]      name to use for destination server
+                       (default is "Destination")
 
     Returns tuple (source, destination) where
             source = connection to source server
@@ -74,17 +79,17 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
         dest_val = src_val
         
     if not silent:
-        _print_connection("Source", src_val)
+        _print_connection(src_name, src_val)
 
     # Try to connect to the MySQL database server (source).
-    source = Server(src_val, "source")
+    source = Server(src_val, src_name)
     try:
         source.connect()
         if version is not None:
             if not source.check_version_compat(major, minor, rel):
-                raise MySQLUtilError("Source version is incompatible. Utility "
+                raise MySQLUtilError("The %s version is incompatible. Utility "
                                      "requires version %s or higher." %
-                                     version)
+                                     (src_name, version))
     except MySQLUtilError, e:
         raise e
         
@@ -93,9 +98,9 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
 
     if not silent:
         if not cloning:
-            _print_connection("Destination", dest_val)
+            _print_connection(dest_name, dest_val)
         elif dest_val is not None:
-            _print_connection("Destination", src_val)
+            _print_connection(dest_name, src_val)
 
     if not cloning:
         # Try to connect to the MySQL database server (destination).
@@ -104,9 +109,9 @@ def connect_servers(src_val, dest_val, silent=False, version=None):
             destination.connect()
             if version is not None:
                 if not source.check_version_compat(major, minor, rel):
-                    raise MySQLUtilError("Destination version is incompatible."
+                    raise MySQLUtilError("The %s version is incompatible."
                                          " Utility requires version %s or "
-                                         "higher." % version)
+                                         "higher." % (dest_name, version))
         except MySQLUtilError, e:
             raise e
         

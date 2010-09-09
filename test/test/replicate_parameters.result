@@ -1,0 +1,27 @@
+Test case 1 - use the test feature
+# master: root@localhost: ... connected.
+# slave: root@localhost: ... connected.
+# Checking for binary logging on master...
+# Setting up replication...
+# Testing replication setup...
+# Success! Replication is running.
+# ...done.
+Test case 2 - show the help
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --server-id=3 --rpl_user=rpl:passwd 
+
+mysqlreplicate - establish replication with a master
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --master=MASTER       connection information for master server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --slave=SLAVE         connection information for slave server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --server-id=SERVER_ID
+                        the server_id for the slave
+  --rpl-user=RPL_USER   the user and password for the replication user
+                        requirement - e.g. rpl:passwd - default = rpl:rpl
+  --test-db=TEST_DB     database name to use in testing  replication setup
+                        (optional)
+  -v, --verbose         display additional information during operation

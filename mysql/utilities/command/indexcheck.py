@@ -56,9 +56,10 @@ def check_index(src_val, table_args, show_drops=False,
     from mysql.utilities.common import Table
 
     # Try to connect to the MySQL database server.
-    servers = connect_servers(src_val, None, False, "5.0.0")
-    if servers[0] is None:
-        raise MySQLUtilError("No server specified!")
+    try:
+        servers = connect_servers(src_val, None, False, "5.0.0")
+    except MySQLUtilError, e:
+        raise e
 
     source = servers[0]
 

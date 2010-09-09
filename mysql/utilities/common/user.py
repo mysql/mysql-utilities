@@ -63,21 +63,22 @@ class User(object):
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbose = verbose
 
-    def create(self, user_name=None):
+    def create(self, new_user=None):
         """Create the user
                 
         Attempts to create the user. If the operation fails, an error is
         generated and printed.
         
-        user_name[in]      MySQL user string (user@host:passwd)
+        new_user[in]       MySQL user string (user@host:passwd)
                            (optional) If omitted, operation is performed
                            on the class instance user name.
         """
         
         cur = self.server1.cursor()
         query_str = "CREATE USER "
+        user, passwd, host = None, None, None
         if new_user:
-            user, passwd, host = parse_user_host(user_name)
+            user, passwd, host = parse_user_host(new_user)
             query_str += "'%s'@'%s' " % (user, host)
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)

@@ -19,11 +19,7 @@
 This module contains abstractions of a MySQL table and an index.
 """
 
-#import datetime
-#import optparse
-#import os
 import re
-#import time
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
