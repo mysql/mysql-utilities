@@ -71,24 +71,29 @@ def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
 
     source = servers[0]
     destination = servers[1]
+    if destination is None:
+        destination = servers[0]
     
-    # Create an instance of the user class.
-    user = User(source, base_user, verbose)
+    # Create an instance of the user class for source.
+    user_source = User(source, base_user, verbose)
+
+    # Create an instance of the user class for destination.
+    user_dest = User(destination, base_user, verbose)
     
     # Check to ensure base user exists.
-    if not user.exists(base_user):
+    if not user_source.exists(base_user):
         raise MySQLUtilError("Base user does not exist!")
 
     # Process dump operation
     if len(new_user_list) >= 1 and dump_sql and not silent:
         print "Dumping grants for user " + base_user
-        user.print_grants()
+        user_source.print_grants()
         return True
     
     # Check to ensure new users don't exist.
     if overwrite is None:
         for new_user in new_user_list:
-            if user.exists(new_user):
+            if user_dest.exists(new_user):
                 raise MySQLUtilError("User %s already exists. Use --force "
                       "to drop and recreate user." % new_user)
     
@@ -100,11 +105,11 @@ def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
         if not silent:
             print "# Cloning %s to user %s " % (base_user, new_user)
         # Check to see if user exists.
-        if user.exists(new_user):
-            user.drop(new_user)
+        if user_dest.exists(new_user):
+            user_dest.drop(new_user)
         # Clone user.
         try:
-            user.clone(new_user, destination)
+            user_source.clone(new_user, destination)
         except MySQLUtilError, e:
             raise
 

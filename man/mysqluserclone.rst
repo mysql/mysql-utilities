@@ -38,7 +38,7 @@ as root on the local machine, use this command:
 ::
 
   mysqluserclone --source=root@localhost:3306 joe@localhost \\
-                 sam@somehost:secret1, sally@localhost:secret2
+                 sam:secret1@somehost, sally:secret2@localhost
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects

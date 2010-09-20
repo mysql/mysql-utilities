@@ -34,7 +34,7 @@ DESCRIPTION = "mysqluserclone - clone a MySQL user account to" + \
               " one or more new users"
 USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket " \
-        "joe@localhost sam@localhost:secret1"
+        "joe@localhost sam:secret1@localhost"
 
 # Setup the command parser
 parser = optparse.OptionParser(version=NAME+VERSION,
