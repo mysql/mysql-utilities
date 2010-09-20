@@ -198,12 +198,24 @@ class Database(object):
             else:
                 create_str = "GRANT %s ON %s.* TO %s" % \
                              (obj[1], self.new_db, obj[0])
+            if create_str.find("%"):
+                create_str = re.sub("%", "%%", create_str)
         else:
             create_str = self.source.get_create_statement(self.db_name,
                                                            obj[0], obj_type)
             if self.new_db != self.db_name:
-                create_str = re.sub(self.db_name, self.new_db, create_str)
-
+                create_str = re.sub(r" %s\." % self.db_name,
+                                    r" %s." % self.new_db,
+                                    create_str)
+                create_str = re.sub(r" `%s`\." % self.db_name, 
+                                    r" `%s`." % self.new_db,
+                                    create_str)
+                create_str = re.sub(r" '%s'\." % self.db_name, 
+                                    r" '%s'." % self.new_db,
+                                    create_str)
+                create_str = re.sub(r' "%s"\.' % self.db_name, 
+                                    r' "%s".' % self.new_db,
+                                    create_str)
         return create_str
 
 
@@ -319,12 +331,10 @@ class Database(object):
         except:
             pass
         try:
-            if create_str.find("'%'"):
-                create_str = re.sub("'%'", "'%%'", create_str)
             res = self.destination.exec_query(create_str)
         except Exception, e:
-            raise MySQLUtilError("Cannot operate on %s object with: %s" % 
-                                 (obj_type, create_str))
+            raise MySQLUtilError("Cannot operate on %s object. Error: %s" % 
+                                 (obj_type, e.errmsg))
 
     def __copy_table_data(self, name, silent=False):
         """Clone table data.
@@ -350,7 +360,8 @@ class Database(object):
             raise e
         
     
-    def copy(self, new_db, input_file, options, new_server=None):
+    def copy(self, new_db, input_file, options,
+             new_server=None, connections=1):
         """Copy a database.
         
         This method will copy a database and all of its objecs and data
@@ -368,6 +379,7 @@ class Database(object):
         options[in]        Options for copy e.g. force, copy_dir, etc.
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
+        connections[in]    Number of threads(connections) to use for insert
         """
  
         # Must call init() first!
@@ -437,7 +449,7 @@ class Database(object):
                 self.create(self.destination, new_db)
             
         # Create the objects in the new database
-        for obj in self.objects:           
+        for obj in self.objects:
 
             # Drop object if --force specified and database not dropped
             # Grants do not need to be dropped for overwriting
@@ -457,28 +469,21 @@ class Database(object):
             # Now copy the data if enabled
             if not self.skip_data:
                 if obj[0] == TABLE:
+                    tblname = obj[1][0]
                     if self.cloning:
-                        self.__copy_table_data(obj[1][0], options["silent"])
+                        self.__copy_table_data(tblname, options["silent"])
                     else:
                         if not options["silent"]:
                             print "# Copying data for TABLE %s.%s" % \
-                                   (self.db_name, obj[1][0])
-                        self.source.get_table_data(self.db_name,
-                                                    obj[1][0],
-                                                    copy_file,
-                                                    self.verbose,
-                                                    new_db)
-                        self.destination.read_and_exec_SQL(copy_file,
-                                                       self.verbose)
-               
-        # Read input file if provided
-        if input_file:
-            if not options["silent"]:
-                print "# Reading the file %s to populate the data" % (input_file)
-            if self.verbose and not options["silent"]:
-                print "# Executing the following data commands:"
-            self.source.read_and_exec_SQL(input_file, self.verbose)
-        
+                                   (self.db_name, tblname)
+                        try:
+                            self.source.copy_table_data(self.db_name, tblname,
+                                                        self.destination,
+                                                        new_db, self.verbose,
+                                                        connections)
+                        except MySQLUtilError, e:
+                            raise e
+                        
         # Cleanup
         if copy_file:
             if os.access(copy_file, os.F_OK):
