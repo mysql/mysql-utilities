@@ -118,8 +118,10 @@ class Index(object):
         """
         
         # Uniqueness counts - can't be duplicate if uniquess differs
-        if self.unique != index.unique:
-            return False
+        #                     except for primary keys which are always unique
+        if index.name != "PRIMARY":
+            if self.unique != index.unique:
+                return False
         num_cols_this = len(self.columns)
         num_cols_that = len(index.columns)
         num_cols_same = 0
@@ -157,8 +159,7 @@ class Index(object):
         """
         
         # Don't compare the same index - no two indexes can have the same name
-        # Don't compare the primary key
-        if (self.name == index.name) or (self.name == "PRIMARY"):
+        if (self.name == index.name):
             return False
         else:
             return self.__check_column_list(index)
@@ -186,9 +187,8 @@ class Index(object):
         
         if self.name == "PRIMARY":
            return None
-        query_str = "DROP INDEX %s FROM %s.%s" % (self.name,
-                                                  self.db,
-                                                  self.table)
+        query_str = "ALTER TABLE %s.%s DROP INDEX %s" % \
+                    (self.db, self.table, self.name)
         return query_str
     
     def __get_column_list(self):
@@ -354,6 +354,16 @@ class Table:
                 duplicate_list.extend(res[1])
         return (duplicates_found, duplicate_list)
         
+        
+    def _get_index_list(self):
+        """ Get the list of indexes for a table.
+        Returns list containing indexes.
+        """
+        try:
+            rows = self.server.get_tbl_indexes(self.table)
+        except MySQLUtilError, e:
+            raise e
+        return rows        
     
     def get_indexes(self):
         """Retrieve the indexes from the server and load them into lists
@@ -370,7 +380,7 @@ class Table:
         if self.verbose:
             print "# Getting indexes for %s" % (self.table)
         try:
-            rows = self.server.get_tbl_indexes(self.table)
+            rows = self._get_index_list()
         except MySQLUtilError, e:
             raise e
         
@@ -429,21 +439,20 @@ class Table:
 
         if len(dupes) > 0:
             print "# The following indexes are duplicates or redundant " \
-                  "for table %s:\n#" % (self.table)
+                  "for table %s:" % (self.table)
             for index in dupes:
+                print "#"
                 index.print_index()
                 print "#     may be redundant or duplicate of:"
                 index.duplicate_of.print_index()
-                print "#"
-            print "#"
             if show_drops:
                 print "#\n# DROP statements:\n#"
                 for index in dupes:
                     print "%s;" % (index.get_drop_statement())
                 print "#"
         else:
-            print "# Table %s has no duplicate indexes.\n#" % (self.table)
-    
+            print "# Table %s has no duplicate indexes." % (self.table)
+                
     
     def __print_index_list(self, indexes):
         """Print the list of indexes
@@ -464,4 +473,20 @@ class Table:
         self.__print_index_list(self.fulltext_indexes)
         print "#"
 
+    
+    def has_primary_key(self):
+        """ Check to see if there is a primary key.
+        Returns bool - True - a primary key was found,
+                       False - no primary key.
+        """
+        primary_key = False
+        try:
+            rows = self._get_index_list()
+        except MySQLUtilError, e:
+            raise e
+        for row in rows:
+            if row[2] == "PRIMARY":
+                primary_key = True
+        return primary_key
+           
 

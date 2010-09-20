@@ -104,11 +104,15 @@ def check_index(src_val, table_args, show_drops=False,
                                  "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():
-                print "# Table %s is not indexed.\n#" % (table_name)
+                print "# Table %s is not indexed." % (table_name)
             else:
                 if verbose:
                     tbl.print_indexes()
+                    # Show if table has primary key
+                if not tbl.has_primary_key():
+                    print "#   Table %s does not contain a PRIMARY key."
                 tbl.check_indexes(show_drops)
+        print "#"
     
     print "# ...done."
     
