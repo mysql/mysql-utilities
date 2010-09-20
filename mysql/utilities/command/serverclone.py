@@ -170,7 +170,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     print "# Setting up empty database and mysql tables..."
     
     # Create the bootstrap file
-    f_boot = open("bootstrap.sql", 'wa')
+    f_boot = open("bootstrap.sql", 'w')
     f_boot.write("CREATE DATABASE mysql;\n")
     f_boot.write("USE mysql;\n")
     f_boot.writelines(open(system_tables).readlines())
