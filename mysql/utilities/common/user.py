@@ -29,14 +29,18 @@ def parse_user_host(user_name):
     user_name[in]      MySQL user string (user:passwd@host)
     """
 
+    user_tuple = (None, None, None)
     no_ticks = user_name.replace("'", "")
-    user_credentials = re.match("(\w+)(?:\:(\w+))?@(\w+)",
+    user_credentials = re.match("(\w+)(?:\:(\w+))?@([\w+|.|%]+)",
                                 no_ticks)
     if user_credentials:
-        return user_credentials.groups()
+        user_tuple = user_credentials.groups()
     else:
-        return (None, None, None)
-        
+        raise MySQLUtilError("Cannot parse user:pass@host : %s." %
+                              no_ticks)
+    extraneous = no_ticks[user_credentials.end():]
+    return user_tuple
+            
 
 class User(object):
     """
@@ -82,6 +86,7 @@ class User(object):
             query_str += "'%s'@'%s' " % (user, host)
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
+            passwd = self.passwd
             
         if passwd:
             query_str += "IDENTIFIED BY '%s'" % (passwd)
@@ -180,7 +185,6 @@ class User(object):
 
         Returns True if user has access, False if not
         """
-        
         regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|%s)\b.*"
                            r"ON\s+(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
                            % (re.escape(access), re.escape(db), re.escape(obj)))
@@ -216,9 +220,9 @@ class User(object):
         for row in res:
             # Create an instance of the user class.
             user = User(server, new_user, self.verbose)
-            if not self.exists():
+            if not user.exists():
                 try:
-                    self.create()
+                    user.create()
                 except MySQLUtilError, e:
                     raise e
 
