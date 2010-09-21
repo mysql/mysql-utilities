@@ -1,0 +1,26 @@
+Test case 1 - show the grant statements
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+Dumping grants for user joe_nopass@user
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
+Test case 2 - show the help
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam@localhost:secret1
+
+mysqluserclone - clone a MySQL user account to one or more new users
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --source=SOURCE       connection information for source server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --destination=DESTINATION
+                        connection information for destination server in the
+                        form: <user>:<password>@<host>:<port>:<socket>
+  --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
+                        files) - default = current directory
+  -d, --dump            dump GRANT statements for user
+  -f, --force           drop the new user if it exists
+  -v, --verbose         display additional information during operation
+  --silent              do not display feedback information during operation
+Test case 3 - use the silent parameter

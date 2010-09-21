@@ -413,8 +413,8 @@ if num_fail == 0:
     if num_tests > 0:
         print "All %d tests passed." % (num_tests)
 else:
-    print "%d of %d tests completed out of %d selected." % \
-          (num_tests_run-num_fail, num_tests_run, num_tests)
+    print "%d of %d tests completed." % \
+          (num_tests_run, num_tests)
     print "The following tests failed or were skipped:",
     for test in failed_tests:
         print test,

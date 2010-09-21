@@ -25,6 +25,7 @@ import optparse
 import os
 import re
 import sys
+import time
 from mysql.utilities.command import dbcopy
 from mysql.utilities.common import parse_connection
 from mysql.utilities.common import MySQLUtilError
@@ -35,6 +36,17 @@ VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqldbcopy - copy databases from one server to another"
 USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket orig_db:new_db"
+
+def print_elapsed_time(start_test):
+    """ Print the elapsed time to stdout (screen)
+    
+    start_test[in]      The starting time of the test
+    """
+    stop_test = time.time()
+    display_time = int((stop_test - start_test) * 100)
+    if display_time == 0:
+        display_time = 1
+    print("Time: %6d\n" % display_time)
 
 # Setup the command parser
 parser = optparse.OptionParser(version=NAME+VERSION,
@@ -119,6 +131,14 @@ parser.add_option("--silent", action="store_true", dest="silent",
                   help="do not display feedback information during operation",
                   default=False)
 
+# Debug mode
+parser.add_option("--debug", action="store_true", dest="debug",
+                  default=False, help="print debug information")
+
+# Threaded/connection mode
+parser.add_option("--connections", action="store", dest="connections",
+                  default=1, help="use multiple connections for insert")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -146,7 +166,9 @@ options = {
     "copy_dir"      : opt.copy_dir,
     "force"         : opt.force,
     "verbose"       : opt.verbose,
-    "silent"        : opt.silent
+    "silent"        : opt.silent,
+    "connections"   : opt.connections,
+    "debug"         : opt.debug
 }
 
 # Parse source connection values
@@ -169,8 +191,13 @@ for db in args:
     db_entry = grp.groups()
     db_list.append(db_entry)
 
-try:    
+try:
+    # record start time
+    if opt.debug:
+        start_test = time.time()
     dbcopy.copy_db(source_values, dest_values, db_list, options)
+    if opt.debug:
+        print_elapsed_time(start_test)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

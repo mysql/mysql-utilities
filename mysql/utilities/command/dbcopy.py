@@ -71,13 +71,19 @@ def _check_access(source, destination, s_user, s_host, d_user, d_host,
                   Message includes a context error message
     """
 
+    source_db = db[0]
+    if db[1] is None:
+        dest_db = db[0]
+    else:
+        dest_db = db[1]
+        
     # Build minimal list of privileges for source access    
     source_privs = []
-    priv_tuple = (db[0], "SELECT")
+    priv_tuple = (source_db, "SELECT")
     source_privs.append(priv_tuple)
     # if views are included, we need SHOW VIEW
     if not skip_views:
-        priv_tuple = (db[0], "SHOW VIEW")
+        priv_tuple = (source_db, "SHOW VIEW")
         source_privs.append(priv_tuple)
     # if procs or funcs are included, we need read on mysql db
     if not skip_proc or not skip_func:
@@ -89,8 +95,8 @@ def _check_access(source, destination, s_user, s_host, d_user, d_host,
         if not _check_user_permissions(source, s_user, s_host, priv):
             raise MySQLUtilError("User %s on the source server does not have "
                                  "permissions to read all objects in %s. " %
-                                 (s_user, db) + "User needs %s privilege "
-                                 "on %s." % (priv[1], priv[0]))
+                                 (s_user, source_db) + "User needs %s "
+                                 "privilege on %s." % (priv[1], priv[0]))
         
     # Build minimal list of privileges for destination access
     if cloning:
@@ -101,12 +107,12 @@ def _check_access(source, destination, s_user, s_host, d_user, d_host,
         server = destination
         user = d_user
         host = d_host
-
-    dest_privs = [(db[1], "CREATE"),
-                  (db[1], "SUPER"),
+        
+    dest_privs = [(dest_db, "CREATE"),
+                  (dest_db, "SUPER"),
                   ("*", "SUPER")]
     if not skip_grants:
-        priv_tuple = (db[1], "WITH GRANT OPTION")
+        priv_tuple = (dest_db, "WITH GRANT OPTION")
         dest_privs.append(priv_tuple)
         
     # Check privileges on destination
@@ -138,7 +144,8 @@ def copy_db(src_val, dest_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, copy_dir, verbose, force, and silent)
+                       skip_data, copy_dir, verbose, force, silent,
+                       connections, and debug)
 
     Notes:
         copy_dir - a directory to use for temporary files (default is None)
@@ -152,9 +159,10 @@ def copy_db(src_val, dest_val, db_list, options):
     
     from mysql.utilities.common import Database
     from mysql.utilities.common import connect_servers
-
+    
     try:
-        servers = connect_servers(src_val, dest_val, options["silent"])
+        servers = connect_servers(src_val, dest_val, options["silent"],
+                                  "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -203,7 +211,8 @@ def copy_db(src_val, dest_val, db_list, options):
         # Perform the copy
         db.init()
         try:
-            db.copy(db_name[1], None, options, destination)
+            db.copy(db_name[1], None, options, destination,
+                    options["connections"])
         except MySQLUtilError, e:
             raise e
             

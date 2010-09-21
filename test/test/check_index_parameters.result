@@ -1,0 +1,40 @@
+Test case 1 - do the help
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck - check for duplicate or redundant indexes
+
+Options:
+  --version         show program's version number and exit
+  --help            
+  --source=SOURCE   connection information for source server in the form:
+                    <user>:<password>@<host>:<port>:<socket>
+  -d, --show-drops  display DROP statements for dropping indexes
+  -s, --skip        skip tables that do not exist
+  -v, --verbose     display additional information during operation
+Test case 2 - show drops for a table with dupe indexes
+# Source: root@localhost: ... connected.
+# Checking indexes...
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+#   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+#   CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+#   CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+#   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#
+#
+#
+# DROP statements:
+#
+DROP INDEX s4 FROM util_test_a.t1;
+DROP INDEX s2 FROM util_test_a.t1;
+#
+# ...done.
+Test case 3 - show drops for a table without dupe indexes
+# Source: root@localhost: ... connected.
+# Checking indexes...
+# Table util_test_c.t6 is not indexed.
+#
+# ...done.
