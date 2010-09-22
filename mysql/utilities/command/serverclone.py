@@ -173,8 +173,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     port_int = None
     if os.name == "posix":
         new_sock = os.path.join(new_data, "mysql.sock")
-    else:
-        port_int = int(new_port)
+    port_int = int(new_port)
     
     conn = {
         "user"   : conn_val["user"],
