@@ -20,9 +20,9 @@ class test(mysql_test.System_test):
     def run(self):
         self.res_fname = self.testdir + "result.txt"
         cmd_str = "mysqlserverclone.py %s " % \
-                  (self.get_connection_parameters(self.server_list[0]))
+                  (self.get_connection_parameters(self.servers.get_server(0)))
        
-        newport = "--new-port=%d " % int(self.new_port)
+        newport = "--new-port=%d " % int(self.servers.get_next_port())
         comment = "Test case 1 - show help"
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
@@ -47,14 +47,15 @@ class test(mysql_test.System_test):
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
        
-        cmd_str += "--new-id=7 " + newport + "--root-password=root "
+        cmd_str += "--new-id=%d " % self.servers.get_next_id() + newport + \
+                   " --root-password=root "
         comment = "Test case 4 - cannot create directory"
         res = self.run_test_case(1, cmd_str + "--new-data=/not/there/yes",
                                  comment)
         if not res:
             return False
         
-        comment = "Test case 5 - clone the current server_list[0]"
+        comment = "Test case 5 - clone the current servers[0]"
         full_datadir = os.path.join(os.getcwd(), "tempdir1")
         cmd_str += "--new-data=%s " % full_datadir
         res = self.exec_util(cmd_str, "start.txt")
@@ -66,21 +67,20 @@ class test(mysql_test.System_test):
         if res:
             return False
        
+        self.servers.clear_last_port()
+        
         # Create a new instance
-        newport = None
-        if self.new_port:
-            newport = int(self.new_port)
         conn = {
             "user"   : "root",
             "passwd" : "root",
             "host"   : "localhost",
-            "port"   : newport,
+            "port"   : int(self.servers.get_next_port()),
             "socket" : full_datadir + "/mysql.sock"
         }
         if os.name != "posix":
             conn["socket"] = None
         
-        self.new_server = mysql_util.Server(conn, "test")
+        self.new_server = mysql_util.Server(conn, "clonedserver")
         if self.new_server is None:
             return False
         
@@ -103,10 +103,10 @@ class test(mysql_test.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         if self.new_server:
-            res = self.stop_server(self.new_server)
-            self.new_server = None
-
-        os.unlink("start.txt")
+            self.servers.add_new_server(self.new_server, True)
+        else:
+            self.servers.clear_last_port()
+            os.unlink("start.txt")
 
         return True
 

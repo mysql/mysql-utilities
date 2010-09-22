@@ -25,9 +25,12 @@ class test(check_index.test):
 
         comment = "Test case 2 - error: invalid login to server"
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
-                                 "--source=nope:nada@localhost:3006", comment)
+                                 "--source=nope:nada@localhost:3306", comment)
         if not res:
             return False
+
+        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
 
         return True
   

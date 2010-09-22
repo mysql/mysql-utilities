@@ -128,4 +128,4 @@ Test case 9 - skip tables only - will fail
 # Destination: root@localhost:[] ... connected
 # Copying database util_test renamed as util_db_clone
 # Copying VIEW util_test.v1
-ERROR: Cannot operate on VIEW object with: CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_db_clone`.`v1` AS select `util_db_clone`.`t1`.`a` AS `a` from `util_db_clone`.`t1`
+ERROR: Cannot operate on VIEW object. Error: Query failed. 1146: Table 'util_db_clone.t1' doesn't exist

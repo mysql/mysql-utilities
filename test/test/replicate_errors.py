@@ -14,9 +14,9 @@ class test(replicate.test):
         return replicate.test.check_prerequisites(self)
 
     def setup(self):
-        self.port1 = int(self.new_port)
-        self.port2 = int(self.new_port)+1
-        self.port3 = int(self.new_port)+4
+        self.port1 = int(self.servers.get_next_port())
+        self.port2 = int(self.servers.get_next_port())
+        self.port3 = int(self.servers.get_next_port())
         
         return replicate.test.setup(self)
 
@@ -57,10 +57,12 @@ class test(replicate.test):
         # Now we must muck with the servers. We need to turn binary logging
         # off for the next test case.
 
-        res = self.stop_server(self.server2)
+        res = self.servers.stop_server(self.server2)
         del self.server2
-        res = self.start_new_server(self.server1, "temp_data3",
-                                    self.port3, 12, "root")
+        res = self.servers.start_new_server(self.server1, "temp_data2",
+                                            self.port3,
+                                            self.servers.get_next_id(),
+                                            "root", "temprep1")
         self.server2 = res[0]
         if not self.server2:
             return False
@@ -98,7 +100,8 @@ class test(replicate.test):
 
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
-        self.replace_result("Error 1227:", "Error 1227: Access denied.\n")
+        self.replace_result("ERROR: Query failed. 1227: Access denied;",
+                            "ERROR: Query failed. 1227: Access denied;\n")
 
         return True
 
@@ -109,6 +112,9 @@ class test(replicate.test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
+        self.servers.clear_last_port()
+        self.servers.clear_last_port()
+        self.servers.clear_last_port()
         return replicate.test.cleanup(self)
 
 

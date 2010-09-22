@@ -17,7 +17,7 @@ Test case 2 - check a list of tables and databases
 #     may be redundant or duplicate of:
 #   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #
-#
+#   Table %s does not contain a PRIMARY key.
 # The following indexes are duplicates or redundant for table util_test_c.t5:
 #
 #   CREATE FULLTEXT INDEX ft1 ON util_test_c.t5 (y) 
@@ -32,11 +32,12 @@ Test case 2 - check a list of tables and databases
 #     may be redundant or duplicate of:
 #   CREATE FULLTEXT INDEX ft4 ON util_test_c.t5 (a, b, y) 
 #
-#
 # Table util_test_c.t6 is not indexed.
 #
+#   Table %s does not contain a PRIMARY key.
 # Table util_test_b.t3 has no duplicate indexes.
 #
+#   Table %s does not contain a PRIMARY key.
 # Table util_test_b.t4 has no duplicate indexes.
 #
 # ...done.
@@ -53,7 +54,7 @@ Test case 3 - check all tables for a single database
 #     may be redundant or duplicate of:
 #   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #
-#
+#   Table %s does not contain a PRIMARY key.
 # Table util_test_a.t2 has no duplicate indexes.
 #
 # ...done.
@@ -68,4 +69,5 @@ ERROR: Table nosuch.nosuch does not exist. Use --skip to skip missing tables.
 Test case 6 - check indexes for a non-existant table with skip option
 # Source: root@localhost: ... connected.
 # Checking indexes...
+#
 # ...done.

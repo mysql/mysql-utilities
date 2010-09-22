@@ -51,6 +51,9 @@ Options:
   -f, --force           drop the new database or object if it exists
   -v, --verbose         display additional information during operation
   --silent              do not display feedback information during operation
+  --debug               print debug information
+  --connections=CONNECTIONS
+                        use multiple connections for insert
 Test case 4 - no data
 # Source: root@localhost: ... connected.
 # Destination: root@localhost: ... connected.

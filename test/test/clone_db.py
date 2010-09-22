@@ -12,12 +12,13 @@ class test(mysql_test.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
+        self.drop_all()
         return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
     
     def run(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
         
         from_conn = "--source=" + self.build_connection_string(self.server1)
@@ -58,18 +59,26 @@ class test(mysql_test.System_test):
             return False
         return True
     
-    def cleanup(self):
-        if self.res_fname:
-            os.unlink(self.res_fname)
+    def drop_all(self):
+        res1, res2 = True, True
         try:
-            res1 = self.drop_db(self.server1, "util_test")
+            self.drop_db(self.server1, "util_test")
         except:
-            pass
+            res1 = False
         try:
-            res2 = self.drop_db(self.server1, "util_db_clone")
+            self.drop_db(self.server1, "util_db_clone")
+        except:
+            res2 = False
+        try:
+            self.server1.exec_query("DROP USER 'joe'@'user'")
         except:
             pass
         return res1 and res2
+
+    def cleanup(self):
+        if self.res_fname:
+            os.unlink(self.res_fname)
+        return self.drop_all()
 
 
 

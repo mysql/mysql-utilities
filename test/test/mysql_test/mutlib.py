@@ -21,9 +21,11 @@ This module contains a test framework for testing MySQL Utilities.
 """
 
 from abc import abstractmethod, ABCMeta
+import commands
 import difflib
 import os
 import shutil
+import string
 import subprocess
 import time
 from mysql.utilities.common import MySQLUtilError
@@ -32,93 +34,106 @@ from mysql.utilities.common import MySQLUtilError
 DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
     "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 
-class System_test(object):
-    """The System_test class is used by the MySQL Utilities Test MUT) facility
-    to perform system tests against MySQL utilitites. This class is the base
-    class from which all tests are derived.
+# Constants
+MAX_SERVER_POOL = 10
+
+def _exec_util(cmd, file_out, utildir, debug=False):
+    """Execute Utility
+    
+    This method executes a MySQL utility using the utildir specified in
+    MUT. It returns the return value from the completion of the command
+    and writes the output to the file supplied.
+    
+    cmd[in]            The command to execute including all parameters
+    file_out[in]       Path and filename of a file to write output
+    utildir[in]        Path to utilities directory
+    debug[in]          Prints debug information during execution of
+                       utility
+    
+    Returns return value of process run.
+    """
+    
+    run_cmd = "python " + utildir + "/" + cmd
+    f_out = open(file_out, 'w+')
+    if debug:
+        print 
+        print "exec_util command=", run_cmd
+        proc = subprocess.Popen(run_cmd, shell=True)
+    else:
+        proc = subprocess.Popen(run_cmd, shell=True,
+                                stdout = f_out, stderr = f_out)
+    ret_val = proc.wait()
+    if debug:
+        print "ret_val=", ret_val
+    f_out.close()
+    return ret_val
+
+
+class Server_list(object):
+    """The Server_list class is used by the MySQL Utilities Test (MUT)
+    facility to gather all the servers used by the tests.
     
     The following utilities are provided:
     
-        - Execute a utility as a subprocess and return result and populate
-          a text file to capture output
-        - Check number of servers for a test
-        - Check a result file
-        
-    To create a test, subclass this class and supply definitions for the
-    following abstract methods:
-    
-        - check_prerequisites - check conditions for test
-        - setup - perform any database setup here
-        - run - execute test cases
-        - get_result - return result to MUT 
-        - cleanup - perform any tear down here
-
-    Note: Place test case comments in the class documentation section. This
-          will be printed by the --verbose option.
+        - start/stop a new server
+        - shutdown all new servers
+        - manage ports and server_ids
     """
-    __metaclass__ = ABCMeta   # Register abstract base class
-
-    def __init__(self, servers, testdir, utildir, startport, verbose=False):
+    def __init__(self, servers, startport, utildir, verbose=False):
         """Constructor
             
-        servers[in]        A list of Server objects
-        testdir[in]        Path to test objects
-        utildir[in]        Path to utilty scripts 
+        servers[in]        List of existing servers (may be None)
         startport[in]      Starting port for spawned servers
+        util_dir[in]       Path to utilities directory
         verbose[in]        print extra data during operations (optional)
                            default value = False
         """
         
-        self.res_fname = None       # Name of intermediate result file
-        self.results = []           # List for storing results
-        self.server_list = servers  # List of servers
-        self.testdir = testdir      # Current test directory
         self.utildir = utildir      # Location of utilities being tested
         self.new_port = startport   # Starting port for spawned servers  
         self.verbose = verbose      # Option for verbosity
-        
-    def __del__(self):
-        """Destructor
-        
-        Reset all parameters.
+        self.new_id = 100           # Starting server id for spawned servers
+        self.server_list = servers  # List of servers available
+        if servers is None:
+            self.server_list = []
+
+    def get_next_port(self):
+        """Get the next available server port.
         """
-        for server in self.server_list:
-            del server
-        for result in self.results:
-            del result
-        
-    def exec_util(self, cmd, file_out, debug=False):
-        """Execute Utility
-        
-        This method executes a MySQL utility using the utildir specified in
-        MUT. It returns the return value from the completion of the command
-        and writes the output to the file supplied.
-        
-        cmd[in]            The command to execute including all parameters
-        file_out[in]       Path and filename of a file to write output
-        debug[in]          Prints debug information during execution of
-                           utility
-        
-        Returns return value of process run.
-        """
-        
-        run_cmd = "python " + self.utildir + "/" + cmd
-        f_out = open(file_out, 'w+')
-        if debug:
-            print 
-            print "exec_util command=", run_cmd
-            proc = subprocess.Popen(run_cmd, shell=True)
-        else:
-            proc = subprocess.Popen(run_cmd, shell=True,
-                                    stdout = f_out, stderr = f_out)
-        ret_val = proc.wait()
-        if debug:
-            print "ret_val=", ret_val
-        f_out.close()
-        return ret_val
+        new_port = self.new_port
+        self.new_port += 1
+        return new_port
     
+    
+    def clear_last_port(self):
+        """Return last port used to available status.
+        """
+        self.new_port -= 1
+
+        
+    def get_next_id(self):
+        """Get the next available server id.
+        """
+        new_id = self.new_id
+        self.new_id += 1
+        return new_id
+
+    def get_server(self, index):
+        """Retrieve the server located at index.
+
+        index[in]           Index (starting at 0)
+
+        Returns - None if index > maximum servers in list or
+                  Server class for server at position index
+        """
+        if index > len(self.server_list):
+            return None
+        else:
+            return self.server_list[index][0]
+            
+        
     def start_new_server(self, server, datadir, port, server_id, passwd,
-                         parameters=None):
+                         role="server", parameters=None):
         """Start a new server with optional parameters
         
         This method will start a new server with the supplied optional
@@ -130,6 +145,7 @@ class System_test(object):
         port[in]            Port
         server_id[in]       Server id
         password[in]        Root password for new server
+        role[in]            Name to give for new server
         parameters[in]      Parameters to use on startup
         
         Returns tuple (server, msg) [(server, None) | (None, error_str)]:
@@ -138,7 +154,7 @@ class System_test(object):
         """
         
         from mysql.utilities.common import Server
-        
+                    
         new_server = (None, None)
         full_datadir = os.getcwd() + "/" + datadir
         
@@ -153,7 +169,7 @@ class System_test(object):
         if parameters:
             cmd += "--mysqld=%s" % parameters
             
-        res = self.exec_util(cmd, "cmd.txt")
+        res = _exec_util(cmd, "cmd.txt", self.utildir)
         
         # Create a new instance
         conn = {
@@ -166,7 +182,7 @@ class System_test(object):
         if os.name != "posix":
             conn["socket"] = None
             
-        self.new_server = Server(conn, "server")
+        self.new_server = Server(conn, role)
         
         server = (self.new_server, None)
 
@@ -175,8 +191,8 @@ class System_test(object):
             self.new_server.connect()
         except MySQLUtilError, e:
             server = (None, "Failed to connect")
-            self.results.append(self.new_server.connect_error)
         return server
+    
     
     def stop_server(self, server, wait=10):
         """Stop a running server.
@@ -225,10 +241,180 @@ class System_test(object):
                     i += 1
                     
         if os.path.exists("cmd.txt"):
-            os.unlink("cmd.txt")
+            try:
+                os.unlink("cmd.txt")
+            except:
+                pass
  
         return True
+
     
+    def spawn_new_servers(self, num_servers):
+        """Spawn new servers to match the number needed.
+        
+        num_servers[in]    The minimal number of Server objects required
+        
+        Returns True - servers available, False - not enough servers
+        """
+
+        if int(num_servers) > MAX_SERVER_POOL:
+            raise MySQLUtilError("Request for servers exceeds maximum of " \
+                                 "%d servers." % MAX_SERVER_POOL)
+        orig_server = self.server_list[0][0]
+        num_to_add = num_servers - len(self.server_list)
+        
+        for server_num in range(0, num_to_add):
+            datadir = "new_server_%d" % (server_num + 1)
+            try:
+                server = self.start_new_server(orig_server, datadir,
+                                               self.get_next_port(),
+                                               self.get_next_id(), "root",
+                                               datadir)
+                self.server_list.append((server[0], True,
+                                         self.get_process_id(datadir)))
+            except MySQLUtilError, e:
+                raise e
+
+
+    def shutdown_spawned_servers(self):
+        """Shutdown all spawned servers.
+        """
+        for server in self.server_list:
+            if server[1]:
+                try:
+                    print "  Shutting down server %s." % server[0].role
+                    self.stop_server(server[0])
+                except MySQLUtilError, e:
+                    print "Unable to shutdown server %s." % server[0].role
+            
+            
+    def add_new_server(self, new_server, spawned=False, id=-1):
+        """Add an existing server to the server lists.
+
+        new_server[in]     Server object to add.
+        spawned[in]        If True, this is a spawned server
+        id[in]             The process id if known
+        """
+        if new_server is not None:
+            self.server_list.append((new_server, spawned, id))
+                        
+    def num_servers(self):
+        """Return number of servers in the list.
+        """
+        return len(self.server_list)
+        
+        
+    def num_spawned_servers(self):
+        """Return number of spawned (new) servers.
+        """
+        num_spawned_servers = 0
+        for server in self.server_list:
+            if server[1]:
+                num_spawned_servers += 1
+        return num_spawned_servers
+
+
+    def get_connection_parameters(self, server):
+        """Return a string that comprises the normal connection parameters
+        common to MySQL utilities for a particular server.
+        
+        server[in]         A Server object
+        
+        Returns string
+        """
+
+        str1 = "--user=%s --host=%s " % (server.user, server.host)
+        if server.passwd:
+            str1 += "--password=%s " % server.passwd
+        if server.socket:
+            str2 = "--socket=%s " % (server.socket)
+        else:
+            str2 = "--port=%s " % (server.port)
+        return str1 + str2
+        
+
+    def get_process_id(self, datadir):
+        if os.name == "posix":
+            output = commands.getoutput("ps -f|grep mysqld")
+            lines = output.splitlines()
+            for line in lines:
+                proginfo = string.split(line)
+                for arg in proginfo[8:]:
+                    if arg.find(datadir) >= 0:
+                        return proginfo[1]
+        return -1
+
+
+class System_test(object):
+    """The System_test class is used by the MySQL Utilities Test (MUT) facility
+    to perform system tests against MySQL utilitites. This class is the base
+    class from which all tests are derived.
+    
+    The following utilities are provided:
+    
+        - Execute a utility as a subprocess and return result and populate
+          a text file to capture output
+        - Check number of servers for a test
+        - Check a result file
+        
+    To create a test, subclass this class and supply definitions for the
+    following abstract methods:
+    
+        - check_prerequisites - check conditions for test
+        - setup - perform any database setup here
+        - run - execute test cases
+        - get_result - return result to MUT 
+        - cleanup - perform any tear down here
+
+    Note: Place test case comments in the class documentation section. This
+          will be printed by the --verbose option.
+    """
+    __metaclass__ = ABCMeta   # Register abstract base class
+
+    def __init__(self, servers, testdir, utildir, verbose=False):
+        """Constructor
+            
+        servers[in]        A list of Server objects
+        testdir[in]        Path to test objects
+        utildir[in]        Path to utilty scripts 
+        verbose[in]        print extra data during operations (optional)
+                           default value = False
+        """
+        
+        self.res_fname = None       # Name of intermediate result file
+        self.results = []           # List for storing results
+        self.servers = servers      # Server_list class
+        self.testdir = testdir      # Current test directory
+        self.utildir = utildir      # Location of utilities being tested
+        self.verbose = verbose      # Option for verbosity
+        
+
+    def __del__(self):
+        """Destructor
+        
+        Reset all parameters.
+        """
+        for result in self.results:
+            del result
+            
+
+    def exec_util(self, cmd, file_out, debug=False):
+        """Execute Utility
+        
+        This method executes a MySQL utility using the utildir specified in
+        MUT. It returns the return value from the completion of the command
+        and writes the output to the file supplied.
+        
+        cmd[in]            The command to execute including all parameters
+        file_out[in]       Path and filename of a file to write output
+        debug[in]          Prints debug information during execution of
+                           utility
+        
+        Returns return value of process run.
+        """
+        return _exec_util(cmd, file_out, self.utildir, debug)
+    
+
     def check_num_servers(self, num_servers):
         """Check the number of servers available.
         
@@ -236,10 +422,10 @@ class System_test(object):
         
         Returns True - servers available, False - not enough servers
         """
-        
-        if len(self.server_list) >= num_servers:
+        if self.servers.num_servers() >= num_servers:
             return True
         return False
+    
 
     def get_connection_parameters(self, server):
         """Return a string that comprises the normal connection parameters
@@ -259,6 +445,7 @@ class System_test(object):
             str2 = "--port=%s " % (server.port)
         return str1 + str2
 
+
     def get_connection_values(self, server):
         """Return a tuple that comprises the connection parameters for a
         particular server.
@@ -269,6 +456,7 @@ class System_test(object):
         """
         return (server.user, server.passwd, server.host,
                 server.port, server.socket, server.role)
+
         
     def build_connection_string(self, server):
         """Return a connection string
@@ -288,7 +476,8 @@ class System_test(object):
             conn_str += ":%s " % conn_val[4]
 
         return conn_str        
-        
+
+
     def run_test_case(self, exp_result, command, comments, debug=False):
         """Execute a test case and save the results.
 
@@ -309,6 +498,7 @@ class System_test(object):
             self.results.append(comments + "\n")
         self.record_results(self.res_fname)
         return res == exp_result
+
     
     def replace_result(self, prefix, str):
         """ Replace a string in the results with a new, deterministic string.
@@ -323,6 +513,7 @@ class System_test(object):
                 self.results.pop(linenum)
                 self.results.insert(linenum, str)
             linenum += 1
+
     
     def mask_result(self, prefix, target, mask):
         """ Mask out a portion of a string for the results.
@@ -347,6 +538,7 @@ class System_test(object):
                         self.results.insert(linenum,
                                             line[0:loc] + mask + line[start:])
             linenum += 1
+
     
     def check_objects(self, server, db, events=True):
         """ Check number of objects.
@@ -372,6 +564,7 @@ class System_test(object):
             res = server.get_db_objects(db, EVENT)
             str += "events = %s \n" % (len(res))
         return str
+
 
     def compare(self, name, actual):
         """ Compare an actual set of return values to the result file
@@ -423,6 +616,7 @@ class System_test(object):
             os.unlink(rej_fname)
             
         return (rej_list == [], rej_list)
+
         
     def record_results(self, fname):
         """Saves the results from a file to the self.results list.
@@ -433,6 +627,7 @@ class System_test(object):
         for line in f_res.readlines():
             self.results.append(line)
         f_res.close()
+
         
     def save_result_file(self, name, results):
         """Saves a result file for the test.
@@ -451,6 +646,7 @@ class System_test(object):
                 res_file.write(str)
             res_file.close()
         return True
+
     
     @abstractmethod
     def check_prerequisites(self):
@@ -462,6 +658,7 @@ class System_test(object):
         Returns: True = servers available, False = not enough servers, skip
         """
         pass
+
     
     @abstractmethod
     def setup(self):
@@ -476,6 +673,7 @@ class System_test(object):
         Returns: True = no errors, False = errors, skip test
         """
         pass
+
     
     @abstractmethod
     def run(self):
@@ -488,6 +686,7 @@ class System_test(object):
         Returns: True = no errors, False = errors occurred
         """
         pass
+
     
     @abstractmethod
     def get_result(self):
@@ -506,6 +705,7 @@ class System_test(object):
                   The caller prints exactly what is returned.
         """
         pass
+
     
     @abstractmethod
     def record(self):
@@ -522,6 +722,7 @@ class System_test(object):
         Returns: True - success, False - error
         """
         pass
+
 
     @abstractmethod
     def cleanup(self):
