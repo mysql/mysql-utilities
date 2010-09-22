@@ -3,7 +3,7 @@
 import optparse
 import getpass
 
-import mysql.command
+import mysql.utilities.command
 
 # The structure of all the scripts are such that the main processing
 # is done in the commands class, while the "view" part, representing
@@ -46,21 +46,21 @@ parser.add_option("-v", "--verbose", action="count", dest="verbosity",
                   default=0,
                   help="Print debugging messages about progress to STDOUT. Multiple -v options increase the verbosity.")
 parser.add_option("--kill", action="append_const",
-                  const=mysql.command.KILL_CONNECTION,
+                  const=mysql.utilities.command.KILL_CONNECTION,
                   dest="action_list",
                   help="Kill all matching connections.")
 parser.add_option("--kill-query", action="append_const",
-                  const=mysql.command.KILL_QUERY,
+                  const=mysql.utilities.command.KILL_QUERY,
                   dest="action_list",
                   help="Kill query for all matching processes.")
 parser.add_option("--print", action="append_const",
-                  const=mysql.command.PRINT_PROCESS,
+                  const=mysql.utilities.command.PRINT_PROCESS,
                   dest="action_list",
                   help="Print all matching processes.")
 (options, args) = parser.parse_args()
 
 # Construct execution object
-command = mysql.command.ProcessListProcessor(options)
+command = mysql.utilities.command.ProcessListProcessor(options)
 # Execute command
 command.execute(args)
 
