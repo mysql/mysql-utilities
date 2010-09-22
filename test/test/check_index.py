@@ -2,6 +2,7 @@
 
 import os
 import mysql_test
+from mysql.utilities.common import MySQLUtilError
 
 class test(mysql_test.System_test):
     """check indexes for duplicates and redundancies
@@ -12,8 +13,9 @@ class test(mysql_test.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         data_file = self.testdir + "data/index_test.sql"
+        self.drop_all()
         return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
     
     def run(self):
@@ -21,7 +23,7 @@ class test(mysql_test.System_test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s " % from_conn
-       
+
         comment = "Test case 1 - check a table without indexes"
         res = self.run_test_case(0, cmd_str + "util_test_c.t6", comment)
         if not res:
@@ -32,7 +34,7 @@ class test(mysql_test.System_test):
                                  " util_test_b", comment)
         if not res:
             return False
-
+        
         comment = "Test case 3 - check all tables for a single database"
         res = self.run_test_case(0, cmd_str + "util_test_a", comment)
         if not res:
@@ -63,9 +65,7 @@ class test(mysql_test.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
     
-    def cleanup(self):
-        if self.res_fname:
-            os.unlink(self.res_fname)
+    def drop_all(self):
         try:
             self.server1.exec_query("DROP DATABASE util_test_a")
         except:
@@ -78,5 +78,10 @@ class test(mysql_test.System_test):
             self.server1.exec_query("DROP DATABASE util_test_c")
         except:
             pass
+
+    def cleanup(self):
+        if self.res_fname:
+            os.unlink(self.res_fname)
+        self.drop_all()
         return True
 

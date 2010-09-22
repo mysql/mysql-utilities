@@ -21,15 +21,20 @@ This file contains the MySQL Utilities Test facility for running system
 tests on the MySQL Utilities.
 """
 
+import commands
 import datetime
 import optparse
 import os
 import re
+import string
+import subprocess
 import sys
 import time
 import MySQLdb
 from mysql.utilities.common import Server
+from mysql.utilities.common import get_tool_path
 from mysql.utilities.common import parse_connection
+from test import Server_list
 
 # Constants
 NAME = "MySQL Utilities Test - mut "
@@ -47,6 +52,112 @@ if os.name == "posix":
     BOLD_ON = '\033[1m'
     BOLD_OFF = '\033[0m'
 START_PORT = 3310
+
+# See if there are any orphan servers
+def check_for_running_servers(start_port):
+    """Check to see if there are any servers running from the test
+    directory.
+    
+    start_port[in]      The starting port number for spawned servers
+
+    This method uses ps for posix systems and netstat for Windows machines
+    to determine the list of running servers.
+    
+    For posix, it matches on the datadir and if datadir is the path for the
+    test directory, the server will be added to the list.
+    
+    For nt, it matches on the port in the range starting_port,
+    starting_port + 10.
+    
+    Returns list - tuples of the form: (process_id, [datadir|port])
+    """
+    datadir = os.getcwd()
+    processes = []
+    if os.name == "posix":
+        output = commands.getoutput("ps -f|grep mysqld")
+        lines = output.splitlines()
+        for line in lines:
+            proginfo = string.split(line)
+            # look for datadir
+            for arg in proginfo[8:]:
+                if arg.find(datadir) >= 0:
+                    processes.append((proginfo[1], arg[10:]))
+                    break
+    elif os.name == "nt":
+        f_out = open("portlist", 'w+')
+        proc = subprocess.Popen("netstat -anop tcp", shell=True,
+                                stdout=f_out, stderr=f_out)
+        res = proc.wait()
+        f_out.close()
+        f_out = open("portlist", 'r')
+        for line in f_out.readlines():
+            proginfo = string.split(line)
+            if proginfo:
+                port = proginfo[1][proginfo[1].find(":")+1:]
+                if proginfo[1][0] == '0' and port.isdigit():
+                    # look for port
+                    if int(port) >= start_port and \
+                       int(port) <= start_port + 10:
+                        processes.append((proginfo[4], port))
+        f_out.close()
+        os.unlink("portlist")
+    return processes
+
+# Shutdown any servers that are running
+def shutdown_running_servers(server_list, processes, basedir):
+    """Shutdown any running servers.
+
+    processes[in]       The list of processes to shutdown with the form:
+                        (process_id, [datadir|port])
+    basedir[in]         The starting path to search for mysqladmin tool
+
+    Returns bool - True - servers shutdown attempted
+                   False - no servers to shutdown
+    """
+    
+    if len(processes) < 1:
+        return False
+    for process in processes:        
+        datadir = os.getcwd()
+        connection = {
+            "user"   : "root",
+            "passwd" : "root",
+            "host"   : "localhost",
+            "port"   : None,
+            "socket" : None
+        }
+        if os.name == "posix":
+            connection["socket"] = os.path.join(process[1], "mysql.sock")
+        elif os.name == "nt":
+            connection["port"] = process[1]
+
+        # 1) connect to the server.
+        svr = Server(connection)
+        ok_to_shutdown = True
+        try:
+            svr.connect()
+        except:  # if we cannot connect, don't try to shut it down.
+            ok_to_shutdown = False
+            
+        # 2) if nt, verify datadirectory
+        if os.name == "nt":
+            res = svr.show_server_variable("datadir")
+            server_datadir = res[0][1]
+            ok_to_shudown = (server_datadir.find(datadir) >= 0)
+
+        # 3) call shutdown method from mutlib Server_list class
+        if ok_to_shutdown and svr:
+            if os.name == "posix":
+                print "  Process id: %6d, Data path: %s" % \
+                       (int(process[0]), process[1])
+            elif os.name == "nt":
+                print "  Process id: %6d, Port: %s" % \
+                       (int(process[0]), process[1])            
+            try:
+                server_list.stop_server(svr)
+            except:
+                print "    Warning: Shutdown failed!"
+    return True
 
 # Utility function
 def print_elapsed_time(start_test):
@@ -75,7 +186,7 @@ def report_error(message, test, mode, start_test):
     stop_test = time.time()
     print_elapsed_time(start_test)
     print "  ERROR: %s" % (message)
-    failed_tests.append(test)
+    failed_tests.append(test)    
 
 # Begin 'main' code
 parser = optparse.OptionParser(version=VERSION, description=DESCRIPTION,
@@ -198,12 +309,13 @@ if opt.skip_tests:
         sys.stdout.write("%s " % (test))
     print
      
-server_list = []
+server_list = Server_list([], opt.start_port, opt.utildir, opt.verbose)
+basedir = None
 
 # Print status of connections
 print "\nServers:"
 if not opt.servers:
-    print "  None"
+    print "  No servers specified."
 else:
     i = 0
     for server in opt.servers:
@@ -228,19 +340,32 @@ else:
             conn = Server(conn_val, "server%d" % i)
             try:
                 conn.connect()
-                server_list.append(conn)
+                server_list.add_new_server(conn)
                 print "CONNECTED"
             except:
                 print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
                 if conn.connect_error is not None:
                     print conn.connect_error
+            res = conn.show_server_variable("basedir")
+            basedir = res[0][1]
         else:
             print "ERROR: Problem parsing server connection '%s'" % (server)
             exit(1)
-    if len(server_list) == 0:
+    if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
         exit(1)
 
+# Check for running servers
+if server_list.num_servers():
+    processes = check_for_running_servers(opt.start_port)            
+
+# Kill any servers running from the test directory
+if len(processes) > 0:
+    print
+    print "WARNING: There are existing servers running that may have been\n" \
+          "spawned by an earlier execution. Attempting shutdown.\n"
+    shutdown_running_servers(server_list, processes, basedir)                
+    
 # Print header
 print "\n" + "-" * opt.width
 print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME" 
@@ -303,6 +428,7 @@ if opt.sorted:
 
 # Run the tests selected
 num_tests_run = 0
+last_test = None
 for test_tuple in test_files:
 
     # Get test parts - directory not used
@@ -325,8 +451,9 @@ for test_tuple in test_files:
     test_class = __import__(test)
     test_case = test_class.test(server_list,
                                 opt.testdir + "/" + test_suite,
-                                opt.utildir, opt.start_port)
+                                opt.utildir)
     
+    last_test = test_case
     # Print name of the test
     sys.stdout.write(test_name)
     sys.stdout.flush()
@@ -418,10 +545,15 @@ else:
     print "The following tests failed or were skipped:",
     for test in failed_tests:
         print test,
-print "\n"
+    print "\n"
 
-# Shut down connections here
-for server in server_list:
-    del server
-    
+# Shutdown connections and spawned servers
+if server_list.num_spawned_servers():
+    print "Shutting down spawned servers "
+    server_list.shutdown_spawned_servers()
+
+del server_list
+
+print "\n"
+        
 exit(0)

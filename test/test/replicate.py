@@ -9,7 +9,7 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         self.server2 = None
         return self.check_num_servers(1)
 
@@ -19,24 +19,32 @@ class test(mysql_test.System_test):
         # to be used as a master and a slave for the tests then destroy them
         # in cleanup()
 
-        port1 = int(self.new_port)
-        port2 = int(self.new_port)+1
+        port1 = int(self.servers.get_next_port())
+        port2 = int(self.servers.get_next_port())
+
+        self.s1_serverid = self.servers.get_next_id()
+        self.s2_serverid = self.servers.get_next_id()
 
         conn_val = self.get_connection_values(self.server1)
-        res = self.start_new_server(self.server1, "temp_data1", port1,
-                                    10, conn_val[1], "--log-bin=mysql-bin")
+        try:
+            res = self.servers.start_new_server(self.server1, "temp_data1",
+                                                port1, self.s1_serverid,
+                                                "root", "replicate1",
+                                                "--log-bin=mysql-bin")
+        except MySQLUtilError, e:
+            print e.errmsg
+            
         self.server1 = res[0]
         if not self.server1:
             return False        
 
-        res = self.start_new_server(self.server1, "temp_data2", port2,
-                                    11, conn_val[1], "--log-bin=mysql-bin")
+        res = self.servers.start_new_server(self.server1, "temp_data2", port2,
+                                            self.s2_serverid, "root",
+                                            "replicate2",
+                                            "--log-bin=mysql-bin")
         self.server2 = res[0]
         if not self.server2:
             return False
-
-        self.s1_serverid = 10
-        self.s2_serverid = 11
 
         return True
     
@@ -157,10 +165,12 @@ class test(mysql_test.System_test):
         res1 = True
         res2 = True
         if self.server1:
-            res1 = self.stop_server(self.server1)
+            res1 = self.servers.stop_server(self.server1)
+            self.servers.clear_last_port()
             self.server1 = None
         if self.server2:
-            res2 = self.stop_server(self.server2)
+            res2 = self.servers.stop_server(self.server2)
+            self.servers.clear_last_port()
             self.server2 = None
         return res1 and res2
 

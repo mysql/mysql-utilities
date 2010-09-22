@@ -22,6 +22,7 @@ server operations used in multiple utilities.
 """
 
 import multiprocessing
+import os
 import re
 import sys
 import MySQLdb

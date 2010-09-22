@@ -24,12 +24,11 @@ Test case 2 - show drops for a table with dupe indexes
 #     may be redundant or duplicate of:
 #   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #
-#
-#
 # DROP statements:
 #
-DROP INDEX s4 FROM util_test_a.t1;
-DROP INDEX s2 FROM util_test_a.t1;
+ALTER TABLE util_test_a.t1 DROP INDEX s4;
+ALTER TABLE util_test_a.t1 DROP INDEX s2;
+#
 #
 # ...done.
 Test case 3 - show drops for a table without dupe indexes

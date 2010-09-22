@@ -21,7 +21,7 @@ class test(clone_db.test):
         return clone_db.test.setup(self)
          
     def run(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
        
         from_conn = "--source=" + self.build_connection_string(self.server1)

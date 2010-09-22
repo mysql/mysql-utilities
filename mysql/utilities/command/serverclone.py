@@ -27,54 +27,6 @@ import sys
 import time
 import shutil
 
-def _add_basedir(search_paths, path_str):
-    """ Add a basedir and all known sub directories
-    
-    This method builds a list of possible paths for a basedir for locating
-    special MySQL files like mysqld (mysqld.exe), etc.
-
-    search_paths[inout] List of paths to append
-    path_str[in]        The basedir path to append
-    """
-    search_paths.append(path_str)
-    search_paths.append(os.path.join(path_str, "share"))
-    search_paths.append(os.path.join(path_str, "scripts"))
-    search_paths.append(os.path.join(path_str, "bin"))
-    search_paths.append(os.path.join(path_str, "libexec"))    
-    search_paths.append(os.path.join(path_str, "mysql"))    
-
-def _get_tool_path(basedir, tool, required=True):
-    """ Search for a MySQL tool and return the full path
-
-    basedir[in]         The initial basedir to search (from mysql server)
-    tool[in]            The name of the tool to find
-    required[in]        If True (default is True), and error will be
-                        generated and the utility aborted if the tool is
-                        not found.
-                        
-    Returns (string) full path to tool
-    """
-
-    from mysql.utilities.common import MySQLUtilError
-
-    search_paths = []
-    _add_basedir(search_paths, basedir)
-    _add_basedir(search_paths, "/usr/local/mysql/")
-    _add_basedir(search_paths, "/usr/sbin/")
-    _add_basedir(search_paths, "/usr/share/")
- 
-    # Search for the tool
-    for path in search_paths:
-        norm_path = os.path.normpath(path)
-        if os.path.isdir(norm_path):
-            toolpath = os.path.join(norm_path, tool)
-            if os.path.isfile(toolpath):
-                return toolpath
-    if required:
-        raise MySQLUtilError("Cannot find location of %s." % tool)
-        
-    return None
-                        
 def clone_server(conn_val, new_data, new_port, new_id, rootpass,
                  mysqld_options=None, verbose=False):
     """ Clone an existing server
@@ -105,6 +57,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
 
     from mysql.utilities.common import Server
     from mysql.utilities.common import MySQLUtilError
+    from mysql.utilities.common import get_tool_path
 
     # Try to connect to the MySQL database server.
     server1 = Server(conn_val, "source")
@@ -141,21 +94,21 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     
     print "# Locating mysql tools..."
     if os.name == "posix":
-        mysqld_path = _get_tool_path(basedir, "mysqld")
-        mysqladmin_path = _get_tool_path(basedir, "mysqladmin")
+        mysqld_path = get_tool_path(basedir, "mysqld")
+        mysqladmin_path = get_tool_path(basedir, "mysqladmin")
     else:
-        mysqld_path = _get_tool_path(basedir, "mysqld.exe")
-        mysqladmin_path = _get_tool_path(basedir, "mysqladmin.exe")
-    mysql_basedir = _get_tool_path(basedir, "share/english/errgmsg.sys", False)
+        mysqld_path = get_tool_path(basedir, "mysqld.exe")
+        mysqladmin_path = get_tool_path(basedir, "mysqladmin.exe")
+    mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys", False)
     mysql_basedir = basedir
     if os.path.exists(basedir + "local/mysql/share/"):
         mysql_basedir += "local/mysql/"
-    system_tables = _get_tool_path(basedir, "mysql_system_tables.sql")
-    system_tables_data = _get_tool_path(basedir,
+    system_tables = get_tool_path(basedir, "mysql_system_tables.sql")
+    system_tables_data = get_tool_path(basedir,
                                         "mysql_system_tables_data.sql")
-    test_data_timezone = _get_tool_path(basedir,
+    test_data_timezone = get_tool_path(basedir,
                                         "mysql_test_data_timezone.sql")
-    help_data = _get_tool_path(basedir, "fill_help_tables.sql")
+    help_data = get_tool_path(basedir, "fill_help_tables.sql")
     
     if verbose:
         print "Location of files:"

@@ -13,7 +13,7 @@ class test(mysql_test.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         data_file = self.testdir + "/data/basic_users.sql"
         return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
         

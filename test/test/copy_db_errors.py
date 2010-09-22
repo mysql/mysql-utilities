@@ -17,6 +17,7 @@ class test(copy_db.test):
         if not res:
             return res
         # Create users for privilege testing
+        self.drop_users()
         res = self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         res = self.server1.exec_query("CREATE USER 'sam'@'localhost'")
         res = self.server1.exec_query("GRANT SELECT ON util_test.* TO " + \
@@ -35,7 +36,7 @@ class test(copy_db.test):
         return True
                     
     def run(self):
-        self.server1 = self.server_list[0]
+        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
        
         from_conn = "--source=" + self.build_connection_string(self.server1)
@@ -182,8 +183,8 @@ class test(copy_db.test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def cleanup(self):
+        
+    def drop_users(self):
         try:
             self.server1.exec_query("DROP USER 'joe'@'localhost'")
         except:
@@ -192,6 +193,17 @@ class test(copy_db.test):
             self.server1.exec_query("DROP USER 'sam'@'localhost'")
         except:
             pass
+        try:
+            self.server2.exec_query("DROP USER 'joe'@'localhost'")
+        except:
+            pass 
+        try:
+            self.server2.exec_query("DROP USER 'sam'@'localhost'")
+        except:
+            pass
+    
+    def cleanup(self):
+        self.drop_users()
         res = copy_db.test.cleanup(self)
         return res
 

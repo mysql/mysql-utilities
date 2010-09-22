@@ -5,7 +5,7 @@ Dumping grants for user joe_nopass@user
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 Test case 2 - show the help
-Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam@localhost:secret1
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone - clone a MySQL user account to one or more new users
 
