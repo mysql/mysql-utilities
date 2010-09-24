@@ -41,4 +41,15 @@ class MySQLUtilError(Exception):
         self.errmsg = message
         self.options = options
 
+class MUTException(Exception):
+    """ MUT errors
+    
+    This exception class is used to report errors from the testing subsystem.
+    """
+    
+    def __init__(self, message, options=None):
+        self.args = (message, options)
+        self.errmsg = message
+        self.options = options
+    
 

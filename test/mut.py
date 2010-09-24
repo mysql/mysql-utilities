@@ -34,6 +34,7 @@ import MySQLdb
 from mysql.utilities.common import Server
 from mysql.utilities.common import get_tool_path
 from mysql.utilities.common import parse_connection
+from mysql.utilities.common import MUTException
 from test import Server_list
 
 # Constants
@@ -54,7 +55,7 @@ if os.name == "posix":
 START_PORT = 3310
 
 # See if there are any orphan servers
-def check_for_running_servers(start_port):
+def _check_for_running_servers(start_port):
     """Check to see if there are any servers running from the test
     directory.
     
@@ -104,7 +105,7 @@ def check_for_running_servers(start_port):
     return processes
 
 # Shutdown any servers that are running
-def shutdown_running_servers(server_list, processes, basedir):
+def _shutdown_running_servers(server_list, processes, basedir):
     """Shutdown any running servers.
 
     processes[in]       The list of processes to shutdown with the form:
@@ -160,7 +161,7 @@ def shutdown_running_servers(server_list, processes, basedir):
     return True
 
 # Utility function
-def print_elapsed_time(start_test):
+def _print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
     
     start_test[in]      The starting time of the test
@@ -172,11 +173,11 @@ def print_elapsed_time(start_test):
     sys.stdout.write(" %6d\n" % display_time)
 
 # Utility function
-def report_error(message, test, mode, start_test):
+def _report_error(message, test_name, mode, start_test):
     """ Print an error message to stdout (screen)
     
     message[in]         Error message to print
-    test[in]            The name of the current test
+    test_name[in]       The name of the current test
     mode[in]            Event mode (PASS, FAIL, WARN, etc)
     start_test[in]      The starting time of the test
     """
@@ -184,9 +185,28 @@ def report_error(message, test, mode, start_test):
     sys.stdout.write(' ' * linelen)
     sys.stdout.write("[%s%s%s]" % (BOLD_ON, mode, BOLD_OFF))
     stop_test = time.time()
-    print_elapsed_time(start_test)
-    print "  ERROR: %s" % (message)
+    _print_elapsed_time(start_test)
+    print "\n%sERROR%s: %s" % (BOLD_ON, BOLD_OFF, message)
     failed_tests.append(test)    
+
+# Helper method to manage exception handling
+def _exec_and_report(procedure, default_message, test_name, action,
+                    start_test_time, exception_procedure=None):
+    extra_message = None
+    try:
+        res = procedure()
+        if res:
+            return True
+    except MUTException, e:
+        extra_message = e.errmsg
+    _report_error(default_message, test_name, action, start_test_time)
+    # print the error if raised from the test.
+    if extra_message is not None:
+        print "%s\n" % extra_message
+    # if there is an exit strategy, execute it
+    if exception_procedure is not None:
+        exception_procedure()
+    return False
 
 # Begin 'main' code
 parser = optparse.OptionParser(version=VERSION, description=DESCRIPTION,
@@ -331,6 +351,7 @@ else:
             sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
                              (conn_val["host"], conn_val["user"],
                               conn_val["port"]))
+            sys.stdout.flush()
 
             if conn_val["port"] is not None:
                 conn_val["port"] = int(conn_val["port"])
@@ -342,12 +363,12 @@ else:
                 conn.connect()
                 server_list.add_new_server(conn)
                 print "CONNECTED"
+                res = conn.show_server_variable("basedir")
+                basedir = res[0][1]
             except:
                 print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
                 if conn.connect_error is not None:
                     print conn.connect_error
-            res = conn.show_server_variable("basedir")
-            basedir = res[0][1]
         else:
             print "ERROR: Problem parsing server connection '%s'" % (server)
             exit(1)
@@ -357,14 +378,14 @@ else:
 
 # Check for running servers
 if server_list.num_servers():
-    processes = check_for_running_servers(opt.start_port)            
+    processes = _check_for_running_servers(opt.start_port)            
 
 # Kill any servers running from the test directory
 if len(processes) > 0:
     print
     print "WARNING: There are existing servers running that may have been\n" \
           "spawned by an earlier execution. Attempting shutdown.\n"
-    shutdown_running_servers(server_list, processes, basedir)                
+    _shutdown_running_servers(server_list, processes, basedir)                
     
 # Print header
 print "\n" + "-" * opt.width
@@ -460,24 +481,28 @@ for test_tuple in test_files:
     
     # Check prerequisites for number of servers. Skip test is there are not
     # enough servers to connect.
-    if not test_case.check_prerequisites():
-        report_error("Not enough resources (e.g. servers) to run test.",
-                     test_name, "SKIP", start_test)
+    if not _exec_and_report(test_case.check_prerequisites,
+                           "Cannot establish resources needed to run test.",
+                           test_name, "SKIP", start_test, None):
         continue
 
     # Set the preconditions for the test
-    if not test_case.setup():
-        report_error("Cannot establish setup conditions to run test.",
-                     test_name, "SKIP", start_test)
-        # We call cleanup() to make sure partial setup conditions are
-        # removed. Allows for resetting of problems.
-        test_case.cleanup()
-        continue        
+    if not _exec_and_report(test_case.setup,
+                           "Cannot establish setup conditions to run test.",
+                           test_name, "SKIP", start_test, test_case.cleanup):
+        continue
     
     # Run the test
     run_ok = True
     results = None
-    if test_case.run():
+    run_msg = None
+    try:
+        run_ok = test_case.run()
+    except MUTException, e:
+        run_msg = e.errmsg
+        run_ok = False
+        
+    if run_ok:
         # Calculate number of spaces based on test name
         linelen = opt.width - (len(test_name) + 13)
         sys.stdout.write(' ' * linelen)
@@ -488,40 +513,58 @@ for test_tuple in test_files:
             res = test_case.record()
             # Write time here since we're done
             stop_test = time.time()
-            print_elapsed_time(start_test)
+            _print_elapsed_time(start_test)
             if not res:
                 sys.stdout.write("  %sWARNING%s: Test record failed." % \
                       (BOLD_ON, BOLD_OFF))
 
         # Display status of test
         else:
-            results = test_case.get_result()
-            if results[0]:
-                sys.stdout.write("[pass]")
-                num_tests_run += 1
-            else:
-                sys.stdout.write("[%sFAIL%s]" % (BOLD_ON, BOLD_OFF))
+            run_ok = True
+            msg = None
+            try:
+                results = test_case.get_result()
+                if results[0]:
+                    sys.stdout.write("[pass]")
+                    num_tests_run += 1
+            except MUTException, e:
+                results = (False, ("Test results cannot be established.\n",
+                                   e.errmsg + "\n"))
+                msg = e.errmsg
+                
+            if results[0] == False:
+                sys.stdout.write("[%sFAIL%s]\n" % (BOLD_ON, BOLD_OFF))
                 run_ok = False
                 failed_tests.append(test)
+                
         if opt.verbose:
             print test_case.__doc__
     else:
-        report_error("Test execution failed.", test_name, "FAIL", start_test)
+        _report_error("Test execution failed.", test_name, "FAIL", start_test)
+        print "%s\n" % run_msg
         run_ok = False
                             
     # Cleanup the database settings if needed
-    test_cleanup_ok = test_case.cleanup()
+    test_cleanup_ok = True
+    cleanup_msg = None
+    try:
+        test_cleanup_ok = test_case.cleanup()
+    except MUTException, e:
+        cleanup_msg = e.errmsg
+        test_cleanup_ok = False
 
     # Display the time if not recording
     if not opt.record and run_ok:
-        print_elapsed_time(start_test)
+        _print_elapsed_time(start_test)
 
     # Display warning about cleanup
     if not test_cleanup_ok:
-        print "  %sWARNING%s: Test cleanup failed." % (BOLD_ON, BOLD_OFF)
+        print "\n%sWARNING%s: Test cleanup failed." % (BOLD_ON, BOLD_OFF) 
+        if cleanup_msg is not None:
+            print "%s\n" % cleanup_msg
 
     if results is not None and results[1]:
-        sys.stdout.write("\n")    
+        sys.stdout.write("\n%sERROR:%s " % (BOLD_ON, BOLD_OFF))    
         for str in results[1]:
             sys.stdout.write(str)
         sys.stdout.write("\n")    
@@ -549,11 +592,11 @@ else:
 
 # Shutdown connections and spawned servers
 if server_list.num_spawned_servers():
-    print "Shutting down spawned servers "
+    print "\nShutting down spawned servers "
     server_list.shutdown_spawned_servers()
 
 del server_list
-
-print "\n"
         
+sys.stdout.write("\n")
+
 exit(0)

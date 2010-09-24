@@ -2,6 +2,8 @@
 
 import os
 import mysql_test
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """simple db clone
@@ -15,7 +17,12 @@ class test(mysql_test.System_test):
         self.server1 = self.servers.get_server(0)
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         self.drop_all()
-        return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+        except MySQLUtilError, e:
+            raise MUTException("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+        return True
     
     def run(self):
         self.server1 = self.servers.get_server(0)
@@ -27,10 +34,13 @@ class test(mysql_test.System_test):
         # Test case 1 - clone a sample database
         cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
               " util_test:util_db_clone"
-        res = self.exec_util(cmd, self.res_fname)
-        self.results.append(res)       
-        return res == 0
-  
+        try:
+            res = self.exec_util(cmd, self.res_fname)
+            self.results.append(res)
+            return res == 0
+        except MySQLUtilError, e:
+            raise MUTException(e.errmsg)
+          
     def get_result(self):
         msg = None
         if self.server1 and self.results[0] == 0:
@@ -38,10 +48,10 @@ class test(mysql_test.System_test):
             try:
                 res = self.server1.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
-                    return (True, msg)
-            except:
-                msg = "Clone db failed."
-        return (False, msg)
+                    return (True, None)
+            except MySQLUtilError, e:
+                raise MUTException(e.errmsg)
+        return (False, ("Result failure.\n", "Database clone not found.\n"))
     
     def record(self):
         # Not a comparative test, returning True

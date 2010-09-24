@@ -2,6 +2,8 @@
 
 import os
 import clone_user
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(clone_user.test):
     """clone user error conditions
@@ -26,31 +28,31 @@ class test(clone_user.test):
         comment = "Test case 1 - error: invalid login to source server"
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py --destination=noone:nope@localhost:3306 " + \
                   from_conn
         comment = "Test case 2 - error: invalid login to destination server"
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
         comment = "Test case 3 - error: no arguments"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 4 - error: no new user"
         res = self.run_test_case(1, cmd_str + "joenopass@localhost", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 5 - error: cannot use dump and silent together"
         res = self.run_test_case(1, cmd_str + " root@localhost " \
                                  " x@f --silent --dump", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         return True
 

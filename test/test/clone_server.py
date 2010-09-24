@@ -3,6 +3,8 @@
 import os
 import mysql.utilities.common as mysql_util
 import mysql_test
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """clone server
@@ -22,11 +24,12 @@ class test(mysql_test.System_test):
         cmd_str = "mysqlserverclone.py %s " % \
                   (self.get_connection_parameters(self.servers.get_server(0)))
        
-        newport = "--new-port=%d " % int(self.servers.get_next_port())
+        port1 = int(self.servers.get_next_port())
+        newport = "--new-port=%d " % port1
         comment = "Test case 1 - show help"
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - error: no login"
         res = self.run_test_case(1, "mysqlserverclone.py " +
@@ -34,7 +37,7 @@ class test(mysql_test.System_test):
                                  "--root-password=nope " + newport,
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         comment = "Test case 3 - error: cannot connect"
         res = self.run_test_case(1, "mysqlserverclone.py -uroot -pnope " +
@@ -42,7 +45,7 @@ class test(mysql_test.System_test):
                                  "--root-password=nope " + newport,
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
@@ -53,10 +56,10 @@ class test(mysql_test.System_test):
         res = self.run_test_case(1, cmd_str + "--new-data=/not/there/yes",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         comment = "Test case 5 - clone the current servers[0]"
-        full_datadir = os.path.join(os.getcwd(), "tempdir1")
+        full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
         cmd_str += "--new-data=%s " % full_datadir
         res = self.exec_util(cmd_str, "start.txt")
         for line in open("start.txt").readlines():
@@ -65,30 +68,29 @@ class test(mysql_test.System_test):
             if index <= 0:
                 self.results.append(line)
         if res:
-            return False
+            raise MUTException("%s: failed" % comment)
        
-        self.servers.clear_last_port()
-        
         # Create a new instance
         conn = {
             "user"   : "root",
             "passwd" : "root",
             "host"   : "localhost",
-            "port"   : int(self.servers.get_next_port()),
+            "port"   : port1,
             "socket" : full_datadir + "/mysql.sock"
         }
         if os.name != "posix":
             conn["socket"] = None
         
-        self.new_server = mysql_util.Server(conn, "clonedserver")
+        self.new_server = mysql_util.Server(conn, "cloned_server")
         if self.new_server is None:
             return False
         
         # Connect to the new instance
         try:
             self.new_server.connect()
-        except:
+        except MySQLUtilError, e:
             self.new_server = None
+            raise MUTException("Cannot connect to spawned server.")
             return False
         
         return True
@@ -106,7 +108,11 @@ class test(mysql_test.System_test):
             self.servers.add_new_server(self.new_server, True)
         else:
             self.servers.clear_last_port()
-            os.unlink("start.txt")
+        if os.path.exists("start.txt"):
+            try:
+                os.unlink("start.txt")
+            except:
+                pass
 
         return True
 

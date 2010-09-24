@@ -3,6 +3,7 @@
 import os
 import mysql_test
 from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """check indexes for duplicates and redundancies
@@ -16,7 +17,12 @@ class test(mysql_test.System_test):
         self.server1 = self.servers.get_server(0)
         data_file = self.testdir + "data/index_test.sql"
         self.drop_all()
-        return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+        except MySQLUtilError, e:
+            raise MUTException("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+        return True
     
     def run(self):
         self.res_fname = self.testdir + "result.txt"
@@ -27,35 +33,35 @@ class test(mysql_test.System_test):
         comment = "Test case 1 - check a table without indexes"
         res = self.run_test_case(0, cmd_str + "util_test_c.t6", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         comment = "Test case 2 - check a list of tables and databases"
         res = self.run_test_case(0, cmd_str + "util_test_c util_test_a.t1" + \
                                  " util_test_b", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         comment = "Test case 3 - check all tables for a single database"
         res = self.run_test_case(0, cmd_str + "util_test_a", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 4 - check tables for a non-existant database"
         res = self.run_test_case(1, cmd_str + "util_test_X -v", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 5 - check indexes for a non-existant table"
         res = self.run_test_case(1, cmd_str + "nosuch.nosuch -v", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 6 - check indexes for a non-existant table " + \
                   "with skip option"
         res = self.run_test_case(0, cmd_str + "nosuch.nosuch -v --skip",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         return True
   

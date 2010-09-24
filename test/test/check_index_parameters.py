@@ -2,6 +2,8 @@
 
 import os
 import check_index
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(check_index.test):
     """check parameters for the check_index utility
@@ -24,19 +26,19 @@ class test(check_index.test):
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
-            return False
-        
+            raise MUTException("%s: failed" % comment)
+       
         comment = "Test case 2 - show drops for a table with dupe indexes"
         res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 3 - show drops for a table without dupe indexes"
         res = self.run_test_case(0, cmd_str + "util_test_c.t6 --show-drops",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         return True
   

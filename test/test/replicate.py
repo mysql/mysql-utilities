@@ -2,6 +2,8 @@
 
 import os
 import mysql_test
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """setup replication
@@ -9,48 +11,72 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
-        self.server1 = self.servers.get_server(0)
-        self.server2 = None
         return self.check_num_servers(1)
 
-    def setup(self):
-
+    def spawn_new_server(self, server, server_id, name):
         # For this setup, we clone the original server making two new servers
         # to be used as a master and a slave for the tests then destroy them
         # in cleanup()
 
         port1 = int(self.servers.get_next_port())
-        port2 = int(self.servers.get_next_port())
-
-        self.s1_serverid = self.servers.get_next_id()
-        self.s2_serverid = self.servers.get_next_id()
-
-        conn_val = self.get_connection_values(self.server1)
         try:
-            res = self.servers.start_new_server(self.server1, "temp_data1",
-                                                port1, self.s1_serverid,
-                                                "root", "replicate1",
+            res = self.servers.start_new_server(self.server0, 
+                                                port1, server_id,
+                                                "root", name,
                                                 "--log-bin=mysql-bin")
         except MySQLUtilError, e:
-            print e.errmsg
+            raise MUTException("Cannot spawn %s: %s" % (name, e.errmsg))
             
-        self.server1 = res[0]
-        if not self.server1:
-            return False        
+        return res
 
-        res = self.servers.start_new_server(self.server1, "temp_data2", port2,
-                                            self.s2_serverid, "root",
-                                            "replicate2",
-                                            "--log-bin=mysql-bin")
-        self.server2 = res[0]
-        if not self.server2:
-            return False
+    def setup(self):
+        self.server0 = self.servers.get_server(0)
+        self.server1 = None
+        self.server2 = None
+        self.s1_serverid = None
+        self.s2_serverid = None
 
+        index = self.servers.find_server_by_name("rep_slave")
+        if index >= 0:
+            self.server1 = self.servers.get_server(index)
+            try:
+                res = self.server1.show_server_variable("server_id")
+            except MySQLUtilError, e:
+                raise MUTException("Cannot get replication slave " +
+                                   "server_id: %s" % e.errmsg)
+            self.s1_serverid = int(res[0][1])
+        else:
+            self.s1_serverid = self.servers.get_next_id()
+            res = self.spawn_new_server(self.server1, self.s1_serverid,
+                                       "rep_slave")
+            if not res:
+                raise MUTException("Cannot spawn replication slave server.")
+            self.server1 = res[0]
+            self.servers.add_new_server(self.server1, True)
+
+        index = self.servers.find_server_by_name("rep_master")
+        if index >= 0:
+            self.server2 = self.servers.get_server(index)
+            try:
+                res = self.server2.show_server_variable("server_id")
+            except MySQLUtilError, e:
+                raise MUTException("Cannot get replication master " +
+                                   "server_id: %s" % e.errmsg)
+            self.s2_serverid = int(res[0][1])
+        else:
+            self.s2_serverid = self.servers.get_next_id()
+            res = self.spawn_new_server(self.server2, self.s2_serverid,
+                                        "rep_master")
+            if not res:
+                raise MUTException("Cannot spawn replication slave server.")
+            self.server2 = res[0]
+            self.servers.add_new_server(self.server2, True)
+            
         return True
     
     def run_test_case(self, server1, server2, s_id,
                       comment, options=None, save_for_compare=False,
-                      expected_result=0):
+                      expected_result=0, show_results=False):
         #
         # Note: server1 is slave, server2 is master
         #
@@ -68,7 +94,7 @@ class test(mysql_test.System_test):
             cmd += " %s" % options
         if not save_for_compare:
             self.results.append(cmd)
-        res = self.exec_util(cmd, self.res_fname)
+        res = self.exec_util(cmd, self.res_fname, show_results)
         if not save_for_compare:
             self.results.append(res)
         
@@ -81,7 +107,7 @@ class test(mysql_test.System_test):
             if not save_for_compare:
                 self.results.append(res)
         except MySQLUtilError, e:
-            return False
+            raise MUTException("Cannot show slave status: %s" % e.errmsg)
 
         if save_for_compare:
             self.results.append(comment+"\n")
@@ -100,23 +126,23 @@ class test(mysql_test.System_test):
         res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
                                  comment, True)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         try:
             res = self.server1.exec_query("STOP SLAVE")
         except:
-            return False
+            raise MUTException("%s: Failed to stop slave." % comment)
 
         comment = "Test case 2 - replicate server2 as slave of server1 "
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, True)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         try:
             res = self.server2.exec_query("STOP SLAVE")
         except:
-            return False
+            raise MUTException("%s: Failed to stop slave." % comment)
 
         return True
 
@@ -162,17 +188,5 @@ class test(mysql_test.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        res1 = True
-        res2 = True
-        if self.server1:
-            res1 = self.servers.stop_server(self.server1)
-            self.servers.clear_last_port()
-            self.server1 = None
-        if self.server2:
-            res2 = self.servers.stop_server(self.server2)
-            self.servers.clear_last_port()
-            self.server2 = None
-        return res1 and res2
-
-
+        return True
 

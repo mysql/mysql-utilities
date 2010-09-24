@@ -27,6 +27,7 @@ import os
 import shutil
 import string
 import subprocess
+import sys
 import time
 from mysql.utilities.common import MySQLUtilError
 
@@ -117,6 +118,24 @@ class Server_list(object):
         new_id = self.new_id
         self.new_id += 1
         return new_id
+    
+    
+    def find_server_by_name(self, name):
+        """Retrieve index of the server with the name indicated.
+        
+        name[in]            Name of the server (also used as role)
+        
+        Note: This finds the first server with the name. Server names are
+        not unique.
+        
+        Returns -1 if not found, index if found.
+        """
+        stop = len(self.server_list)
+        for index in range(0, stop):
+            if self.server_list[index][0].role == name:
+                return index
+        return -1
+
 
     def get_server(self, index):
         """Retrieve the server located at index.
@@ -132,7 +151,7 @@ class Server_list(object):
             return self.server_list[index][0]
             
         
-    def start_new_server(self, server, datadir, port, server_id, passwd,
+    def start_new_server(self, server, port, server_id, passwd,
                          role="server", parameters=None):
         """Start a new server with optional parameters
         
@@ -141,7 +160,6 @@ class Server_list(object):
         server passed. It will also connect to the new server.
         
         server[in]          Server instance to clone
-        datadir[in]         Data directory for new server
         port[in]            Port
         server_id[in]       Server id
         password[in]        Root password for new server
@@ -156,7 +174,9 @@ class Server_list(object):
         from mysql.utilities.common import Server
                     
         new_server = (None, None)
-        full_datadir = os.getcwd() + "/" + datadir
+        
+        # Set data directory for new server so that it is unique
+        full_datadir = os.getcwd() + "/temp_%s" % port
         
         # Attempt to clone existing server
         cmd = "mysqlserverclone.py "
@@ -266,7 +286,7 @@ class Server_list(object):
         for server_num in range(0, num_to_add):
             datadir = "new_server_%d" % (server_num + 1)
             try:
-                server = self.start_new_server(orig_server, datadir,
+                server = self.start_new_server(orig_server,
                                                self.get_next_port(),
                                                self.get_next_id(), "root",
                                                datadir)
@@ -282,10 +302,14 @@ class Server_list(object):
         for server in self.server_list:
             if server[1]:
                 try:
-                    print "  Shutting down server %s." % server[0].role
+                    sys.stdout.write("  Shutting down server %s..." % \
+                                     server[0].role)
+                    sys.stdout.flush()
                     self.stop_server(server[0])
+                    print "success."
                 except MySQLUtilError, e:
-                    print "Unable to shutdown server %s." % server[0].role
+                    print "ERROR!"
+                    print "    Unable to shutdown server %s." % server[0].role
             
             
     def add_new_server(self, new_server, spawned=False, id=-1):

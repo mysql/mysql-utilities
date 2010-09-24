@@ -2,6 +2,8 @@
 
 import os
 import copy_db
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(copy_db.test):
     """check errors for copy db
@@ -47,26 +49,26 @@ class test(copy_db.test):
         comment = "Test case 1 - error: no destination specified"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
         cmd_opts = " "
         comment = "Test case 2 - error: no database specified"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_opts = " wax\t::sad "
         comment = "Test case 3 - error: cannot parse database list"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_opts = "NOT_THERE_AT_ALL:util_db_clone"
         comment = "Test case 4 - error: old database doesn't exist"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s " % to_conn
         cmd_str += "--source=nope:nada@localhost:3306 "
@@ -74,7 +76,7 @@ class test(copy_db.test):
         comment = "Test case 5 - error: cannot connect to source"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         cmd_str = "mysqldbcopy.py %s " % from_conn
         cmd_str += "--destination=nope:nada@localhost:3306 "
@@ -82,7 +84,7 @@ class test(copy_db.test):
         comment = "Test case 6 - error: cannot connect to destination"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         from_conn = "--source=joe@localhost:3306 "
         # Watchout for Windows: it doesn't use sockets!
@@ -96,7 +98,7 @@ class test(copy_db.test):
         comment = "Test case 7 - users with minimal privileges"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         from_conn = "--source=sam@localhost:3306 "
         if os.name == "posix":
@@ -109,7 +111,7 @@ class test(copy_db.test):
         comment = "Test case 8 - source user not enough privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         # Give Sam some privileges on source and retest until copy works
         res = self.server1.exec_query("GRANT SELECT ON util_test.* TO " + \
@@ -117,21 +119,21 @@ class test(copy_db.test):
         comment = "Test case 9 - source user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         res = self.server1.exec_query("GRANT SELECT ON mysql.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 10 - source user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         res = self.server1.exec_query("GRANT SHOW VIEW ON util_test.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 11 - source user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix":
@@ -144,7 +146,7 @@ class test(copy_db.test):
         comment = "Test case 12 - dest user not enough privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Give Sam some privileges on source and retest until copy works
         res = self.server2.exec_query("GRANT ALL ON util_db_clone.* TO " + \
@@ -152,21 +154,21 @@ class test(copy_db.test):
         comment = "Test case 13 - dest user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         res = self.server2.exec_query("GRANT CREATE USER ON *.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 14 - dest user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         res = self.server2.exec_query("GRANT SUPER ON *.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 15 - dest user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
@@ -176,7 +178,7 @@ class test(copy_db.test):
         self.replace_result("# Destination: sam@localhost:",
                             "# Destination: sam@localhost:[] ... connected\n")
 
-        return res
+        return True
   
     def get_result(self):
         return self.compare(__name__, self.results)

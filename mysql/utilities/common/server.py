@@ -728,21 +728,20 @@ class Server(object):
             raise e
         return res
 
-    def read_and_exec_SQL(self, input_file, verbose=False, suppress=False):
+    def read_and_exec_SQL(self, input_file, verbose=False):
         """Read an input file containing SQL statements and execute them.
     
         input_file[in]     The full path to the file
         verbose[in]        Print the command read
                            Default = False
-        suppress[in]       Do not display errors
-                           Default = False
-        
+
         Returns True = success, False = error
         
         TODO : Make method read multi-line queries.
         """
         file = open(input_file)
         i = 0
+        res = True
         while True:
             cmd = file.readline()
             if not cmd:
@@ -758,4 +757,4 @@ class Server(object):
                     except MySQLUtilError, e:
                         raise e
         file.close()
-        return True
+        return res

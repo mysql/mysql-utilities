@@ -4,6 +4,7 @@ import os
 import mysql_test
 import mysql.utilities.common as mysql
 from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """copy user
@@ -25,11 +26,17 @@ class test(mysql_test.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MySQLUtilError, e:
-                return False
+                raise MUTException("Cannot spawn needed servers.")
+                
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = self.testdir + "/data/basic_users.sql"
-        return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+        except MySQLUtilError, e:
+            raise MUTException("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+        return True
         
     def show_user_grants(self, server, user):
         query = "SHOW GRANTS FOR %s" % (user)
@@ -39,7 +46,7 @@ class test(mysql_test.System_test):
                 for row in res:
                     self.results.append(row[0]+"\n")
         except MySQLUtilError, e:
-            pass
+            raise MUTException("Cannot get grants for %s." % user)
             
     def run(self):
         self.res_fname = self.testdir + "result.txt"
@@ -54,7 +61,7 @@ class test(mysql_test.System_test):
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         self.show_user_grants(self.server2, "'jill'@'user'")
 
@@ -64,7 +71,7 @@ class test(mysql_test.System_test):
         res = self.run_test_case(0, cmd_str + " amy_nopass@user " +
                                  "jack:duh@user john@user", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         self.show_user_grants(self.server2,"jack@user")
         self.show_user_grants(self.server2,"john@user")
@@ -74,7 +81,7 @@ class test(mysql_test.System_test):
         res = self.run_test_case(1, cmd_str + " nosuch@user jack@user",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Test case 4 - attempt to copy a user to a user that already exists
         comment= "Test case 4 - attempt to copy a user to a user that " + \
@@ -82,7 +89,7 @@ class test(mysql_test.System_test):
         res = self.run_test_case(1, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         # Test case 5 - attempt to copy a user to a user that already exists
         #               with overwrite
@@ -92,7 +99,8 @@ class test(mysql_test.System_test):
         res = self.run_test_case(0, cmd_str + " joe_pass@user " +
                                  "jill:duh@user --force", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
+
         # No show overwritten grants
         self.show_user_grants(self.server2, "jill@user")
 

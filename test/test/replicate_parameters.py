@@ -2,6 +2,8 @@
 
 import os
 import replicate
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(replicate.test):
     """check parameters for the replicate utility
@@ -22,15 +24,18 @@ class test(replicate.test):
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, "--test-db=db_not_there_yet", True)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
-        res = self.server2.exec_query("STOP SLAVE")
+        try:
+            res = self.server2.exec_query("STOP SLAVE")
+        except:
+            pass
 
         comment = "Test case 2 - show the help"
         res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
                                  comment, "--help", True)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         return True
 

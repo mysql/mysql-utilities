@@ -3,6 +3,7 @@
 import os
 import mysql_test
 from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(mysql_test.System_test):
     """simple db copy
@@ -24,11 +25,17 @@ class test(mysql_test.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MySQLUtilError, e:
-                return False
+                raise MUTException("Cannot spawn needed servers.")
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
-        return self.server1.read_and_exec_SQL(data_file, self.verbose, True)
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+        except MySQLUtilError, e:
+            raise MUTException("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+        return True
+
     
     def run(self):
         self.res_fname = self.testdir + "result.txt"
@@ -51,9 +58,9 @@ class test(mysql_test.System_test):
                 res = self.server2.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
                     return (True, msg)
-            except:
-                msg = "Copy db failed."
-        return (False, msg)
+            except MySQLUtilError, e:
+                raise MUTException(e.errmsg)
+        return (False, ("Result failure.\n", "Database copy not found.\n"))
     
     def record(self):
         # Not a comparative test, returning True

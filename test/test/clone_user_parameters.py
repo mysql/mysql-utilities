@@ -2,6 +2,8 @@
 
 import os
 import clone_user
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import MUTException
 
 class test(clone_user.test):
     """clone user parameter checking
@@ -26,19 +28,19 @@ class test(clone_user.test):
         res = self.run_test_case(0, cmd_str + " --dump joe_nopass@user " + \
                                  "jack@user john@user jill@user", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - show the help"
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
         
         comment = "Test case 3 - use the silent parameter"
         res = self.run_test_case(0, cmd_str + "joe_nopass@user --force" + \
                                  " jack@user john@user jill@user --silent ",
                                  comment)
         if not res:
-            return False
+            raise MUTException("%s: failed" % comment)
 
         return True
 
