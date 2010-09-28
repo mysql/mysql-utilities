@@ -68,13 +68,11 @@ opt, args = parser.parse_args()
 
 # Fail if no options listed.
 if opt.login_user is None:
-    print "ERROR: No login user specified. Use --help for available options."
-    exit(1)
+    parser.error("No login user specified. Use --help for available options.")
     
-# Fail if no arguments and no options.
-if opt is None:
-    print "ERROR No arguments found. Use --help for available options."
-    exit(1)
+# Fail if no database path specified.
+if opt.new_data is None:
+    parser.error("No new database path. Use --help for available options.")
 
 conn = {
     "user"   : opt.login_user,

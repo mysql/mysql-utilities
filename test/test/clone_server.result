@@ -22,12 +22,18 @@ Options:
                         password for the root user
   --mysqld=MYSQLD       Additional options for mysqld
   -v, --verbose         display additional information during operation
-Test case 2 - error: no login
-ERROR: No login user specified. Use --help for available options.
-Test case 3 - error: cannot connect
+Test case 2 - error: no --new-data option
+Usage: mysqlserverclone.py -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2
+
+mysqlserverclone.py: error: No new database path. Use --help for available options.
+Test case 3 - error: no login
+Usage: mysqlserverclone.py -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2
+
+mysqlserverclone.py: error: No login user specified. Use --help for available options.
+Test case 4 - error: cannot connect
 ERROR: Cannot connect to the source server.
 Error 2005: Unknown MySQL server host 'nothere' #######
-Test case 4 - cannot create directory
+Test case 5 - cannot create directory
 # Cloning the MySQL server running on localhost.
 # Creating new data directory...
 ERROR: Unable to create directory '/not/there/yes'

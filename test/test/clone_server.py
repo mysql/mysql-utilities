@@ -31,15 +31,20 @@ class test(mysql_test.System_test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 2 - error: no login"
-        res = self.run_test_case(1, "mysqlserverclone.py " +
+        comment = "Test case 2 - error: no --new-data option"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 3 - error: no login"
+        res = self.run_test_case(2, "mysqlserverclone.py " +
                                  "-hnothere --new-data=/nada --new-id=7 " +
                                  "--root-password=nope " + newport,
                                  comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
-        comment = "Test case 3 - error: cannot connect"
+        comment = "Test case 4 - error: cannot connect"
         res = self.run_test_case(1, "mysqlserverclone.py -uroot -pnope " +
                                  "-hnothere --new-data=/nada --new-id=7 " +
                                  "--root-password=nope " + newport,
@@ -52,13 +57,13 @@ class test(mysql_test.System_test):
        
         cmd_str += "--new-id=%d " % self.servers.get_next_id() + newport + \
                    " --root-password=root "
-        comment = "Test case 4 - cannot create directory"
+        comment = "Test case 5 - cannot create directory"
         res = self.run_test_case(1, cmd_str + "--new-data=/not/there/yes",
                                  comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
-        comment = "Test case 5 - clone the current servers[0]"
+        comment = "Test case 6 - clone the current servers[0]"
         full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
         cmd_str += "--new-data=%s " % full_datadir
         res = self.exec_util(cmd_str, "start.txt")
