@@ -280,13 +280,11 @@ opt, args = parser.parse_args()
 
 # Cannot use --do-test= with listing tests.
 if opt.wildcard and len(args) > 0:
-    print "ERROR: Cannot mix --do-test= and list of tests."
-    exit(1)
+    parser.error("Cannot mix --do-test= and list of tests.")
 
 # Must use --record with a specific test
 if opt.record and len(args) != 1:
-    print "ERROR: Must specify a single test when using record."
-    exit(1)
+    parser.error("Must specify a single test when using record.")
     
 # Append default paths if options not specified
 sys.path.append(opt.testdir)
@@ -344,9 +342,8 @@ else:
             i += 1   
             # Fail if port and socket are both None
             if conn_val["port"] is None and conn_val["socket"] is None:
-                print "ERROR: You must specify either a port or a socket " \
-                      "in the server string: \n       %s" % server 
-                exit(1)
+                parser.error("You must specify either a port or a socket " \
+                      "in the server string: \n       %s" % server)
 
             sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
                              (conn_val["host"], conn_val["user"],
@@ -370,8 +367,7 @@ else:
                 if conn.connect_error is not None:
                     print conn.connect_error
         else:
-            print "ERROR: Problem parsing server connection '%s'" % (server)
-            exit(1)
+            parser.error("Problem parsing server connection '%s'" % server)
     if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
         exit(1)
