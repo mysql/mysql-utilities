@@ -54,3 +54,19 @@ Test case 6 - show user@127.0.0.1 works
 # Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 #...done.
+Test case 7 - cannot parse --source
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: Source connection values invalid or cannot be parsed.
+Test case 8 - cannot parse --destination
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: Destination connection values invalid or cannot be parsed.
+Test case 9 - no destination specified
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: No destination server specified.
+Test case 10 - no database specified
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: You must specify at least one database to copy.

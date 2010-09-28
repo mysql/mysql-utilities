@@ -103,6 +103,35 @@ class test(clone_db.test):
         if not res:
             raise MUTException("%s: failed" % comment)
              
+        cmd_str = "mysqldbcopy.py --source=rocks_rocks_rocks %s " % to_conn
+        cmd_str += "util_test:util_db_clone --force "
+        comment = "Test case 7 - cannot parse --source"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqldbcopy.py --destination=rocks_rocks_rocks %s " % \
+                  from_conn
+        cmd_str += "util_test:util_db_clone --force "
+        comment = "Test case 8 - cannot parse --destination"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqldbcopy.py --source=rocks_rocks_rocks "
+        cmd_str += "util_test:util_db_clone --force "
+        comment = "Test case 9 - no destination specified"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
+        cmd_str += " "
+        comment = "Test case 10 - no database specified"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
         return True
   
     def get_result(self):

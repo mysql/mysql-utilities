@@ -144,13 +144,11 @@ opt, args = parser.parse_args()
 
 # Fail if no options listed.
 if opt.destination is None:
-    print "ERROR: No destination server specified."
-    exit(1)
+    parser.error("No destination server specified.")
 
 # Fail if no arguments
 if len(args) == 0:
-    print "ERROR: You must specify at least one database to copy."
-    exit(1)
+    parser.error("You must specify at least one database to copy.")
     
 # Set options for database operations.
 options = {
@@ -174,20 +172,19 @@ options = {
 # Parse source connection values
 source_values = parse_connection(opt.source)
 if source_values is None:
-    print "ERROR: Source connection values invalid or cannot be parsed."
+    parser.error("Source connection values invalid or cannot be parsed.")
 
 # Parse destination connection values
 dest_values = parse_connection(opt.destination)
 if dest_values is None:
-    print "ERROR: Destination connection values invalid or cannot be parsed."
+    parser.error("Destination connection values invalid or cannot be parsed.")
 
 # Build list of databases to copy
 db_list = []
 for db in args:
     grp = re.match("(\w+)(?:\:(\w+))?", db)
     if not grp:
-        print "ERROR: Cannot parse database list. Error on '%s'." % db
-        exit(1)
+        parser.error("Cannot parse database list. Error on '%s'." % db)
     db_entry = grp.groups()
     db_list.append(db_entry)
 
