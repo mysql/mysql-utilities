@@ -81,12 +81,12 @@ opt, args = parser.parse_args()
 # Parse source connection values
 m_values = parse_connection(opt.master)
 if m_values is None:
-    print "ERROR: Master connection values invalid or cannot be parsed."
+    parser.error("Master connection values invalid or cannot be parsed.")
 
 # Parse source connection values
 s_values = parse_connection(opt.slave)
 if s_values is None:
-    print "ERROR: Slave connection values invalid or cannot be parsed."
+    parser.error("Slave connection values invalid or cannot be parsed.")
         
 try:
     res = rpl.replicate(m_values, s_values, opt.server_id, opt.rpl_user,

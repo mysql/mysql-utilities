@@ -16,6 +16,7 @@ class test(replicate.test):
         return replicate.test.check_prerequisites(self)
 
     def setup(self):
+        self.server3 = None
         return replicate.test.setup(self)
 
     def run(self):
@@ -27,7 +28,21 @@ class test(replicate.test):
 
         cmd_str = "mysqlreplicate.py "
       
-        comment = "Test case 1 - error: invalid login to server (master)"
+        comment = "Test case 1 - error: cannot parse server (slave)"
+        res = mysql_test.System_test.run_test_case(self, 2, cmd_str +
+                        master_str + " --slave=wikiwakawonky " +
+                        "--rpl-user=rpl:whatsit", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 2 - error: cannot parse server (master)"
+        res = mysql_test.System_test.run_test_case(self, 2, cmd_str +
+                        slave_str + " --master=wikiwakawonky " +
+                        "--rpl-user=rpl:whatsit", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 3 - error: invalid login to server (master)"
         res = mysql_test.System_test.run_test_case(self, 1, cmd_str +
                         slave_str + " --master=nope@nada:localhost:5510 " +
                         "--rpl-user=rpl:whatsit", comment)
@@ -36,7 +51,7 @@ class test(replicate.test):
 
         conn_values = self.get_connection_values(self.server1)
         
-        comment = "Test case 2 - error: invalid login to server (slave)"
+        comment = "Test case 4 - error: invalid login to server (slave)"
         res = mysql_test.System_test.run_test_case(self, 1, cmd_str +
                         master_str + " --slave=nope@nada:localhost:5511 " +
                         "--rpl-user=rpl:whatsit", comment)
@@ -46,7 +61,7 @@ class test(replicate.test):
         str = self.build_connection_string(self.server1)
         same_str = "--master=%s --slave=%s " % (str, str)
 
-        comment = "Test case 3 - error: slave and master same machine"
+        comment = "Test case 5 - error: slave and master same machine"
         res = mysql_test.System_test.run_test_case(self, 1, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
@@ -71,7 +86,7 @@ class test(replicate.test):
         cmd_str = "mysqlreplicate.py --master=%s " % new_server_str
         cmd_str += slave_str
         
-        comment = "Test case 4 - error: No binary logging on master"
+        comment = "Test case 6 - error: No binary logging on master"
         cmd = cmd_str + "--rpl-user=rpl:whatsit "
         res = mysql_test.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
@@ -82,7 +97,7 @@ class test(replicate.test):
         self.server1.exec_query("CREATE USER dummy@localhost")
         self.server1.exec_query("GRANT SELECT ON *.* TO dummy@localhost")
 
-        comment = "Test case 5 - error: replicate() fails"
+        comment = "Test case 7 - error: replicate() fails"
         
         conn = self.get_connection_values(self.server3)
         
