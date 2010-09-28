@@ -19,13 +19,10 @@
 This module contains abstractions of a MySQL table and an index.
 """
 
+import sys
 import re
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
-
-# List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
@@ -213,15 +210,15 @@ class Index(object):
                 col_str = col_str + ", "
         return col_str
     
-    def print_index(self):
+    def print_index_sql(self):
         """Print the CREATE INDEX for indexes and ALTER TABLE for a primary key
         """
         
         if self.name == "PRIMARY":
-            print "#   ALTER TABLE %s.%s ADD PRIMARY KEY (%s)" % \
+            print "ALTER TABLE %s.%s ADD PRIMARY KEY (%s)" % \
                   (self.db, self.table, self.__get_column_list())
         else:
-            create_str = "#   CREATE "
+            create_str = "CREATE "
             if self.unique:
                 create_str += "UNIQUE "
             if self.type == "FULLTEXT":
@@ -231,6 +228,12 @@ class Index(object):
             if (self.type == "BTREE") or (self.type == "RTREE"):
                 create_str += "USING %s" % (self.type)
             print create_str
+    
+    def get_row(self):
+        """Return index information as a list of columns for tabular output.
+        """
+        cols = self.__get_column_list()
+        return (self.db, self.table, self.name, self.type, cols)
 
 
 class Table:
@@ -406,10 +409,11 @@ class Table:
         return True
     
     
-    def check_indexes(self, show_drops=False):
+    def check_indexes(self, show_drops=False, silent=False):
         """Check for duplicate or redundant indexes and display all matches
 
         show_drops[in]     (optional) If True the DROP statements are printed
+        silent[in]         (optional) If True, do not print info messages
        
         Note: You must call get_indexes() prior to calling this method. If
         get_indexes() is not called, no duplicates will be found.
@@ -442,35 +446,136 @@ class Table:
                   "for table %s:" % (self.table)
             for index in dupes:
                 print "#"
-                index.print_index()
+                index.print_index_sql()
                 print "#     may be redundant or duplicate of:"
-                index.duplicate_of.print_index()
+                index.duplicate_of.print_index_sql()
             if show_drops:
                 print "#\n# DROP statements:\n#"
                 for index in dupes:
                     print "%s;" % (index.get_drop_statement())
                 print "#"
         else:
-            print "# Table %s has no duplicate indexes." % (self.table)
-                
-    
-    def __print_index_list(self, indexes):
-        """Print the list of indexes
+            if not silent:
+                print "# Table %s has no duplicate indexes." % (self.table)
+           
+    def show_special_indexes(self, format, limit, best=False):
+        """Display a list of the best or worst queries for this table.
+
+        This shows the best (first n) or worst (last n) performing queries
+        for a given table.
+
+        format[in]         format out output = SQL, TABLE, TAB, CSV
+        limit[in]          number to limit the display
+        best[in]           (optional) if True, print best performing indexes
+                                      if False, print worst performing indexes
+        """
+       
+        _QUERY = """
+            SELECT
+                t.TABLE_SCHEMA AS `db`, t.TABLE_NAME AS `table`,
+                s.INDEX_NAME AS `index name`, s.COLUMN_NAME AS `field name`,
+                s.SEQ_IN_INDEX `seq in index`, s2.max_columns AS `# cols`,
+                s.CARDINALITY AS `card`, t.TABLE_ROWS AS `est rows`,
+                ROUND(((s.CARDINALITY / IFNULL(
+                IF(t.TABLE_ROWS < s.CARDINALITY, s.CARDINALITY, t.TABLE_ROWS),
+                0.01)) * 100), 2) AS `sel_percent`
+            FROM INFORMATION_SCHEMA.STATISTICS s
+                INNER JOIN INFORMATION_SCHEMA.TABLES t
+                ON s.TABLE_SCHEMA = t.TABLE_SCHEMA
+                AND s.TABLE_NAME = t.TABLE_NAME
+            INNER JOIN (
+                SELECT TABLE_SCHEMA, TABLE_NAME, INDEX_NAME,
+                    MAX(SEQ_IN_INDEX) AS max_columns
+                FROM INFORMATION_SCHEMA.STATISTICS
+                WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
+                      AND INDEX_NAME != 'PRIMARY'
+                GROUP BY TABLE_SCHEMA, TABLE_NAME, INDEX_NAME
+             ) AS s2
+             ON s.TABLE_SCHEMA = s2.TABLE_SCHEMA
+                AND s.TABLE_NAME = s2.TABLE_NAME
+                AND s.INDEX_NAME = s2.INDEX_NAME
+            WHERE t.TABLE_SCHEMA != 'mysql'
+                AND t.TABLE_ROWS > 10 /* Only tables with some rows */
+                AND s.CARDINALITY IS NOT NULL
+                AND (s.CARDINALITY / IFNULL(
+                IF(t.TABLE_ROWS < s.CARDINALITY, s.CARDINALITY, t.TABLE_ROWS),
+                0.01)) <= 1.00
+            ORDER BY `sel_percent`
         """
         
-        for index in indexes:
-            index.print_index()
+        from mysql.utilities.common import format_tabular_list
+        
+        rows = []
+        type = "best"
+        if not best:
+            type = "worst"
+        try:
+            if best:
+                rows= self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
+                                             (self.db_name, self.tbl_name,))
+            else:
+                rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
+                                             (self.db_name, self.tbl_name,))
+        except MySQLUtilError, e:
+            raise e
+        if rows:
+            print "#"
+            print "# Showing the top 5 %s performing indexes from %s:\n#" % \
+                  (type, self.table)
+            cols = ("database", "table", "name", "column", "sequence",
+                    "num columns", "cardinality", "est. rows", "percent")
+            if format == "TAB":
+                format_tabular_list(sys.stdout, cols, rows, True, '\t', True)
+            elif format == "CSV":
+                format_tabular_list(sys.stdout, cols, rows, True, ',', True)
+            else:  # default to table format
+                format_tabular_list(sys.stdout, cols, rows, True, None)
+    
+    def __print_index_list(self, indexes, format, header=False):
+        """Print the list of indexes
+
+        indexes[in]        list of indexes to print
+        format[in]         format out output = SQL, TABLE, TAB, CSV
+        header[in]         (optional) if True, print the header for the cols
+        """
+
+        from mysql.utilities.common import format_tabular_list
+
+        if format == "SQL":
+            for index in indexes:
+                index.print_index_sql()
+        else:
+            cols = ("database", "table", "name", "type", "columns")
+            rows = []
+            for index in indexes:
+                rows.append(index.get_row())
+            if format == "TAB":
+                format_tabular_list(sys.stdout, cols, rows, header, '\t', True)
+            elif format == "CSV":
+                format_tabular_list(sys.stdout, cols, rows, header, ',', True)
+            else:  # default to table format
+                format_tabular_list(sys.stdout, cols, rows, header, None)
         
         
-    def print_indexes(self):
+    def print_indexes(self, format):
         """Print all indexes for this table
+
+        format[in]         format out output = SQL, TABLE, TAB, CSV
         """
         
         print "# Showing indexes from %s:\n#" % (self.table)
-        self.__print_index_list(self.btree_indexes)
-        self.__print_index_list(self.hash_indexes)
-        self.__print_index_list(self.rtree_indexes)
-        self.__print_index_list(self.fulltext_indexes)
+        if format == "SQL":
+            self.__print_index_list(self.btree_indexes, format, True)
+            self.__print_index_list(self.hash_indexes, format)
+            self.__print_index_list(self.rtree_indexes, format)
+            self.__print_index_list(self.fulltext_indexes, format)
+        else:
+            master_indexes = []
+            master_indexes.extend(self.btree_indexes)
+            master_indexes.extend(self.hash_indexes)
+            master_indexes.extend(self.rtree_indexes)
+            master_indexes.extend(self.fulltext_indexes)
+            self.__print_index_list(master_indexes, format, True)
         print "#"
 
     

@@ -54,6 +54,11 @@ parser.add_option("--show-drops", "-d", action="store_true",
                   dest="show_drops", default=False,
                   help="display DROP statements for dropping indexes")
 
+# Display all indexes per table
+parser.add_option("--show-indexes", "-i", action="store_true",
+                  dest="show_indexes", default=False,
+                  help="display indexes for each table")
+
 # Force mode
 parser.add_option("-s", "--skip", action="store_true", dest="skip",
                   help="skip tables that do not exist",
@@ -64,29 +69,107 @@ parser.add_option("--verbose", "-v", action="store_true",
                   dest="verbose", default=False,
                   help="display additional information during operation")
 
+# Silent mode
+parser.add_option("--silent", action="store_true",
+                  dest="silent", default=False,
+                  help="do not display informational messages")
+
+# Index list mode
+parser.add_option("--index-format", action="store",
+                  dest="index_format", default="TABLE",
+                  help="display the list of indexes per table in either " \
+                       "SQL, TABLE (default), TAB, or CSV format")
+
+# Show index statistics
+parser.add_option("--stats", action="store_true",
+                  dest="stats", default=False,
+                  help="show index performance statistics")
+
+# Set limit for best
+parser.add_option("--first", action="store",
+                  dest="first", default=None,
+                  help="limit index statistics to the best N indexes")
+
+# Set limit for worst
+parser.add_option("--last", action="store",
+                  dest="last", default=None,
+                  help="limit index statistics to the worst N indexes")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# Fail if no options listed.
-if opt.source is None:
-    print "ERROR: No source connection specified. Use --help for " \
-          "available options."
-    exit(1)
+if opt.silent and opt.verbose:
+    parser.error("You cannot use --silent and --verbose together.")
+
+# Check to make sure at least one table specified.
+if len(args) == 0:
+    parser.error("You must specify at least one table or database to check.")
+    
+PERMITTED_FORMATS = ("SQL", "TABLE", "TAB", "CSV")
+
+if opt.index_format.upper() not in PERMITTED_FORMATS:
+    print "WARNING : '%s' is not a valid index format. Using default." % \
+          opt.index_format
+    opt.index_format = "TABLE"
+else:
+    opt.index_format = opt.index_format.upper()
 
 # Parse source connection values
 source_values = parse_connection(opt.source)
 if source_values is None:
-    print "ERROR: Source connection values invalid or cannot be parsed."
-    exit(1)
+    parser.error("Source connection values invalid or cannot be parsed.")
+
+# Check first, last for validity
+first = None
+if opt.first is not None:
+    try:
+        first = int(opt.first)
+    except:
+        first = -1
+if first is not None and first < 0:
+    parser.error("The --first parameter must be an integer > 1")
     
-# Check to make sure at least one table specified.
-if len(args) == 0:
-    print "ERROR: You must specify at least one table or database to check."
-    exit(1)
+last = None
+if opt.last is not None:
+    try:
+        last = int(opt.last)
+    except:
+        last = -1
+if last is not None and last < 0:
+    parser.error("The --last parameter must be an integer > 1")
+        
+if opt.stats and last is not None and first is not None:
+    parser.error("You must specify either --first or --last but not both.")
+    
+# default to worst performing queries
+if opt.stats and last is None and first is None:
+    last = 5
+    
+# no stats specified
+if (last is not None or first is not None) and not opt.stats:
+    parser.error("You must specify --stats for --first or --last to take " \
+                 "effect.")
+
+# Parse source connection values
+source_values = parse_connection(opt.source)
+if source_values is None:
+    parser.error("Source connection values invalid or cannot be parsed.")
+    
+# Build dictionary of options
+options = {
+    "show-drops"    : opt.show_drops,
+    "skip"          : opt.skip,
+    "verbose"       : opt.verbose,
+    "show-indexes"  : opt.show_indexes,
+    "index-format"  : opt.index_format,
+    "silent"        : opt.silent,
+    "stats"         : opt.stats,
+    "first"         : first,
+    "last"          : last
+}
 
 try:
-    res = indexcheck.check_index(source_values, args, opt.show_drops,
-                                 opt.skip, opt.verbose)
+    res = indexcheck.check_index(source_values, args, options)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

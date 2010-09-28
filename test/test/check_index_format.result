@@ -1,0 +1,125 @@
+Test case 1 - show indexes using default format
+# Showing indexes from util_test_a.t1:
+#
++--------------+--------+----------+----------+----------+
+| database     | table  | name     | type     | columns  |
++--------------+--------+----------+----------+----------+
+| util_test_a  | t1     | PRIMARY  | BTREE    | A        |
+| util_test_a  | t1     | s1       | SPATIAL  | e(32)    |
+| util_test_a  | t1     | s2       | SPATIAL  | d(32)    |
+| util_test_a  | t1     | s4       | SPATIAL  | d(32)    |
++--------------+--------+----------+----------+----------+
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
++--------------+--------+-------+--------+----------+
+| database     | table  | name  | type   | columns  |
++--------------+--------+-------+--------+----------+
+| util_test_a  | t2     | id    | BTREE  | id       |
++--------------+--------+-------+--------+----------+
+#
+Test case 2 - show indexes using SQL format
+# Showing indexes from util_test_a.t1:
+#
+ALTER TABLE util_test_a.t1 ADD PRIMARY KEY (A)
+CREATE INDEX s1 ON util_test_a.t1 (e(32)) 
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
+CREATE INDEX id ON util_test_a.t2 (id) USING BTREE
+#
+Test case 3 - show indexes using TABLE format
+# Showing indexes from util_test_a.t1:
+#
++--------------+--------+----------+----------+----------+
+| database     | table  | name     | type     | columns  |
++--------------+--------+----------+----------+----------+
+| util_test_a  | t1     | PRIMARY  | BTREE    | A        |
+| util_test_a  | t1     | s1       | SPATIAL  | e(32)    |
+| util_test_a  | t1     | s2       | SPATIAL  | d(32)    |
+| util_test_a  | t1     | s4       | SPATIAL  | d(32)    |
++--------------+--------+----------+----------+----------+
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
++--------------+--------+-------+--------+----------+
+| database     | table  | name  | type   | columns  |
++--------------+--------+-------+--------+----------+
+| util_test_a  | t2     | id    | BTREE  | id       |
++--------------+--------+-------+--------+----------+
+#
+Test case 4 - show indexes using TAB format
+# Showing indexes from util_test_a.t1:
+#
+database	table	name	type	columns
+util_test_a	t1	PRIMARY	BTREE	A
+util_test_a	t1	s1	SPATIAL	e(32)
+util_test_a	t1	s2	SPATIAL	d(32)
+util_test_a	t1	s4	SPATIAL	d(32)
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
+database	table	name	type	columns
+util_test_a	t2	id	BTREE	id
+#
+Test case 5 - show indexes using CSV format
+# Showing indexes from util_test_a.t1:
+#
+database,table,name,type,columns
+util_test_a,t1,PRIMARY,BTREE,A
+util_test_a,t1,s1,SPATIAL,e(32)
+util_test_a,t1,s2,SPATIAL,d(32)
+util_test_a,t1,s4,SPATIAL,d(32)
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
+database,table,name,type,columns
+util_test_a,t2,id,BTREE,id
+#

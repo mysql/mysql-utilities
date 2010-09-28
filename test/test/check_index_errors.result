@@ -1,6 +1,38 @@
-Test case 1 - error: no login user
+Test case 1 - error: no db specified
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: You must specify at least one table or database to check.
+Test case 2 - error: no source specified
 # Source: root@localhost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
-Test case 2 - error: invalid login to server
+Test case 3 - error: invalid login to server
 # Source: nope@localhost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
+Test case 4 - error: silent and verbose
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: You cannot use --silent and --verbose together.
+Test case 5 - error: stats and first=alpha
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: The --first parameter must be an integer > 1
+Test case 6 - error: stats and last=alpha
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: The --last parameter must be an integer > 1
+Test case 7 - error: not stats 
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: You must specify --stats for --first or --last to take effect.
+Test case 8 - error: stats and both first and last 
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: You must specify either --first or --last but not both.
+Test case 9 - error: stats and last=-1
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: The --last parameter must be an integer > 1
+Test case 10 - error: stats and first=-1
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+
+mysqlindexcheck.py: error: The --first parameter must be an integer > 1

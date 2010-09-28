@@ -19,7 +19,9 @@ SYNOPSIS
 
  mysqlcheckindex --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[ --help | --version ] |
-                 [ --show-drops | --skip | --verbose ]
+                 [ --show-drops | --skip | --verbose | --show-indexes |
+                   --silent | --index-format=[TABLE|SQL|TAB|CSV] |
+                   --best | --worst ]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
@@ -59,8 +61,25 @@ redundant indexes, use this command:
 
 ::
 
-   mysqlcheckindex --source=root@localhost:3306 -v \
-                   my_db db1.t1 db2.t2
+   mysqlcheckindex --source=root@localhost:3306 -i \
+                   my_db db1.t1 db2.t2 
+
+You can also display the best and worst non-primary key indexes for each table
+with the --best and --worst options. The data will show the top 5 indexes from
+tables with 10 or more rows.
+
+You can change the display format of the index lists for --show-indexes,
+--best, and --worst in one of the following formats:
+
+* TABLE (default) : print a mysql-like table output
+
+* TAB : print using tabs for separation
+
+* CSV : print using commas for separation
+
+* SQL : print SQL statements rather than a list.
+
+Note: the --best and --worst lists cannot be printed as SQL statements.
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
@@ -82,11 +101,30 @@ OPTIONS
 -d, --show-drops
   display DROP statements for dropping indexes
 
+-i, --show-indexes
+  display indexes for each table
+
 -s, --skip
   skip tables that do not exist
 
 -v, --verbose
   display additional information during operation
+
+--silent
+  do not display informational messages
+
+--index-format=INDEX_FORMAT
+  display the list of indexes per table in either SQL, TABLE (default), TAB,
+  or CSV format
+
+--stats
+show index performance statistics
+
+--first=FIRST
+limit index statistics to the best N indexes
+
+--last=LAST
+limit index statistics to the worst N indexes
 
 
 FILES

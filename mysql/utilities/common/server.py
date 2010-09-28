@@ -29,14 +29,14 @@ import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
 # Constants
-MAX_PACKET_SIZE = 1024 * 1024
-MAX_BULK_VALUES = 25000
-MAX_THREADS_INSERT = 6
-MAX_ROWS_PER_THREAD = 100000
-MAX_AVERAGE_CALC = 100
+_MAXPACKET_SIZE = 1024 * 1024
+_MAXBULK_VALUES = 25000
+_MAXTHREADS_INSERT = 6
+_MAXROWS_PER_THREAD = 100000
+_MAXAVERAGE_CALC = 100
 
 # List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
+_DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
     "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 
 def _print_connection(prefix, conn_val):
@@ -206,14 +206,14 @@ class Server(object):
         self.connect_error = None
 
         # Get max allowed packet
-        res = self.show_server_variable("MAX_ALLOWED_PACKET")
+        res = self.show_server_variable("_MAXALLOWED_PACKET")
         if res:
             self.max_packet_size = res[0][1]
         else:
-            self.max_packet_size = MAX_PACKET_SIZE
+            self.max_packet_size = _MAXPACKET_SIZE
         # Watch for invalid values
-        if self.max_packet_size > MAX_PACKET_SIZE:
-            self.max_packet_size = MAX_PACKET_SIZE
+        if self.max_packet_size > _MAXPACKET_SIZE:
+            self.max_packet_size = _MAXPACKET_SIZE
 
 
     def get_create_statement(self, db, name, obj_type):
@@ -228,7 +228,7 @@ class Server(object):
         """
     
         row = None
-        if obj_type == DATABASE:
+        if obj_type == _DATABASE:
             name_str = name
         else:
             name_str = db + "." + name
@@ -239,9 +239,10 @@ class Server(object):
         
         create_statement = None
         if row:
-            if obj_type == TABLE or obj_type == VIEW or obj_type == DATABASE:
+            if obj_type == _TABLE or obj_type == _VIEW or \
+               obj_type == _DATABASE:
                 create_statement = row[0][1]
-            elif obj_type == EVENT:
+            elif obj_type == _EVENT:
                 create_statement = row[0][3]
             else:
                 create_statement = row[0][2]
@@ -414,7 +415,7 @@ class Server(object):
 
             row_size = len(val_str)
             next_size = data_size + row_size + 3
-            if (row_count >= MAX_BULK_VALUES) or \
+            if (row_count >= _MAXBULK_VALUES) or \
                 (next_size > (int(self.max_packet_size) - 512)): # add buffer
                 try:
                     res = dest.exec_query(insert_str)
@@ -512,14 +513,14 @@ class Server(object):
         # Calculate number of threads and segment size to fetch
         if num_conn > 1:
             thread_limit = num_conn
-            if thread_limit > MAX_THREADS_INSERT:
-                thread_limit = MAX_THREADS_INSERT
+            if thread_limit > _MAXTHREADS_INSERT:
+                thread_limit = _MAXTHREADS_INSERT
         else:
-            thread_limit = MAX_THREADS_INSERT
-        if num_rows > (MAX_ROWS_PER_THREAD * thread_limit):
+            thread_limit = _MAXTHREADS_INSERT
+        if num_rows > (_MAXROWS_PER_THREAD * thread_limit):
             max_threads = thread_limit
         else:
-            max_threads = int(num_rows / MAX_ROWS_PER_THREAD) 
+            max_threads = int(num_rows / _MAXROWS_PER_THREAD) 
         if max_threads == 0:
             max_threads = 1
         if max_threads > 1 and verbose:
@@ -654,37 +655,37 @@ class Server(object):
         Returns MySQLdb result set
         """
     
-        if obj_type == TABLE:
+        if obj_type == _TABLE:
             _OBJECT_QUERY = """
             SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
             WHERE TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
             """
-        elif obj_type == VIEW:
+        elif obj_type == _VIEW:
             _OBJECT_QUERY = """
             SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS 
             WHERE TABLE_SCHEMA = %s
             """
-        elif obj_type == TRIGGER:
+        elif obj_type == _TRIG:
             _OBJECT_QUERY = """
             SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS 
             WHERE TRIGGER_SCHEMA = %s 
             """
-        elif obj_type == PROC:
+        elif obj_type == _PROC:
             _OBJECT_QUERY = """
             SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
             WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
             """
-        elif obj_type == FUNC:
+        elif obj_type == _FUNC:
             _OBJECT_QUERY = """
             SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
             WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
             """
-        elif obj_type == EVENT:
+        elif obj_type == _EVENT:
             _OBJECT_QUERY = """
             SELECT EVENT_NAME FROM INFORMATION_SCHEMA.EVENTS 
             WHERE EVENT_SCHEMA = %s
             """
-        elif obj_type == GRANT:
+        elif obj_type == _GRANT:
             _OBJECT_QUERY = """
             (
                 SELECT grantee AS c1, privilege_type AS c2, table_schema AS c3,
@@ -710,7 +711,7 @@ class Server(object):
         else:
             return None
         
-        if obj_type == GRANT:
+        if obj_type == _GRANT:
             return self.exec_query(_OBJECT_QUERY, (db,db,db,db,))
         else:
             return self.exec_query(_OBJECT_QUERY, (db,))

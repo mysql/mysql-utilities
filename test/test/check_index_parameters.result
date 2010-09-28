@@ -4,25 +4,33 @@ Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
 mysqlindexcheck - check for duplicate or redundant indexes
 
 Options:
-  --version         show program's version number and exit
-  --help            
-  --source=SOURCE   connection information for source server in the form:
-                    <user>:<password>@<host>:<port>:<socket>
-  -d, --show-drops  display DROP statements for dropping indexes
-  -s, --skip        skip tables that do not exist
-  -v, --verbose     display additional information during operation
+  --version             show program's version number and exit
+  --help                
+  --source=SOURCE       connection information for source server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -d, --show-drops      display DROP statements for dropping indexes
+  -i, --show-indexes    display indexes for each table
+  -s, --skip            skip tables that do not exist
+  -v, --verbose         display additional information during operation
+  --silent              do not display informational messages
+  --index-format=INDEX_FORMAT
+                        display the list of indexes per table in either SQL,
+                        TABLE (default), TAB, or CSV format
+  --stats               show index performance statistics
+  --first=FIRST         limit index statistics to the best N indexes
+  --last=LAST           limit index statistics to the worst N indexes
 Test case 2 - show drops for a table with dupe indexes
 # Source: root@localhost: ... connected.
 # Checking indexes...
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-#   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #     may be redundant or duplicate of:
-#   CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
 #
-#   CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
 #     may be redundant or duplicate of:
-#   CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #
 # DROP statements:
 #
@@ -31,9 +39,96 @@ ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
 #
 # ...done.
-Test case 3 - show drops for a table without dupe indexes
+Test case 3 - show drops for a table with dupe indexes
+# Source: root@localhost: ... connected.
+# Checking indexes...
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#
+# DROP statements:
+#
+ALTER TABLE util_test_a.t1 DROP INDEX s4;
+ALTER TABLE util_test_a.t1 DROP INDEX s2;
+#
+#
+# ...done.
+Test case 4 - show drops for a table without dupe indexes
 # Source: root@localhost: ... connected.
 # Checking indexes...
 # Table util_test_c.t6 is not indexed.
+#
+# ...done.
+Test case 5 - same as test case 2 but silent
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#
+# DROP statements:
+#
+ALTER TABLE util_test_a.t1 DROP INDEX s4;
+ALTER TABLE util_test_a.t1 DROP INDEX s2;
+#
+Test case 6 - same as test case 4 but silent
+Test case 7 - show indexes
+# Source: root@localhost: ... connected.
+# Checking indexes...
+# Showing indexes from util_test_a.t1:
+#
++--------------+--------+----------+----------+----------+
+| database     | table  | name     | type     | columns  |
++--------------+--------+----------+----------+----------+
+| util_test_a  | t1     | PRIMARY  | BTREE    | A        |
+| util_test_a  | t1     | s1       | SPATIAL  | e(32)    |
+| util_test_a  | t1     | s2       | SPATIAL  | d(32)    |
+| util_test_a  | t1     | s4       | SPATIAL  | d(32)    |
++--------------+--------+----------+----------+----------+
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#
+# ...done.
+Test case 8 - show indexes with -i
+# Source: root@localhost: ... connected.
+# Checking indexes...
+# Showing indexes from util_test_a.t1:
+#
++--------------+--------+----------+----------+----------+
+| database     | table  | name     | type     | columns  |
++--------------+--------+----------+----------+----------+
+| util_test_a  | t1     | PRIMARY  | BTREE    | A        |
+| util_test_a  | t1     | s1       | SPATIAL  | e(32)    |
+| util_test_a  | t1     | s2       | SPATIAL  | d(32)    |
+| util_test_a  | t1     | s4       | SPATIAL  | d(32)    |
++--------------+--------+----------+----------+----------+
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
 #
 # ...done.

@@ -564,6 +564,43 @@ class System_test(object):
             linenum += 1
 
     
+    def mask_column_result(self, prefix, separator, num_col, mask):
+        """ Mask out a column portion of a string for the results.
+
+        str[in]            string to mask
+        prefix[in]         starting prefix of string to mask
+        separator[in]      separator for columns (e.g. ',')
+        num_col[in]        number of column to mask
+        mask[in]           mask string (e.g. '######")
+        """
+        linenum = 0
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                pos = 0
+                for i in range(0, num_col):
+                    loc = line.find(separator, pos)
+                    if i+1 == num_col:
+                        next = line.find(separator, loc)
+                        if next < 0:
+                            start = len(line)
+                        else:
+                            start = next
+                        self.results.pop(linenum)
+                        if start >= len(line):
+                           self.results.insert(linenum,
+                                                line[0:pos] + mask + "\n")
+                        else:
+                            self.results.insert(linenum,
+                                                line[0:pos] + mask +
+                                                line[start:])
+                    else:
+                        pos = loc + 1
+                    if loc < 0:
+                        break
+            linenum += 1
+
+    
     def check_objects(self, server, db, events=True):
         """ Check number of objects.
         
@@ -614,7 +651,7 @@ class System_test(object):
         # Use ndiff to compare to known result file
         #
         res_file = open(res_fname)
-        diff = difflib.ndiff(res_file.readlines(), actual)
+        diff = difflib.ndiff(res_file.readlines(), actual, charjunk="\n")
         #
         # Now convert the diff to a string list and write reject file
         #
