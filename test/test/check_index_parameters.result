@@ -15,7 +15,7 @@ Options:
   --silent              do not display informational messages
   --index-format=INDEX_FORMAT
                         display the list of indexes per table in either SQL,
-                        TABLE (default), TAB, or CSV format
+                        GRID (default), TAB, or CSV format
   --stats               show index performance statistics
   --first=FIRST         limit index statistics to the best N indexes
   --last=LAST           limit index statistics to the worst N indexes

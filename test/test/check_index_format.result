@@ -48,7 +48,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 #
 CREATE INDEX id ON util_test_a.t2 (id) USING BTREE
 #
-Test case 3 - show indexes using TABLE format
+Test case 3 - show indexes using GRID format
 # Showing indexes from util_test_a.t1:
 #
 +--------------+--------+----------+----------+----------+

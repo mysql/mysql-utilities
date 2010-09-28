@@ -25,6 +25,7 @@ METHODS
 """
 
 import csv
+import os
 
 def _format_col_separator(file, columns, col_widths, silent=False):
     """Format a row of the header with column separators
@@ -79,8 +80,12 @@ def format_tabular_list(file, columns, rows, print_header=True,
     if len(rows) == 0:
         return
     if separator is not None:
-        if print_header:
+        if os.name == "posix":
             csv_writer = csv.writer(file, delimiter=separator)
+        else:
+            csv_writer = csv.writer(file, delimiter=separator,
+                                    lineterminator='\n')
+        if print_header:
             csv_writer.writerow(columns)
         for row in rows:
             csv_writer.writerow(row)

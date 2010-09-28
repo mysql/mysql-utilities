@@ -34,8 +34,8 @@ class test(check_index_parameters.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 3 - show indexes using TABLE format"
-        res = self.run_test_case(0, cmd_str + "--index-format=TABLE", comment)
+        comment = "Test case 3 - show indexes using GRID format"
+        res = self.run_test_case(0, cmd_str + "--index-format=GRID", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 

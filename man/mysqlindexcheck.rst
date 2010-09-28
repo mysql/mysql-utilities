@@ -20,7 +20,7 @@ SYNOPSIS
  mysqlcheckindex --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                   --silent | --index-format=[TABLE|SQL|TAB|CSV] |
+                   --silent | --index-format=[GRID|SQL|TAB|CSV] |
                    --stat [--first=<num_rows> | --last=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 

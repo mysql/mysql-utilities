@@ -651,7 +651,7 @@ class System_test(object):
         # Use ndiff to compare to known result file
         #
         res_file = open(res_fname)
-        diff = difflib.ndiff(res_file.readlines(), actual, charjunk="\n")
+        diff = difflib.ndiff(res_file.readlines(), actual)
         #
         # Now convert the diff to a string list and write reject file
         #
