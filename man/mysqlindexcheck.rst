@@ -21,7 +21,7 @@ SYNOPSIS
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
                    --silent | --index-format=[TABLE|SQL|TAB|CSV] |
-                   --best | --worst ]
+                   --stat [--first=<num_rows> | --last=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
