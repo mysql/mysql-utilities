@@ -6,8 +6,22 @@ Test case 2 - error: invalid login to destination server
 # Destination: noone@localhost: ... ERROR: Cannot connect to the destination server.
 Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
 Test case 3 - error: no arguments
-ERROR: No arguments found. Use --help for available options.
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: No arguments found. Use --help for available options.
 Test case 4 - error: no new user
-ERROR: wrong parameter combination or no new users.
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: Wrong parameter combination or no new users.
 Test case 5 - error: cannot use dump and silent together
-ERROR: You cannot use --silent and --dump together.
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: You cannot use --silent and --dump together.
+Test case 6 - error: cannot parser source connection
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: Source connection values invalid or cannot be parsed.
+Test case 7 - error: cannot parser destination connection
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: Destination connection values invalid or cannot be parsed.

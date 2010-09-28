@@ -85,18 +85,15 @@ opt, args = parser.parse_args()
 
 # Fail if dump and silent set
 if opt.silent and opt.dump:
-    print "ERROR: You cannot use --silent and --dump together."
-    exit(1)
+    parser.error("You cannot use --silent and --dump together.")
 
 # Fail if no arguments and no options.
 if len(args) == 0 or opt is None:
-    print "ERROR: No arguments found. Use --help for available options."
-    exit(1)
+    parser.error("No arguments found. Use --help for available options.")
 
 # Make sure we have the base user plus at least one new user
 if len(args) < 2:
-    print "ERROR: wrong parameter combination or no new users."
-    exit(1)
+    parser.error("Wrong parameter combination or no new users.")
 
 base_user = args[0]
 new_user_list = args[1:]
@@ -104,14 +101,12 @@ new_user_list = args[1:]
 # Parse source connection values
 source_values = parse_connection(opt.source)
 if source_values is None:
-    print "ERROR: Source connection values invalid or cannot be parsed."
-    exit(1)
+    parser.error("Source connection values invalid or cannot be parsed.")
 
 # Parse destination connection values
 dest_values = parse_connection(opt.destination)
 if dest_values is None:
-    print "ERROR: Destination connection values invalid or cannot be parsed."
-    exit(1)
+    parser.error("Destination connection values invalid or cannot be parsed.")
 
 try:
     res = userclone.clone_user(source_values, dest_values, base_user,

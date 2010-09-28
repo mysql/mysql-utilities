@@ -39,18 +39,31 @@ class test(copy_user.test):
 
         cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
         comment = "Test case 3 - error: no arguments"
-        res = self.run_test_case(1, cmd_str, comment)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 4 - error: no new user"
-        res = self.run_test_case(1, cmd_str + "joenopass@localhost", comment)
+        res = self.run_test_case(2, cmd_str + "joenopass@localhost", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 5 - error: cannot use dump and silent together"
-        res = self.run_test_case(1, cmd_str + " root@localhost " \
+        res = self.run_test_case(2, cmd_str + " root@localhost " \
                                  " x@f --silent --dump", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqluserclone.py --source=wikiwakawonky %s " % to_conn
+        comment = "Test case 6 - error: cannot parser source connection"
+        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqluserclone.py --destination=wikiwakawonky %s " % \
+                  from_conn
+        comment = "Test case 7 - error: cannot parser destination connection"
+        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
