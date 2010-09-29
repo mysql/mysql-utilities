@@ -275,12 +275,22 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
 parser.add_option("--force", action="store_true", dest="force",
                   help="do not abort when a test fails")
 
+# Debug mode
+parser.add_option("--debug", "-d", action="store_true", dest="debug",
+                  help="display actual results of test cases to screen "
+                       "and ignore result processing - used to diagnose "
+                       "test execution problems")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
 # Cannot use --do-test= with listing tests.
 if opt.wildcard and len(args) > 0:
-    parser.error("Cannot mix --do-test= and list of tests.")
+    parser.error("Cannot mix --do-test= and a list of tests.")
+
+# Cannot use --debug with listing tests.
+if opt.debug and len(args) > 1:
+    parser.error("Cannot mix --debug and a list of tests.")
 
 # Must use --record with a specific test
 if opt.record and len(args) != 1:
@@ -468,7 +478,7 @@ for test_tuple in test_files:
     test_class = __import__(test)
     test_case = test_class.test(server_list,
                                 opt.testdir + "/" + test_suite,
-                                opt.utildir)
+                                opt.utildir, opt.verbose, opt.debug)
     
     last_test = test_case
     # Print name of the test

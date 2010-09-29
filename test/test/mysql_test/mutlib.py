@@ -53,7 +53,6 @@ def _exec_util(cmd, file_out, utildir, debug=False):
     
     Returns return value of process run.
     """
-    
     run_cmd = "python " + utildir + "/" + cmd
     f_out = open(file_out, 'w+')
     if debug:
@@ -395,13 +394,15 @@ class System_test(object):
     """
     __metaclass__ = ABCMeta   # Register abstract base class
 
-    def __init__(self, servers, testdir, utildir, verbose=False):
+    def __init__(self, servers, testdir, utildir, verbose=False, debug=False):
         """Constructor
             
         servers[in]        A list of Server objects
         testdir[in]        Path to test objects
         utildir[in]        Path to utilty scripts 
         verbose[in]        print extra data during operations (optional)
+                           default value = False
+        debug[in]          Turn on debugging mode for a single test
                            default value = False
         """
         
@@ -411,7 +412,8 @@ class System_test(object):
         self.testdir = testdir      # Current test directory
         self.utildir = utildir      # Location of utilities being tested
         self.verbose = verbose      # Option for verbosity
-        
+        self.debug = debug          # Option for diagnostic work
+
 
     def __del__(self):
         """Destructor
@@ -422,7 +424,7 @@ class System_test(object):
             del result
             
 
-    def exec_util(self, cmd, file_out, debug=False):
+    def exec_util(self, cmd, file_out):
         """Execute Utility
         
         This method executes a MySQL utility using the utildir specified in
@@ -431,12 +433,10 @@ class System_test(object):
         
         cmd[in]            The command to execute including all parameters
         file_out[in]       Path and filename of a file to write output
-        debug[in]          Prints debug information during execution of
-                           utility
         
         Returns return value of process run.
         """
-        return _exec_util(cmd, file_out, self.utildir, debug)
+        return _exec_util(cmd, file_out, self.utildir, self.debug)
     
 
     def check_num_servers(self, num_servers):
@@ -517,7 +517,7 @@ class System_test(object):
         """
         if debug:
             print "\n%s" % comments
-        res = self.exec_util(command, self.res_fname, debug)
+        res = self.exec_util(command, self.res_fname)
         if comments:
             self.results.append(comments + "\n")
         self.record_results(self.res_fname)

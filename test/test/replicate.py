@@ -76,7 +76,7 @@ class test(mysql_test.System_test):
     
     def run_test_case(self, server1, server2, s_id,
                       comment, options=None, save_for_compare=False,
-                      expected_result=0, show_results=False):
+                      expected_result=0):
         #
         # Note: server1 is slave, server2 is master
         #
@@ -94,7 +94,7 @@ class test(mysql_test.System_test):
             cmd += " %s" % options
         if not save_for_compare:
             self.results.append(cmd)
-        res = self.exec_util(cmd, self.res_fname, show_results)
+        res = self.exec_util(cmd, self.res_fname)
         if not save_for_compare:
             self.results.append(res)
         
