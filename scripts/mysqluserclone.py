@@ -79,6 +79,11 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
 parser.add_option("--silent", action="store_true", dest="silent",
                   help="do not display feedback information during operation")
 
+# Include globals mode
+parser.add_option("--include-globals", action="store_true", dest="globals",
+                  help="include privileges that match base_user@% as well " 
+                       "as base_user@host", default=False)
+
 # Now we process the rest of the arguments where the first is the
 # base user and the next N are the new users.
 opt, args = parser.parse_args()
@@ -108,10 +113,19 @@ dest_values = parse_connection(opt.destination)
 if dest_values is None:
     parser.error("Destination connection values invalid or cannot be parsed.")
 
+# Build dictionary of options
+options = {
+    "dump"      : opt.dump,
+    "copy_dir"  : opt.copy_dir,
+    "overwrite" : opt.overwrite,
+    "silent"    : opt.silent,
+    "verbose"   : opt.verbose,
+    "globals"   : opt.globals
+}
+
 try:
     res = userclone.clone_user(source_values, dest_values, base_user,
-                               new_user_list, opt.dump, opt.copy_dir,
-                               opt.overwrite, opt.verbose, opt.silent)
+                               new_user_list, options)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

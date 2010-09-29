@@ -87,8 +87,30 @@ class test(mysql_test.System_test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        # No show overwritten grants
+        # Now show overwritten grants
         self.show_user_grants("joe_nopass@user")
+
+        # Now show how --include-globals works.
+        try:
+            self.server1.exec_query("CREATE USER joe_pass@'%%'")
+            self.server1.exec_query("GRANT ALL ON util_test.* TO "
+                                    "joe_pass@'%%'")
+        except MySQLUtilError, e:
+            raise MUTException("Cannot create user with global grants: %s" %
+                               e.errmsg)
+
+        comment= "Test case 6 - show clone without --include-globals set"
+        res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
+                                 "joe_nopass@user --force ", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment= "Test case 7 - show clone with --include-globals set"
+        res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
+                                 "joe_nopass@user --force --include-globals",
+                                 comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
 
         return True
 
@@ -113,6 +135,9 @@ class test(mysql_test.System_test):
         try:
             res = self.server1.exec_query(query)
         except:
+            return False
+        res = self.drop_user("joe_pass@%", self.server1)
+        if not res:
             return False
         res = self.drop_user("joe_pass@user", self.server1)
         if not res:

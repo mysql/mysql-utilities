@@ -23,4 +23,6 @@ Options:
   -f, --force           drop the new user if it exists
   -v, --verbose         display additional information during operation
   --silent              do not display feedback information during operation
+  --include-globals     include privileges that match base_user@% as well as
+                        base_user@host
 Test case 3 - use the silent parameter
