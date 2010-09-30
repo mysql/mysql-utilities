@@ -4,4 +4,5 @@ from dbcopy import copy_db
 from userclone import clone_user
 from indexcheck import check_index
 from rpl import replicate
+from grep import *
 
