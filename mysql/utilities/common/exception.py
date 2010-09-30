@@ -20,6 +20,9 @@
 This file contains the exceptions used by MySQL Utilities and their libraries.
 """
 
+class Error(Exception):
+    pass
+
 class OptionError(Exception):
     """
     Exception thrown when there either an option is missing or incorrect.
@@ -40,6 +43,10 @@ class MySQLUtilError(Exception):
         self.args = (message, options)
         self.errmsg = message
         self.options = options
+
+class FormatError(Error):
+    """An entity was supplied in the wrong format."""
+    pass
 
 class MUTException(Exception):
     """ MUT errors

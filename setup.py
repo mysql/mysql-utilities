@@ -34,6 +34,7 @@ INSTALL = {
         'scripts/mysqluserclone.py',
         'scripts/mysqlindexcheck.py',
         'scripts/mysqlreplicate.py'
+        'scripts/mysqlgrep.py'
         ],
     }
 
