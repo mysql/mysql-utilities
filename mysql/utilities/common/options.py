@@ -79,26 +79,53 @@ def setup_common_options(version_str, desc_str, usage_str):
     return parser
 
 
+_CONN_CRE = re.compile(
+    r"(\w+)"                    # User name
+    r"(?:\:(\w+))?"             # Optional password
+    r"@"
+    r"([\w+|\d+|.]+)"           # Domain name or IP address
+    r"(?:\:(\d+))?"             # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
+    )
+
 def parse_connection(connection_values):
-    """Parse connection values
+    """Parse connection values.
     
+    The function parses a connection specification of the form::
+    
+      user[:password]@host[:port[:socket]]
+
+    A dictionary is returned containing the connection parameters. The
+    function is designed so that it shall be possible to use it with a
+    ``connect`` call in the following manner::
+
+      options = parse_connection(spec)
+      conn = MySQLdb.connect(**options)
+
     conn_values[in]     Connection values in the form:
                         user:password@host:port:socket
                         
     Returns dictionary (user, passwd, host, port, socket)
             or None if parsing error
     """
-    grp = re.match("(\w+)(?:\:(\w+))?@([\w+|\d+|.]+)(?:\:(\d+))?" +
-                   "(?:\:([\/\\w+.\w+.\-]+))?", connection_values)
+    grp = _CONN_CRE.match(connection_values)
     if not grp:
         return None
+        # from . import FormatError
+        # raise FormatError("'%s' can not be parsed as a connection")
     user, passwd, host, port, socket = grp.groups()
+
     connection = {
         "user"   : user,
-        "passwd" : passwd,
         "host"   : host,
-        "port"   : port,
-        "socket" : socket
+        "port"   : int(port) if port else 3306,
+        "passwd" : passwd if passwd else ''
     }
+
+    # Handle optional parameters. They are only stored in the dict if
+    # they were provided in the specifier.
+    if socket is not None:
+        connection['unix_socket'] = socket
+
     return connection
 

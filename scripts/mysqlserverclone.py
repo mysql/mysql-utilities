@@ -79,7 +79,7 @@ conn = {
     "passwd" : opt.login_pass,
     "host"   : opt.host,
     "port"   : opt.port,
-    "socket" : opt.socket
+    "unix_socket" : opt.socket
 }
 
 try:

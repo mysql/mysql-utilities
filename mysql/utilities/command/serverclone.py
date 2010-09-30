@@ -180,7 +180,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         "passwd" : "",
         "host"   : conn_val["host"],
         "port"   : port_int,
-        "socket" : new_sock
+        "unix_socket" : new_sock
     }
     server2 = Server(conn, "clone")
     

@@ -196,10 +196,10 @@ class Server_list(object):
             "passwd" : passwd,
             "host"   : "localhost",
             "port"   : port,
-            "socket" : full_datadir + "/mysql.sock"
+            "unix_socket" : full_datadir + "/mysql.sock"
         }
         if os.name != "posix":
-            conn["socket"] = None
+            conn["unix_socket"] = None
             
         self.new_server = Server(conn, role)
         

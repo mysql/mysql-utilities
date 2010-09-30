@@ -81,10 +81,10 @@ class test(mysql_test.System_test):
             "passwd" : "root",
             "host"   : "localhost",
             "port"   : port1,
-            "socket" : full_datadir + "/mysql.sock"
+            "unix_socket" : full_datadir + "/mysql.sock"
         }
         if os.name != "posix":
-            conn["socket"] = None
+            conn["unix_socket"] = None
         
         self.new_server = mysql_util.Server(conn, "cloned_server")
         if self.new_server is None:
