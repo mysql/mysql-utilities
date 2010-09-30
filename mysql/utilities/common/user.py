@@ -153,8 +153,10 @@ class User(object):
         else:
             return False        
 
-    def get_grants(self):
+    def get_grants(self, globals=False):
         """Retrieve the grants for the current user
+
+        globals[in]        Include global privileges in clone (i.e. user@%)
         
         returns MySQLdb.result set or None if no grants defined
         """
@@ -166,13 +168,14 @@ class User(object):
                 grants.append(grant)
         except MySQLUtilError, e:
             pass # Error here is ok - no grants found.
-        try:
-            res = self.server1.exec_query("SHOW GRANTS FOR '%s'" % self.user +
-                                          "@'%%'")
-            for grant in res:
-                grants.append(grant)
-        except MySQLUtilError, e:
-            pass # Error here is ok - no grants found.
+        if globals:
+            try:
+                res = self.server1.exec_query("SHOW GRANTS FOR '%s'" % \
+                                              self.user + "@'%%'")
+                for grant in res:
+                    grants.append(grant)
+            except MySQLUtilError, e:
+                pass # Error here is ok - no grants found.
         return grants
 
     def has_privilege(self, db, obj, access):
@@ -188,18 +191,18 @@ class User(object):
         regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|%s)\b.*"
                            r"ON\s+(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
                            % (re.escape(access), re.escape(db), re.escape(obj)))
-        for grant in self.get_grants():
+        for grant in self.get_grants(True):
             if regex.match(grant[0]):
                 return True
 
     def print_grants(self):
         """Display grants for the current user"""
         
-        res = self.get_grants()
+        res = self.get_grants(True)
         for grant_tuple in res:
             print grant_tuple[0]
 
-    def clone(self, new_user, destination=None):
+    def clone(self, new_user, destination=None, globals=False):
         """Clone the current user to the new user
         
         Operation will create the new user account copying all of the
@@ -209,11 +212,12 @@ class User(object):
         new_name[in]       MySQL user string (user@host:passwd)
         destination[in]    A connection to a new server to clone the user
                            (default is None)
+        globals[in]        Include global privileges in clone (i.e. user@%)
         
         Note: Caller must ensure the new user account does not exist.
         """
         
-        res = self.get_grants()
+        res = self.get_grants(globals)
         server = self.server1
         if destination is not None:
             server = destination

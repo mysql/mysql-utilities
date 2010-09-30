@@ -72,6 +72,9 @@ OPTIONS
 
 --silent              do not display feedback information during operation
 
+--include-globals     include privileges that match base_user@% as well as
+                      base_user@host
+
 
 FILES
 =====

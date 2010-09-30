@@ -35,3 +35,24 @@ Test case 5 - attempt to copy a user to a user that already exists with --force
 # ...done.
 GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
 GRANT SELECT ON `util_test`.* TO 'jill'@'user'
+Test case 6 - show clone without --include-globals set
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user joe_nopass@user 
+CREATE USER 'joe_nopass'@'user' 
+GRANT USAGE ON *.* TO 'joe_nopass'@'user' 
+GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
+# ...done.
+Test case 7 - show clone with --include-globals set
+# Source: root@localhost: ... connected.
+# Destination: root@localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user joe_nopass@user 
+DROP USER 'joe_nopass'@'user' 
+CREATE USER 'joe_nopass'@'user' 
+GRANT USAGE ON *.* TO 'joe_nopass'@'user' 
+GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
+GRANT USAGE ON *.* TO 'joe_pass'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
+# ...done.

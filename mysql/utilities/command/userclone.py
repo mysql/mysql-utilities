@@ -25,8 +25,7 @@ to the new users.
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
-def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
-               copy_dir=None, overwrite=False, verbose=False, silent=False):
+def clone_user(src_val, dest_val, base_user, new_user_list, options):
     """ Clone a user to one or more new user accounts
     
     This method will create one or more new user accounts copying the
@@ -49,20 +48,27 @@ def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
                        the template for the new users
     user_list[in]      a list of new user accounts in the form:
                        (username:password@host)
-    dumpSQL[in]        if True, print grants for base user (no new users
-                       are created)
-    force[in]          drop new users if they exist
-    verbose[in]        print additional information during operation
-                       (default is False)
-    silent[in]         do not print any information during the operation -
-                       Note: Error messages are printed regardless
-                       (default is False)
+    options[in]        optional parameters dictionary including:
+                         dump_sql - if True, print grants for base user
+                                    (no new users are created)
+                         force    - drop new users if they exist
+                         verbose  - print add'l information during operation
+                         silent   - do not print information during operation
+                                    Note: Error messages are printed regardless
+                         globals  - include global privileges (i.e. user@%) 
                        
     Returns bool True = success, raises MySQLUtilError if error
     """
 
     from mysql.utilities.common import connect_servers
     from mysql.utilities.common import User
+
+    dump_sql = options["dump"]
+    copy_dir = options["copy_dir"]
+    overwrite = options["overwrite"]
+    verbose = options["verbose"]
+    silent = options["silent"]
+    globals = options["globals"]
 
     try:
         servers = connect_servers(src_val, dest_val, silent, "5.1.0")
@@ -109,7 +115,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, dump_sql,
             user_dest.drop(new_user)
         # Clone user.
         try:
-            user_source.clone(new_user, destination)
+            user_source.clone(new_user, destination, globals)
         except MySQLUtilError, e:
             raise
 
