@@ -37,6 +37,26 @@ class test(replicate.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
+        comment = "Test case 3 - use the verbose feature"
+        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
+                                 comment, " --verbose", True)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        try:
+            res = self.server2.exec_query("STOP SLAVE")
+        except:
+            pass
+        
+        self.remove_result("# status:")
+        self.remove_result("# error: ")
+        self.mask_result("# CHANGE MASTER TO MASTER_HOST",
+                         "MASTER_LOG_POS = ", "MASTER_LOG_POST = XXXX")
+        self.mask_result("# CHANGE MASTER TO MASTER_HOST",
+                         "MASTER_PORT = ", "MASTER_PORT = XXXX")
+        self.mask_result("# master id =", "= ", "= XXX")
+        self.mask_result("#  slave id =", "= ", "= XXX")
+
         return True
 
     def get_result(self):

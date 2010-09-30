@@ -54,11 +54,6 @@ parser.add_option("--slave", action="store", dest="slave",
                   help="connection information for slave server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Server id
-parser.add_option("--server-id", action="store", dest="server_id",
-                  type = "string", default="",
-                  help="the server_id for the slave")
-
 # Replication user and password
 parser.add_option("--rpl-user", action="store", dest="rpl_user",
                   type = "string", default="rpl:rpl",
@@ -89,9 +84,9 @@ try:
     s_values = parse_connection(opt.slave)
 except:
     parser.error("Slave connection values invalid or cannot be parsed.")
-        
+    
 try:
-    res = rpl.replicate(m_values, s_values, opt.server_id, opt.rpl_user,
+    res = rpl.replicate(m_values, s_values, opt.rpl_user,
                         opt.test_db, opt.verbose)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg

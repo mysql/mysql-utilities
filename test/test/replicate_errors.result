@@ -14,8 +14,6 @@ Test case 4 - error: invalid login to server (slave)
 # slave on nada: ... ERROR: Cannot connect to the destination server.
 Error 2005: Unknown MySQL server host 'nada' #######
 Test case 5 - error: slave and master same machine
-# master on localhost: ... connected.
-# slave on localhost: ... connected.
 ERROR: You must specify two different servers for the operation.
 Test case 6 - error: No binary logging on master
 # master on localhost: ... connected.
@@ -28,3 +26,11 @@ Test case 7 - error: replicate() fails
 # Checking for binary logging on master...
 # Setting up replication...
 ERROR: Query failed. 1227: Access denied;
+Test case 8 - error: Master server id = 0
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+ERROR: Master server_id is set to 0.
+Test case 9 - error: Slave server id = 0
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+ERROR: Slave server_id is set to 0.

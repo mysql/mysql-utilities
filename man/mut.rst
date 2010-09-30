@@ -88,6 +88,10 @@ OPTIONS
 
 --verbose              display additional information during operation
 
+-d, --debug            display actual results of test cases to screen and
+                       ignore result processing - used to diagnose test
+                       execution problems
+
 FILES
 =====
 

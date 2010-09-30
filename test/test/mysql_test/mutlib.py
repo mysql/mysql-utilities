@@ -518,7 +518,7 @@ class System_test(object):
               
         Returns True if result matches expected result
         """
-        if debug:
+        if self.debug or debug:
             print "\n%s" % comments
         res = self.exec_util(command, self.res_fname)
         if comments:
@@ -539,6 +539,19 @@ class System_test(object):
             if index == 0:
                 self.results.pop(linenum)
                 self.results.insert(linenum, str)
+            linenum += 1
+
+    
+    def remove_result(self, prefix):
+        """ Remove a string in the results.
+
+        prefix[in]         starting prefix of string to mask
+        """
+        linenum = 0
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                self.results.pop(linenum)
             linenum += 1
 
     
