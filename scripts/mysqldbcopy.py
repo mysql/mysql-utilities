@@ -170,13 +170,15 @@ options = {
 }
 
 # Parse source connection values
-source_values = parse_connection(opt.source)
-if source_values is None:
+try:
+    source_values = parse_connection(opt.source)
+except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 # Parse destination connection values
-dest_values = parse_connection(opt.destination)
-if dest_values is None:
+try:
+    dest_values = parse_connection(opt.destination)
+except:
     parser.error("Destination connection values invalid or cannot be parsed.")
 
 # Build list of databases to copy

@@ -115,8 +115,9 @@ else:
     opt.index_format = opt.index_format.upper()
 
 # Parse source connection values
-source_values = parse_connection(opt.source)
-if source_values is None:
+try:
+    source_values = parse_connection(opt.source)
+except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 # Check first, last for validity
@@ -151,8 +152,9 @@ if (last is not None or first is not None) and not opt.stats:
                  "effect.")
 
 # Parse source connection values
-source_values = parse_connection(opt.source)
-if source_values is None:
+try:
+    source_values = parse_connection(opt.source)
+except:
     parser.error("Source connection values invalid or cannot be parsed.")
     
 # Build dictionary of options

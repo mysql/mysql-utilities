@@ -209,7 +209,8 @@ class Server_list(object):
         try:
             self.new_server.connect()
         except MySQLUtilError, e:
-            server = (None, "Failed to connect")
+            raise MySQLUtilError("Cannot connect to spawned server: %s" % \
+                                 e.errmsg)
         return server
     
     
@@ -478,6 +479,8 @@ class System_test(object):
         
         Returns (user, password, host, port, socket)
         """
+        if server is None:
+            raise MySQLUtilError("Server not initialized!")
         return (server.user, server.passwd, server.host,
                 server.port, server.socket, server.role)
 

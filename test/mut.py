@@ -347,37 +347,38 @@ if not opt.servers:
 else:
     i = 0
     for server in opt.servers:
-        conn_val = parse_connection(server)
-        if conn_val:
-            i += 1   
-            # Fail if port and socket are both None
-            if conn_val["port"] is None and conn_val["unix_socket"] is None:
-                parser.error("You must specify either a port or a socket " \
-                      "in the server string: \n       %s" % server)
-
-            sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
-                             (conn_val["host"], conn_val["user"],
-                              conn_val["port"]))
-            sys.stdout.flush()
-
-            if conn_val["port"] is not None:
-                conn_val["port"] = int(conn_val["port"])
-            else:
-                conn_val["port"] = 0
-                
-            conn = Server(conn_val, "server%d" % i)
-            try:
-                conn.connect()
-                server_list.add_new_server(conn)
-                print "CONNECTED"
-                res = conn.show_server_variable("basedir")
-                basedir = res[0][1]
-            except:
-                print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
-                if conn.connect_error is not None:
-                    print conn.connect_error
-        else:
+        try:
+            conn_val = parse_connection(server)
+        except:
             parser.error("Problem parsing server connection '%s'" % server)
+
+        i += 1   
+        # Fail if port and socket are both None
+        if conn_val["port"] is None and conn_val["unix_socket"] is None:
+            parser.error("You must specify either a port or a socket " \
+                  "in the server string: \n       %s" % server)
+
+        sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
+                         (conn_val["host"], conn_val["user"],
+                          conn_val["port"]))
+        sys.stdout.flush()
+
+        if conn_val["port"] is not None:
+            conn_val["port"] = int(conn_val["port"])
+        else:
+            conn_val["port"] = 0
+            
+        conn = Server(conn_val, "server%d" % i)
+        try:
+            conn.connect()
+            server_list.add_new_server(conn)
+            print "CONNECTED"
+            res = conn.show_server_variable("basedir")
+            basedir = res[0][1]
+        except:
+            print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
+            if conn.connect_error is not None:
+                print conn.connect_error
     if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
         exit(1)

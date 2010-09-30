@@ -108,11 +108,11 @@ def parse_connection(connection_values):
     Returns dictionary (user, passwd, host, port, socket)
             or None if parsing error
     """
+    
     grp = _CONN_CRE.match(connection_values)
     if not grp:
-        return None
-        # from . import FormatError
-        # raise FormatError("'%s' can not be parsed as a connection")
+        from mysql.utilities.common import MySQLUtilError
+        raise MySQLUtilError("Cannot parse connection.")
     user, passwd, host, port, socket = grp.groups()
 
     connection = {
@@ -121,7 +121,7 @@ def parse_connection(connection_values):
         "port"   : int(port) if port else 3306,
         "passwd" : passwd if passwd else ''
     }
-
+    
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.
     if socket is not None:

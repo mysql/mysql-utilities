@@ -79,13 +79,15 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
 opt, args = parser.parse_args()
 
 # Parse source connection values
-m_values = parse_connection(opt.master)
-if m_values is None:
+try:
+    m_values = parse_connection(opt.master)
+except:
     parser.error("Master connection values invalid or cannot be parsed.")
 
 # Parse source connection values
-s_values = parse_connection(opt.slave)
-if s_values is None:
+try:
+    s_values = parse_connection(opt.slave)
+except:
     parser.error("Slave connection values invalid or cannot be parsed.")
         
 try:

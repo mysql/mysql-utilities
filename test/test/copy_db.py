@@ -25,7 +25,8 @@ class test(mysql_test.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers.")
+                raise MUTException("Cannot spawn needed servers: %s" % \
+                                   e.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
