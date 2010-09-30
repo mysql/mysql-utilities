@@ -125,10 +125,10 @@ def _shutdown_running_servers(server_list, processes, basedir):
             "passwd" : "root",
             "host"   : "localhost",
             "port"   : None,
-            "socket" : None
+            "unix_socket" : None
         }
         if os.name == "posix":
-            connection["socket"] = os.path.join(process[1], "mysql.sock")
+            connection["unix_socket"] = os.path.join(process[1], "mysql.sock")
         elif os.name == "nt":
             connection["port"] = process[1]
 
@@ -341,7 +341,7 @@ else:
         if conn_val:
             i += 1   
             # Fail if port and socket are both None
-            if conn_val["port"] is None and conn_val["socket"] is None:
+            if conn_val["port"] is None and conn_val["unix_socket"] is None:
                 parser.error("You must specify either a port or a socket " \
                       "in the server string: \n       %s" % server)
 

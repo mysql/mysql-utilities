@@ -161,7 +161,7 @@ class Server(object):
         self.host = conn_val["host"]
         self.user = conn_val["user"]
         self.passwd = conn_val["passwd"]
-        self.socket = conn_val["socket"]
+        self.socket = conn_val["unix_socket"] if "unix_socket" in conn_val else None
         self.port = 3306
         if conn_val["port"] is not None:
             self.port = int(conn_val["port"])
@@ -533,7 +533,7 @@ class Server(object):
             "host"   : destination.host,
             "user"   : destination.user,
             "passwd" : destination.passwd,
-            "socket" : destination.socket,
+            "unix_socket" : destination.socket,
             "port"   : destination.port
         }
 
