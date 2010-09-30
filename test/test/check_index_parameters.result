@@ -20,7 +20,7 @@ Options:
   --first=FIRST         limit index statistics to the best N indexes
   --last=LAST           limit index statistics to the worst N indexes
 Test case 2 - show drops for a table with dupe indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
@@ -40,7 +40,7 @@ ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
 # ...done.
 Test case 3 - show drops for a table with dupe indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
@@ -60,7 +60,7 @@ ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
 # ...done.
 Test case 4 - show drops for a table without dupe indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # Table util_test_c.t6 is not indexed.
 #
@@ -83,7 +83,7 @@ ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
 Test case 6 - same as test case 4 but silent
 Test case 7 - show indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # Showing indexes from util_test_a.t1:
 #
@@ -108,7 +108,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 #
 # ...done.
 Test case 8 - show indexes with -i
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # Showing indexes from util_test_a.t1:
 #

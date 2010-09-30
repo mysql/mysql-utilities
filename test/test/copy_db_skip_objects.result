@@ -1,6 +1,6 @@
 Test case 1 - no grants
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -18,8 +18,8 @@ Test case 1 - no grants
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
 Test case 2 - no events
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -36,8 +36,8 @@ Test case 2 - no events
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
 Test case 3 - no functions
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -53,8 +53,8 @@ Test case 3 - no functions
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
 Test case 4 - no procedures
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -69,8 +69,8 @@ Test case 4 - no procedures
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
 Test case 5 - no triggers
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -84,8 +84,8 @@ Test case 5 - no triggers
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 6 - no views
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -98,14 +98,14 @@ Test case 6 - no views
 #...done.
 OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 7 - no tables
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 #...done.
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 8 - skip create db
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -124,8 +124,8 @@ Test case 8 - skip create db
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
 Test case 9 - skip tables only - will fail
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying VIEW util_test.v1
 ERROR: Cannot operate on VIEW object. Error: Query failed. 1146: Table 'util_db_clone.t1' doesn't exist

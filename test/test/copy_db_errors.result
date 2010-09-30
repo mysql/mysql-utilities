@@ -11,20 +11,20 @@ Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pas
 
 mysqldbcopy.py: error: Cannot parse database list. Error on '::sad'.
 Test case 4 - error: old database doesn't exist
-# Source: root@localhost: ... connected.
-# Destination: root@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database NOT_THERE_AT_ALL renamed as util_db_clone
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 5 - error: cannot connect to source
-# Source: nope@localhost: ... ERROR: Cannot connect to the Source server.
+# Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: cannot connect to destination
-# Source: root@localhost: ... connected.
-# Destination: nope@localhost: ... ERROR: Cannot connect to the destination server.
+# Source on localhost: ... connected.
+# Destination on localhost: ... ERROR: Cannot connect to the destination server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 7 - users with minimal privileges
-# Source: joe@localhost: ... connected.
-# Destination: joe@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -40,20 +40,20 @@ Test case 7 - users with minimal privileges
 # Copying GRANTS from util_test
 #...done.
 Test case 8 - source user not enough privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: joe@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - source user has some privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: joe@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 10 - source user has some privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: joe@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 11 - source user has privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: joe@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1
@@ -69,20 +69,20 @@ Test case 11 - source user has privileges needed
 # Copying GRANTS from util_test
 #...done.
 Test case 12 - dest user not enough privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: sam@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
 Test case 13 - dest user has some privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: sam@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 14 - dest user has some privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: sam@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User sam on the destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 15 - dest user has privileges needed
-# Source: sam@localhost: ... connected.
-# Destination: sam@localhost:[] ... connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying data for TABLE util_test.t1

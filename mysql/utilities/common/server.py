@@ -43,8 +43,7 @@ def _print_connection(prefix, conn_val):
     """ Print connection information
     """
     conn_str = None
-    sys.stdout.write("# %s: %s@%s: ... " %
-                     (prefix, conn_val["user"], conn_val["host"]))
+    sys.stdout.write("# %s on %s: ... " % (prefix, conn_val["host"]))
 
 
 def connect_servers(src_val, dest_val, silent=False, version=None,
