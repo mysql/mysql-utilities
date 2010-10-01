@@ -723,6 +723,13 @@ class System_test(object):
                 res_file.write(str)
             res_file.close()
         return True
+    
+    def is_long(self):
+        """Is test marked as a long running test?
+        
+        Override this method to specify the test is a long-running test.
+        """
+        return False
 
     
     @abstractmethod
