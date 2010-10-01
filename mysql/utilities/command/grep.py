@@ -1,7 +1,28 @@
+#
+# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+
+"""Module for searching MySQL database servers for objects by name or content.
+"""
+
 import MySQLdb
 import sys
 
-from mysql.utilities.common.options import parse_connection
+from ..common.options import parse_connection
+from ..common.format import format_tabular_list
 
 # Mapping database object to information schema names and fields. I
 # wish that the tables would have had simple names and not qualify the
@@ -42,10 +63,24 @@ _OBJMAP = {
         'type_field': "'SCHEMA'",
         'schema_field': 'schema_name',
         },        
+    'view': {
+        'field_name': 'table_name',
+        'table_name': 'views',
+        'type_field': "'VIEW'",
+        'schema_field': 'table_schema',
+        },
+    'user': {
+        'select_option': 'DISTINCT',
+        'field_name': 'grantee',
+        'table_name': 'schema_privileges',
+        'type_field': "'USER'",
+        'schema_field': 'table_schema',
+        'body_field': 'privilege_type',
+        },
 }
 
 _SELECT_TYPE_FRM = """
-  SELECT
+  SELECT %(select_option)s
     %(type_field)s AS `Type`,
     %(field_name)s AS `Name`,
     %(schema_field)s AS `Schema`
@@ -70,40 +105,12 @@ def _make_select(objtype, pattern, check_body, use_regexp):
         'pattern': _obj2sql(pattern),
         'regex': 'REGEXP' if use_regexp else 'LIKE',
         'extra_condition': '',
+        'select_option': '',
         }
     options.update(_OBJMAP[objtype])
     if check_body and "body_field" in options:
         options["extra_condition"] = " OR %(body_field)s %(regex)s %(pattern)s" % options
     return _SELECT_TYPE_FRM % options
-
-def _ptw_max_len(a,b):
-    """Point-wise max length.
-
-    Used with reduce to compute the maximum lengths of a sequence of
-    tuples of strings.
-
-    >>> ptw_max_len((5,8), ("abrakadabra","boo"))
-    (11, 8)
-    """
-    return tuple(map(max, a, tuple(map(len,b))))
-
-def _print_result_table(entries, headers, output):
-    # Compute the maximum width for each field. We include the
-    # headers in the computation in case the values are narrower
-    # than the headers.
-    widths = reduce(_ptw_max_len, entries, tuple(map(len, headers)))
-
-    # Build the format string from the maximum of each field and
-    # add 2 to the width. All fields are left-adjusted.
-    formats = [ "{%d:<%d}" % (i,w+2) for i, w in zip(range(0, len(widths)), widths) ]
-    frm_str = ''.join(formats)
-
-    print >>output, frm_str.format(*map(lambda a: "=" * a, widths))
-    print >>output, frm_str.format(*headers)
-    print >>output, frm_str.format(*map(lambda a: "=" * a, widths))
-    for entry in entries:
-        print >>output, frm_str.format(*entry)
-    print >>output, frm_str.format(*map(lambda a: "=" * a, widths))
 
 def _spec(info):
     """Create a server specification string from an info structure."""
@@ -112,13 +119,24 @@ def _spec(info):
         result += ":" + info["unix_socket"]
     return result
 
-# Here are constants that can be used for the objects.
-ROUTINE, EVENT, TRIGGER, TABLE, DATABASE = 'routine', 'event', 'trigger', 'table', 'database'
+#: Constants for object types
+ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER = 'routine', 'event', 'trigger', 'table', 'database', 'view', 'user'
 
-_TYPES = [ ROUTINE, EVENT, TRIGGER, TABLE, DATABASE ]
+#: List of all object types that can be searched
+OBJECT_TYPES = [ ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER ]
 
 class ObjectGrep(object):
-    def __init__(self, pattern, types=_TYPES, check_body=False, use_regexp=False):
+    """.. class: ObjectGrep(pattern[, types, check_body=False, use_regexp=False])
+
+    Search for objects on a MySQL server by name or content.
+
+    This command class is used to search one or more MySQL server
+    instances for objects where the name (or the contents of routines,
+    triggers, or events) match a given pattern.
+
+    
+    """
+    def __init__(self, pattern, types=OBJECT_TYPES, check_body=False, use_regexp=False):
         stmts = [_make_select(t, pattern, check_body, use_regexp) for t in types]
         self.__sql = "UNION".join(stmts)
 
@@ -139,4 +157,4 @@ class ObjectGrep(object):
             cursor = connection.cursor()
             cursor.execute(self.__sql)
             entries.extend([tuple([_spec(info)] + list(row)) for row in cursor])
-        _print_result_table(entries, ("Connection", "Type", "Name", "Database"), output)
+        format_tabular_list(output, ("Connection", "Type", "Name", "Database"), entries)
