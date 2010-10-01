@@ -1,0 +1,17 @@
+Test case 1 - copy a sample database
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+# Copying database employees renamed as emp_mt
+# Copying TABLE employees.departments
+# Copying data for TABLE employees.departments
+# Copying TABLE employees.dept_emp
+# Copying data for TABLE employees.dept_emp
+# Copying TABLE employees.dept_manager
+# Copying data for TABLE employees.dept_manager
+# Copying TABLE employees.employees
+# Copying data for TABLE employees.employees
+# Copying TABLE employees.salaries
+# Copying data for TABLE employees.salaries
+# Copying TABLE employees.titles
+# Copying data for TABLE employees.titles
+#...done.

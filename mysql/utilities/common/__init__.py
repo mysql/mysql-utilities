@@ -1,5 +1,6 @@
 from .exception import MySQLUtilError
 from .exception import MUTException
+from .options import add_skip_options
 from .options import setup_common_options
 from .options import parse_connection
 from .database import Database

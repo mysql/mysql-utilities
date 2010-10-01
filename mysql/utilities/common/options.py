@@ -79,6 +79,52 @@ def setup_common_options(version_str, desc_str, usage_str):
     return parser
 
 
+def add_skip_options(parser):
+    """Add the common --skip options for database utilties.
+    """
+    # Skip tables
+    parser.add_option("--skip-tables", action="store_true", dest="skip_tables",
+                      default=False, help="exclude tables in the operation")
+    
+    # Skip views
+    parser.add_option("--skip-views", action="store_true", dest="skip_views",
+                      default=False, help="exclude views in the operation")
+    
+    # Skip triggers
+    parser.add_option("--skip-triggers", action="store_true",
+                      dest="skip_triggers", default=False,
+                      help="exclude triggers in the copy process ")
+    
+    # Skip procedures
+    parser.add_option("--skip-procedures", action="store_true",
+                      dest="skip_procs", default=False,
+                      help="exclude procedures in the copy process ")
+    
+    # Skip functions
+    parser.add_option("--skip-functions", action="store_true",
+                      dest="skip_funcs", default=False,
+                      help="exclude functions in the copy process ")
+    
+    # Skip events
+    parser.add_option("--skip-events", action="store_true", dest="skip_events",
+                      default=False, help="exclude events in the operation")
+    
+    # Skip grants
+    parser.add_option("--skip-grants", action="store_true", dest="skip_grants",
+                      default=False, help="exclude database-level and below " +
+                      "grants in the operation")
+    
+    # Skip data
+    parser.add_option("--skip-data", action="store_true", dest="skip_data",
+                      default=False, help="do include the data in the "
+                      "operation")
+    
+    # Skip create db mode
+    parser.add_option("--skip-create-db", action="store_true",
+                      dest="skip_create", default=False,
+                      help="do not create the database")
+
+
 _CONN_CRE = re.compile(
     r"(\w+)"                    # User name
     r"(?:\:(\w+))?"             # Optional password

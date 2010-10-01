@@ -27,6 +27,7 @@ import re
 import sys
 import time
 from mysql.utilities.command import dbcopy
+from mysql.utilities.common import options
 from mysql.utilities.common import parse_connection
 from mysql.utilities.common import MySQLUtilError
 
@@ -75,47 +76,6 @@ parser.add_option("--copy-dir", action="store", dest="copy_dir",
                          "copying data (stores temporary files) - "
                          "default = current directory")
 
-# Skip tables
-parser.add_option("--skip-tables", action="store_true", dest="skip_tables",
-                  default=False, help="exclude tables in the copy process ")
-
-# Skip views
-parser.add_option("--skip-views", action="store_true", dest="skip_views",
-                  default=False, help="exclude views in the copy process ")
-
-# Skip triggers
-parser.add_option("--skip-triggers", action="store_true",
-                  dest="skip_triggers", default=False,
-                  help="exclude triggers in the copy process ")
-
-# Skip procedures
-parser.add_option("--skip-procedures", action="store_true", dest="skip_procs",
-                  default=False,
-                  help="exclude procedures in the copy process ")
-
-# Skip functions
-parser.add_option("--skip-functions", action="store_true", dest="skip_funcs",
-                  default=False,
-                  help="exclude functions in the copy process ")
-
-# Skip events
-parser.add_option("--skip-events", action="store_true", dest="skip_events",
-                  default=False, help="exclude events in the copy process ")
-
-# Skip grants
-parser.add_option("--skip-grants", action="store_true", dest="skip_grants",
-                  default=False, help="exclude database-level and below " +
-                  "grants in the copy process")
-
-# Skip data
-parser.add_option("--skip-data", action="store_true", dest="skip_data",
-                  default=False, help="do not copy the data from the " +
-                  "source database to the destination database")
-
-# Skip create db mode
-parser.add_option("--skip-create-db", action="store_true", dest="skip_create",
-                  default=False, help="do not create the destination database")
-
 # Overwrite mode
 parser.add_option("-f", "--force", action="store_true", dest="force",
                   help="drop the new database or object if it exists",
@@ -138,6 +98,9 @@ parser.add_option("--debug", action="store_true", dest="debug",
 # Threaded/connection mode
 parser.add_option("--connections", action="store", dest="connections",
                   default=1, help="use multiple connections for insert")
+
+# Add the skip common options
+options.add_skip_options(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()

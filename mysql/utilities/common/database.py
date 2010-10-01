@@ -381,6 +381,8 @@ class Database(object):
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
         """
+        
+        from mysql.utilities.common import Table
  
         # Must call init() first!
         # Guard for init() prerequisite
@@ -477,10 +479,15 @@ class Database(object):
                             print "# Copying data for TABLE %s.%s" % \
                                    (self.db_name, tblname)
                         try:
-                            self.source.copy_table_data(self.db_name, tblname,
-                                                        self.destination,
-                                                        new_db, self.verbose,
-                                                        connections)
+                            tbl = Table(self.source,
+                                        "%s.%s" % (self.db_name, tblname),
+                                        self.verbose)
+                            if tbl is None:
+                                raise MySQLUtilError("Cannot create table "
+                                                     "object before copy.")
+                                
+                            tbl.copy_data(self.destination, new_db,
+                                          self.verbose, connections)
                         except MySQLUtilError, e:
                             raise e
                         

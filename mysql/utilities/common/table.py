@@ -19,10 +19,18 @@
 This module contains abstractions of a MySQL table and an index.
 """
 
-import sys
+import multiprocessing
 import re
+import sys
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
+
+# Constants
+_MAXPACKET_SIZE = 1024 * 1024
+_MAXBULK_VALUES = 25000
+_MAXTHREADS_INSERT = 6
+_MAXROWS_PER_THREAD = 100000
+_MAXAVERAGE_CALC = 100
 
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
@@ -244,6 +252,9 @@ class Table:
         - Check to see if the table exists
         - Check indexes for duplicates and redundancies
         - Print list of indexes for the table
+        - Extract table data
+        - Import table data
+        - Copy table data
     """   
     
     def __init__(self, server1, name, verbose=False):
@@ -267,7 +278,21 @@ class Table:
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
-    
+        self.col_metadata = None
+        self.dest_vals = None
+
+        # Get max allowed packet
+        res = self.server.show_server_variable("_MAXALLOWED_PACKET")
+        if res:
+            self.max_packet_size = res[0][1]
+        else:
+            self.max_packet_size = _MAXPACKET_SIZE
+        # Watch for invalid values
+        if self.max_packet_size > _MAXPACKET_SIZE:
+            self.max_packet_size = _MAXPACKET_SIZE
+            
+        self._insert = "INSERT INTO %s.%s VALUES " 
+
     def exists(self, tbl_name=None):
         """Check to see if the table exists
         
@@ -296,6 +321,365 @@ class Table:
             return False
         
     
+    def _build_update_blob(self, row, new_db, name, special_cols, blob_col):
+        """ Build an UPDATE statement to update blob fields.
+        
+        row[in]            a row to process
+        new_db[in]         new database name
+        name[in]           name of the table
+        conn_val[in]       connection information for the destination server
+        query[in]          the INSERT string for executemany()
+        special_cols[in]   list of columns for special string handling
+        blob_col[in]       number of the column containing the blob
+
+        Returns tuple (UPDATE string, blob data)
+        """
+        
+        blob_insert = "UPDATE %s.%s SET `" % (new_db, name)
+        where_clause = "WHERE "
+        data_clause = None
+        stop = len(row)
+        for col in range(0,stop):
+            if col == blob_col:
+                blob_insert += special_cols[col]["name"] + "` = %s "
+                data = row[col]
+            else:
+                where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
+                                                  row[col])
+                if col < stop-1:
+                    where_clause += " AND "
+        return (blob_insert + where_clause, data)
+    
+
+    def _bulk_insert(self, rows, new_db, destination=None):
+        """Import data using bulk insert
+        
+        Reads data from a table and builds group INSERT statements for writing
+        to the destination server specified (new_db.name).
+        
+        This method is designed to be used in a thread for parallel inserts.
+        As such, it requires its own connection to the destination server.
+
+        Note: This method does not print any information to stdout.
+    
+        rows[in]           a list of rows to process
+        new_db[in]         new database name
+        destination[in]    the destination server
+        """
+        
+        from mysql.utilities.common import Server
+        
+        if self.dest_vals is None:
+            self.dest_vals = self.get_dest_values(destination)
+        
+        # Spawn a new connection
+        dest = Server(self.dest_vals, "thread")
+        try:
+            dest.connect()
+        except MySQLUtilError, e:
+            raise e
+
+        # get cursor
+        cur = dest.cursor()
+                    
+        # First, turn off foreign keys if turned on
+        try:
+            fkey_on = dest.toggle_fkeys(False)
+        except MySQLUtilError, e:
+            raise e
+            
+        if self.col_metadata is None:
+            self.col_metadata = self.get_column_metadata()
+            
+        blobs = []
+        row_count = 0
+        data_size = 0
+        val_str = None
+        for row in rows:
+            if row_count == 0:
+                insert_str = self._insert % (new_db, self.tbl_name)
+                if val_str:
+                    row_count += 1
+                    insert_str += val_str
+                data_size = len(insert_str)
+            val_str = " ("
+            stop = len(row)
+            for col in range(0,stop):
+                if row[col] == None:
+                    val_str += "NULL" 
+                else:
+                    # Save blob updates for later...
+                    if self.col_metadata[col]["has_blob"]: # It is a blob field!
+                        str = self._build_update_blob(row, new_db,
+                                                      self.tbl_name,
+                                                      self.col_metadata, col)
+                        blobs.append(str)
+                        val_str += "NULL"
+                    # We must ensure to escape ' marks.
+                    elif self.col_metadata[col]["is_text"]: # No, text field
+                        if row[col].find("'"):
+                            val_str += "'%s'" % re.sub("'", "''", row[col])
+                        else:
+                            val_str += "'%s'" % row[col]
+                    elif self.col_metadata[col]["is_time"]:
+                        val_str += "'%s'" % row[col]
+                    else: # Ah, ok, so it is some other field...
+                        val_str += "%s" % row[col]
+                if (col + 1) < stop:
+                    val_str += ", "
+            val_str += ")"
+
+            row_size = len(val_str)
+            next_size = data_size + row_size + 3
+            if (row_count >= _MAXBULK_VALUES) or \
+                (next_size > (int(self.max_packet_size) - 512)): # add buffer
+                try:
+                    res = dest.exec_query(insert_str)
+                except MySQLUtilError, e:
+                    raise e
+                row_count = 0
+            else:
+                row_count += 1
+                if row_count > 1:
+                    insert_str += ", "
+                insert_str += val_str
+                data_size += row_size + 3
+
+        if row_count > 0 :
+            try:
+                res = dest.exec_query(insert_str)
+            except MySQLUtilError, e:
+                raise e
+            
+        for blob_insert in blobs:
+            try:
+                res = dest.exec_query(blob_insert[0], blob_insert[1])
+            except MySQLUtilError, e:
+                raise MySQLUtilError("Problem updating blob field. "
+                                     "Error = %s" % e.errmsg)
+        
+        # Now, turn on foreign keys if they were on at the start
+        if fkey_on:
+            try:
+                fkey_on = dest.toggle_fkeys(True)
+            except MySQLUtilError, e:
+                raise e
+        del dest
+            
+
+    def copy_data(self, destination, new_db=None,
+                  verbose=False, connections=1):                        
+        """Retrieve data from a table.
+        
+        Reads data from a table and inserts the correct INSERT statements into
+        the file provided.
+    
+        destination[in]    Destination server
+        new_db[in]         Rename the db to this name 
+        verbose[in]        Print the INSERT command 
+                           Default = False
+        connections[in]    Number of threads(connections) to use for insert
+        """
+        cur = self.server.cursor()
+        if new_db is None:
+            new_db = db
+
+        # Get number of rows
+        num_rows = 0
+        try:
+            res = cur.execute("USE %s" % self.db_name)
+            res = cur.execute("SHOW TABLE STATUS LIKE '%s'" % self.tbl_name)
+            if res:
+                row = cur.fetchone()
+                num_rows = int(row[4])
+        except MySQLUtilError, e:
+            raise e
+        cur.close()
+        
+        num_conn = int(connections)
+
+        # Calculate number of threads and segment size to fetch
+        if num_conn > 1:
+            thread_limit = num_conn
+            if thread_limit > _MAXTHREADS_INSERT:
+                thread_limit = _MAXTHREADS_INSERT
+        else:
+            thread_limit = _MAXTHREADS_INSERT
+        if num_rows > (_MAXROWS_PER_THREAD * thread_limit):
+            max_threads = thread_limit
+        else:
+            max_threads = int(num_rows / _MAXROWS_PER_THREAD) 
+        if max_threads == 0:
+            max_threads = 1
+        if max_threads > 1 and verbose:
+            print "# Using multi-threaded insert option. Number of " \
+                  "threads = %d." % max_threads
+        segment_size = (num_rows / max_threads) + max_threads
+
+        # Read and copy the data
+        pthreads = []
+        for rows in self.retrieve_rows(segment_size):
+            try:
+                p = self.insert_rows(rows, new_db, destination, num_conn > 1)
+                if p is not None:
+                    p.start()
+                    pthreads.append(p)    
+            except MySQLUtilError, e:
+                raise e
+
+        if num_conn > 1:
+            # Wait for all to finish            
+            num_complete = 0
+            while num_complete < len(pthreads):
+                for p in pthreads:
+                    if not p.is_alive():
+                        num_complete += 1
+
+        
+    def retrieve_rows(self, segment_size):                        
+        """Retrieve the table data in rows.
+        
+        This method can be used to retrieve rows from a table as a generator
+        specifying how many rows to retrieve at one time (segment_size).
+        A segment size of 0 retrieves all rows at one time.
+        
+        segment_size[in]   Number of rows for each segment of retrieving rows
+
+        Returns (yield) row data 
+        """
+        
+        cur = self.server.cursor()
+
+        num_conn = int(segment_size)
+
+        # Execute query to get all of the data
+        try:
+            res = cur.execute("SELECT * FROM %s" % self.table)
+        except MySQLUtilError, e:
+            raise e
+
+        while True:
+            if num_conn <= 0:
+                rows = cur.fetchall()
+            else:
+                rows = cur.fetchmany(segment_size)
+            if not rows:
+                break
+            yield rows        
+
+        cur.close()
+    
+    def get_column_metadata(self):
+        """Get information about the table for the bulk insert operation.
+        """
+
+        cur = self.server.cursor()
+
+        # Get field masks for blob and quoted fields
+        # Build an array of dictionaries describing the fields
+        special_cols = []
+        try:
+            res = cur.execute("explain %s" % self.table)
+            if res:
+                rows = cur.fetchall()
+                for row in rows:
+                    has_char = (row[1].find("char") >= 0)
+                    has_text = (row[1].find("text") >= 0)
+                    has_enum = (row[1].find("enum") >= 0)
+                    has_set = (row[1].find("set") >= 0)
+                    has_date = (row[1].find("date") >= 0)
+                    has_time = (row[1].find("time") >= 0)
+                    col_data = {
+                        "has_blob" : (row[1].find("blob") >= 0),
+                        "is_text"  : has_char or has_text or has_enum or
+                                     has_set,
+                        "is_time"  : has_date or has_time,
+                        "name"     : row[0]
+                    }
+                    special_cols.append(col_data)
+                        
+        except MySQLUtilError, e:
+            raise e
+        cur.close
+        return special_cols
+    
+    def get_dest_values(self, destination = None):
+        """Get the destination connection values if not already set.
+
+        destination[in]    Connection values for destination server
+        
+        Returns connection values for destination if set or self.server 
+        """
+        # Get connection to database
+        if destination is None:
+            conn_val = {
+                "host"        : self.server.host,
+                "user"        : self.server.user,
+                "passwd"      : self.server.passwd,
+                "unix_socket" : self.server.socket,
+                "port"        : self.server.port
+            }
+        else:
+            conn_val = {
+                "host"        : destination.host,
+                "user"        : destination.user,
+                "passwd"      : destination.passwd,
+                "unix_socket" : destination.socket,
+                "port"        : destination.port
+            }
+        return conn_val        
+    
+    
+    def insert_rows(self, rows, new_db, destination=None, spawn=False):
+        """Insert rows in the table using bulk copy.
+        
+        This method opens a new connect to the destination server to insert
+        the data with a bulk copy. If spawn is True, the method spawns a new
+        process and returns it. This allows for using a multi-threaded insert
+        which can be faster on some platforms. If spawn is False, the method
+        will open a new connection to insert the data.
+        
+        num_conn[in]       Number of threads(connections) to use for insert
+        rows[in]           List of rows to insert
+        new_db[in]         Rename the db to this name
+        destination[in]    Destination server
+                           Default = None (copy to same server)
+        spawn[in]          If True, spawn a new process for the insert
+                           Default = False
+
+        Returns If spawn == True, process
+                If spawn == False, None
+        """
+        
+        if self.col_metadata is None:
+            self.col_metadata = self.get_column_metadata()
+            
+        if self.dest_vals is None:
+            self.dest_vals = self.get_dest_values(destination)
+        
+        proc = None    
+        try:
+            if spawn:
+                proc = multiprocessing.Process(target=self._bulk_insert,
+                                              args=(rows, new_db, destination))
+            else:
+                self._bulk_insert(rows, new_db, destination)
+        except MySQLUtilError, e:
+            raise e
+        return proc
+        
+        
+    def get_tbl_indexes(self):
+        """Return a result set containing all indexes for a given table
+        
+        Returns MySQLdb result set
+        """
+        try:
+            res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)
+        except MySQLUtilError, e:
+            raise e
+        return res
+
     # Put the primary key first so that it can be compared to all indexes
     def __append(self, indexes, index):
         """Encapsulated append() method to ensure the primary key index
@@ -363,7 +747,7 @@ class Table:
         Returns list containing indexes.
         """
         try:
-            rows = self.server.get_tbl_indexes(self.table)
+            rows = self.get_tbl_indexes()
         except MySQLUtilError, e:
             raise e
         return rows        

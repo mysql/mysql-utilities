@@ -70,17 +70,17 @@ OPTIONS
 --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
                       files) - default = current directory
 
---skip-tables         exclude tables in the copy process
+--skip-tables         exclude tables in the operation
 
---skip-views          exclude views in the copy process
+--skip-views          exclude views in the operation
 
---skip-triggers       exclude triggers in the copy process
+--skip-triggers       exclude triggers in the operation
 
---skip-procedures     exclude procedures in the copy process
+--skip-procedures     exclude procedures in the operation
 
---skip-functions      exclude functions in the copy process
+--skip-functions      exclude functions in the operation
 
---skip-events         exclude events in the copy process
+--skip-events         exclude events in the operation
 
 --skip-grants         exclude database-level and below grants in the copy
                       process
@@ -125,7 +125,7 @@ on (i.e. the need for ''SUPER'').
 NOTICE
 ======
 
-Some combinations of the options may result in errors during the copy process.
+Some combinations of the options may result in errors during the operation.
 For example, eliminating tables but not views may result in an error when the
 view is copied.
 
