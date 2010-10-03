@@ -114,31 +114,47 @@ def _make_select(objtype, pattern, check_body, use_regexp):
 
 def _spec(info):
     """Create a server specification string from an info structure."""
-    result = "%(user)s:%(passwd)s@%(host)s:%(port)s" % info
+    result = "%(user)s:<password>@%(host)s:%(port)s" % info
     if "unix_socket" in info:
         result += ":" + info["unix_socket"]
     return result
 
-#: Constants for object types
+def _join_words(words, delimiter=",", conjunction="and"):
+    """Join words together for nice printout.
+
+    >>> _join_words(["first", "second", "third"])
+    'first, second, and third'
+    >>> _join_words(["first", "second"])
+    'first and second'
+    >>> _join_words(["first"])
+    'first'
+    """
+    if len(words) == 1:
+        return words[0]
+    elif len(words) == 2:
+        return ' {0} '.format(conjunction).join(words)
+    else:
+        return '{0} '.format(delimiter).join(words[0:-1]) + "%s %s %s" % (delimiter, conjunction, words[-1])
+
 ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER = 'routine', 'event', 'trigger', 'table', 'database', 'view', 'user'
 
 #: List of all object types that can be searched
 OBJECT_TYPES = [ ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER ]
 
 class ObjectGrep(object):
-    """.. class: ObjectGrep(pattern[, types, check_body=False, use_regexp=False])
-
-    Search for objects on a MySQL server by name or content.
+    """Search for objects on a MySQL server by name or content.
 
     This command class is used to search one or more MySQL server
     instances for objects where the name (or the contents of routines,
     triggers, or events) match a given pattern.
-
-    
     """
     def __init__(self, pattern, types=OBJECT_TYPES, check_body=False, use_regexp=False):
         stmts = [_make_select(t, pattern, check_body, use_regexp) for t in types]
         self.__sql = "UNION".join(stmts)
+
+        # Need to save the pattern for informative error messages later
+        self.__pattern = pattern 
+        self.__types = types
 
     def sql(self):
         """Return SQL code for performing this search.
@@ -146,15 +162,28 @@ class ObjectGrep(object):
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=MySQLdb):
+        """Perform a search on a list of servers.
+        """
+
+        from ..common.exception import FormatError, EmptyResultError
+
         entries = []
         for info in connections:
             # If the connection is string-like, we assume it is a
             # server specification and parse it. Otherwise, connection
             # info is expected and we just use it directly.
             if isinstance(info, basestring):
-                info = parse_connection(info)
+                conn = parse_connection(info)
+                if not conn:
+                    msg = "'%s' is not a valid connection specifier" % (info,)
+                    raise FormatError(msg)
+                info = conn
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)
             entries.extend([tuple([_spec(info)] + list(row)) for row in cursor])
-        format_tabular_list(output, ("Connection", "Type", "Name", "Database"), entries)
+        if len(entries) > 0:
+            format_tabular_list(output, ("Connection", "Type", "Name", "Database"), entries)
+        else:
+            msg = "Nothing matches '%s' in any %s" % (self.__pattern, _join_words(self.__types, conjunction="or"))
+            raise EmptyResultError(msg)

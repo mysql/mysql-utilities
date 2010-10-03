@@ -48,6 +48,10 @@ class FormatError(Error):
     """An entity was supplied in the wrong format."""
     pass
 
+class EmptyResultError(Error):
+    """An entity was supplied in the wrong format."""
+    pass
+
 class MUTException(Exception):
     """ MUT errors
     

@@ -60,7 +60,13 @@ if len(args) == 0 and not options.print_sql:
 
 types = re.split(r"\s*,\s*", options.types)
 command = ObjectGrep(pattern, types, options.check_body, options.use_regexp)
-if options.print_sql:
-    print command.sql()
-else:
-    command.execute(args)
+
+import mysql.utilities.common.exception
+
+try:
+    if options.print_sql:
+        print command.sql()
+    else:
+        command.execute(args)
+except mysql.utilities.common.exception.Error as details:
+    parser.error(details)
