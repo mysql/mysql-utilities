@@ -482,7 +482,7 @@ class Table:
         """
         cur = self.server.cursor()
         if new_db is None:
-            new_db = db
+            new_db = self.db_name
 
         # Get number of rows
         num_rows = 0
@@ -564,7 +564,7 @@ class Table:
             else:
                 rows = cur.fetchmany(segment_size)
             if not rows:
-                break
+                raise StopIteration()
             yield rows        
 
         cur.close()
