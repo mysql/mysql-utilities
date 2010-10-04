@@ -47,16 +47,40 @@ parser.add_option(
     "-p", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,
     help="Print the statement instead of sending it to the server")
-                  
+parser.add_option(
+    "-e", "--pattern",
+    dest="pattern",
+    help="Pattern to use when matching. Required if the pattern looks like a connection specification.")
+
 options, args = parser.parse_args()
 
-try:
-    pattern = args.pop(0)
-except IndexError:
-    parser.error("No pattern supplied")
+_LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a
+connection specification. Use --pattern if this is really what you
+want"""
 
+# We do not allow patterns that look like connection specification 
+if options.pattern:
+    pattern = options.pattern
+else:
+    from mysql.utilities.common.exception import FormatError
+    from mysql.utilities.common import parse_connection
+    
+    try:
+        pattern = args.pop(0)
+        parse_connection(pattern)
+    except IndexError:
+        parser.error("No pattern supplied")
+    except FormatError:
+        pass # The pattern supplied was not a connection specification
+    else:
+        parser.error(_LOOKS_LIKE_CONNECTION_MSG.format(pattern=pattern))
+
+# Check that --sql option is not used with server, and servers are
+# supplied if --sql is not used.
 if len(args) == 0 and not options.print_sql:
     parser.error("You need at least one server if you're not using the --sql option")
+elif len(args) > 0 and options.print_sql:
+    parser.error("You should not include servers in the call if you are using the --sql option")
 
 types = re.split(r"\s*,\s*", options.types)
 command = ObjectGrep(pattern, types, options.check_body, options.use_regexp)
