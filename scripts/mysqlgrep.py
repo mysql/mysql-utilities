@@ -42,7 +42,6 @@ parser.add_option(
     "-G", "--basic-regexp", "--regexp",
     dest="use_regexp", action="store_true", default=False,
     help="Use 'REGEXP' operator to match pattern. Default is to use 'LIKE'.")
-
 parser.add_option(
     "-p", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,
@@ -51,6 +50,10 @@ parser.add_option(
     "-e", "--pattern",
     dest="pattern",
     help="Pattern to use when matching. Required if the pattern looks like a connection specification.")
+parser.add_option(
+    "--database",
+    dest="database_pattern", default=None,
+    help="Only look at objects in databases matching this pattern")
 
 options, args = parser.parse_args()
 
@@ -83,7 +86,7 @@ elif len(args) > 0 and options.print_sql:
     parser.error("You should not include servers in the call if you are using the --sql option")
 
 types = re.split(r"\s*,\s*", options.types)
-command = ObjectGrep(pattern, types, options.check_body, options.use_regexp)
+command = ObjectGrep(pattern, options.database_pattern, types, options.check_body, options.use_regexp)
 
 import mysql.utilities.common.exception
 

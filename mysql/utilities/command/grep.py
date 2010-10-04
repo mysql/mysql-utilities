@@ -80,14 +80,14 @@ _OBJMAP = {
 }
 
 _SELECT_TYPE_FRM = """
-  SELECT %(select_option)s
-    %(type_field)s AS `Type`,
-    %(field_name)s AS `Name`,
-    %(schema_field)s AS `Schema`
+  SELECT {select_option}
+    {type_field} AS `Type`,
+    {field_name} AS `Name`,
+    {schema_field} AS `Schema`
   FROM
-    information_schema.%(table_name)s
+    information_schema.{table_name}
   WHERE
-    %(field_name)s %(regex)s %(pattern)s%(extra_condition)s
+    {condition}
 """
 
 def _obj2sql(obj):
@@ -98,23 +98,30 @@ def _obj2sql(obj):
     from MySQLdb.converters import conversions
     return conversions[type(obj)](obj, conversions)
 
-def _make_select(objtype, pattern, check_body, use_regexp):
+def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     """Generate a SELECT statement for finding an object.
     """
     options = {
         'pattern': _obj2sql(pattern),
         'regex': 'REGEXP' if use_regexp else 'LIKE',
-        'extra_condition': '',
         'select_option': '',
         }
     options.update(_OBJMAP[objtype])
+
+    # Build a condition for inclusion in the select
+    condition = "{field_name} {regex} {pattern}".format(**options)
     if check_body and "body_field" in options:
-        options["extra_condition"] = " OR %(body_field)s %(regex)s %(pattern)s" % options
-    return _SELECT_TYPE_FRM % options
+        condition += " OR {body_field} {regex} {pattern}".format(**options)
+    if database_pattern:
+        options['database_pattern'] = _obj2sql(database_pattern)
+        condition = "({0}) AND {schema_field} {regex} {database_pattern}".format(condition, **options)
+    options['condition'] = condition
+
+    return _SELECT_TYPE_FRM.format(**options)
 
 def _spec(info):
     """Create a server specification string from an info structure."""
-    result = "%(user)s:<password>@%(host)s:%(port)s" % info
+    result = "%(user)s:*@%(host)s:%(port)s" % info
     if "unix_socket" in info:
         result += ":" + info["unix_socket"]
     return result
@@ -148,8 +155,9 @@ class ObjectGrep(object):
     instances for objects where the name (or the contents of routines,
     triggers, or events) match a given pattern.
     """
-    def __init__(self, pattern, types=OBJECT_TYPES, check_body=False, use_regexp=False):
-        stmts = [_make_select(t, pattern, check_body, use_regexp) for t in types]
+    def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
+                 check_body=False, use_regexp=False):
+        stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
         self.__sql = "UNION".join(stmts)
 
         # Need to save the pattern for informative error messages later
