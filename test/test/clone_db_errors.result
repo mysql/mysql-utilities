@@ -15,7 +15,7 @@ ERROR: destination database exists. Use --force to overwrite existing database.
 Test case 4 - error: user with % - not enough permissions
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User joe on the source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
+ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 5 - No error: user with % - has permissions
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

@@ -20,7 +20,7 @@ Test case 5 - error: cannot connect to source
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: cannot connect to destination
 # Source on localhost: ... connected.
-# Destination on localhost: ... ERROR: Cannot connect to the destination server.
+# Destination on localhost: ... ERROR: Cannot connect to the Destination server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 7 - users with minimal privileges
 # Source on localhost: ... connected.
@@ -42,15 +42,15 @@ Test case 7 - users with minimal privileges
 Test case 8 - source user not enough privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - source user has some privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 10 - source user has some privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 11 - source user has privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
@@ -71,15 +71,15 @@ Test case 11 - source user has privileges needed
 Test case 12 - dest user not enough privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
+ERROR: User sam on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
 Test case 13 - dest user has some privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 14 - dest user has some privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: User sam on the destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 15 - dest user has privileges needed
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

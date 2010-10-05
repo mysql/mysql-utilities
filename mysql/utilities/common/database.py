@@ -619,4 +619,109 @@ class Database(object):
         else:
             return self.source.exec_query(_OBJECT_QUERY, (self.db_name,))
         
+        
+    def _check_user_permissions(self, uname, host, access):
+        """ Check user permissions for a given privilege
+    
+        uname[in]          user name to check
+        host[in]           host name of connection
+        acess[in]          privilege to check (e.g. "SELECT")
+        
+        Returns True if user has permission, False if not
+        """
+        
+        from mysql.utilities.common import User
+        
+        result = True    
+        user = User(self.source, uname+'@'+host)
+        result = user.has_privilege(access[0], '*', access[1])
+        return result
+    
+    
+    def check_read_access(self, user, host, skip_views,
+                          skip_proc, skip_func, skip_grants):
+        """ Check access levels for reading database objects
+        
+        This method will check the user's permission levels for copying a
+        database from this server.
+        
+        It will also skip specific checks if certain objects are not being
+        copied (i.e., views, procs, funcs, grants).
+    
+        user[in]           user name to check
+        host[in]           host name to check
+        skip_views[in]     True = no views processed
+        skup_proc[in]      True = no procedures processed
+        skip_func[in]      True = no functions processed
+        skip_grants[in]    True = no grants processed
+        
+        Returns True if user has permissions and raises a MySQLUtilError if the
+                     user does not have permission with a message that includes
+                     the server context.
+        """
+    
+        # Build minimal list of privileges for source access    
+        source_privs = []
+        priv_tuple = (self.db_name, "SELECT")
+        source_privs.append(priv_tuple)
+        # if views are included, we need SHOW VIEW
+        if not skip_views:
+            priv_tuple = (self.db_name, "SHOW VIEW")
+            source_privs.append(priv_tuple)
+        # if procs or funcs are included, we need read on mysql db
+        if not skip_proc or not skip_func:
+            priv_tuple = ("mysql", "SELECT")
+            source_privs.append(priv_tuple)
+        
+        # Check permissions on source
+        for priv in source_privs:
+            if not self._check_user_permissions(user, host, priv):
+                raise MySQLUtilError("User %s on the %s server does not have "
+                                     "permissions to read all objects in %s. " %
+                                     (user, self.source.role, self.db_name) +
+                                     "User needs %s privilege on %s." %
+                                     (priv[1], priv[0]))
+            
+        return True
+    
+    
+    def check_write_access(self, user, host, skip_views,
+                           skip_proc, skip_func, skip_grants):
+        """ Check access levels for creating and writing database objects
+        
+        This method will check the user's permission levels for copying a
+        database to this server.
+        
+        It will also skip specific checks if certain objects are not being
+        copied (i.e., views, procs, funcs, grants).
+    
+        user[in]           user name to check
+        host[in]           host name to check
+        skip_views[in]     True = no views processed
+        skup_proc[in]      True = no procedures processed
+        skip_func[in]      True = no functions processed
+        skip_grants[in]    True = no grants processed
+        
+        Returns True if user has permissions and raises a MySQLUtilError if the
+                     user does not have permission with a message that includes
+                     the server context.
+        """
+    
+        dest_privs = [(self.db_name, "CREATE"),
+                      (self.db_name, "SUPER"),
+                      ("*", "SUPER")]
+        if not skip_grants:
+            priv_tuple = (self.db_name, "WITH GRANT OPTION")
+            dest_privs.append(priv_tuple)
+            
+        # Check privileges on destination
+        for priv in dest_privs:
+            if not self._check_user_permissions(user, host, priv):
+                raise MySQLUtilError("User %s on the %s server does not "
+                                     "have permissions to create all objects "
+                                     "in %s. User needs %s privilege on %s." %
+                                     (user, self.source.role, priv[0],
+                                      priv[1], priv[0]))
+                
+        return True
 

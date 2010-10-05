@@ -11,7 +11,7 @@ Test case 3 - error: invalid login to server (master)
 Error 2005: Unknown MySQL server host 'nada' #######
 Test case 4 - error: invalid login to server (slave)
 # master on localhost: ... connected.
-# slave on nada: ... ERROR: Cannot connect to the destination server.
+# slave on nada: ... ERROR: Cannot connect to the slave server.
 Error 2005: Unknown MySQL server host 'nada' #######
 Test case 5 - error: slave and master same machine
 ERROR: You must specify two different servers for the operation.

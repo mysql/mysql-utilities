@@ -101,7 +101,7 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
 
     if not cloning:
         # Try to connect to the MySQL database server (destination).
-        destination = Server(dest_val, "destination")
+        destination = Server(dest_val, dest_name)
         try:
             destination.connect()
             if version is not None:

@@ -25,107 +25,6 @@ import sys
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
-def _check_user_permissions(server, uname, host, access):
-    """ Check user permissions for a given privilege
-
-    server[in]         Server object to query
-    uname[in]          user name to check
-    host[in]           host name of connection
-    acess[in]          privilege to check (e.g. "SELECT")
-    
-    Returns True if user has permission, False if not
-    """
-    
-    from mysql.utilities.common import User
-    
-    result = True    
-    user = User(server, uname+'@'+host)
-    result = user.has_privilege(access[0], '*', access[1])
-    return result
-
-
-def _check_access(source, destination, s_user, s_host, d_user, d_host,
-                  db, cloning, skip_views, skip_proc, skip_func, skip_grants):
-    """ Check access levels for source and destination
-    
-    This method will check the user's permission levels for copying a
-    database from the source and creating it on the destination server.
-    It will also skip specific checks if certain objects are not being
-    copied (i.e., views, procs, funcs, grants).
-
-    source[in]         source server object to query
-    destination[in]    destination server object to query
-    s_user[in]         source user name to check
-    s_host[in]         source host name of connection
-    d_user[in]         destination user name to check
-    d_host[in]         destination host name of connection
-    db[in]             database
-    cloning[in]        True if source == destination
-    skip_views[in]     True = no views processed
-    skup_proc[in]      True = no procedures processed
-    skip_func[in]      True = no functions processed
-    skip_grants[in]    True = no grants processed
-    
-    Returns tuple (bool, msg) where (True, None) = user has permissions and
-                  (False, Message) = user does not have permission and
-                  Message includes a context error message
-    """
-
-    source_db = db[0]
-    if db[1] is None:
-        dest_db = db[0]
-    else:
-        dest_db = db[1]
-        
-    # Build minimal list of privileges for source access    
-    source_privs = []
-    priv_tuple = (source_db, "SELECT")
-    source_privs.append(priv_tuple)
-    # if views are included, we need SHOW VIEW
-    if not skip_views:
-        priv_tuple = (source_db, "SHOW VIEW")
-        source_privs.append(priv_tuple)
-    # if procs or funcs are included, we need read on mysql db
-    if not skip_proc or not skip_func:
-        priv_tuple = ("mysql", "SELECT")
-        source_privs.append(priv_tuple)
-    
-    # Check permissions on source
-    for priv in source_privs:
-        if not _check_user_permissions(source, s_user, s_host, priv):
-            raise MySQLUtilError("User %s on the source server does not have "
-                                 "permissions to read all objects in %s. " %
-                                 (s_user, source_db) + "User needs %s "
-                                 "privilege on %s." % (priv[1], priv[0]))
-        
-    # Build minimal list of privileges for destination access
-    if cloning:
-        server = source
-        user = s_user
-        host = s_host
-    else:
-        server = destination
-        user = d_user
-        host = d_host
-        
-    dest_privs = [(dest_db, "CREATE"),
-                  (dest_db, "SUPER"),
-                  ("*", "SUPER")]
-    if not skip_grants:
-        priv_tuple = (dest_db, "WITH GRANT OPTION")
-        dest_privs.append(priv_tuple)
-        
-    # Check privileges on destination
-    for priv in dest_privs:
-        if not _check_user_permissions(server, user, host, priv):
-            raise MySQLUtilError("User %s on the destination server does not "
-                                 "have permissions to create all objects "
-                                 "in %s. User needs %s privilege on %s." %
-                                 (user, priv[0], priv[1], priv[0]))
-            
-    return (True, None)
-
-
 def copy_db(src_val, dest_val, db_list, options):
     """ Copy a database
     
@@ -175,13 +74,27 @@ def copy_db(src_val, dest_val, db_list, options):
     # Check user permissions on source and destination for all databases
     for db_name in db_list:
         try:
-            result = _check_access(source, destination, src_val["user"],
-                                   src_val["host"], dest_val["user"],
-                                   dest_val["host"], db_name, cloning,
-                                   options.get("skip_views", False),
-                                   options.get("skip_procs", False),
-                                   options.get("skip_funcs", False),
-                                   options.get("skip_grants", False))
+            source_db = Database(source, db_name[0])
+            if destination is None:
+                dest = source
+            else:
+                dest = destination
+            if db_name[1] is None:
+                db = db_name[0]
+            else:
+                db = db_name[1]
+            dest_db = Database(dest, db)
+
+            source_db.check_read_access(src_val["user"], src_val["host"],
+                                        options.get("skip_views", False),
+                                        options.get("skip_procs", False),
+                                        options.get("skip_funcs", False),
+                                        options.get("skip_grants", False))
+            dest_db.check_write_access(dest_val["user"], dest_val["host"],
+                                       options.get("skip_views", False),
+                                       options.get("skip_procs", False),
+                                       options.get("skip_funcs", False),
+                                       options.get("skip_grants", False))
         except MySQLUtilError, e:
             raise e
             
