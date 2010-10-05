@@ -63,12 +63,12 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     from mysql.utilities.common import connect_servers
     from mysql.utilities.common import User
 
-    dump_sql = options["dump"]
-    copy_dir = options["copy_dir"]
-    overwrite = options["overwrite"]
-    verbose = options["verbose"]
-    silent = options["silent"]
-    globals = options["globals"]
+    dump_sql = options.get("dump", False)
+    copy_dir = options.get("copy_dir", False)
+    overwrite = options.get("overwrite", False)
+    verbose = options.get("verbose", False)
+    silent = options.get("silent", False)
+    globals = options.get("globals", False)
 
     try:
         servers = connect_servers(src_val, dest_val, silent, "5.1.0")

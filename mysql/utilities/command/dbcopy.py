@@ -161,8 +161,8 @@ def copy_db(src_val, dest_val, db_list, options):
     from mysql.utilities.common import connect_servers
     
     try:
-        servers = connect_servers(src_val, dest_val, options["silent"],
-                                  "5.1.30")
+        servers = connect_servers(src_val, dest_val,
+                                  options.get("silent", False), "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -178,10 +178,10 @@ def copy_db(src_val, dest_val, db_list, options):
             result = _check_access(source, destination, src_val["user"],
                                    src_val["host"], dest_val["user"],
                                    dest_val["host"], db_name, cloning,
-                                   options["skip_views"],
-                                   options["skip_procs"],
-                                   options["skip_funcs"],
-                                   options["skip_grants"])
+                                   options.get("skip_views", False),
+                                   options.get("skip_procs", False),
+                                   options.get("skip_funcs", False),
+                                   options.get("skip_grants", False))
         except MySQLUtilError, e:
             raise e
             
@@ -194,7 +194,7 @@ def copy_db(src_val, dest_val, db_list, options):
                                  (db_name[0], db_name[1]))
     
         # Display copy message
-        if not options["silent"]:
+        if not options.get("silent", False):
             msg = "# Copying database %s " % db_name[0]
             if db_name[1]:
                 msg += "renamed as %s" % (db_name[1])
@@ -212,10 +212,10 @@ def copy_db(src_val, dest_val, db_list, options):
         db.init()
         try:
             db.copy(db_name[1], None, options, destination,
-                    options["connections"])
+                    options.get("connections", False))
         except MySQLUtilError, e:
             raise e
             
-    if not options["silent"]:
+    if not options.get("silent", False):
         print "#...done."
     return True

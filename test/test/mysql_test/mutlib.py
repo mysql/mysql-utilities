@@ -31,10 +31,6 @@ import sys
 import time
 from mysql.utilities.common import MySQLUtilError
 
-# List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
-
 # Constants
 MAX_SERVER_POOL = 10
 
@@ -627,18 +623,23 @@ class System_test(object):
         
         Returns string
         """
-        res = server.get_db_objects(db, TABLE)
+
+        from mysql.utilities.common import Database
+
+        db_source = Database(server, db)
+        db_source.init()
+        res = db_source.get_db_objects("TABLE")
         str = "OBJECT COUNTS: tables = %s, " % (len(res))
-        res = server.get_db_objects(db, VIEW)
+        res = db_source.get_db_objects("VIEW")
         str += "views = %s, " % (len(res))
-        res = server.get_db_objects(db, TRIGGER)
+        res = db_source.get_db_objects("TRIGGER")
         str += "triggers = %s, " % (len(res))
-        res = server.get_db_objects(db, PROC)
+        res = db_source.get_db_objects("PROCEDURE")
         str += "procedures = %s, " % (len(res))
-        res = server.get_db_objects(db, FUNC)
+        res = db_source.get_db_objects("FUNCTION")
         str += "functions = %s, " % (len(res))
         if events:
-            res = server.get_db_objects(db, EVENT)
+            res = db_source.get_db_objects("EVENT")
             str += "events = %s \n" % (len(res))
         return str
 

@@ -51,23 +51,18 @@ def check_index(src_val, table_args, options):
     """
     
     # Get options
-    show_drops = options["show-drops"]
-    skip = options["skip"]
-    verbose = options["verbose"]
-    show_indexes = options["show-indexes"]
-    index_format = options["index-format"]
-    silent = options["silent"]
-    stats = False
-    if "stats" in options:
-        stats = options["stats"]
-    first_indexes = None
-    if "first" in options:
-        first_indexes = options["first"]        
-    last_indexes = None
-    if "last" in options:
-        last_indexes = options["last"]
+    show_drops = options.get("show-drops", False)
+    skip = options.get("skip", False)
+    verbose = options.get("verbose", False)
+    show_indexes = options.get("show-indexes", False)
+    index_format = options.get("index-format", False)
+    silent = options.get("silent", False)
+    stats = options.get("stats", False)
+    first_indexes = options.get("first", None)        
+    last_indexes = options.get("last", None)
 
     from mysql.utilities.common import connect_servers
+    from mysql.utilities.common import Database
     from mysql.utilities.common import Table
 
     # Try to connect to the MySQL database server.
@@ -99,12 +94,14 @@ def check_index(src_val, table_args, options):
     
     # Loop through database list adding tables
     for db in db_list:
-        tables = source.get_db_objects(db, "TABLE")
+        db_source = Database(source, db)
+        db_source.init()
+        tables = db_source.get_db_objects("TABLE")
         if not tables and verbose:
             print "# Warning: database %s does not exist. Skipping." % (db)
         for table in tables:
             table_list.append(db + "." + table[0])
-    
+
     # Fail if no tables to check
     if not table_list:
         raise MySQLUtilError("No tables to check.")

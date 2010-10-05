@@ -27,7 +27,7 @@ import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
 # List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
+_DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
     "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 
 class Database(object):
@@ -41,9 +41,9 @@ class Database(object):
         - Clone the database
         - Print CREATE statements for all objects
     """
-    obj_type = DATABASE
+    obj_type = _DATABASE
     
-    def __init__(self, source, name, options):
+    def __init__(self, source, name, options={}):
         """Constructor
         
         source[in]         A Server object
@@ -53,18 +53,18 @@ class Database(object):
         options[in]        Array of options for controlling what is included
                            and how operations perform (e.g., verbose) 
         """
-        self.verbose = options["verbose"]
         self.source = source
         self.db_name = name
-        self.skip_tables = options["skip_tables"]
-        self.skip_views = options["skip_views"]
-        self.skip_triggers = options["skip_triggers"]
-        self.skip_procs = options["skip_procs"]
-        self.skip_funcs = options["skip_funcs"]
-        self.skip_events = options["skip_events"]
-        self.skip_grants = options["skip_grants"]
-        self.skip_create = options["skip_create"]
-        self.skip_data = options["skip_data"]
+        self.verbose = options.get("verbose", False)
+        self.skip_tables = options.get("skip_tables", False)
+        self.skip_views = options.get("skip_views", False)
+        self.skip_triggers = options.get("skip_triggers", False)
+        self.skip_procs = options.get("skip_procs", False)
+        self.skip_funcs = options.get("skip_funcs", False)
+        self.skip_events = options.get("skip_events", False)
+        self.skip_grants = options.get("skip_grants", False)
+        self.skip_create = options.get("skip_create", False)
+        self.skip_data = options.get("skip_data", False)
         self.new_db = None
         self.init_called = False
         self.destination = None # Used for copy mode
@@ -188,10 +188,10 @@ class Database(object):
             self.new_db = self.db_name
         create_str = None
         # Tables are not supported
-        if obj_type == TABLE and self.cloning:
+        if obj_type == _TABLE and self.cloning:
             return None
         # Grants are a different animal!
-        if obj_type == GRANT:
+        if obj_type == _GRANT:
             if obj[3]:
                 create_str = "GRANT %s ON %s.%s TO %s" % \
                              (obj[1], self.new_db, obj[3], obj[0])
@@ -201,8 +201,8 @@ class Database(object):
             if create_str.find("%"):
                 create_str = re.sub("%", "%%", create_str)
         else:
-            create_str = self.source.get_create_statement(self.db_name,
-                                                           obj[0], obj_type)
+            create_str = self.get_create_statement(self.db_name,
+                                                   obj[0], obj_type)
             if self.new_db != self.db_name:
                 create_str = re.sub(r" %s\." % self.db_name,
                                     r" %s." % self.new_db,
@@ -228,11 +228,12 @@ class Database(object):
         obj_type[in]       Object type (string) e.g. DATABASE
         """
 
-        rows = self.source.get_db_objects(self.db_name, obj_type)
+        rows = self.get_db_objects(obj_type)
         if rows:
             for row in rows:
                 tuple = (obj_type, row)
                 self.objects.append(tuple)
+                
 
     def init(self):
         """Get all objects for the database based on options set.
@@ -245,28 +246,28 @@ class Database(object):
         NOTE: This method must be called before the copy method. A
               guard is in place to ensure this.
         """
+        self.init_called = True
         # Get tables
         if not self.skip_tables:
-            self.__add_db_objects(TABLE)
+            self.__add_db_objects(_TABLE)
         # Get views
         if not self.skip_views:
-            self.__add_db_objects(VIEW)
+            self.__add_db_objects(_VIEW)
         # Get triggers
         if not self.skip_triggers:
-            self.__add_db_objects(TRIGGER)
+            self.__add_db_objects(_TRIG)
         # Get stored procedures
         if not self.skip_procs:
-            self.__add_db_objects(PROC)
+            self.__add_db_objects(_PROC)
         # Get functions
         if not self.skip_funcs:
-            self.__add_db_objects(FUNC)
+            self.__add_db_objects(_FUNC)
         # Get events
         if not self.skip_events:
-            self.__add_db_objects(EVENT)
+            self.__add_db_objects(_EVENT)
         # Get grants
         if not self.skip_grants:
-            self.__add_db_objects(GRANT)
-        self.init_called = True
+            self.__add_db_objects(_GRANT)
     
     def __drop_object(self, obj_type, name):
         """Drop a database object.
@@ -310,14 +311,14 @@ class Database(object):
         """
         
         create_str = None
-        if obj_type == TABLE and self.cloning:
+        if obj_type == _TABLE and self.cloning:
             create_str = "CREATE TABLE %s.%s LIKE %s.%s" % \
                          (self.new_db, obj[0], self.db_name, obj[0])
         else:
             create_str = self.__make_create_statement(obj_type, obj)
         str = "# Copying"
         if not silent:
-            if obj_type == GRANT:
+            if obj_type == _GRANT:
                 if show_grant_msg:
                     print "%s GRANTS from %s" % (str, self.db_name)
             else:
@@ -403,7 +404,7 @@ class Database(object):
             self.destination = new_server
             copy_file = "copy_data_%s" % \
                         (datetime.datetime.now().strftime("%Y.%m.%d"))
-            if options["copy_dir"]:
+            if options.get("copy_dir", False):
                copy_file = options["copy_dir"] + copy_file
         else:
             self.destination = self.source
@@ -436,7 +437,7 @@ class Database(object):
             exists = self.exists(self.destination, new_db)
             drop_server = self.destination
         if exists:
-            if options["force"]:
+            if options.get("force", False):
                 self.drop(drop_server, True, new_db)
             elif not self.skip_create:
                 raise MySQLUtilError("destination database exists. Use "
@@ -455,27 +456,28 @@ class Database(object):
 
             # Drop object if --force specified and database not dropped
             # Grants do not need to be dropped for overwriting
-            if options["force"] and obj[0] != GRANT:
+            if options.get("force", False) and obj[0] != _GRANT:
                 self.__drop_object(obj[0], obj[1][0])
                 
             # Create the object
             try:
                 self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                     options["silent"])
+                                     options.get("silent", False))
             except MySQLUtilError, e:
                 raise e
             
-            if obj[0] == GRANT and not grant_msg_displayed:
+            if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
                 
             # Now copy the data if enabled
             if not self.skip_data:
-                if obj[0] == TABLE:
+                if obj[0] == _TABLE:
                     tblname = obj[1][0]
                     if self.cloning:
-                        self.__copy_table_data(tblname, options["silent"])
+                        self.__copy_table_data(tblname, options.get("silent",
+                                                                    False))
                     else:
-                        if not options["silent"]:
+                        if not options.get("silent", False):
                             print "# Copying data for TABLE %s.%s" % \
                                    (self.db_name, tblname)
                         try:
@@ -502,4 +504,119 @@ class Database(object):
                 res = self.destination.exec_query(fkey_query, "ON")
             except MySQLUtilError, e:
                 raise e
+
+
+    def get_create_statement(self, db, name, obj_type):
+        """Return the create statement for the object
+        
+        db[in]             Database name
+        name[in]           Name of the object 
+        obj_type[in]       Object type (string) e.g. DATABASE
+                           Note: this is used to form the correct SHOW command
+    
+        Returns create statement
+        """
+    
+        row = None
+        if obj_type == _DATABASE:
+            name_str = name
+        else:
+            name_str = db + "." + name
+        try:
+            row = self.source.exec_query("SHOW CREATE %s %s" % \
+                                         (obj_type, name_str))
+        except MySQLUtilError, e:
+            raise e
+        
+        create_statement = None
+        if row:
+            if obj_type == _TABLE or obj_type == _VIEW or \
+               obj_type == _DATABASE:
+                create_statement = row[0][1]
+            elif obj_type == _EVENT:
+                create_statement = row[0][3]
+            else:
+                create_statement = row[0][2]
+        if create_statement.find("%"):
+            create_statement = re.sub("%", "%%", create_statement)
+        return create_statement
+        
+
+    def get_db_objects(self, obj_type):
+        """Return a result set containing all objects for a given database
+        
+        obj_type[in]       Type of object to retrieve    
+
+        TODO: Change implementation to return classes instead of a result set.
+    
+        Returns MySQLdb result set
+        """
+    
+        # Must call init() first!
+        # Guard for init() prerequisite
+        assert self.init_called, "You must call db.init() before db.copy()."
+
+        if obj_type == _TABLE:
+            _OBJECT_QUERY = """
+            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+            WHERE TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
+            """
+        elif obj_type == _VIEW:
+            _OBJECT_QUERY = """
+            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS 
+            WHERE TABLE_SCHEMA = %s
+            """
+        elif obj_type == _TRIG:
+            _OBJECT_QUERY = """
+            SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS 
+            WHERE TRIGGER_SCHEMA = %s 
+            """
+        elif obj_type == _PROC:
+            _OBJECT_QUERY = """
+            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
+            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
+            """
+        elif obj_type == _FUNC:
+            _OBJECT_QUERY = """
+            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
+            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
+            """
+        elif obj_type == _EVENT:
+            _OBJECT_QUERY = """
+            SELECT EVENT_NAME FROM INFORMATION_SCHEMA.EVENTS 
+            WHERE EVENT_SCHEMA = %s
+            """
+        elif obj_type == _GRANT:
+            _OBJECT_QUERY = """
+            (
+                SELECT grantee AS c1, privilege_type AS c2, table_schema AS c3,
+                       NULL AS c4, NULL AS c5, NULL AS c6
+                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
+                WHERE table_schema = %s
+            ) UNION (
+                SELECT grantee, privilege_type, table_schema, table_name,
+                       NULL, NULL 
+                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES 
+                WHERE table_schema = %s
+            ) UNION (
+                SELECT grantee, privilege_type, table_schema, table_name,
+                       column_name, NULL 
+                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES 
+                WHERE table_schema = %s
+            ) UNION (
+                SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
+                       Routine_name, NULL, Routine_type 
+                FROM mysql.procs_priv WHERE Db = %s
+            ) ORDER BY c1 ASC, c2 ASC, c3 ASC, c4 ASC, c5 ASC, c6 ASC
+            """
+        else:
+            return None
+        
+        if obj_type == _GRANT:
+            return self.source.exec_query(_OBJECT_QUERY,
+                                          (self.db_name, self.db_name,
+                                           self.db_name, self.db_name,))
+        else:
+            return self.source.exec_query(_OBJECT_QUERY, (self.db_name,))
+        
 

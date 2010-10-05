@@ -27,10 +27,6 @@ import sys
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
-# List of database objects for enumeration
-_DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
-
 def _print_connection(prefix, conn_val):
     """ Print connection information
     """
@@ -197,40 +193,6 @@ class Server(object):
         self.connect_error = None
 
 
-    def get_create_statement(self, db, name, obj_type):
-        """Return the create statement for the object
-        
-        db[in]             Database name
-        name[in]           Name of the object 
-        obj_type[in]       Object type (string) e.g. DATABASE
-                           Note: this is used to form the correct SHOW command
-    
-        Returns create statement
-        """
-    
-        row = None
-        if obj_type == _DATABASE:
-            name_str = name
-        else:
-            name_str = db + "." + name
-        try:
-            row = self.exec_query("SHOW CREATE %s %s" % (obj_type, name_str))
-        except MySQLUtilError, e:
-            raise e
-        
-        create_statement = None
-        if row:
-            if obj_type == _TABLE or obj_type == _VIEW or \
-               obj_type == _DATABASE:
-                create_statement = row[0][1]
-            elif obj_type == _EVENT:
-                create_statement = row[0][3]
-            else:
-                create_statement = row[0][2]
-        if create_statement.find("%"):
-            create_statement = re.sub("%", "%%", create_statement)
-        return create_statement
-        
     def check_version_compat(self, t_major, t_minor, t_rel):
         """ Checks version of the server against requested version.
         
@@ -359,79 +321,6 @@ class Server(object):
         """
         return self.exec_query(_GET_DATABASES)
 
-
-    def get_db_objects(self, db, obj_type):
-        """Return a result set containing all objects for a given database
-        
-        db[in]             Name of the database
-        obj_type[in]       Type of object to retrieve    
-
-        TODO: Change implementation to return classes instead of a result set.
-    
-        Returns MySQLdb result set
-        """
-    
-        if obj_type == _TABLE:
-            _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
-            """
-        elif obj_type == _VIEW:
-            _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS 
-            WHERE TABLE_SCHEMA = %s
-            """
-        elif obj_type == _TRIG:
-            _OBJECT_QUERY = """
-            SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS 
-            WHERE TRIGGER_SCHEMA = %s 
-            """
-        elif obj_type == _PROC:
-            _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
-            """
-        elif obj_type == _FUNC:
-            _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
-            """
-        elif obj_type == _EVENT:
-            _OBJECT_QUERY = """
-            SELECT EVENT_NAME FROM INFORMATION_SCHEMA.EVENTS 
-            WHERE EVENT_SCHEMA = %s
-            """
-        elif obj_type == _GRANT:
-            _OBJECT_QUERY = """
-            (
-                SELECT grantee AS c1, privilege_type AS c2, table_schema AS c3,
-                       NULL AS c4, NULL AS c5, NULL AS c6
-                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       NULL, NULL 
-                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       column_name, NULL 
-                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
-                       Routine_name, NULL, Routine_type 
-                FROM mysql.procs_priv WHERE Db = %s
-            ) ORDER BY c1 ASC, c2 ASC, c3 ASC, c4 ASC, c5 ASC, c6 ASC
-            """
-        else:
-            return None
-        
-        if obj_type == _GRANT:
-            return self.exec_query(_OBJECT_QUERY, (db,db,db,db,))
-        else:
-            return self.exec_query(_OBJECT_QUERY, (db,))
-        
 
     def read_and_exec_SQL(self, input_file, verbose=False):
         """Read an input file containing SQL statements and execute them.
