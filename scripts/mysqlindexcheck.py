@@ -32,7 +32,7 @@ from mysql.utilities.command import indexcheck
 NAME = "MySQL Utilities - mysqlindexcheck "
 VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
-USAGE = "%prog --source=user:pass@host:port:socket db1.table1"
+USAGE = "%prog --source=user:pass@host:port:socket db1.table1 db2 db3.table2"
 
 # Setup the command parser
 parser = optparse.OptionParser(version=NAME+VERSION,
