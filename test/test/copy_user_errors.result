@@ -1,9 +1,9 @@
 Test case 1 - error: invalid login to source server
-# Source: noone@localhost: ... ERROR: Cannot connect to the Source server.
+# Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
 Test case 2 - error: invalid login to destination server
-# Source: root@localhost: ... connected.
-# Destination: noone@localhost: ... ERROR: Cannot connect to the destination server.
+# Source on localhost: ... connected.
+# Destination on localhost: ... ERROR: Cannot connect to the Destination server.
 Error 1045: Access denied for user 'noone'@'localhost' (using password: YES)
 Test case 3 - error: no arguments
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost

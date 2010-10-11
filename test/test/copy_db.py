@@ -25,7 +25,8 @@ class test(mysql_test.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers.")
+                raise MUTException("Cannot spawn needed servers: %s" % \
+                                   e.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
@@ -43,12 +44,21 @@ class test(mysql_test.System_test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server2)
        
-        # Test case 1 - copy a sample database
-        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
-              " util_test:util_db_clone"
-        res = self.exec_util(cmd, self.res_fname)
+        comment = "Test case 1 - copy a sample database X:Y"
+        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        res = self.exec_util(cmd + " util_test:util_db_clone", self.res_fname)
         self.results.append(res)
-        return res == 0
+        if res != 0:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 2 - copy a sample database X"
+        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        res = self.exec_util(cmd + " util_test", self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTException("%s: failed" % comment)
+
+        return True
   
     def get_result(self):
         msg = None
@@ -57,6 +67,13 @@ class test(mysql_test.System_test):
             try:
                 res = self.server2.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
+                    return (True, msg)
+            except MySQLUtilError, e:
+                raise MUTException(e.errmsg)
+            query = "SHOW DATABASES LIKE 'util_test'"
+            try:
+                res = self.server2.exec_query(query)
+                if res and res[0][0] == 'util_test':
                     return (True, msg)
             except MySQLUtilError, e:
                 raise MUTException(e.errmsg)
@@ -79,15 +96,19 @@ class test(mysql_test.System_test):
         return True
     
     def drop_all(self):
-        res1, res2 = True, True
+        res1, res2, res3 = True, True, True
         try:
             self.drop_db(self.server1, "util_test")
         except:
             res1 = False
         try:
-            self.drop_db(self.server2, "util_db_clone")
+            self.drop_db(self.server2, "util_test")
         except:
             res2 = False
+        try:
+            self.drop_db(self.server2, "util_db_clone")
+        except:
+            res3 = False
         try:
             self.server1.exec_query("DROP USER 'joe'@'user'")
         except:

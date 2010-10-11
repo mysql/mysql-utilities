@@ -76,7 +76,7 @@ class test(mysql_test.System_test):
     
     def run_test_case(self, server1, server2, s_id,
                       comment, options=None, save_for_compare=False,
-                      expected_result=0, show_results=False):
+                      expected_result=0):
         #
         # Note: server1 is slave, server2 is master
         #
@@ -88,13 +88,12 @@ class test(mysql_test.System_test):
         # Test case 1 - setup replication among two servers
         if not save_for_compare:
             self.results.append(comment)
-        cmd = "mysqlreplicate.py --server-id=%d " % s_id
-        cmd += "--rpl-user=rpl:rpl %s" % (conn_str)
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         if options:
             cmd += " %s" % options
         if not save_for_compare:
             self.results.append(cmd)
-        res = self.exec_util(cmd, self.res_fname, show_results)
+        res = self.exec_util(cmd, self.res_fname)
         if not save_for_compare:
             self.results.append(res)
         
@@ -124,7 +123,7 @@ class test(mysql_test.System_test):
         
         comment = "Test case 1 - replicate server1 as slave of server2 "
         res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
-                                 comment, True)
+                                 comment, None)
         if not res:
             raise MUTException("%s: failed" % comment)
         
@@ -135,7 +134,7 @@ class test(mysql_test.System_test):
 
         comment = "Test case 2 - replicate server2 as slave of server1 "
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
-                                 comment, True)
+                                 comment, None)
         if not res:
             raise MUTException("%s: failed" % comment)
         

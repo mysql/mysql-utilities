@@ -31,10 +31,6 @@ import sys
 import time
 from mysql.utilities.common import MySQLUtilError
 
-# List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
-
 # Constants
 MAX_SERVER_POOL = 10
 
@@ -53,7 +49,6 @@ def _exec_util(cmd, file_out, utildir, debug=False):
     
     Returns return value of process run.
     """
-    
     run_cmd = "python " + utildir + "/" + cmd
     f_out = open(file_out, 'w+')
     if debug:
@@ -210,7 +205,8 @@ class Server_list(object):
         try:
             self.new_server.connect()
         except MySQLUtilError, e:
-            server = (None, "Failed to connect")
+            raise MySQLUtilError("Cannot connect to spawned server: %s" % \
+                                 e.errmsg)
         return server
     
     
@@ -395,13 +391,15 @@ class System_test(object):
     """
     __metaclass__ = ABCMeta   # Register abstract base class
 
-    def __init__(self, servers, testdir, utildir, verbose=False):
+    def __init__(self, servers, testdir, utildir, verbose=False, debug=False):
         """Constructor
             
         servers[in]        A list of Server objects
         testdir[in]        Path to test objects
         utildir[in]        Path to utilty scripts 
         verbose[in]        print extra data during operations (optional)
+                           default value = False
+        debug[in]          Turn on debugging mode for a single test
                            default value = False
         """
         
@@ -411,7 +409,8 @@ class System_test(object):
         self.testdir = testdir      # Current test directory
         self.utildir = utildir      # Location of utilities being tested
         self.verbose = verbose      # Option for verbosity
-        
+        self.debug = debug          # Option for diagnostic work
+
 
     def __del__(self):
         """Destructor
@@ -422,7 +421,7 @@ class System_test(object):
             del result
             
 
-    def exec_util(self, cmd, file_out, debug=False):
+    def exec_util(self, cmd, file_out):
         """Execute Utility
         
         This method executes a MySQL utility using the utildir specified in
@@ -431,12 +430,10 @@ class System_test(object):
         
         cmd[in]            The command to execute including all parameters
         file_out[in]       Path and filename of a file to write output
-        debug[in]          Prints debug information during execution of
-                           utility
         
         Returns return value of process run.
         """
-        return _exec_util(cmd, file_out, self.utildir, debug)
+        return _exec_util(cmd, file_out, self.utildir, self.debug)
     
 
     def check_num_servers(self, num_servers):
@@ -478,6 +475,8 @@ class System_test(object):
         
         Returns (user, password, host, port, socket)
         """
+        if server is None:
+            raise MySQLUtilError("Server not initialized!")
         return (server.user, server.passwd, server.host,
                 server.port, server.socket, server.role)
 
@@ -515,9 +514,9 @@ class System_test(object):
               
         Returns True if result matches expected result
         """
-        if debug:
+        if self.debug or debug:
             print "\n%s" % comments
-        res = self.exec_util(command, self.res_fname, debug)
+        res = self.exec_util(command, self.res_fname)
         if comments:
             self.results.append(comments + "\n")
         self.record_results(self.res_fname)
@@ -536,6 +535,19 @@ class System_test(object):
             if index == 0:
                 self.results.pop(linenum)
                 self.results.insert(linenum, str)
+            linenum += 1
+
+    
+    def remove_result(self, prefix):
+        """ Remove a string in the results.
+
+        prefix[in]         starting prefix of string to mask
+        """
+        linenum = 0
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                self.results.pop(linenum)
             linenum += 1
 
     
@@ -611,18 +623,23 @@ class System_test(object):
         
         Returns string
         """
-        res = server.get_db_objects(db, TABLE)
+
+        from mysql.utilities.common import Database
+
+        db_source = Database(server, db)
+        db_source.init()
+        res = db_source.get_db_objects("TABLE")
         str = "OBJECT COUNTS: tables = %s, " % (len(res))
-        res = server.get_db_objects(db, VIEW)
+        res = db_source.get_db_objects("VIEW")
         str += "views = %s, " % (len(res))
-        res = server.get_db_objects(db, TRIGGER)
+        res = db_source.get_db_objects("TRIGGER")
         str += "triggers = %s, " % (len(res))
-        res = server.get_db_objects(db, PROC)
+        res = db_source.get_db_objects("PROCEDURE")
         str += "procedures = %s, " % (len(res))
-        res = server.get_db_objects(db, FUNC)
+        res = db_source.get_db_objects("FUNCTION")
         str += "functions = %s, " % (len(res))
         if events:
-            res = server.get_db_objects(db, EVENT)
+            res = db_source.get_db_objects("EVENT")
             str += "events = %s \n" % (len(res))
         return str
 
@@ -707,6 +724,13 @@ class System_test(object):
                 res_file.write(str)
             res_file.close()
         return True
+    
+    def is_long(self):
+        """Is test marked as a long running test?
+        
+        Override this method to specify the test is a long-running test.
+        """
+        return False
 
     
     @abstractmethod

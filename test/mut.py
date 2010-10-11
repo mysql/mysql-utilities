@@ -35,6 +35,7 @@ from mysql.utilities.common import Server
 from mysql.utilities.common import get_tool_path
 from mysql.utilities.common import parse_connection
 from mysql.utilities.common import MUTException
+from mysql.utilities.common import MySQLUtilError
 from test import Server_list
 
 # Constants
@@ -173,20 +174,25 @@ def _print_elapsed_time(start_test):
     sys.stdout.write(" %6d\n" % display_time)
 
 # Utility function
-def _report_error(message, test_name, mode, start_test):
+def _report_error(message, test_name, mode, start_test, error=True):
     """ Print an error message to stdout (screen)
     
     message[in]         Error message to print
     test_name[in]       The name of the current test
     mode[in]            Event mode (PASS, FAIL, WARN, etc)
     start_test[in]      The starting time of the test
+    error[in]           If True, print 'ERROR' else print 'WARNING'
     """
     linelen = opt.width - (len(test_name) + 13)
     sys.stdout.write(' ' * linelen)
     sys.stdout.write("[%s%s%s]" % (BOLD_ON, mode, BOLD_OFF))
     stop_test = time.time()
     _print_elapsed_time(start_test)
-    print "\n%sERROR%s: %s" % (BOLD_ON, BOLD_OFF, message)
+    if error:   
+        fishy = "ERROR"
+    else:
+        fishy = "WARNING"
+    print "\n%s%s%s: %s\n" % (BOLD_ON, fishy, BOLD_OFF, message)
     failed_tests.append(test)    
 
 # Helper method to manage exception handling
@@ -220,7 +226,7 @@ parser.add_option("--server", action="append", dest="servers",
                   "- list option multiple times for multiple servers to use")
 
 # Add test wildcard option
-parser.add_option("--do-test", action="store", dest="wildcard",
+parser.add_option("--do-tests", action="store", dest="wildcard",
                   type = "string", help="execute all tests that begin " \
                          "with this string")
 
@@ -230,9 +236,19 @@ parser.add_option("--suite", action="append", dest="suites",
                   "option multiple times for multiple suites")
 
 # Add skip-test list option
-parser.add_option("--skip-test", action="append", dest="skip_tests",
-                  type = "string", help="exclude test - list "
-                  "option multiple times for multiple suites")
+parser.add_option("--skip-test", action="append", dest="skip_test",
+                  type = "string", help="exclude a test - list "
+                  "option multiple times for multiple tests")
+
+# Add skip-test list option
+parser.add_option("--skip-tests", action="store", dest="skip_tests",
+                  type = "string", help="exclude tests that begin with "
+                  "this string")
+
+# Add skip-long tests option
+parser.add_option("--skip-long", action="store_true", dest="skip_long",
+                  default=False, help="exclude tests that require "
+                  "greater resources or take a long time to run")
 
 # Add skip-suite list option
 parser.add_option("--skip-suite", action="append", dest="skip_suites",
@@ -275,12 +291,22 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
 parser.add_option("--force", action="store_true", dest="force",
                   help="do not abort when a test fails")
 
+# Debug mode
+parser.add_option("--debug", "-d", action="store_true", dest="debug",
+                  help="display actual results of test cases to screen "
+                       "and ignore result processing - used to diagnose "
+                       "test execution problems")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
 # Cannot use --do-test= with listing tests.
 if opt.wildcard and len(args) > 0:
-    parser.error("Cannot mix --do-test= and list of tests.")
+    parser.error("Cannot mix --do-test= and a list of tests.")
+
+# Cannot use --debug with listing tests.
+if opt.debug and len(args) > 1:
+    parser.error("Cannot mix --debug and a list of tests.")
 
 # Must use --record with a specific test
 if opt.record and len(args) != 1:
@@ -321,11 +347,14 @@ if opt.wildcard:
     print "  Test wildcard       = '%s%%'" % (opt.wildcard)
 
 # Check to see if we're skipping tests
-if opt.skip_tests:
+if opt.skip_test:
     sys.stdout.write("  Skipping tests      = ")
-    for test in opt.skip_tests:
+    for test in opt.skip_test:
         sys.stdout.write("%s " % (test))
     print
+    
+if opt.skip_tests:
+    print "  Skip wildcard       = '%s%%'" % (opt.skip_tests)
      
 server_list = Server_list([], opt.start_port, opt.utildir, opt.verbose)
 basedir = None
@@ -337,37 +366,39 @@ if not opt.servers:
 else:
     i = 0
     for server in opt.servers:
-        conn_val = parse_connection(server)
-        if conn_val:
-            i += 1   
-            # Fail if port and socket are both None
-            if conn_val["port"] is None and conn_val["unix_socket"] is None:
-                parser.error("You must specify either a port or a socket " \
-                      "in the server string: \n       %s" % server)
-
-            sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
-                             (conn_val["host"], conn_val["user"],
-                              conn_val["port"]))
-            sys.stdout.flush()
-
-            if conn_val["port"] is not None:
-                conn_val["port"] = int(conn_val["port"])
-            else:
-                conn_val["port"] = 0
-                
-            conn = Server(conn_val, "server%d" % i)
-            try:
-                conn.connect()
-                server_list.add_new_server(conn)
-                print "CONNECTED"
-                res = conn.show_server_variable("basedir")
-                basedir = res[0][1]
-            except:
-                print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
-                if conn.connect_error is not None:
-                    print conn.connect_error
-        else:
+        try:
+            conn_val = parse_connection(server)
+        except:
             parser.error("Problem parsing server connection '%s'" % server)
+
+        i += 1   
+        # Fail if port and socket are both None
+        if conn_val["port"] is None and conn_val["unix_socket"] is None:
+            parser.error("You must specify either a port or a socket " \
+                  "in the server string: \n       %s" % server)
+
+        sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
+                         (conn_val["host"], conn_val["user"],
+                          conn_val["port"]))
+        sys.stdout.flush()
+
+        if conn_val["port"] is not None:
+            conn_val["port"] = int(conn_val["port"])
+        else:
+            conn_val["port"] = 0
+            
+        conn = Server(conn_val, "server%d" % i)
+        try:
+            conn.connect()
+            server_list.add_new_server(conn)
+            print "CONNECTED"
+            res = conn.show_server_variable("basedir")
+            basedir = res[0][1]
+        except MySQLUtilError, e:
+            print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
+            if conn.connect_error is not None:
+                print conn.connect_error
+            print "ERROR:", e.errmsg
     if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
         exit(1)
@@ -413,9 +444,9 @@ for root, dirs, files in os.walk(opt.testdir):
             continue
         
         # See if test is to be skipped
-        if opt.skip_tests:
-            if fname in opt.skip_tests or \
-               directory + "." + fname in opt.skip_tests:
+        if opt.skip_test:
+            if fname in opt.skip_test or \
+               directory + "." + fname in opt.skip_test:
                 continue
             
         # See if suite is to be skipped
@@ -429,6 +460,9 @@ for root, dirs, files in os.walk(opt.testdir):
             # Do selective tests based on matches for --do-test=
             if opt.wildcard:
                 if opt.wildcard == fname[0:len(opt.wildcard)]:
+                    test_files.append(test_ref)
+            elif opt.skip_tests:
+                if opt.skip_tests != fname[0:len(opt.skip_tests)]:
                     test_files.append(test_ref)
             # Add test if no wildcard and suite (dir) is included
             else:
@@ -468,12 +502,18 @@ for test_tuple in test_files:
     test_class = __import__(test)
     test_case = test_class.test(server_list,
                                 opt.testdir + "/" + test_suite,
-                                opt.utildir)
+                                opt.utildir, opt.verbose, opt.debug)
     
     last_test = test_case
     # Print name of the test
     sys.stdout.write(test_name)
     sys.stdout.flush()
+    
+    # Check to see if we need to skip long running tests
+    if opt.skip_long and test_case.is_long():
+        _report_error("Test marked as long running test.", test_name,
+                      "SKIP", start_test, False)
+        continue
     
     # Check prerequisites for number of servers. Skip test is there are not
     # enough servers to connect.

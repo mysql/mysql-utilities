@@ -32,7 +32,7 @@ from mysql.utilities.command import indexcheck
 NAME = "MySQL Utilities - mysqlindexcheck "
 VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
-USAGE = "%prog --source=user:pass@host:port:socket db1.table1"
+USAGE = "%prog --source=user:pass@host:port:socket db1.table1 db2 db3.table2"
 
 # Setup the command parser
 parser = optparse.OptionParser(version=NAME+VERSION,
@@ -115,8 +115,9 @@ else:
     opt.index_format = opt.index_format.upper()
 
 # Parse source connection values
-source_values = parse_connection(opt.source)
-if source_values is None:
+try:
+    source_values = parse_connection(opt.source)
+except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 # Check first, last for validity
@@ -151,8 +152,9 @@ if (last is not None or first is not None) and not opt.stats:
                  "effect.")
 
 # Parse source connection values
-source_values = parse_connection(opt.source)
-if source_values is None:
+try:
+    source_values = parse_connection(opt.source)
+except:
     parser.error("Source connection values invalid or cannot be parsed.")
     
 # Build dictionary of options

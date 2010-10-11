@@ -44,9 +44,9 @@ the operation.
 * FULLTEXT : idx_b is redundant to idx_a iff all columns in idx_b are 
   included in idx_a (order is not important)
 
-You can specify scanning all databases (except the internal databases
-mysql, INFORMATION_SCHEMA, PERFORMANCE_SCHEMA) by not specifying any
-databases or tables, or you can specify a list of databases or tables
+You can specify scanning all of the tables for any database (except the
+internal databases mysql, INFORMATION_SCHEMA, PERFORMANCE_SCHEMA) by
+specifying only the database name or you can specify a list of tables
 (in the form db.tablename) which will limit the scan to only those tables
 in the databases listed and those tables listed.
 

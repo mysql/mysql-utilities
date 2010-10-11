@@ -65,7 +65,7 @@ want"""
 if options.pattern:
     pattern = options.pattern
 else:
-    from mysql.utilities.common.exception import FormatError
+    from mysql.utilities.common.exception import MySQLUtilError
     from mysql.utilities.common import parse_connection
     
     try:
@@ -73,7 +73,7 @@ else:
         parse_connection(pattern)
     except IndexError:
         parser.error("No pattern supplied")
-    except FormatError:
+    except MySQLUtilError:
         pass # The pattern supplied was not a connection specification
     else:
         parser.error(_LOOKS_LIKE_CONNECTION_MSG.format(pattern=pattern))

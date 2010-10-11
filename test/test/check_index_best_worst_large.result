@@ -1,5 +1,5 @@
 Test case 1 - show best indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
@@ -15,7 +15,7 @@ employees,dept_emp,dept_no,dept_no,1,1,NNNNNNN,NNNNNNN,NNNNNNN
 #
 # ...done.
 Test case 2 - show worst indexes
-# Source: root@localhost: ... connected.
+# Source on localhost: ... connected.
 # Checking indexes...
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #

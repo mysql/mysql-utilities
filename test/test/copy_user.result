@@ -1,14 +1,14 @@
 Test case 1 - copy a single user joe_pass@user to a single user: jill@user
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Cloning 1 users...
 # Cloning joe_pass@user to user jill:duh@user 
 # ...done.
 GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
 GRANT SELECT ON `util_test`.* TO 'jill'@'user'
 Test case 2 - copy a single user amy_nopass@user to multiple users: jack@user and john@user
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Cloning 2 users...
 # Cloning amy_nopass@user to user jack:duh@user 
 # Cloning amy_nopass@user to user john@user 
@@ -18,26 +18,26 @@ GRANT INSERT ON `util_test`.* TO 'jack'@'user'
 GRANT USAGE ON *.* TO 'john'@'user'
 GRANT INSERT ON `util_test`.* TO 'john'@'user'
 Test case 3 - attempt to copy a non-existant user
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: Base user does not exist!
 Test case 4 - attempt to copy a user to a user that already exists
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 ERROR: User jill:duh@user already exists. Use --force to drop and recreate user.
 GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
 GRANT SELECT ON `util_test`.* TO 'jill'@'user'
 Test case 5 - attempt to copy a user to a user that already exists with --force
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Cloning 1 users...
 # Cloning joe_pass@user to user jill:duh@user 
 # ...done.
 GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
 GRANT SELECT ON `util_test`.* TO 'jill'@'user'
 Test case 6 - show clone without --include-globals set
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Cloning 1 users...
 # Cloning joe_pass@user to user joe_nopass@user 
 CREATE USER 'joe_nopass'@'user' 
@@ -45,8 +45,8 @@ GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.
 Test case 7 - show clone with --include-globals set
-# Source: root@localhost: ... connected.
-# Destination: root@localhost: ... connected.
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
 # Cloning 1 users...
 # Cloning joe_pass@user to user joe_nopass@user 
 DROP USER 'joe_nopass'@'user' 

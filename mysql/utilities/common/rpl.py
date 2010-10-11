@@ -69,20 +69,18 @@ class Rpl(object):
             return False
         return True
         
-    def replicate(self, server_id, rpl_user, num_tries):
+    def replicate(self, rpl_user, num_tries):
         """Setup replication among a slave and master.
         
         Note: Must have connected to a master and slave before calling this
         method.
 
-        server_id[in]      Server id for the new slave
         rpl_user[in]       Replication user in form user:passwd
         num_tries[in]      Number of attempts to wait for slave synch
         
         Returns True if success, False if error
         """
         
-        self.slave_server_id = server_id
         if self.master is None or self.slave is None:
             print "ERROR: Must connect to master and slave before " \
                   "calling replicate()"
@@ -94,6 +92,7 @@ class Rpl(object):
         # Create user class instance
         user_str = "%s@%s:%s" % (rpl_user, self.master.host, self.master.port)
         user = User(self.master, user_str, self.verbose)
+
         m_obj = re.match("(\w+)(?:\:(\w+))?", rpl_user)
         r_user, r_pass = m_obj.groups()
         
@@ -131,26 +130,7 @@ class Rpl(object):
             
         master_file = res[0][0]
         master_pos = res[0][1]
-        
-        # Check server ids to make sure they're unique
-        res = self.master.show_server_variable("server_id")    
-        master_id = res[0][1]
-        
-        if self.verbose:
-            print "# master id = %s" % master_id
-            print "#  slave id = %s" % self.slave_server_id
-            
-        if master_id == self.slave_server_id:
-            print "ERROR: The slave's server_id is the same as the master."
-            return False
-        
-        # Set slave id
-        if self.slave_server_id:
-            res = self.slave.exec_query("SET GLOBAL SERVER_ID = %s" % \
-                                        self.slave_server_id)
-            if self.verbose:
-                print "# set slave id = %s." % self.slave_server_id
- 
+         
         # Stop slave first
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != ():

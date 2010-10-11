@@ -27,10 +27,10 @@ class test(replicate.test):
         conn_str = master_str + slave_str
 
         cmd_str = "mysqlreplicate.py "
-      
+
         comment = "Test case 1 - error: cannot parse server (slave)"
         res = mysql_test.System_test.run_test_case(self, 2, cmd_str +
-                        master_str + " --slave=wikiwakawonky " +
+                        master_str + " --slave=wikiwokiwonky "
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
@@ -110,6 +110,38 @@ class test(replicate.test):
         res = mysql_test.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
+            
+        cmd_str = "mysqlreplicate.py %s %s" % (master_str, slave_str)
+
+        res = self.server2.show_server_variable("server_id")
+        if not res:
+            raise MUTException("Cannot get master's server id.")
+        master_serverid = res[0][1]
+        
+        self.server2.exec_query("SET GLOBAL server_id = 0")
+        
+        comment = "Test case 8 - error: Master server id = 0"
+        cmd = cmd_str + "--rpl-user=rpl:whatsit "
+        res = mysql_test.System_test.run_test_case(self, 1, cmd, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        self.server2.exec_query("SET GLOBAL server_id = %s" % master_serverid)
+            
+        res = self.server1.show_server_variable("server_id")
+        if not res:
+            raise MUTException("Cannot get slave's server id.")
+        slave_serverid = res[0][1]
+        
+        self.server1.exec_query("SET GLOBAL server_id = 0")
+        
+        comment = "Test case 9 - error: Slave server id = 0"
+        cmd = cmd_str + "--rpl-user=rpl:whatsit "
+        res = mysql_test.System_test.run_test_case(self, 1, cmd, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        self.server1.exec_query("SET GLOBAL server_id = %s" % slave_serverid)
 
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')

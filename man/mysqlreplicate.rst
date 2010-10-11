@@ -21,7 +21,7 @@ SYNOPSIS
                  --slave=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[--help | --version] | 
                  [--verbose | --testdb=<test database>]
-                 --rpl_user=<uid:passwd> --server-id=<id>]
+                 --rpl_user=<uid:passwd>]
 
 DESCRIPTION
 ===========
@@ -37,7 +37,7 @@ hosts using the default settings, use this command:
 ::
 
   mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3307
-                 --server-id=22 --rpl-user=rpl:rpl
+                 --rpl-user=rpl:rpl
 
 You can also specify a database to be used to test replication as well as
 a unix socket file for connecting to a master running on a local host.
@@ -54,9 +54,6 @@ OPTIONS
 
 --slave=SLAVE         connection information for slave server in the form:
                       <user>:<password>@<host>:<port>:<socket>
-
---server-id=SERVER_ID
-                      the server_id for the slave
 
 --rpl-user=RPL_USER   the user and password for the replication user
                       requirement - e.g. rpl:passwd - default = rpl:rpl
@@ -79,3 +76,8 @@ NOTES
 
 The login user must have the appropriate permissions to grant access to all
 databases and the ability to create a user account.
+
+The server_id on the master and slave must be unique. The utility will report
+an error if the server_id is 0 or is the same on the master and slave. Set
+these values before starting this utility.
+

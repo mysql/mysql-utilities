@@ -24,7 +24,8 @@ SYNOPSIS
             [, --server=<user:passwd@host:port:socket> ] |
             [ --suite=<suite> | [, --suite=<suite> ]] |
             [ --skip-suite=<suite> | [, --skip-suite=<suite> ]] |
-            [ --skip-test=<suite> | [, --skip-test=<suite> ]] |
+              --skip-tests=<test_prefix> | --skip-long |
+            [ --skip-test=<test> | [, --skip-test=<test> ]] |
             [ <test> | <suite>.<test> | [, <test> | <suite>.<test> ]]
 
 DESCRIPTION
@@ -65,11 +66,13 @@ OPTIONS
 --suite=<suite>        test suite to execute - list option multiple times for
                        multiple suites
 
---skip-test=<test>     exclude test - list option multiple times for multiple
-                       suites
+--skip-test=SKIP_TEST  exclude a test - list option multiple times for
+                        multiple tests
+--skip-tests=SKIP_TESTS
+                       exclude tests that begin with this string
 
---skip-suite=<suite>   exclude suite - list option multiple times for multiple
-                       suites
+--skip-long            exclude tests that require greater resources or take a
+                       long time to run
 
 --testdir=<path>       path to test directory
 
@@ -87,6 +90,10 @@ OPTIONS
 -f, --force            do not abort when a test fails
 
 --verbose              display additional information during operation
+
+-d, --debug            display actual results of test cases to screen and
+                       ignore result processing - used to diagnose test
+                       execution problems
 
 FILES
 =====

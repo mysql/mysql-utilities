@@ -21,30 +21,17 @@ by multiple utlities. It also contains helper methods for common
 server operations used in multiple utilities.
 """
 
-import multiprocessing
 import os
 import re
 import sys
 import MySQLdb
 from mysql.utilities.common import MySQLUtilError
 
-# Constants
-_MAXPACKET_SIZE = 1024 * 1024
-_MAXBULK_VALUES = 25000
-_MAXTHREADS_INSERT = 6
-_MAXROWS_PER_THREAD = 100000
-_MAXAVERAGE_CALC = 100
-
-# List of database objects for enumeration
-_DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
-
 def _print_connection(prefix, conn_val):
     """ Print connection information
     """
     conn_str = None
-    sys.stdout.write("# %s: %s@%s: ... " %
-                     (prefix, conn_val["user"], conn_val["host"]))
+    sys.stdout.write("# %s on %s: ... " % (prefix, conn_val["host"]))
 
 
 def connect_servers(src_val, dest_val, silent=False, version=None,
@@ -114,7 +101,7 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
 
     if not cloning:
         # Try to connect to the MySQL database server (destination).
-        destination = Server(dest_val, "destination")
+        destination = Server(dest_val, dest_name)
         try:
             destination.connect()
             if version is not None:
@@ -205,51 +192,7 @@ class Server(object):
             return False
         self.connect_error = None
 
-        # Get max allowed packet
-        res = self.show_server_variable("_MAXALLOWED_PACKET")
-        if res:
-            self.max_packet_size = res[0][1]
-        else:
-            self.max_packet_size = _MAXPACKET_SIZE
-        # Watch for invalid values
-        if self.max_packet_size > _MAXPACKET_SIZE:
-            self.max_packet_size = _MAXPACKET_SIZE
 
-
-    def get_create_statement(self, db, name, obj_type):
-        """Return the create statement for the object
-        
-        db[in]             Database name
-        name[in]           Name of the object 
-        obj_type[in]       Object type (string) e.g. DATABASE
-                           Note: this is used to form the correct SHOW command
-    
-        Returns create statement
-        """
-    
-        row = None
-        if obj_type == _DATABASE:
-            name_str = name
-        else:
-            name_str = db + "." + name
-        try:
-            row = self.exec_query("SHOW CREATE %s %s" % (obj_type, name_str))
-        except MySQLUtilError, e:
-            raise e
-        
-        create_statement = None
-        if row:
-            if obj_type == _TABLE or obj_type == _VIEW or \
-               obj_type == _DATABASE:
-                create_statement = row[0][1]
-            elif obj_type == _EVENT:
-                create_statement = row[0][3]
-            else:
-                create_statement = row[0][2]
-        if create_statement.find("%"):
-            create_statement = re.sub("%", "%%", create_statement)
-        return create_statement
-        
     def check_version_compat(self, t_major, t_minor, t_rel):
         """ Checks version of the server against requested version.
         
@@ -310,271 +253,6 @@ class Server(object):
             except MySQLUtilError, e:
                 raise e
         return fkey
-
-    def _build_update_blob(self, row, new_db, name, special_cols, blob_col):
-        """ Build an UPDATE statement to update blob fields.
-        
-        row[in]            a row to process
-        new_db[in]         new database name
-        name[in]           name of the table
-        conn_val[in]       connection information for the destination server
-        query[in]          the INSERT string for executemany()
-        special_cols[in]   list of columns for special string handling
-        blob_col[in]       number of the column containing the blob
-
-        Returns tuple (UPDATE string, blob data)
-        """
-        
-        blob_insert = "UPDATE %s.%s SET `" % (new_db, name)
-        where_clause = "WHERE "
-        data_clause = None
-        stop = len(row)
-        for col in range(0,stop):
-            if col == blob_col:
-                blob_insert += special_cols[col]["name"] + "` = %s "
-                data = row[col]
-            else:
-                where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
-                                                  row[col])
-                if col < stop-1:
-                    where_clause += " AND "
-        return (blob_insert + where_clause, data)
-    
-
-    def _bulk_copy(self, rows, new_db, name, conn_val, query, special_cols):
-        """Copy data using bulk insert
-        
-        Reads data from a table and builds group INSERT statements for writing
-        to the destination server specified (new_db.name).
-        
-        This method is designed to be used in a thread for parallel inserts.
-        As such, it requires its own connection to the destination server.
-
-        Note: This method does not print any information to stdout.
-    
-        rows[in]           a list of rows to process
-        new_db[in]         new database name
-        name[in]           name of the table
-        conn_val[in]       connection information for the destination server
-        query[in]          the INSERT string for executemany()
-        special_cols[in]   list of columns for special string handling
-        """
-        
-        # Spawn a new connection
-        dest = Server(conn_val, "thread")
-        try:
-            dest.connect()
-        except MySQLUtilError, e:
-            raise e
-
-        # get cursor
-        cur = dest.cursor()
-                    
-        # First, turn off foreign keys if turned on
-        try:
-            fkey_on = dest.toggle_fkeys(False)
-        except MySQLUtilError, e:
-            raise e
-            
-        blobs = []
-        row_count = 0
-        data_size = 0
-        val_str = None
-        for row in rows:
-            if row_count == 0:
-                insert_str = query 
-                if val_str:
-                    row_count += 1
-                    insert_str += val_str
-                data_size = len(insert_str)
-            val_str = " ("
-            stop = len(row)
-            for col in range(0,stop):
-                if row[col] == None:
-                    val_str += "NULL" 
-                else:
-                    # Save blob updates for later...
-                    if special_cols[col]["has_blob"]: # It is a blob field!
-                        str = self._build_update_blob(row, new_db, name,
-                                                      special_cols, col)
-                        blobs.append(str)
-                        val_str += "NULL"
-                    # We must ensure to escape ' marks.
-                    elif special_cols[col]["is_text"]: # No, wait, it's a text field
-                        if row[col].find("'"):
-                            val_str += "'%s'" % re.sub("'", "''", row[col])
-                        else:
-                            val_str += "'%s'" % row[col]
-                    elif special_cols[col]["is_time"]:
-                        val_str += "'%s'" % row[col]
-                    else: # Ah, ok, so it is some other field...
-                        val_str += "%s" % row[col]
-                if (col + 1) < stop:
-                    val_str += ", "
-            val_str += ")"
-
-            row_size = len(val_str)
-            next_size = data_size + row_size + 3
-            if (row_count >= _MAXBULK_VALUES) or \
-                (next_size > (int(self.max_packet_size) - 512)): # add buffer
-                try:
-                    res = dest.exec_query(insert_str)
-                except MySQLUtilError, e:
-                    raise e
-                row_count = 0
-            else:
-                row_count += 1
-                if row_count > 1:
-                    insert_str += ", "
-                insert_str += val_str
-                data_size += row_size + 3
-
-        if row_count > 0 :
-            try:
-                res = dest.exec_query(insert_str)
-            except MySQLUtilError, e:
-                raise e
-            
-        for blob_insert in blobs:
-            try:
-                res = dest.exec_query(blob_insert[0], blob_insert[1])
-            except MySQLUtilError, e:
-                raise MySQLUtilError("Problem updating blob field. "
-                                     "Error = %s" % e.errmsg)
-        
-        # Now, turn on foreign keys if they were on at the start
-        if fkey_on:
-            try:
-                fkey_on = dest.toggle_fkeys(True)
-            except MySQLUtilError, e:
-                raise e
-        del dest
-            
-
-    def copy_table_data(self, db, name, destination,
-                        new_db=None, verbose=False,
-                        connections=1):                        
-        """Retrieve data from a table.
-        
-        Reads data from a table and inserts the correct INSERT statements into
-        the file provided.
-    
-        db[in]             Database name
-        name[in]           Name of the object
-        destination[in]    Destination server
-        new_db[in]         Rename the db to this name 
-        verbose[in]        Print the INSERT command 
-                           Default = False
-        connections[in]    Number of threads(connections) to use for insert
-        """
-        cur = self.db_conn.cursor()
-        if new_db is None:
-            new_db = db
-
-        # Get number of rows
-        num_rows = 0
-        try:
-            res = cur.execute("USE %s" % db)
-            res = cur.execute("SHOW TABLE STATUS LIKE '%s'" % name)
-            if res:
-                row = cur.fetchone()
-                num_rows = int(row[4])
-        except MySQLUtilError, e:
-            raise e
-        
-        # Now, get field masks for blob and quoted fields
-        # Build an array of dictionaries describing the fields
-        special_cols = []
-        try:
-            res = cur.execute("explain %s.%s" % (db, name))
-            if res:
-                rows = cur.fetchall()
-                for row in rows:
-                    has_char = (row[1].find("char") >= 0)
-                    has_text = (row[1].find("text") >= 0)
-                    has_enum = (row[1].find("enum") >= 0)
-                    has_set = (row[1].find("set") >= 0)
-                    has_date = (row[1].find("date") >= 0)
-                    has_time = (row[1].find("time") >= 0)
-                    col_data = {
-                        "has_blob" : (row[1].find("blob") >= 0),
-                        "is_text"  : has_char or has_text or has_enum or
-                                     has_set,
-                        "is_time"  : has_date or has_time,
-                        "name"     : row[0]
-                    }
-                    special_cols.append(col_data)
-                        
-        except MySQLUtilError, e:
-            raise e
-        
-        num_conn = int(connections)
-
-        # Calculate number of threads and segment size to fetch
-        if num_conn > 1:
-            thread_limit = num_conn
-            if thread_limit > _MAXTHREADS_INSERT:
-                thread_limit = _MAXTHREADS_INSERT
-        else:
-            thread_limit = _MAXTHREADS_INSERT
-        if num_rows > (_MAXROWS_PER_THREAD * thread_limit):
-            max_threads = thread_limit
-        else:
-            max_threads = int(num_rows / _MAXROWS_PER_THREAD) 
-        if max_threads == 0:
-            max_threads = 1
-        if max_threads > 1 and verbose:
-            print "# Using multi-threaded insert option. Number of " \
-                  "threads = %d." % max_threads
-        segment_size = (num_rows / max_threads) + max_threads
-
-        # Get connection to database
-        conn_val = {
-            "host"   : destination.host,
-            "user"   : destination.user,
-            "passwd" : destination.passwd,
-            "unix_socket" : destination.socket,
-            "port"   : destination.port
-        }
-
-        # Execute query to get all of the data
-        try:
-            res = cur.execute("SELECT * FROM %s.%s" % (db, name))
-        except MySQLUtilError, e:
-            raise e
-
-        # Spawn bulk copies
-        ins_str = None
-        pthreads = []
-        while True:
-            rows = cur.fetchmany(segment_size)
-            if ins_str is None:
-                ins_str = "INSERT INTO %s.%s VALUES " % (new_db, name)
-            if not rows:
-                break
-            try:
-                if num_conn > 1:
-                    p = multiprocessing.Process(target=self._bulk_copy,
-                                                args=(rows, new_db, name,
-                                                      conn_val, ins_str,
-                                                      special_cols))
-                    p.start()
-                    pthreads.append(p)
-                else:
-                    self._bulk_copy(rows, new_db, name, conn_val,
-                                    ins_str, special_cols)
-            except MySQLUtilError, e:
-                raise e
-
-        if num_conn > 1:
-            # Wait for all to finish            
-            num_complete = 0
-            while num_complete < len(pthreads):
-                for p in pthreads:
-                    if not p.is_alive():
-                        num_complete += 1
-
-        cur.close()
 
 
     def cursor(self):
@@ -643,91 +321,6 @@ class Server(object):
         """
         return self.exec_query(_GET_DATABASES)
 
-
-    def get_db_objects(self, db, obj_type):
-        """Return a result set containing all objects for a given database
-        
-        db[in]             Name of the database
-        obj_type[in]       Type of object to retrieve    
-
-        TODO: Change implementation to return classes instead of a result set.
-    
-        Returns MySQLdb result set
-        """
-    
-        if obj_type == _TABLE:
-            _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
-            """
-        elif obj_type == _VIEW:
-            _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS 
-            WHERE TABLE_SCHEMA = %s
-            """
-        elif obj_type == _TRIG:
-            _OBJECT_QUERY = """
-            SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS 
-            WHERE TRIGGER_SCHEMA = %s 
-            """
-        elif obj_type == _PROC:
-            _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
-            """
-        elif obj_type == _FUNC:
-            _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
-            """
-        elif obj_type == _EVENT:
-            _OBJECT_QUERY = """
-            SELECT EVENT_NAME FROM INFORMATION_SCHEMA.EVENTS 
-            WHERE EVENT_SCHEMA = %s
-            """
-        elif obj_type == _GRANT:
-            _OBJECT_QUERY = """
-            (
-                SELECT grantee AS c1, privilege_type AS c2, table_schema AS c3,
-                       NULL AS c4, NULL AS c5, NULL AS c6
-                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       NULL, NULL 
-                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       column_name, NULL 
-                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES 
-                WHERE table_schema = %s
-            ) UNION (
-                SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
-                       Routine_name, NULL, Routine_type 
-                FROM mysql.procs_priv WHERE Db = %s
-            ) ORDER BY c1 ASC, c2 ASC, c3 ASC, c4 ASC, c5 ASC, c6 ASC
-            """
-        else:
-            return None
-        
-        if obj_type == _GRANT:
-            return self.exec_query(_OBJECT_QUERY, (db,db,db,db,))
-        else:
-            return self.exec_query(_OBJECT_QUERY, (db,))
-        
-    def get_tbl_indexes(self, tbl):
-        """Return a result set containing all indexes for a given table
-        
-        tbl[in]            Name of the table in the form "db.table"
-    
-        Returns MySQLdb result set
-        """
-        try:
-            res = self.exec_query("SHOW INDEXES FROM %s" % tbl)
-        except MySQLUtilError, e:
-            raise e
-        return res
 
     def read_and_exec_SQL(self, input_file, verbose=False):
         """Read an input file containing SQL statements and execute them.
