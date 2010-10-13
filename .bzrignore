@@ -1,3 +1,10 @@
 *~
 build
 dist
+scripts/mysqldbcopy
+scripts/mysqlgrep
+scripts/mysqlindexcheck
+scripts/mysqlproc
+scripts/mysqlreplicate
+scripts/mysqlserverclone
+scripts/mysqluserclone
