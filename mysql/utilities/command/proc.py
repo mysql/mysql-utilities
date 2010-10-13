@@ -2,130 +2,124 @@
 
 import MySQLdb
 import re
-
-_factor = { "s": 1, "m": 60, "h": 3600, "d": 24*3600, "w": 7*24*3600 }
-_row_format = "%4s %-10s %-10s %-10s %-6s %8s %-10s %s"
-
-def _print_processes(conn, rows):
-    print _row_format % ('ID', 'USER', 'HOST', 'DB','COMMAND','TIME','STATE','INFO')
-    for row in rows:
-        print _row_format % row
-
-def _kill_queries(conn, rows):
-    cursor = conn.cursor()
-    for row in rows:
-        cursor.execute("KILL QUERY %s", row[0])
-
-def _kill_connections(conn, rows):
-    cursor = conn.cursor()
-    for row in rows:
-        cursor.execute("KILL CONNECTION %s", row[0])
+import sys
 
 # Some handy constants
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
-_action_map = [
-    _kill_queries,              # KILL_QUERY
-    _kill_connections,          # KILL_CONNECTION
-    _print_processes,           # PRINT_PROCESS
-]
+ID      = "Id"
+USER    = "User"
+HOST    = "Host"
+DB      = "Db"
+COMMAND = "Command"
+TIME    = "Time"
+STATE   = "State"
+INFO    = "Info"
 
-class ProcessListProcessor(object):
-    "Class for searching the PROCESSLIST table on a MySQL server. "
+def _spec(info):
+    """Create a server specification string from an info structure."""
+    result = "{user}:*@{host}:{port}".format(**info)
+    if "unix_socket" in info:
+        result += ":" + info["unix_socket"]
+    return result
 
-    def __string_matcher(self, opt, pos):
+def _obj2sql(obj):
+    """Convert a Python object to an SQL object.
+
+    This function convert Python objects to SQL values using the
+    conversion functions in the database connector package."""
+    from MySQLdb.converters import conversions
+    return conversions[type(obj)](obj, conversions)
+
+_SELECT_PROC_FRM = """
+SELECT
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST{condition}"""
+
+def _make_select(matches, use_regexp):
+    """Generate a SELECT statement for matching the processes.
+    """
+    oper = 'REGEXP' if use_regexp else 'LIKE'
+    conditions = []
+    for field, pattern in matches:
+        conditions.append("    {0} {1} {2}".format(field, oper, _obj2sql(pattern)))
+    if len(conditions) > 0:
+        condition = "\nWHERE\n" + "\n  AND\n".join(conditions)
+    else:
+        condition = ""
+    return _SELECT_PROC_FRM.format(condition=condition)
+
+_KILL_BODY = """
+DECLARE kill_done INT;
+DECLARE kill_cursor CURSOR FOR
+  {select}
+OPEN kill_cursor;
+BEGIN
+   DECLARE id BIGINT;
+   DECLARE EXIT HANDLER FOR NOT FOUND SET kill_done = 1;
+   kill_loop: LOOP
+      FETCH kill_cursor INTO id;
+      KILL {kill} id;
+   END LOOP kill_loop;
+END;
+CLOSE kill_cursor;"""
+
+_KILL_PROCEDURE = """
+CREATE PROCEDURE {name} ()
+BEGIN{body}
+END"""
+
+class ProcessGrep(object):
+    """Class for searching the INFORMATION_SCHEMA.PROCESSLIST table on MySQL servers.
+    """
+    
+    def __init__(self, matches, actions=[], use_regexp=False):
+        self.__select = _make_select(matches, use_regexp).strip()
+        self.__actions = actions
+
+    def sql(self, only_body=False):
+        """Show SQL code for executing action.
         """
-        Add a string matcher for an option at a given position in the
-        match list
-        """
-        if opt:
-            mobj = re.compile(opt, re.IGNORECASE)
-            self.__matches[pos] = lambda string: mobj.match(string)
-
-    def __period_matcher(self, opt, pos):
-        """
-        Create a matcher for a period and add that to the given
-        positon in the match list.
-
-        The function accept periods of the form ``[+-]?<digits>[smhdw]``
-        """
-        if opt:
-            mobj = re.match("([+-]?)(\d+)([smhdw]?)", opt)
-            if mobj:
-                sign, sec, per = mobj.groups()
-                if per in _factor:
-                    sec *= _factor[per]
-                if sign == "+":
-                    def match_func(val):
-                        return int(val) >= int(sec)
-                elif sign == "-":
-                    def match_func(val):
-                        return int(val) <= int(sec)
-                else:           # !!! We need to think closer about this
-                    def match_func(val):
-                        return int(val) == int(sec)
-                self.__matches[pos] = match_func
-
-    def __init__(self, option):
-        # PROCESSLIST files are: Id, User, Host, Db, Command, Time, State, Info
-        self.__matches = 8 * [lambda x: True]
-        self.__string_matcher(option.match_user, 1)
-        self.__string_matcher(option.match_host, 2)
-        self.__string_matcher(option.match_db,   3)
-        self.__string_matcher(option.match_command, 4)
-        self.__period_matcher(option.match_time, 5)
-        self.__string_matcher(option.match_state, 6)
-        self.__string_matcher(option.match_info, 7)
-
-        self.__port = 3306
-        self.__password = ""
-        self.__socket = option.socket
-        self.__user = option.user
-
-        if option.port:
-            self.__port = option.port
-        if option.password:
-            self.__password = option.password
-        if option.host:
-            self.__host = option.host
-
-        # If there were no action option supplied, we print all
-        # matching processes
-        if option.action_list:
-            self.__action_list = option.action_list
+        params = {
+            'select': "\n      ".join(self.__select.split("\n")),
+            'kill': 'CONNECTION' if KILL_CONNECTION in self.__actions else 'QUERY',
+            }
+        if KILL_CONNECTION in self.__actions or KILL_QUERY in self.__actions:
+            sql = _KILL_BODY.format(**params)
+            if not only_body:
+                sql = _KILL_PROCEDURE.format(name="kill_processes",
+                                             body="\n   ".join(sql.split("\n")))
+            return sql
         else:
-            self.__action_list = [PRINT_PROCESS]
+            return self.__select
 
-    def __match_row(self, row):
-        """Process a single row and see if it matches the stored patterns."""
-        if not row:
-            return False
-        return True
+    def execute(self, args, output=sys.stdout, connector=MySQLdb):
+        from ..common.exception import EmptyResultError
+        from ..common.options import parse_connection
+        from ..common.format import format_tabular_list
 
-    def __ask_one_server(self, conn):
-        """Execute ``SHOW FULL PROCESSLIST`` on a server and return
-        the rows that matched"""
-        result = []
-        cur = conn.cursor()
-        cur.execute("SHOW FULL PROCESSLIST")
-        for row in cur:
-            for match, column in zip(self.__matches, row):
-                # Here we should use MySQLdb.conversion instead of
-                # converting (back) to a string
-                if not match(str(column)):
-                    break
-            else:
-                result.append(row)  # All matched
-        return result
+        headers = ("Connection", "Id", "User", "Host", "Db",
+                   "Command", "Time", "State", "Info")
+        entries = []
+        # Build SQL statement
+        for info in args:
+            if isinstance(info, basestring):
+                info = parse_connection(info)
+            connection = connector.connect(**info)
+            cursor = connection.cursor()
+            cursor.execute(self.__select)
+            for row in cursor:
+                if KILL_QUERY in self.__actions:
+                    cursor.execute("KILL {0}".format(row[0]))
+                if KILL_CONNECTION in self.__actions:
+                    cursor.execute("KILL {0}".format(row[0]))
+                if PRINT_PROCESS in self.__actions:
+                    entries.append(tuple([_spec(info)] + list(row)))
         
-    def execute(self, args):
-        if self.__socket:
-            conn = MySQLdb.connect(unix_socket=self.__socket,
-                                   user=self.__user, passwd=self.__password)
-        else:
-            conn = MySQLdb.connect(host=self.__host, port=self.__port,
-                                   user=self.__user, passwd=self.__password)
-            
-        rows = self.__ask_one_server(conn)
-        for action in self.__action_list:
-            _action_map[action](conn, rows)
+        # If output is None, nothing is printed
+        if len(entries) > 0 and output: 
+            format_tabular_list(output, headers, entries)
+        elif PRINT_PROCESS in self.__actions:
+            raise EmptyResultError("No matches found")
+

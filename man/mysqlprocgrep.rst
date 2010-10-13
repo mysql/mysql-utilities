@@ -1,6 +1,6 @@
-=========
-mysqlproc
-=========
+=============
+mysqlprocgrep
+=============
 
 ----------------------------------------------------------
 Search for processes on a MySQL server and perform actions
@@ -13,7 +13,7 @@ Search for processes on a MySQL server and perform actions
 SYNOPSIS
 ========
 
-  mysqlproc [options] 
+  mysqlprocgrep [options] server ...
 
 DESCRIPTION
 ===========
@@ -27,22 +27,6 @@ conditions given have to match.
 
 Options
 -------
-
--h HOST, --host=HOST
-  Connect to the MySQL server on the given host. Default is 'localhost'.
-
--u USER, --user=USER
-  The MySQL user name to use when connecting to the server. Default is
-  to use the login name of the user.
-
--S SOCKET, --socket=SOCKET
-  For connections to localhost, the Unix socket file to use.
-
--p PASSWORD, --password=PASSWORD
-  The password to use when connecting to the server.
-
--P PORT, --port=PORT
- The TCP/IP port number to use for the connection.
 
 --match-user=PATTEN
   Match all rows where the ``User`` field matches PATTERN
@@ -60,60 +44,69 @@ Options
   Match all rows where the ``Command`` field matches PATTERN
 
 --match-state=PATTERN
-  Match all rows where the ``State`` field matches PATTERN
+  Match all rows where the ``State`` field matches **PATTERN**.
 
 --match-info=PATTERN
-  Match all rows where the ``Info`` field matches PATTERN
+  Match all rows where the ``Info`` field matches **PATTERN**.
 
---kill
-  Kill the connection for all matching processes
+--kill-connection
+  Kill the connection for all matching processes.
 
 --kill-query
-  Kill the query for all matching processes
+  Kill the query for all matching processes.
 
 --print
-  Print information about the matching processes
+  Print information about the matching processes. This is the default
+  if no ``--kill-*`` option is given. If a ``--kill-*`` option is
+  given, this option will print information about the processes before
+  killing them.
 
---verbose
+-v, --verbose
   Be more verbose and print messages about execution. Can be given
   multiple times, in which case the verbosity level increases.
 
---emit-body
+-G, --basic-regexp, --regexp
+  Use 'REGEXP' operator to match patterns instead of 'LIKE'.
+
+-Q, --sql, --print-sql
+  Emit the SQL for matching or killing the queries. If the ``--kill``
+  option is given, a routine for killing the queries are generated.
+
+--sql-body
   Emit SQL statements for performing the search or kill of the
   ``INFORMATION_SCHEMA.PROCESSLIST`` table.  This is useful together
-  with ``mysqlcron`` to generate an event for the server scheduler.
+  with `mysqlmkevent`_ to generate an event for the server scheduler.
 
   When used with the ``--kill`` option, code for killing the matching
   queries are generated. Note that it is not possible to execute the
   emitted code unless it is put in a stored routine, event, or
   trigger. For example, the following code could be generated to kill
-  all connections for user ``www-data`` that has been idle for more
-  than 30 seconds::
+  all connections for user ``www-data`` that is idle::
 
+     $ mysqlprocgrep --kill-connection --sql-body \
+     >   --match-user=www-data --match-state=sleep
+     DECLARE kill_done INT;
      DECLARE kill_cursor CURSOR FOR
-       SELECT id FROM INFORMATION_SCHEMA.PROCESSLIST
-        WHERE user = 'www-data' AND state = 'Sleep' AND time > 30;
+       SELECT
+             Id, User, Host, Db, Command, Time, State, Info
+           FROM
+             INFORMATION_SCHEMA.PROCESSLIST
+           WHERE
+               user LIKE 'www-data'
+             AND
+               State LIKE 'sleep'
      OPEN kill_cursor;
      BEGIN
-        DECLARE id_to_kill BIGINT;
+        DECLARE id BIGINT;
         DECLARE EXIT HANDLER FOR NOT FOUND SET kill_done = 1;
         kill_loop: LOOP
-           FETCH kill_cursor INTO id_to_kill;
-           KILL id_to_kill;
+           FETCH kill_cursor INTO id;
+           KILL CONNECTION id;
         END LOOP kill_loop;
      END;
      CLOSE kill_cursor;
 
-  **Not Yet Implemented!**
-
---emit-procedure
-  Emit the definition of a stored procedure for matching or killing
-  the queries. If the ``--kill`` option is given, a routine for
-  killing the queries are generated.
-
-  **Not Yet Implemented!**
-
---help
+-h, --help
   Print help
 
 
@@ -139,8 +132,8 @@ connections.
 
 To kill all connections created by user "mats" that are younger than 1 minute::
 
-  mysqlproc --user=root --host=localhost --match-user=mats --match-time=-1m --kill-query
+  mysqlprocgrep --user=root --host=localhost --match-user=mats --match-time=-1m --kill-query
 
 To kill all queries that has been idle for more than 1 hour::
 
-  mysqlproc --user=root --host=localhost --match-command=sleep --match-time=+1h --kill
+  mysqlprocgrep --user=root --host=localhost --match-command=sleep --match-time=+1h --kill
