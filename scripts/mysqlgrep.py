@@ -18,12 +18,16 @@
 #
 
 import optparse
+import os.path
 import re
+import sys
 
+from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import ObjectGrep, OBJECT_TYPES
 
-parser = optparse.OptionParser(version="0.1",
-                               usage="usage: %prog [options] pattern server ...")
+parser = optparse.OptionParser(
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    usage="usage: %prog [options] pattern server ...")
 
 parser.add_option("-b", "--body",
                   dest="check_body", action="store_true", default=False,

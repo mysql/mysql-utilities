@@ -27,24 +27,27 @@ Methods:
 import optparse
 import re
 
-def setup_common_options(version_str, desc_str, usage_str):
+from .. import VERSION_FRM
+
+def setup_common_options(program_name, desc_str, usage_str):
     """Setup option parser and options common to all MySQL Utilities.
  
     This method creates an option parser and adds options for user
     login and connection options to a MySQL database system including
     user, password, host, socket, and port.
     
-    version_str[in]    The string representing the utility version number
+    program_name[in]   The program name
     desc_str[in]       The description of the utility
     usage_str[in]      A brief usage example
     
     Returns parser object
     """
     
-    parser = optparse.OptionParser(version=version_str,
-                                   description=desc_str,
-                                   usage=usage_str,
-                                   add_help_option=False)
+    parser = optparse.OptionParser(
+        version=VERSION_FRM.format(program=program_name),
+        description=desc_str,
+        usage=usage_str,
+        add_help_option=False)
     parser.add_option("--help", action="help")
     
     # Login user

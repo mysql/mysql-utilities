@@ -24,21 +24,24 @@ or all tables in all databases except internal databases.
 """
 
 import optparse
-from mysql.utilities.common import parse_connection
-from mysql.utilities.common import MySQLUtilError
+import os.path
+import sys
+
+from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import indexcheck
+from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common import parse_connection
 
 # Constants
-NAME = "MySQL Utilities - mysqlindexcheck "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
 USAGE = "%prog --source=user:pass@host:port:socket db1.table1 db2 db3.table2"
 
 # Setup the command parser
-parser = optparse.OptionParser(version=NAME+VERSION,
-                               description=DESCRIPTION,
-                               usage=USAGE,
-                               add_help_option=False)
+parser = optparse.OptionParser(
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    description=DESCRIPTION,
+    usage=USAGE,
+    add_help_option=False)
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:
@@ -175,4 +178,3 @@ try:
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
-    

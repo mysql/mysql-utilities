@@ -30,10 +30,10 @@ from mysql.utilities.command import dbcopy
 from mysql.utilities.common import options
 from mysql.utilities.common import parse_connection
 from mysql.utilities.common import MySQLUtilError
+from mysql.utilities import VERSION_FRM
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqldbcopy - copy databases from one server to another"
 USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket orig_db:new_db"
@@ -50,10 +50,11 @@ def print_elapsed_time(start_test):
     print("Time: %6d\n" % display_time)
 
 # Setup the command parser
-parser = optparse.OptionParser(version=NAME+VERSION,
-                               description=DESCRIPTION,
-                               usage=USAGE,
-                               add_help_option=False)
+parser = optparse.OptionParser(
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    description=DESCRIPTION,
+    usage=USAGE,
+    add_help_option=False)
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:

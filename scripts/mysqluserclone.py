@@ -23,13 +23,16 @@ to the new users.
 """
 
 import optparse
+import os.path
+import sys
+
 from mysql.utilities.common import parse_connection
 from mysql.utilities.common import MySQLUtilError
 from mysql.utilities.command import userclone
+from mysql.utilities import VERSION_FRM
 
 # Constants
 NAME = "MySQL Utilities - mysqluserclone "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqluserclone - clone a MySQL user account to" + \
               " one or more new users"
 USAGE = "%prog --source=user:pass@host:port:socket " \
@@ -37,10 +40,11 @@ USAGE = "%prog --source=user:pass@host:port:socket " \
         "joe@localhost sam:secret1@localhost"
 
 # Setup the command parser
-parser = optparse.OptionParser(version=NAME+VERSION,
-                               description=DESCRIPTION,
-                               usage=USAGE,
-                               add_help_option=False)
+parser = optparse.OptionParser(
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    description=DESCRIPTION,
+    usage=USAGE,
+    add_help_option=False)
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:

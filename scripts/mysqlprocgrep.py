@@ -2,11 +2,13 @@
 
 import getpass
 import optparse
+import os.path
 import sys
 
+from mysql.utilities import VERSION_FRM
+from mysql.utilities.command import KILL_CONNECTION, KILL_QUERY, PRINT_PROCESS
 from mysql.utilities.command import ProcessGrep
 from mysql.utilities.command import USER, HOST, DB, COMMAND, INFO, STATE
-from mysql.utilities.command import KILL_CONNECTION, KILL_QUERY, PRINT_PROCESS
 from mysql.utilities.common.exception import FormatError, EmptyResultError
 
 def add_pattern(option, opt, value, parser, field):
@@ -18,7 +20,7 @@ def add_pattern(option, opt, value, parser, field):
 
 # Parse options
 parser = optparse.OptionParser(
-    version="0.1",
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
     usage="usage: %prog [options] server ...")
 
 parser.add_option(
