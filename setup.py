@@ -28,12 +28,12 @@ else:
 INSTALL = {
     'packages': ["mysql"],
     'scripts': [
-        'scripts/mysqlproc.py',
+        'scripts/mysqlprocgrep.py',
         'scripts/mysqlserverclone.py',
         'scripts/mysqldbcopy.py',
         'scripts/mysqluserclone.py',
         'scripts/mysqlindexcheck.py',
-        'scripts/mysqlreplicate.py'
+        'scripts/mysqlreplicate.py',
         'scripts/mysqlgrep.py'
         ],
     }
@@ -76,7 +76,7 @@ ARGS = {
             },
         },
     }
-    
+
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
