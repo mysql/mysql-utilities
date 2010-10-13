@@ -21,18 +21,20 @@ This file contains the clone server utility which launches a new instance
 of an existing server.
 """
 
+import os.path
+import sys
+
 from mysql.utilities.common import setup_common_options
 from mysql.utilities.common import exception
 from mysql.utilities.command import serverclone
 
 # Constants
 NAME = "MySQL Utilities - mysqlserverclone "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqlserverclone - start another instance of a running server"
 USAGE = "%prog -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2"
                         
 # Setup the command parser and setup user, password, host, socket, port
-parser = setup_common_options(NAME+VERSION, DESCRIPTION, USAGE)
+parser = setup_common_options(os.path.basename(sys.argv[0]), DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
 

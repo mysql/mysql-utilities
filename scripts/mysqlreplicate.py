@@ -22,22 +22,26 @@ master/slave replication topology among two servers.
 """
 
 import optparse
+import os.path
+import sys
+
 from mysql.utilities.common import MySQLUtilError
 from mysql.utilities.common import parse_connection
 from mysql.utilities.command import rpl
+from mysql.utilities import VERSION_FRM
 
 # Constants
 NAME = "MySQL Utilities - mysqlreplicate "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqlreplicate - establish replication with a master"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
         "--server-id=3 --rpl_user=rpl:passwd "
 
 # Setup the command parser
-parser = optparse.OptionParser(version=NAME+VERSION,
-                               description=DESCRIPTION,
-                               usage=USAGE,
-                               add_help_option=False)
+parser = optparse.OptionParser(
+    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    description=DESCRIPTION,
+    usage=USAGE,
+    add_help_option=False)
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:
