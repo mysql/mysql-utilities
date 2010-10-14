@@ -9,11 +9,13 @@ from distutils.command.build_scripts import build_scripts
 from distutils.core import Command
 from distutils.util import convert_path
 
+import mysql.utilities
+
 META_INFO = {
     'description':      'MySQL Command-line Utilities',
     'maintainer':       'MySQL',         # !!!
     'maintainer_email': "internals@lists.mysql.com", # !!!
-    'version':          '0.1.0',
+    'version':          mysql.utilities.VERSION_STRING,
     'url':              'http://launchpad.net/???', # !!! Launchpad URL
     'classifiers': [
         'Programming Language :: Python',
