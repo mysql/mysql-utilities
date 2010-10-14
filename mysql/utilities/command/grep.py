@@ -29,51 +29,94 @@ from ..common.format import format_tabular_list
 # names with the kind as well, e.g., not "table.table_name" but rather
 # "table.name". If that was the case, these kinds of scripts would be
 # a lot easier to develop.
+#
+# The fields in each entry are:
+#
+# field_name
+#   The name of the column in the table where the field name to match
+#   can be found. 
+# field_type
+#   The name of the type of the field. Usually a string.
+# object_name
+#   The name of the column where the name of the object being searched
+#   can be found.
+# object_type
+#   The name of the type of the object being searched. Usually a
+#   string.
+# schema_field
+#   The name of the field where the schema name can be found.
+# table_name
+#   The name of the information schema table to search in.
+# [body_field]
+#   The name of the field in the table where the body of the object
+#   can be found. This is an optional entry since not all objects have
+#   bodies.
 _OBJMAP = {
+    'partition': {
+        'field_name': 'partition_name',
+        'object_name': 'table_name',
+        'object_type': "'TABLE'",
+        'schema_field': 'table_schema',
+        'table_name': 'partitions',
+        },
+    'column': {
+        'field_name': 'column_name',
+        'object_name': 'table_name',
+        'table_name': 'columns',
+        'object_type': "'TABLE'",
+        'schema_field': 'table_schema',
+        },
     'table': {
         'field_name': 'table_name',
+        'object_name': 'table_name',
         'table_name': 'tables',
-        'type_field': "'TABLE'",
+        'object_type': "'TABLE'",
         'schema_field': 'table_schema',
         },
     'event': {
         'field_name': 'event_name',
+        'object_name': 'event_name',
         'table_name': 'events',
-        'type_field': "'EVENT'",
+        'object_type': "'EVENT'",
         'schema_field': 'event_schema',
         'body_field': 'event_body',
         },
     'routine': {
         'field_name': 'routine_name',
+        'object_name': 'routine_name',
         'table_name': 'routines',
-        'type_field': 'routine_type',
+        'object_type': 'routine_type',
         'schema_field': 'routine_schema',
         'body_field': 'routine_body',
         },
     'trigger': {
         'field_name': 'trigger_name',
+        'object_name': 'trigger_name',
         'table_name': 'triggers',
-        'type_field': "'TRIGGER'",
+        'object_type': "'TRIGGER'",
         'schema_field': 'trigger_schema',
         'body_field': 'action_statement',
         },
     'database': {
         'field_name': 'schema_name',
+        'object_name': 'schema_name',
         'table_name': 'schemata',
-        'type_field': "'SCHEMA'",
+        'object_type': "'SCHEMA'",
         'schema_field': 'schema_name',
         },        
     'view': {
         'field_name': 'table_name',
+        'object_name': 'table_name',
         'table_name': 'views',
-        'type_field': "'VIEW'",
+        'object_type': "'VIEW'",
         'schema_field': 'table_schema',
         },
     'user': {
         'select_option': 'DISTINCT',
         'field_name': 'grantee',
+        'object_name': 'grantee',
         'table_name': 'schema_privileges',
-        'type_field': "'USER'",
+        'object_type': "'USER'",
         'schema_field': 'table_schema',
         'body_field': 'privilege_type',
         },
@@ -81,9 +124,9 @@ _OBJMAP = {
 
 _SELECT_TYPE_FRM = """
   SELECT {select_option}
-    {type_field} AS `Type`,
-    {field_name} AS `Name`,
-    {schema_field} AS `Schema`
+    {object_type} AS `Object Type`,
+    {object_name} AS `Object Name`,
+    {schema_field} AS `Database`
   FROM
     information_schema.{table_name}
   WHERE
@@ -105,6 +148,7 @@ def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
         'pattern': _obj2sql(pattern),
         'regex': 'REGEXP' if use_regexp else 'LIKE',
         'select_option': '',
+        'field_type': "'" + objtype.upper() + "'",
         }
     options.update(_OBJMAP[objtype])
 
@@ -144,9 +188,10 @@ def _join_words(words, delimiter=",", conjunction="and"):
         return '{0} '.format(delimiter).join(words[0:-1]) + "%s %s %s" % (delimiter, conjunction, words[-1])
 
 ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER = 'routine', 'event', 'trigger', 'table', 'database', 'view', 'user'
+COLUMN = 'column'
 
 #: List of all object types that can be searched
-OBJECT_TYPES = [ ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER ]
+OBJECT_TYPES = _OBJMAP.keys()
 
 class ObjectGrep(object):
     """Search for objects on a MySQL server by name or content.
@@ -190,8 +235,11 @@ class ObjectGrep(object):
             cursor = connection.cursor()
             cursor.execute(self.__sql)
             entries.extend([tuple([_spec(info)] + list(row)) for row in cursor])
+
+        headers = ["Connection"]
+        headers.extend(col[0].title() for col in cursor.description)
         if len(entries) > 0:
-            format_tabular_list(output, ("Connection", "Type", "Name", "Database"), entries)
+            format_tabular_list(output, headers, entries)
         else:
             msg = "Nothing matches '%s' in any %s" % (self.__pattern, _join_words(self.__types, conjunction="or"))
             raise EmptyResultError(msg)

@@ -49,13 +49,13 @@ INSTALL = {
         "mysql.utilities.common",
         ],
     'scripts': [
-        'scripts/mysqlprocgrep.py',
-        'scripts/mysqlserverclone.py',
         'scripts/mysqldbcopy.py',
-        'scripts/mysqluserclone.py',
         'scripts/mysqlindexcheck.py',
+        'scripts/mysqlmetagrep.py',
+        'scripts/mysqlprocgrep.py',
         'scripts/mysqlreplicate.py',
-        'scripts/mysqlgrep.py',
+        'scripts/mysqlserverclone.py',
+        'scripts/mysqluserclone.py',
         ],
     }
 
