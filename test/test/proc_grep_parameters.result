@@ -1,0 +1,35 @@
+Test case 1 - do the help
+Usage: mysqlprocgrep.py [options] server ...
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -G, --basic-regexp, --regexp
+                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
+  -Q, --print-sql, --sql
+                        Print the statement instead of sending it to the
+                        server. If a kill option is submitted, a procedure
+                        will be generated containing the code for executing
+                        the kill.
+  --sql-body            Only print the body of the procedure.
+  -v, --verbose         Print debugging messages about progress to STDOUT.
+                        Multiple -v options increase the verbosity.
+  --kill-connection     Kill all matching connections.
+  --kill-query          Kill query for all matching processes.
+  --print               Print all matching processes.
+  --match-user=PATTERN  Match the 'user' column of the PROCESSLIST table
+  --match-host=PATTERN  Match the 'Host' column of the PROCESSLIST table
+  --match-db=PATTERN    Match the 'Db' column of the PROCESSLIST table
+  --match-command=PATTERN
+                        Match the 'Command' column of the PROCESSLIST table
+  --match-info=PATTERN  Match the 'Info' column of the PROCESSLIST table
+  --match-state=PATTERN
+                        Match the 'State' column of the PROCESSLIST table
+Test case 2 - do the SQL for a simple search
+SELECT
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST
+WHERE
+    user LIKE 'XXXX'
