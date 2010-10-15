@@ -23,7 +23,7 @@ import re
 import sys
 
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command import ObjectGrep, OBJECT_TYPES
+from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 
 parser = optparse.OptionParser(
     version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
@@ -69,8 +69,8 @@ want"""
 if options.pattern:
     pattern = options.pattern
 else:
-    from mysql.utilities.common.exception import MySQLUtilError
-    from mysql.utilities.common import parse_connection
+    from mysql.utilities.exception import MySQLUtilError
+    from mysql.utilities.common.options import parse_connection
     
     try:
         pattern = args.pop(0)
@@ -92,12 +92,12 @@ elif len(args) > 0 and options.print_sql:
 types = re.split(r"\s*,\s*", options.types)
 command = ObjectGrep(pattern, options.database_pattern, types, options.check_body, options.use_regexp)
 
-import mysql.utilities.common.exception
+import mysql.utilities.exception
 
 try:
     if options.print_sql:
         print command.sql()
     else:
         command.execute(args)
-except mysql.utilities.common.exception.Error as details:
+except mysql.utilities.exception.Error as details:
     parser.error(details)

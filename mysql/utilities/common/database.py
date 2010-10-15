@@ -24,7 +24,7 @@ import datetime
 import os
 import re
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -383,7 +383,7 @@ class Database(object):
         connections[in]    Number of threads(connections) to use for insert
         """
         
-        from mysql.utilities.common import Table
+        from mysql.utilities.common.table import Table
  
         # Must call init() first!
         # Guard for init() prerequisite
@@ -630,7 +630,7 @@ class Database(object):
         Returns True if user has permission, False if not
         """
         
-        from mysql.utilities.common import User
+        from mysql.utilities.common.user import User
         
         result = True    
         user = User(self.source, uname+'@'+host)

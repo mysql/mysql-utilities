@@ -160,7 +160,7 @@ def parse_connection(connection_values):
     
     grp = _CONN_CRE.match(connection_values)
     if not grp:
-        from mysql.utilities.common import MySQLUtilError
+        from mysql.utilities.exception import MySQLUtilError
         raise MySQLUtilError("Cannot parse connection.")
     user, passwd, host, port, socket = grp.groups()
 

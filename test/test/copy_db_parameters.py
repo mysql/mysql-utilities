@@ -2,8 +2,7 @@
 
 import os
 import copy_db
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(copy_db.test):
     """check parameters for clone db

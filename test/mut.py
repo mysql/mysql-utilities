@@ -31,11 +31,10 @@ import subprocess
 import sys
 import time
 import MySQLdb
-from mysql.utilities.common import Server
-from mysql.utilities.common import get_tool_path
-from mysql.utilities.common import parse_connection
-from mysql.utilities.common import MUTException
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common.server import Server
+from mysql.utilities.common.tools import get_tool_path
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.exception import MUTException, MySQLUtilError
 from test import Server_list
 
 # Constants

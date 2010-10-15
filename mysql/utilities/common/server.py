@@ -25,7 +25,7 @@ import os
 import re
 import sys
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def _print_connection(prefix, conn_val):
     """ Print connection information

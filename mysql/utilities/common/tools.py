@@ -49,7 +49,7 @@ def get_tool_path(basedir, tool, required=True):
     Returns (string) full path to tool
     """
 
-    from mysql.utilities.common import MySQLUtilError
+    from mysql.utilities.exception import MySQLUtilError
 
     search_paths = []
     _add_basedir(search_paths, basedir)

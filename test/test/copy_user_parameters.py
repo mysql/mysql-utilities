@@ -2,8 +2,8 @@
 
 import os
 import copy_user
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(copy_user.test):
     """clone user parameter checking

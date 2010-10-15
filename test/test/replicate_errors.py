@@ -3,8 +3,7 @@
 import os
 import replicate
 import mysql_test
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(replicate.test):
     """check error conditions

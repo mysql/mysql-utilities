@@ -24,7 +24,7 @@ or all tables in all databases except internal databases.
 """
 
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def check_index(src_val, table_args, options):
     """ Check for duplicate or redundant indexes for one or more tables
@@ -61,9 +61,9 @@ def check_index(src_val, table_args, options):
     first_indexes = options.get("first", None)        
     last_indexes = options.get("last", None)
 
-    from mysql.utilities.common import connect_servers
-    from mysql.utilities.common import Database
-    from mysql.utilities.common import Table
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.database import Database
+    from mysql.utilities.common.table import Table
 
     # Try to connect to the MySQL database server.
     try:

@@ -24,8 +24,8 @@ of an existing server.
 import os.path
 import sys
 
-from mysql.utilities.common import setup_common_options
-from mysql.utilities.common import exception
+from mysql.utilities.common.options import setup_common_options
+from mysql.utilities import exception
 from mysql.utilities.command import serverclone
 
 # Constants

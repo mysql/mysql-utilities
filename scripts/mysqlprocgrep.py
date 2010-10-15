@@ -6,10 +6,8 @@ import os.path
 import sys
 
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command import KILL_CONNECTION, KILL_QUERY, PRINT_PROCESS
-from mysql.utilities.command import ProcessGrep
-from mysql.utilities.command import USER, HOST, DB, COMMAND, INFO, STATE
-from mysql.utilities.common.exception import FormatError, EmptyResultError
+from mysql.utilities.command.proc import *
+from mysql.utilities.exception import FormatError, EmptyResultError
 
 def add_pattern(option, opt, value, parser, field):
     entry = (field, value)

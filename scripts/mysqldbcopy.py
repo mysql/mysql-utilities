@@ -26,11 +26,11 @@ import os
 import re
 import sys
 import time
-from mysql.utilities.command import dbcopy
-from mysql.utilities.common import options
-from mysql.utilities.common import parse_connection
-from mysql.utilities.common import MySQLUtilError
+
 from mysql.utilities import VERSION_FRM
+from mysql.utilities.command import dbcopy
+from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.exception import MySQLUtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -101,7 +101,7 @@ parser.add_option("--connections", action="store", dest="connections",
                   default=1, help="use multiple connections for insert")
 
 # Add the skip common options
-options.add_skip_options(parser)
+add_skip_options(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()

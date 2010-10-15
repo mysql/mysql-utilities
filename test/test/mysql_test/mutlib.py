@@ -29,7 +29,7 @@ import string
 import subprocess
 import sys
 import time
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -166,7 +166,7 @@ class Server_list(object):
                     msg = None or error message if error
         """
         
-        from mysql.utilities.common import Server
+        from mysql.utilities.common.server import Server
                     
         new_server = (None, None)
         
@@ -624,7 +624,7 @@ class System_test(object):
         Returns string
         """
 
-        from mysql.utilities.common import Database
+        from mysql.utilities.common.database import Database
 
         db_source = Database(server, db)
         db_source.init()

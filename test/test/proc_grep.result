@@ -7,6 +7,6 @@ Test case 1 - find processes for current user
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    user LIKE 'root'  |
+    User LIKE 'root'  |
 | XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Sleep    | 1     |            | None                                                                                                                      |
 +------------------------+------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+

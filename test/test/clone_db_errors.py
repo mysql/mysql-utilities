@@ -2,8 +2,7 @@
 
 import os
 import clone_db
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(clone_db.test):
     """check errors for clone db

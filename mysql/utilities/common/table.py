@@ -23,7 +23,7 @@ import multiprocessing
 import re
 import sys
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 # Constants
 _MAXPACKET_SIZE = 1024 * 1024
@@ -367,7 +367,7 @@ class Table:
         destination[in]    the destination server
         """
         
-        from mysql.utilities.common import Server
+        from mysql.utilities.common.server import Server
         
         if self.dest_vals is None:
             self.dest_vals = self.get_dest_values(destination)
@@ -887,7 +887,7 @@ class Table:
             ORDER BY `sel_percent`
         """
         
-        from mysql.utilities.common import format_tabular_list
+        from mysql.utilities.common.format import format_tabular_list
         
         rows = []
         type = "best"
@@ -923,7 +923,7 @@ class Table:
         header[in]         (optional) if True, print the header for the cols
         """
 
-        from mysql.utilities.common import format_tabular_list
+        from mysql.utilities.common.format import format_tabular_list
 
         if format == "SQL":
             for index in indexes:

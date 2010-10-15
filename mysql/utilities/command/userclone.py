@@ -23,7 +23,7 @@ to the new users.
 """
 
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
     """ Clone a user to one or more new user accounts
@@ -60,8 +60,8 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     Returns bool True = success, raises MySQLUtilError if error
     """
 
-    from mysql.utilities.common import connect_servers
-    from mysql.utilities.common import User
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.user import User
 
     dump_sql = options.get("dump", False)
     copy_dir = options.get("copy_dir", False)

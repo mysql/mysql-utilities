@@ -23,7 +23,7 @@ is exactly the same among two servers.
 
 import sys
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def copy_db(src_val, dest_val, db_list, options):
     """ Copy a database
@@ -56,8 +56,8 @@ def copy_db(src_val, dest_val, db_list, options):
     Returns bool True = success, False = error
     """
     
-    from mysql.utilities.common import Database
-    from mysql.utilities.common import connect_servers
+    from mysql.utilities.common.database import Database
+    from mysql.utilities.common.server import connect_servers
     
     try:
         servers = connect_servers(src_val, dest_val,
