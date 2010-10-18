@@ -71,6 +71,9 @@ OPTIONS
 --skip-tests=SKIP_TESTS
                        exclude tests that begin with this string
 
+--start-test=START_TEST
+                       start executing tests that begin with this string
+
 --skip-long            exclude tests that require greater resources or take a
                        long time to run
 
@@ -89,7 +92,7 @@ OPTIONS
 
 -f, --force            do not abort when a test fails
 
---verbose              display additional information during operation
+-v, --verbose          display additional information during operation
 
 -d, --debug            display actual results of test cases to screen and
                        ignore result processing - used to diagnose test
