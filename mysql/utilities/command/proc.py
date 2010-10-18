@@ -95,7 +95,7 @@ class ProcessGrep(object):
             return self.__select
 
     def execute(self, args, output=sys.stdout, connector=MySQLdb):
-        from ..common.exception import EmptyResultError
+        from ..exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list
 

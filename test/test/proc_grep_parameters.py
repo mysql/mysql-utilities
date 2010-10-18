@@ -36,8 +36,8 @@ class test(proc_grep.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        self.mask_result("    user LIKE 'root'", "    user LIKE 'root'",
-                         "    user LIKE 'XXXX'")
+        self.mask_result("    User LIKE 'root'", "    User LIKE 'root'",
+                         "    User LIKE 'XXXX'")
         
         return True
   
