@@ -555,7 +555,7 @@ for test_tuple in test_files:
     sys.stdout.flush()
     
     # Skip disabled tests
-    if have_disabled > 0:
+    if have_disabled > 0 and not opt.force:
         skipped = False
         for disabled_test in disable_list:
             if test_name == disabled_test[0]:
