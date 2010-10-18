@@ -30,6 +30,7 @@ import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.common.options import check_skip_options
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -106,6 +107,12 @@ add_skip_options(parser)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
+try:
+    skips = check_skip_options(opt.skip_objects)
+except MySQLUtilError, e:
+    print "ERROR: %s" % e.errmsg
+    exit(1)
+
 # Fail if no options listed.
 if opt.destination is None:
     parser.error("No destination server specified.")
@@ -116,15 +123,15 @@ if len(args) == 0:
     
 # Set options for database operations.
 options = {
-    "skip_tables"   : opt.skip_tables,
-    "skip_views"    : opt.skip_views,
-    "skip_triggers" : opt.skip_triggers,
-    "skip_procs"    : opt.skip_procs,
-    "skip_funcs"    : opt.skip_funcs,
-    "skip_events"   : opt.skip_events,
-    "skip_grants"   : opt.skip_grants,
-    "skip_create"   : opt.skip_create,
-    "skip_data"     : opt.skip_data,
+    "skip_tables"   : "TABLES" in skips,
+    "skip_views"    : "VIEWS" in skips,
+    "skip_triggers" : "TRIGGERS" in skips,
+    "skip_procs"    : "PROCEDURES" in skips,
+    "skip_funcs"    : "FUNCTIONS" in skips,
+    "skip_events"   : "EVENTS" in skips,
+    "skip_grants"   : "GRANTS" in skips,
+    "skip_create"   : "CREATE_DB" in skips,
+    "skip_data"     : "DATA" in skips,
     "copy_dir"      : opt.copy_dir,
     "force"         : opt.force,
     "verbose"       : opt.verbose,

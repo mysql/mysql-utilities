@@ -43,16 +43,10 @@ Options:
   --debug               print debug information
   --connections=CONNECTIONS
                         use multiple connections for insert
-  --skip-tables         exclude tables in the operation
-  --skip-views          exclude views in the operation
-  --skip-triggers       exclude triggers in the copy process
-  --skip-procedures     exclude procedures in the copy process
-  --skip-functions      exclude functions in the copy process
-  --skip-events         exclude events in the operation
-  --skip-grants         exclude database-level and below grants in the
-                        operation
-  --skip-data           do include the data in the operation
-  --skip-create-db      do not create the database
+  --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
+                        of a comma-separated list (no spaces). Valid values =
+                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
+                        EVENTS, GRANTS, DATA, CREATE_DB
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
