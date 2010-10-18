@@ -265,13 +265,14 @@ class Server(object):
         return self.db_conn.cursor()
 
     
-    def exec_query(self, query_str, params=()):
+    def exec_query(self, query_str, params=(), columns=False):
         """Execute a query and return result set
         
         Note: will handle exception and print error if query fails
         
         query_str[in]      The query to execute
-        params[in]         Parameters for query 
+        params[in]         Parameters for query
+        columns[in]        Add column headings as first row
     
         Returns MySQLdb result set
         """
@@ -288,6 +289,13 @@ class Server(object):
         except Exception, e:
             raise MySQLUtilError("Unknown error. Command: %s" % query_str)
         results = cur.fetchall()
+        if columns:
+            col_headings = cur.description
+            stop = len(col_headings)
+            col_names = []
+            for col in col_headings:
+                col_names.append(col[0])
+            results = col_names, results
         cur.close()
         self.db_conn.commit()        
         return results
