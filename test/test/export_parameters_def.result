@@ -1,0 +1,257 @@
+Test case 1 - help
+Usage: mysqlexport.py --server=user:pass@host:port:socket db1, db2, db3
+
+mysqlexport - export metadata and data from databases
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f FORMAT, --format=FORMAT
+                        display the output in either SQL|S (default), GRID|G,
+                        TAB|T, CSV|C, or VERTICAL|V format
+  -d DISPLAY, --display=DISPLAY
+                        control the number of columns shown: BRIEF = minimal
+                        columns for object creation (default), FULL = all
+                        columns, NAMES = only object names (not valid for
+                        --format=SQL)
+  -e EXPORT, --export=EXPORT
+                        control the export of either DATA|D = only the table
+                        data for the tables in the database list,
+                        DEFINITIONS|F = export only the definitions for the
+                        objects in the database list, or BOTH|B = export the
+                        metadata followed by the data (default: export
+                        metadata)
+  -b, --bulk-insert     Use bulk insert statements for data (default:False)
+  -h, --show-header     display the column headers
+  -v, --verbose         display additional information during operation
+  --silent              do not display feedback information during operation
+  --debug               print debug information
+  --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
+                        of a comma-separated list (no spaces). Valid values =
+                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
+                        EVENTS, GRANTS, DATA, CREATE_DB
+  --skip-blobs          Do not export blob data.
+Test case 2 - no grants
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+#...done.
+Test case 3 - no events
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+#...done.
+Test case 4 - no functions
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+#...done.
+Test case 5 - no procedures
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+#...done.
+Test case 6 - no triggers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+#...done.
+Test case 7 - no views
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+#...done.
+Test case 8 - no tables
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+#...done.
+Test case 9 - no create_db
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+USE util_test;
+#...done.
+Test case 10 - no data
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+USE util_test;
+#...done.

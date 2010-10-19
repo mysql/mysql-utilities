@@ -75,8 +75,7 @@ parser.add_option("-d", "--display", action="store", dest="display",
                   default="BRIEF", help="control the number of columns shown: "
                   "BRIEF = minimal columns for object creation (default), "
                   "FULL = all columns, NAMES = only object names (not "
-                  "valid for --format=SQL), VERTICAL - vertical display like "
-                  "the mysql monitor \G output")
+                  "valid for --format=SQL)")
 
 # Export mode
 parser.add_option("-e", "--export", action="store", dest="export",

@@ -53,6 +53,7 @@ def export_metadata(src_val, db_list, options):
     format = options.get("format", "SQL")
     headers = options.get("header", False)
     column_type = options.get("display", "BRIEF")
+    skip_create = options.get("skip_create", False)
     
     try:
         servers = connect_servers(src_val, None, False, "5.1.30")
@@ -90,8 +91,9 @@ def export_metadata(src_val, db_list, options):
         try:
             if format == "SQL":
                 db.init()
-                print "DROP DATABASE IF EXISTS %s;" % db_name
-                print "CREATE DATABASE %s;" % db_name
+                if not skip_create:
+                    print "DROP DATABASE IF EXISTS %s;" % db_name
+                    print "CREATE DATABASE %s;" % db_name
                 print "USE %s;" % db_name
                 for dbobj in db.get_next_object():
                     if dbobj[0] == "GRANT":
@@ -130,7 +132,7 @@ def export_metadata(src_val, db_list, options):
                                                 True, ',', True)
                         else:  # default to table format
                             format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                True, None, False)
+                                                False, None, False)
 
         except MySQLUtilError, e:
             raise e
@@ -210,9 +212,7 @@ def _export_row(data_rows, cur_table, col_metadata,
         format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows,
                             first, ',', header)
     else:  # default to table format - header is always printed
-        format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows,
-                            True, None, False)
-
+        format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows)
 
 
 def export_data(src_val, db_list, options):
@@ -289,7 +289,9 @@ def export_data(src_val, db_list, options):
                 tbl_name = "%s.%s" % (db_name, table[0])
                 cur_table = Table(source, tbl_name)
                 col_metadata = cur_table.get_column_metadata()
-                if single and (format != "SQL" or format != "S"):
+                if single and (format != "SQL" and format != "S" and \
+                               format != "GRID" and format != "G" and \
+                               format != "VERTICAL" and format != "V"):
                     retrieval_mode = -1
                     first = True
                 else:
