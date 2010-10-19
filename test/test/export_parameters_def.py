@@ -33,7 +33,7 @@ class test(export_basic.test):
             
         # Now test the skips
 
-        cmd_opts = "%s util_test --skip=grants" % (cmd_str)
+        cmd_opts = "%s util_test --skip=grants" % cmd_str
         comment = "Test case 2 - no grants"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
@@ -87,11 +87,217 @@ class test(export_basic.test):
         if not res:
             raise MUTException("%s: failed" % comment)
             
-        self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS",
+        cmd_opts = "%s util_test --format=SQL --export=definitions" % cmd_str
+        comment = "Test case 11 - SQL single rows"
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 12 - SQL bulk insert"
+        res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        try:
+            func = self.test_format_and_display_values
+            func("%s util_test --export=definitions --format=" % cmd_str, 13)
+        except MUTException, e:
+            raise e
+
+        return True
+
+    def test_format_and_display_values(self, cmd_opts, starting_case_num,
+                                       full_format=True, no_headers=True,
+                                       abbrev=True, displays=True):
+        
+        _FORMATS = ("SQL", "CSV", "TAB", "GRID", "VERTICAL")
+        _FORMATS_ABBREV = ("S", "C", "T", "G", "V")
+
+        # First, with headers
+        if full_format:
+            for format in _FORMATS:
+                cmd_variant = cmd_opts + format
+                comment = "Test case %s - %s format" % \
+                          (starting_case_num, format)
+                res = self.run_test_case(0, cmd_variant, comment)
+                starting_case_num += 1
+                if not res:
+                    raise MUTException("%s: failed" % comment)
+        
+        # Now without headers
+        if no_headers:
+            for format in _FORMATS:
+                cmd_variant = cmd_opts + format + " --no-headers"
+                comment = "Test case %s - %s format no headers" % \
+                          (starting_case_num, format)
+                res = self.run_test_case(0, cmd_variant, comment)
+                starting_case_num += 1
+                if not res:
+                    raise MUTException("%s: failed" % comment)
+        
+        # Now the abbreviations
+        if abbrev:
+            for format in _FORMATS_ABBREV:
+                cmd_variant = cmd_opts + format
+                comment = "Test case %s - %s format" % \
+                          (starting_case_num, format)
+                res = self.run_test_case(0, cmd_variant, comment)
+                starting_case_num += 1
+                if not res:
+                    raise MUTException("%s: failed" % comment)
+
+        # Conduct format and display combination tests
+        
+        _DISPLAYS = ("BRIEF", "FULL", "NAMES")
+        # SQL format not valid
+        _FORMAT_DISPLAY = ("GRID","CSV","TAB","VERTICAL")
+
+        if displays:
+            for format in _FORMAT_DISPLAY:
+                for display in _DISPLAYS:
+                    cmd_variant = cmd_opts + format + " --display=%s" % display
+                    comment = "Test case %s - %s format with %s display" % \
+                              (starting_case_num, format, display)
+                    res = self.run_test_case(0, cmd_variant, comment)
+                    starting_case_num += 1
+                    if not res:
+                        raise MUTException("%s: failed" % comment)
+
+        # Perform masking for deterministic output
+        
+        self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
 
+        self._mask_grid()
+        self._mask_csv()
+        self._mask_tab()
+        self._mask_vertical()
+
         return True
+
+    def _mask_grid(self):
+        self.mask_column_result("| None           | util_test     | t", "|",
+                                16, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| None           | util_test     | t", "|",
+                                14, " XXXXXXXXXX ")
+        self.mask_column_result("| None           | util_test     | t", "|",
+                                17, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| None           | util_test "
+                                "    | e1          |", "|",
+                                14, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| None           | util_test "
+                                "    | e1          |", "|",
+                                18, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| None           | util_test "
+                                "    | e1          |", "|",
+                                19, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| None           | util_test "
+                                "    | e1          |", "|",
+                                22, " XX          ")
+        self.mask_column_result("| e1          | root@localhost  | SQL"
+                                "         |", "|",
+                                10, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| e1          | root@localhost  | SQL"
+                                "         |", "|",
+                                14, " XX          ")
+        self.mask_column_result("| p1             | None             | "
+                                "util_test       | p1", "|",
+                                17, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| p1             | None             | "
+                                "util_test       | p1", "|",
+                                18, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| f1             | None             | "
+                                "util_test       | f1", "|",
+                                17, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| f1             | None             | "
+                                "util_test       | f1", "|",
+                                18, " XXXX-XX-XX XX:XX:XX ")
+
+
+    def _mask_csv(self):
+        self.mask_column_result("e1,root@localhost,SQL,", ",",
+                                9, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1,root@localhost,SQL,", ",",
+                                13, "XX")
+        self.mask_column_result(",util_test,t", ",",
+                                13, "XXXXXX")
+        self.mask_column_result(",util_test,t", ",",
+                                15, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",util_test,t", ",",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("p1,,util_test,p1,PROCEDURE", ",",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("p1,,util_test,p1,PROCEDURE", ",",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("f1,,util_test,f1,FUNCTION", ",",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("f1,,util_test,f1,FUNCTION", ",",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",util_test,e1", ",",
+                                13, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",util_test,e1", ",",
+                                21, "XX")
+        self.mask_column_result(",util_test,e1", ",",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",util_test,e1", ",",
+                                18, "XXXX-XX-XX XX:XX:XX")
+                                
+
+    def _mask_tab(self):
+        self.mask_column_result("e1	root@localhost	SQL", "\t",
+                                9, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1	root@localhost	SQL", "\t",
+                                13, "XX")
+        self.mask_column_result("	util_test	t", "\t",
+                                13, "XX")
+        self.mask_column_result("	util_test	t", "\t",
+                                15, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	util_test	t", "\t",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("p1		util_test	p1	PROCEDURE", "\t",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("p1		util_test	p1	PROCEDURE", "\t",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("f1		util_test	f1	FUNCTION", "\t",
+                                16, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("f1		util_test	f1	FUNCTION", "\t",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	util_test	e1", "\t",
+                                13, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	util_test	e1", "\t",
+                                21, "XX")
+        self.mask_column_result("	util_test	e1", "\t",
+                                17, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	util_test	e1", "\t",
+                                18, "XXXX-XX-XX XX:XX:XX")
+    
+    def _mask_vertical(self):
+        self.replace_result("              CREATED:",
+                            "              CREATED: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("               UPDATE_TIME:",
+                            "               UPDATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("         LAST_ALTERED:",
+                            "         LAST_ALTERED: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("               STARTS:",
+                            "               STARTS: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("               CREATE_TIME:",
+                            "               CREATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("            AVG_ROW_LENGTH:",
+                            "            AVG_ROW_LENGTH: XXXXXXX\n")
+        self.replace_result("               DATA_LENGTH:",
+                            "               DATA_LENGTH: XXXXXXX\n")
+        self.replace_result("              INDEX_LENGTH:",
+                            "              INDEX_LENGTH: XXXXXXX\n")
+        self.replace_result("           MAX_DATA_LENGTH:",
+                            "           MAX_DATA_LENGTH: XXXXXXX\n")
+        self.replace_result("                 DATA_FREE:",
+                            "                 DATA_FREE: XXXXXXXXXXX\n")
+        self.replace_result("           ORIGINATOR:",
+                            "           ORIGINATOR: XX\n")
+
   
     def get_result(self):
         return self.compare(__name__, self.results)

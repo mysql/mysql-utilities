@@ -92,13 +92,9 @@ parser.add_option("-b", "--bulk-insert", action="store_true",
                   "statements for data (default:False)")
 
 # Header row
-parser.add_option("-h", "--show-header", action="store_true", dest="header",
-                  default=False, help="display the column headers")
-
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation",
-                  default=False)
+parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
+                  default=False, help="do not display the column headers - "
+                  "ignored for GRID format")
 
 # Verbose mode
 parser.add_option("--silent", action="store_true", dest="silent",
@@ -197,11 +193,11 @@ options = {
     "skip_create"   : "CREATE_DB" in skips,
     "skip_data"     : "DATA" in skips,
     "skip_blobs"    : opt.skip_blobs,
-    "verbose"       : opt.verbose,
     "format"        : opt.format,
-    "header"        : opt.header,
+    "no_headers"    : opt.no_headers,
     "display"       : opt.display,
     "single"        : not opt.bulk_import,
+    "silent"        : opt.silent,
     "debug"         : opt.debug
 }
 

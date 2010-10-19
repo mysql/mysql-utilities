@@ -32,29 +32,43 @@ class test(mysql_test.System_test):
         cmd = "mysqlexport.py %s util_test  " % from_conn
        
         comment = "Test case 1 - export metadata only"
-        cmd += " --export=definitions --format=SQL --skip=events "
-        res = self.run_test_case(0, cmd, comment)
+        cmd_str = cmd + " --export=definitions --format=SQL --skip=events "
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
                     
         comment = "Test case 2 - export data only - single rows"
-        cmd += " --export=data --format=SQL " 
-        res = self.run_test_case(0, cmd, comment)
+        cmd_str = cmd + " --export=data --format=SQL " 
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
                     
         comment = "Test case 3 - export data only - bulk insert"
-        cmd += " --export=data --format=SQL --bulk-insert" 
-        res = self.run_test_case(0, cmd, comment)
+        cmd_str = cmd + " --export=data --format=SQL --bulk-insert" 
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
                     
         comment = "Test case 4 - export data and metadata"
-        cmd += " --export=both --format=SQL --skip=events"
-        res = self.run_test_case(0, cmd, comment)
+        cmd_str = cmd + " --export=both --format=SQL --skip=events"
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
                     
+        comment = "Test case 5 - export data and metadata with silent"
+        cmd_str = cmd + " --export=both --format=SQL --skip=events --silent"
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        comment = "Test case 6 - export data and metadata with debug"
+        cmd_str = cmd + " --export=both --format=SQL --skip=events --debug"
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        self.replace_result("Time:", "Time:       XXXXXX\n")
+
         return True
           
     def get_result(self):

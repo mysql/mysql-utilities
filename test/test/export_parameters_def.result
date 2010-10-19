@@ -24,8 +24,8 @@ Options:
                         metadata followed by the data (default: export
                         metadata)
   -b, --bulk-insert     Use bulk insert statements for data (default:False)
-  -h, --show-header     display the column headers
-  -v, --verbose         display additional information during operation
+  -h, --no-headers      do not display the column headers - ignored for GRID
+                        format
   --silent              do not display feedback information during operation
   --debug               print debug information
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
@@ -254,4 +254,3332 @@ Test case 10 - no data
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 USE util_test;
+#...done.
+Test case 11 - SQL single rows
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Grant:
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DROP ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 12 - SQL bulk insert
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Grant:
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DROP ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 13 - SQL format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Grant:
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DROP ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 14 - CSV format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,DELETE_RULE
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+p1,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",SQL,NO,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+f1,SQL,RETURN (SELECT 1),SQL,YES,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME,DEFINER,EVENT_BODY,EVENT_DEFINITION,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+e1,root@localhost,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 15 - TAB format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	DELETE_RULE
+util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci					
+util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci					
+util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
+util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+p1	SQL	"INSERT INTO util_test.t1 VALUES (""50"")"	SQL	NO	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+f1	SQL	RETURN (SELECT 1)	SQL	YES	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME	DEFINER	EVENT_BODY	EVENT_DEFINITION	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+e1	root@localhost	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 16 - GRID format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | DELETE_RULE  |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
+| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+# VIEWS in util_test:
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`  | NONE          | YES           | latin1                | latin1_swedish_ci     |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+# TRIGGERS in util_test:
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| TRIGGER_NAME  | DEFINER         | EVENT_MANIPULATION  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_STATEMENT                                       | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+# PROCEDURES in util_test:
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| p1            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | SQL              | NO                | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# FUNCTIONS in util_test:
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| f1            | SQL           | RETURN (SELECT 1)   | SQL              | YES               | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# EVENTS in util_test:
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| EVENT_NAME  | DEFINER         | EVENT_BODY  | EVENT_DEFINITION                                | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| e1          | root@localhost  | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 17 - VERTICAL format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t1
+                 ENGINE: MEMORY
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       2. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t2
+                 ENGINE: MyISAM
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       3. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: PRI
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       4. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: b
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       5. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: c
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: MUL
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+*************************       6. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: d
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+6 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+         TABLE_SCHEMA: util_test
+           TABLE_NAME: v1
+              DEFINER: root@localhost
+        SECURITY_TYPE: DEFINER
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+         CHECK_OPTION: NONE
+         IS_UPDATABLE: YES
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+         TRIGGER_NAME: trg
+              DEFINER: root@localhost
+   EVENT_MANIPULATION: INSERT
+  EVENT_OBJECT_SCHEMA: util_test
+   EVENT_OBJECT_TABLE: t1
+   ACTION_ORIENTATION: ROW
+        ACTION_TIMING: AFTER
+     ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: p1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: NO
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: f1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: RETURN (SELECT 1)
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: YES
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+           EVENT_NAME: e1
+              DEFINER: root@localhost
+           EVENT_BODY: SQL
+     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
+             SQL_MODE: 
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: None
+               STATUS: DISABLED
+        ON_COMPLETION: NOT PRESERVE
+           ORIGINATOR: XX
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
+#...done.
+Test case 18 - SQL format no headers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Grant:
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DROP ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 19 - CSV format no headers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+# VIEWS in util_test:
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+p1,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",SQL,NO,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+f1,SQL,RETURN (SELECT 1),SQL,YES,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+e1,root@localhost,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 20 - TAB format no headers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci					
+util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci					
+util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+# VIEWS in util_test:
+util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
+# TRIGGERS in util_test:
+trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
+# PROCEDURES in util_test:
+p1	SQL	"INSERT INTO util_test.t1 VALUES (""50"")"	SQL	NO	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# FUNCTIONS in util_test:
+f1	SQL	RETURN (SELECT 1)	SQL	YES	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# EVENTS in util_test:
+e1	root@localhost	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+# GRANTS in util_test:
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 21 - GRID format no headers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | DELETE_RULE  |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
+| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+# VIEWS in util_test:
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`  | NONE          | YES           | latin1                | latin1_swedish_ci     |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+# TRIGGERS in util_test:
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| TRIGGER_NAME  | DEFINER         | EVENT_MANIPULATION  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_STATEMENT                                       | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+# PROCEDURES in util_test:
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| p1            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | SQL              | NO                | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# FUNCTIONS in util_test:
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| f1            | SQL           | RETURN (SELECT 1)   | SQL              | YES               | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# EVENTS in util_test:
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| EVENT_NAME  | DEFINER         | EVENT_BODY  | EVENT_DEFINITION                                | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| e1          | root@localhost  | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 22 - VERTICAL format no headers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t1
+                 ENGINE: MEMORY
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       2. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t2
+                 ENGINE: MyISAM
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       3. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: PRI
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       4. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: b
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       5. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: c
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: MUL
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+*************************       6. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: d
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+6 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+         TABLE_SCHEMA: util_test
+           TABLE_NAME: v1
+              DEFINER: root@localhost
+        SECURITY_TYPE: DEFINER
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+         CHECK_OPTION: NONE
+         IS_UPDATABLE: YES
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+         TRIGGER_NAME: trg
+              DEFINER: root@localhost
+   EVENT_MANIPULATION: INSERT
+  EVENT_OBJECT_SCHEMA: util_test
+   EVENT_OBJECT_TABLE: t1
+   ACTION_ORIENTATION: ROW
+        ACTION_TIMING: AFTER
+     ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: p1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: NO
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: f1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: RETURN (SELECT 1)
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: YES
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+           EVENT_NAME: e1
+              DEFINER: root@localhost
+           EVENT_BODY: SQL
+     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
+             SQL_MODE: 
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: None
+               STATUS: DISABLED
+        ON_COMPLETION: NOT PRESERVE
+           ORIGINATOR: XX
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
+#...done.
+Test case 23 - S format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+# TRIGGER: util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# PROCEDURE: util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+# FUNCTION: util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+# EVENT: util_test.e1
+CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Grant:
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT DROP ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+# Grant:
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 24 - C format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,DELETE_RULE
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+p1,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",SQL,NO,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+f1,SQL,RETURN (SELECT 1),SQL,YES,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME,DEFINER,EVENT_BODY,EVENT_DEFINITION,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+e1,root@localhost,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 25 - T format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	DELETE_RULE
+util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci					
+util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci					
+util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
+util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+p1	SQL	"INSERT INTO util_test.t1 VALUES (""50"")"	SQL	NO	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+f1	SQL	RETURN (SELECT 1)	SQL	YES	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME	DEFINER	EVENT_BODY	EVENT_DEFINITION	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+e1	root@localhost	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 26 - G format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | DELETE_RULE  |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
+| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+# VIEWS in util_test:
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`  | NONE          | YES           | latin1                | latin1_swedish_ci     |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+# TRIGGERS in util_test:
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| TRIGGER_NAME  | DEFINER         | EVENT_MANIPULATION  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_STATEMENT                                       | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+# PROCEDURES in util_test:
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| p1            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | SQL              | NO                | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# FUNCTIONS in util_test:
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| f1            | SQL           | RETURN (SELECT 1)   | SQL              | YES               | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# EVENTS in util_test:
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| EVENT_NAME  | DEFINER         | EVENT_BODY  | EVENT_DEFINITION                                | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| e1          | root@localhost  | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 27 - V format
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t1
+                 ENGINE: MEMORY
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       2. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t2
+                 ENGINE: MyISAM
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       3. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: PRI
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       4. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: b
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       5. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: c
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: MUL
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+*************************       6. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: d
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+6 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+         TABLE_SCHEMA: util_test
+           TABLE_NAME: v1
+              DEFINER: root@localhost
+        SECURITY_TYPE: DEFINER
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+         CHECK_OPTION: NONE
+         IS_UPDATABLE: YES
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+         TRIGGER_NAME: trg
+              DEFINER: root@localhost
+   EVENT_MANIPULATION: INSERT
+  EVENT_OBJECT_SCHEMA: util_test
+   EVENT_OBJECT_TABLE: t1
+   ACTION_ORIENTATION: ROW
+        ACTION_TIMING: AFTER
+     ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: p1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: NO
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: f1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: RETURN (SELECT 1)
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: YES
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+           EVENT_NAME: e1
+              DEFINER: root@localhost
+           EVENT_BODY: SQL
+     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
+             SQL_MODE: 
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: None
+               STATUS: DISABLED
+        ON_COMPLETION: NOT PRESERVE
+           ORIGINATOR: XX
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
+#...done.
+Test case 28 - GRID format with BRIEF display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | DELETE_RULE  |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
+| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
+| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
+# VIEWS in util_test:
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`  | NONE          | YES           | latin1                | latin1_swedish_ci     |
++---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
+# TRIGGERS in util_test:
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| TRIGGER_NAME  | DEFINER         | EVENT_MANIPULATION  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_STATEMENT                                       | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+| trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
+# PROCEDURES in util_test:
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| p1            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | SQL              | NO                | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# FUNCTIONS in util_test:
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+| f1            | SQL           | RETURN (SELECT 1)   | SQL              | YES               | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
+# EVENTS in util_test:
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| EVENT_NAME  | DEFINER         | EVENT_BODY  | EVENT_DEFINITION                                | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| e1          | root@localhost  | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 29 - GRID format with FULL display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+
+| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ORDINAL_POSITION  | COLUMN_DEFAULT  | IS_NULLABLE  | DATA_TYPE  | CHARACTER_MAXIMUM_LENGTH  | CHARACTER_OCTET_LENGTH  | NUMERIC_PRECISION  | NUMERIC_SCALE  | CHARACTER_SET_NAME  | COLLATION_NAME     | COLUMN_TYPE  | COLUMN_KEY  | EXTRA           | PRIVILEGES                       | COLUMN_COMMENT  | CONSTRAINT_CATALOG  | CONSTRAINT_SCHEMA  | CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_CATALOG  | UNIQUE_CONSTRAINT_SCHEMA  | UNIQUE_CONSTRAINT_NAME  | MATCH_OPTION  | UPDATE_RULE  | DELETE_RULE  | TABLE_NAME  | REFERENCED_TABLE_NAME  |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+
+| None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | 127008       | 16252928          | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t1          | a            | 1                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   |
+| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 3           | 31              | 93           | 8725724278030335  | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t2          | a            | 1                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | 16384        | 0                 | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t3          | a            | 1                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      | PRI         | auto_increment  | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | 16384        | 0                 | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t3          | b            | 2                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | 16384        | 0                 | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t4          | c            | 1                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      | MUL         |                 | select,insert,update,references  |                 | None                | util_test          | ref_t3           | None                       | util_test                 | PRIMARY                 | NONE          | RESTRICT     | RESTRICT     | t4          | t3                     |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | 16384        | 0                 | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t4          | d            | 2                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      |             |                 | select,insert,update,references  |                 | None                | util_test          | ref_t3           | None                       | util_test                 | PRIMARY                 | NONE          | RESTRICT     | RESTRICT     | t4          | t3                     |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+
+# VIEWS in util_test:
++----------------+---------------+-------------+-----------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
+| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | DEFINER         | SECURITY_TYPE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
++----------------+---------------+-------------+-----------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
+| None           | util_test     | v1          | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`  | NONE          | YES           | root@localhost  | DEFINER        | latin1                | latin1_swedish_ci     |
++----------------+---------------+-------------+-----------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
+# TRIGGERS in util_test:
++------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
+| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  | EVENT_MANIPULATION  | EVENT_OBJECT_CATALOG  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORDER  | ACTION_CONDITION  | ACTION_STATEMENT                                       | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_REFERENCE_OLD_TABLE  | ACTION_REFERENCE_NEW_TABLE  | ACTION_REFERENCE_OLD_ROW  | ACTION_REFERENCE_NEW_ROW  | CREATED  | SQL_MODE  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
+| None             | util_test       | trg           | INSERT              | None                  | util_test            | t1                  | 0             | None              | INSERT INTO util_test.t2 VALUES('Test objects count')  | ROW                 | AFTER          | None                        | None                        | OLD                       | NEW                       | None     |           | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
+# PROCEDURES in util_test:
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+| SPECIFIC_NAME  | ROUTINE_CATALOG  | ROUTINE_SCHEMA  | ROUTINE_NAME  | ROUTINE_TYPE  | DTD_IDENTIFIER  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | EXTERNAL_NAME  | EXTERNAL_LANGUAGE  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SQL_PATH  | SECURITY_TYPE  | CREATED              | LAST_ALTERED         | SQL_MODE  | ROUTINE_COMMENT  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+| p1             | None             | util_test       | p1            | PROCEDURE     | None            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | None           | None               | SQL              | NO                | CONTAINS SQL     | None      | DEFINER        | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX |           |                  | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+# FUNCTIONS in util_test:
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+| SPECIFIC_NAME  | ROUTINE_CATALOG  | ROUTINE_SCHEMA  | ROUTINE_NAME  | ROUTINE_TYPE  | DTD_IDENTIFIER  | ROUTINE_BODY  | ROUTINE_DEFINITION  | EXTERNAL_NAME  | EXTERNAL_LANGUAGE  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SQL_PATH  | SECURITY_TYPE  | CREATED              | LAST_ALTERED         | SQL_MODE  | ROUTINE_COMMENT  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+| f1             | None             | util_test       | f1            | FUNCTION      | int(11)         | SQL           | RETURN (SELECT 1)   | None           | None               | SQL              | YES               | CONTAINS SQL     | None      | DEFINER        | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX |           |                  | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
+# EVENTS in util_test:
++----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| EVENT_CATALOG  | EVENT_SCHEMA  | EVENT_NAME  | DEFINER         | TIME_ZONE  | EVENT_BODY  | EVENT_DEFINITION                                | EVENT_TYPE  | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | CREATED              | LAST_ALTERED         | LAST_EXECUTED  | EVENT_COMMENT  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
++----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
+| None           | util_test     | e1          | root@localhost  | SYSTEM     | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | RECURRING   | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None           |                | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
++----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 30 - GRID format with NAMES display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
++-------------+
+| TABLE_NAME  |
++-------------+
+| t1          |
+| t2          |
+| t3          |
+| t4          |
++-------------+
+# VIEWS in util_test:
++-------------+
+| TABLE_NAME  |
++-------------+
+| v1          |
++-------------+
+# TRIGGERS in util_test:
++---------------+
+| TRIGGER_NAME  |
++---------------+
+| trg           |
++---------------+
+# PROCEDURES in util_test:
++---------------+
+| ROUTINE_NAME  |
++---------------+
+| p1            |
++---------------+
+# FUNCTIONS in util_test:
++---------------+
+| ROUTINE_NAME  |
++---------------+
+| f1            |
++---------------+
+# EVENTS in util_test:
++-------------+
+| EVENT_NAME  |
++-------------+
+| e1          |
++-------------+
+# GRANTS in util_test:
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------+--------------------------+---------------+-------------+--------------+---------------+
+#...done.
+Test case 31 - CSV format with BRIEF display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,DELETE_RULE
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+p1,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",SQL,NO,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+f1,SQL,RETURN (SELECT 1),SQL,YES,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME,DEFINER,EVENT_BODY,EVENT_DEFINITION,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+e1,root@localhost,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 32 - CSV format with FULL display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CHARACTER_OCTET_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA,PRIVILEGES,COLUMN_COMMENT,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,UNIQUE_CONSTRAINT_CATALOG,UNIQUE_CONSTRAINT_SCHEMA,UNIQUE_CONSTRAINT_NAME,MATCH_OPTION,UPDATE_RULE,DELETE_RULE,TABLE_NAME,REFERENCED_TABLE_NAME
+,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,127008,16252928,0,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,93,8725724278030335,1024,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,XXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,XXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
+# VIEWS in util_test:
+TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
+,util_test,v1,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+,util_test,trg,INSERT,,util_test,t1,0,,INSERT INTO util_test.t2 VALUES('Test objects count'),ROW,AFTER,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+SPECIFIC_NAME,ROUTINE_CATALOG,ROUTINE_SCHEMA,ROUTINE_NAME,ROUTINE_TYPE,DTD_IDENTIFIER,ROUTINE_BODY,ROUTINE_DEFINITION,EXTERNAL_NAME,EXTERNAL_LANGUAGE,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SQL_PATH,SECURITY_TYPE,CREATED,LAST_ALTERED,SQL_MODE,ROUTINE_COMMENT,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+p1,,util_test,p1,PROCEDURE,,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",,,SQL,NO,CONTAINS SQL,,DEFINER,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+SPECIFIC_NAME,ROUTINE_CATALOG,ROUTINE_SCHEMA,ROUTINE_NAME,ROUTINE_TYPE,DTD_IDENTIFIER,ROUTINE_BODY,ROUTINE_DEFINITION,EXTERNAL_NAME,EXTERNAL_LANGUAGE,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SQL_PATH,SECURITY_TYPE,CREATED,LAST_ALTERED,SQL_MODE,ROUTINE_COMMENT,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+f1,,util_test,f1,FUNCTION,int(11),SQL,RETURN (SELECT 1),,,SQL,YES,CONTAINS SQL,,DEFINER,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_CATALOG,EVENT_SCHEMA,EVENT_NAME,DEFINER,TIME_ZONE,EVENT_BODY,EVENT_DEFINITION,EVENT_TYPE,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,CREATED,LAST_ALTERED,LAST_EXECUTED,EVENT_COMMENT,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+,util_test,e1,root@localhost,SYSTEM,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",RECURRING,,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 33 - CSV format with NAMES display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+ROUTINE_NAME
+p1
+# FUNCTIONS in util_test:
+ROUTINE_NAME
+f1
+# EVENTS in util_test:
+EVENT_NAME
+e1
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 34 - TAB format with BRIEF display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	DELETE_RULE
+util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci					
+util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci					
+util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci					
+util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+# VIEWS in util_test:
+TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
+util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
+# PROCEDURES in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+p1	SQL	"INSERT INTO util_test.t1 VALUES (""50"")"	SQL	NO	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# FUNCTIONS in util_test:
+ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+f1	SQL	RETURN (SELECT 1)	SQL	YES	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_NAME	DEFINER	EVENT_BODY	EVENT_DEFINITION	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+e1	root@localhost	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 35 - TAB format with FULL display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ORDINAL_POSITION	COLUMN_DEFAULT	IS_NULLABLE	DATA_TYPE	CHARACTER_MAXIMUM_LENGTH	CHARACTER_OCTET_LENGTH	NUMERIC_PRECISION	NUMERIC_SCALE	CHARACTER_SET_NAME	COLLATION_NAME	COLUMN_TYPE	COLUMN_KEY	EXTRA	PRIVILEGES	COLUMN_COMMENT	CONSTRAINT_CATALOG	CONSTRAINT_SCHEMA	CONSTRAINT_NAME	UNIQUE_CONSTRAINT_CATALOG	UNIQUE_CONSTRAINT_SCHEMA	UNIQUE_CONSTRAINT_NAME	MATCH_OPTION	UPDATE_RULE	DELETE_RULE	TABLE_NAME	REFERENCED_TABLE_NAME
+	util_test	t1	BASE TABLE	MEMORY	10	Fixed	7	31	127008	16252928	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t1	a	1		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references												
+	util_test	t2	BASE TABLE	MyISAM	10	Fixed	3	31	93	8725724278030335	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t2	a	1		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references												
+	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	16384	0	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t3	a	1		NO	int			10	0			int(11)	PRI	auto_increment	select,insert,update,references												
+	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	16384	0	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t3	b	2		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references												
+	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	16384	0	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t4	c	1		NO	int			10	0			int(11)	MUL		select,insert,update,references			util_test	ref_t3		util_test	PRIMARY	NONE	RESTRICT	RESTRICT	t4	t3
+	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	16384	0	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t4	d	2		NO	int			10	0			int(11)			select,insert,update,references			util_test	ref_t3		util_test	PRIMARY	NONE	RESTRICT	RESTRICT	t4	t3
+# VIEWS in util_test:
+TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	DEFINER	SECURITY_TYPE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
+	util_test	v1	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	latin1	latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+	util_test	trg	INSERT		util_test	t1	0		INSERT INTO util_test.t2 VALUES('Test objects count')	ROW	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+# PROCEDURES in util_test:
+SPECIFIC_NAME	ROUTINE_CATALOG	ROUTINE_SCHEMA	ROUTINE_NAME	ROUTINE_TYPE	DTD_IDENTIFIER	ROUTINE_BODY	ROUTINE_DEFINITION	EXTERNAL_NAME	EXTERNAL_LANGUAGE	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SQL_PATH	SECURITY_TYPE	CREATED	LAST_ALTERED	SQL_MODE	ROUTINE_COMMENT	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+p1		util_test	p1	PROCEDURE		SQL	"INSERT INTO util_test.t1 VALUES (""50"")"			SQL	NO	CONTAINS SQL		DEFINER	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+# FUNCTIONS in util_test:
+SPECIFIC_NAME	ROUTINE_CATALOG	ROUTINE_SCHEMA	ROUTINE_NAME	ROUTINE_TYPE	DTD_IDENTIFIER	ROUTINE_BODY	ROUTINE_DEFINITION	EXTERNAL_NAME	EXTERNAL_LANGUAGE	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SQL_PATH	SECURITY_TYPE	CREATED	LAST_ALTERED	SQL_MODE	ROUTINE_COMMENT	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+f1		util_test	f1	FUNCTION	int(11)	SQL	RETURN (SELECT 1)			SQL	YES	CONTAINS SQL		DEFINER	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+# EVENTS in util_test:
+EVENT_CATALOG	EVENT_SCHEMA	EVENT_NAME	DEFINER	TIME_ZONE	EVENT_BODY	EVENT_DEFINITION	EVENT_TYPE	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	CREATED	LAST_ALTERED	LAST_EXECUTED	EVENT_COMMENT	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
+	util_test	e1	root@localhost	SYSTEM	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""	RECURRING		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 36 - TAB format with NAMES display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+ROUTINE_NAME
+p1
+# FUNCTIONS in util_test:
+ROUTINE_NAME
+f1
+# EVENTS in util_test:
+EVENT_NAME
+e1
+# GRANTS in util_test:
+GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
+'joe'@'user'	ALTER	util_test			
+'joe'@'user'	ALTER ROUTINE	util_test			
+'joe'@'user'	CREATE	util_test			
+'joe'@'user'	CREATE ROUTINE	util_test			
+'joe'@'user'	CREATE TEMPORARY TABLES	util_test			
+'joe'@'user'	CREATE VIEW	util_test			
+'joe'@'user'	DELETE	util_test			
+'joe'@'user'	DROP	util_test			
+'joe'@'user'	EVENT	util_test			
+'joe'@'user'	EXECUTE	util_test			
+'joe'@'user'	INDEX	util_test			
+'joe'@'user'	INSERT	util_test			
+'joe'@'user'	LOCK TABLES	util_test			
+'joe'@'user'	REFERENCES	util_test			
+'joe'@'user'	SELECT	util_test			
+'joe'@'user'	SHOW VIEW	util_test			
+'joe'@'user'	TRIGGER	util_test			
+'joe'@'user'	UPDATE	util_test			
+#...done.
+Test case 37 - VERTICAL format with BRIEF display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t1
+                 ENGINE: MEMORY
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       2. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t2
+                 ENGINE: MyISAM
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       3. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: a
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: PRI
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       4. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t3
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: b
+            COLUMN_TYPE: char(30)
+            IS_NULLABLE: YES
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: None
+  REFERENCED_TABLE_NAME: None
+ UNIQUE_CONSTRAINT_NAME: None
+            DELETE_RULE: None
+*************************       5. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 1
+            COLUMN_NAME: c
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: MUL
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+*************************       6. row *************************
+           TABLE_SCHEMA: util_test
+             TABLE_NAME: t4
+                 ENGINE: InnoDB
+       ORDINAL_POSITION: 2
+            COLUMN_NAME: d
+            COLUMN_TYPE: int(11)
+            IS_NULLABLE: NO
+         COLUMN_DEFAULT: None
+             COLUMN_KEY: 
+        TABLE_COLLATION: latin1_swedish_ci
+         CREATE_OPTIONS: 
+        CONSTRAINT_NAME: ref_t3
+  REFERENCED_TABLE_NAME: t3
+ UNIQUE_CONSTRAINT_NAME: PRIMARY
+            DELETE_RULE: RESTRICT
+6 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+         TABLE_SCHEMA: util_test
+           TABLE_NAME: v1
+              DEFINER: root@localhost
+        SECURITY_TYPE: DEFINER
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+         CHECK_OPTION: NONE
+         IS_UPDATABLE: YES
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+         TRIGGER_NAME: trg
+              DEFINER: root@localhost
+   EVENT_MANIPULATION: INSERT
+  EVENT_OBJECT_SCHEMA: util_test
+   EVENT_OBJECT_TABLE: t1
+   ACTION_ORIENTATION: ROW
+        ACTION_TIMING: AFTER
+     ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: p1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: NO
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+         ROUTINE_NAME: f1
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: RETURN (SELECT 1)
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: YES
+      SQL_DATA_ACCESS: CONTAINS SQL
+        SECURITY_TYPE: DEFINER
+              DEFINER: root@localhost
+             SQL_MODE: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+           EVENT_NAME: e1
+              DEFINER: root@localhost
+           EVENT_BODY: SQL
+     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
+             SQL_MODE: 
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: None
+               STATUS: DISABLED
+        ON_COMPLETION: NOT PRESERVE
+           ORIGINATOR: XX
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
+#...done.
+Test case 38 - VERTICAL format with FULL display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t1
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: MEMORY
+                   VERSION: 10
+                ROW_FORMAT: Fixed
+                TABLE_ROWS: 7
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: None
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t1
+               COLUMN_NAME: a
+          ORDINAL_POSITION: 1
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: YES
+                 DATA_TYPE: char
+  CHARACTER_MAXIMUM_LENGTH: 30
+    CHARACTER_OCTET_LENGTH: 30
+         NUMERIC_PRECISION: None
+             NUMERIC_SCALE: None
+        CHARACTER_SET_NAME: latin1
+            COLLATION_NAME: latin1_swedish_ci
+               COLUMN_TYPE: char(30)
+                COLUMN_KEY: 
+                     EXTRA: 
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: None
+           CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: None
+    UNIQUE_CONSTRAINT_NAME: None
+              MATCH_OPTION: None
+               UPDATE_RULE: None
+               DELETE_RULE: None
+                TABLE_NAME: None
+     REFERENCED_TABLE_NAME: None
+*************************       2. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t2
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: MyISAM
+                   VERSION: 10
+                ROW_FORMAT: Fixed
+                TABLE_ROWS: 3
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: None
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t2
+               COLUMN_NAME: a
+          ORDINAL_POSITION: 1
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: YES
+                 DATA_TYPE: char
+  CHARACTER_MAXIMUM_LENGTH: 30
+    CHARACTER_OCTET_LENGTH: 30
+         NUMERIC_PRECISION: None
+             NUMERIC_SCALE: None
+        CHARACTER_SET_NAME: latin1
+            COLLATION_NAME: latin1_swedish_ci
+               COLUMN_TYPE: char(30)
+                COLUMN_KEY: 
+                     EXTRA: 
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: None
+           CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: None
+    UNIQUE_CONSTRAINT_NAME: None
+              MATCH_OPTION: None
+               UPDATE_RULE: None
+               DELETE_RULE: None
+                TABLE_NAME: None
+     REFERENCED_TABLE_NAME: None
+*************************       3. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t3
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: InnoDB
+                   VERSION: 10
+                ROW_FORMAT: Compact
+                TABLE_ROWS: 3
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: 4
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t3
+               COLUMN_NAME: a
+          ORDINAL_POSITION: 1
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: NO
+                 DATA_TYPE: int
+  CHARACTER_MAXIMUM_LENGTH: None
+    CHARACTER_OCTET_LENGTH: None
+         NUMERIC_PRECISION: 10
+             NUMERIC_SCALE: 0
+        CHARACTER_SET_NAME: None
+            COLLATION_NAME: None
+               COLUMN_TYPE: int(11)
+                COLUMN_KEY: PRI
+                     EXTRA: auto_increment
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: None
+           CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: None
+    UNIQUE_CONSTRAINT_NAME: None
+              MATCH_OPTION: None
+               UPDATE_RULE: None
+               DELETE_RULE: None
+                TABLE_NAME: None
+     REFERENCED_TABLE_NAME: None
+*************************       4. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t3
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: InnoDB
+                   VERSION: 10
+                ROW_FORMAT: Compact
+                TABLE_ROWS: 3
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: 4
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t3
+               COLUMN_NAME: b
+          ORDINAL_POSITION: 2
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: YES
+                 DATA_TYPE: char
+  CHARACTER_MAXIMUM_LENGTH: 30
+    CHARACTER_OCTET_LENGTH: 30
+         NUMERIC_PRECISION: None
+             NUMERIC_SCALE: None
+        CHARACTER_SET_NAME: latin1
+            COLLATION_NAME: latin1_swedish_ci
+               COLUMN_TYPE: char(30)
+                COLUMN_KEY: 
+                     EXTRA: 
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: None
+           CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: None
+    UNIQUE_CONSTRAINT_NAME: None
+              MATCH_OPTION: None
+               UPDATE_RULE: None
+               DELETE_RULE: None
+                TABLE_NAME: None
+     REFERENCED_TABLE_NAME: None
+*************************       5. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t4
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: InnoDB
+                   VERSION: 10
+                ROW_FORMAT: Compact
+                TABLE_ROWS: 1
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: None
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t4
+               COLUMN_NAME: c
+          ORDINAL_POSITION: 1
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: NO
+                 DATA_TYPE: int
+  CHARACTER_MAXIMUM_LENGTH: None
+    CHARACTER_OCTET_LENGTH: None
+         NUMERIC_PRECISION: 10
+             NUMERIC_SCALE: 0
+        CHARACTER_SET_NAME: None
+            COLLATION_NAME: None
+               COLUMN_TYPE: int(11)
+                COLUMN_KEY: MUL
+                     EXTRA: 
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: util_test
+           CONSTRAINT_NAME: ref_t3
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: util_test
+    UNIQUE_CONSTRAINT_NAME: PRIMARY
+              MATCH_OPTION: NONE
+               UPDATE_RULE: RESTRICT
+               DELETE_RULE: RESTRICT
+                TABLE_NAME: t4
+     REFERENCED_TABLE_NAME: t3
+*************************       6. row *************************
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t4
+                TABLE_TYPE: BASE TABLE
+                    ENGINE: InnoDB
+                   VERSION: 10
+                ROW_FORMAT: Compact
+                TABLE_ROWS: 1
+            AVG_ROW_LENGTH: XXXXXXX
+               DATA_LENGTH: XXXXXXX
+           MAX_DATA_LENGTH: XXXXXXX
+              INDEX_LENGTH: XXXXXXX
+                 DATA_FREE: XXXXXXXXXXX
+            AUTO_INCREMENT: None
+               CREATE_TIME: XXXX-XX-XX XX:XX:XX
+               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+                CHECK_TIME: None
+           TABLE_COLLATION: latin1_swedish_ci
+                  CHECKSUM: None
+            CREATE_OPTIONS: 
+             TABLE_COMMENT: 
+             TABLE_CATALOG: None
+              TABLE_SCHEMA: util_test
+                TABLE_NAME: t4
+               COLUMN_NAME: d
+          ORDINAL_POSITION: 2
+            COLUMN_DEFAULT: None
+               IS_NULLABLE: NO
+                 DATA_TYPE: int
+  CHARACTER_MAXIMUM_LENGTH: None
+    CHARACTER_OCTET_LENGTH: None
+         NUMERIC_PRECISION: 10
+             NUMERIC_SCALE: 0
+        CHARACTER_SET_NAME: None
+            COLLATION_NAME: None
+               COLUMN_TYPE: int(11)
+                COLUMN_KEY: 
+                     EXTRA: 
+                PRIVILEGES: select,insert,update,references
+            COLUMN_COMMENT: 
+        CONSTRAINT_CATALOG: None
+         CONSTRAINT_SCHEMA: util_test
+           CONSTRAINT_NAME: ref_t3
+ UNIQUE_CONSTRAINT_CATALOG: None
+  UNIQUE_CONSTRAINT_SCHEMA: util_test
+    UNIQUE_CONSTRAINT_NAME: PRIMARY
+              MATCH_OPTION: NONE
+               UPDATE_RULE: RESTRICT
+               DELETE_RULE: RESTRICT
+                TABLE_NAME: t4
+     REFERENCED_TABLE_NAME: t3
+6 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+        TABLE_CATALOG: None
+         TABLE_SCHEMA: util_test
+           TABLE_NAME: v1
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+         CHECK_OPTION: NONE
+         IS_UPDATABLE: YES
+              DEFINER: root@localhost
+        SECURITY_TYPE: DEFINER
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+            TRIGGER_CATALOG: None
+             TRIGGER_SCHEMA: util_test
+               TRIGGER_NAME: trg
+         EVENT_MANIPULATION: INSERT
+       EVENT_OBJECT_CATALOG: None
+        EVENT_OBJECT_SCHEMA: util_test
+         EVENT_OBJECT_TABLE: t1
+               ACTION_ORDER: 0
+           ACTION_CONDITION: None
+           ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
+         ACTION_ORIENTATION: ROW
+              ACTION_TIMING: AFTER
+ ACTION_REFERENCE_OLD_TABLE: None
+ ACTION_REFERENCE_NEW_TABLE: None
+   ACTION_REFERENCE_OLD_ROW: OLD
+   ACTION_REFERENCE_NEW_ROW: NEW
+                    CREATED: None
+                   SQL_MODE: 
+                    DEFINER: root@localhost
+       CHARACTER_SET_CLIENT: latin1
+       COLLATION_CONNECTION: latin1_swedish_ci
+         DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+        SPECIFIC_NAME: p1
+      ROUTINE_CATALOG: None
+       ROUTINE_SCHEMA: util_test
+         ROUTINE_NAME: p1
+         ROUTINE_TYPE: PROCEDURE
+       DTD_IDENTIFIER: None
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
+        EXTERNAL_NAME: None
+    EXTERNAL_LANGUAGE: None
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: NO
+      SQL_DATA_ACCESS: CONTAINS SQL
+             SQL_PATH: None
+        SECURITY_TYPE: DEFINER
+              CREATED: XXXX-XX-XX XX:XX:XX
+         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
+             SQL_MODE: 
+      ROUTINE_COMMENT: 
+              DEFINER: root@localhost
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+        SPECIFIC_NAME: f1
+      ROUTINE_CATALOG: None
+       ROUTINE_SCHEMA: util_test
+         ROUTINE_NAME: f1
+         ROUTINE_TYPE: FUNCTION
+       DTD_IDENTIFIER: int(11)
+         ROUTINE_BODY: SQL
+   ROUTINE_DEFINITION: RETURN (SELECT 1)
+        EXTERNAL_NAME: None
+    EXTERNAL_LANGUAGE: None
+      PARAMETER_STYLE: SQL
+     IS_DETERMINISTIC: YES
+      SQL_DATA_ACCESS: CONTAINS SQL
+             SQL_PATH: None
+        SECURITY_TYPE: DEFINER
+              CREATED: XXXX-XX-XX XX:XX:XX
+         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
+             SQL_MODE: 
+      ROUTINE_COMMENT: 
+              DEFINER: root@localhost
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+        EVENT_CATALOG: None
+         EVENT_SCHEMA: util_test
+           EVENT_NAME: e1
+              DEFINER: root@localhost
+            TIME_ZONE: SYSTEM
+           EVENT_BODY: SQL
+     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+           EVENT_TYPE: RECURRING
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
+             SQL_MODE: 
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: None
+               STATUS: DISABLED
+        ON_COMPLETION: NOT PRESERVE
+              CREATED: XXXX-XX-XX XX:XX:XX
+         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
+        LAST_EXECUTED: None
+        EVENT_COMMENT: 
+           ORIGINATOR: XX
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+   DATABASE_COLLATION: latin1_swedish_ci
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
+#...done.
+Test case 39 - VERTICAL format with NAMES display
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+*************************       1. row *************************
+ TABLE_NAME: t1
+*************************       2. row *************************
+ TABLE_NAME: t2
+*************************       3. row *************************
+ TABLE_NAME: t3
+*************************       4. row *************************
+ TABLE_NAME: t4
+4 rows.
+
+# VIEWS in util_test:
+*************************       1. row *************************
+ TABLE_NAME: v1
+1 rows.
+
+# TRIGGERS in util_test:
+*************************       1. row *************************
+ TRIGGER_NAME: trg
+1 rows.
+
+# PROCEDURES in util_test:
+*************************       1. row *************************
+ ROUTINE_NAME: p1
+1 rows.
+
+# FUNCTIONS in util_test:
+*************************       1. row *************************
+ ROUTINE_NAME: f1
+1 rows.
+
+# EVENTS in util_test:
+*************************       1. row *************************
+ EVENT_NAME: e1
+1 rows.
+
+# GRANTS in util_test:
+*************************       1. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       2. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       3. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       4. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       5. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       6. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       7. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       8. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************       9. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      10. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      11. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      12. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      13. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      14. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      15. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      16. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      17. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      18. row *************************
+        GRANTEE: 'joe'@'user'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+18 rows.
+
 #...done.

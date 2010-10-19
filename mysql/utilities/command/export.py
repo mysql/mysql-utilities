@@ -40,7 +40,7 @@ def export_metadata(src_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, header, verbose, display, format, and debug)
+                       skip_data, no_header, display, format, and debug)
 
     Returns bool True = success, False = error
     """
@@ -51,12 +51,13 @@ def export_metadata(src_val, db_list, options):
     from mysql.utilities.common.format import format_vertical_list
     
     format = options.get("format", "SQL")
-    headers = options.get("header", False)
+    no_headers = options.get("no_headers", False)
     column_type = options.get("display", "BRIEF")
     skip_create = options.get("skip_create", False)
+    silent = options.get("silent", False)
     
     try:
-        servers = connect_servers(src_val, None, False, "5.1.30")
+        servers = connect_servers(src_val, None, silent, "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -85,7 +86,8 @@ def export_metadata(src_val, db_list, options):
             raise MySQLUtilError("Source database does not exist - %s" %
                                  db_name)
 
-        print "# Exporting metadata from %s" % db_name
+        if not silent:
+            print "# Exporting metadata from %s" % db_name
         
         # Perform the extraction
         try:
@@ -97,7 +99,8 @@ def export_metadata(src_val, db_list, options):
                 print "USE %s;" % db_name
                 for dbobj in db.get_next_object():
                     if dbobj[0] == "GRANT":
-                        print "# Grant:"
+                        if not silent:
+                            print "# Grant:"
                         if dbobj[1][3]:
                             create_str = "GRANT %s ON %s.%s TO %s" % \
                                          (dbobj[1][1], db_name,
@@ -109,41 +112,47 @@ def export_metadata(src_val, db_list, options):
                             create_str = re.sub("%", "%%", create_str)
                         print create_str
                     else:
-                        print "# %s: %s.%s" % (dbobj[0], db_name, dbobj[1][0])
-                        print "%s;" % db.get_create_statement(db_name, dbobj[1][0],
+                        if not silent:
+                            print "# %s: %s.%s" % (dbobj[0], db_name,
+                                                   dbobj[1][0])
+                        print "%s;" % db.get_create_statement(db_name,
+                                                              dbobj[1][0],
                                                               dbobj[0])
             else:
                 objects = ["TABLE", "VIEW", "TRIGGER", "PROCEDURE",
                            "FUNCTION", "EVENT", "GRANT"]
                 for obj_type in objects:
-                    sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
+                    if not silent:
+                        sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
                     rows = db.get_db_objects(obj_type, column_type, True)
                     if len(rows[1]) < 1:
-                        print " (none found)"
+                        if not silent:
+                            print " (none found)"
                     else:
-                        print
+                        if not silent:
+                            print
                         if format == "VERTICAL":
                             format_vertical_list(sys.stdout, rows[0], rows[1])
                         elif format == "TAB":
                             format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                True, '\t', True)
+                                                not no_headers, '\t')
                         elif format == "CSV":
                             format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                True, ',', True)
+                                                not no_headers, ',')
                         else:  # default to table format
                             format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                False, None, False)
+                                                True, None, False, True)
 
         except MySQLUtilError, e:
             raise e
             
-    if not options.get("silent", False):
+    if not silent:
         print "#...done."
     return True
 
 
 def _export_row(data_rows, cur_table, col_metadata,
-                format, single, first=False, header=True):
+                format, single, skip_blobs, first=False, no_headers=False):
     """Export a row
     
     This method will print a row to stdout based on the format chosen -
@@ -153,11 +162,12 @@ def _export_row(data_rows, cur_table, col_metadata,
     cur_table[in]      Table class instance
     col_metadata[in]   metadata about the columns including types and widths
     format[in]         desired output format
+    skip_blobs[in]     if True, skip blob data
     single[in]         if True, generate single INSERT statements (valid
                        only for format=SQL)
     first[in]          if True, this is the first row to be exported - this
                        causes the header to be printed if chosen.
-    header[in]         if True, print headers
+    no_headers[in]     if True, do not print headers
     """
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
@@ -207,10 +217,10 @@ def _export_row(data_rows, cur_table, col_metadata,
         format_vertical_list(sys.stdout, cur_table.get_col_names(), data_rows)
     elif format == "TAB":
         format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows,
-                            first, '\t', header)
+                            first, '\t', not no_headers)
     elif format == "CSV":
         format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows,
-                            first, ',', header)
+                            first, ',', not no_headers)
     else:  # default to table format - header is always printed
         format_tabular_list(sys.stdout, cur_table.get_col_names(), data_rows)
 
@@ -229,7 +239,7 @@ def export_data(src_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, header, verbose, display, format, and debug)
+                       skip_data, no_header, display, format, and debug)
 
     Returns bool True = success, False = error
     """
@@ -239,14 +249,14 @@ def export_data(src_val, db_list, options):
     from mysql.utilities.common.server import connect_servers
     
     format = options.get("format", "SQL")
-    headers = options.get("header", False)
+    no_headers = options.get("no_headers", True)
     column_type = options.get("display", "BRIEF")
     single = options.get("single", False)
     skip_blobs = options.get("skip_blobs", False)
-    verbose = options.get("verbose", False)
+    silent = options.get("silent", False)
     
     try:
-        servers = connect_servers(src_val, None, False, "5.1.30")
+        servers = connect_servers(src_val, None, silent, "5.1.30")
     except MySQLUtilError, e:
         raise e
 
@@ -274,18 +284,22 @@ def export_data(src_val, db_list, options):
             raise MySQLUtilError("Source database does not exist - %s" %
                                  db_name)
 
-        print "USE %s;" % db_name
-        print "# Exporting data from %s" % db_name
+        if not silent:
+            print "USE %s;" % db_name
+            print "# Exporting data from %s" % db_name
         
         # Perform the extraction
         try:
-            sys.stdout.write("# TABLES in %s:" % db_name)
+            if not silent:
+                sys.stdout.write("# TABLES in %s:" % db_name)
             tables = db.get_db_objects("TABLE")
             if len(tables) < 1:
-                print " (none found)"
+                if not silent:
+                    print " (none found)"
                 break
             for table in tables:
-                print
+                if not silent:
+                    print
                 tbl_name = "%s.%s" % (db_name, table[0])
                 cur_table = Table(source, tbl_name)
                 col_metadata = cur_table.get_column_metadata()
@@ -297,15 +311,16 @@ def export_data(src_val, db_list, options):
                 else:
                     retrieval_mode = 1
                     first = False
-                print "# Data for table %s: " % tbl_name
+                if not silent:
+                    print "# Data for table %s: " % tbl_name
                 for data_rows in cur_table.retrieve_rows(retrieval_mode):
                     _export_row(data_rows, cur_table, col_metadata,
-                                format, single, first, headers)
+                                format, single, skip_blobs, first, no_headers)
                     if first:
                         first = False
         except MySQLUtilError, e:
             raise e
             
-    if not options.get("silent", False):
+    if not silent:
         print "#...done."
     return True

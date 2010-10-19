@@ -1,33 +1,51 @@
 #!/usr/bin/env python
 
 import os
-import export_basic
+import export_parameters_def
 from mysql.utilities.exception import MySQLUtilError, MUTException
 
-class test(export_basic.test):
+class test(export_parameters_def.test):
     """check parameters for export utility
     This test executes a series of export database operations on a single
-    server using a variety of parameters. It uses the export_basic test
-    as a parent for setup and teardown methods.
+    server using a variety of parameters. It uses the export_parameters_def
+    test as a parent for setup and teardown methods.
     """
 
     def check_prerequisites(self):
-        return export_basic.test.check_prerequisites(self)
+        return export_parameters_def.test.check_prerequisites(self)
 
     def setup(self):
-        return export_basic.test.setup(self)
+        try:
+            res = export_parameters_def.test.setup(self)
+            if not res:
+                return False
+        except MUTException, e:
+            raise e
+        self.server1 = self.servers.get_server(0)
+
+        try:
+            self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
+                                    " x_blob blob")
+        except MySQLUtilError, e:
+            raise MUTException("Cannot alter table: %s" % e.errmsg)
+            
+        try:
+            self.server1.exec_query("UPDATE util_test.t2 SET x_blob = "
+                                    "'This is a blob.' ")
+
+        except MySQLUtilError, e:
+            raise MUTException("Cannot update rows: %s" % e.errmsg)
+
+        return True
          
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
        
         from_conn = "--server=" + self.build_connection_string(self.server1)
        
         cmd_str = "mysqlexport.py %s " % from_conn
         
-        # Now test the skips
-
-        cmd_opts = "%s util_test --format=SQL --export=data" % (cmd_str)
+        cmd_opts = "%s util_test --format=SQL --export=data" % cmd_str
         comment = "Test case 1 - SQL single rows"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
@@ -37,30 +55,20 @@ class test(export_basic.test):
         res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-
-        cmd_opts = "%s util_test --format=CSV --export=data" % (cmd_str)
-        comment = "Test case 3 - CSV format"
-        res = self.run_test_case(0, cmd_opts, comment)
+        
+        comment = "Test case 3 - skip blobs"
+        res = self.run_test_case(0, cmd_opts + " --skip-blobs", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
+        
+        # Conduct format and display combination tests
+        # Note: should say it is ignored for --export=data output.
 
-        cmd_opts = "%s util_test --format=TAB --export=data" % (cmd_str)
-        comment = "Test case 4 - TAB format"
-        res = self.run_test_case(0, cmd_opts, comment)
-        if not res:
-            raise MUTException("%s: failed" % comment)
-
-        cmd_opts = "%s util_test --format=GRID --export=data" % (cmd_str)
-        comment = "Test case 4 - GRID format"
-        res = self.run_test_case(0, cmd_opts, comment)
-        if not res:
-            raise MUTException("%s: failed" % comment)
-
-        cmd_opts = "%s util_test --format=VERTICAL --export=data" % (cmd_str)
-        comment = "Test case 5 - VERTICAL format"
-        res = self.run_test_case(0, cmd_opts, comment)
-        if not res:
-            raise MUTException("%s: failed" % comment)
+        try:
+            func = export_parameters_def.test.test_format_and_display_values
+            func(self, "%s util_test --export=data --format=" % cmd_str, 4)
+        except MUTException, e:
+            raise e
 
         return True
   
@@ -71,7 +79,7 @@ class test(export_basic.test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
-        return export_basic.test.cleanup(self)
+        return export_parameters_def.test.cleanup(self)
 
 
 
