@@ -34,7 +34,7 @@ from mysql.utilities.exception import MySQLUtilError
 # Constants
 MAX_SERVER_POOL = 10
 
-def _exec_util(cmd, file_out, utildir, debug=False):
+def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
     """Execute Utility
     
     This method executes a MySQL utility using the utildir specified in
@@ -46,10 +46,14 @@ def _exec_util(cmd, file_out, utildir, debug=False):
     utildir[in]        Path to utilities directory
     debug[in]          Prints debug information during execution of
                        utility
+    abspath[in]        Use absolute path and not current directory
     
     Returns return value of process run.
     """
-    run_cmd = "python " + utildir + "/" + cmd
+    if not abspath:
+        run_cmd = "python " + utildir + "/" + cmd
+    else:
+        run_cmd = cmd
     f_out = open(file_out, 'w+')
     if debug:
         print 
@@ -421,7 +425,7 @@ class System_test(object):
             del result
             
 
-    def exec_util(self, cmd, file_out):
+    def exec_util(self, cmd, file_out, abspath=False):
         """Execute Utility
         
         This method executes a MySQL utility using the utildir specified in
@@ -430,10 +434,11 @@ class System_test(object):
         
         cmd[in]            The command to execute including all parameters
         file_out[in]       Path and filename of a file to write output
+        abspath[in]        Use absolute path and not current directory
         
         Returns return value of process run.
         """
-        return _exec_util(cmd, file_out, self.utildir, self.debug)
+        return _exec_util(cmd, file_out, self.utildir, self.debug, abspath)
     
 
     def check_num_servers(self, num_servers):
