@@ -27,7 +27,7 @@ import re
 import sys
 import time
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command import export
+from mysql.utilities.command import dbexport
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import check_skip_options
 from mysql.utilities.exception import MySQLUtilError
@@ -217,11 +217,11 @@ try:
     if opt.debug:
         start_test = time.time()
     if opt.export == "DEFINITIONS" or opt.export == "BOTH":
-        export.export_metadata(server_values, db_list, options)
+        dbexport.export_metadata(server_values, db_list, options)
     if opt.export == "DATA" or opt.export == "BOTH":
         if opt.display != "BRIEF":
             print "# NOTE : --display is ignored for data export."
-        export.export_data(server_values, db_list, options)
+        dbexport.export_data(server_values, db_list, options)
     if opt.debug:
         print_elapsed_time(start_test)
 except MySQLUtilError, e:

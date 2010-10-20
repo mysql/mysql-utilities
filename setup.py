@@ -42,6 +42,7 @@ INSTALL = {
         'scripts/mysqlreplicate.py',
         'scripts/mysqlserverclone.py',
         'scripts/mysqluserclone.py',
+        'scripts/mysqlexport.py',
         ],
     }
 
