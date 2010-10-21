@@ -2,11 +2,11 @@ Test case 1 - find processes for current user
 +------------------------+------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+
 | Connection             | Id   | User  | Host       | Db    | Command  | Time  | State      | Info                                                                                                                      |
 +------------------------+------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+
-| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Query    | 0     | executing  | SELECT
+| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Query    |XXX |XXXXX | SELECT
   Id, User, Host, Db, Command, Time, State, Info
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    user LIKE 'root'  |
-| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Sleep    | 1     |            | None                                                                                                                      |
+    User LIKE 'root'  |
+| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Sleep    |XXX |XXXXX | None                                                                                                                      |
 +------------------------+------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+

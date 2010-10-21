@@ -21,7 +21,7 @@ This module contains and abstraction of a MySQL user object.
 
 import re
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def parse_user_host(user_name):
     """Parse user, passwd, host, port from user:passwd@host

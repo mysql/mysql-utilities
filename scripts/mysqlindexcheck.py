@@ -29,8 +29,8 @@ import sys
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import indexcheck
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import parse_connection
+from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.common.options import parse_connection
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"

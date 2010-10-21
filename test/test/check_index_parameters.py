@@ -2,8 +2,7 @@
 
 import os
 import check_index
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(check_index.test):
     """check parameters for the check_index utility

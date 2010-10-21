@@ -31,22 +31,6 @@ META_INFO = {
         ],
     }
 
-ARGS = {}
-
-if sys.platform.startswith("win32"):
-    from cx_Freeze import setup, Executable
-    META_INFO['name'] = 'MySQL Utilities'
-    ARGS.update({
-            'executable': [
-                Executable(exe, base="Console") for exe in INSTALL['scripts']
-                ],
-            'options': { 'bdist_msi': { 'add_to_path': True, },
-                }
-            })
-else:
-    from distutils.core import setup
-    META_INFO['name'] = 'mysql-utilities'
-
 INSTALL = {
     'packages': [
         "mysql.utilities",
@@ -69,6 +53,22 @@ INSTALL = {
                 ] ),
         ],
     }
+
+ARGS = {}
+
+if sys.platform.startswith("win32"):
+    from cx_Freeze import setup, Executable
+    META_INFO['name'] = 'MySQL Utilities'
+    ARGS.update({
+            'executable': [
+                Executable(exe, base="Console") for exe in INSTALL['scripts']
+                ],
+            'options': { 'bdist_msi': { 'add_to_path': True, },
+                }
+            })
+else:
+    from distutils.core import setup
+    META_INFO['name'] = 'mysql-utilities'
 
 class CheckCommand(distutils.core.Command):
     """

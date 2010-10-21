@@ -1,0 +1,64 @@
+Test case 1 - export metadata to new server via the mysql monitor
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, 
+Test case 2 - export the data to new server via the mysql monitor
+Showing data for table t1 
+a
+01 Test Basic database example
+02 Test Basic database example
+03 Test Basic database example
+04 Test Basic database example
+05 Test Basic database example
+06 Test Basic database example
+07 Test Basic database example
+Showing data for table t2 
+a
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+11 Test Basic database example
+12 Test Basic database example
+13 Test Basic database example
+Showing data for table t3 
+a	b
+1	14 test fkeys
+2	15 test fkeys
+3	16 test fkeys
+Showing data for table t4 
+c	d
+3	2
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, 
+Test case 3 - export all objects and data to new server via the mysql monitor
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, 
+Showing data for table t1 
+a
+01 Test Basic database example
+02 Test Basic database example
+03 Test Basic database example
+04 Test Basic database example
+05 Test Basic database example
+06 Test Basic database example
+07 Test Basic database example
+Showing data for table t2 
+a
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+Test objects count
+11 Test Basic database example
+12 Test Basic database example
+13 Test Basic database example
+Showing data for table t3 
+a	b
+1	14 test fkeys
+2	15 test fkeys
+3	16 test fkeys
+Showing data for table t4 
+c	d
+3	2

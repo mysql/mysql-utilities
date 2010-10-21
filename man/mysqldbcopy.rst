@@ -20,9 +20,8 @@ SYNOPSIS
  mysqldbcopy --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
              --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
              (<db_name>[:<new_name>])+ [--verbose | --overwrite |
-             --skip-events | --skip-triggers | --skip-procedures |
-             --skip-functions |  --skip-tables | --skip-views |
-             --skip-grants | --skip-data | --help | --version]
+             --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
+             EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version]
 
 DESCRIPTION
 ===========
@@ -70,25 +69,10 @@ OPTIONS
 --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
                       files) - default = current directory
 
---skip-tables         exclude tables in the operation
-
---skip-views          exclude views in the operation
-
---skip-triggers       exclude triggers in the operation
-
---skip-procedures     exclude procedures in the operation
-
---skip-functions      exclude functions in the operation
-
---skip-events         exclude events in the operation
-
---skip-grants         exclude database-level and below grants in the copy
-                      process
-
---skip-data           do not copy the data from the source database to the
-                      destination database
-
---skip-create-db      do not create the destination database
+--skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
+                      of a comma-separated list (no spaces). Valid values =
+                      TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
+                      EVENTS, GRANTS, DATA, CREATE_DB
 
 -o, --overwrite       drop the new database or object if it exists
 

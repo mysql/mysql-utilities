@@ -22,6 +22,7 @@ tests on the MySQL Utilities.
 """
 
 import commands
+import csv
 import datetime
 import optparse
 import os
@@ -31,11 +32,10 @@ import subprocess
 import sys
 import time
 import MySQLdb
-from mysql.utilities.common import Server
-from mysql.utilities.common import get_tool_path
-from mysql.utilities.common import parse_connection
-from mysql.utilities.common import MUTException
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.common.server import Server
+from mysql.utilities.common.tools import get_tool_path
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.exception import MUTException, MySQLUtilError
 from test import Server_list
 
 # Constants
@@ -214,6 +214,17 @@ def _exec_and_report(procedure, default_message, test_name, action,
         exception_procedure()
     return False
 
+# Helper method to read CSV file
+def read_disabled_tests():
+    disabled_tests = []
+    file = open("disabled")
+    csv_reader = csv.reader(file)
+    for row in csv_reader:
+        if row[0] != '#':
+            disabled_tests.append(row)
+    file.close()
+    return disabled_tests
+
 # Begin 'main' code
 parser = optparse.OptionParser(version=VERSION, description=DESCRIPTION,
                                usage=USAGE, add_help_option=False)
@@ -244,6 +255,11 @@ parser.add_option("--skip-test", action="append", dest="skip_test",
 parser.add_option("--skip-tests", action="store", dest="skip_tests",
                   type = "string", help="exclude tests that begin with "
                   "this string")
+
+# Add start-test list option
+parser.add_option("--start-test", action="store", dest="start_test",
+                  type = "string", help="start executing tests that begin "
+                  "with this string", default=None)
 
 # Add skip-long tests option
 parser.add_option("--skip-long", action="store_true", dest="skip_long",
@@ -288,7 +304,7 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
                   help="display additional information during operation")
 
 # Force mode
-parser.add_option("--force", action="store_true", dest="force",
+parser.add_option("-f", "--force", action="store_true", dest="force",
                   help="do not abort when a test fails")
 
 # Debug mode
@@ -344,7 +360,7 @@ if opt.skip_suites:
     
 # Is there a --do-test?
 if opt.wildcard:
-    print "  Test wildcard       = '%s%%'" % (opt.wildcard)
+    print "  Test wildcard       = '%s%%'" % opt.wildcard
 
 # Check to see if we're skipping tests
 if opt.skip_test:
@@ -354,7 +370,13 @@ if opt.skip_test:
     print
     
 if opt.skip_tests:
-    print "  Skip wildcard       = '%s%%'" % (opt.skip_tests)
+    print "  Skip wildcard       = '%s%%'" % opt.skip_tests
+     
+if opt.start_test:
+    print "  Start test sequence = '%s%%'" % opt.start_test
+    start_sequence = True
+else:
+    start_sequence = False
      
 server_list = Server_list([], opt.start_port, opt.utildir, opt.verbose)
 basedir = None
@@ -414,11 +436,6 @@ if len(processes) > 0:
           "spawned by an earlier execution. Attempting shutdown.\n"
     _shutdown_running_servers(server_list, processes, basedir)                
     
-# Print header
-print "\n" + "-" * opt.width
-print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME" 
-print "=" * opt.width
-
 test_files = []
 failed_tests = []
 
@@ -477,11 +494,39 @@ if len(test_files) == 0:
 if opt.sorted:
     test_files.sort()
 
+# Check for validity of --start-test
+if start_sequence:
+    found = False
+    for test_tuple in test_files:
+        if opt.start_test == test_tuple[2][0:len(opt.start_test)]:
+            found = True
+    if not found:
+        print "\nWARNING: --start-test=%s%% was not found. Running full " \
+              "suite(s)" % opt.start_test
+        start_sequence = False
+
+# Get list of disabled tests
+disable_list = read_disabled_tests()
+
+have_disabled = len(disable_list)
+
+# Print header
+print "\n" + "-" * opt.width
+print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME" 
+print "=" * opt.width
+
 # Run the tests selected
 num_tests_run = 0
 last_test = None
 for test_tuple in test_files:
-
+    
+    # Skip tests for start-test sequence
+    if start_sequence:
+        if opt.start_test == test_tuple[2][0:len(opt.start_test)]:
+            start_sequence = False
+        else:
+            continue
+        
     # Get test parts - directory not used
     test = test_tuple[2]
     test_name = ""
@@ -494,7 +539,7 @@ for test_tuple in test_files:
     else:
         test_name = "main"
     test_name += "." + test
-    
+        
     # record start time
     start_test = time.time()
     
@@ -509,6 +554,17 @@ for test_tuple in test_files:
     sys.stdout.write(test_name)
     sys.stdout.flush()
     
+    # Skip disabled tests
+    if have_disabled > 0 and not opt.force:
+        skipped = False
+        for disabled_test in disable_list:
+            if test_name == disabled_test[0]:
+                _report_error("Test marked as disabled.", test_name,
+                              "SKIP", start_test, False)
+                skipped = True
+        if skipped:
+            continue
+
     # Check to see if we need to skip long running tests
     if opt.skip_long and test_case.is_long():
         _report_error("Test marked as long running test.", test_name,

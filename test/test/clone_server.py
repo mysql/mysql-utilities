@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import os
-import mysql.utilities.common as mysql_util
 import mysql_test
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+
+from mysql.utilities.common.server import Server
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(mysql_test.System_test):
     """clone server
@@ -86,7 +86,7 @@ class test(mysql_test.System_test):
         if os.name != "posix":
             conn["unix_socket"] = None
         
-        self.new_server = mysql_util.Server(conn, "cloned_server")
+        self.new_server = Server(conn, "cloned_server")
         if self.new_server is None:
             return False
         
