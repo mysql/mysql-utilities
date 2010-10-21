@@ -2,16 +2,6 @@
  mut - MySQL Utilities Testing 
 ===============================
 
--------------------------------------------------------
-run system and acceptance tests on the MySQL Utilities
--------------------------------------------------------
-
-:Author: The Oracle MySQL Utilities team
-:Date: 2010-08-27
-:Copyright: GPL
-:Version: 1.0.0
-:Manual group: database 
-
 SYNOPSIS
 ========
 

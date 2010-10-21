@@ -213,11 +213,32 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
+    ('man/mysqldbcopy', 'mysqldbcopy',
+     u'Copy databases from one MySQL server to another',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqlexport', 'mysqlexport',
+     u'Export a list of databases in a variety of formats',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqlindexcheck', 'mysqlindexcheck',
+     u'Check for redundant or duplicate indexes on a list tables or databases',
+     [u'MySQL Utilities Team'], 1),
     ('man/mysqlmetagrep', 'mysqlmetagrep',
      u'Search MySQL servers for objects matching a pattern',
      [u'MySQL Utilities Team'], 1),
     ('man/mysqlprocgrep', 'mysqlprocgrep',
      u'Search MySQL servers for processes matching a pattern',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqlreplicate', 'mysqlreplicate',
+     u'Setup replication among two MySQL servers',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqlserverclone', 'mysqlserverclone',
+     u'Start a new instance of an existing MySQL server',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqluserclone', 'mysqluserclone',
+     u'Copy a MySQL user to one or more new users on another server',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mut', 'mut',
+     u'Testing environment for MySQL utilities',
      [u'MySQL Utilities Team'], 1),
 ]
 
