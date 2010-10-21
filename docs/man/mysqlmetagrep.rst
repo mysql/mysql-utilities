@@ -36,41 +36,49 @@ if you want to match the beginning of the string.
 Options
 -------
 
---type=TYPE,...
-  Only search for/in objects of type TYPE, where TYPE can be:
-  **procedure**, **function**, **event**, **trigger**, **table**,
-  or **database**.
+.. option:: --type=TYPE,...
+
+Only search for/in objects of type TYPE, where TYPE can be:
+**procedure**, **function**, **event**, **trigger**, **table**, or
+**database**.
   
-  Default is to search for/in all kinds of types.  
+Default is to search for/in all kinds of types.
 
--b, --body
-  Search the body of procedures, functions, triggers, and
-  events. Default is to only match the name.
+.. option:: -b, --body
 
--G, --basic-regexp, --regexp
-  Perform the match using the **REGEXP** operator. Default is to use
-  **LIKE** for matching.
+Search the body of procedures, functions, triggers, and
+events. Default is to only match the name.
 
--p, --print-sql, --sql
-  Print the SQL code that will be executed to find all matching
-  objects. This can be useful if you want to safe the statement for
-  later execution, or pipe it into other tools.
+.. option:: -G, --basic-regexp, --regexp
 
--e PATTERN, --pattern=PATTERN
-  Pattern to use when matching. This is required when the pattern
-  looks like a connection specification.
+Perform the match using the **REGEXP** operator. Default is to use
+**LIKE** for matching.
 
-  If a pattern option is given, the first argument is not treated as a
-  pattern but as a connection specifier.
+.. option:: -p, --print-sql, --sql
 
---database=PATTERN
-  Only look in databases matching this pattern.
+Print the SQL code that will be executed to find all matching
+objects. This can be useful if you want to safe the statement for
+later execution, or pipe it into other tools.
 
---version
-  Print the version and exit.
+.. option:: -e PATTERN, --pattern=PATTERN
 
--h, --help
-  Print help.
+Pattern to use when matching. This is required when the pattern looks
+like a connection specification.
+
+If a pattern option is given, the first argument is not treated as a
+pattern but as a connection specifier.
+
+.. option:: --database=PATTERN
+
+Only look in databases matching this pattern.
+
+.. option:: --version
+
+Print the version and exit.
+
+.. option:: -h, --help
+
+Print help.
 
 
 EXAMPLES
