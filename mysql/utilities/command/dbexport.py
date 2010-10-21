@@ -122,15 +122,12 @@ def export_metadata(src_val, db_list, options):
                 objects = ["TABLE", "VIEW", "TRIGGER", "PROCEDURE",
                            "FUNCTION", "EVENT", "GRANT"]
                 for obj_type in objects:
-                    if not silent:
-                        sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
+                    sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
                     rows = db.get_db_objects(obj_type, column_type, True)
                     if len(rows[1]) < 1:
-                        if not silent:
-                            print " (none found)"
+                        print " (none found)"
                     else:
-                        if not silent:
-                            print
+                        print
                         if format == "VERTICAL":
                             format_vertical_list(sys.stdout, rows[0], rows[1])
                         elif format == "TAB":
@@ -311,8 +308,7 @@ def export_data(src_val, db_list, options):
                 else:
                     retrieval_mode = 1
                     first = False
-                if not silent:
-                    print "# Data for table %s: " % tbl_name
+                print "# Data for table %s: " % tbl_name
                 for data_rows in cur_table.retrieve_rows(retrieval_mode):
                     _export_row(data_rows, cur_table, col_metadata,
                                 format, single, skip_blobs, first, no_headers)
