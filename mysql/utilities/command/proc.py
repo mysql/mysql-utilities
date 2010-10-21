@@ -1,10 +1,10 @@
-#!/usr/bin/python
-
+"""Module for scanning processes on a server and operating on the result.
+"""
 import MySQLdb
 import re
 import sys
 
-# Some handy constants
+#: The possible actions for processes
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
 ID      = "Id"
@@ -71,7 +71,12 @@ BEGIN{body}
 END"""
 
 class ProcessGrep(object):
-    """Class for searching the INFORMATION_SCHEMA.PROCESSLIST table on MySQL servers.
+    """Class for searching the **INFORMATION_SCHEMA.PROCESSLIST**
+    table on MySQL servers.
+
+    >>> from mysql.utilities.command.proc import *
+    >>> grep = ProcessGrep(matches=["t_"], actions=[KILL_QUERY])
+    >>> grep.execute("root@master-1.example.com", "root@master-2.example.com")
     """
     
     def __init__(self, matches, actions=[], use_regexp=False):
@@ -79,7 +84,13 @@ class ProcessGrep(object):
         self.__actions = actions
 
     def sql(self, only_body=False):
-        """Show SQL code for executing action.
+        """Get SQL code for executing search. If **only_body** is
+        true, only the body of the function is shown. This is useful
+        if the SQL code is going to be used with other utilities that
+        generate the routine declaration.
+
+        :param only_body: Only show the body of the procedure.
+        :returns: SQL code as a string.
         """
         params = {
             'select': "\n      ".join(self.__select.split("\n")),
@@ -94,7 +105,12 @@ class ProcessGrep(object):
         else:
             return self.__select
 
-    def execute(self, args, output=sys.stdout, connector=MySQLdb):
+    def execute(self, connections, output=sys.stdout, connector=MySQLdb):
+        """Execute the search on each of the connections in turn and print the result.
+
+        :param connections: Sequence of connections to query.
+        :type connections: Sequence of :ref:`connection specificers`
+        """
         from ..common.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list

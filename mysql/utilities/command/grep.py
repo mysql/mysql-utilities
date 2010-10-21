@@ -15,7 +15,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 
-"""Module for searching MySQL database servers for objects by name or content.
+"""This module provide utilities to search objects on server. The
+module define a set of *object types* that can be searched by
+searching the *fields* of each object. The notion of a field of an
+object is in this case very loosly defined and basically means any
+names occuring as part of the definition of an object. For example,
+the fields of a table include the table name, the column names, and
+the partition names (if it is a partition table).
 """
 
 import MySQLdb
@@ -187,10 +193,18 @@ def _join_words(words, delimiter=",", conjunction="and"):
     else:
         return '{0} '.format(delimiter).join(words[0:-1]) + "%s %s %s" % (delimiter, conjunction, words[-1])
 
-ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER = 'routine', 'event', 'trigger', 'table', 'database', 'view', 'user'
+ROUTINE =  'routine'
+EVENT =  'event'
+TRIGGER =  'trigger'
+TABLE =  'table'
+DATABASE =  'database'
+VIEW =  'view'
+USER = 'user'
 COLUMN = 'column'
 
-#: List of all object types that can be searched
+#: This is a sequence of all the object types that are available. It
+#: can be used to generate a version-independent list of object types
+#: that can be searched in, for example, options and help texts.
 OBJECT_TYPES = _OBJMAP.keys()
 
 class ObjectGrep(object):
@@ -210,12 +224,18 @@ class ObjectGrep(object):
         self.__types = types
 
     def sql(self):
-        """Return SQL code for performing this search.
+        """This will return SQL code for executing the search in the
+        form of a **SELECT** statement.
         """
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=MySQLdb):
-        """Perform a search on a list of servers.
+        """Execute the search on each of the connections in turn and
+        print an aggregate of the result as a grid table.
+
+        :param connections: Sequence of :ref:`connection specifiers` to send the query to.
+        :param output: Output stream where the result will be written.
+        :param connector: Connector to use when connecting to the servers.
         """
 
         from ..common.exception import FormatError, EmptyResultError

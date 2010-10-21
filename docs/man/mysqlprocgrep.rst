@@ -1,14 +1,6 @@
-=============
+#############
 mysqlprocgrep
-=============
-
-----------------------------------------------------------
-Search for processes on a MySQL server and perform actions
-----------------------------------------------------------
-
-:Author: Mats Kindahl <mats.kindahl@oracle.com>
-:Manual section: 1
-
+#############
 
 SYNOPSIS
 ========
@@ -29,25 +21,25 @@ Options
 -------
 
 --match-user=PATTEN
-  Match all rows where the ``User`` field matches PATTERN
+  Match all rows where the **User** field matches PATTERN
 
 --match-host=PATTERN
-  Match all rows where the ``Host`` field matches PATTERN
+  Match all rows where the **Host** field matches PATTERN
 
 --match-db=PATTERN
-  Match all rows where the ``Db`` field matches PATTERN
+  Match all rows where the **Db** field matches PATTERN
 
 --match-time=PERIOD
-  Match all rows where the ``Time`` field is within PERIOD
+  Match all rows where the **Time** field is within PERIOD
 
 --match-command=PATTERN
-  Match all rows where the ``Command`` field matches PATTERN
+  Match all rows where the **Command** field matches PATTERN
 
 --match-state=PATTERN
-  Match all rows where the ``State`` field matches **PATTERN**.
+  Match all rows where the **State** field matches **PATTERN**.
 
 --match-info=PATTERN
-  Match all rows where the ``Info`` field matches **PATTERN**.
+  Match all rows where the **Info** field matches **PATTERN**.
 
 --kill-connection
   Kill the connection for all matching processes.
@@ -57,7 +49,7 @@ Options
 
 --print
   Print information about the matching processes. This is the default
-  if no ``--kill-*`` option is given. If a ``--kill-*`` option is
+  if no **--kill-*** option is given. If a **--kill-*** option is
   given, this option will print information about the processes before
   killing them.
 
@@ -69,19 +61,20 @@ Options
   Use 'REGEXP' operator to match patterns instead of 'LIKE'.
 
 -Q, --sql, --print-sql
-  Emit the SQL for matching or killing the queries. If the ``--kill``
+  Emit the SQL for matching or killing the queries. If the **--kill**
   option is given, a routine for killing the queries are generated.
 
 --sql-body
   Emit SQL statements for performing the search or kill of the
-  ``INFORMATION_SCHEMA.PROCESSLIST`` table.  This is useful together
-  with `mysqlmkevent`_ to generate an event for the server scheduler.
+  **INFORMATION_SCHEMA.PROCESSLIST** table.  This is useful together
+  with :manpage:`mysqlmkevent(1)` to generate an event for the server
+  scheduler.
 
-  When used with the ``--kill`` option, code for killing the matching
+  When used with the **--kill** option, code for killing the matching
   queries are generated. Note that it is not possible to execute the
   emitted code unless it is put in a stored routine, event, or
   trigger. For example, the following code could be generated to kill
-  all connections for user ``www-data`` that is idle::
+  all connections for user **www-data** that is idle::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -119,15 +112,15 @@ or - sign as prefix. A + sign before the period means greater than the
 given period, a - sign means less than the given period, while no sign
 means within that period.
 
-The allowable suffixes are ``s`` (second), ``m`` (minute), ``h``
-(hour), ``d`` (day), and ``w`` (week).
+The allowable suffixes are **s** (second), **m** (minute), **h**
+(hour), **d** (day), and **w** (week).
 
 
 EXAMPLES
 ========
 
-For all the examples, we assume that the ``root`` user on
-``localhost`` has sufficient privileges to kill queries and
+For all the examples, we assume that the **root** user on
+**localhost** has sufficient privileges to kill queries and
 connections.
 
 To kill all connections created by user "mats" that are younger than 1 minute::
