@@ -178,8 +178,8 @@ def _export_row(data_rows, cur_table, col_metadata,
                 data = data_rows
             else:
                 data = data_rows[1]
+            blob_rows = []
             for row in data:
-                blob_rows = []
                 columns = cur_table.get_column_string(row, full_name,
                                                       col_metadata)
                 if len(columns[1]) > 0:

@@ -407,7 +407,7 @@ class Table:
             else:
                 where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
                                                   row[col])
-                if col < stop-1:
+                if col < stop-2:
                     where_clause += " AND "
         return (blob_insert + where_clause, data)
     
