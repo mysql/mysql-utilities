@@ -2,16 +2,16 @@ Test case 1 - GRID format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-+---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
-| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | DELETE_RULE  |
-+---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
-| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
-| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
-| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
-| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         |
-| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
-| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     |
-+---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+
+| util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         |
+| util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         |
+| util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         |
+| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         |
+| util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     |
+| util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     |
++---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+
 # VIEWS in util_test:
 +---------------+-------------+-----------------+----------------+-----------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
@@ -25,23 +25,23 @@ Test case 1 - GRID format with BRIEF display
 | trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
 # PROCEDURES in util_test:
-+---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
-| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
-| p1            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | SQL              | NO                | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+---------------+---------------+-----------------------------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
++-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
+| NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST   | RETURNS  | BODY                                    | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
++-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
+| p1    | SQL       | CONTAINS_SQL     | NO                | DEFINER        | root@localhost  | p1 CHAR(20)  |          | INSERT INTO util_test.t1 VALUES ("50")  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
++-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 # FUNCTIONS in util_test:
-+---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
-| ROUTINE_NAME  | ROUTINE_BODY  | ROUTINE_DEFINITION  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SECURITY_TYPE  | DEFINER         | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
-| f1            | SQL           | RETURN (SELECT 1)   | SQL              | YES               | CONTAINS SQL     | DEFINER        | root@localhost  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+---------------+---------------+---------------------+------------------+-------------------+------------------+----------------+-----------------+-----------+-----------------------+-----------------------+---------------------+
++-------+-----------+------------------+-------------------+----------------+-----------------+-------------+----------+--------------------+-----------+-----------------------+-----------------------+--------------------+
+| NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST  | RETURNS  | BODY               | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
++-------+-----------+------------------+-------------------+----------------+-----------------+-------------+----------+--------------------+-----------+-----------------------+-----------------------+--------------------+
+| f1    | SQL       | CONTAINS_SQL     | YES               | DEFINER        | root@localhost  |             | int(11)  | RETURN (SELECT 1)  |           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
++-------+-----------+------------------+-------------------+----------------+-----------------+-------------+----------+--------------------+-----------+-----------------------+-----------------------+--------------------+
 # EVENTS in util_test:
-+-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
-| EVENT_NAME  | DEFINER         | EVENT_BODY  | EVENT_DEFINITION                                | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
-| e1          | root@localhost  | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+-------------+-----------------+-------------+-------------------------------------------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+---------------------+
++-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
+| NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
++-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
+| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | XXXX-XX-XX XX:XX:XX | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | DISABLED  | DROP           | 5           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
++-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
@@ -135,23 +135,23 @@ Test case 2 - GRID format with FULL display
 | None             | util_test       | trg           | INSERT              | None                  | util_test            | t1                  | 0             | None              | INSERT INTO util_test.t2 VALUES('Test objects count')  | ROW                 | AFTER          | None                        | None                        | OLD                       | NEW                       | None     |           | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
 +------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
 # PROCEDURES in util_test:
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
-| SPECIFIC_NAME  | ROUTINE_CATALOG  | ROUTINE_SCHEMA  | ROUTINE_NAME  | ROUTINE_TYPE  | DTD_IDENTIFIER  | ROUTINE_BODY  | ROUTINE_DEFINITION                      | EXTERNAL_NAME  | EXTERNAL_LANGUAGE  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SQL_PATH  | SECURITY_TYPE  | CREATED              | LAST_ALTERED         | SQL_MODE  | ROUTINE_COMMENT  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
-| p1             | None             | util_test       | p1            | PROCEDURE     | None            | SQL           | INSERT INTO util_test.t1 VALUES ("50")  | None           | None               | SQL              | NO                | CONTAINS SQL     | None      | DEFINER        | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX |           |                  | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+-----------------------------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
++------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
+| db         | name  | type       | specific_name  | language  | sql_data_access  | is_deterministic  | security_type  | param_list   | returns  | body                                    | definer         | created              | modified             | sql_mode  | comment  | character_set_client  | collation_connection  | db_collation       | body_utf8                               |
++------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
+| util_test  | p1    | PROCEDURE  | p1             | SQL       | CONTAINS_SQL     | NO                | DEFINER        | p1 CHAR(20)  |          | INSERT INTO util_test.t1 VALUES ("50")  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | INSERT INTO util_test.t1 VALUES ("50")  |
++------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
 # FUNCTIONS in util_test:
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
-| SPECIFIC_NAME  | ROUTINE_CATALOG  | ROUTINE_SCHEMA  | ROUTINE_NAME  | ROUTINE_TYPE  | DTD_IDENTIFIER  | ROUTINE_BODY  | ROUTINE_DEFINITION  | EXTERNAL_NAME  | EXTERNAL_LANGUAGE  | PARAMETER_STYLE  | IS_DETERMINISTIC  | SQL_DATA_ACCESS  | SQL_PATH  | SECURITY_TYPE  | CREATED              | LAST_ALTERED         | SQL_MODE  | ROUTINE_COMMENT  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
-| f1             | None             | util_test       | f1            | FUNCTION      | int(11)         | SQL           | RETURN (SELECT 1)   | None           | None               | SQL              | YES               | CONTAINS SQL     | None      | DEFINER        | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX |           |                  | root@localhost  | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+----------------+------------------+-----------------+---------------+---------------+-----------------+---------------+---------------------+----------------+--------------------+------------------+-------------------+------------------+-----------+----------------+----------------------+----------------------+-----------+------------------+-----------------+-----------------------+-----------------------+---------------------+
++------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
+| db         | name  | type      | specific_name  | language  | sql_data_access  | is_deterministic  | security_type  | param_list  | returns  | body               | definer         | created              | modified             | sql_mode  | comment  | character_set_client  | collation_connection  | db_collation       | body_utf8          |
++------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
+| util_test  | f1    | FUNCTION  | f1             | SQL       | CONTAINS_SQL     | YES               | DEFINER        |             | int(11)  | RETURN (SELECT 1)  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | RETURN (SELECT 1)  |
++------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
 # EVENTS in util_test:
-+----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
-| EVENT_CATALOG  | EVENT_SCHEMA  | EVENT_NAME  | DEFINER         | TIME_ZONE  | EVENT_BODY  | EVENT_DEFINITION                                | EVENT_TYPE  | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | CREATED              | LAST_ALTERED         | LAST_EXECUTED  | EVENT_COMMENT  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
-| None           | util_test     | e1          | root@localhost  | SYSTEM     | SQL         | DELETE FROM util_test.t1 WHERE a = "not there"  | RECURRING   | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX | None  | DISABLED  | NOT PRESERVE   | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None           |                | XX          | latin1                | latin1_swedish_ci     | latin1_swedish_ci   |
-+----------------+---------------+-------------+-----------------+------------+-------------+-------------------------------------------------+-------------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+----------------------+----------------------+----------------+----------------+-------------+-----------------------+-----------------------+---------------------+
++------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
+| db         | name  | body                                            | definer         | execute_at  | interval_value  | interval_field  | created              | modified             | last_executed  | starts               | ends  | status    | on_completion  | sql_mode  | comment  | originator  | time_zone  | character_set_client  | collation_connection  | db_collation       | body_utf8                                       |
++------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
+| util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | 5           | SYSTEM     | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
++------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
@@ -244,23 +244,23 @@ Test case 3 - GRID format with NAMES display
 | trg           |
 +---------------+
 # PROCEDURES in util_test:
-+---------------+
-| ROUTINE_NAME  |
-+---------------+
-| p1            |
-+---------------+
++-------+
+| NAME  |
++-------+
+| p1    |
++-------+
 # FUNCTIONS in util_test:
-+---------------+
-| ROUTINE_NAME  |
-+---------------+
-| f1            |
-+---------------+
++-------+
+| NAME  |
++-------+
+| f1    |
++-------+
 # EVENTS in util_test:
-+-------------+
-| EVENT_NAME  |
-+-------------+
-| e1          |
-+-------------+
++-------+
+| NAME  |
++-------+
+| e1    |
++-------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
@@ -332,13 +332,13 @@ Test case 4 - CSV format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,DELETE_RULE
-util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
-util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,
-util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,
-util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,
-util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
-util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT
 # VIEWS in util_test:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
@@ -346,14 +346,14 @@ util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `uti
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # PROCEDURES in util_test:
-ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-p1,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",SQL,NO,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
 # FUNCTIONS in util_test:
-ROUTINE_NAME,ROUTINE_BODY,ROUTINE_DEFINITION,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SECURITY_TYPE,DEFINER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-f1,SQL,RETURN (SELECT 1),SQL,YES,CONTAINS SQL,DEFINER,root@localhost,,latin1,latin1_swedish_ci,latin1_swedish_ci
+NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
-EVENT_NAME,DEFINER,EVENT_BODY,EVENT_DEFINITION,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-e1,root@localhost,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,5,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -410,27 +410,27 @@ Test case 5 - CSV format with FULL display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CHARACTER_OCTET_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA,PRIVILEGES,COLUMN_COMMENT,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,UNIQUE_CONSTRAINT_CATALOG,UNIQUE_CONSTRAINT_SCHEMA,UNIQUE_CONSTRAINT_NAME,MATCH_OPTION,UPDATE_RULE,DELETE_RULE,TABLE_NAME,REFERENCED_TABLE_NAME
-,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,127008,16252928,0,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
-,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,93,8725724278030335,1024,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,XXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,XXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
+,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,127008,16252928,0,0,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,93,8725724278030335,1024,0,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,34603008,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,34603008,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,34603008,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,34603008,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3
 # VIEWS in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 ,util_test,v1,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-,util_test,trg,INSERT,,util_test,t1,0,,INSERT INTO util_test.t2 VALUES('Test objects count'),ROW,AFTER,XXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+,util_test,trg,INSERT,,util_test,t1,0,,INSERT INTO util_test.t2 VALUES('Test objects count'),ROW,AFTER,,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
 # PROCEDURES in util_test:
-SPECIFIC_NAME,ROUTINE_CATALOG,ROUTINE_SCHEMA,ROUTINE_NAME,ROUTINE_TYPE,DTD_IDENTIFIER,ROUTINE_BODY,ROUTINE_DEFINITION,EXTERNAL_NAME,EXTERNAL_LANGUAGE,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SQL_PATH,SECURITY_TYPE,CREATED,LAST_ALTERED,SQL_MODE,ROUTINE_COMMENT,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-p1,,util_test,p1,PROCEDURE,,SQL,"INSERT INTO util_test.t1 VALUES (""50"")",,,SQL,NO,CONTAINS SQL,,DEFINER,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+db,name,type,specific_name,language,sql_data_access,is_deterministic,security_type,param_list,returns,body,definer,created,modified,sql_mode,comment,character_set_client,collation_connection,db_collation,body_utf8
+util_test,p1,PROCEDURE,p1,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
 # FUNCTIONS in util_test:
-SPECIFIC_NAME,ROUTINE_CATALOG,ROUTINE_SCHEMA,ROUTINE_NAME,ROUTINE_TYPE,DTD_IDENTIFIER,ROUTINE_BODY,ROUTINE_DEFINITION,EXTERNAL_NAME,EXTERNAL_LANGUAGE,PARAMETER_STYLE,IS_DETERMINISTIC,SQL_DATA_ACCESS,SQL_PATH,SECURITY_TYPE,CREATED,LAST_ALTERED,SQL_MODE,ROUTINE_COMMENT,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-f1,,util_test,f1,FUNCTION,int(11),SQL,RETURN (SELECT 1),,,SQL,YES,CONTAINS SQL,,DEFINER,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+db,name,type,specific_name,language,sql_data_access,is_deterministic,security_type,param_list,returns,body,definer,created,modified,sql_mode,comment,character_set_client,collation_connection,db_collation,body_utf8
+util_test,f1,FUNCTION,f1,SQL,CONTAINS_SQL,YES,DEFINER,,int(11),RETURN (SELECT 1),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,RETURN (SELECT 1)
 # EVENTS in util_test:
-EVENT_CATALOG,EVENT_SCHEMA,EVENT_NAME,DEFINER,TIME_ZONE,EVENT_BODY,EVENT_DEFINITION,EVENT_TYPE,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,CREATED,LAST_ALTERED,LAST_EXECUTED,EVENT_COMMENT,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-,util_test,e1,root@localhost,SYSTEM,SQL,"DELETE FROM util_test.t1 WHERE a = ""not there""",RECURRING,,1,YEAR,,XXXX-XX-XX XX:XX:XX,,DISABLED,NOT PRESERVE,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+db,name,body,definer,execute_at,interval_value,interval_field,created,modified,last_executed,starts,ends,status,on_completion,sql_mode,comment,originator,time_zone,character_set_client,collation_connection,db_collation,body_utf8
+util_test,e1,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,5,SYSTEM,latin1,latin1_swedish_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -499,13 +499,13 @@ v1
 TRIGGER_NAME
 trg
 # PROCEDURES in util_test:
-ROUTINE_NAME
+NAME
 p1
 # FUNCTIONS in util_test:
-ROUTINE_NAME
+NAME
 f1
 # EVENTS in util_test:
-EVENT_NAME
+NAME
 e1
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
@@ -563,13 +563,13 @@ Test case 7 - TAB format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	DELETE_RULE
-util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci					
-util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci					
-util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci					
-util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci					
-util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
-util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE
+util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci						
+util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci						
+util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci						
+util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci						
+util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT	RESTRICT
+util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT	RESTRICT
 # VIEWS in util_test:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
 util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
@@ -577,14 +577,14 @@ util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `uti
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
 # PROCEDURES in util_test:
-ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-p1	SQL	"INSERT INTO util_test.t1 VALUES (""50"")"	SQL	NO	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
+p1	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		latin1	latin1_swedish_ci	latin1_swedish_ci
 # FUNCTIONS in util_test:
-ROUTINE_NAME	ROUTINE_BODY	ROUTINE_DEFINITION	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SECURITY_TYPE	DEFINER	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-f1	SQL	RETURN (SELECT 1)	SQL	YES	CONTAINS SQL	DEFINER	root@localhost		latin1	latin1_swedish_ci	latin1_swedish_ci
+NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
+f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
-EVENT_NAME	DEFINER	EVENT_BODY	EVENT_DEFINITION	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-e1	root@localhost	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
+e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	5	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -654,14 +654,14 @@ TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	
 TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 	util_test	trg	INSERT		util_test	t1	0		INSERT INTO util_test.t2 VALUES('Test objects count')	ROW	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
 # PROCEDURES in util_test:
-SPECIFIC_NAME	ROUTINE_CATALOG	ROUTINE_SCHEMA	ROUTINE_NAME	ROUTINE_TYPE	DTD_IDENTIFIER	ROUTINE_BODY	ROUTINE_DEFINITION	EXTERNAL_NAME	EXTERNAL_LANGUAGE	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SQL_PATH	SECURITY_TYPE	CREATED	LAST_ALTERED	SQL_MODE	ROUTINE_COMMENT	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-p1		util_test	p1	PROCEDURE		SQL	"INSERT INTO util_test.t1 VALUES (""50"")"			SQL	NO	CONTAINS SQL		DEFINER	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+db	name	type	specific_name	language	sql_data_access	is_deterministic	security_type	param_list	returns	body	definer	created	modified	sql_mode	comment	character_set_client	collation_connection	db_collation	body_utf8
+util_test	p1	PROCEDURE	p1	SQL	CONTAINS_SQL	NO	DEFINER	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	"INSERT INTO util_test.t1 VALUES (""50"")"
 # FUNCTIONS in util_test:
-SPECIFIC_NAME	ROUTINE_CATALOG	ROUTINE_SCHEMA	ROUTINE_NAME	ROUTINE_TYPE	DTD_IDENTIFIER	ROUTINE_BODY	ROUTINE_DEFINITION	EXTERNAL_NAME	EXTERNAL_LANGUAGE	PARAMETER_STYLE	IS_DETERMINISTIC	SQL_DATA_ACCESS	SQL_PATH	SECURITY_TYPE	CREATED	LAST_ALTERED	SQL_MODE	ROUTINE_COMMENT	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-f1		util_test	f1	FUNCTION	int(11)	SQL	RETURN (SELECT 1)			SQL	YES	CONTAINS SQL		DEFINER	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+db	name	type	specific_name	language	sql_data_access	is_deterministic	security_type	param_list	returns	body	definer	created	modified	sql_mode	comment	character_set_client	collation_connection	db_collation	body_utf8
+util_test	f1	FUNCTION	f1	SQL	CONTAINS_SQL	YES	DEFINER		int(11)	RETURN (SELECT 1)	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	RETURN (SELECT 1)
 # EVENTS in util_test:
-EVENT_CATALOG	EVENT_SCHEMA	EVENT_NAME	DEFINER	TIME_ZONE	EVENT_BODY	EVENT_DEFINITION	EVENT_TYPE	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	CREATED	LAST_ALTERED	LAST_EXECUTED	EVENT_COMMENT	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-	util_test	e1	root@localhost	SYSTEM	SQL	"DELETE FROM util_test.t1 WHERE a = ""not there"""	RECURRING		1	YEAR		XXXX-XX-XX XX:XX:XX		DISABLED	NOT PRESERVE	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+db	name	body	definer	execute_at	interval_value	interval_field	created	modified	last_executed	starts	ends	status	on_completion	sql_mode	comment	originator	time_zone	character_set_client	collation_connection	db_collation	body_utf8
+util_test	e1	"DELETE FROM util_test.t1 WHERE a = ""not there"""	root@localhost		1	YEAR	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		XXXX-XX-XX XX:XX:XX		DISABLED	DROP			XX	SYSTEM	latin1	latin1_swedish_ci	latin1_swedish_ci	"DELETE FROM util_test.t1 WHERE a = ""not there"""
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -730,13 +730,13 @@ v1
 TRIGGER_NAME
 trg
 # PROCEDURES in util_test:
-ROUTINE_NAME
+NAME
 p1
 # FUNCTIONS in util_test:
-ROUTINE_NAME
+NAME
 f1
 # EVENTS in util_test:
-EVENT_NAME
+NAME
 e1
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
@@ -809,6 +809,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: None
   REFERENCED_TABLE_NAME: None
  UNIQUE_CONSTRAINT_NAME: None
+            UPDATE_RULE: None
             DELETE_RULE: None
 *************************       2. row *************************
            TABLE_SCHEMA: util_test
@@ -825,6 +826,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: None
   REFERENCED_TABLE_NAME: None
  UNIQUE_CONSTRAINT_NAME: None
+            UPDATE_RULE: None
             DELETE_RULE: None
 *************************       3. row *************************
            TABLE_SCHEMA: util_test
@@ -841,6 +843,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: None
   REFERENCED_TABLE_NAME: None
  UNIQUE_CONSTRAINT_NAME: None
+            UPDATE_RULE: None
             DELETE_RULE: None
 *************************       4. row *************************
            TABLE_SCHEMA: util_test
@@ -857,6 +860,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: None
   REFERENCED_TABLE_NAME: None
  UNIQUE_CONSTRAINT_NAME: None
+            UPDATE_RULE: None
             DELETE_RULE: None
 *************************       5. row *************************
            TABLE_SCHEMA: util_test
@@ -873,6 +877,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: ref_t3
   REFERENCED_TABLE_NAME: t3
  UNIQUE_CONSTRAINT_NAME: PRIMARY
+            UPDATE_RULE: RESTRICT
             DELETE_RULE: RESTRICT
 *************************       6. row *************************
            TABLE_SCHEMA: util_test
@@ -889,6 +894,7 @@ Test case 10 - VERTICAL format with BRIEF display
         CONSTRAINT_NAME: ref_t3
   REFERENCED_TABLE_NAME: t3
  UNIQUE_CONSTRAINT_NAME: PRIMARY
+            UPDATE_RULE: RESTRICT
             DELETE_RULE: RESTRICT
 6 rows.
 
@@ -923,42 +929,44 @@ Test case 10 - VERTICAL format with BRIEF display
 
 # PROCEDURES in util_test:
 *************************       1. row *************************
-         ROUTINE_NAME: p1
-         ROUTINE_BODY: SQL
-   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
-      PARAMETER_STYLE: SQL
+                 NAME: p1
+             LANGUAGE: SQL
+      SQL_DATA_ACCESS: CONTAINS_SQL
      IS_DETERMINISTIC: NO
-      SQL_DATA_ACCESS: CONTAINS SQL
         SECURITY_TYPE: DEFINER
               DEFINER: root@localhost
+           PARAM_LIST: p1 CHAR(20)
+              RETURNS: 
+                 BODY: INSERT INTO util_test.t1 VALUES ("50")
              SQL_MODE: 
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
 1 rows.
 
 # FUNCTIONS in util_test:
 *************************       1. row *************************
-         ROUTINE_NAME: f1
-         ROUTINE_BODY: SQL
-   ROUTINE_DEFINITION: RETURN (SELECT 1)
-      PARAMETER_STYLE: SQL
+                 NAME: f1
+             LANGUAGE: SQL
+      SQL_DATA_ACCESS: CONTAINS_SQL
      IS_DETERMINISTIC: YES
-      SQL_DATA_ACCESS: CONTAINS SQL
         SECURITY_TYPE: DEFINER
               DEFINER: root@localhost
+           PARAM_LIST: 
+              RETURNS: int(11)
+                 BODY: RETURN (SELECT 1)
              SQL_MODE: 
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
 1 rows.
 
 # EVENTS in util_test:
 *************************       1. row *************************
-           EVENT_NAME: e1
+                 NAME: e1
               DEFINER: root@localhost
-           EVENT_BODY: SQL
-     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
+                 BODY: DELETE FROM util_test.t1 WHERE a = "not there"
+               STATUS: DISABLED
            EXECUTE_AT: None
        INTERVAL_VALUE: 1
        INTERVAL_FIELD: YEAR
@@ -966,11 +974,11 @@ Test case 10 - VERTICAL format with BRIEF display
                STARTS: XXXX-XX-XX XX:XX:XX
                  ENDS: None
                STATUS: DISABLED
-        ON_COMPLETION: NOT PRESERVE
+        ON_COMPLETION: DROP
            ORIGINATOR: XX
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
 1 rows.
 
 # GRANTS in util_test:
@@ -1515,84 +1523,76 @@ Test case 11 - VERTICAL format with FULL display
 
 # PROCEDURES in util_test:
 *************************       1. row *************************
-        SPECIFIC_NAME: p1
-      ROUTINE_CATALOG: None
-       ROUTINE_SCHEMA: util_test
-         ROUTINE_NAME: p1
-         ROUTINE_TYPE: PROCEDURE
-       DTD_IDENTIFIER: None
-         ROUTINE_BODY: SQL
-   ROUTINE_DEFINITION: INSERT INTO util_test.t1 VALUES ("50")
-        EXTERNAL_NAME: None
-    EXTERNAL_LANGUAGE: None
-      PARAMETER_STYLE: SQL
-     IS_DETERMINISTIC: NO
-      SQL_DATA_ACCESS: CONTAINS SQL
-             SQL_PATH: None
-        SECURITY_TYPE: DEFINER
+                   db: util_test
+                 name: p1
+                 type: PROCEDURE
+        specific_name: p1
+             language: SQL
+      sql_data_access: CONTAINS_SQL
+     is_deterministic: NO
+        security_type: DEFINER
+           param_list: p1 CHAR(20)
+              returns: 
+                 body: INSERT INTO util_test.t1 VALUES ("50")
+              definer: root@localhost
               CREATED: XXXX-XX-XX XX:XX:XX
-         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
-             SQL_MODE: 
-      ROUTINE_COMMENT: 
-              DEFINER: root@localhost
- CHARACTER_SET_CLIENT: latin1
- COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+             MODIFIED: XXXX-XX-XX XX:XX:XX
+             sql_mode: 
+              comment: 
+ character_set_client: latin1
+ collation_connection: latin1_swedish_ci
+         db_collation: latin1_swedish_ci
+            body_utf8: INSERT INTO util_test.t1 VALUES ("50")
 1 rows.
 
 # FUNCTIONS in util_test:
 *************************       1. row *************************
-        SPECIFIC_NAME: f1
-      ROUTINE_CATALOG: None
-       ROUTINE_SCHEMA: util_test
-         ROUTINE_NAME: f1
-         ROUTINE_TYPE: FUNCTION
-       DTD_IDENTIFIER: int(11)
-         ROUTINE_BODY: SQL
-   ROUTINE_DEFINITION: RETURN (SELECT 1)
-        EXTERNAL_NAME: None
-    EXTERNAL_LANGUAGE: None
-      PARAMETER_STYLE: SQL
-     IS_DETERMINISTIC: YES
-      SQL_DATA_ACCESS: CONTAINS SQL
-             SQL_PATH: None
-        SECURITY_TYPE: DEFINER
+                   db: util_test
+                 name: f1
+                 type: FUNCTION
+        specific_name: f1
+             language: SQL
+      sql_data_access: CONTAINS_SQL
+     is_deterministic: YES
+        security_type: DEFINER
+           param_list: 
+              returns: int(11)
+                 body: RETURN (SELECT 1)
+              definer: root@localhost
               CREATED: XXXX-XX-XX XX:XX:XX
-         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
-             SQL_MODE: 
-      ROUTINE_COMMENT: 
-              DEFINER: root@localhost
- CHARACTER_SET_CLIENT: latin1
- COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+             MODIFIED: XXXX-XX-XX XX:XX:XX
+             sql_mode: 
+              comment: 
+ character_set_client: latin1
+ collation_connection: latin1_swedish_ci
+         db_collation: latin1_swedish_ci
+            body_utf8: RETURN (SELECT 1)
 1 rows.
 
 # EVENTS in util_test:
 *************************       1. row *************************
-        EVENT_CATALOG: None
-         EVENT_SCHEMA: util_test
-           EVENT_NAME: e1
-              DEFINER: root@localhost
-            TIME_ZONE: SYSTEM
-           EVENT_BODY: SQL
-     EVENT_DEFINITION: DELETE FROM util_test.t1 WHERE a = "not there"
-           EVENT_TYPE: RECURRING
-           EXECUTE_AT: None
-       INTERVAL_VALUE: 1
-       INTERVAL_FIELD: YEAR
-             SQL_MODE: 
-               STARTS: XXXX-XX-XX XX:XX:XX
-                 ENDS: None
-               STATUS: DISABLED
-        ON_COMPLETION: NOT PRESERVE
+                   db: util_test
+                 name: e1
+                 body: DELETE FROM util_test.t1 WHERE a = "not there"
+              definer: root@localhost
+           execute_at: None
+       interval_value: 1
+       interval_field: YEAR
               CREATED: XXXX-XX-XX XX:XX:XX
-         LAST_ALTERED: XXXX-XX-XX XX:XX:XX
-        LAST_EXECUTED: None
-        EVENT_COMMENT: 
-           ORIGINATOR: XX
- CHARACTER_SET_CLIENT: latin1
- COLLATION_CONNECTION: latin1_swedish_ci
-   DATABASE_COLLATION: latin1_swedish_ci
+             MODIFIED: XXXX-XX-XX XX:XX:XX
+        last_executed: None
+               STARTS: XXXX-XX-XX XX:XX:XX
+                 ENDS: XXXX-XX-XX XX:XX:XX
+               status: DISABLED
+        on_completion: DROP
+             sql_mode: 
+              comment: 
+           originator: 5
+            time_zone: SYSTEM
+ character_set_client: latin1
+ collation_connection: latin1_swedish_ci
+         db_collation: latin1_swedish_ci
+            body_utf8: DELETE FROM util_test.t1 WHERE a = "not there"
 1 rows.
 
 # GRANTS in util_test:
@@ -1804,17 +1804,17 @@ Test case 12 - VERTICAL format with NAMES display
 
 # PROCEDURES in util_test:
 *************************       1. row *************************
- ROUTINE_NAME: p1
+ NAME: p1
 1 rows.
 
 # FUNCTIONS in util_test:
 *************************       1. row *************************
- ROUTINE_NAME: f1
+ NAME: f1
 1 rows.
 
 # EVENTS in util_test:
 *************************       1. row *************************
- EVENT_NAME: e1
+ NAME: e1
 1 rows.
 
 # GRANTS in util_test:

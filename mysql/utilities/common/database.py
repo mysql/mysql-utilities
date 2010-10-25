@@ -596,6 +596,7 @@ class Database(object):
                 REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME,
                 REFERENTIAL_CONSTRAINTS.REFERENCED_TABLE_NAME,
                 REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_NAME,
+                REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
                 REFERENTIAL_CONSTRAINTS.DELETE_RULE
             """
             _OBJECT_QUERY = """
@@ -639,48 +640,48 @@ class Database(object):
             """
         elif obj_type == _PROC:
             _NAMES = """
-            SELECT ROUTINE_NAME
+            SELECT NAME
             """
             _MINIMAL = """
-            SELECT ROUTINE_NAME, ROUTINE_BODY, ROUTINE_DEFINITION,
-                   PARAMETER_STYLE, IS_DETERMINISTIC, SQL_DATA_ACCESS,
-                   SECURITY_TYPE, DEFINER, SQL_MODE,  
+            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                   SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
+                   BODY, SQL_MODE,  
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
-                   DATABASE_COLLATION
+                   DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
+            FROM MYSQL.PROC
+            WHERE DB = %s AND TYPE = 'PROCEDURE'
             """
         elif obj_type == _FUNC:
             _NAMES = """
-            SELECT ROUTINE_NAME
+            SELECT NAME
             """
             _MINIMAL = """
-            SELECT ROUTINE_NAME, ROUTINE_BODY, ROUTINE_DEFINITION,
-                   PARAMETER_STYLE, IS_DETERMINISTIC, SQL_DATA_ACCESS,
-                   SECURITY_TYPE, DEFINER, SQL_MODE,  
+            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                   SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
+                   BODY, SQL_MODE,  
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
-                   DATABASE_COLLATION
+                   DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
+            FROM MYSQL.PROC 
+            WHERE DB = %s AND TYPE = 'FUNCTION'
             """
         elif obj_type == _EVENT:
             _NAMES = """
-            SELECT EVENT_NAME
+            SELECT NAME
             """
             _MINIMAL = """
-            SELECT EVENT_NAME, DEFINER, EVENT_BODY, EVENT_DEFINITION,
+            SELECT NAME, DEFINER, BODY, STATUS,
                    EXECUTE_AT, INTERVAL_VALUE, INTERVAL_FIELD, SQL_MODE,
                    STARTS, ENDS, STATUS, ON_COMPLETION, ORIGINATOR,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
-                   DATABASE_COLLATION
+                   DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM INFORMATION_SCHEMA.EVENTS 
-            WHERE EVENT_SCHEMA = %s
+            FROM MYSQL.EVENT 
+            WHERE DB = %s
             """
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """

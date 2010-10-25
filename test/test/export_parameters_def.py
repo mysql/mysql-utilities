@@ -186,95 +186,94 @@ class test(export_basic.test):
         self.mask_column_result("| None           | util_test "
                                 "    | e1          |", "|",
                                 14, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| None           | util_test "
-                                "    | e1          |", "|",
-                                18, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| None           | util_test "
-                                "    | e1          |", "|",
-                                19, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| None           | util_test "
-                                "    | e1          |", "|",
-                                22, " XX          ")
-        self.mask_column_result("| e1          | root@localhost  | SQL"
-                                "         |", "|",
+        self.mask_column_result("| util_test  | e1    |", "|",
+                                9, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | e1    |", "|",
+                                10, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | e1    |", "|",
+                                12, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| e1    | root@localhost  |", "|",
+                                6, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| e1    | root@localhost  |", "|",
                                 10, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| e1          | root@localhost  | SQL"
-                                "         |", "|",
-                                14, " XX          ")
-        self.mask_column_result("| p1             | None             | "
-                                "util_test       | p1", "|",
-                                17, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| p1             | None             | "
-                                "util_test       | p1", "|",
-                                18, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| f1             | None             | "
-                                "util_test       | f1", "|",
-                                17, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| f1             | None             | "
-                                "util_test       | f1", "|",
-                                18, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| e1    | root@localhost  |", "|",
+                                11, " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| util_test  | p1", "|",
+                                14, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | p1", "|",
+                                15, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f1", "|",
+                                14, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f1", "|",
+                                15, " XXXX-XX-XX XX:XX:XX  ")
 
 
     def _mask_csv(self):
-        self.mask_column_result("e1,root@localhost,SQL,", ",",
+        self.mask_column_result("e1,root@localhost,", ",",
+                                5, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1,root@localhost,", ",",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1,root@localhost,SQL,", ",",
-                                13, "XX")
-        self.mask_column_result(",util_test,t", ",",
-                                13, "XXXXXX")
+        self.mask_column_result("e1,root@localhost,", ",",
+                                10, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result(",util_test,t", ",",
                                 15, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result(",util_test,t", ",",
                                 16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("p1,,util_test,p1,PROCEDURE", ",",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("p1,,util_test,p1,PROCEDURE", ",",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("f1,,util_test,f1,FUNCTION", ",",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("f1,,util_test,f1,FUNCTION", ",",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",util_test,e1", ",",
+        self.mask_column_result("util_test,p1,PROCEDURE", ",",
                                 13, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,p1,PROCEDURE", ",",
+                                14, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,f1,FUNCTION", ",",
+                                13, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,f1,FUNCTION", ",",
+                                14, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,e1", ",",
+                                8, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result(",util_test,e1", ",",
-                                21, "XX")
-        self.mask_column_result(",util_test,e1", ",",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",util_test,e1", ",",
-                                18, "XXXX-XX-XX XX:XX:XX")
+                                17, "XX")
+        self.mask_column_result("util_test,e1", ",",
+                                9, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,e1", ",",
+                                11, "XXXX-XX-XX XX:XX:XX")
                                 
 
     def _mask_tab(self):
-        self.mask_column_result("e1	root@localhost	SQL", "\t",
+        self.mask_column_result("e1	root@localhost", "\t",
+                                5, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1	root@localhost", "\t",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1	root@localhost	SQL", "\t",
-                                13, "XX")
+        self.mask_column_result("e1	root@localhost", "\t",
+                                10, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("	util_test	t", "\t",
                                 13, "XX")
         self.mask_column_result("	util_test	t", "\t",
                                 15, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("	util_test	t", "\t",
                                 16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("p1		util_test	p1	PROCEDURE", "\t",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("p1		util_test	p1	PROCEDURE", "\t",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("f1		util_test	f1	FUNCTION", "\t",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("f1		util_test	f1	FUNCTION", "\t",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("	util_test	e1", "\t",
+        self.mask_column_result("util_test	p1	PROCEDURE", "\t",
                                 13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("	util_test	e1", "\t",
-                                21, "XX")
-        self.mask_column_result("	util_test	e1", "\t",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("	util_test	e1", "\t",
-                                18, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	p1	PROCEDURE", "\t",
+                                14, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	f1	FUNCTION", "\t",
+                                13, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	f1	FUNCTION", "\t",
+                                14, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	e1", "\t",
+                                8, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	e1", "\t",
+                                17, "XX")
+        self.mask_column_result("util_test	e1", "\t",
+                                9, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test	e1", "\t",
+                                11, "XXXX-XX-XX XX:XX:XX")
     
     def _mask_vertical(self):
         self.replace_result("              CREATED:",
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("              created:",
+                            "              CREATED: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("             modified:",
+                            "             MODIFIED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("               UPDATE_TIME:",
                             "               UPDATE_TIME: "
                             "XXXX-XX-XX XX:XX:XX\n")
@@ -282,6 +281,10 @@ class test(export_basic.test):
                             "         LAST_ALTERED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("               STARTS:",
                             "               STARTS: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("               starts:",
+                            "               STARTS: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("                 ends:",
+                            "                 ENDS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("               CREATE_TIME:",
                             "               CREATE_TIME: "
                             "XXXX-XX-XX XX:XX:XX\n")
