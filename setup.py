@@ -48,8 +48,15 @@ INSTALL = {
         ],
     'data_files': [
         ('man/man1', [
+                'build/sphinx/man/mysqldbcopy.1',
+                'build/sphinx/man/mysqlexport.1',
+                'build/sphinx/man/mysqlindexcheck.1',
                 'build/sphinx/man/mysqlmetagrep.1',
                 'build/sphinx/man/mysqlprocgrep.1',
+                'build/sphinx/man/mysqlreplicate.1',
+                'build/sphinx/man/mysqlserverclone.1',
+                'build/sphinx/man/mysqluserclone.1',
+                'build/sphinx/man/mut.1',
                 ] ),
         ],
     }

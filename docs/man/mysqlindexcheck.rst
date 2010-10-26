@@ -2,16 +2,6 @@
  mysqlindexcheck
 =================
 
-----------------------------------------
-check for duplicate or redundant indexes
-----------------------------------------
-
-:Author: The Oracle MySQL Utilities team
-:Date: 2010-09-09
-:Copyright: GPL
-:Version: 1.0.0
-:Manual group: database 
-
 SYNOPSIS
 ========
 

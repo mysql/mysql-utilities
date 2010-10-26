@@ -2,16 +2,6 @@
  mysqlreplicate
 ================
 
---------------------------------------
-start replication with a master server
---------------------------------------
-
-:Author: The Oracle MySQL Utilities team
-:Date: 2010-09-09
-:Copyright: GPL
-:Version: 1.0.0
-:Manual group: database 
-
 SYNOPSIS
 ========
 

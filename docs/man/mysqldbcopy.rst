@@ -2,16 +2,6 @@
  mysqldbcopy
 =============
 
-------------------------------------
-copy MySQL databases and all objects
-------------------------------------
-
-:Author: The Oracle MySQL Utilities team
-:Date: 2010-08-27
-:Copyright: GPL
-:Version: 1.0.0
-:Manual group: database 
-
 SYNOPSIS
 ========
 
