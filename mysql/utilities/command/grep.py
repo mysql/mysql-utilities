@@ -15,15 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 
-"""This module provide utilities to search objects on server. The
-module define a set of *object types* that can be searched by
-searching the *fields* of each object. The notion of a field of an
-object is in this case very loosly defined and basically means any
-names occuring as part of the definition of an object. For example,
-the fields of a table include the table name, the column names, and
-the partition names (if it is a partition table).
-"""
-
 import MySQLdb
 import sys
 
@@ -202,18 +193,9 @@ VIEW =  'view'
 USER = 'user'
 COLUMN = 'column'
 
-#: This is a sequence of all the object types that are available. It
-#: can be used to generate a version-independent list of object types
-#: that can be searched in, for example, options and help texts.
 OBJECT_TYPES = _OBJMAP.keys()
 
 class ObjectGrep(object):
-    """Search for objects on a MySQL server by name or content.
-
-    This command class is used to search one or more MySQL server
-    instances for objects where the name (or the contents of routines,
-    triggers, or events) match a given pattern.
-    """
     def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
                  check_body=False, use_regexp=False):
         stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
@@ -224,20 +206,9 @@ class ObjectGrep(object):
         self.__types = types
 
     def sql(self):
-        """This will return SQL code for executing the search in the
-        form of a **SELECT** statement.
-        """
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=MySQLdb):
-        """Execute the search on each of the connections in turn and
-        print an aggregate of the result as a grid table.
-
-        :param connections: Sequence of :ref:`connection specifiers` to send the query to.
-        :param output: Output stream where the result will be written.
-        :param connector: Connector to use when connecting to the servers.
-        """
-
         from ..common.exception import FormatError, EmptyResultError
 
         entries = []

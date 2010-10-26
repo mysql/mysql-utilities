@@ -20,61 +20,77 @@ conditions given have to match.
 Options
 -------
 
---match-user=PATTEN
-  Match all rows where the **User** field matches PATTERN
+.. option:: --match-user=PATTEN
 
---match-host=PATTERN
-  Match all rows where the **Host** field matches PATTERN
+   Match all rows where the **User** field matches PATTERN
 
---match-db=PATTERN
-  Match all rows where the **Db** field matches PATTERN
+.. option:: --match-host=PATTERN
 
---match-time=PERIOD
-  Match all rows where the **Time** field is within PERIOD
+   Match all rows where the **Host** field matches PATTERN
 
---match-command=PATTERN
-  Match all rows where the **Command** field matches PATTERN
+.. option:: --match-db=PATTERN
 
---match-state=PATTERN
-  Match all rows where the **State** field matches **PATTERN**.
+   Match all rows where the **Db** field matches PATTERN
 
---match-info=PATTERN
-  Match all rows where the **Info** field matches **PATTERN**.
+.. option:: --match-time=PERIOD
 
---kill-connection
-  Kill the connection for all matching processes.
+   Match all rows where the **Time** field is within PERIOD
 
---kill-query
-  Kill the query for all matching processes.
+.. option:: --match-command=PATTERN
 
---print
-  Print information about the matching processes. This is the default
-  if no **--kill-*** option is given. If a **--kill-*** option is
-  given, this option will print information about the processes before
-  killing them.
+   Match all rows where the **Command** field matches PATTERN
 
--v, --verbose
-  Be more verbose and print messages about execution. Can be given
-  multiple times, in which case the verbosity level increases.
+.. option:: --match-state=PATTERN
 
--G, --basic-regexp, --regexp
-  Use 'REGEXP' operator to match patterns instead of 'LIKE'.
+   Match all rows where the **State** field matches **PATTERN**.
 
--Q, --sql, --print-sql
-  Emit the SQL for matching or killing the queries. If the **--kill**
-  option is given, a routine for killing the queries are generated.
+.. option:: --match-info=PATTERN
 
---sql-body
-  Emit SQL statements for performing the search or kill of the
-  **INFORMATION_SCHEMA.PROCESSLIST** table.  This is useful together
-  with :manpage:`mysqlmkevent(1)` to generate an event for the server
-  scheduler.
+   Match all rows where the **Info** field matches **PATTERN**.
 
-  When used with the **--kill** option, code for killing the matching
-  queries are generated. Note that it is not possible to execute the
-  emitted code unless it is put in a stored routine, event, or
-  trigger. For example, the following code could be generated to kill
-  all connections for user **www-data** that is idle::
+.. option:: --kill-connection
+
+   Kill the connection for all matching processes.
+
+.. option:: --kill-query
+
+   Kill the query for all matching processes.
+
+.. option:: --print
+
+   Print information about the matching processes. This is the default
+   if no :option:`--kill-*` option is given. If a :option:`--kill-*`
+   option is given, this option will print information about the
+   processes before killing them.
+
+.. option:: -v, --verbose
+
+   Be more verbose and print messages about execution. Can be given
+   multiple times, in which case the verbosity level increases.
+
+.. option:: -G, --basic-regexp, --regexp
+
+   Use 'REGEXP' operator to match patterns instead of 'LIKE'.
+
+.. option:: -Q, --sql, --print-sql
+
+   Emit the SQL for matching or killing the queries. If the
+   :option:`--kill-*` option is given, a routine for killing the queries
+   are generated.
+
+.. option:: --sql-body
+
+   Emit SQL statements for performing the search or kill of the
+   **INFORMATION_SCHEMA.PROCESSLIST** table.  This is useful together
+   with :manpage:`mysqlmkevent(1)` to generate an event for the server
+   scheduler.
+
+   When used with the :option:`--kill-*` option, code for killing the
+   matching queries are generated. Note that it is not possible to
+   execute the emitted code unless it is put in a stored routine,
+   event, or trigger. For example, the following code could be
+   generated to kill all connections for user **www-data** that is
+   idle::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -99,8 +115,9 @@ Options
      END;
      CLOSE kill_cursor;
 
--h, --help
-  Print help
+.. option:: -h, --help
+
+   Print help
 
 
 Specifying time periods
