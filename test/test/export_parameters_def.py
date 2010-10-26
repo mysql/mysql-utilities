@@ -193,11 +193,7 @@ class test(export_basic.test):
         self.mask_column_result("| util_test  | e1    |", "|",
                                 12, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| e1    | root@localhost  |", "|",
-                                6, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| e1    | root@localhost  |", "|",
-                                10, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| e1    | root@localhost  |", "|",
-                                11, " XXXX-XX-XX XX:XX:XX ")
+                                10, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | p1", "|",
                                 14, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | p1", "|",
@@ -274,8 +270,8 @@ class test(export_basic.test):
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("             modified:",
                             "             MODIFIED: XXXX-XX-XX XX:XX:XX\n")
-        self.replace_result("               UPDATE_TIME:",
-                            "               UPDATE_TIME: "
+        self.replace_result("                   UPDATE_TIME:",
+                            "                   UPDATE_TIME: "
                             "XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("         LAST_ALTERED:",
                             "         LAST_ALTERED: XXXX-XX-XX XX:XX:XX\n")
@@ -285,8 +281,8 @@ class test(export_basic.test):
                             "               STARTS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("                 ends:",
                             "                 ENDS: XXXX-XX-XX XX:XX:XX\n")
-        self.replace_result("               CREATE_TIME:",
-                            "               CREATE_TIME: "
+        self.replace_result("                   CREATE_TIME:",
+                            "                   CREATE_TIME: "
                             "XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("            AVG_ROW_LENGTH:",
                             "            AVG_ROW_LENGTH: XXXXXXX\n")
