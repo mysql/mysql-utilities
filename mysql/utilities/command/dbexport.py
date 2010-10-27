@@ -117,14 +117,16 @@ def export_metadata(src_val, db_list, options):
                                                    dbobj[1][0])
                         if dbobj[0] == "PROCEDURE" or \
                            dbobj[0] == "FUNCTION" or \
-                           dbobj[0] == "EVENT":
+                           dbobj[0] == "EVENT" or \
+                           dbobj[0] == "TRIGGER":
                             print "DELIMITER ||"
                         print "%s;" % db.get_create_statement(db_name,
                                                               dbobj[1][0],
                                                               dbobj[0])
                         if dbobj[0] == "PROCEDURE" or \
                            dbobj[0] == "FUNCTION" or \
-                           dbobj[0] == "EVENT":
+                           dbobj[0] == "EVENT" or \
+                           dbobj[0] == "TRIGGER":
                             print "||"
                             print "DELIMITER ;"
             else:

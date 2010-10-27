@@ -28,7 +28,10 @@ CREATE TABLE `t4` (
 # VIEW: util_test.v1
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 # TRIGGER: util_test.trg
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
 # PROCEDURE: util_test.p1
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
@@ -153,7 +156,10 @@ CREATE TABLE `t4` (
 # VIEW: util_test.v1
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 # TRIGGER: util_test.trg
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
 # PROCEDURE: util_test.p1
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
@@ -252,7 +258,10 @@ CREATE TABLE `t4` (
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
@@ -330,7 +339,10 @@ CREATE TABLE `t4` (
 # VIEW: util_test.v1
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 # TRIGGER: util_test.trg
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
 # PROCEDURE: util_test.p1
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
