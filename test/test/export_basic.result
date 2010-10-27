@@ -30,12 +30,18 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -149,12 +155,18 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -241,11 +253,17 @@ CREATE TABLE `t4` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
 GRANT CREATE ON util_test.* TO 'joe'@'user'
@@ -314,12 +332,18 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:

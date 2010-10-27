@@ -115,9 +115,18 @@ def export_metadata(src_val, db_list, options):
                         if not silent:
                             print "# %s: %s.%s" % (dbobj[0], db_name,
                                                    dbobj[1][0])
+                        if dbobj[0] == "PROCEDURE" or \
+                           dbobj[0] == "FUNCTION" or \
+                           dbobj[0] == "EVENT":
+                            print "DELIMITER ||"
                         print "%s;" % db.get_create_statement(db_name,
                                                               dbobj[1][0],
                                                               dbobj[0])
+                        if dbobj[0] == "PROCEDURE" or \
+                           dbobj[0] == "FUNCTION" or \
+                           dbobj[0] == "EVENT":
+                            print "||"
+                            print "DELIMITER ;"
             else:
                 objects = ["TABLE", "VIEW", "TRIGGER", "PROCEDURE",
                            "FUNCTION", "EVENT", "GRANT"]

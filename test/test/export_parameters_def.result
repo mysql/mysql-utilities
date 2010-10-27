@@ -65,14 +65,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 #...done.
 Test case 3 - no events
 # Source on localhost: ... connected.
@@ -106,12 +115,18 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 #...done.
 Test case 4 - no functions
 # Source on localhost: ... connected.
@@ -145,8 +160,11 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 #...done.
 Test case 5 - no procedures
 # Source on localhost: ... connected.
@@ -287,14 +305,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -364,14 +391,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -441,14 +477,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -1025,14 +1070,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
@@ -1595,14 +1649,23 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 # TRIGGER: util_test.trg
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 # PROCEDURE: util_test.p1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
 # FUNCTION: util_test.f1
+DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
+||
+DELIMITER ;
 # EVENT: util_test.e1
+DELIMITER ||
 CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+||
+DELIMITER ;
 # Grant:
 GRANT ALTER ON util_test.* TO 'joe'@'user'
 # Grant:
