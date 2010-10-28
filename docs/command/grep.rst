@@ -1,6 +1,6 @@
-####################################
-command.grep - Searching for Objects
-####################################
+#############################################################
+:mod:`mysql.utilities.command.grep` --- Searching for Objects
+#############################################################
 
 .. module:: mysql.utilities.command.grep
 
@@ -11,6 +11,10 @@ case very loosly defined and basically means any names occuring as
 part of the definition of an object. For example, the fields of a
 table include the table name, the column names, and the partition
 names (if it is a partition table).
+
+
+Module Contents
+---------------
 
 .. data:: ROUTINE
 .. data:: EVENT
@@ -39,7 +43,7 @@ names (if it is a partition table).
    .. method:: sql() -> string
 
       This will return SQL code for executing the search in the form of a
-      **SELECT** statement.
+      `SELECT`_ statement.
 
    .. method:: execute(connections[, output=sys.output, connector=MySQLdb])
 
@@ -49,3 +53,8 @@ names (if it is a partition table).
       :param connections: Sequence of :ref:`connection specifiers` to send the query to.
       :param output: Output stream where the result will be written.
       :param connector: Connector to use when connecting to the servers.
+
+
+.. References
+.. ----------
+.. _`SELECT`: http://dev.mysql.com/doc/refman/5.1/en/select.html

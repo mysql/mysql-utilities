@@ -1,31 +1,46 @@
-##############################################################
-command.proc - Search for processes on servers
-##############################################################
+###################################################################
+:mod:`mysql.utilities.command.proc` --- Search processes on servers
+###################################################################
 
 .. module:: mysql.utilities.command.proc
 
-Module for searching processes on a server and operating on them.
+Module for searching processes on a server and optionally kill either
+the query or the connection for all matching processes.
+
+The processes are searched by matching the fields in the
+`INFORMATION_SCHEMA.PROCESSLIST`_ table in the server (this means that
+the module only works for servers with version 5.1.7 and later). The
+module operates internally by constructing a `SELECT`_ statement for
+finding matching processes, and then sending it to the server.
+Instead of performing the search, SQL code performing the query can be
+printed on standard output, which can be useful if you want to execute
+the query later, or feed it into some other program that process SQL
+queries further.
+
+
+Module Content
+--------------
 
 .. data:: KILL_QUERY
-.. data:: KILL_CONNECTION
-.. data:: PRINT_PROCESS
+          KILL_CONNECTION
+          PRINT_PROCESS
 
    Constants for the different actions that can be done on processes.
 
 .. data:: ID
-.. data:: USER
-.. data:: HOST
-.. data:: DB
-.. data:: COMMAND
-.. data:: TIME
-.. data:: STATE
-.. data:: INFO
+          USER
+          HOST
+          DB
+          COMMAND
+          TIME
+          STATE
+          INFO
 
    Constants for the columns available in the processlist table.
 
 .. class:: ProcessGrep(matches, actions=[], use_regexp=False)
 
-   Class for searching the **INFORMATION_SCHEMA.PROCESSLIST** table on
+   Class for searching the `INFORMATION_SCHEMA.PROCESSLIST`_ table on
    MySQL servers. It can both be used to do the actual search as well
    as generate a statement for doing the job.
 
@@ -46,12 +61,12 @@ Module for searching processes on a server and operating on them.
       Get SQL code for executing the search (and optionally, the
       kill).
 
-      If **only_body** is ``True``, only the body of the function is
+      If *only_body* is ``True``, only the body of the function is
       shown. This is useful if the SQL code is going to be used with
       other utilities that generate the routine declaration. If
-      **only_body** is false, a complete procedure will be generated
-      if there is any kill action supplied, and just a select
-      statement if it is a plain search.
+      *only_body* is false, a complete procedure will be generated if
+      there is any kill action supplied, and just a select statement
+      if it is a plain search.
 
       :type only_body: boolean
       :param only_body: Only show the body of the procedure. If this
@@ -64,7 +79,7 @@ Module for searching processes on a server and operating on them.
    .. method:: execute(connections[, output=sys.stdout, connector=MySQLdb])
 
       Execute the search on each of the connections supplied. If
-      **output** is not ``None``, then the value will be treated as a
+      *output* is not ``None``, then the value will be treated as a
       file object and the result of the execution printed on that
       stream.
 
@@ -73,3 +88,8 @@ Module for searching processes on a server and operating on them.
       :param output: File object for printing output to
       :param connector: Connector to use.
 
+
+.. References
+.. ----------
+.. _`INFORMATION_SCHEMA.PROCESSLIST`: http://dev.mysql.com/doc/refman/5.1/en/processlist-table.html
+.. _`SELECT`: http://dev.mysql.com/doc/refman/5.1/en/select.html
