@@ -328,8 +328,12 @@ class Table:
             return False
         
     
-    def get_column_metadata(self):
+    def get_column_metadata(self, columns=None):
         """Get information about the table for the bulk insert operation.
+
+        columns[in]        if None, use EXPLAIN else use column list.
+
+        Returns column metadata list
         """
 
         cur = self.server.cursor()
@@ -338,23 +342,35 @@ class Table:
         # Build an array of dictionaries describing the fields
         special_cols = []
         try:
-            res = cur.execute("explain %s" % self.table)
-            if res:
-                rows = cur.fetchall()
+            if columns is None:
+                res = cur.execute("explain %s" % self.table)
+                if res:
+                    rows = cur.fetchall()
+            else:
+                rows = columns
+            if rows is not None:
                 for row in rows:
-                    has_char = (row[1].find("char") >= 0)
-                    has_text = (row[1].find("text") >= 0)
-                    has_enum = (row[1].find("enum") >= 0)
-                    has_set = (row[1].find("set") >= 0)
-                    has_date = (row[1].find("date") >= 0)
-                    has_time = (row[1].find("time") >= 0)
-                    col_data = {
-                        "has_blob" : (row[1].find("blob") >= 0),
-                        "is_text"  : has_char or has_text or has_enum or
-                                     has_set,
-                        "is_time"  : has_date or has_time,
-                        "name"     : row[0]
-                    }
+                    if len(row) > 1:
+                        has_char = (row[1].find("char") >= 0)
+                        has_text = (row[1].find("text") >= 0)
+                        has_enum = (row[1].find("enum") >= 0)
+                        has_set = (row[1].find("set") >= 0)
+                        has_date = (row[1].find("date") >= 0)
+                        has_time = (row[1].find("time") >= 0)
+                        col_data = {
+                            "has_blob" : (row[1].find("blob") >= 0),
+                            "is_text"  : has_char or has_text or has_enum or
+                                         has_set,
+                            "is_time"  : has_date or has_time,
+                            "name"     : row[0]
+                        }
+                    else: # No column information - make all text
+                        col_data = {
+                            "has_blob" : False,
+                            "is_text"  : True,
+                            "is_time"  : False,
+                            "name"     : row[0]
+                        }
                     special_cols.append(col_data)
                         
         except MySQLUtilError, e:

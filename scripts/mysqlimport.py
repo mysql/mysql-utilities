@@ -17,7 +17,7 @@
 #
 
 """
-This file contains the export database utility which allows users to export
+This file contains the import database utility which allows users to import
 metadata for objects in a database and data for tables.
 """
 
@@ -27,16 +27,16 @@ import re
 import sys
 import time
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command import dbexport
+from mysql.utilities.command import dbimport
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import check_skip_options
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
-NAME = "MySQL Utilities - mysqlexport "
+NAME = "MySQL Utilities - mysqlimport "
 VERSION = "1.0.0 alpha"
-DESCRIPTION = "mysqlexport - export metadata and data from databases"
-USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
+DESCRIPTION = "mysqlimport - import metadata and data from files"
+USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
 
 def print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
@@ -65,36 +65,32 @@ parser.add_option("--server", action="store", dest="server",
                   help="connection information for the server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Output format
+# Input format
 parser.add_option("-f", "--format", action="store", dest="format", default="SQL",
                   help="display the output in either SQL|S (default), "
                        "GRID|G, TAB|T, CSV|C, or VERTICAL|V format")
 
-# Output format
-parser.add_option("-d", "--display", action="store", dest="display",
-                  default="BRIEF", help="control the number of columns shown: "
-                  "BRIEF = minimal columns for object creation (default), "
-                  "FULL = all columns, NAMES = only object names (not "
-                  "valid for --format=SQL)")
-
-# Export mode
-parser.add_option("-e", "--export", action="store", dest="export",
-                  default="definitions", help="control the export of either "
+# Import mode
+parser.add_option("-i", "--import", action="store", dest="import_type",
+                  default="definitions", help="control the import of either "
                   "DATA|D = only the table data for the tables in the database "
-                  "list, DEFINITIONS|F = export only the definitions for "
-                  "the objects in the database list, or BOTH|B = export "
+                  "list, DEFINITIONS|F = import only the definitions for "
+                  "the objects in the database list, or BOTH|B = import "
                   "the metadata followed by the data "
-                  "(default: export definitions)")
+                  "(default: import definitions)")
+
+# Drop mode
+parser.add_option("-d", "--drop-first", action="store_true", default=False,
+                  help="Drop database before importing.", dest="do_drop")
 
 # Single insert mode
 parser.add_option("-b", "--bulk-insert", action="store_true",
-                  dest="bulk_import", default=False, help="Use bulk insert "
+                  dest="bulk_insert", default=False, help="Use bulk insert "
                   "statements for data (default:False)")
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
-                  default=False, help="do not display the column headers - "
-                  "ignored for GRID format")
+                  default=False, help="files do not contain column headers")
 
 # Verbose mode
 parser.add_option("--silent", action="store_true", dest="silent",
@@ -105,12 +101,18 @@ parser.add_option("--silent", action="store_true", dest="silent",
 parser.add_option("--debug", action="store_true", dest="debug",
                   default=False, help="print debug information")
 
+# Dryrun mode
+parser.add_option("--dryrun", action="store_true", dest="dryrun",
+                  default=False, help="import the files and generate the "
+                  "statements but do not execute them - useful for testing "
+                  "file validity")
+
 # Add the skip common options
 add_skip_options(parser)
 
-# Skip blobs for export
+# Skip blobs for import
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
-                  default=False, help="Do not export blob data.")
+                  default=False, help="Do not import blob data.")
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -123,7 +125,7 @@ except MySQLUtilError, e:
     
 # Fail if no arguments
 if len(args) == 0:
-    parser.error("You must specify at least one database to export.")
+    parser.error("You must specify at least one file to import.")
     
 _PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL",
                       "S", "G", "T", "C", "V")
@@ -147,37 +149,28 @@ elif opt.format == "C":
 elif opt.format == "V":
     opt.format = "VERTICAL"
 
-_PERMITTED_DISPLAY_TYPES = ("NAMES", "BRIEF", "FULL")
-
-if opt.display.upper() not in _PERMITTED_DISPLAY_TYPES:
-    print "# WARNING : '%s' is not a valid display mode. Using default." % \
-          opt.display
-    opt.display = "BRIEF"
-else:
-    opt.display = opt.display.upper()
-    
 _PERMITTED_EXPORTS = ("DATA", "DEFINITIONS", "BOTH", "D", "F", "B")
 
-if opt.export.upper() not in _PERMITTED_EXPORTS:
-    print "# WARNING : '%s' is not a valid export mode. Using default." % \
-          opt.export
-    opt.export = "DEFINITIONS"
+if opt.import_type.upper() not in _PERMITTED_EXPORTS:
+    print "# WARNING : '%s' is not a valid import mode. Using default." % \
+          opt.import_type
+    opt.import_type = "DEFINITIONS"
 else:
-    opt.export = opt.export.upper()
+    opt.import_type = opt.import_type.upper()
     
 # Convert to full word for easier coding in command module
-if opt.export == "D":
-    opt.export = "DATA"
-elif opt.export == "F":
-    opt.export = "DEFINITIONS"
-elif opt.export == "B":
-    opt.export = "BOTH"
+if opt.import_type == "D":
+    opt.import_type = "DATA"
+elif opt.import_type == "F":
+    opt.import_type = "DEFINITIONS"
+elif opt.import_type == "B":
+    opt.import_type = "BOTH"
     
-if opt.skip_blobs and not opt.export == "DATA":
-    print "# WARNING : --skip-blobs option ignored for metadata export."
+if opt.skip_blobs and not opt.import_type == "DATA":
+    print "# WARNING : --skip-blobs option ignored for metadata import."
     
-if "DATA" in skips and opt.export == "DATA":
-    print "You cannot use --export=data and --skip-data when exporting " \
+if "DATA" in skips and opt.import_type == "DATA":
+    print "You cannot use --import=data and --skip-data when importing " \
           "table data."
     exit(1)
 
@@ -195,9 +188,11 @@ options = {
     "skip_blobs"    : opt.skip_blobs,
     "format"        : opt.format,
     "no_headers"    : opt.no_headers,
-    "display"       : opt.display,
-    "single"        : not opt.bulk_import,
+    "single"        : not opt.bulk_insert,
     "silent"        : opt.silent,
+    "import_type"   : opt.import_type,
+    "dryrun"        : opt.dryrun,
+    "do_drop"       : opt.do_drop,
     "debug"         : opt.debug
 }
 
@@ -207,23 +202,22 @@ try:
 except:
     parser.error("Server connection values invalid or cannot be parsed.")
 
-# Build list of databases to copy
-db_list = []
-for db in args:
-    db_list.append(db)
+# Build list of files to import
+file_list = []
+for file_name in args:
+    file_list.append(file_name)
 
 try:
     # record start time
     if opt.debug:
         start_test = time.time()
-    if opt.export == "DEFINITIONS" or opt.export == "BOTH":
-        dbexport.export_metadata(server_values, db_list, options)
-    if opt.export == "DATA" or opt.export == "BOTH":
-        if opt.display != "BRIEF":
-            print "# NOTE : --display is ignored for data export."
-        dbexport.export_data(server_values, db_list, options)
+
+    for file_name in file_list:
+        dbimport.import_file(server_values, file_name, options)
+
     if opt.debug:
         print_elapsed_time(start_test)
+        
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

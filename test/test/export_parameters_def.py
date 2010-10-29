@@ -187,6 +187,8 @@ class test(export_basic.test):
                                 "    | e1          |", "|",
                                 14, " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| util_test  | e1    |", "|",
+                                18, " X           ")
+        self.mask_column_result("| util_test  | e1    |", "|",
                                 9, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | e1    |", "|",
                                 10, " XXXX-XX-XX XX:XX:XX  ")
@@ -194,6 +196,8 @@ class test(export_basic.test):
                                 12, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| e1    | root@localhost  |", "|",
                                 10, " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| e1    | root@localhost  |", "|",
+                                14, " X           ")
         self.mask_column_result("| util_test  | p1", "|",
                                 14, " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | p1", "|",
@@ -211,6 +215,14 @@ class test(export_basic.test):
                                 9, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("e1,root@localhost,", ",",
                                 10, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1,root@localhost,", ",",
+                                13, "XX")
+        self.mask_column_result(",util_test,t", ",",
+                                10, "XXXXXXXXXX")
+        self.mask_column_result(",util_test,t", ",",
+                                11, "XXXXXXXXXX")
+        self.mask_column_result(",util_test,t", ",",
+                                13, "XXXXXXXXXX")
         self.mask_column_result(",util_test,t", ",",
                                 15, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result(",util_test,t", ",",
@@ -231,6 +243,8 @@ class test(export_basic.test):
                                 9, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("util_test,e1", ",",
                                 11, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("util_test,e1", ",",
+                                17, "XX")
                                 
 
     def _mask_tab(self):
@@ -240,6 +254,8 @@ class test(export_basic.test):
                                 9, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("e1	root@localhost", "\t",
                                 10, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("e1	root@localhost", "\t",
+                                13, "XX")
         self.mask_column_result("	util_test	t", "\t",
                                 13, "XX")
         self.mask_column_result("	util_test	t", "\t",
@@ -292,9 +308,11 @@ class test(export_basic.test):
                             "              INDEX_LENGTH: XXXXXXX\n")
         self.replace_result("           MAX_DATA_LENGTH:",
                             "           MAX_DATA_LENGTH: XXXXXXX\n")
-        self.replace_result("                 DATA_FREE:",
-                            "                 DATA_FREE: XXXXXXXXXXX\n")
+        self.replace_result("                     DATA_FREE:",
+                            "                     DATA_FREE: XXXXXXXXXXX\n")
         self.replace_result("           ORIGINATOR:",
+                            "           ORIGINATOR: XX\n")
+        self.replace_result("           originator:",
                             "           ORIGINATOR: XX\n")
 
   

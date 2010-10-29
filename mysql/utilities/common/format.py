@@ -149,6 +149,6 @@ def format_vertical_list(file, columns, rows):
             file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
                                                 row[i]))
     if row_num > 0:
-        print "%d rows.\n" % int(row_num)
+        print "%d rows." % int(row_num)
                     
 

@@ -72,7 +72,8 @@ def export_metadata(src_val, db_list, options):
                                         options.get("skip_views", False),
                                         options.get("skip_procs", False),
                                         options.get("skip_funcs", False),
-                                        options.get("skip_grants", False))
+                                        options.get("skip_grants", False),
+                                        options.get("skip_events", False))
         except MySQLUtilError, e:
             raise e
             
@@ -278,7 +279,8 @@ def export_data(src_val, db_list, options):
                                         options.get("skip_views", False),
                                         options.get("skip_procs", False),
                                         options.get("skip_funcs", False),
-                                        options.get("skip_grants", False))
+                                        options.get("skip_grants", False),
+                                        options.get("skip_events", False))
         except MySQLUtilError, e:
             raise e
             
@@ -293,21 +295,16 @@ def export_data(src_val, db_list, options):
                                  db_name)
 
         if not silent:
-            print "USE %s;" % db_name
+            if format == "SQL":
+                print "USE %s;" % db_name
             print "# Exporting data from %s" % db_name
         
         # Perform the extraction
         try:
-            if not silent:
-                sys.stdout.write("# TABLES in %s:" % db_name)
             tables = db.get_db_objects("TABLE")
             if len(tables) < 1:
-                if not silent:
-                    print " (none found)"
                 break
             for table in tables:
-                if not silent:
-                    print
                 tbl_name = "%s.%s" % (db_name, table[0])
                 cur_table = Table(source, tbl_name)
                 col_metadata = cur_table.get_column_metadata()

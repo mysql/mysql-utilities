@@ -21,7 +21,7 @@ class test(copy_db.test):
         self.drop_users()
         res = self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         res = self.server1.exec_query("CREATE USER 'sam'@'localhost'")
-        res = self.server1.exec_query("GRANT SELECT ON util_test.* TO " + \
+        res = self.server1.exec_query("GRANT SELECT, EVENT ON util_test.* TO " + \
                                       "'joe'@'localhost'")
         res = self.server1.exec_query("GRANT SELECT ON mysql.* TO " + \
                                       "'joe'@'localhost'")
@@ -127,7 +127,8 @@ class test(copy_db.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        res = self.server1.exec_query("GRANT SHOW VIEW ON util_test.* TO " + \
+        res = self.server1.exec_query("GRANT SHOW VIEW, EVENT "
+                                      "ON util_test.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 11 - source user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)

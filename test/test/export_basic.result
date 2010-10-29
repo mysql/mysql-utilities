@@ -86,7 +86,6 @@ Test case 2 - export data only - single rows
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
-# TABLES in util_test:
 # Data for table util_test.t1: 
 INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
@@ -95,17 +94,14 @@ INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-
 # Data for table util_test.t2: 
 INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
 INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
@@ -113,16 +109,12 @@ Test case 3 - export data only - bulk insert
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
-# TABLES in util_test:
 # Data for table util_test.t1: 
 INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
-
 # Data for table util_test.t2: 
 INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example');
-
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
-
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES  (3, 2);
 #...done.
@@ -213,7 +205,6 @@ GRANT UPDATE ON util_test.* TO 'joe'@'user'
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
-# TABLES in util_test:
 # Data for table util_test.t1: 
 INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
@@ -222,17 +213,14 @@ INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-
 # Data for table util_test.t2: 
 INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
 INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
@@ -396,7 +384,6 @@ GRANT UPDATE ON util_test.* TO 'joe'@'user'
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
-# TABLES in util_test:
 # Data for table util_test.t1: 
 INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
@@ -405,17 +392,14 @@ INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
 INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-
 # Data for table util_test.t2: 
 INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
 INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.

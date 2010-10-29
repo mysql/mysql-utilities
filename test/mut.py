@@ -215,7 +215,7 @@ def _exec_and_report(procedure, default_message, test_name, action,
     return False
 
 # Helper method to read CSV file
-def read_disabled_tests():
+def _read_disabled_tests():
     disabled_tests = []
     file = open("disabled")
     csv_reader = csv.reader(file)
@@ -506,7 +506,7 @@ if start_sequence:
         start_sequence = False
 
 # Get list of disabled tests
-disable_list = read_disabled_tests()
+disable_list = _read_disabled_tests()
 
 have_disabled = len(disable_list)
 

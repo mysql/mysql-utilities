@@ -660,7 +660,7 @@ class Database(object):
                    DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM MYSQL.PROC
+            FROM mysql.proc
             WHERE DB = %s AND TYPE = 'PROCEDURE'
             """
         elif obj_type == _FUNC:
@@ -675,7 +675,7 @@ class Database(object):
                    DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM MYSQL.PROC 
+            FROM mysql.proc 
             WHERE DB = %s AND TYPE = 'FUNCTION'
             """
         elif obj_type == _EVENT:
@@ -690,7 +690,7 @@ class Database(object):
                    DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM MYSQL.EVENT 
+            FROM mysql.event 
             WHERE DB = %s
             """
         elif obj_type == _GRANT:
@@ -756,7 +756,8 @@ class Database(object):
     
     
     def check_read_access(self, user, host, skip_views,
-                          skip_proc, skip_func, skip_grants):
+                          skip_proc, skip_func, skip_grants,
+                          skip_events):
         """ Check access levels for reading database objects
         
         This method will check the user's permission levels for copying a
@@ -771,6 +772,7 @@ class Database(object):
         skup_proc[in]      True = no procedures processed
         skip_func[in]      True = no functions processed
         skip_grants[in]    True = no grants processed
+        skip_events[in]    True = no events processed
         
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
@@ -788,6 +790,10 @@ class Database(object):
         # if procs or funcs are included, we need read on mysql db
         if not skip_proc or not skip_func:
             priv_tuple = ("mysql", "SELECT")
+            source_privs.append(priv_tuple)
+        # if events, we need event
+        if not skip_events:
+            priv_tuple = (self.db_name, "EVENT")
             source_privs.append(priv_tuple)
         
         # Check permissions on source

@@ -22,7 +22,7 @@ Options:
                         DEFINITIONS|F = export only the definitions for the
                         objects in the database list, or BOTH|B = export the
                         metadata followed by the data (default: export
-                        metadata)
+                        definitions)
   -b, --bulk-insert     Use bulk insert statements for data (default:False)
   -h, --no-headers      do not display the column headers - ignored for GRID
                         format
@@ -577,7 +577,7 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
 NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,5,latin1,latin1_swedish_ci,latin1_swedish_ci
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -624,7 +624,7 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
 NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	5	latin1	latin1_swedish_ci	latin1_swedish_ci
+e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -688,7 +688,7 @@ Test case 16 - GRID format
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
-| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | 5           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
+| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -845,7 +845,6 @@ Test case 17 - VERTICAL format
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
 6 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
@@ -858,7 +857,6 @@ Test case 17 - VERTICAL format
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
          TRIGGER_NAME: trg
@@ -874,7 +872,6 @@ Test case 17 - VERTICAL format
  COLLATION_CONNECTION: latin1_swedish_ci
    DATABASE_COLLATION: latin1_swedish_ci
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
                  NAME: p1
@@ -891,7 +888,6 @@ Test case 17 - VERTICAL format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                  NAME: f1
@@ -908,7 +904,6 @@ Test case 17 - VERTICAL format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
                  NAME: e1
@@ -928,7 +923,6 @@ Test case 17 - VERTICAL format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -1057,7 +1051,6 @@ Test case 17 - VERTICAL format
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.
 Test case 18 - SQL format no headers
 # Source on localhost: ... connected.
@@ -1167,7 +1160,7 @@ p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_tes
 # FUNCTIONS in util_test:
 f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
-e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,5,latin1,latin1_swedish_ci,latin1_swedish_ci
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 'joe'@'user',ALTER,util_test,,,
 'joe'@'user',ALTER ROUTINE,util_test,,,
@@ -1207,7 +1200,7 @@ p1	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_tes
 # FUNCTIONS in util_test:
 f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
-e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	5	latin1	latin1_swedish_ci	latin1_swedish_ci
+e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 'joe'@'user'	ALTER	util_test			
 'joe'@'user'	ALTER ROUTINE	util_test			
@@ -1270,7 +1263,7 @@ Test case 21 - GRID format no headers
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
-| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | 5           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
+| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -1427,7 +1420,6 @@ Test case 22 - VERTICAL format no headers
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
 6 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
@@ -1440,7 +1432,6 @@ Test case 22 - VERTICAL format no headers
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
          TRIGGER_NAME: trg
@@ -1456,7 +1447,6 @@ Test case 22 - VERTICAL format no headers
  COLLATION_CONNECTION: latin1_swedish_ci
    DATABASE_COLLATION: latin1_swedish_ci
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
                  NAME: p1
@@ -1473,7 +1463,6 @@ Test case 22 - VERTICAL format no headers
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                  NAME: f1
@@ -1490,7 +1479,6 @@ Test case 22 - VERTICAL format no headers
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
                  NAME: e1
@@ -1510,7 +1498,6 @@ Test case 22 - VERTICAL format no headers
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -1639,7 +1626,6 @@ Test case 22 - VERTICAL format no headers
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.
 Test case 23 - S format
 # Source on localhost: ... connected.
@@ -1755,7 +1741,7 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
 NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,5,latin1,latin1_swedish_ci,latin1_swedish_ci
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -1802,7 +1788,7 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
 NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	5	latin1	latin1_swedish_ci	latin1_swedish_ci
+e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -1866,7 +1852,7 @@ Test case 26 - G format
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
-| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | 5           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
+| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -2023,7 +2009,6 @@ Test case 27 - V format
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
 6 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
@@ -2036,7 +2021,6 @@ Test case 27 - V format
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
          TRIGGER_NAME: trg
@@ -2052,7 +2036,6 @@ Test case 27 - V format
  COLLATION_CONNECTION: latin1_swedish_ci
    DATABASE_COLLATION: latin1_swedish_ci
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
                  NAME: p1
@@ -2069,7 +2052,6 @@ Test case 27 - V format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                  NAME: f1
@@ -2086,7 +2068,6 @@ Test case 27 - V format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
                  NAME: e1
@@ -2106,7 +2087,6 @@ Test case 27 - V format
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -2235,7 +2215,6 @@ Test case 27 - V format
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.
 Test case 28 - GRID format with BRIEF display
 # Source on localhost: ... connected.
@@ -2279,7 +2258,7 @@ Test case 28 - GRID format with BRIEF display
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
-| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | 5           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
+| e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -2347,7 +2326,7 @@ Test case 29 - GRID format with FULL display
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 | db         | name  | body                                            | definer         | execute_at  | interval_value  | interval_field  | created              | modified             | last_executed  | starts               | ends  | status    | on_completion  | sql_mode  | comment  | originator  | time_zone  | character_set_client  | collation_connection  | db_collation       | body_utf8                                       |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
-| util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | 5           | SYSTEM     | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
+| util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | X           | SYSTEM     | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 # GRANTS in util_test:
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -2464,7 +2443,7 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
 NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,5,latin1,latin1_swedish_ci,latin1_swedish_ci
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -2491,18 +2470,18 @@ Test case 32 - CSV format with FULL display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CHARACTER_OCTET_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA,PRIVILEGES,COLUMN_COMMENT,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,UNIQUE_CONSTRAINT_CATALOG,UNIQUE_CONSTRAINT_SCHEMA,UNIQUE_CONSTRAINT_NAME,MATCH_OPTION,UPDATE_RULE,DELETE_RULE,TABLE_NAME,REFERENCED_TABLE_NAME,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,POSITION_IN_UNIQUE_CONSTRAINT,REFERENCED_TABLE_SCHEMA,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME
-,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,127008,16252928,0,0,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
-,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,93,8725724278030335,1024,0,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,34603008,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,16384,0,0,34603008,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,34603008,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,16384,0,16384,34603008,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
+,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
+,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
 # VIEWS in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 ,util_test,v1,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-,util_test,trg,INSERT,,util_test,t1,0,,INSERT INTO util_test.t2 VALUES('Test objects count'),ROW,AFTER,,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+,util_test,trg,INSERT,,util_test,t1,0,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
 # PROCEDURES in util_test:
 db,name,type,specific_name,language,sql_data_access,is_deterministic,security_type,param_list,returns,body,definer,created,modified,sql_mode,comment,character_set_client,collation_connection,db_collation,body_utf8
 util_test,p1,PROCEDURE,p1,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
@@ -2511,7 +2490,7 @@ db,name,type,specific_name,language,sql_data_access,is_deterministic,security_ty
 util_test,f1,FUNCTION,f1,SQL,CONTAINS_SQL,YES,DEFINER,,int(11),RETURN (SELECT 1),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,RETURN (SELECT 1)
 # EVENTS in util_test:
 db,name,body,definer,execute_at,interval_value,interval_field,created,modified,last_executed,starts,ends,status,on_completion,sql_mode,comment,originator,time_zone,character_set_client,collation_connection,db_collation,body_utf8
-util_test,e1,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,5,SYSTEM,latin1,latin1_swedish_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
+util_test,e1,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,XX,SYSTEM,latin1,latin1_swedish_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -2603,7 +2582,7 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
 NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	5	latin1	latin1_swedish_ci	latin1_swedish_ci
+e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -2848,7 +2827,6 @@ Test case 37 - VERTICAL format with BRIEF display
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
 6 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
@@ -2861,7 +2839,6 @@ Test case 37 - VERTICAL format with BRIEF display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
          TRIGGER_NAME: trg
@@ -2877,7 +2854,6 @@ Test case 37 - VERTICAL format with BRIEF display
  COLLATION_CONNECTION: latin1_swedish_ci
    DATABASE_COLLATION: latin1_swedish_ci
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
                  NAME: p1
@@ -2894,7 +2870,6 @@ Test case 37 - VERTICAL format with BRIEF display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                  NAME: f1
@@ -2911,7 +2886,6 @@ Test case 37 - VERTICAL format with BRIEF display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
                  NAME: e1
@@ -2931,7 +2905,6 @@ Test case 37 - VERTICAL format with BRIEF display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -3060,7 +3033,6 @@ Test case 37 - VERTICAL format with BRIEF display
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.
 Test case 38 - VERTICAL format with FULL display
 # Source on localhost: ... connected.
@@ -3079,7 +3051,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 127008
                MAX_DATA_LENGTH: 16252928
                   INDEX_LENGTH: 0
-                     DATA_FREE: 0
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: None
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3143,7 +3115,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 93
                MAX_DATA_LENGTH: 8725724278030335
                   INDEX_LENGTH: 1024
-                     DATA_FREE: 0
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: None
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3207,7 +3179,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 16384
                MAX_DATA_LENGTH: 0
                   INDEX_LENGTH: 0
-                     DATA_FREE: 34603008
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: 4
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3271,7 +3243,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 16384
                MAX_DATA_LENGTH: 0
                   INDEX_LENGTH: 0
-                     DATA_FREE: 34603008
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: 4
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3335,7 +3307,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 16384
                MAX_DATA_LENGTH: 0
                   INDEX_LENGTH: 16384
-                     DATA_FREE: 34603008
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: None
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3399,7 +3371,7 @@ Test case 38 - VERTICAL format with FULL display
                    DATA_LENGTH: 16384
                MAX_DATA_LENGTH: 0
                   INDEX_LENGTH: 16384
-                     DATA_FREE: 34603008
+                     DATA_FREE: XXXXXXXXXXX
                 AUTO_INCREMENT: None
                    CREATE_TIME: XXXX-XX-XX XX:XX:XX
                    UPDATE_TIME: XXXX-XX-XX XX:XX:XX
@@ -3451,7 +3423,6 @@ Test case 38 - VERTICAL format with FULL display
          REFERENCED_TABLE_NAME: t3
         REFERENCED_COLUMN_NAME: a
 6 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
         TABLE_CATALOG: None
@@ -3465,7 +3436,6 @@ Test case 38 - VERTICAL format with FULL display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
             TRIGGER_CATALOG: None
@@ -3491,7 +3461,6 @@ Test case 38 - VERTICAL format with FULL display
        COLLATION_CONNECTION: latin1_swedish_ci
          DATABASE_COLLATION: latin1_swedish_ci
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
                    db: util_test
@@ -3515,7 +3484,6 @@ Test case 38 - VERTICAL format with FULL display
          db_collation: latin1_swedish_ci
             body_utf8: INSERT INTO util_test.t1 VALUES ("50")
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                    db: util_test
@@ -3539,7 +3507,6 @@ Test case 38 - VERTICAL format with FULL display
          db_collation: latin1_swedish_ci
             body_utf8: RETURN (SELECT 1)
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
                    db: util_test
@@ -3558,14 +3525,13 @@ Test case 38 - VERTICAL format with FULL display
         on_completion: DROP
              sql_mode: 
               comment: 
-           originator: 5
+           ORIGINATOR: XX
             time_zone: SYSTEM
  character_set_client: latin1
  collation_connection: latin1_swedish_ci
          db_collation: latin1_swedish_ci
             body_utf8: DELETE FROM util_test.t1 WHERE a = "not there"
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -3694,7 +3660,6 @@ Test case 38 - VERTICAL format with FULL display
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.
 Test case 39 - VERTICAL format with NAMES display
 # Source on localhost: ... connected.
@@ -3709,32 +3674,26 @@ Test case 39 - VERTICAL format with NAMES display
 *************************       4. row *************************
  TABLE_NAME: t4
 4 rows.
-
 # VIEWS in util_test:
 *************************       1. row *************************
  TABLE_NAME: v1
 1 rows.
-
 # TRIGGERS in util_test:
 *************************       1. row *************************
  TRIGGER_NAME: trg
 1 rows.
-
 # PROCEDURES in util_test:
 *************************       1. row *************************
  NAME: p1
 1 rows.
-
 # FUNCTIONS in util_test:
 *************************       1. row *************************
  NAME: f1
 1 rows.
-
 # EVENTS in util_test:
 *************************       1. row *************************
  NAME: e1
 1 rows.
-
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -3863,5 +3822,4 @@ Test case 39 - VERTICAL format with NAMES display
     COLUMN_NAME: None
    ROUTINE_NAME: None
 18 rows.
-
 #...done.

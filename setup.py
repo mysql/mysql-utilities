@@ -39,6 +39,8 @@ INSTALL = {
         ],
     'scripts': [
         'scripts/mysqldbcopy.py',
+        'scripts/mysqlexport.py',
+        'scripts/mysqlimport.py',
         'scripts/mysqlindexcheck.py',
         'scripts/mysqlmetagrep.py',
         'scripts/mysqlprocgrep.py',
@@ -50,6 +52,7 @@ INSTALL = {
         ('man/man1', [
                 'build/sphinx/man/mysqldbcopy.1',
                 'build/sphinx/man/mysqlexport.1',
+                'build/sphinx/man/mysqlimport.1',
                 'build/sphinx/man/mysqlindexcheck.1',
                 'build/sphinx/man/mysqlmetagrep.1',
                 'build/sphinx/man/mysqlprocgrep.1',

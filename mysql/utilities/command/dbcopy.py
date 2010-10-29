@@ -89,7 +89,8 @@ def copy_db(src_val, dest_val, db_list, options):
                                         options.get("skip_views", False),
                                         options.get("skip_procs", False),
                                         options.get("skip_funcs", False),
-                                        options.get("skip_grants", False))
+                                        options.get("skip_grants", False),
+                                        options.get("skip_events", False))
             dest_db.check_write_access(dest_val["user"], dest_val["host"],
                                        options.get("skip_views", False),
                                        options.get("skip_procs", False),

@@ -37,6 +37,7 @@ Test case 7 - users with minimal privileges
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
+# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 #...done.
 Test case 8 - source user not enough privileges needed
@@ -66,6 +67,7 @@ Test case 11 - source user has privileges needed
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
+# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 #...done.
 Test case 12 - dest user not enough privileges needed
@@ -95,6 +97,7 @@ Test case 15 - dest user has privileges needed
 # Copying VIEW util_test.v1
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
+# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 #...done.
 Test case 16 - cannot parse --source
