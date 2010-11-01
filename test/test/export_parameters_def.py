@@ -180,6 +180,10 @@ class test(export_basic.test):
         self.mask_column_result("| None           | util_test     | t", "|",
                                 16, " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| None           | util_test     | t", "|",
+                                11, " XXXXXXXXXX ")
+        self.mask_column_result("| None           | util_test     | t", "|",
+                                12, " XXXXXXXXXX ")
+        self.mask_column_result("| None           | util_test     | t", "|",
                                 14, " XXXXXXXXXX ")
         self.mask_column_result("| None           | util_test     | t", "|",
                                 17, " XXXX-XX-XX XX:XX:XX ")
@@ -257,6 +261,10 @@ class test(export_basic.test):
         self.mask_column_result("e1	root@localhost", "\t",
                                 13, "XX")
         self.mask_column_result("	util_test	t", "\t",
+                                10, "XXXXXX")
+        self.mask_column_result("	util_test	t", "\t",
+                                11, "XXXXXXXX")
+        self.mask_column_result("	util_test	t", "\t",
                                 13, "XX")
         self.mask_column_result("	util_test	t", "\t",
                                 15, "XXXX-XX-XX XX:XX:XX")
@@ -302,6 +310,12 @@ class test(export_basic.test):
                             "XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("            AVG_ROW_LENGTH:",
                             "            AVG_ROW_LENGTH: XXXXXXX\n")
+        self.replace_result("                   DATA_LENGTH:",
+                            "                   DATA_LENGTH: XXXXXXX\n")
+        self.replace_result("                  INDEX_LENGTH:",
+                            "                  INDEX_LENGTH: XXXXXXX\n")
+        self.replace_result("               MAX_DATA_LENGTH:",
+                            "               MAX_DATA_LENGTH: XXXXXXX\n")
         self.replace_result("               DATA_LENGTH:",
                             "               DATA_LENGTH: XXXXXXX\n")
         self.replace_result("              INDEX_LENGTH:",

@@ -39,6 +39,10 @@ class test(proc_grep.test):
         self.mask_result("    User LIKE 'root'", "    User LIKE 'root'",
                          "    User LIKE 'XXXX'")
         
+        # Mask funny output on Windows
+        if os.name != "posix":
+            self.replace_result("    User LIKE ", "    User LIKE 'XXXX'\n")
+        
         return True
   
     def get_result(self):

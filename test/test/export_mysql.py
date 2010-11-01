@@ -56,8 +56,12 @@ class test(mysql_test.System_test):
     def show_data(self, tbl):
         comment = "Showing data for table %s \n" % tbl
         self.results.append(comment)
-        cmd = "%s %s util_test -e 'SELECT  * FROM %s'" % \
-              (self.mysql_path, self.server2_conn, tbl)
+        if os.name == "posix":
+            cmd = "%s %s util_test -e 'SELECT  * FROM %s'" % \
+                  (self.mysql_path, self.server2_conn, tbl)
+        else:
+            cmd = '%s %s util_test -e "SELECT  * FROM %s"' % \
+                  (self.mysql_path, self.server2_conn, tbl)
         res = self.exec_util(cmd, self.res_fname, True)
         if res != 0:
             raise MUTException("%s: failed" % comment)
