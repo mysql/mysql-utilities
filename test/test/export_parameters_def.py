@@ -288,15 +288,25 @@ class test(export_basic.test):
                                 11, "XXXX-XX-XX XX:XX:XX")
     
     def _mask_vertical(self):
+        self.replace_result("                   UPDATE_TIME:",
+                            "                   UPDATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("                   CREATE_TIME:",
+                            "                   CREATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("              UPDATE_TIME:",
+                            "              UPDATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("              CREATE_TIME:",
+                            "              CREATE_TIME: "
+                            "XXXX-XX-XX XX:XX:XX\n")
+
         self.replace_result("              CREATED:",
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("              created:",
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("             modified:",
                             "             MODIFIED: XXXX-XX-XX XX:XX:XX\n")
-        self.replace_result("                   UPDATE_TIME:",
-                            "                   UPDATE_TIME: "
-                            "XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("         LAST_ALTERED:",
                             "         LAST_ALTERED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("               STARTS:",
@@ -305,29 +315,30 @@ class test(export_basic.test):
                             "               STARTS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("                 ends:",
                             "                 ENDS: XXXX-XX-XX XX:XX:XX\n")
-        self.replace_result("                   CREATE_TIME:",
-                            "                   CREATE_TIME: "
-                            "XXXX-XX-XX XX:XX:XX\n")
-        self.replace_result("            AVG_ROW_LENGTH:",
-                            "            AVG_ROW_LENGTH: XXXXXXX\n")
+        self.replace_result("           ORIGINATOR:",
+                            "           ORIGINATOR: XX\n")
+        self.replace_result("           originator:",
+                            "           ORIGINATOR: XX\n")
+
         self.replace_result("                   DATA_LENGTH:",
                             "                   DATA_LENGTH: XXXXXXX\n")
         self.replace_result("                  INDEX_LENGTH:",
                             "                  INDEX_LENGTH: XXXXXXX\n")
         self.replace_result("               MAX_DATA_LENGTH:",
                             "               MAX_DATA_LENGTH: XXXXXXX\n")
-        self.replace_result("               DATA_LENGTH:",
-                            "               DATA_LENGTH: XXXXXXX\n")
-        self.replace_result("              INDEX_LENGTH:",
-                            "              INDEX_LENGTH: XXXXXXX\n")
-        self.replace_result("           MAX_DATA_LENGTH:",
-                            "           MAX_DATA_LENGTH: XXXXXXX\n")
         self.replace_result("                     DATA_FREE:",
                             "                     DATA_FREE: XXXXXXXXXXX\n")
-        self.replace_result("           ORIGINATOR:",
-                            "           ORIGINATOR: XX\n")
-        self.replace_result("           originator:",
-                            "           ORIGINATOR: XX\n")
+        
+        self.replace_result("           AVG_ROW_LENGTH:",
+                            "           AVG_ROW_LENGTH: XXXXXXX\n")
+        self.replace_result("              DATA_LENGTH:",
+                            "              DATA_LENGTH: XXXXXXX\n")
+        self.replace_result("             INDEX_LENGTH:",
+                            "             INDEX_LENGTH: XXXXXXX\n")
+        self.replace_result("          MAX_DATA_LENGTH:",
+                            "          MAX_DATA_LENGTH: XXXXXXX\n")
+        self.replace_result("                DATA_FREE:",
+                            "                DATA_FREE: XXXXXXXXXXX\n")
 
   
     def get_result(self):

@@ -38,20 +38,20 @@ class test(mysql_test.System_test):
                                data_file + e.errmsg)
         return True
     
-    def run_import_test(self, expected_res, from_conn, to_conn,
-                        format, type, comment, options=None):
+    def run_import_test(self, expected_res, from_conn, to_conn, format, type,
+                        comment, export_options=None, import_options=None):
     
         export_cmd = "mysqlexport.py %s util_test --export=" % from_conn
         export_cmd += type + " --format=%s " % format
-        if options is not None:
-            export_cmd += options
+        if export_options is not None:
+            export_cmd += export_options
         export_cmd += " > %s" % self.export_import_file
         
         import_cmd = "mysqlimport.py %s " % to_conn
         import_cmd += "%s --import=" % self.export_import_file
         import_cmd += type + " --format=%s " % format
-        if options is not None:
-            import_cmd += options
+        if import_options is not None:
+            import_cmd += import_options
             
         self.results.append(comment + "\n")
         
@@ -60,7 +60,7 @@ class test(mysql_test.System_test):
         self.results.append(self.check_objects(self.server2, "util_test"))
 
         # First run the export to a file.
-        res = self.run_test_case(expected_res, export_cmd, "Running export...")
+        res = self.run_test_case(0, export_cmd, "Running export...")
         if not res:
             raise MUTException("EXPORT: %s: failed" % comment)
         
@@ -91,7 +91,8 @@ class test(mysql_test.System_test):
                     comment += "and %s display" % display
                     # We test DEFINITIONS and DATA only in other tests
                     self.run_import_test(0, from_conn, to_conn,
-                                         format, "BOTH", comment)
+                                         format, "BOTH", comment,
+                                         " --display=%s" % display)
                 except MUTException, e:
                     raise e
                 self.drop_db(self.server2, "util_test")

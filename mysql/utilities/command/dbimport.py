@@ -113,6 +113,8 @@ def _read_row(file, format, skip_comments=False):
                 # strip \n from lines
                 data_row.append(field[1][0:len(field[1])-1].strip())
             elif len(field) == 4: # date field!
+                if read_header:
+                    header.append(field[0].strip())
                 date_str = "%s:%s:%s" % (field[1], field[2],
                                          field[3].strip())
                 data_row.append(date_str)
@@ -141,15 +143,15 @@ def _read_row(file, format, skip_comments=False):
                         new_row.append(col.strip())
                     yield new_row
             else:
-                if row[0][0] != '#' or \
-                   (row[0][0] == '#' and not skip_comments):
+                if len(row[0]) == 0 or row[0][0] != '#' or \
+                   row[0][0] == '#' and not skip_comments:
                     yield row
         
 
 def _check_for_object_list(row, obj_type):
     """Check to see if object is in the list of valid objects.
  
-    row[in]           A row cintainint an object
+    row[in]           A row containing an object
     obj_type[in]      Object type to find
     
     Returns (bool) - True = object is obj_type
@@ -250,7 +252,7 @@ def read_next(file, format, no_headers=False):
                 continue
             else:
                 # We're reading rows here
-                if row[0][0] == "#":
+                if len(row[0]) > 0 and row[0][0] == "#":
                     continue
                 else:
                     yield (cmd_type, row)    
@@ -279,11 +281,14 @@ def _get_db(row):
             if row[0] == "GRANT":
                 db_name = row[1][2]
             else:
-                db_name = row[1][0]
+                if len(row[1][0]) > 0 and row[1][0].upper() != "NONE":
+                    db_name = row[1][0] # --display=BRIEF
+                else:
+                    db_name = row[1][1] # --display=FULL
     return db_name
 
 
-def _build_create_table(db_name, tbl_name, engine, columns):
+def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
     """Build the CREATE TABLE command for a table.
     
     This method uses the data from the _read_next() method to build a
@@ -292,7 +297,8 @@ def _build_create_table(db_name, tbl_name, engine, columns):
     db_name[in]       Database name for the object
     tbl_name[in]      Name of the table
     engine[in]        Storage engine name for the table
-    columsn[in]       A list of the column definitions for the table
+    columns[in]       A list of the column definitions for the table
+    col_ref[in]       A dictionary of column names/indexes
 
     Returns (string) the CREATE TABLE statement.
     """
@@ -301,21 +307,31 @@ def _build_create_table(db_name, tbl_name, engine, columns):
     pri_keys = []
     keys = []
     key_str = ""
+    col_name_index = col_ref.get("COLUMN_NAME", 0)
+    col_type_index = col_ref.get("COLUMN_TYPE", 1)
+    is_null_index = col_ref.get("IS_NULLABLE", 2)
+    def_index = col_ref.get("COLUMN_DEFAULT", 3)
+    col_key_index = col_ref.get("COLUMN_KEY", 4)
+    const_name_index = col_ref.get("CONSTRAINT_NAME", 7)
+    ref_tbl_index = col_ref.get("REFERENCED_TABLE_NAME", 8)
+    ref_col_index = col_ref.get("COL_NAME", 13)
+    ref_col_ref = col_ref.get("REFERENCED_COLUMN_NAME", 15)
     constraints = []
     for column in range(0,stop):
         cur_col = columns[column]
-        create_str += "  `%s` %s" % (cur_col[0], cur_col[1])
-        if cur_col[2].upper() != "YES":
+        create_str += "  `%s` %s" % (cur_col[col_name_index],
+                                     cur_col[col_type_index])
+        if cur_col[is_null_index].upper() != "YES":
             create_str += " NOT NULL"
-        if len(cur_col[3]) > 0 and cur_col[3].upper() != "NONE":
-            create_str += " DEFAULT %s" % cur_col[3]
-        elif cur_col[2].upper == "YES":
+        if len(cur_col[def_index]) > 0 and cur_col[def_index].upper() != "NONE":
+            create_str += " DEFAULT %s" % cur_col[def_index]
+        elif cur_col[is_null_index].upper == "YES":
             create_str += " DEFAULT NULL"
-        if len(cur_col[4]) > 0:
-            if cur_col[4] == "PRI":
-                pri_keys.append(cur_col[0])
+        if len(cur_col[col_key_index]) > 0:
+            if cur_col[col_key_index] == "PRI":
+                pri_keys.append(cur_col[col_name_index])
             else:
-                keys.append(cur_col[0])
+                keys.append(cur_col[col_name_index])
         if column+1 < stop:
             create_str += ",\n"
     if len(pri_keys) > 0:
@@ -323,9 +339,9 @@ def _build_create_table(db_name, tbl_name, engine, columns):
         key_str = ",\n  PRIMARY KEY("
     elif len(keys) > 0:
         key_list = keys
-        key_str = ",\n  KEY `%s` (" % cur_col[7]
-        constraints.append((cur_col[7], cur_col[8],
-                            cur_col[13], cur_col[15])) 
+        key_str = ",\n  KEY `%s` (" % cur_col[const_name_index]
+        constraints.append((cur_col[const_name_index], cur_col[ref_tbl_index],
+                            cur_col[ref_col_index], cur_col[ref_col_ref])) 
     if len(key_str) > 0:
         stop = len(key_list)
         for key in range(0,stop):
@@ -341,8 +357,23 @@ def _build_create_table(db_name, tbl_name, engine, columns):
             constraint_str += "REFERENCES `%s` (`%s`)" % \
                               (constraint[1], constraint[3])
             create_str += ",\n" + constraint_str
-    create_str += "\n) ENGINE=%s;" % engine 
+    create_str += "\n) ENGINE=%s;" % engine
     return create_str
+
+
+def _build_column_ref(row):
+    """Build a dictionary of column references
+    
+    row[in]           The header with column names.
+    
+    Returns (dictionary) where dict[col_name] = index position
+    """
+    indexes = { }
+    i = 0
+    for col in row:
+        indexes[col.upper()] = i
+        i += 1
+    return indexes
 
 
 def _build_create_objects(obj_type, db, definitions):
@@ -365,67 +396,90 @@ def _build_create_objects(obj_type, db, definitions):
     obj_name = ""
     col_list = []
     stop = len(definitions)
+    col_ref = {}
     # Now the tricky part.
     for i in range(0,stop):
         if skip_header:
             skip_header = False
+            col_ref = _build_column_ref(definitions[i])
             continue
         defn = definitions[i]
         create_str = ""
         if obj_type == "TABLE":
             if (obj_db == "" and obj_name == ""):
-                obj_db = defn[0]
-                obj_name = defn[1]
-            if (obj_db == defn[0] and obj_name == defn[1]):
-                col_list.append(defn[4:])
+                obj_db = defn[col_ref.get("TABLE_SCHEMA",0)]
+                obj_name = defn[col_ref.get("TABLE_NAME",1)]
+            if (obj_db == defn[col_ref.get("TABLE_SCHEMA",0)] and \
+                obj_name == defn[col_ref.get("TABLE_NAME",1)]):
+                col_list.append(defn)
             else:
                 # this is a new one, so make the CREATE statement.
                 # we should capture table data from first row like
                 # engine, etc. then add cols to col_list.
                 create_str = _build_create_table(obj_db, obj_name,
-                                                 defn[2], col_list)
+                                                 defn[col_ref.get("ENGINE",2)],
+                                                 col_list, col_ref)
                 create_strings.append(create_str)
-                obj_db = defn[0]
-                obj_name = defn[1]
+                obj_db = defn[col_ref.get("TABLE_SCHEMA",0)]
+                obj_name = defn[col_ref.get("TABLE_NAME",1)]
                 col_list = []
-                col_list.append(defn[4:])
+                col_list.append(defn)
             # check for end.
             if i+1 == stop:
                 create_str = _build_create_table(obj_db, obj_name,
-                                                 defn[2], col_list)
+                                                 defn[col_ref.get("ENGINE",2)],
+                                                 col_list, col_ref)
                 create_strings.append(create_str)
         elif obj_type == "VIEW":
-            create_str = "CREATE ALGORITHM=UNDEFINED DEFINER=%s " % defn[2]
-            create_str += "SQL SECURITY %s " % defn[3]
-            create_str += "VIEW `%s`.`%s` AS " % (defn[0], defn[1])
-            create_str += "%s; " % defn[4]
+            create_str = "CREATE ALGORITHM=UNDEFINED DEFINER=%s " % \
+                         defn[col_ref.get("DEFINER",2)]
+            create_str += "SQL SECURITY %s " % \
+                          defn[col_ref.get("SECURITY_TYPE",3)]
+            create_str += "VIEW `%s`.`%s` AS " % \
+                          (defn[col_ref.get("TABLE_SCHEMA",0)], 
+                           defn[col_ref.get("TABLE_NAME",1)])
+            create_str += "%s; " % defn[col_ref.get("VIEW_DEFINITION",4)]
             create_strings.append(create_str)
         elif obj_type == "TRIGGER":
-            create_str = "CREATE DEFINER=%s " % defn[1]
+            create_str = "CREATE DEFINER=%s " % \
+                         defn[col_ref.get("DEFINER",1)]
             create_str += "TRIGGER `%s`.`%s` %s %s " % \
-                          (db, defn[0], defn[6], defn[2])
-            create_str += "ON `%s`.`%s` " % (defn[3], defn[4])
-            create_str += "FOR EACH %s %s;" % (defn[5], defn[7])
+                          (db, defn[col_ref.get("TRIGGER_NAME",0)],
+                           defn[col_ref.get("ACTION_TIMING",6)],
+                           defn[col_ref.get("EVENT_MANIPULATION",2)])
+            create_str += "ON `%s`.`%s` " % \
+                          (defn[col_ref.get("EVENT_OBJECT_SCHEMA",3)],
+                           defn[col_ref.get("EVENT_OBJECT_TABLE",4)])
+            create_str += "FOR EACH %s %s;" % \
+                          (defn[col_ref.get("ACTION_ORIENTATION",5)],
+                           defn[col_ref.get("ACTION_STATEMENT",7)])
             create_strings.append(create_str)
         elif obj_type == "PROCEDURE" or obj_type == "FUNCTION":
-            create_str = "CREATE DEFINER=%s" % defn[5]
+            create_str = "CREATE DEFINER=%s" % defn[col_ref.get("DEFINER",5)]
             create_str += " %s `%s`.`%s`(%s)" % \
-                          (obj_type, db, defn[0], defn[6])
+                          (obj_type, db,
+                           defn[col_ref.get("NAME",0)],
+                           defn[col_ref.get("PARAM_LIST",6)])
             if obj_type == "FUNCTION":
-                create_str += " RETURNS %s" % defn[7]
-            create_str += " %s;" % defn[8]
+                create_str += " RETURNS %s" % defn[col_ref.get("RETURNS",7)]
+            create_str += " %s;" % defn[col_ref.get("BODY",8)]
             create_strings.append(create_str)
         elif obj_type == "EVENT":
-            create_str = "CREATE EVENT `%s`.`%s` " % (db, defn[0])
-            create_str += "ON SCHEDULE EVERY %s %s " % (defn[5], defn[6])
-            create_str += "STARTS '%s' " % defn[8]
-            if len(defn[9]) > 0 and defn[9].upper() != "NONE":
-                create_str += "ENDS '%s' " % defn[9]
-            if defn[11] == "DROP":
+            create_str = "CREATE EVENT `%s`.`%s` " % \
+                         (db, defn[col_ref.get("NAME",0)])
+            create_str += "ON SCHEDULE EVERY %s %s " % \
+                          (defn[col_ref.get("INTERVAL_VALUE",5)],
+                           defn[col_ref.get("INTERVAL_FIELD",6)])
+            create_str += "STARTS '%s' " % defn[col_ref.get("STARTS",8)]
+            ends_index = col_ref.get("ENDS",9)
+            if len(defn[ends_index]) > 0 and \
+               defn[ends_index].upper() != "NONE":
+                create_str += "ENDS '%s' " % defn[ends_index]
+            if defn[col_ref.get("ON_COMPLETION",11)] == "DROP":
                 create_str += "ON COMPLETION NOT PRESERVE "
-            if defn[10] == "DISABLED":
+            if defn[col_ref.get("STATUS",10)] == "DISABLED":
                 create_str += "DISABLE "
-            create_str += "DO %s;" % defn[2]
+            create_str += "DO %s;" % defn[col_ref.get("BODY",2)]
             create_strings.append(create_str)
         elif obj_type == "GRANT":
             user, priv, db, tbl = defn[0:4]

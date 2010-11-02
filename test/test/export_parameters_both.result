@@ -107,16 +107,16 @@ Test case 2 - GRID format with FULL display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+---------------------+--------------------+------------------+----------------+---------------+-------------+--------------+-------------------+--------------------------------+--------------------------+------------------------+-------------------------+
-| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ORDINAL_POSITION  | COLUMN_DEFAULT  | IS_NULLABLE  | DATA_TYPE  | CHARACTER_MAXIMUM_LENGTH  | CHARACTER_OCTET_LENGTH  | NUMERIC_PRECISION  | NUMERIC_SCALE  | CHARACTER_SET_NAME  | COLLATION_NAME     | COLUMN_TYPE  | COLUMN_KEY  | EXTRA           | PRIVILEGES                       | COLUMN_COMMENT  | CONSTRAINT_CATALOG  | CONSTRAINT_SCHEMA  | CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_CATALOG  | UNIQUE_CONSTRAINT_SCHEMA  | UNIQUE_CONSTRAINT_NAME  | MATCH_OPTION  | UPDATE_RULE  | DELETE_RULE  | TABLE_NAME  | REFERENCED_TABLE_NAME  | CONSTRAINT_CATALOG  | CONSTRAINT_SCHEMA  | CONSTRAINT_NAME  | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ORDINAL_POSITION  | POSITION_IN_UNIQUE_CONSTRAINT  | REFERENCED_TABLE_SCHEMA  | REFERENCED_TABLE_NAME  | REFERENCED_COLUMN_NAME  |
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+---------------------+--------------------+------------------+----------------+---------------+-------------+--------------+-------------------+--------------------------------+--------------------------+------------------------+-------------------------+
-| None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t1          | a            | 1                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   | None                | None               | None             | None           | None          | None        | None         | None              | None                           | None                     | None                   | None                    |
-| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 3           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t2          | a            | 1                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   | None                | None               | None             | None           | None          | None        | None         | None              | None                           | None                     | None                   | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t3          | a            | 1                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      | PRI         | auto_increment  | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   | None                | util_test          | PRIMARY          | None           | util_test     | t3          | a            | 1                 | None                           | None                     | None                   | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t3          | b            | 2                 | None            | YES          | char       | 30                        | 30                      | None               | None           | latin1              | latin1_swedish_ci  | char(30)     |             |                 | select,insert,update,references  |                 | None                | None               | None             | None                       | None                      | None                    | None          | None         | None         | None        | None                   | None                | util_test          | PRIMARY          | None           | util_test     | t3          | a            | 1                 | None                           | None                     | None                   | None                    |
-| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t4          | c            | 1                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      | MUL         |                 | select,insert,update,references  |                 | None                | util_test          | ref_t3           | None                       | util_test                 | PRIMARY                 | NONE          | RESTRICT     | RESTRICT     | t4          | t3                     | None                | util_test          | ref_t3           | None           | util_test     | t4          | c            | 1                 | 1                              | util_test                | t3                     | a                       |
-| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | None           | util_test     | t4          | d            | 2                 | None            | NO           | int        | None                      | None                    | 10                 | 0              | None                | None               | int(11)      |             |                 | select,insert,update,references  |                 | None                | util_test          | ref_t3           | None                       | util_test                 | PRIMARY                 | NONE          | RESTRICT     | RESTRICT     | t4          | t3                     | None                | util_test          | ref_t3           | None           | util_test     | t4          | c            | 1                 | 1                              | util_test                | t3                     | a                       |
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+----------------+---------------+-------------+--------------+-------------------+-----------------+--------------+------------+---------------------------+-------------------------+--------------------+----------------+---------------------+--------------------+--------------+-------------+-----------------+----------------------------------+-----------------+---------------------+--------------------+------------------+----------------------------+---------------------------+-------------------------+---------------+--------------+--------------+-------------+------------------------+---------------------+--------------------+------------------+----------------+---------------+-------------+--------------+-------------------+--------------------------------+--------------------------+------------------------+-------------------------+
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
+| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_SCHEMA  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME  | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
+| None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None      | None                     | None                    |
+| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 3           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None      | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | int(11)      | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | b            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | c            | int(11)      | NO           | None            | MUL         | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | d            | int(11)      | NO           | None            |             | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
 # VIEWS in util_test:
 +----------------+---------------+-------------+-----------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | VIEW_DEFINITION                                           | CHECK_OPTION  | IS_UPDATABLE  | DEFINER         | SECURITY_TYPE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
@@ -389,13 +389,13 @@ Test case 5 - CSV format with FULL display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CHARACTER_OCTET_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA,PRIVILEGES,COLUMN_COMMENT,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,UNIQUE_CONSTRAINT_CATALOG,UNIQUE_CONSTRAINT_SCHEMA,UNIQUE_CONSTRAINT_NAME,MATCH_OPTION,UPDATE_RULE,DELETE_RULE,TABLE_NAME,REFERENCED_TABLE_NAME,CONSTRAINT_CATALOG,CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,POSITION_IN_UNIQUE_CONSTRAINT,REFERENCED_TABLE_SCHEMA,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME
-,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t1,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
-,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t2,a,1,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,,,,,,,,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,a,1,,NO,int,,,10,0,,,int(11),PRI,auto_increment,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t3,b,2,,YES,char,30,30,,,latin1,latin1_swedish_ci,char(30),,,"select,insert,update,references",,,,,,,,,,,,,,util_test,PRIMARY,,util_test,t3,a,1,,,,
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,c,1,,NO,int,,,10,0,,,int(11),MUL,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,,util_test,t4,d,2,,NO,int,,,10,0,,,int(11),,,"select,insert,update,references",,,util_test,ref_t3,,util_test,PRIMARY,NONE,RESTRICT,RESTRICT,t4,t3,,util_test,ref_t3,,util_test,t4,c,1,1,util_test,t3,a
+TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,char(30),YES,,,,,,,,,,,,
+,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,char(30),YES,,,,,,,,,,,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,int(11),NO,,PRI,,,,,,,PRIMARY,a,,
+,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,b,char(30),YES,,,,,,,,,PRIMARY,a,,
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,c,int(11),NO,,MUL,ref_t3,t3,PRIMARY,util_test,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,d,int(11),NO,,,ref_t3,t3,PRIMARY,util_test,RESTRICT,RESTRICT,ref_t3,c,util_test,a
 # VIEWS in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 ,util_test,v1,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
@@ -605,13 +605,13 @@ Test case 8 - TAB format with FULL display
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ORDINAL_POSITION	COLUMN_DEFAULT	IS_NULLABLE	DATA_TYPE	CHARACTER_MAXIMUM_LENGTH	CHARACTER_OCTET_LENGTH	NUMERIC_PRECISION	NUMERIC_SCALE	CHARACTER_SET_NAME	COLLATION_NAME	COLUMN_TYPE	COLUMN_KEY	EXTRA	PRIVILEGES	COLUMN_COMMENT	CONSTRAINT_CATALOG	CONSTRAINT_SCHEMA	CONSTRAINT_NAME	UNIQUE_CONSTRAINT_CATALOG	UNIQUE_CONSTRAINT_SCHEMA	UNIQUE_CONSTRAINT_NAME	MATCH_OPTION	UPDATE_RULE	DELETE_RULE	TABLE_NAME	REFERENCED_TABLE_NAME	CONSTRAINT_CATALOG	CONSTRAINT_SCHEMA	CONSTRAINT_NAME	TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ORDINAL_POSITION	POSITION_IN_UNIQUE_CONSTRAINT	REFERENCED_TABLE_SCHEMA	REFERENCED_TABLE_NAME	REFERENCED_COLUMN_NAME
-	util_test	t1	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t1	a	1		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references																								
-	util_test	t2	BASE TABLE	MyISAM	10	Fixed	3	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t2	a	1		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references																								
-	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t3	a	1		NO	int			10	0			int(11)	PRI	auto_increment	select,insert,update,references														util_test	PRIMARY		util_test	t3	a	1				
-	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t3	b	2		YES	char	30	30			latin1	latin1_swedish_ci	char(30)			select,insert,update,references														util_test	PRIMARY		util_test	t3	a	1				
-	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t4	c	1		NO	int			10	0			int(11)	MUL		select,insert,update,references			util_test	ref_t3		util_test	PRIMARY	NONE	RESTRICT	RESTRICT	t4	t3		util_test	ref_t3		util_test	t4	c	1	1	util_test	t3	a
-	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci					util_test	t4	d	2		NO	int			10	0			int(11)			select,insert,update,references			util_test	ref_t3		util_test	PRIMARY	NONE	RESTRICT	RESTRICT	t4	t3		util_test	ref_t3		util_test	t4	c	1	1	util_test	t3	a
+TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
+	util_test	t1	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	char(30)	YES												
+	util_test	t2	BASE TABLE	MyISAM	10	Fixed	3	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	char(30)	YES												
+	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	int(11)	NO		PRI							PRIMARY	a		
+	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	b	char(30)	YES									PRIMARY	a		
+	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	c	int(11)	NO		MUL	ref_t3	t3	PRIMARY	util_test	RESTRICT	RESTRICT	ref_t3	c	util_test	a
+	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	d	int(11)	NO			ref_t3	t3	PRIMARY	util_test	RESTRICT	RESTRICT	ref_t3	c	util_test	a
 # VIEWS in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	DEFINER	SECURITY_TYPE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
 	util_test	v1	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	latin1	latin1_swedish_ci
@@ -1131,389 +1131,233 @@ Test case 11 - VERTICAL format with FULL display
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t1
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: MEMORY
-                       VERSION: 10
-                    ROW_FORMAT: Fixed
-                    TABLE_ROWS: 7
-                AVG_ROW_LENGTH: 31
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: None
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t1
-                   COLUMN_NAME: a
-              ORDINAL_POSITION: 1
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: YES
-                     DATA_TYPE: char
-      CHARACTER_MAXIMUM_LENGTH: 30
-        CHARACTER_OCTET_LENGTH: 30
-             NUMERIC_PRECISION: None
-                 NUMERIC_SCALE: None
-            CHARACTER_SET_NAME: latin1
-                COLLATION_NAME: latin1_swedish_ci
-                   COLUMN_TYPE: char(30)
-                    COLUMN_KEY: 
-                         EXTRA: 
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: None
-        UNIQUE_CONSTRAINT_NAME: None
-                  MATCH_OPTION: None
-                   UPDATE_RULE: None
-                   DELETE_RULE: None
-                    TABLE_NAME: None
-         REFERENCED_TABLE_NAME: None
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: None
-                    TABLE_NAME: None
-                   COLUMN_NAME: None
-              ORDINAL_POSITION: None
- POSITION_IN_UNIQUE_CONSTRAINT: None
-       REFERENCED_TABLE_SCHEMA: None
-         REFERENCED_TABLE_NAME: None
-        REFERENCED_COLUMN_NAME: None
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t1
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: MEMORY
+                  VERSION: 10
+               ROW_FORMAT: Fixed
+               TABLE_ROWS: 7
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: None
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 1
+              COLUMN_NAME: a
+              COLUMN_TYPE: char(30)
+              IS_NULLABLE: YES
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: 
+          CONSTRAINT_NAME: None
+    REFERENCED_TABLE_NAME: None
+   UNIQUE_CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_SCHEMA: None
+              UPDATE_RULE: None
+              DELETE_RULE: None
+          CONSTRAINT_NAME: None
+                 COL_NAME: None
+  REFERENCED_TABLE_SCHEMA: None
+   REFERENCED_COLUMN_NAME: None
 *************************       2. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t2
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: MyISAM
-                       VERSION: 10
-                    ROW_FORMAT: Fixed
-                    TABLE_ROWS: 3
-                AVG_ROW_LENGTH: 31
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: None
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t2
-                   COLUMN_NAME: a
-              ORDINAL_POSITION: 1
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: YES
-                     DATA_TYPE: char
-      CHARACTER_MAXIMUM_LENGTH: 30
-        CHARACTER_OCTET_LENGTH: 30
-             NUMERIC_PRECISION: None
-                 NUMERIC_SCALE: None
-            CHARACTER_SET_NAME: latin1
-                COLLATION_NAME: latin1_swedish_ci
-                   COLUMN_TYPE: char(30)
-                    COLUMN_KEY: 
-                         EXTRA: 
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: None
-        UNIQUE_CONSTRAINT_NAME: None
-                  MATCH_OPTION: None
-                   UPDATE_RULE: None
-                   DELETE_RULE: None
-                    TABLE_NAME: None
-         REFERENCED_TABLE_NAME: None
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: None
-                    TABLE_NAME: None
-                   COLUMN_NAME: None
-              ORDINAL_POSITION: None
- POSITION_IN_UNIQUE_CONSTRAINT: None
-       REFERENCED_TABLE_SCHEMA: None
-         REFERENCED_TABLE_NAME: None
-        REFERENCED_COLUMN_NAME: None
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t2
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: MyISAM
+                  VERSION: 10
+               ROW_FORMAT: Fixed
+               TABLE_ROWS: 3
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: None
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 1
+              COLUMN_NAME: a
+              COLUMN_TYPE: char(30)
+              IS_NULLABLE: YES
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: 
+          CONSTRAINT_NAME: None
+    REFERENCED_TABLE_NAME: None
+   UNIQUE_CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_SCHEMA: None
+              UPDATE_RULE: None
+              DELETE_RULE: None
+          CONSTRAINT_NAME: None
+                 COL_NAME: None
+  REFERENCED_TABLE_SCHEMA: None
+   REFERENCED_COLUMN_NAME: None
 *************************       3. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: InnoDB
-                       VERSION: 10
-                    ROW_FORMAT: Compact
-                    TABLE_ROWS: 3
-                AVG_ROW_LENGTH: 5461
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: 4
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                   COLUMN_NAME: a
-              ORDINAL_POSITION: 1
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: NO
-                     DATA_TYPE: int
-      CHARACTER_MAXIMUM_LENGTH: None
-        CHARACTER_OCTET_LENGTH: None
-             NUMERIC_PRECISION: 10
-                 NUMERIC_SCALE: 0
-            CHARACTER_SET_NAME: None
-                COLLATION_NAME: None
-                   COLUMN_TYPE: int(11)
-                    COLUMN_KEY: PRI
-                         EXTRA: auto_increment
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: None
-        UNIQUE_CONSTRAINT_NAME: None
-                  MATCH_OPTION: None
-                   UPDATE_RULE: None
-                   DELETE_RULE: None
-                    TABLE_NAME: None
-         REFERENCED_TABLE_NAME: None
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: PRIMARY
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                   COLUMN_NAME: a
-              ORDINAL_POSITION: 1
- POSITION_IN_UNIQUE_CONSTRAINT: None
-       REFERENCED_TABLE_SCHEMA: None
-         REFERENCED_TABLE_NAME: None
-        REFERENCED_COLUMN_NAME: None
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t3
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: InnoDB
+                  VERSION: 10
+               ROW_FORMAT: Compact
+               TABLE_ROWS: 3
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: 4
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 1
+              COLUMN_NAME: a
+              COLUMN_TYPE: int(11)
+              IS_NULLABLE: NO
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: PRI
+          CONSTRAINT_NAME: None
+    REFERENCED_TABLE_NAME: None
+   UNIQUE_CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_SCHEMA: None
+              UPDATE_RULE: None
+              DELETE_RULE: None
+          CONSTRAINT_NAME: PRIMARY
+                 COL_NAME: a
+  REFERENCED_TABLE_SCHEMA: None
+   REFERENCED_COLUMN_NAME: None
 *************************       4. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: InnoDB
-                       VERSION: 10
-                    ROW_FORMAT: Compact
-                    TABLE_ROWS: 3
-                AVG_ROW_LENGTH: 5461
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: 4
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                   COLUMN_NAME: b
-              ORDINAL_POSITION: 2
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: YES
-                     DATA_TYPE: char
-      CHARACTER_MAXIMUM_LENGTH: 30
-        CHARACTER_OCTET_LENGTH: 30
-             NUMERIC_PRECISION: None
-                 NUMERIC_SCALE: None
-            CHARACTER_SET_NAME: latin1
-                COLLATION_NAME: latin1_swedish_ci
-                   COLUMN_TYPE: char(30)
-                    COLUMN_KEY: 
-                         EXTRA: 
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: None
-               CONSTRAINT_NAME: None
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: None
-        UNIQUE_CONSTRAINT_NAME: None
-                  MATCH_OPTION: None
-                   UPDATE_RULE: None
-                   DELETE_RULE: None
-                    TABLE_NAME: None
-         REFERENCED_TABLE_NAME: None
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: PRIMARY
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t3
-                   COLUMN_NAME: a
-              ORDINAL_POSITION: 1
- POSITION_IN_UNIQUE_CONSTRAINT: None
-       REFERENCED_TABLE_SCHEMA: None
-         REFERENCED_TABLE_NAME: None
-        REFERENCED_COLUMN_NAME: None
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t3
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: InnoDB
+                  VERSION: 10
+               ROW_FORMAT: Compact
+               TABLE_ROWS: 3
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: 4
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 2
+              COLUMN_NAME: b
+              COLUMN_TYPE: char(30)
+              IS_NULLABLE: YES
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: 
+          CONSTRAINT_NAME: None
+    REFERENCED_TABLE_NAME: None
+   UNIQUE_CONSTRAINT_NAME: None
+ UNIQUE_CONSTRAINT_SCHEMA: None
+              UPDATE_RULE: None
+              DELETE_RULE: None
+          CONSTRAINT_NAME: PRIMARY
+                 COL_NAME: a
+  REFERENCED_TABLE_SCHEMA: None
+   REFERENCED_COLUMN_NAME: None
 *************************       5. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: InnoDB
-                       VERSION: 10
-                    ROW_FORMAT: Compact
-                    TABLE_ROWS: 1
-                AVG_ROW_LENGTH: 16384
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: None
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                   COLUMN_NAME: c
-              ORDINAL_POSITION: 1
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: NO
-                     DATA_TYPE: int
-      CHARACTER_MAXIMUM_LENGTH: None
-        CHARACTER_OCTET_LENGTH: None
-             NUMERIC_PRECISION: 10
-                 NUMERIC_SCALE: 0
-            CHARACTER_SET_NAME: None
-                COLLATION_NAME: None
-                   COLUMN_TYPE: int(11)
-                    COLUMN_KEY: MUL
-                         EXTRA: 
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: ref_t3
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: util_test
-        UNIQUE_CONSTRAINT_NAME: PRIMARY
-                  MATCH_OPTION: NONE
-                   UPDATE_RULE: RESTRICT
-                   DELETE_RULE: RESTRICT
-                    TABLE_NAME: t4
-         REFERENCED_TABLE_NAME: t3
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: ref_t3
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                   COLUMN_NAME: c
-              ORDINAL_POSITION: 1
- POSITION_IN_UNIQUE_CONSTRAINT: 1
-       REFERENCED_TABLE_SCHEMA: util_test
-         REFERENCED_TABLE_NAME: t3
-        REFERENCED_COLUMN_NAME: a
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t4
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: InnoDB
+                  VERSION: 10
+               ROW_FORMAT: Compact
+               TABLE_ROWS: 1
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: None
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 1
+              COLUMN_NAME: c
+              COLUMN_TYPE: int(11)
+              IS_NULLABLE: NO
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: MUL
+          CONSTRAINT_NAME: ref_t3
+    REFERENCED_TABLE_NAME: t3
+   UNIQUE_CONSTRAINT_NAME: PRIMARY
+ UNIQUE_CONSTRAINT_SCHEMA: util_test
+              UPDATE_RULE: RESTRICT
+              DELETE_RULE: RESTRICT
+          CONSTRAINT_NAME: ref_t3
+                 COL_NAME: c
+  REFERENCED_TABLE_SCHEMA: util_test
+   REFERENCED_COLUMN_NAME: a
 *************************       6. row *************************
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                    TABLE_TYPE: BASE TABLE
-                        ENGINE: InnoDB
-                       VERSION: 10
-                    ROW_FORMAT: Compact
-                    TABLE_ROWS: 1
-                AVG_ROW_LENGTH: 16384
-                   DATA_LENGTH: XXXXXXX
-               MAX_DATA_LENGTH: XXXXXXX
-                  INDEX_LENGTH: XXXXXXX
-                     DATA_FREE: XXXXXXXXXXX
-                AUTO_INCREMENT: None
-                   CREATE_TIME: XXXX-XX-XX XX:XX:XX
-                   UPDATE_TIME: XXXX-XX-XX XX:XX:XX
-                    CHECK_TIME: None
-               TABLE_COLLATION: latin1_swedish_ci
-                      CHECKSUM: None
-                CREATE_OPTIONS: 
-                 TABLE_COMMENT: 
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                   COLUMN_NAME: d
-              ORDINAL_POSITION: 2
-                COLUMN_DEFAULT: None
-                   IS_NULLABLE: NO
-                     DATA_TYPE: int
-      CHARACTER_MAXIMUM_LENGTH: None
-        CHARACTER_OCTET_LENGTH: None
-             NUMERIC_PRECISION: 10
-                 NUMERIC_SCALE: 0
-            CHARACTER_SET_NAME: None
-                COLLATION_NAME: None
-                   COLUMN_TYPE: int(11)
-                    COLUMN_KEY: 
-                         EXTRA: 
-                    PRIVILEGES: select,insert,update,references
-                COLUMN_COMMENT: 
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: ref_t3
-     UNIQUE_CONSTRAINT_CATALOG: None
-      UNIQUE_CONSTRAINT_SCHEMA: util_test
-        UNIQUE_CONSTRAINT_NAME: PRIMARY
-                  MATCH_OPTION: NONE
-                   UPDATE_RULE: RESTRICT
-                   DELETE_RULE: RESTRICT
-                    TABLE_NAME: t4
-         REFERENCED_TABLE_NAME: t3
-            CONSTRAINT_CATALOG: None
-             CONSTRAINT_SCHEMA: util_test
-               CONSTRAINT_NAME: ref_t3
-                 TABLE_CATALOG: None
-                  TABLE_SCHEMA: util_test
-                    TABLE_NAME: t4
-                   COLUMN_NAME: c
-              ORDINAL_POSITION: 1
- POSITION_IN_UNIQUE_CONSTRAINT: 1
-       REFERENCED_TABLE_SCHEMA: util_test
-         REFERENCED_TABLE_NAME: t3
-        REFERENCED_COLUMN_NAME: a
+            TABLE_CATALOG: None
+             TABLE_SCHEMA: util_test
+               TABLE_NAME: t4
+               TABLE_TYPE: BASE TABLE
+                   ENGINE: InnoDB
+                  VERSION: 10
+               ROW_FORMAT: Compact
+               TABLE_ROWS: 1
+           AVG_ROW_LENGTH: XXXXXXX
+              DATA_LENGTH: XXXXXXX
+          MAX_DATA_LENGTH: XXXXXXX
+             INDEX_LENGTH: XXXXXXX
+                DATA_FREE: XXXXXXXXXXX
+           AUTO_INCREMENT: None
+              CREATE_TIME: XXXX-XX-XX XX:XX:XX
+              UPDATE_TIME: XXXX-XX-XX XX:XX:XX
+               CHECK_TIME: None
+          TABLE_COLLATION: latin1_swedish_ci
+                 CHECKSUM: None
+           CREATE_OPTIONS: 
+            TABLE_COMMENT: 
+         ORDINAL_POSITION: 2
+              COLUMN_NAME: d
+              COLUMN_TYPE: int(11)
+              IS_NULLABLE: NO
+           COLUMN_DEFAULT: None
+               COLUMN_KEY: 
+          CONSTRAINT_NAME: ref_t3
+    REFERENCED_TABLE_NAME: t3
+   UNIQUE_CONSTRAINT_NAME: PRIMARY
+ UNIQUE_CONSTRAINT_SCHEMA: util_test
+              UPDATE_RULE: RESTRICT
+              DELETE_RULE: RESTRICT
+          CONSTRAINT_NAME: ref_t3
+                 COL_NAME: c
+  REFERENCED_TABLE_SCHEMA: util_test
+   REFERENCED_COLUMN_NAME: a
 6 rows.
 # VIEWS in util_test:
 *************************       1. row *************************
