@@ -169,3 +169,6 @@ def parse_connection(connection_values):
 
     return connection
 
+def test_suite():
+    import tests.test_options
+    return tests.test_options.test_suite()

@@ -1,3 +1,5 @@
+.. `connection specification`
+
 Connection Parameters
 =====================
 

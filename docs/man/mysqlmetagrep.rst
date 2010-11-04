@@ -1,14 +1,16 @@
-#############
-mysqlmetagrep
-#############
+.. _ `mysqlmetagrep`:
+
+#############################################
+``mysqlmetagrep`` - Search object definitions
+#############################################
 
 SYNOPSIS
-========
+--------
 
-  mysqlmetagrep [ OPTIONS ] PATTERN [ SERVER ] ...
+  mysqlmetagrep [ <options> ] <pattern> [ <server> ] ...
 
 DESCRIPTION
-===========
+-----------
 
 This utility searches for objects on a server matching a given pattern
 and show a table of the objects that match. The first non-option
@@ -36,31 +38,31 @@ if you want to match the beginning of the string.
 Options
 -------
 
-.. option:: --type=TYPE,...
+.. option:: --type <type>,...
 
-   Only search for/in objects of type TYPE, where TYPE can be:
+   Only search for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
   
    Default is to search for/in all kinds of types.
 
-.. option:: -b, --body
+.. option:: --body, -b
 
    Search the body of procedures, functions, triggers, and
    events. Default is to only match the name.
 
-.. option:: -G, --basic-regexp, --regexp
+.. option:: --regexp, --basic-regexp, -G
 
    Perform the match using the **REGEXP** operator. Default is to use
    **LIKE** for matching.
 
-.. option:: -p, --print-sql, --sql
+.. option:: --sql, --print-sql, -p
 
    Print the SQL code that will be executed to find all matching
    objects. This can be useful if you want to safe the statement for
    later execution, or pipe it into other tools.
 
-.. option:: -e PATTERN, --pattern=PATTERN
+.. option:: --pattern <pattern>, -e <pattern>
 
    Pattern to use when matching. This is required when the pattern
    looks like a connection specification.
@@ -68,7 +70,7 @@ Options
    If a pattern option is given, the first argument is not treated as
    a pattern but as a connection specifier.
 
-.. option:: --database=PATTERN
+.. option:: --database <pattern>
 
    Only look in databases matching this pattern.
 
@@ -76,15 +78,15 @@ Options
 
    Print the version and exit.
 
-.. option:: -h, --help
+.. option:: --help, -h
 
    Print help.
 
 
 EXAMPLES
-========
+--------
 
-Find all objects where the name match the pattern 't\_'::
+Find all objects where the name match the pattern ``'t\_'``::
 
     $ mysqlmetagrep 't_' mats@localhost
     +------------------------+--------------+--------------+-----------+
@@ -95,7 +97,7 @@ Find all objects where the name match the pattern 't\_'::
     | mats:*@localhost:3306  | TABLE        | t3           | test      |
     +------------------------+--------------+--------------+-----------+
 
-To find all object that contain 't2' in the name or the body (for
+To find all object that contain ``'t2'`` in the name or the body (for
 routines, triggers, and events)::
 
     $ mysqlmetagrep -b '%t2%' mats@localhost:3306
@@ -115,3 +117,22 @@ Same thing, but using the **REGEXP** operator::
     | root:*@localhost:3306  | TRIGGER      | tr_foo       | test      |
     | root:*@localhost:3306  | TABLE        | t2           | test      |
     +------------------------+--------------+--------------+-----------+
+
+COPYRIGHT
+---------
+
+Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA

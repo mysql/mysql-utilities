@@ -2,6 +2,7 @@
 # merging easier.
 
 import os
+import setuptools
 import sys
 
 from distutils import log
@@ -15,19 +16,24 @@ import distutils.core
 import mysql.utilities
 
 META_INFO = {
-    'description':      'MySQL Command-line Utilities',
-    'maintainer':       'MySQL',         # !!!
+    'description':      'MySQL Utilities',
+    'maintainer':       'MySQL Utilities Team',
     'maintainer_email': "internals@lists.mysql.com", # !!!
     'version':          mysql.utilities.VERSION_STRING,
     'url':              'http://launchpad.net/???', # !!! Launchpad URL
     'classifiers': [
-        'Programming Language :: Python',
+        'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: 2.6',
         'Environment :: Console',
+        'Environment :: Win32 (MS Windows)',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
+        'Intended Audience :: Database Administrators',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
+        'Topic :: Utilities',
         ],
     }
 
@@ -64,7 +70,9 @@ INSTALL = {
         ],
     }
 
-ARGS = {}
+ARGS = {
+    'test_suite': 'tests.test_all',
+}
 
 if sys.platform.startswith("win32"):
     from cx_Freeze import setup, Executable
@@ -79,32 +87,6 @@ if sys.platform.startswith("win32"):
 else:
     from distutils.core import setup
     META_INFO['name'] = 'mysql-utilities'
-
-class CheckCommand(distutils.core.Command):
-    """
-    Command to execute all unit tests in the tree.
-    """
-    user_options = [ ]
-
-    def initialize_options(self):
-        self._dir = os.getcwd()
-        # Install mock database
-        # @todo add option to use real database later
-        import tests.MySQLdb
-        sys.modules['MySQLdb'] = tests.MySQLdb
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        "Finds all the tests modules in tests/, and runs them."
-
-        import unittest
-        import tests.command
-        suite = unittest.TestSuite()
-        suite.addTest(tests.command.suite())
-        runner = unittest.TextTestRunner(verbosity=1)
-        runner.run(suite)
 
 class MyInstallData(install_data):
     """Class for providing a customized version of install_data.
@@ -155,7 +137,6 @@ class MyBuildScripts(build_scripts):
 
 COMMANDS = {
     'cmdclass': {
-        'check': CheckCommand,
         'build_scripts': MyBuildScripts,
         'build_html': BuildDoc,
         'build_man': BuildDoc,
