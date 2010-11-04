@@ -1,14 +1,16 @@
-#############
-mysqlprocgrep
-#############
+.. _`mysqlprocgrep`:
+
+############################################################
+``mysqlprocgrep`` - Search through process lists on a server
+############################################################
 
 SYNOPSIS
-========
+--------
 
-  mysqlprocgrep [options] server ...
+  mysqlprocgrep [ <options> ] <server> ...
 
 DESCRIPTION
-===========
+-----------
 
 This utility scan the process lists for all the servers provided on
 the command line and will either print the result (the default) or
@@ -20,33 +22,37 @@ conditions given have to match.
 Options
 -------
 
-.. option:: --match-user=PATTEN
+.. option:: --help, -h
 
-   Match all rows where the **User** field matches PATTERN
+   Print help
 
-.. option:: --match-host=PATTERN
+.. option:: --match-user <pattern>
 
-   Match all rows where the **Host** field matches PATTERN
+   Match all rows where the **User** field matches pattern
 
-.. option:: --match-db=PATTERN
+.. option:: --match-host <pattern>
 
-   Match all rows where the **Db** field matches PATTERN
+   Match all rows where the **Host** field matches pattern
 
-.. option:: --match-time=PERIOD
+.. option:: --match-db <pattern>
 
-   Match all rows where the **Time** field is within PERIOD
+   Match all rows where the **Db** field matches pattern
 
-.. option:: --match-command=PATTERN
+.. option:: --match-time <pattern>
 
-   Match all rows where the **Command** field matches PATTERN
+   Match all rows where the **Time** field matches pattern
 
-.. option:: --match-state=PATTERN
+.. option:: --match-command <pattern>
 
-   Match all rows where the **State** field matches **PATTERN**.
+   Match all rows where the **Command** field matches pattern
 
-.. option:: --match-info=PATTERN
+.. option:: --match-state <pattern>
 
-   Match all rows where the **Info** field matches **PATTERN**.
+   Match all rows where the **State** field matches pattern.
+
+.. option:: --match-info <pattern>
+
+   Match all rows where the **Info** field matches pattern.
 
 .. option:: --kill-connection
 
@@ -59,24 +65,24 @@ Options
 .. option:: --print
 
    Print information about the matching processes. This is the default
-   if no :option:`--kill-*` option is given. If a :option:`--kill-*`
-   option is given, this option will print information about the
-   processes before killing them.
+   if no :option:`--kill-connection` or :option:`--kill-query` option
+   is given. If a kill option is given, this option will print
+   information about the processes before killing them.
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
    Be more verbose and print messages about execution. Can be given
    multiple times, in which case the verbosity level increases.
 
-.. option:: -G, --basic-regexp, --regexp
+.. option:: --regexp, --basic-regexp, -G
 
-   Use 'REGEXP' operator to match patterns instead of 'LIKE'.
+   Use **REGEXP** operator to match patterns instead of **LIKE**.
 
-.. option:: -Q, --sql, --print-sql
+.. option:: --sql, --print-sql, -Q
 
    Emit the SQL for matching or killing the queries. If the
-   :option:`--kill-*` option is given, a routine for killing the queries
-   are generated.
+   :option:`--kill-connection` or :option:`--kill-query` option is
+   given, a routine for killing the queries are generated.
 
 .. option:: --sql-body
 
@@ -85,12 +91,11 @@ Options
    with :manpage:`mysqlmkevent(1)` to generate an event for the server
    scheduler.
 
-   When used with the :option:`--kill-*` option, code for killing the
-   matching queries are generated. Note that it is not possible to
-   execute the emitted code unless it is put in a stored routine,
-   event, or trigger. For example, the following code could be
-   generated to kill all connections for user **www-data** that is
-   idle::
+   When used with a kill option, code for killing the matching queries
+   are generated. Note that it is not possible to execute the emitted
+   code unless it is put in a stored routine, event, or trigger. For
+   example, the following code could be generated to kill all
+   connections for user **www-data** that is idle::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -115,13 +120,9 @@ Options
      END;
      CLOSE kill_cursor;
 
-.. option:: -h, --help
 
-   Print help
-
-
-Specifying time periods
------------------------
+Specifying time
+~~~~~~~~~~~~~~~
 
 A time period specification consists of a number with an optional
 suffix denoting the size of the period and there can be an optional +
@@ -134,16 +135,36 @@ The allowable suffixes are **s** (second), **m** (minute), **h**
 
 
 EXAMPLES
-========
+--------
 
 For all the examples, we assume that the **root** user on
 **localhost** has sufficient privileges to kill queries and
 connections.
 
-To kill all connections created by user "mats" that are younger than 1 minute::
+To kill all connections created by user "mats" that are younger than 1
+minute::
 
-  mysqlprocgrep --user=root --host=localhost --match-user=mats --match-time=-1m --kill-query
+  mysqlprocgrep --user=root --host=localhost --match-user=mats --age=-1m --kill-query
 
 To kill all queries that has been idle for more than 1 hour::
 
-  mysqlprocgrep --user=root --host=localhost --match-command=sleep --match-time=+1h --kill
+  mysqlprocgrep --user=root --host=localhost --match-command=sleep --age=+1h --kill
+
+COPYRIGHT
+---------
+
+Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA

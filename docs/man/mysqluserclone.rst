@@ -1,9 +1,12 @@
-================
- mysqluserclone
-================
+.. _`mysqluserclone`:
+
+########################################################################
+``mysqluserclone`` - Create new users using an existing user as template
+########################################################################
+
 
 SYNOPSIS
-========
+--------
 
 ::
 
@@ -14,69 +17,97 @@ SYNOPSIS
                  [ ,<new_user> [ :<password>]]]
 
 DESCRIPTION
-===========
+-----------
 
-This document describes the ''mysqluserclone'' utility. This utility
-permits a database administrator to use an existing user account on one
-server as a template, clone a MySQL user such that one or more new user
-accounts are created on another (or the same) server with the same
-privileges as the original user.
+This utility permits a database administrator to use an existing user
+account on one server as a template, clone a MySQL user such that one
+or more new user accounts are created on another (or the same) server
+with the same privileges as the original user.
 
 For example, to clone 'joe' as 'sam' and 'sally' with passwords and logging in
-as root on the local machine, use this command:
-
-::
+as root on the local machine, use this command::
 
   mysqluserclone --source=root@localhost:3306 joe@localhost \\
                  sam:secret1@somehost, sally:secret2@localhost
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
-in the operation. 
+in the operation.
 
 OPTIONS
-=======
+-------
 
---version             show version number and exit
+.. option:: --version
 
---help                show the help page
+   show version number and exit
 
---source=SOURCE       connection information for source server in the form:
-                      <user>:<password>@<host>:<port>:<socket>
-                      Where <password> is optional and either <port> or
-                      <socket> must be provided.
+.. option:: --help
 
---destination=DEST    connection information for destination server in the
-                      form: <user>:<password>@<host>:<port>:<socket>
-                      Where <password> is optional and either <port> or
-                      <socket> must be provided.
+   show the help page
 
---copy-dir=COPY_DIR   a path to use when copying data (stores temporary
-                      files) - default = current directory
+.. option:: --source <source>
 
--d, --dump            dump GRANT statements for user
+   connection information for source server in the form:
+   <user>:<password>@<host>:<port>:<socket> where <password> is
+   optional and either <port> or <socket> must be provided.
 
--f, --force           drop the new user if it exists
+.. option:: --destination <destinatio>
 
--v, --verbose         display additional information during operation
+   connection information for destination server in the form:
+   <user>:<password>@<host>:<port>:<socket> Where <password> is
+   optional and either <port> or <socket> must be provided.
 
---silent              do not display feedback information during operation
+.. option:: --copy-dir <directory>
 
---include-globals     include privileges that match base_user@% as well as
-                      base_user@host
+   Path to use when copying data (stores temporary files) - default =
+   current directory
 
+.. option:: -d, --dump
 
-FILES
-=====
+   dump GRANT statements for user
 
-- ''mysqlusercopy.py''  the utility script
-- ''mysql''             the MySQL utilities library
+.. option:: -f, --force
+
+   drop the new user if it exists
+
+.. option:: -v, --verbose
+
+   display additional information during operation
+
+.. option:: --silent
+
+   do not display feedback information during operation
+
+.. option:: --include-globals
+
+    include privileges that match ``base_user@%`` as well as
+    ``base_user@host``
+
 
 NOTES
-=====
+-----
 
-The login user must have the appropriate permissions to create new users,
-access (read) the mysql database, and grant privileges. At a minimum, this
-requires the login user to have read on the mysql database, the
-''WITH GRANT OPTION'' for all databases listed in the ''GRANT'' statements
-found, and the ability to create a user account.
+The login user must have the appropriate permissions to create new
+users, access (read) the mysql database, and grant privileges. At a
+minimum, this requires the login user to have read on the mysql
+database, the **WITH GRANT OPTION** for all databases listed in the
+**GRANT** statements found, and the ability to create a user account.
+
+COPYRIGHT
+---------
+
+Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
