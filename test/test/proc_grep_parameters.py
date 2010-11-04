@@ -3,8 +3,7 @@
 import os
 import mysql_test
 import proc_grep
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(proc_grep.test):
     """Process grep
@@ -37,8 +36,12 @@ class test(proc_grep.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        self.mask_result("    user LIKE 'root'", "    user LIKE 'root'",
-                         "    user LIKE 'XXXX'")
+        self.mask_result("    User LIKE 'root'", "    User LIKE 'root'",
+                         "    User LIKE 'XXXX'")
+        
+        # Mask funny output on Windows
+        if os.name != "posix":
+            self.replace_result("    User LIKE ", "    User LIKE 'XXXX'\n")
         
         return True
   

@@ -2,8 +2,7 @@
 
 import os
 import replicate
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(replicate.test):
     """check parameters for the replicate utility

@@ -25,8 +25,8 @@ This module contains abstractions of MySQL replication functionality.
 import re
 import time
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import User
+from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.common.user import User
 
 # List of database objects for enumeration
 DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \

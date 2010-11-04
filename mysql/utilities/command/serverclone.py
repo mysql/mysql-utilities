@@ -55,9 +55,9 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
                         (default is False)
     """
 
-    from mysql.utilities.common import Server
-    from mysql.utilities.common import MySQLUtilError
-    from mysql.utilities.common import get_tool_path
+    from mysql.utilities.common.server import Server
+    from mysql.utilities.exception import MySQLUtilError
+    from mysql.utilities.common.tools import get_tool_path
 
     # Try to connect to the MySQL database server.
     server1 = Server(conn_val, "source")

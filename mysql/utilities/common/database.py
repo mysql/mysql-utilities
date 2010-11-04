@@ -24,7 +24,7 @@ import datetime
 import os
 import re
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -302,7 +302,7 @@ class Database(object):
         """Create a database object.
 
         obj_type[in]       Object type (string) e.g. DATABASE
-        obj[in]            A row from the get_db_objects() method
+        obj[in]            A row from the get_db_object_names() method
                            that contains the elements of the object
         show_grant_msg[in] If true, display diagnostic information
         silent[in]         do not print informational messages
@@ -383,7 +383,7 @@ class Database(object):
         connections[in]    Number of threads(connections) to use for insert
         """
         
-        from mysql.utilities.common import Table
+        from mysql.utilities.common.table import Table
  
         # Must call init() first!
         # Guard for init() prerequisite
@@ -488,8 +488,7 @@ class Database(object):
                                 raise MySQLUtilError("Cannot create table "
                                                      "object before copy.")
                                 
-                            tbl.copy_data(self.destination, new_db,
-                                          self.verbose, connections)
+                            tbl.copy_data(self.destination, new_db, connections)
                         except MySQLUtilError, e:
                             raise e
                         
@@ -541,56 +540,180 @@ class Database(object):
             create_statement = re.sub("%", "%%", create_statement)
         return create_statement
         
-
-    def get_db_objects(self, obj_type):
-        """Return a result set containing all objects for a given database
         
-        obj_type[in]       Type of object to retrieve    
+    def get_next_object(self):
+        """Retrieve the next object in the database list.
+        
+        This method is an iterator for retrieving the objects in the database
+        as specified in the init() method. You must call this method first.
+        
+        Returns next object in list or throws exception at EOL.
+        """
+
+        # Must call init() first!
+        # Guard for init() prerequisite
+        assert self.init_called, "You must call db.init() before db.copy()."
+
+        for obj in self.objects:
+            yield obj
+            
+
+    def get_db_objects(self, obj_type, columns='NAMES', get_columns=False):
+        """Return a result set containing a list of objects for a given
+        database based on type.
+        
+        This method returns either a list of names for the object type
+        specified, a brief list of minimal columns for creating the
+        objects, or the full list of columns from INFORMATION_SCHEMA. It can
+        also provide the list of column names if desired.
+        
+        obj_type[in]       Type of object to retrieve
+        columns[in]        Column mode - NAMES (default), BRIEF, or FULL
+                           Note: not valid for GRANT objects.
+        get_columns[in]    If True, return column names as first element
+                           and result set as second element. If False,
+                           return only the result set.
 
         TODO: Change implementation to return classes instead of a result set.
     
         Returns MySQLdb result set
         """
-    
-        # Must call init() first!
-        # Guard for init() prerequisite
-        assert self.init_called, "You must call db.init() before db.copy()."
 
+        _FULL = """
+        SELECT *
+        """
         if obj_type == _TABLE:
+            _NAMES = """
+            SELECT DISTINCT TABLES.TABLE_NAME 
+            """
+            _FULL = """
+            SELECT TABLES.*, COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
+                COLUMNS.COLUMN_TYPE, COLUMNS.IS_NULLABLE,
+                COLUMNS.COLUMN_DEFAULT, COLUMNS.COLUMN_KEY,
+                REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME,
+                REFERENTIAL_CONSTRAINTS.REFERENCED_TABLE_NAME,
+                REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_NAME,
+                REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_SCHEMA,
+                REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
+                REFERENTIAL_CONSTRAINTS.DELETE_RULE,
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME, 
+                KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
+                KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
+                KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
+            """
+            _MINIMAL = """
+            SELECT TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME, ENGINE,
+                COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
+                COLUMNS.COLUMN_TYPE, COLUMNS.IS_NULLABLE,
+                COLUMNS.COLUMN_DEFAULT, COLUMNS.COLUMN_KEY,
+                TABLES.TABLE_COLLATION,
+                TABLES.CREATE_OPTIONS,
+                REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME,
+                REFERENTIAL_CONSTRAINTS.REFERENCED_TABLE_NAME,
+                REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_NAME,
+                REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
+                REFERENTIAL_CONSTRAINTS.DELETE_RULE,
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME, 
+                KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
+                KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
+                KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
+            """
             _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
+            FROM INFORMATION_SCHEMA.TABLES JOIN INFORMATION_SCHEMA.COLUMNS ON
+                TABLES.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA AND
+                TABLES.TABLE_NAME = COLUMNS.TABLE_NAME 
+            LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS ON
+                TABLES.TABLE_SCHEMA = REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA 
+                AND 
+                TABLES.TABLE_NAME = REFERENTIAL_CONSTRAINTS.TABLE_NAME 
+            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE ON 
+                TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA 
+                AND 
+                TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME 
+            WHERE TABLES.TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
+            ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
+                     COLUMNS.ORDINAL_POSITION
             """
         elif obj_type == _VIEW:
+            _NAMES = """
+            SELECT TABLE_NAME
+            """
+            _MINIMAL = """
+            SELECT TABLE_SCHEMA, TABLE_NAME, DEFINER, SECURITY_TYPE,
+                   VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE, 
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION                   
+            """
             _OBJECT_QUERY = """
-            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS 
+            FROM INFORMATION_SCHEMA.VIEWS 
             WHERE TABLE_SCHEMA = %s
             """
         elif obj_type == _TRIG:
+            _NAMES = """
+            SELECT TRIGGER_NAME
+            """
+            _MINIMAL = """
+            SELECT TRIGGER_NAME, DEFINER, EVENT_MANIPULATION,
+                   EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE,
+                   ACTION_ORIENTATION, ACTION_TIMING,
+                   ACTION_STATEMENT, SQL_MODE, 
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DATABASE_COLLATION
+            """
             _OBJECT_QUERY = """
-            SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS 
-            WHERE TRIGGER_SCHEMA = %s 
+            FROM INFORMATION_SCHEMA.TRIGGERS 
+            WHERE TRIGGER_SCHEMA = %s
             """
         elif obj_type == _PROC:
+            _NAMES = """
+            SELECT NAME
+            """
+            _MINIMAL = """
+            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                   SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
+                   BODY, SQL_MODE,  
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DB_COLLATION
+            """
             _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'PROCEDURE'
+            FROM mysql.proc
+            WHERE DB = %s AND TYPE = 'PROCEDURE'
             """
         elif obj_type == _FUNC:
+            _NAMES = """
+            SELECT NAME
+            """
+            _MINIMAL = """
+            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                   SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
+                   BODY, SQL_MODE,  
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DB_COLLATION
+            """
             _OBJECT_QUERY = """
-            SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-            WHERE ROUTINE_SCHEMA = %s AND ROUTINE_TYPE = 'FUNCTION'
+            FROM mysql.proc 
+            WHERE DB = %s AND TYPE = 'FUNCTION'
             """
         elif obj_type == _EVENT:
+            _NAMES = """
+            SELECT NAME
+            """
+            _MINIMAL = """
+            SELECT NAME, DEFINER, BODY, STATUS,
+                   EXECUTE_AT, INTERVAL_VALUE, INTERVAL_FIELD, SQL_MODE,
+                   STARTS, ENDS, STATUS, ON_COMPLETION, ORIGINATOR,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DB_COLLATION
+            """
             _OBJECT_QUERY = """
-            SELECT EVENT_NAME FROM INFORMATION_SCHEMA.EVENTS 
-            WHERE EVENT_SCHEMA = %s
+            FROM mysql.event 
+            WHERE DB = %s
             """
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """
             (
-                SELECT grantee AS c1, privilege_type AS c2, table_schema AS c3,
-                       NULL AS c4, NULL AS c5, NULL AS c6
+                SELECT GRANTEE, PRIVILEGE_TYPE, TABLE_SCHEMA,
+                       NULL as TABLE_NAME, NULL AS COLUMN_NAME,
+                       NULL AS ROUTINE_NAME
                 FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
                 WHERE table_schema = %s
             ) UNION (
@@ -607,7 +730,8 @@ class Database(object):
                 SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
                        Routine_name, NULL, Routine_type 
                 FROM mysql.procs_priv WHERE Db = %s
-            ) ORDER BY c1 ASC, c2 ASC, c3 ASC, c4 ASC, c5 ASC, c6 ASC
+            ) ORDER BY GRANTEE ASC, PRIVILEGE_TYPE ASC, TABLE_SCHEMA ASC,
+                       TABLE_NAME ASC, COLUMN_NAME ASC, ROUTINE_NAME ASC
             """
         else:
             return None
@@ -615,11 +739,19 @@ class Database(object):
         if obj_type == _GRANT:
             return self.source.exec_query(_OBJECT_QUERY,
                                           (self.db_name, self.db_name,
-                                           self.db_name, self.db_name,))
+                                           self.db_name, self.db_name,),
+                                          get_columns)
         else:
-            return self.source.exec_query(_OBJECT_QUERY, (self.db_name,))
-        
-        
+            if columns == "NAMES":
+                prefix = _NAMES
+            elif columns == "FULL":
+                prefix = _FULL
+            else:
+                prefix = _MINIMAL
+            return self.source.exec_query(prefix + _OBJECT_QUERY,
+                                          (self.db_name,), get_columns)
+
+
     def _check_user_permissions(self, uname, host, access):
         """ Check user permissions for a given privilege
     
@@ -630,7 +762,7 @@ class Database(object):
         Returns True if user has permission, False if not
         """
         
-        from mysql.utilities.common import User
+        from mysql.utilities.common.user import User
         
         result = True    
         user = User(self.source, uname+'@'+host)
@@ -639,7 +771,8 @@ class Database(object):
     
     
     def check_read_access(self, user, host, skip_views,
-                          skip_proc, skip_func, skip_grants):
+                          skip_proc, skip_func, skip_grants,
+                          skip_events):
         """ Check access levels for reading database objects
         
         This method will check the user's permission levels for copying a
@@ -654,6 +787,7 @@ class Database(object):
         skup_proc[in]      True = no procedures processed
         skip_func[in]      True = no functions processed
         skip_grants[in]    True = no grants processed
+        skip_events[in]    True = no events processed
         
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
@@ -671,6 +805,10 @@ class Database(object):
         # if procs or funcs are included, we need read on mysql db
         if not skip_proc or not skip_func:
             priv_tuple = ("mysql", "SELECT")
+            source_privs.append(priv_tuple)
+        # if events, we need event
+        if not skip_events:
+            priv_tuple = (self.db_name, "EVENT")
             source_privs.append(priv_tuple)
         
         # Check permissions on source

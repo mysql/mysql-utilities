@@ -1,10 +1,7 @@
-#!/usr/bin/python
-
 import MySQLdb
 import re
 import sys
 
-# Some handy constants
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
 ID      = "Id"
@@ -71,16 +68,11 @@ BEGIN{body}
 END"""
 
 class ProcessGrep(object):
-    """Class for searching the INFORMATION_SCHEMA.PROCESSLIST table on MySQL servers.
-    """
-    
     def __init__(self, matches, actions=[], use_regexp=False):
         self.__select = _make_select(matches, use_regexp).strip()
         self.__actions = actions
 
     def sql(self, only_body=False):
-        """Show SQL code for executing action.
-        """
         params = {
             'select': "\n      ".join(self.__select.split("\n")),
             'kill': 'CONNECTION' if KILL_CONNECTION in self.__actions else 'QUERY',
@@ -94,7 +86,7 @@ class ProcessGrep(object):
         else:
             return self.__select
 
-    def execute(self, args, output=sys.stdout, connector=MySQLdb):
+    def execute(self, connections, output=sys.stdout, connector=MySQLdb):
         from ..common.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list

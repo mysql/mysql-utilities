@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import mysql_test
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(mysql_test.System_test):
     """check indexes for duplicates and redundancies

@@ -15,9 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 
-"""Module for searching MySQL database servers for objects by name or content.
-"""
-
 import MySQLdb
 import sys
 
@@ -194,19 +191,18 @@ def _join_words(words, delimiter=",", conjunction="and"):
     else:
         return '{0} '.format(delimiter).join(words[0:-1]) + "%s %s %s" % (delimiter, conjunction, words[-1])
 
-ROUTINE, EVENT, TRIGGER, TABLE, DATABASE, VIEW, USER = 'routine', 'event', 'trigger', 'table', 'database', 'view', 'user'
+ROUTINE =  'routine'
+EVENT =  'event'
+TRIGGER =  'trigger'
+TABLE =  'table'
+DATABASE =  'database'
+VIEW =  'view'
+USER = 'user'
 COLUMN = 'column'
 
-#: List of all object types that can be searched
 OBJECT_TYPES = _OBJMAP.keys()
 
 class ObjectGrep(object):
-    """Search for objects on a MySQL server by name or content.
-
-    This command class is used to search one or more MySQL server
-    instances for objects where the name (or the contents of routines,
-    triggers, or events) match a given pattern.
-    """
     def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
                  check_body=False, use_regexp=False):
         stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
@@ -217,14 +213,9 @@ class ObjectGrep(object):
         self.__types = types
 
     def sql(self):
-        """Return SQL code for performing this search.
-        """
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=MySQLdb):
-        """Perform a search on a list of servers.
-        """
-
         from ..common.exception import FormatError, EmptyResultError
 
         entries = []

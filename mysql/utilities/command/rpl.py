@@ -24,7 +24,7 @@ master/slave replication topology among two servers.
 import re
 import sys
 import MySQLdb
-from mysql.utilities.common import MySQLUtilError
+from mysql.utilities.exception import MySQLUtilError
 
 def replicate(master_vals, slave_vals, rpl_user,
               test_db=None, verbose=False):
@@ -39,9 +39,9 @@ def replicate(master_vals, slave_vals, rpl_user,
                        optional - default = False
     """
     
-    from mysql.utilities.common import connect_servers
-    from mysql.utilities.common import Rpl
-    from mysql.utilities.common import Server
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.rpl import Rpl
+    from mysql.utilities.common.server import Server
 
     # Fail if master and slave are using the same connection parameters.
     dupes = False

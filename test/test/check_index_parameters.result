@@ -1,5 +1,5 @@
 Test case 1 - do the help
-Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1
+Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck - check for duplicate or redundant indexes
 

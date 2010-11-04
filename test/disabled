@@ -1,0 +1,9 @@
+#
+# Use this file to disable tests for non-deterministic or other reasons that keep the
+# test from passing on all platforms.
+# 
+# Include the following information (CSV):
+# suite.test, reason
+# main.example, This is a test (bug#xxxxx)
+#
+main.proc_grep, Output generated is non-deterministic

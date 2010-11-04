@@ -2,33 +2,77 @@
 # merging easier.
 
 import os
+import setuptools
 import sys
 
 from distutils import log
 from distutils.command.build_scripts import build_scripts
-from distutils.core import Command
+from distutils.command.install_data import install_data
 from distutils.util import convert_path
+from sphinx.setup_command import BuildDoc
+
+import distutils.core
 
 import mysql.utilities
 
 META_INFO = {
-    'description':      'MySQL Command-line Utilities',
-    'maintainer':       'MySQL',         # !!!
+    'description':      'MySQL Utilities',
+    'maintainer':       'MySQL Utilities Team',
     'maintainer_email': "internals@lists.mysql.com", # !!!
     'version':          mysql.utilities.VERSION_STRING,
     'url':              'http://launchpad.net/???', # !!! Launchpad URL
     'classifiers': [
-        'Programming Language :: Python',
+        'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: 2.6',
         'Environment :: Console',
+        'Environment :: Win32 (MS Windows)',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
+        'Intended Audience :: Database Administrators',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
+        'Topic :: Utilities',
         ],
     }
 
-ARGS = {}
+INSTALL = {
+    'packages': [
+        "mysql.utilities",
+        "mysql.utilities.command",
+        "mysql.utilities.common",
+        ],
+    'scripts': [
+        'scripts/mysqldbcopy.py',
+        'scripts/mysqlexport.py',
+        'scripts/mysqlimport.py',
+        'scripts/mysqlindexcheck.py',
+        'scripts/mysqlmetagrep.py',
+        'scripts/mysqlprocgrep.py',
+        'scripts/mysqlreplicate.py',
+        'scripts/mysqlserverclone.py',
+        'scripts/mysqluserclone.py',
+        ],
+    'data_files': [
+        ('man/man1', [
+                'build/sphinx/man/mysqldbcopy.1',
+                'build/sphinx/man/mysqlexport.1',
+                'build/sphinx/man/mysqlimport.1',
+                'build/sphinx/man/mysqlindexcheck.1',
+                'build/sphinx/man/mysqlmetagrep.1',
+                'build/sphinx/man/mysqlprocgrep.1',
+                'build/sphinx/man/mysqlreplicate.1',
+                'build/sphinx/man/mysqlserverclone.1',
+                'build/sphinx/man/mysqluserclone.1',
+                'build/sphinx/man/mut.1',
+                ] ),
+        ],
+    }
+
+ARGS = {
+    'test_suite': 'tests.test_all',
+}
 
 if sys.platform.startswith("win32"):
     from cx_Freeze import setup, Executable
@@ -44,48 +88,18 @@ else:
     from distutils.core import setup
     META_INFO['name'] = 'mysql-utilities'
 
-INSTALL = {
-    'packages': [
-        "mysql.utilities",
-        "mysql.utilities.command",
-        "mysql.utilities.common",
-        ],
-    'scripts': [
-        'scripts/mysqldbcopy.py',
-        'scripts/mysqlindexcheck.py',
-        'scripts/mysqlmetagrep.py',
-        'scripts/mysqlprocgrep.py',
-        'scripts/mysqlreplicate.py',
-        'scripts/mysqlserverclone.py',
-        'scripts/mysqluserclone.py',
-        ],
-    }
+class MyInstallData(install_data):
+    """Class for providing a customized version of install_data.
 
-class CheckCommand(Command):
+    Before installing the data, the manuals will be built since these
+    are considered data from the view of distutils.
     """
-    Command to execute all unit tests in the tree.
-    """
-    user_options = [ ]
-
-    def initialize_options(self):
-        self._dir = os.getcwd()
-        # Install mock database
-        # @todo add option to use real database later
-        import tests.MySQLdb
-        sys.modules['MySQLdb'] = tests.MySQLdb
-
-    def finalize_options(self):
-        pass
 
     def run(self):
-        "Finds all the tests modules in tests/, and runs them."
-
-        import unittest
-        import tests.command
-        suite = unittest.TestSuite()
-        suite.addTest(tests.command.suite())
-        runner = unittest.TextTestRunner(verbosity=1)
-        runner.run(suite)
+        self.run_command('build_man')
+        # distutils is compatible with 2.1 so we cannot use super() to
+        # call it.
+        install_data.run(self)
 
 class MyBuildScripts(build_scripts):
     """Class for providing a customized version of build_scripts.
@@ -115,14 +129,22 @@ class MyBuildScripts(build_scripts):
                 log.debug("Copying %s -> %s", script, script_copy)
                 self.copy_file(script, script_copy)
                 self.scripts.append(script_copy)
-        build_scripts.run(self) # distutils is compatible with 2.1
+        # distutils is compatible with 2.1 so we cannot use super() to
+        # call it.
+        build_scripts.run(self)
         self.scripts = saved_scripts
 
 
 COMMANDS = {
     'cmdclass': {
-        'check': CheckCommand,
         'build_scripts': MyBuildScripts,
+        'build_html': BuildDoc,
+        'build_man': BuildDoc,
+        'install_data': MyInstallData,
+        },
+    'options': {
+        'build_html': { 'builder': 'html' },
+        'build_man': { 'builder': 'man' },
         },
     }
 

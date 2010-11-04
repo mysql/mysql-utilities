@@ -2,9 +2,8 @@
 
 import os
 import mysql_test
-import mysql.utilities.common as mysql
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.common.user import User
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(mysql_test.System_test):
     """copy user
@@ -135,7 +134,7 @@ class test(mysql_test.System_test):
         return self.save_result_file(__name__, self.results)
     
     def drop_user(self, user_name, server):
-        user = mysql.User(server, user_name, False)
+        user = User(server, user_name, False)
         if user.exists():
             res = user.drop()
             if res is not None:

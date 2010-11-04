@@ -2,8 +2,7 @@
 
 import os
 import mysql_test
-from mysql.utilities.common import MySQLUtilError
-from mysql.utilities.common import MUTException
+from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(mysql_test.System_test):
     """Process grep
@@ -40,6 +39,8 @@ class test(mysql_test.System_test):
             raise MUTException("%s: failed" % comment)
             
         self.mask_column_result("| %s:*@" % conn_val[0], "|", 3, "XXXXX ")
+        self.mask_column_result("| %s:*@" % conn_val[0], "|", 8, "XXX ")
+        self.mask_column_result("| %s:*@" % conn_val[0], "|", 9, "XXXXX ")
         self.mask_result("| %s:*@" % conn_val[0], "| %s:*@" % conn_val[0],
                          "| XXXXXXXXXXXXXXXXXXXXX")
         
