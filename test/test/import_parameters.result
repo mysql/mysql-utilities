@@ -275,7 +275,7 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
 Test case 20 - no blobs
-# WARNING : --skip-blobs option ignored for metadata import.
+# WARNING: --skip-blobs option ignored for metadata import.
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 CREATE DATABASE `util_test`;

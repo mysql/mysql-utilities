@@ -1,7 +1,7 @@
 Test case 1 - bad --skip values
 ERROR: The value wiki-waki is not a valid value for --skip.
 Test case 2 - exporting data and skipping data
-You cannot use --export=data and --skip-data when exporting table data.
+ERROR: You cannot use --export=data and --skip-data when exporting table data.
 Test case 3 - no database specified
 Usage: mysqlexport.py --server=user:pass@host:port:socket db1, db2, db3
 

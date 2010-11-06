@@ -174,10 +174,10 @@ elif opt.export == "B":
     opt.export = "BOTH"
     
 if opt.skip_blobs and not opt.export == "DATA":
-    print "# WARNING : --skip-blobs option ignored for metadata export."
+    print "# WARNING: --skip-blobs option ignored for metadata export."
     
 if "DATA" in skips and opt.export == "DATA":
-    print "You cannot use --export=data and --skip-data when exporting " \
+    print "ERROR: You cannot use --export=data and --skip-data when exporting " \
           "table data."
     exit(1)
 
