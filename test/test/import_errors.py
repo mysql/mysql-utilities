@@ -157,6 +157,16 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
         test_num += 1
 
+        bad_csv_file = os.path.normpath(self.testdir + "/data/bad_object.csv")
+
+        cmd_str = import_cmd + " %s " % bad_csv_file + \
+                  "--format=csv --import=both " 
+        comment = "Test case %d - error: bad object definition" % test_num
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        test_num += 1
+
         return True
 
     def get_result(self):

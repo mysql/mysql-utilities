@@ -78,3 +78,7 @@ Test case 14 - warning: --skip-blobs
 #...done.
 Test case 15 - error: --skip=data & --import=data
 ERROR: You cannot use --import=data and --skip-data when importing table data.
+Test case 16 - error: bad object definition
+# Source on localhost: ... connected.
+# Importing definitions and data from test\data\bad_object.csv.
+ERROR: Object data invalid: GRANT : ['NAME', 'ORIGIN', 'COLOUR']

@@ -482,7 +482,11 @@ def _build_create_objects(obj_type, db, definitions):
             create_str += "DO %s;" % defn[col_ref.get("BODY",2)]
             create_strings.append(create_str)
         elif obj_type == "GRANT":
-            user, priv, db, tbl = defn[0:4]
+            try:
+                user, priv, db, tbl = defn[0:4]
+            except:
+                raise MySQLUtilError("Object data invalid: %s : %s" % \
+                                     (obj_type, defn))
             if not tbl:
                 tbl = "*"
             elif tbl.upper() == "NONE":
@@ -490,7 +494,7 @@ def _build_create_objects(obj_type, db, definitions):
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, db, tbl, user)
             create_strings.append(create_str)
         else:
-            raise MySQLUtilError("Unknow object type discovered: %s", obj_type)
+            raise MySQLUtilError("Unknown object type discovered: %s", obj_type)
     return create_strings
         
         
