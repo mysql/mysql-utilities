@@ -95,7 +95,7 @@ class test(import_basic.test):
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix":
             joe_conn = "--server=joe@localhost:%s" % self.server2.port
-            if self.server1.socket is not None:
+            if self.server2.socket is not None:
                 joe_conn += ":%s" % self.server2.socket
         else:
             joe_conn = "--server=joe@localhost:%s " % self.server2.port
@@ -166,6 +166,16 @@ class test(import_basic.test):
         if not res:
             raise MUTException("%s: failed" % comment)
         test_num += 1
+        
+        if os.name != "posix":
+            self.replace_result("# Importing definitions and data from "
+                                "test\\data\\bad_object.csv",
+                                "# Importing definitions and data from "
+                                "test/data/bad_object.csv.\n")
+            self.replace_result("# Importing definitions from "
+                                "test\\data\\bad_sql.sql",
+                                "# Importing definitions from "
+                                "test/data/bad_sql.sql.\n")
 
         return True
 

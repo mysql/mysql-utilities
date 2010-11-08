@@ -64,7 +64,7 @@ Test case 11 - error: not enough privileges
 ERROR: User joe on the Source server does not have permissions to create all objects in util_test. User needs CREATE privilege on util_test.
 Test case 12 - error: bad SQL statements
 # Source on localhost: ... connected.
-# Importing definitions from test\data\bad_sql.sql.
+# Importing definitions from test/data/bad_sql.sql.
 >>>>
 CREATE TABLES util_test.t1 (a char(30)) ENGINE=MEMORY;
 <<<<
@@ -80,5 +80,5 @@ Test case 15 - error: --skip=data & --import=data
 ERROR: You cannot use --import=data and --skip-data when importing table data.
 Test case 16 - error: bad object definition
 # Source on localhost: ... connected.
-# Importing definitions and data from test\data\bad_object.csv.
+# Importing definitions and data from test/data/bad_object.csv.
 ERROR: Object data invalid: GRANT : ['NAME', 'ORIGIN', 'COLOUR']
