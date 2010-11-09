@@ -9,7 +9,6 @@ from distutils import log
 from distutils.command.build_scripts import build_scripts
 from distutils.command.install_data import install_data
 from distutils.util import convert_path
-from sphinx.setup_command import BuildDoc
 
 import distutils.core
 
@@ -138,13 +137,7 @@ class MyBuildScripts(build_scripts):
 COMMANDS = {
     'cmdclass': {
         'build_scripts': MyBuildScripts,
-        'build_html': BuildDoc,
-        'build_man': BuildDoc,
         'install_data': MyInstallData,
-        },
-    'options': {
-        'build_html': { 'builder': 'html' },
-        'build_man': { 'builder': 'man' },
         },
     }
 

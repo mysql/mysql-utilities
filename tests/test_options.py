@@ -1,7 +1,7 @@
 import unittest
 
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import FormatError
 
 def _spec(info):
     """Create a server specification string from an info structure."""
@@ -40,7 +40,7 @@ class TestParseConnection(unittest.TestCase):
 
     def testInvalid(self):
         for spec in invalid_specificers:
-            self.assertRaises(MySQLUtilError, parse_connection, spec)
+            self.assertRaises(FormatError, parse_connection, spec)
  
 def test_suite():
     return unittest.makeSuite(TestParseConnection, 'test')

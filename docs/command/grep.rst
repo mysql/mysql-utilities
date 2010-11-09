@@ -13,8 +13,8 @@ table include the table name, the column names, and the partition
 names (if it is a partition table).
 
 
-Module Contents
----------------
+Constants
+---------
 
 .. data:: ROUTINE
 .. data:: EVENT
@@ -31,6 +31,9 @@ Module Contents
    This is a sequence of all the object types that are available. It
    can be used to generate a version-independent list of object types
    that can be searched in, for example, options and help texts.
+
+Classes
+-------
 
 .. class:: ObjectGrep(pattern[, database_pattern=None, types=OBJECT_TYPES, check_body=False, use_regexp=False])
 

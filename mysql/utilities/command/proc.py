@@ -86,16 +86,19 @@ class ProcessGrep(object):
         else:
             return self.__select
 
-    def execute(self, connections, output=sys.stdout, connector=MySQLdb):
+    def execute(self, *connections, **kwrds):
         from ..common.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list
+
+        output = kwrds.get('output', sys.stdout)
+        connector = kwrds.get('connector', MySQLdb)
 
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")
         entries = []
         # Build SQL statement
-        for info in args:
+        for info in connections:
             if isinstance(info, basestring):
                 info = parse_connection(info)
             connection = connector.connect(**info)

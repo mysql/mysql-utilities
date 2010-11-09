@@ -28,7 +28,6 @@ import optparse
 import re
 
 from .. import VERSION_FRM
-from mysql.utilities.exception import MySQLUtilError
 
 def setup_common_options(program_name, desc_str, usage_str):
     """Setup option parser and options common to all MySQL Utilities.
@@ -128,6 +127,8 @@ _CONN_CRE = re.compile(
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
+_BAD_CONN_FORMAT = "Connection '{0}' cannot be parsed as a connection"
+
 def parse_connection(connection_values):
     """Parse connection values.
     
@@ -151,8 +152,8 @@ def parse_connection(connection_values):
     
     grp = _CONN_CRE.match(connection_values)
     if not grp:
-        from mysql.utilities.exception import MySQLUtilError
-        raise MySQLUtilError("Cannot parse connection.")
+        from mysql.utilities.exception import FormatError
+        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
     user, passwd, host, port, socket = grp.groups()
 
     connection = {

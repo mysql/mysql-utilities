@@ -18,8 +18,8 @@ the query later, or feed it into some other program that process SQL
 queries further.
 
 
-Module Content
---------------
+Constants
+---------
 
 .. data:: KILL_QUERY
           KILL_CONNECTION
@@ -37,6 +37,10 @@ Module Content
           INFO
 
    Constants for the columns available in the processlist table.
+
+
+Classes
+-------
 
 .. class:: ProcessGrep(matches, actions=[], use_regexp=False)
 
@@ -76,15 +80,16 @@ Module Content
                 options.
       :rtype: string
 
-   .. method:: execute(connections[, output=sys.stdout, connector=MySQLdb])
+   .. method:: execute(connection, ...[, output=sys.stdout, connector=MySQLdb])
 
       Execute the search on each of the connections supplied. If
       *output* is not ``None``, then the value will be treated as a
       file object and the result of the execution printed on that
-      stream.
+      stream. Note that the output and connector arguments *have* to
+      be supplied as keyword arguments and that all other arguments
+      are treated as connection specifiers.
 
-      :param connections: Sequence of connections to query.
-      :type connections: Sequence of :ref:`connection specificers`
+      :type connection: A :ref:`connection specificers`
       :param output: File object for printing output to
       :param connector: Connector to use.
 
