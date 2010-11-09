@@ -1,0 +1,327 @@
+Test case 1 - help
+Usage: mysqlimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqlimport - import metadata and data from files
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f FORMAT, --format=FORMAT
+                        display the output in either SQL|S (default), GRID|G,
+                        TAB|T, CSV|C, or VERTICAL|V format
+  -i IMPORT_TYPE, --import=IMPORT_TYPE
+                        control the import of either DATA|D = only the table
+                        data for the tables in the database list,
+                        DEFINITIONS|F = import only the definitions for the
+                        objects in the database list, or BOTH|B = import the
+                        metadata followed by the data (default: import
+                        definitions)
+  -d, --drop-first      Drop database before importing.
+  -b, --bulk-insert     Use bulk insert statements for data (default:False)
+  -h, --no-headers      files do not contain column headers
+  --silent              do not display feedback information during operation
+  --debug               print debug information
+  --dryrun              import the files and generate the statements but do
+                        not execute them - useful for testing file validity
+  --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
+                        of a comma-separated list (no spaces). Valid values =
+                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
+                        EVENTS, GRANTS, DATA, CREATE_DB
+  --skip-blobs          Do not import blob data.
+Generating import file
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 2 - no grants
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 3 - no events
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 4 - no functions
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 5 - no procedures
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 6 - no triggers
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 7 - no views
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 8 - no tables
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 9 - no create_db
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was NOT created.
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Generating import file
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 10 - no grants
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 11 - no events
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 12 - no functions
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 13 - no procedures
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 14 - no triggers
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 15 - no views
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 16 - no tables
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was created.
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 17 - no create_db
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+AFTER:
+Database was NOT created.
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Generating import file
+Test case 18 - no events
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CREATE DATABASE `util_test`;
+CREATE TABLE `util_test`.`t1` (
+  `a` char(30)
+) ENGINE=MyISAM;
+CREATE TABLE `util_test`.`t2` (
+  `a` char(30)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t3` (
+  `a` int(11) NOT NULL,
+  `b` char(30),
+  `me_blob` blob,
+  PRIMARY KEY(`a`)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB;
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
+INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
+INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' 
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' 
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' 
+INSERT INTO util_test.t4 VALUES  (3, 2)
+#...done.
+Test case 19 - no data
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CREATE DATABASE `util_test`;
+CREATE TABLE `util_test`.`t1` (
+  `a` char(30)
+) ENGINE=MyISAM;
+CREATE TABLE `util_test`.`t2` (
+  `a` char(30)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t3` (
+  `a` int(11) NOT NULL,
+  `b` char(30),
+  `me_blob` blob,
+  PRIMARY KEY(`a`)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB;
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+#...done.
+Test case 20 - no blobs
+# WARNING: --skip-blobs option ignored for metadata import.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CREATE DATABASE `util_test`;
+CREATE TABLE `util_test`.`t1` (
+  `a` char(30)
+) ENGINE=MyISAM;
+CREATE TABLE `util_test`.`t2` (
+  `a` char(30)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t3` (
+  `a` int(11) NOT NULL,
+  `b` char(30),
+  `me_blob` blob,
+  PRIMARY KEY(`a`)
+) ENGINE=InnoDB;
+CREATE TABLE `util_test`.`t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB;
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
+GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON util_test.* TO 'joe'@'user'
+INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
+INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
+INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
+INSERT INTO util_test.t4 VALUES  (3, 2)
+#...done.
+Test case 21 - no messages (silent)

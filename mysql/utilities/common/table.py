@@ -351,16 +351,15 @@ class Table:
             if rows is not None:
                 for row in rows:
                     if len(row) > 1:
-                        has_char = (row[1].find("char") >= 0)
-                        has_text = (row[1].find("text") >= 0)
-                        has_enum = (row[1].find("enum") >= 0)
-                        has_set = (row[1].find("set") >= 0)
-                        has_date = (row[1].find("date") >= 0)
-                        has_time = (row[1].find("time") >= 0)
+                        has_char = (row[1].lower().find("char") >= 0)
+                        has_enum = (row[1].lower().find("enum") >= 0)
+                        has_set = (row[1].lower().find("set") >= 0)
+                        has_date = (row[1].lower().find("date") >= 0)
+                        has_time = (row[1].lower().find("time") >= 0)
                         col_data = {
-                            "has_blob" : (row[1].find("blob") >= 0),
-                            "is_text"  : has_char or has_text or has_enum or
-                                         has_set,
+                            "has_blob" : (row[1].lower().find("blob") >= 0) \
+                                         or (row[1].lower().find("text") >= 0),
+                            "is_text"  : has_char or has_enum or has_set,
                             "is_time"  : has_date or has_time,
                             "name"     : row[0]
                         }

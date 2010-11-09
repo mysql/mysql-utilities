@@ -1,0 +1,74 @@
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+# VIEWS in util_test:
+TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# EVENTS in util_test:
+NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
+e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,,1,YEAR,,2010-11-06 15:09:55,,DISABLED,DROP,1,latin1,latin1_swedish_ci,latin1_swedish_ci
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+# POLAR_BEARS
+NAME,ORIGIN,COLOUR
+binky,Alaska,pink
+#...done.
+# Source on localhost: ... connected.
+# Exporting data from util_test
+# Data for table util_test.t1: 
+a
+01 Test Basic database example
+02 Test Basic database example
+03 Test Basic database example
+04 Test Basic database example
+05 Test Basic database example
+06 Test Basic database example
+07 Test Basic database example
+# Data for table util_test.t2: 
+a
+11 Test Basic database example
+12 Test Basic database example
+13 Test Basic database example
+# Data for table util_test.t3: 
+a,b
+1,14 test fkeys
+2,15 test fkeys
+3,16 test fkeys
+# Data for table util_test.t4: 
+c,d
+3,2
+#...done.

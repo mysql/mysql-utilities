@@ -482,7 +482,11 @@ def _build_create_objects(obj_type, db, definitions):
             create_str += "DO %s;" % defn[col_ref.get("BODY",2)]
             create_strings.append(create_str)
         elif obj_type == "GRANT":
-            user, priv, db, tbl = defn[0:4]
+            try:
+                user, priv, db, tbl = defn[0:4]
+            except:
+                raise MySQLUtilError("Object data invalid: %s : %s" % \
+                                     (obj_type, defn))
             if not tbl:
                 tbl = "*"
             elif tbl.upper() == "NONE":
@@ -490,7 +494,7 @@ def _build_create_objects(obj_type, db, definitions):
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, db, tbl, user)
             create_strings.append(create_str)
         else:
-            raise MySQLUtilError("Unknow object type discovered: %s", obj_type)
+            raise MySQLUtilError("Unknown object type discovered: %s", obj_type)
     return create_strings
         
         
@@ -561,11 +565,95 @@ def _build_insert_data(col_names, tbl_name, data):
            ") VALUES (" + ','.join(imap(_to_sql, data))  + ");" 
 
 
-def _exec_statements(statements, destination, dryrun=False):
+def _skip_sql(sql, options):
+    """Check to see if we skip this SQL statement
+    
+    sql[in]           SQL statement to evaluate
+    options[in]       Option dictionary containing the --skip_* options
+
+    Returns (bool) True - skip the statement, False - do not skip
+    """
+
+    prefix = sql[0:100].upper().strip()    
+    if prefix[0:len("CREATE")] == "CREATE":
+        # need to test for tables, views, events, triggers, proc, func, db
+        index = sql.find(" TABLE ")
+        if index > 0:
+            return options.get("skip_tables", False)
+        index = sql.find(" VIEW ")
+        if index > 0:
+            return options.get("skip_views", False)
+        index = sql.find(" TRIGGER ")
+        if index > 0:
+            return options.get("skip_triggers", False)
+        index = sql.find(" PROCEDURE ")
+        if index > 0:
+            return options.get("skip_procs", False)
+        index = sql.find(" FUNCTION ")
+        if index > 0:
+            return options.get("skip_funcs", False)
+        index = sql.find(" EVENT ")
+        if index > 0:
+            return options.get("skip_events", False)
+        index = sql.find(" DATABASE ")
+        if index > 0:
+            return options.get("skip_create", False)
+        return False
+    # If we skip create_db, need to skip the drop too
+    elif prefix[0:len("DROP")] == "DROP":
+        return options.get("skip_create", False)
+    elif prefix[0:len("GRANT")] == "GRANT":
+        return options.get("skip_grants", False)
+    elif prefix[0:len("INSERT")] == "INSERT":
+        return options.get("skip_data", False)
+    elif prefix[0:len("UPDATE")] == "UPDATE":
+        return options.get("skip_blobs", False)
+    elif prefix[0:len("USE")] == "USE":
+        return options.get("skip_create", False)
+    return False
+
+
+def _skip_object(obj_type, options):
+    """Check to see if we skip this object type
+    
+    obj_type[in]      Type of object for the --skip_* option
+                      (e.g. "tables", "data", "views", etc.)
+    options[in]       Option dictionary containing the --skip_* options
+
+    Returns (bool) True - skip the object, False - do not skip
+    """
+    object = obj_type.upper()
+    if object == "TABLE":
+        return options.get("skip_tables", False)
+    elif object == "VIEW":
+        return options.get("skip_views", False)
+    elif object == "TRIGGER":
+        return options.get("skip_triggers", False)
+    elif object == "PROCEDURE":
+        return options.get("skip_procs", False)
+    elif object == "FUNCTION":
+        return options.get("skip_funcs", False)
+    elif object == "EVENT":
+        return options.get("skip_events", False)
+    elif object == "GRANT":
+        return options.get("skip_grants", False)
+    elif object == "CREATE_DB":
+        return options.get("skip_create", False)
+    elif object == "DATA":
+        return options.get("skip_data", False)
+    elif object == "BLOB":
+        return options.get("skip_blobs", False)
+    else:
+        return False
+    
+
+def _exec_statements(statements, destination, format, options, dryrun=False):
     """Execute a list of SQL statements
     
     statements[in]    A list of SQL statements to execute
     destination[in]   A connection to the destination server
+    format[in]        Format of import file
+    options[in]       Option dictionary containing the --skip_* options
     dryrun[in]        If True, print the SQL statements and do not execute
     
     Returns (bool) - True if all execute, raises error if one fails
@@ -575,7 +663,11 @@ def _exec_statements(statements, destination, dryrun=False):
             print statement
         else:
             try:
-                destination.exec_query(statement)
+                if format == "SQL":
+                    if not _skip_sql(statement, options):
+                        destination.exec_query(statement)
+                else:
+                    destination.exec_query(statement)
             except MySQLUtilError, e:
                 print ">>>>"
                 print statement
@@ -640,7 +732,8 @@ def import_file(dest_val, file_name, options):
         if len(col_list) > 0:
             table_col_list.extend(col_list)
                 
-    def _process_data(statements, columns, table_col_list, table_rows):
+    def _process_data(tbl_name, statements, columns,
+                      table_col_list, table_rows, skip_blobs):
         # if there is data here, build bulk inserts
         # First, create table reference, then call insert_rows()
         tbl = Table(destination, tbl_name)
@@ -656,11 +749,12 @@ def import_file(dest_val, file_name, options):
         if col_meta is None:
             raise MySQLUtilError("Cannot build bulk insert statements without "
                                  "the table definition.")
-        ins_strs = tbl.make_bulk_insert(table_rows, None, col_meta)
+        ins_strs = tbl.make_bulk_insert(table_rows, tbl.db_name, col_meta)
         if len(ins_strs[0]) > 0:
             statements.extend(ins_strs[0])
-        if len(ins_strs[1]) > 0:
-            statements.extend(ins_strs[1])
+        if len(ins_strs[1]) > 0 and not skip_blobs:
+            for update in ins_strs[1]:
+                statements.append(update[0] % "'%s'" % update[1])
 
     # Gather options
     format = options.get("format", "SQL").upper()
@@ -670,6 +764,7 @@ def import_file(dest_val, file_name, options):
     single = options.get("single", True)
     dryrun = options.get("dryrun", False)
     do_drop = options.get("do_drop", False)
+    skip_blobs = options.get("skip_blobs", False)
     
     # Attempt to connect to the destination server
     try:
@@ -716,7 +811,8 @@ def import_file(dest_val, file_name, options):
                     statements.append("DROP DATABASE IF EXISTS `%s`;" % \
                                       db_name)
                 if import_type != "DATA":
-                    statements.append("CREATE DATABASE `%s`;" % db_name)
+                    if not _skip_object("CREATE_DB", options):
+                        statements.append("CREATE DATABASE `%s`;" % db_name)
                 
         # This is the first time through the loop so we must
         # check user permissions on source for all databases
@@ -749,7 +845,8 @@ def import_file(dest_val, file_name, options):
                                                  db_name)
                         obj_type = row[0]
                         definitions = []
-                    definitions.append(row[1])
+                    if not _skip_object(row[0], options):
+                        definitions.append(row[1]) 
         else:
             # see if there are any definitions to process
             if len(definitions) > 0:
@@ -757,14 +854,17 @@ def import_file(dest_val, file_name, options):
                 definitions = []
                 
             if import_type == "DATA" or import_type == "BOTH":
-                if format == "SQL":
+                if _skip_object("DATA", options):
+                    continue  # skip data
+                elif format == "SQL":
                     statements.append(row[1])
                 else:
                     if row[0] == "BEGIN_DATA":
                         # Start of table so first row is columns.
                         if len(table_rows) > 0:
-                            _process_data(statements, columns,
-                                          table_col_list, table_rows)
+                            _process_data(tbl_name, statements, columns,
+                                          table_col_list, table_rows,
+                                          skip_blobs)
                             table_rows = []
                         read_columns = True
                         tbl_name = row[1]
@@ -781,12 +881,13 @@ def import_file(dest_val, file_name, options):
                                 statements.append(str)
     # Process remaining data rows
     if len(table_rows) > 0:
-        _process_data(statements, columns, table_col_list, table_rows)
+        _process_data(tbl_name, statements, columns,
+                      table_col_list, table_rows, skip_blobs)
         table_rows = []
         
     # Now process the statements                            
     try:
-        _exec_statements(statements, destination, dryrun)
+        _exec_statements(statements, destination, format, options, dryrun)
     except MySQLUtilError, e:
         raise e
     

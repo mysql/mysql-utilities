@@ -167,12 +167,16 @@ elif opt.import_type == "B":
     opt.import_type = "BOTH"
     
 if opt.skip_blobs and not opt.import_type == "DATA":
-    print "# WARNING : --skip-blobs option ignored for metadata import."
+    print "# WARNING: --skip-blobs option ignored for metadata import."
     
 if "DATA" in skips and opt.import_type == "DATA":
-    print "You cannot use --import=data and --skip-data when importing " \
-          "table data."
+    print "ERROR: You cannot use --import=data and --skip-data when " \
+          "importing table data."
     exit(1)
+
+if "CREATE_DB" in skips and opt.do_drop:
+    print "ERROR: You cannot combine --drop-first and --skip=create_db."
+    exit (1)
 
 # Set options for database operations.
 options = {

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import mysql_test
 from mysql.utilities.exception import MySQLUtilError, MUTException
 
@@ -10,6 +11,9 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
+        # Need non-Windows platform
+        if os.name == "nt":
+            raise MUTException("Test requires a non-Windows platform.")
         res = self.check_num_servers(1)
         self.server1 = self.servers.get_server(0)
         rows = []
