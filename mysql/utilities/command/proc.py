@@ -87,7 +87,7 @@ class ProcessGrep(object):
             return self.__select
 
     def execute(self, *connections, **kwrds):
-        from ..common.exception import EmptyResultError
+        from mysql.utilities.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list
 
