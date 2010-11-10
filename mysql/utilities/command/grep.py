@@ -209,7 +209,7 @@ class ObjectGrep(object):
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=MySQLdb):
-        from ..common.exception import FormatError, EmptyResultError
+        from mysql.utilities.exception import FormatError, EmptyResultError
 
         entries = []
         for info in connections:

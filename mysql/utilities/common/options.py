@@ -106,6 +106,9 @@ def check_skip_options(skip_list):
     
     Returns new skip list with items converted to upper case.
     """
+    
+    from mysql.utilities.exception import MySQLUtilError
+    
     new_skip_list = []
     if skip_list is not None:
         items = skip_list.split(",")
