@@ -31,7 +31,7 @@ class test(mysql_test.System_test):
         
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-        from_conn = "--source=" + self.build_connection_string(self.server1)
+        from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s employees.dept_emp " % from_conn
         cmd_str += " --index-format=CSV "

@@ -1,19 +1,13 @@
 Test case 1 - show help
-Usage: mysqlserverclone.py -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2
+Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=<dir> --new-port=3307 --new-id=2
 
 mysqlserverclone - start another instance of a running server
 
 Options:
   --version             show program's version number and exit
   --help                
-  -u LOGIN_USER, --user=LOGIN_USER
-                        user name for server login
-  -p LOGIN_PASS, --password=LOGIN_PASS
-                        password for server login
-  -h HOST, --host=HOST  hostname of server to connect (default = localhost)
-  -P PORT, --port=PORT  port for server login (default = 3306)
-  -S SOCKET, --socket=SOCKET
-                        socket for server login
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
   --new-data=NEW_DATA   the full path to the location of the data directory
                         for the new instance
   --new-port=NEW_PORT   the new port for the new instance - default=3307
@@ -23,13 +17,12 @@ Options:
   --mysqld=MYSQLD       Additional options for mysqld
   -v, --verbose         display additional information during operation
 Test case 2 - error: no --new-data option
-Usage: mysqlserverclone.py -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2
+Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=<dir> --new-port=3307 --new-id=2
 
 mysqlserverclone.py: error: No new database path. Use --help for available options.
 Test case 3 - error: no login
-Usage: mysqlserverclone.py -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2
-
-mysqlserverclone.py: error: No login user specified. Use --help for available options.
+ERROR: Cannot connect to the source server.
+Error 2005: Unknown MySQL server host 'nothere' #######
 Test case 4 - error: cannot connect
 ERROR: Cannot connect to the source server.
 Error 2005: Unknown MySQL server host 'nothere' #######

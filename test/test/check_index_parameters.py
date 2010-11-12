@@ -18,7 +18,7 @@ class test(check_index.test):
         
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-        from_conn = "--source=" + self.build_connection_string(self.server1)
+        from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s " % from_conn
        

@@ -29,7 +29,7 @@ import re
 
 from .. import VERSION_FRM
 
-def setup_common_options(program_name, desc_str, usage_str):
+def setup_common_options(program_name, desc_str, usage_str, append=False):
     """Setup option parser and options common to all MySQL Utilities.
  
     This method creates an option parser and adds options for user
@@ -39,6 +39,8 @@ def setup_common_options(program_name, desc_str, usage_str):
     program_name[in]   The program name
     desc_str[in]       The description of the utility
     usage_str[in]      A brief usage example
+    append[in]         If True, allow --server to be specified multiple times
+                       (default = False)
     
     Returns parser object
     """
@@ -50,37 +52,18 @@ def setup_common_options(program_name, desc_str, usage_str):
         add_help_option=False)
     parser.add_option("--help", action="help")
     
-    # Login user
-    parser.add_option("-u", "--user", action="store",
-                      type="string", dest="login_user",
-                      help="user name for server login")
-    
-    # Login user password
-    parser.add_option("-p", "--password", action="store",
-                      type="string", dest="login_pass",
-                      help="password for server login",
-                      default="")
-    
-    # Hostname 
-    parser.add_option("-h", "--host", action="store",
-                      type="string", dest="host",
-                      help="hostname of server to connect " \
-                      "(default = %default)",
-                      default="localhost")
-    
-    # Port
-    parser.add_option("-P", "--port", action="store",
-                      type="int", dest="port",
-                      help="port for server login (default = %default)",
-                      default=3306)
-    
-    # Socket
-    parser.add_option("-S", "--socket", action="store",
-                      type="string", dest="socket",
-                      help="socket for server login",
-                      default="")
-    return parser
+    # Connection information for the first server
+    if append:
+        parser.add_option("--server", action="append", dest="server",
+                          help="connection information for the server in " + \
+                          "the form: <user>:<password>@<host>:<port>:<socket>")
+    else:
+        parser.add_option("--server", action="store", dest="server",
+                          type = "string", default="root@localhost:3306",
+                          help="connection information for the server in " + \
+                          "the form: <user>:<password>@<host>:<port>:<socket>")
 
+    return parser
 
 
 _SKIP_VALUES = (

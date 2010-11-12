@@ -31,26 +31,15 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import indexcheck
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import setup_common_options
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
-USAGE = "%prog --source=user:pass@host:port:socket db1.table1 db2 db3.table2"
+USAGE = "%prog --server=user:pass@host:port:socket db1.table1 db2 db3.table2"
 
-# Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
-
-# Setup utility-specific options:
-
-# Connection information for the source server
-parser.add_option("--source", action="store", dest="source",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for source server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+# Setup the command parser and setup server, help
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE)
 
 # Display DROP statements
 parser.add_option("--show-drops", "-d", action="store_true",
@@ -119,7 +108,7 @@ else:
 
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.source)
+    source_values = parse_connection(opt.server)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
@@ -156,7 +145,7 @@ if (last is not None or first is not None) and not opt.stats:
 
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.source)
+    source_values = parse_connection(opt.server)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
     

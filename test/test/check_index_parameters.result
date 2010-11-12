@@ -1,12 +1,12 @@
 Test case 1 - do the help
-Usage: mysqlindexcheck.py --source=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck - check for duplicate or redundant indexes
 
 Options:
   --version             show program's version number and exit
   --help                
-  --source=SOURCE       connection information for source server in the form:
+  --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -d, --show-drops      display DROP statements for dropping indexes
   -i, --show-indexes    display indexes for each table

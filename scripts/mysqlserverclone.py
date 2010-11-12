@@ -24,6 +24,7 @@ of an existing server.
 import os.path
 import sys
 
+from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities import exception
 from mysql.utilities.command import serverclone
@@ -31,10 +32,12 @@ from mysql.utilities.command import serverclone
 # Constants
 NAME = "MySQL Utilities - mysqlserverclone "
 DESCRIPTION = "mysqlserverclone - start another instance of a running server"
-USAGE = "%prog -u=root -p=passwd --new-data=<dir> --new-port=3307 --new-id=2"
+USAGE = "%prog --server=user:pass@host:port:socket --new-data=<dir> " \
+        "--new-port=3307 --new-id=2"
                         
-# Setup the command parser and setup user, password, host, socket, port
-parser = setup_common_options(os.path.basename(sys.argv[0]), DESCRIPTION, USAGE)
+# Setup the command parser and setup server, help
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
 
@@ -68,21 +71,15 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# Fail if no options listed.
-if opt.login_user is None:
-    parser.error("No login user specified. Use --help for available options.")
-    
 # Fail if no database path specified.
 if opt.new_data is None:
     parser.error("No new database path. Use --help for available options.")
 
-conn = {
-    "user"   : opt.login_user,
-    "passwd" : opt.login_pass,
-    "host"   : opt.host,
-    "port"   : opt.port,
-    "unix_socket" : opt.socket
-}
+# Parse source connection values
+try:
+    conn = parse_connection(opt.server)
+except:
+    parser.error("Source connection values invalid or cannot be parsed.")
 
 try:
     res = serverclone.clone_server(conn, opt.new_data, opt.new_port,

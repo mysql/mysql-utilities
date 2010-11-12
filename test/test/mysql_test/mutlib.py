@@ -178,11 +178,11 @@ class Server_list(object):
         full_datadir = os.getcwd() + "/temp_%s" % port
         
         # Attempt to clone existing server
-        cmd = "mysqlserverclone.py "
-        cmd += self.get_connection_parameters(server)
+        cmd = "mysqlserverclone.py --server="
+        cmd += self.get_connection_string(server)
         if passwd:
-           cmd += "--root-password=%s " % passwd
-        cmd += "--new-port=%s " % port
+           cmd += " --root-password=%s " % passwd
+        cmd += " --new-port=%s " % port
         cmd += "--new-id=%s " % server_id
         cmd += "--new-data=%s " % os.path.normpath(full_datadir)
         if parameters:
@@ -357,7 +357,34 @@ class Server_list(object):
         return str1 + str2
         
 
+    def get_connection_string(self, server):
+        """Return a string that comprises the normal connection parameters
+        common to MySQL utilities for a particular server in the form of
+        user:pass@host:port:socket.
+        
+        server[in]         A Server object
+        
+        Returns string
+        """
+
+        conn_str = "%s" % server.user
+        if server.passwd:
+            conn_str += ":%s" % server.passwd
+        conn_str += "@%s:" % server.host
+        if server.port:
+            conn_str += "%s" % server.port
+        if server.socket is not None and server.socket != "":
+            conn_str += ":%s " % server.socket
+        return conn_str
+
+
     def get_process_id(self, datadir):
+        """Return process id of new process.
+
+        datadir[in]        The data directory of the process
+        
+        Returns (int) process id or -1 if not found
+        """
         if os.name == "posix":
             output = commands.getoutput("ps -f|grep mysqld")
             lines = output.splitlines()

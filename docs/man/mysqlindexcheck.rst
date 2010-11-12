@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlcheckindex --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
+  mysqlcheckindex --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
                    --silent | --index-format=[GRID|SQL|TAB|CSV] |
@@ -56,7 +56,7 @@ For example, to scan all of the tables in my_db, tables db1.t1 and
 db2.t2 and see the indexes and the DROP statements for the duplicate
 and redundant indexes, use this command::
 
-   mysqlcheckindex --source=root@localhost:3306 -i \
+   mysqlcheckindex --server=root@localhost:3306 -i \
                    my_db db1.t1 db2.t2
 
 You can also display the best and worst non-primary key indexes for
@@ -98,7 +98,7 @@ OPTIONS
 
    show the help page
 
-.. option:: --source <source>
+.. option:: --server <source>
 
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>

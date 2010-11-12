@@ -29,6 +29,7 @@ import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbexport
 from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import check_skip_options
 from mysql.utilities.exception import MySQLUtilError
 
@@ -49,21 +50,11 @@ def print_elapsed_time(start_test):
         display_time = 1
     print("Time: %6d\n" % display_time)
 
-# Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+# Setup the command parser and setup server, help
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
-
-# Connection information for the server
-parser.add_option("--server", action="store", dest="server",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for the server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
 
 # Output format
 parser.add_option("-f", "--format", action="store", dest="format", default="SQL",

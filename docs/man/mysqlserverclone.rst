@@ -24,7 +24,7 @@ password for the login user account on the new instance.
 For example, to create a new instance of a typical MySQL instances,
 use this command::
 
- mysqlcloneserver --u root -p xxxx -h localhost --new-id=3 \
+ mysqlcloneserver --server=root:passwd@localhost --new-id=3 \
                   --new-data=/Users/joe/data --root-password=xxxx  
 
 OPTIONS
@@ -38,25 +38,10 @@ OPTIONS
 
    show the help page       
 
-.. option:: -u <login user>, --user <login user>
+.. option:: --server <source>
 
-   user name for server login
-
-.. option:: -p <login password>, --password <login password>
-
-   password for server login
-
-.. option:: -h <host>, --host <host>
-
-   hostname of server to connect default: localhost
-
-.. option:: -P <port>, --port <port>
-
-   port for server login
-
-.. option:: -S <socket>, --socket <socket>
-
-   socket for server login
+   connection information for source server in the form:
+   <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --verbose
 

@@ -21,8 +21,8 @@ class test(mysql_test.System_test):
     
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-        cmd_str = "mysqlserverclone.py %s " % \
-                  (self.get_connection_parameters(self.servers.get_server(0)))
+        cmd_str = "mysqlserverclone.py --server=%s " % \
+                  self.build_connection_string(self.servers.get_server(0))
        
         port1 = int(self.servers.get_next_port())
         newport = "--new-port=%d " % port1
@@ -37,16 +37,16 @@ class test(mysql_test.System_test):
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 3 - error: no login"
-        res = self.run_test_case(2, "mysqlserverclone.py " +
-                                 "-hnothere --new-data=/nada --new-id=7 " +
-                                 "--root-password=nope " + newport,
+        res = self.run_test_case(1, "mysqlserverclone.py " +
+                                 "--server=root:root@nothere --new-data=/nada "
+                                 "--new-id=7 --root-password=nope " + newport,
                                  comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
         comment = "Test case 4 - error: cannot connect"
-        res = self.run_test_case(1, "mysqlserverclone.py -uroot -pnope " +
-                                 "-hnothere --new-data=/nada --new-id=7 " +
+        res = self.run_test_case(1, "mysqlserverclone.py --server=root:nope@" +
+                                 "nothere --new-data=/nada --new-id=7 " +
                                  "--root-password=nope " + newport,
                                  comment)
         if not res:

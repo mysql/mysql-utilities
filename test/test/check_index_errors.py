@@ -31,7 +31,7 @@ class test(check_index.test):
 
         comment = "Test case 3 - error: invalid login to server"
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
-                                 "--source=nope:nada@localhost:3306", comment)
+                                 "--server=nope:nada@localhost:3306", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
          
