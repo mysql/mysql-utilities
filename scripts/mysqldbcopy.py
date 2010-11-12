@@ -98,8 +98,9 @@ parser.add_option("--debug", action="store_true", dest="debug",
                   default=False, help="print debug information")
 
 # Threaded/connection mode
-parser.add_option("--connections", action="store", dest="connections",
-                  default=1, help="use multiple connections for insert")
+parser.add_option("--threads", action="store", dest="threads",
+                  default=1, help="use multiple threads (connections) "
+                  "for insert")
 
 # Add the skip common options
 add_skip_options(parser)
@@ -136,7 +137,7 @@ options = {
     "force"         : opt.force,
     "verbose"       : opt.verbose,
     "silent"        : opt.silent,
-    "connections"   : opt.connections,
+    "threads"       : opt.threads,
     "debug"         : opt.debug
 }
 

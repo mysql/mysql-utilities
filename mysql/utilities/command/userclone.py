@@ -55,7 +55,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
                          verbose  - print add'l information during operation
                          silent   - do not print information during operation
                                     Note: Error messages are printed regardless
-                         globals  - include global privileges (i.e. user@%) 
+                         global_privs - include global privileges (i.e. user@%) 
                        
     Returns bool True = success, raises MySQLUtilError if error
     """
@@ -68,7 +68,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     overwrite = options.get("overwrite", False)
     verbose = options.get("verbose", False)
     silent = options.get("silent", False)
-    globals = options.get("globals", False)
+    global_privs = options.get("global_privs", False)
 
     try:
         servers = connect_servers(src_val, dest_val, silent, "5.1.0")
@@ -115,7 +115,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
             user_dest.drop(new_user)
         # Clone user.
         try:
-            user_source.clone(new_user, destination, globals)
+            user_source.clone(new_user, destination, global_privs)
         except MySQLUtilError, e:
             raise
 

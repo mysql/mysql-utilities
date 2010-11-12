@@ -55,7 +55,7 @@ class test(mysql_test.System_test):
        
         comment = "Test case 1 - copy a sample database"
         cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
-              " employees:emp_mt --force --connections=3 "
+              " employees:emp_mt --force --threads=3 "
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTException("%s: failed" % comment)

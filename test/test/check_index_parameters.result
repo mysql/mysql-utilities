@@ -17,8 +17,8 @@ Options:
                         display the list of indexes per table in either SQL,
                         GRID (default), TAB, or CSV format
   --stats               show index performance statistics
-  --first=FIRST         limit index statistics to the best N indexes
-  --last=LAST           limit index statistics to the worst N indexes
+  --best=BEST           limit index statistics to the best N indexes
+  --worst=WORST         limit index statistics to the worst N indexes
 Test case 2 - show drops for a table with dupe indexes
 # Source on localhost: ... connected.
 # Checking indexes...

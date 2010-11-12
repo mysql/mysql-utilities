@@ -41,8 +41,7 @@ Options:
   -v, --verbose         display additional information during operation
   --silent              do not display feedback information during operation
   --debug               print debug information
-  --connections=CONNECTIONS
-                        use multiple connections for insert
+  --threads=THREADS     use multiple threads (connections) for insert
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,

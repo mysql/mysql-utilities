@@ -58,8 +58,8 @@ def check_index(src_val, table_args, options):
     index_format = options.get("index-format", False)
     silent = options.get("silent", False)
     stats = options.get("stats", False)
-    first_indexes = options.get("first", None)        
-    last_indexes = options.get("last", None)
+    first_indexes = options.get("best", None)        
+    last_indexes = options.get("worst", None)
 
     from mysql.utilities.common.server import connect_servers
     from mysql.utilities.common.database import Database

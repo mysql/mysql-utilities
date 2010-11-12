@@ -84,9 +84,9 @@ parser.add_option("--silent", action="store_true", dest="silent",
                   help="do not display feedback information during operation")
 
 # Include globals mode
-parser.add_option("--include-globals", action="store_true", dest="globals",
-                  help="include privileges that match base_user@% as well " 
-                       "as base_user@host", default=False)
+parser.add_option("--include-global-privileges", action="store_true",
+                  dest="global_privs", help="include privileges that match "
+                  "base_user@% as well as base_user@host", default=False)
 
 # Now we process the rest of the arguments where the first is the
 # base user and the next N are the new users.
@@ -121,12 +121,12 @@ except:
 
 # Build dictionary of options
 options = {
-    "dump"      : opt.dump,
-    "copy_dir"  : opt.copy_dir,
-    "overwrite" : opt.overwrite,
-    "silent"    : opt.silent,
-    "verbose"   : opt.verbose,
-    "globals"   : opt.globals
+    "dump"         : opt.dump,
+    "copy_dir"     : opt.copy_dir,
+    "overwrite"    : opt.overwrite,
+    "silent"       : opt.silent,
+    "verbose"      : opt.verbose,
+    "global_privs" : opt.global_privs
 }
 
 try:

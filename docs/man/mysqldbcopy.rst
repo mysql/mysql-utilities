@@ -13,7 +13,8 @@ SYNOPSIS
              --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
              (<db_name>[:<new_name>])+ [--verbose | --overwrite |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
-             EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version]
+             EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version |
+             --threads=<num threads>]
 
 DESCRIPTION
 -----------
@@ -88,6 +89,9 @@ The following command line options are accepted by **mysqldbcopy**:
    do not display feedback/progress information (errors are still
    displayed)
 
+.. option:: --threads
+
+    use multiple threads for cross-server copy (default = 1)
 
 .. _mysqldbcopy-notes:
 

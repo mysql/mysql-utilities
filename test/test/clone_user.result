@@ -35,7 +35,7 @@ Test case 5 - attempt to clone a user to a user that already exists with --force
 # ...done.
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
-Test case 6 - show clone without --include-globals set
+Test case 6 - show clone without --include-global-privileges
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
 # Cloning 1 users...
@@ -45,7 +45,7 @@ CREATE USER 'joe_nopass'@'user'
 GRANT USAGE ON *.* TO 'joe_nopass'@'user' 
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.
-Test case 7 - show clone with --include-globals set
+Test case 7 - show clone with --include-global-privileges
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
 # Cloning 1 users...

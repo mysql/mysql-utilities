@@ -41,38 +41,38 @@ class test(check_index.test):
         if not res:
             raise MUTException("%s: failed" % comment)
             
-        comment = "Test case 5 - error: stats and first=alpha"
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --first=A "
+        comment = "Test case 5 - error: stats and best=alpha"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=A "
                                  "util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
-        comment = "Test case 6 - error: stats and last=alpha"
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --last=A "
+        comment = "Test case 6 - error: stats and worst=alpha"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=A "
                                  "util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
             
         comment = "Test case 7 - error: not stats "
-        res = self.run_test_case(2, "mysqlindexcheck.py --first=1 "
+        res = self.run_test_case(2, "mysqlindexcheck.py --best=1 "
                                  "util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 8 - error: stats and both first and last "
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --first=1 "
-                                 "--last=1 util_test_a", comment)
+        comment = "Test case 8 - error: stats and both best and worst "
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=1 "
+                                 "--worst=1 util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 9 - error: stats and last=-1"
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --last=-1 "
+        comment = "Test case 9 - error: stats and worst=-1"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=-1 "
                                  "util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 10 - error: stats and first=-1"
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --first=-1 "
+        comment = "Test case 10 - error: stats and best=-1"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=-1 "
                                  "util_test_a", comment)
         if not res:
             raise MUTException("%s: failed" % comment)

@@ -126,7 +126,7 @@ def copy_db(src_val, dest_val, db_list, options):
         db.init()
         try:
             db.copy(db_name[1], None, options, destination,
-                    options.get("connections", False))
+                    options.get("threads", False))
         except MySQLUtilError, e:
             raise e
             

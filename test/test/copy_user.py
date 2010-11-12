@@ -103,7 +103,7 @@ class test(mysql_test.System_test):
         # No show overwritten grants
         self.show_user_grants(self.server2, "jill@user")
 
-        # Now show how --include-globals works.
+        # Now show how --include-global-privileges works.
         try:
             self.server1.exec_query("CREATE USER joe_pass@'%%'")
             self.server1.exec_query("GRANT ALL ON util_test.* TO "
@@ -112,16 +112,16 @@ class test(mysql_test.System_test):
             raise MUTException("Cannot create user with global grants: %s" %
                                e.errmsg)
             
-        comment= "Test case 6 - show clone without --include-globals set"
+        comment= "Test case 6 - show clone without --include-global-privileges"
         res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
                                  "joe_nopass@user --force ", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment= "Test case 7 - show clone with --include-globals set"
+        comment= "Test case 7 - show clone with --include-global-privileges"
         res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
-                                 "joe_nopass@user --force --include-globals",
-                                 comment)
+                                 "joe_nopass@user --force " +
+                                 "--include-global-privileges", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 

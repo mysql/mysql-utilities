@@ -37,12 +37,12 @@ class test(mysql_test.System_test):
         cmd_str += " --index-format=CSV "
         
         comment = "Test case 1 - show best indexes"
-        res = self.run_test_case(0, cmd_str + "--stats --first=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats --best=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - show worst indexes"
-        res = self.run_test_case(0, cmd_str + "--stats --last=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats --worst=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 

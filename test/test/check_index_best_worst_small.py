@@ -25,12 +25,12 @@ class test(check_index_parameters.test):
         cmd_str = "mysqlindexcheck.py %s util_test_a --silent " % from_conn
        
         comment = "Test case 1 - show best indexes on small database"
-        res = self.run_test_case(0, cmd_str + "--stats --first=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats --best=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - show worst indexes on small database"
-        res = self.run_test_case(0, cmd_str + "--stats --last=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats --worst=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         

@@ -13,7 +13,7 @@ SYNOPSIS
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
                    --silent | --index-format=[GRID|SQL|TAB|CSV] |
-                   --stat [--first=<num_rows> | --last=<num rows> ]]
+                   --stat [--best=<num_rows> | --worst=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
@@ -132,11 +132,11 @@ OPTIONS
 
     show index performance statistics
 
-.. option:: --first <first>
+.. option:: --best <num>
 
     limit index statistics to the best N indexes
 
-.. option:: --last <last>
+.. option:: --worst <num>
 
    limit index statistics to the worst N indexes
 

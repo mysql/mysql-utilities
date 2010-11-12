@@ -78,13 +78,13 @@ parser.add_option("--stats", action="store_true",
                   help="show index performance statistics")
 
 # Set limit for best
-parser.add_option("--first", action="store",
-                  dest="first", default=None,
+parser.add_option("--best", action="store",
+                  dest="best", default=None,
                   help="limit index statistics to the best N indexes")
 
 # Set limit for worst
-parser.add_option("--last", action="store",
-                  dest="last", default=None,
+parser.add_option("--worst", action="store",
+                  dest="worst", default=None,
                   help="limit index statistics to the worst N indexes")
 
 # Now we process the rest of the arguments.
@@ -112,35 +112,35 @@ try:
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
-# Check first, last for validity
-first = None
-if opt.first is not None:
+# Check best, worst for validity
+best = None
+if opt.best is not None:
     try:
-        first = int(opt.first)
+        best = int(opt.best)
     except:
-        first = -1
-if first is not None and first < 0:
-    parser.error("The --first parameter must be an integer > 1")
+        best = -1
+if best is not None and best < 0:
+    parser.error("The --best parameter must be an integer > 1")
     
-last = None
-if opt.last is not None:
+worst = None
+if opt.worst is not None:
     try:
-        last = int(opt.last)
+        worst = int(opt.worst)
     except:
-        last = -1
-if last is not None and last < 0:
-    parser.error("The --last parameter must be an integer > 1")
+        worst = -1
+if worst is not None and worst < 0:
+    parser.error("The --worst parameter must be an integer > 1")
         
-if opt.stats and last is not None and first is not None:
-    parser.error("You must specify either --first or --last but not both.")
+if opt.stats and worst is not None and best is not None:
+    parser.error("You must specify either --best or --worst but not both.")
     
 # default to worst performing queries
-if opt.stats and last is None and first is None:
-    last = 5
+if opt.stats and worst is None and best is None:
+    worst = 5
     
 # no stats specified
-if (last is not None or first is not None) and not opt.stats:
-    parser.error("You must specify --stats for --first or --last to take " \
+if (worst is not None or best is not None) and not opt.stats:
+    parser.error("You must specify --stats for --best or --worst to take " \
                  "effect.")
 
 # Parse source connection values
@@ -158,8 +158,8 @@ options = {
     "index-format"  : opt.index_format,
     "silent"        : opt.silent,
     "stats"         : opt.stats,
-    "first"         : first,
-    "last"          : last
+    "best"          : best,
+    "worst"         : worst
 }
 
 try:

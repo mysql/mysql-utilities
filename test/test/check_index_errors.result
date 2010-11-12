@@ -12,27 +12,27 @@ Test case 4 - error: silent and verbose
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: You cannot use --silent and --verbose together.
-Test case 5 - error: stats and first=alpha
+Test case 5 - error: stats and best=alpha
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --first parameter must be an integer > 1
-Test case 6 - error: stats and last=alpha
+mysqlindexcheck.py: error: The --best parameter must be an integer > 1
+Test case 6 - error: stats and worst=alpha
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --last parameter must be an integer > 1
+mysqlindexcheck.py: error: The --worst parameter must be an integer > 1
 Test case 7 - error: not stats 
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: You must specify --stats for --first or --last to take effect.
-Test case 8 - error: stats and both first and last 
+mysqlindexcheck.py: error: You must specify --stats for --best or --worst to take effect.
+Test case 8 - error: stats and both best and worst 
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: You must specify either --first or --last but not both.
-Test case 9 - error: stats and last=-1
+mysqlindexcheck.py: error: You must specify either --best or --worst but not both.
+Test case 9 - error: stats and worst=-1
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --last parameter must be an integer > 1
-Test case 10 - error: stats and first=-1
+mysqlindexcheck.py: error: The --worst parameter must be an integer > 1
+Test case 10 - error: stats and best=-1
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --first parameter must be an integer > 1
+mysqlindexcheck.py: error: The --best parameter must be an integer > 1

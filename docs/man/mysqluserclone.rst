@@ -12,9 +12,9 @@ SYNOPSIS
 
   mysqluserclone --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                 [[--help | --version] | [ --dump  | --verbose | --force ]
-                 <base_user> <new_user> [ :<password>]
-                 [ ,<new_user> [ :<password>]]]
+                 [[--help | --version] | [ --dump  | --verbose | --force |
+                 --include-global-privileges ] <base_user>
+                 <new_user>[:<password>] [,<new_user>[:<password>]]]
 
 DESCRIPTION
 -----------
@@ -78,7 +78,7 @@ OPTIONS
 
    do not display feedback information during operation
 
-.. option:: --include-globals
+.. option:: --include-global-privileges
 
     include privileges that match ``base_user@%`` as well as
     ``base_user@host``
