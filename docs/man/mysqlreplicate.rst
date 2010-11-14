@@ -61,9 +61,10 @@ OPTIONS
 
    database name to use in testing replication setup (optional)
 
-.. option:: --verbose, -v
+.. option:: -v, --verbose
 
-   display additional information during operation
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 
 NOTES

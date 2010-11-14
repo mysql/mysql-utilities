@@ -27,6 +27,7 @@ import os.path
 import sys
 
 from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.command import userclone
 from mysql.utilities import VERSION_FRM
@@ -75,18 +76,13 @@ parser.add_option("-d", "--dump", action="store_true",
 parser.add_option("-f", "--force", action="store_true", dest="overwrite",
                   help="drop the new user if it exists")
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation")
-
-# Silent mode
-parser.add_option("--silent", action="store_true", dest="silent",
-                  help="do not display feedback information during operation")
-
 # Include globals mode
 parser.add_option("--include-global-privileges", action="store_true",
                   dest="global_privs", help="include privileges that match "
                   "base_user@% as well as base_user@host", default=False)
+
+# Add verbosity and silent mode
+add_verbosity(parser, True)
 
 # Now we process the rest of the arguments where the first is the
 # base user and the next N are the new users.
@@ -95,6 +91,9 @@ opt, args = parser.parse_args()
 # Fail if dump and silent set
 if opt.silent and opt.dump:
     parser.error("You cannot use --silent and --dump together.")
+
+# Warn if silent and verbosity are both specified
+check_verbosity(opt)    
 
 # Fail if no arguments and no options.
 if len(args) == 0 or opt is None:
@@ -125,7 +124,7 @@ options = {
     "copy_dir"     : opt.copy_dir,
     "overwrite"    : opt.overwrite,
     "silent"       : opt.silent,
-    "verbose"      : opt.verbose,
+    "verbosity"    : opt.verbosity,
     "global_privs" : opt.global_privs
 }
 

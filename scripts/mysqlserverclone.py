@@ -26,6 +26,7 @@ import sys
 
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities import exception
 from mysql.utilities.command import serverclone
 
@@ -64,9 +65,8 @@ parser.add_option("--root-password", action="store", dest="rootpass",
 parser.add_option("--mysqld", action="store", dest="mysqld",
                   type="string", help="Additional options for mysqld")
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation")
+# Add verbosity mode
+add_verbosity(parser, False)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -84,7 +84,7 @@ except:
 try:
     res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
                                     opt.new_id, opt.rootpass, opt.mysqld,
-                                    opt.verbose)
+                                    opt.verbosity >= 1)
 except exception.MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

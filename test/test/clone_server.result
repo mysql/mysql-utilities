@@ -15,7 +15,8 @@ Options:
   --root-password=ROOTPASS
                         password for the root user
   --mysqld=MYSQLD       Additional options for mysqld
-  -v, --verbose         display additional information during operation
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
 Test case 2 - error: no --new-data option
 Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=<dir> --new-port=3307 --new-id=2
 

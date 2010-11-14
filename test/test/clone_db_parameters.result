@@ -38,14 +38,14 @@ Options:
   --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
                         files) - default = current directory
   -f, --force           drop the new database or object if it exists
-  -v, --verbose         display additional information during operation
-  --silent              do not display feedback information during operation
-  --debug               print debug information
   --threads=THREADS     use multiple threads (connections) for insert
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
                         EVENTS, GRANTS, DATA, CREATE_DB
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -s, --silent          Turn off all messages for silent execution.
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

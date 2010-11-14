@@ -21,9 +21,10 @@ Options:
                         files) - default = current directory
   -d, --dump            dump GRANT statements for user
   -f, --force           drop the new user if it exists
-  -v, --verbose         display additional information during operation
-  --silent              do not display feedback information during operation
   --include-global-privileges
                         include privileges that match base_user@% as well as
                         base_user@host
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -s, --silent          Turn off all messages for silent execution.
 Test case 3 - use the silent parameter

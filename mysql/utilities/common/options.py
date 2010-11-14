@@ -74,6 +74,8 @@ _SKIP_VALUES = (
 
 def add_skip_options(parser):
     """Add the common --skip options for database utilties.
+    
+    parser[in]        the parser instance
     """
     parser.add_option("--skip", action="store", dest="skip_objects",
                       default=None, help="specify objects to skip in the "
@@ -102,6 +104,32 @@ def check_skip_options(skip_list):
                 raise MySQLUtilError("The value %s is not a valid value for "
                                      "--skip." % object)
     return new_skip_list
+
+
+def add_verbosity(parser, silent=True):
+    """Add the verbosity and silent options.
+    
+    parser[in]        the parser instance
+    silent[in]        if True, include the --silent option
+                      (default is True)
+    
+    """
+    parser.add_option("-v", "--verbose", action="count", dest="verbosity",
+                      help="Control how much information is displayed. "
+                      "e.g., -v = verbose, -vv = more verbose, -vvv = debug")
+    if silent:
+        parser.add_option("-s", "--silent", action="store_true", dest="silent",
+                          help="Turn off all messages for silent execution.")
+        
+
+def check_verbosity(options):
+    """Check to see if both verbosity and silent are being used.
+    """
+    # Warn if silent and verbosity are both specified
+    if options.silent is not None and options.silent and \
+       options.verbosity is not None and options.verbosity > 0:
+        print "WARNING: --verbosity is ignored when --silent is specified."
+        options.verbosity = None
 
 
 _CONN_CRE = re.compile(

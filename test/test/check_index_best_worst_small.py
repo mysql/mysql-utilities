@@ -22,15 +22,15 @@ class test(check_index_parameters.test):
         self.res_fname = self.testdir + "result.txt"
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
-        cmd_str = "mysqlindexcheck.py %s util_test_a --silent " % from_conn
+        cmd_str = "mysqlindexcheck.py %s util_test_a " % from_conn
        
         comment = "Test case 1 - show best indexes on small database"
-        res = self.run_test_case(0, cmd_str + "--stats --best=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats -v --best=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - show worst indexes on small database"
-        res = self.run_test_case(0, cmd_str + "--stats --worst=5", comment)
+        res = self.run_test_case(0, cmd_str + "--stats -v --worst=5", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         

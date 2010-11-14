@@ -80,14 +80,14 @@ The following command line options are accepted by **mysqldbcopy**:
 
    drop the new database or object if it exists
 
-.. option:: -v, --verbose
-
-   display additional information during operation
-
 .. option:: --silent
 
-   do not display feedback/progress information (errors are still
-   displayed)
+   turn off all messages for silent execution
+
+.. option:: -v, --verbose
+
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --threads
 

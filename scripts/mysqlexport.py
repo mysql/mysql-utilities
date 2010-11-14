@@ -28,9 +28,10 @@ import sys
 import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbexport
-from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import check_skip_options
+from mysql.utilities.common.options import add_skip_options, check_skip_options
+from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -87,24 +88,21 @@ parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
                   default=False, help="do not display the column headers - "
                   "ignored for GRID format")
 
-# Verbose mode
-parser.add_option("--silent", action="store_true", dest="silent",
-                  help="do not display feedback information during operation",
-                  default=False)
-
-# Debug mode
-parser.add_option("--debug", action="store_true", dest="debug",
-                  default=False, help="print debug information")
-
-# Add the skip common options
-add_skip_options(parser)
-
 # Skip blobs for export
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
                   default=False, help="Do not export blob data.")
 
+# Add the skip common options
+add_skip_options(parser)
+
+# Add verbosity and silent mode
+add_verbosity(parser, True)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Warn if silent and verbosity are both specified
+check_verbosity(opt)    
 
 try:
     skips = check_skip_options(opt.skip_objects)
@@ -189,7 +187,8 @@ options = {
     "display"       : opt.display,
     "single"        : not opt.bulk_import,
     "silent"        : opt.silent,
-    "debug"         : opt.debug
+    "verbosity"     : opt.verbosity,
+    "debug"         : opt.verbosity >= 3
 }
 
 # Parse server connection values
@@ -205,7 +204,7 @@ for db in args:
 
 try:
     # record start time
-    if opt.debug:
+    if opt.verbosity >= 3:
         start_test = time.time()
     if opt.export == "DEFINITIONS" or opt.export == "BOTH":
         dbexport.export_metadata(server_values, db_list, options)
@@ -213,7 +212,7 @@ try:
         if opt.display != "BRIEF":
             print "# NOTE : --display is ignored for data export."
         dbexport.export_data(server_values, db_list, options)
-    if opt.debug:
+    if opt.verbosity >= 3:
         print_elapsed_time(start_test)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg

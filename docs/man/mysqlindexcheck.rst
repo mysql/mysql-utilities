@@ -115,13 +115,10 @@ OPTIONS
 
    skip tables that do not exist
 
-.. option:: --verbose, -v
+.. option:: -v, --verbose
 
-   display additional information during operation
-
-.. option:: --silent
-
-   do not display informational messages
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --index-format <index-format>
 

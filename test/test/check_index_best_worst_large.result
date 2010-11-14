@@ -1,6 +1,7 @@
 Test case 1 - show best indexes
 # Source on localhost: ... connected.
 # Checking indexes...
+# Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
 CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
@@ -17,6 +18,7 @@ employees,dept_emp,dept_no,dept_no,1,1,NNNNNNN,NNNNNNN,NNNNNNN
 Test case 2 - show worst indexes
 # Source on localhost: ... connected.
 # Checking indexes...
+# Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
 CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE

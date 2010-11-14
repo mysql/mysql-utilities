@@ -22,7 +22,9 @@ Options:
                        requirement - e.g. rpl:passwd - default = rpl:rpl
   --test-db=TEST_DB    database name to use in testing  replication setup
                        (optional)
-  -v, --verbose        display additional information during operation
+  -v, --verbose        Control how much information is displayed. e.g., -v =
+                       verbose, -vv = more verbose, -vvv = debug
+  -s, --silent         Turn off all messages for silent execution.
 Test case 3 - use the verbose feature
 # master on localhost: ... connected.
 # slave on localhost: ... connected.

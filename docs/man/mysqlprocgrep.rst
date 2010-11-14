@@ -69,10 +69,11 @@ Options
    is given. If a kill option is given, this option will print
    information about the processes before killing them.
 
-.. option:: --verbose, -v
+.. option:: -v, --verbose
 
    Be more verbose and print messages about execution. Can be given
    multiple times, in which case the verbosity level increases.
+   e.g., -v = verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --regexp, --basic-regexp, -G
 

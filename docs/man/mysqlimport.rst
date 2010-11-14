@@ -124,11 +124,12 @@ OPTIONS
 
 .. option:: --silent
 
-   do not display feedback information during operation
+   turn off all messages for silent execution
 
-.. option:: --debug
+.. option:: -v, --verbose
 
-   print debug information
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --skip <skip-objects>
 

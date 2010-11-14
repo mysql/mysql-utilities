@@ -30,6 +30,7 @@ import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options
 from mysql.utilities.exception import MySQLUtilError
 
@@ -83,20 +84,6 @@ parser.add_option("-f", "--force", action="store_true", dest="force",
                   help="drop the new database or object if it exists",
                   default=False)
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation",
-                  default=False)
-
-# Verbose mode
-parser.add_option("--silent", action="store_true", dest="silent",
-                  help="do not display feedback information during operation",
-                  default=False)
-
-# Debug mode
-parser.add_option("--debug", action="store_true", dest="debug",
-                  default=False, help="print debug information")
-
 # Threaded/connection mode
 parser.add_option("--threads", action="store", dest="threads",
                   default=1, help="use multiple threads (connections) "
@@ -104,6 +91,9 @@ parser.add_option("--threads", action="store", dest="threads",
 
 # Add the skip common options
 add_skip_options(parser)
+
+# Add verbosity and silent mode
+add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -121,7 +111,10 @@ if opt.destination is None:
 # Fail if no arguments
 if len(args) == 0:
     parser.error("You must specify at least one database to copy.")
-    
+
+# Warn if silent and verbosity are both specified
+check_verbosity(opt)    
+
 # Set options for database operations.
 options = {
     "skip_tables"   : "TABLES" in skips,
@@ -135,10 +128,10 @@ options = {
     "skip_data"     : "DATA" in skips,
     "copy_dir"      : opt.copy_dir,
     "force"         : opt.force,
-    "verbose"       : opt.verbose,
+    "verbose"       : opt.verbosity >= 1,
     "silent"        : opt.silent,
     "threads"       : opt.threads,
-    "debug"         : opt.debug
+    "debug"         : opt.verbosity == 3
 }
 
 # Parse source connection values
@@ -164,10 +157,10 @@ for db in args:
 
 try:
     # record start time
-    if opt.debug:
+    if opt.verbosity >= 3:
         start_test = time.time()
     dbcopy.copy_db(source_values, dest_values, db_list, options)
-    if opt.debug:
+    if opt.verbosity >= 3:
         print_elapsed_time(start_test)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg

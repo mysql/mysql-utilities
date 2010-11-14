@@ -43,9 +43,10 @@ OPTIONS
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --verbose
+.. option:: -v, --verbose
 
-   display additional information during operation
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --new-data <path to new datadir>
 

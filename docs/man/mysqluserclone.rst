@@ -70,18 +70,18 @@ OPTIONS
 
    drop the new user if it exists
 
-.. option:: -v, --verbose
-
-   display additional information during operation
-
 .. option:: --silent
 
-   do not display feedback information during operation
+   turn off all messages for silent execution
+
+.. option:: -v, --verbose
+
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --include-global-privileges
 
-    include privileges that match ``base_user@%`` as well as
-    ``base_user@host``
+   include privileges that match ``base_user@%`` as well as ``base_user@host``
 
 
 NOTES

@@ -27,6 +27,7 @@ import sys
 
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.command import rpl
 from mysql.utilities import VERSION_FRM
 
@@ -70,9 +71,8 @@ parser.add_option("--test-db", action="store", dest="test_db",
                   type = "string", help="database name to use in testing "
                          " replication setup (optional)")
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation")
+# Add verbosity
+add_verbosity(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -91,7 +91,7 @@ except:
     
 try:
     res = rpl.replicate(m_values, s_values, opt.rpl_user,
-                        opt.test_db, opt.verbose)
+                        opt.test_db, opt.verbosity >= 1)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

@@ -13,11 +13,11 @@ Options:
                         will be generated containing the code for executing
                         the kill.
   --sql-body            Only print the body of the procedure.
-  -v, --verbose         Print debugging messages about progress to STDOUT.
-                        Multiple -v options increase the verbosity.
   --kill-connection     Kill all matching connections.
   --kill-query          Kill query for all matching processes.
   --print               Print all matching processes.
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
   --match-user=PATTERN  Match the 'User' column of the PROCESSLIST table
   --match-host=PATTERN  Match the 'Host' column of the PROCESSLIST table
   --match-db=PATTERN    Match the 'Db' column of the PROCESSLIST table

@@ -40,10 +40,9 @@ def check_index(src_val, table_args, options):
     options[in]        dictionary of options to include:
                          show-drops   : show drop statements for dupe indexes
                          skip         : skip non-existant tables
-                         verbose      : print extra information
+                         verbosity    : print extra information
                          show-indexes : show all indexes for each table
                          index-format : index format = SQL, TABLE, TAB, CSV
-                         silent       : do not print informational messages
                          worst        : show worst performing indexes
                          best         : show best performing indexes
     
@@ -53,10 +52,9 @@ def check_index(src_val, table_args, options):
     # Get options
     show_drops = options.get("show-drops", False)
     skip = options.get("skip", False)
-    verbose = options.get("verbose", False)
+    verbosity = options.get("verbosity", False)
     show_indexes = options.get("show-indexes", False)
     index_format = options.get("index-format", False)
-    silent = options.get("silent", False)
     stats = options.get("stats", False)
     first_indexes = options.get("best", None)        
     last_indexes = options.get("worst", None)
@@ -67,7 +65,7 @@ def check_index(src_val, table_args, options):
 
     # Try to connect to the MySQL database server.
     try:
-        servers = connect_servers(src_val, None, silent, "5.0.0")
+        servers = connect_servers(src_val, None, verbosity == 1, "5.0.0")
     except MySQLUtilError, e:
         raise e
 
@@ -97,7 +95,7 @@ def check_index(src_val, table_args, options):
         db_source = Database(source, db)
         db_source.init()
         tables = db_source.get_db_objects("TABLE")
-        if not tables and verbose:
+        if not tables and verbosity >= 1:
             print "# Warning: database %s does not exist. Skipping." % (db)
         for table in tables:
             table_list.append(db + "." + table[0])
@@ -106,27 +104,28 @@ def check_index(src_val, table_args, options):
     if not table_list:
         raise MySQLUtilError("No tables to check.")
 
-    if not silent:
+    if verbosity > 1:
         print "# Checking indexes..."
     # Check indexes for each table in the list
     for table_name in table_list:
-        tbl = Table(source, table_name, verbose)
+        tbl = Table(source, table_name, verbosity >= 1)
         exists = tbl.exists()
         if not exists and not skip:
             raise MySQLUtilError("Table %s does not exist. Use --skip "
                                  "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():
-                if not silent:
+                if verbosity > 1:
                     print "# Table %s is not indexed." % (table_name)
             else:
                 if show_indexes:
                     tbl.print_indexes(index_format)
                     # Show if table has primary key
                 if not tbl.has_primary_key():
-                    if not silent:
+                    if verbosity > 1:
                         print "#   Table %s does not contain a PRIMARY key."
-                tbl.check_indexes(show_drops, silent)
+                tbl.check_indexes(show_drops,
+                                  verbosity is None or verbosity < 1)
                 
             # Show best and/or worst indexes
             if stats:
@@ -135,9 +134,9 @@ def check_index(src_val, table_args, options):
                 if last_indexes is not None:
                     tbl.show_special_indexes(index_format, last_indexes)
                 
-        if not silent:
+        if verbosity > 1:
             print "#"
 
-    if not silent:    
+    if verbosity > 1:    
         print "# ...done."
     

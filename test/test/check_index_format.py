@@ -21,7 +21,7 @@ class test(check_index_parameters.test):
         self.res_fname = self.testdir + "result.txt"
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
-        cmd_str = "mysqlindexcheck.py %s util_test_a -i --silent " % from_conn
+        cmd_str = "mysqlindexcheck.py %s util_test_a -i  " % from_conn
        
         comment = "Test case 1 - show indexes using default format"
         res = self.run_test_case(0, cmd_str, comment)

@@ -62,7 +62,7 @@ class test(mysql_test.System_test):
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 6 - export data and metadata with debug"
-        cmd_str = cmd + " --export=both --format=SQL --skip=events --debug"
+        cmd_str = cmd + " --export=both --format=SQL --skip=events -vvv"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)

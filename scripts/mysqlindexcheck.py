@@ -32,6 +32,7 @@ from mysql.utilities.command import indexcheck
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import add_verbosity, check_verbosity
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
@@ -56,16 +57,6 @@ parser.add_option("-s", "--skip", action="store_true", dest="skip",
                   help="skip tables that do not exist",
                   default=False)
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true",
-                  dest="verbose", default=False,
-                  help="display additional information during operation")
-
-# Silent mode
-parser.add_option("--silent", action="store_true",
-                  dest="silent", default=False,
-                  help="do not display informational messages")
-
 # Index list mode
 parser.add_option("--index-format", action="store",
                   dest="index_format", default="GRID",
@@ -87,11 +78,11 @@ parser.add_option("--worst", action="store",
                   dest="worst", default=None,
                   help="limit index statistics to the worst N indexes")
 
+# Add verbosity mode
+add_verbosity(parser, False)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
-
-if opt.silent and opt.verbose:
-    parser.error("You cannot use --silent and --verbose together.")
 
 # Check to make sure at least one table specified.
 if len(args) == 0:
@@ -153,10 +144,9 @@ except:
 options = {
     "show-drops"    : opt.show_drops,
     "skip"          : opt.skip,
-    "verbose"       : opt.verbose,
+    "verbosity"     : opt.verbosity,
     "show-indexes"  : opt.show_indexes,
     "index-format"  : opt.index_format,
-    "silent"        : opt.silent,
     "stats"         : opt.stats,
     "best"          : best,
     "worst"         : worst

@@ -8,6 +8,7 @@ import sys
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.proc import *
 from mysql.utilities.exception import FormatError, EmptyResultError
+from mysql.utilities.common.options import add_verbosity
 
 def add_pattern(option, opt, value, parser, field):
     entry = (field, value)
@@ -34,11 +35,6 @@ parser.add_option(
     dest="sql_body", action="store_true", default=False,
     help="Only print the body of the procedure.")
 parser.add_option(
-    "-v", "--verbose",
-    action="count", dest="verbosity", default=0,
-    help="Print debugging messages about progress to STDOUT."
-         " Multiple -v options increase the verbosity.")
-parser.add_option(
     "--kill-connection",
     action="append_const", const=KILL_CONNECTION,
     dest="actions", default=[],
@@ -53,6 +49,9 @@ parser.add_option(
     action="append_const", const=PRINT_PROCESS,
     dest="actions", default=[],
     help="Print all matching processes.")
+
+# Add verbosity mode
+add_verbosity(parser, False)
 
 # Adding the --match-* options
 for col in USER, HOST, DB, COMMAND, INFO, STATE:

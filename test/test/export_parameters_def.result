@@ -26,13 +26,14 @@ Options:
   -b, --bulk-insert     Use bulk insert statements for data (default:False)
   -h, --no-headers      do not display the column headers - ignored for GRID
                         format
-  --silent              do not display feedback information during operation
-  --debug               print debug information
+  --skip-blobs          Do not export blob data.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
                         EVENTS, GRANTS, DATA, CREATE_DB
-  --skip-blobs          Do not export blob data.
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -s, --silent          Turn off all messages for silent execution.
 Test case 2 - no grants
 # Source on localhost: ... connected.
 # Exporting metadata from util_test

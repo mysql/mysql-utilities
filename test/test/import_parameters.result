@@ -21,15 +21,16 @@ Options:
   -d, --drop-first      Drop database before importing.
   -b, --bulk-insert     Use bulk insert statements for data (default:False)
   -h, --no-headers      files do not contain column headers
-  --silent              do not display feedback information during operation
-  --debug               print debug information
   --dryrun              import the files and generate the statements but do
                         not execute them - useful for testing file validity
+  --skip-blobs          Do not import blob data.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
                         EVENTS, GRANTS, DATA, CREATE_DB
-  --skip-blobs          Do not import blob data.
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -s, --silent          Turn off all messages for silent execution.
 Generating import file
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 

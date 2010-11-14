@@ -30,34 +30,34 @@ class test(mysql_test.System_test):
         cmd_str = "mysqlindexcheck.py %s " % from_conn
 
         comment = "Test case 1 - check a table without indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6", comment)
+        res = self.run_test_case(0, cmd_str + "util_test_c.t6 -vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
         comment = "Test case 2 - check a list of tables and databases"
         res = self.run_test_case(0, cmd_str + "util_test_c util_test_a.t1" + \
-                                 " util_test_b", comment)
+                                 " util_test_b -vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
         comment = "Test case 3 - check all tables for a single database"
-        res = self.run_test_case(0, cmd_str + "util_test_a", comment)
+        res = self.run_test_case(0, cmd_str + "util_test_a -vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 4 - check tables for a non-existant database"
-        res = self.run_test_case(1, cmd_str + "util_test_X -v", comment)
+        res = self.run_test_case(1, cmd_str + "util_test_X -vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 5 - check indexes for a non-existant table"
-        res = self.run_test_case(1, cmd_str + "nosuch.nosuch -v", comment)
+        res = self.run_test_case(1, cmd_str + "nosuch.nosuch -vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 6 - check indexes for a non-existant table " + \
                   "with skip option"
-        res = self.run_test_case(0, cmd_str + "nosuch.nosuch -v --skip",
+        res = self.run_test_case(0, cmd_str + "nosuch.nosuch -vv --skip",
                                  comment)
         if not res:
             raise MUTException("%s: failed" % comment)

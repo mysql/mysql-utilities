@@ -8,31 +8,27 @@ Error XXXX: Access denied
 Test case 3 - error: invalid login to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
-Test case 4 - error: silent and verbose
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
-
-mysqlindexcheck.py: error: You cannot use --silent and --verbose together.
-Test case 5 - error: stats and best=alpha
+Test case 4 - error: stats and best=alpha
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: The --best parameter must be an integer > 1
-Test case 6 - error: stats and worst=alpha
+Test case 5 - error: stats and worst=alpha
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: The --worst parameter must be an integer > 1
-Test case 7 - error: not stats 
+Test case 6 - error: not stats 
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: You must specify --stats for --best or --worst to take effect.
-Test case 8 - error: stats and both best and worst 
+Test case 7 - error: stats and both best and worst 
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: You must specify either --best or --worst but not both.
-Test case 9 - error: stats and worst=-1
+Test case 8 - error: stats and worst=-1
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: The --worst parameter must be an integer > 1
-Test case 10 - error: stats and best=-1
+Test case 9 - error: stats and best=-1
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: The --best parameter must be an integer > 1

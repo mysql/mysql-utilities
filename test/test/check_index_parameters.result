@@ -11,17 +11,18 @@ Options:
   -d, --show-drops      display DROP statements for dropping indexes
   -i, --show-indexes    display indexes for each table
   -s, --skip            skip tables that do not exist
-  -v, --verbose         display additional information during operation
-  --silent              do not display informational messages
   --index-format=INDEX_FORMAT
                         display the list of indexes per table in either SQL,
                         GRID (default), TAB, or CSV format
   --stats               show index performance statistics
   --best=BEST           limit index statistics to the best N indexes
   --worst=WORST         limit index statistics to the worst N indexes
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
 Test case 2 - show drops for a table with dupe indexes
 # Source on localhost: ... connected.
 # Checking indexes...
+# Getting indexes for util_test_a.t1
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
 CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
@@ -41,7 +42,6 @@ ALTER TABLE util_test_a.t1 DROP INDEX s2;
 # ...done.
 Test case 3 - show drops for a table with dupe indexes
 # Source on localhost: ... connected.
-# Checking indexes...
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
 CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
@@ -57,15 +57,15 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 ALTER TABLE util_test_a.t1 DROP INDEX s4;
 ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
-#
-# ...done.
 Test case 4 - show drops for a table without dupe indexes
 # Source on localhost: ... connected.
 # Checking indexes...
+# Getting indexes for util_test_c.t6
 # Table util_test_c.t6 is not indexed.
 #
 # ...done.
 Test case 5 - same as test case 2 but silent
+# Source on localhost: ... connected.
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
 CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
@@ -82,9 +82,9 @@ ALTER TABLE util_test_a.t1 DROP INDEX s4;
 ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
 Test case 6 - same as test case 4 but silent
+# Source on localhost: ... connected.
 Test case 7 - show indexes
 # Source on localhost: ... connected.
-# Checking indexes...
 # Showing indexes from util_test_a.t1:
 #
 +--------------+--------+----------+----------+----------+
@@ -105,11 +105,8 @@ CREATE INDEX s2 ON util_test_a.t1 (d(32))
 CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
 #     may be redundant or duplicate of:
 CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
-#
-# ...done.
 Test case 8 - show indexes with -i
 # Source on localhost: ... connected.
-# Checking indexes...
 # Showing indexes from util_test_a.t1:
 #
 +--------------+--------+----------+----------+----------+
@@ -130,5 +127,3 @@ CREATE INDEX s2 ON util_test_a.t1 (d(32))
 CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
 #     may be redundant or duplicate of:
 CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
-#
-# ...done.

@@ -28,8 +28,8 @@ class test(check_index.test):
             raise MUTException("%s: failed" % comment)
        
         comment = "Test case 2 - show drops for a table with dupe indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops",
-                                 comment)
+        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops "
+                                 "-vv", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
@@ -40,19 +40,19 @@ class test(check_index.test):
             return False
 
         comment = "Test case 4 - show drops for a table without dupe indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6 --show-drops",
-                                  comment)
+        res = self.run_test_case(0, cmd_str + "util_test_c.t6 --show-drops "
+                                 "-vv", comment)
         if not res:
             return False
  
         comment = "Test case 5 - same as test case 2 but silent"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops " \
-                                 "--silent", comment)
+        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops ",
+                                 comment)
         if not res:
             return False
 
         comment = "Test case 6 - same as test case 4 but silent"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6 -d --silent",
+        res = self.run_test_case(0, cmd_str + "util_test_c.t6 -d ",
                                  comment)
         if not res:
             return False
@@ -64,7 +64,7 @@ class test(check_index.test):
             return False
 
         comment = "Test case 8 - show indexes with -i"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 -i",
+        res = self.run_test_case(0, cmd_str + "util_test_a.t1 -i ",
                                  comment)
         if not res:
             return False

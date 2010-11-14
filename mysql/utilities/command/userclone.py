@@ -52,7 +52,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
                          dump_sql - if True, print grants for base user
                                     (no new users are created)
                          force    - drop new users if they exist
-                         verbose  - print add'l information during operation
+                         verbosity - print add'l information during operation
                          silent   - do not print information during operation
                                     Note: Error messages are printed regardless
                          global_privs - include global privileges (i.e. user@%) 
@@ -66,7 +66,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     dump_sql = options.get("dump", False)
     copy_dir = options.get("copy_dir", False)
     overwrite = options.get("overwrite", False)
-    verbose = options.get("verbose", False)
+    verbosity = options.get("verbosity", False)
     silent = options.get("silent", False)
     global_privs = options.get("global_privs", False)
 
@@ -81,10 +81,10 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         destination = servers[0]
     
     # Create an instance of the user class for source.
-    user_source = User(source, base_user, verbose)
+    user_source = User(source, base_user, verbosity >= 1)
 
     # Create an instance of the user class for destination.
-    user_dest = User(destination, base_user, verbose)
+    user_dest = User(destination, base_user, verbosity >= 1)
     
     # Check to ensure base user exists.
     if not user_source.exists(base_user):
