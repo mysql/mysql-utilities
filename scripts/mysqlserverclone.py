@@ -33,8 +33,8 @@ from mysql.utilities.command import serverclone
 # Constants
 NAME = "MySQL Utilities - mysqlserverclone "
 DESCRIPTION = "mysqlserverclone - start another instance of a running server"
-USAGE = "%prog --server=user:pass@host:port:socket --new-data=<dir> " \
-        "--new-port=3307 --new-id=2"
+USAGE = "%prog --server=user:pass@host:port:socket --new-data=/tmp/data2 " \
+        "--new-port=3310 --new-id=12 --root-password=root"
                         
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -74,6 +74,10 @@ opt, args = parser.parse_args()
 # Fail if no database path specified.
 if opt.new_data is None:
     parser.error("No new database path. Use --help for available options.")
+
+# Warn if root-password is left off.
+if opt.rootpass is None or opt.rootpass == '':
+    print "# WARNING: Root password for new instance has not been set."
 
 # Parse source connection values
 try:

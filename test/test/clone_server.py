@@ -39,8 +39,7 @@ class test(mysql_test.System_test):
         comment = "Test case 3 - error: no login"
         res = self.run_test_case(1, "mysqlserverclone.py " +
                                  "--server=root:root@nothere --new-data=/nada "
-                                 "--new-id=7 --root-password=nope " + newport,
-                                 comment)
+                                 "--new-id=7 " + newport, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         
