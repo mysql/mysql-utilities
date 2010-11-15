@@ -58,10 +58,10 @@ parser.add_option("-s", "--skip", action="store_true", dest="skip",
                   default=False)
 
 # Index list mode
-parser.add_option("--index-format", action="store",
+parser.add_option("--format", action="store",
                   dest="index_format", default="GRID",
                   help="display the list of indexes per table in either " \
-                       "SQL, GRID (default), TAB, or CSV format")
+                       "SQL, GRID (default), TAB, CSV, or VERTICAL format")
 
 # Show index statistics
 parser.add_option("--stats", action="store_true",
@@ -88,7 +88,7 @@ opt, args = parser.parse_args()
 if len(args) == 0:
     parser.error("You must specify at least one table or database to check.")
     
-PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV")
+PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL")
 
 if opt.index_format.upper() not in PERMITTED_FORMATS:
     print "WARNING : '%s' is not a valid index format. Using default." % \

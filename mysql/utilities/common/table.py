@@ -1006,6 +1006,7 @@ class Table:
         """
         
         from mysql.utilities.common.format import format_tabular_list
+        from mysql.utilities.common.format import format_vertical_list
         
         rows = []
         type = "best"
@@ -1030,6 +1031,8 @@ class Table:
                 format_tabular_list(sys.stdout, cols, rows, True, '\t', True)
             elif format == "CSV":
                 format_tabular_list(sys.stdout, cols, rows, True, ',', True)
+            elif format == "VERTICAL":
+                format_vertical_list(sys.stdout, cols, rows)
             else:  # default to table format
                 format_tabular_list(sys.stdout, cols, rows, True, None)
 
@@ -1043,6 +1046,7 @@ class Table:
         """
 
         from mysql.utilities.common.format import format_tabular_list
+        from mysql.utilities.common.format import format_vertical_list
 
         if format == "SQL":
             for index in indexes:
@@ -1056,6 +1060,8 @@ class Table:
                 format_tabular_list(sys.stdout, cols, rows, header, '\t', True)
             elif format == "CSV":
                 format_tabular_list(sys.stdout, cols, rows, header, ',', True)
+            elif format == "VERTICAL":
+                format_vertical_list(sys.stdout, cols, rows)
             else:  # default to table format
                 format_tabular_list(sys.stdout, cols, rows, header, None)
 

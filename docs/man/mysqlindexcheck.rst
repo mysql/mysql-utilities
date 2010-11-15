@@ -120,10 +120,10 @@ OPTIONS
    control how much information is displayed. e.g., -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --index-format <index-format>
+.. option:: --format <index-format>
 
    Display the list of indexes per table in either **SQL**, **TABLE**
-   (default), **TAB**, or **CSV** format
+   (default), **TAB**, **CSV**, or **VERTICAL** format
 
 .. option:: --stats
 
