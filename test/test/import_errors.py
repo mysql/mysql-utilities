@@ -39,7 +39,7 @@ class test(import_basic.test):
             self.drop_db(self.server2, "util_test")
             test_num += 1
 
-        export_cmd = "mysqlexport.py %s util_test --export=BOTH" % from_conn
+        export_cmd = "mysqldbexport.py %s util_test --export=BOTH" % from_conn
         export_cmd += " --format=SQL "
         export_cmd += " > %s" % self.export_import_file
         
@@ -48,7 +48,7 @@ class test(import_basic.test):
         if not res:
             raise MUTException("EXPORT: %s: failed" % comment)
 
-        import_cmd = "mysqlimport.py %s " % to_conn
+        import_cmd = "mysqldbimport.py %s " % to_conn
 
         comment = "Test case %d - no file specified " % test_num
         cmd_str = import_cmd + " --import=BOTH --format=SQL"
@@ -74,7 +74,7 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
         test_num += 1
           
-        cmd_str = "mysqlimport.py --server=rocks_rocks_rocks "
+        cmd_str = "mysqldbimport.py --server=rocks_rocks_rocks "
         cmd_str += " %s " % self.export_import_file
         comment = "Test case %d - cannot parse --server" % test_num
         res = self.run_test_case(2, cmd_str, comment)
@@ -82,7 +82,7 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
         test_num += 1
 
-        cmd_str = "mysqlimport.py %s " % self.export_import_file
+        cmd_str = "mysqldbimport.py %s " % self.export_import_file
         cmd_str += "--server=nope:nada@localhost:3306"
         comment = "Test case %d - error: cannot connect to server" % test_num
         res = self.run_test_case(1, cmd_str, comment)
@@ -100,14 +100,14 @@ class test(import_basic.test):
         else:
             joe_conn = "--server=joe@localhost:%s " % self.server2.port
 
-        cmd_str = "mysqlimport.py %s %s " % (joe_conn, self.export_import_file)
+        cmd_str = "mysqldbimport.py %s %s " % (joe_conn, self.export_import_file)
         comment = "Test case %d - error: not enough privileges" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         test_num += 1
 
-        cmd_str = "mysqlimport.py %s %s --import=definitions" % \
+        cmd_str = "mysqldbimport.py %s %s --import=definitions" % \
                   (joe_conn, self.export_import_file)
         comment = "Test case %d - error: not enough privileges" % test_num
         res = self.run_test_case(1, cmd_str, comment)
@@ -117,7 +117,7 @@ class test(import_basic.test):
 
         bad_sql_file = os.path.normpath(self.testdir + "/data/bad_sql.sql")
 
-        cmd_str = "mysqlimport.py %s %s --import=definitions" % \
+        cmd_str = "mysqldbimport.py %s %s --import=definitions" % \
                   (to_conn, bad_sql_file)
         comment = "Test case %d - error: bad SQL statements" % test_num
         res = self.run_test_case(1, cmd_str, comment)
@@ -140,7 +140,7 @@ class test(import_basic.test):
 
         self.drop_db(self.server2, "util_test")
 
-        import_cmd = "mysqlimport.py %s " % to_conn
+        import_cmd = "mysqldbimport.py %s " % to_conn
         cmd_str = import_cmd + " %s --skip-blobs " % self.export_import_file + \
                   "--format=sql --import=definitions " 
         comment = "Test case %d - warning: --skip-blobs" % test_num

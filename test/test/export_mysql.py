@@ -82,7 +82,7 @@ class test(mysql_test.System_test):
         if conn_val[4] is not None:
             self.server2_conn += "--socket=%s " % conn_val[4]
         
-        cmd = "mysqlexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test  " % from_conn
        
         comment = "Test case 1 - export metadata to new server via the " \
                   "mysql monitor"

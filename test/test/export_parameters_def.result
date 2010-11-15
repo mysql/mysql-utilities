@@ -1,7 +1,7 @@
 Test case 1 - help
-Usage: mysqlexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
 
-mysqlexport - export metadata and data from databases
+mysqldbexport - export metadata and data from databases
 
 Options:
   --version             show program's version number and exit

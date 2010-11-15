@@ -40,17 +40,17 @@ AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
 Test case 5 - no file specified 
-Usage: mysqlimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+Usage: mysqldbimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
-mysqlimport.py: error: You must specify at least one file to import.
+mysqldbimport.py: error: You must specify at least one file to import.
 Test case 6 - bad --skip values
 ERROR: The value wiki-waki is not a valid value for --skip.
 Test case 7 - exporting data and skipping data
 ERROR: You cannot use --import=data and --skip-data when importing table data.
 Test case 8 - cannot parse --server
-Usage: mysqlimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+Usage: mysqldbimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
-mysqlimport.py: error: Server connection values invalid or cannot be parsed.
+mysqldbimport.py: error: Server connection values invalid or cannot be parsed.
 Test case 9 - error: cannot connect to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)

@@ -6,7 +6,7 @@ from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(import_basic.test):
     """check parameters for impport utility
-    This test executes a basic check of parameters for mysqlimport.
+    This test executes a basic check of parameters for mysqldbimport.
     It uses the import_basic test as a parent for setup and teardown methods.
     """
 
@@ -44,7 +44,7 @@ class test(import_basic.test):
         from_conn = "--server=" + self.build_connection_string(self.server1)
         to_conn = "--server=" + self.build_connection_string(self.server2)
        
-        cmd_str = "mysqlimport.py %s %s --import=definitions " % \
+        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
                   (to_conn, self.export_import_file)
         
         cmd_opts = " --help"
@@ -63,7 +63,7 @@ class test(import_basic.test):
         case_num = 2
         for format in _FORMATS:
             # Create an import file
-            export_cmd = "mysqlexport.py %s util_test --export=BOTH " % \
+            export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
                          from_conn
             export_cmd += "--format=%s --display=BRIEF > %s " % \
                           (format, self.export_import_file)
@@ -96,7 +96,7 @@ class test(import_basic.test):
         except MySQLUtilError, e:
             raise MUTException("Failed to add blob column: %s" % e.errmsg)
             
-        export_cmd = "mysqlexport.py %s util_test --export=BOTH " % \
+        export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
                      from_conn
         export_cmd += "--format=%s --display=BRIEF > %s " % \
                       ("CSV", self.export_import_file)
@@ -106,7 +106,7 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
 
         # No skips for reference (must skip events for deterministic reasons
-        cmd_str = "mysqlimport.py %s %s --import=both --dryrun " % \
+        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
                   (to_conn, self.export_import_file)
         cmd_str += " --format=CSV --bulk-insert "
         comment = "Test case %d - no %s" % (case_num, "events")
@@ -115,7 +115,7 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
         case_num += 1
 
-        cmd_str = "mysqlimport.py %s %s --import=both --dryrun " % \
+        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
                   (to_conn, self.export_import_file)
         cmd_str += " --format=CSV --bulk-insert "
         comment = "Test case %d - no %s" % (case_num, "data")
@@ -124,7 +124,7 @@ class test(import_basic.test):
             raise MUTException("%s: failed" % comment)
         case_num += 1
 
-        cmd_str = "mysqlimport.py %s %s --import=both --dryrun " % \
+        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
                   (to_conn, self.export_import_file)
         cmd_str += " --format=CSV --skip-blobs --bulk-insert "
         comment = "Test case %d - no %s" % (case_num, "blobs")
@@ -135,7 +135,7 @@ class test(import_basic.test):
         
         # Lastly, do a silent import
 
-        cmd_str = "mysqlimport.py %s %s --import=both --silent " % \
+        cmd_str = "mysqldbimport.py %s %s --import=both --silent " % \
                   (to_conn, self.export_import_file)
         cmd_str += " --format=CSV --bulk-insert "
         comment = "Test case %d - no %s" % (case_num, "messages (silent)")

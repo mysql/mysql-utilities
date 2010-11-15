@@ -1,7 +1,7 @@
 Test case 1 - help
-Usage: mysqlimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+Usage: mysqldbimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
-mysqlimport - import metadata and data from files
+mysqldbimport - import metadata and data from files
 
 Options:
   --version             show program's version number and exit

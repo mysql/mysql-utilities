@@ -29,7 +29,7 @@ class test(mysql_test.System_test):
         
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
         
-        cmd = "mysqlexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test  " % from_conn
        
         comment = "Test case 1 - export metadata only"
         cmd_str = cmd + " --export=definitions --format=SQL --skip=events "

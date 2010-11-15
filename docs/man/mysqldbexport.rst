@@ -1,7 +1,7 @@
-.. _`mysqlexport`:
+.. _`mysqldbexport`:
 
 ###################################################################
-``mysqlexport`` - Export object definitions or data from a database
+``mysqldbexport`` - Export object definitions or data from a database
 ###################################################################
 
 SYNOPSIS
@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlexport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldbexport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
              (<db_name>[, <db_name>])+ [--silent | --help | --no-headers | 
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
@@ -26,17 +26,17 @@ data, or both for a list of databases. For example, to export the
 metadata of the database 'dev' from server1 on port 3306 producing
 **CREATE** statements, use this command::
 
-  mysqlexport --server=root@server1:3306 --export=definitions dev
+  mysqldbexport --server=root@server1:3306 --export=definitions dev
   
 Similarly, to export the data of the database 'dev' from server1 on port 3306
 producing bulk insert statements, use this command::
 
-  mysqlexport --server=root@server1:3306 --bulk-insert --export=data dev
+  mysqldbexport --server=root@server1:3306 --bulk-insert --export=data dev
 
 Also, to export both the data and definitions of the database 'dev' from
 server1 on port 3306 producing bulk insert statements, use this command::
 
-  mysqlexport --server=root@server1:3306 --bulk-insert --export=both dev
+  mysqldbexport --server=root@server1:3306 --bulk-insert --export=both dev
 
 You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This can allow you to extract a
@@ -90,7 +90,7 @@ You can turn off all feedback information by specifying the
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
-in the operation. See :ref:`mysqlexport-notes` below for more details.
+in the operation. See :ref:`mysqldbexport-notes` below for more details.
 
 OPTIONS
 -------
@@ -152,7 +152,7 @@ OPTIONS
    Do not export blob data.
 
 
-.. _mysqlexport-notes:
+.. _mysqldbexport-notes:
 
 NOTES
 -----

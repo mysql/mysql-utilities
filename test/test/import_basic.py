@@ -7,7 +7,7 @@ from mysql.utilities.exception import MySQLUtilError, MUTException
 class test(mysql_test.System_test):
     """Import Data
     This test executes the import utility on a single server.
-    It uses the mysqlexport utility to generate files for importing.
+    It uses the mysqldbexport utility to generate files for importing.
     """
 
     def check_prerequisites(self):
@@ -41,13 +41,13 @@ class test(mysql_test.System_test):
     def run_import_test(self, expected_res, from_conn, to_conn, format, type,
                         comment, export_options=None, import_options=None):
     
-        export_cmd = "mysqlexport.py %s util_test --export=" % from_conn
+        export_cmd = "mysqldbexport.py %s util_test --export=" % from_conn
         export_cmd += type + " --format=%s " % format
         if export_options is not None:
             export_cmd += export_options
         export_cmd += " > %s" % self.export_import_file
         
-        import_cmd = "mysqlimport.py %s " % to_conn
+        import_cmd = "mysqldbimport.py %s " % to_conn
         import_cmd += "%s --import=" % self.export_import_file
         import_cmd += type + " --format=%s " % format
         if import_options is not None:

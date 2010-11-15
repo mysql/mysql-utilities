@@ -1,7 +1,7 @@
-.. _`mysqlimport`:
+.. _`mysqldbimport`:
 
 ###################################################################
-``mysqlimport`` - Import object definitions or data into a database
+``mysqldbimport`` - Import object definitions or data into a database
 ###################################################################
 
 SYNOPSIS
@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlimport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldbimport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
              (<db_name>[, <db_name>])+ [--silent | --help | --no-headers |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
@@ -21,24 +21,24 @@ DESCRIPTION
 This utility permits a database administrator to import the metadata
 (objects) or data for one or more databases from one or more files in
 either SQL, CSV, TAB, GRID, or VERTICAL formats. These formats are the
-output of the mysqlexport utility.
+output of the mysqldbexport utility.
 
 The utility allows you to import either the object definitions, the data, or
 both for a list of databases. For example, to import the metadata of the
 database 'dev' to server1 on port 3306 using a file containing SQL statements,
 use this command::
 
-  mysqlimport --server=root@server1:3306 --import=definitions dev.sql
+  mysqldbimport --server=root@server1:3306 --import=definitions dev.sql
 
 Similarly, to import the data of the database 'dev' to server1 on port 3306
 producing bulk insert statements, use this command::
 
-  mysqlimport --server=root@server1:3306 --bulk-insert --import=data dev.sql
+  mysqldbimport --server=root@server1:3306 --bulk-insert --import=data dev.sql
 
 Also, to import both the data and definitions of the database 'dev' to
 server1 on port 3306 producing bulk insert statements, use this command::
 
-  mysqlimport --server=root@server1:3306 --bulk-insert --import=both dev.sql
+  mysqldbimport --server=root@server1:3306 --bulk-insert --import=both dev.sql
 
 You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This can allow you to extract a
@@ -77,7 +77,7 @@ You can turn off all feedback information by specifying the
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects in
-the operation. See :ref:`mysqlimport-notes` below for more details.
+the operation. See :ref:`mysqldbimport-notes` below for more details.
 
 OPTIONS
 -------
@@ -142,7 +142,7 @@ OPTIONS
    Do not import blob data.
 
 
-.. _`mysqlimport-notes`:
+.. _`mysqldbimport-notes`:
 
 NOTES
 -----

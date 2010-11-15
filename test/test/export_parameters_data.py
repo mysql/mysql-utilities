@@ -43,7 +43,7 @@ class test(export_parameters_def.test):
        
         from_conn = "--server=" + self.build_connection_string(self.server1)
        
-        cmd_str = "mysqlexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py %s " % from_conn
         
         cmd_opts = "%s util_test --format=SQL --export=data" % cmd_str
         comment = "Test case 1 - SQL single rows"

@@ -25,7 +25,7 @@ class test(export_basic.test):
         
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
         
-        cmd = "mysqlexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test  " % from_conn
        
         comment = "Test case 1 - bad --skip values"
         cmd += " --skip=events,wiki-waki,woo-woo "
@@ -39,20 +39,20 @@ class test(export_basic.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        cmd_str = "mysqlexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py %s " % from_conn
         comment = "Test case 3 - no database specified"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        cmd_str = "mysqlexport.py --server=rocks_rocks_rocks "
+        cmd_str = "mysqldbexport.py --server=rocks_rocks_rocks "
         cmd_str += "util_test "
         comment = "Test case 4 - cannot parse --server"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        cmd_str = "mysqlexport.py "
+        cmd_str = "mysqldbexport.py "
         cmd_str += "--server=nope:nada@localhost:3306 util_test"
         comment = "Test case 5 - error: cannot connect to server"
         res = self.run_test_case(1, cmd_str, comment)
@@ -66,19 +66,20 @@ class test(export_basic.test):
             if self.server1.socket is not None:
                 joe_conn += ":%s" % self.server1.socket
 
-        cmd_str = "mysqlexport.py %s util_test " % joe_conn
+        cmd_str = "mysqldbexport.py %s util_test " % joe_conn
         comment = "Test case 6 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        cmd_str = "mysqlexport.py %s notthereatall" % from_conn
+        cmd_str = "mysqldbexport.py %s notthereatall" % from_conn
         comment = "Test case 7 - database does not exist"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        cmd_str = "mysqlexport.py %s util_test --export=definitions" % joe_conn
+        cmd_str = "mysqldbexport.py %s util_test --export=definitions" % \
+                  joe_conn
         comment = "Test case 8 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:

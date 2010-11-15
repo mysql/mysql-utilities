@@ -3,13 +3,13 @@ ERROR: The value wiki-waki is not a valid value for --skip.
 Test case 2 - exporting data and skipping data
 ERROR: You cannot use --export=data and --skip-data when exporting table data.
 Test case 3 - no database specified
-Usage: mysqlexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
 
-mysqlexport.py: error: You must specify at least one database to export.
+mysqldbexport.py: error: You must specify at least one database to export.
 Test case 4 - cannot parse --server
-Usage: mysqlexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
 
-mysqlexport.py: error: Server connection values invalid or cannot be parsed.
+mysqldbexport.py: error: Server connection values invalid or cannot be parsed.
 Test case 5 - error: cannot connect to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)

@@ -23,7 +23,7 @@ class test(export_parameters_def.test):
        
         from_conn = "--server=" + self.build_connection_string(self.server1)
        
-        cmd_str = "mysqlexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py %s " % from_conn
         
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.

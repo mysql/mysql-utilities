@@ -35,9 +35,9 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
-NAME = "MySQL Utilities - mysqlimport "
+NAME = "MySQL Utilities - mysqldbimport "
 VERSION = "1.0.0 alpha"
-DESCRIPTION = "mysqlimport - import metadata and data from files"
+DESCRIPTION = "mysqldbimport - import metadata and data from files"
 USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
 
 def print_elapsed_time(start_test):

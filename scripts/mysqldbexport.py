@@ -35,9 +35,9 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
-NAME = "MySQL Utilities - mysqlexport "
+NAME = "MySQL Utilities - mysqldbexport "
 VERSION = "1.0.0 alpha"
-DESCRIPTION = "mysqlexport - export metadata and data from databases"
+DESCRIPTION = "mysqldbexport - export metadata and data from databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
 
 def print_elapsed_time(start_test):
