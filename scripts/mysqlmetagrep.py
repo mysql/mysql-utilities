@@ -24,11 +24,16 @@ import sys
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import setup_common_options
 
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    usage="usage: %prog [options] pattern server ...")
+# Setup the command parser and setup server, help
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              "mysqlmetagrep - search metadata",
+                              "%prog --server=user:pass@host:port:socket "
+                              "[options] pattern", True)
 
+# Setup utility-specific options:
 parser.add_option("-b", "--body",
                   dest="check_body", action="store_true", default=False,
                   help="Search the body of routines, triggers, and events as well")
@@ -69,24 +74,13 @@ want"""
 if options.pattern:
     pattern = options.pattern
 else:
-    from mysql.utilities.exception import MySQLUtilError
-    from mysql.utilities.common.options import parse_connection
-    
-    try:
-        pattern = args.pop(0)
-        parse_connection(pattern)
-    except IndexError:
-        parser.error("No pattern supplied")
-    except MySQLUtilError:
-        pass # The pattern supplied was not a connection specification
-    else:
-        parser.error(_LOOKS_LIKE_CONNECTION_MSG.format(pattern=pattern))
+    parser.error("No pattern supplied.")
 
 # Check that --sql option is not used with server, and servers are
 # supplied if --sql is not used.
-if len(args) == 0 and not options.print_sql:
+if (options.server is None or len(options.server) == 0) and not options.print_sql:
     parser.error("You need at least one server if you're not using the --sql option")
-elif len(args) > 0 and options.print_sql:
+elif options.server is not None and len(options.server) > 0 and options.print_sql:
     parser.error("You should not include servers in the call if you are using the --sql option")
 
 types = re.split(r"\s*,\s*", options.types)
@@ -98,6 +92,6 @@ try:
     if options.print_sql:
         print command.sql()
     else:
-        command.execute(args)
+        command.execute(options.server)
 except mysql.utilities.exception.Error as details:
     parser.error(details)

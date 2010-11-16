@@ -7,12 +7,13 @@
 SYNOPSIS
 --------
 
-  mysqlmetagrep [ <options> ] <pattern> [ <server> ] ...
+  mysqlmetagrep [ <options> ] --pattern=<pattern> --server=user:pass@host:port:socket ...
 
 DESCRIPTION
 -----------
 
-This utility searches for objects on a server matching a given pattern
+This utility searches for objects on all the servers provided via repeated
+occurrences of the --server option matching a given pattern
 and show a table of the objects that match. The first non-option
 argument it taken to be the pattern unless the :option:`--pattern`
 option is used, in which case all non-option arguments are treated as
@@ -88,7 +89,7 @@ EXAMPLES
 
 Find all objects where the name match the pattern ``'t\_'``::
 
-    $ mysqlmetagrep 't_' mats@localhost
+    $ mysqlmetagrep 't_' --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+
@@ -100,7 +101,7 @@ Find all objects where the name match the pattern ``'t\_'``::
 To find all object that contain ``'t2'`` in the name or the body (for
 routines, triggers, and events)::
 
-    $ mysqlmetagrep -b '%t2%' mats@localhost:3306
+    $ mysqlmetagrep -b '%t2%' --server=mats@localhost:3306
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+
@@ -110,7 +111,7 @@ routines, triggers, and events)::
 
 Same thing, but using the **REGEXP** operator::
 
-    $ mysqlmetagrep -Gb 't2' mats@localhost
+    $ mysqlmetagrep -Gb 't2' --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+

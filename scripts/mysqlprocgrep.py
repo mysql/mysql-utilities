@@ -8,6 +8,8 @@ import sys
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.proc import *
 from mysql.utilities.exception import FormatError, EmptyResultError
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 
 def add_pattern(option, opt, value, parser, field):
@@ -17,11 +19,11 @@ def add_pattern(option, opt, value, parser, field):
     except AttributeError:
         setattr(parser.values, option.dest, [entry])
 
-# Parse options
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    usage="usage: %prog [options] server ...")
-
+# Setup the command parser and setup server, help
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              "mysqlprocgrep - search process information",
+                              "%prog --server=user:pass@host:port:socket "
+                              "[options]", True)
 parser.add_option(
     "-G", "--basic-regexp", "--regexp",
     dest="use_regexp", action="store_true", default=False,
@@ -67,9 +69,9 @@ for col in USER, HOST, DB, COMMAND, INFO, STATE:
 if options.sql_body:
     options.print_sql = True
 
-if len(args) == 0 and not options.print_sql:
+if (options.server is None or len(options.server) == 0) and not options.print_sql:
     parser.error("You need at least one server if you're not using the --sql option")
-elif len(args) > 0 and options.print_sql:
+elif options.server is not None and len(options.server) > 0 and options.print_sql:
     parser.error("You should not include servers in the call if you are using the --sql option")
 
 # If no option was supplied, we print the processes by default
@@ -81,7 +83,7 @@ if options.print_sql:
     print command.sql(options.sql_body).strip()
 else:
     try:
-        command.execute(args,)
+        command.execute(options.server)
     except (EmptyResultError) as details:
         print >>sys.stderr, "No matches"
         exit(1)

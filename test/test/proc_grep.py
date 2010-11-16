@@ -30,7 +30,7 @@ class test(mysql_test.System_test):
         from_conn = self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server1)
         
-        cmd = "mysqlprocgrep.py %s " % from_conn
+        cmd = "mysqlprocgrep.py --server=%s " % from_conn
        
         comment = "Test case 1 - find processes for current user"
         cmd += "--match-user='%s' " % conn_val[0]

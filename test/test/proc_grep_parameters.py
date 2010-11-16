@@ -22,7 +22,7 @@ class test(proc_grep.test):
         from_conn = self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server1)
 
-        cmd_str = "mysqlprocgrep.py %s " % from_conn
+        cmd_str = "mysqlprocgrep.py --server=%s " % from_conn
        
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
