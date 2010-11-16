@@ -7,14 +7,14 @@
 SYNOPSIS
 --------
 
-  mysqlprocgrep [ <options> ] <server> ...
+  mysqlprocgrep [ <options> ] --server=user:pass@host:port:socket ...
 
 DESCRIPTION
 -----------
 
-This utility scan the process lists for all the servers provided on
-the command line and will either print the result (the default) or
-execute certain actions on it. The match conditions are given as
+This utility scan the process lists for all the servers provided via repeated
+occurrences of the --server option and will either print the result (the
+default) or execute certain actions on it. The match conditions are given as
 options to the tool and in order for a row to match, all the
 conditions given have to match.
 
@@ -145,11 +145,11 @@ connections.
 To kill all connections created by user "mats" that are younger than 1
 minute::
 
-  mysqlprocgrep --user=root --host=localhost --match-user=mats --age=-1m --kill-query
+  mysqlprocgrep --server=root@localhost --match-user=mats --age=-1m --kill-query
 
 To kill all queries that has been idle for more than 1 hour::
 
-  mysqlprocgrep --user=root --host=localhost --match-command=sleep --age=+1h --kill
+  mysqlprocgrep --server=root@localhost --match-command=sleep --age=+1h --kill
 
 COPYRIGHT
 ---------

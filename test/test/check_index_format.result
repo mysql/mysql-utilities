@@ -128,3 +128,52 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 database,table,name,type,columns
 util_test_a,t2,id,BTREE,id
 #
+Test case 6 - show indexes using VERTICAL format
+# Source on localhost: ... connected.
+# Showing indexes from util_test_a.t1:
+#
+*************************       1. row *************************
+ database: util_test_a
+    table: t1
+     name: PRIMARY
+     type: BTREE
+  columns: A
+*************************       2. row *************************
+ database: util_test_a
+    table: t1
+     name: s1
+     type: SPATIAL
+  columns: e(32)
+*************************       3. row *************************
+ database: util_test_a
+    table: t1
+     name: s2
+     type: SPATIAL
+  columns: d(32)
+*************************       4. row *************************
+ database: util_test_a
+    table: t1
+     name: s4
+     type: SPATIAL
+  columns: d(32)
+4 rows.
+#
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#
+CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+# Showing indexes from util_test_a.t2:
+#
+*************************       1. row *************************
+ database: util_test_a
+    table: t2
+     name: id
+     type: BTREE
+  columns: id
+1 rows.
+#

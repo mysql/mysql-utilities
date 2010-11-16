@@ -1,6 +1,5 @@
 Test case 1 - show the grant statements
 # Source on localhost: ... connected.
-# Destination on localhost: ... connected.
 Dumping grants for user joe_nopass@user
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
@@ -19,11 +18,17 @@ Options:
                         form: <user>:<password>@<host>:<port>:<socket>
   --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
                         files) - default = current directory
-  -d, --dump            dump GRANT statements for user
+  -d, --dump            dump GRANT statements for user - does not require a
+                        destination
   -f, --force           drop the new user if it exists
   --include-global-privileges
                         include privileges that match base_user@% as well as
                         base_user@host
+  --list                list all users on the source - does not require a
+                        destination
+  --format=LIST_FORMAT  display the list of users in either GRID (default),
+                        TAB, CSV, or VERTICAL format - valid only for --list
+                        option
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -s, --silent          Turn off all messages for silent execution.

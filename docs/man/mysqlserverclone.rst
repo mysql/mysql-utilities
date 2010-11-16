@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlcloneserver  [[ --help | --version] | <login information>
+ mysqlserverclone  [[ --help | --version] | <login information>
                    [ --new-data=<datadir> | --new-port=<port> |
                      --new-id=<server_id> ] | --root-password=<passwd> ]
 
@@ -24,7 +24,7 @@ password for the login user account on the new instance.
 For example, to create a new instance of a typical MySQL instances,
 use this command::
 
- mysqlcloneserver --server=root:passwd@localhost --new-id=3 \
+ mysqlserverclone --server=root:passwd@localhost --new-id=3 \
                   --new-data=/Users/joe/data --root-password=xxxx  
 
 OPTIONS

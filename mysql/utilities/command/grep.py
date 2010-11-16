@@ -213,15 +213,11 @@ class ObjectGrep(object):
 
         entries = []
         for info in connections:
-            # If the connection is string-like, we assume it is a
-            # server specification and parse it. Otherwise, connection
-            # info is expected and we just use it directly.
-            if isinstance(info, basestring):
-                conn = parse_connection(info)
-                if not conn:
-                    msg = "'%s' is not a valid connection specifier" % (info,)
-                    raise FormatError(msg)
-                info = conn
+            conn = parse_connection(info)
+            if not conn:
+                msg = "'%s' is not a valid connection specifier" % (info,)
+                raise FormatError(msg)
+            info = conn
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)

@@ -11,9 +11,9 @@ Options:
   -d, --show-drops      display DROP statements for dropping indexes
   -i, --show-indexes    display indexes for each table
   -s, --skip            skip tables that do not exist
-  --index-format=INDEX_FORMAT
+  --format=INDEX_FORMAT
                         display the list of indexes per table in either SQL,
-                        GRID (default), TAB, or CSV format
+                        GRID (default), TAB, CSV, or VERTICAL format
   --stats               show index performance statistics
   --best=BEST           limit index statistics to the best N indexes
   --worst=WORST         limit index statistics to the worst N indexes

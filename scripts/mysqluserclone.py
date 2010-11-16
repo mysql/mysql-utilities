@@ -70,7 +70,8 @@ parser.add_option("--copy-dir", action="store", dest="copy_dir",
 
 # Dump mode
 parser.add_option("-d", "--dump", action="store_true",
-                  dest="dump", help="dump GRANT statements for user")
+                  dest="dump", help="dump GRANT statements for user - does "
+                  "not require a destination")
 
 # Overwrite mode
 parser.add_option("-f", "--force", action="store_true", dest="overwrite",
@@ -80,6 +81,17 @@ parser.add_option("-f", "--force", action="store_true", dest="overwrite",
 parser.add_option("--include-global-privileges", action="store_true",
                   dest="global_privs", help="include privileges that match "
                   "base_user@% as well as base_user@host", default=False)
+
+# List mode
+parser.add_option("--list", action="store_true", dest="list_users",
+                  help="list all users on the source - does not require "
+                  "a destination", default=False)
+
+# format for list
+parser.add_option("--format", action="store", dest="list_format",
+                  default="GRID", help="display the list of users in either " 
+                  "GRID (default), TAB, CSV, or VERTICAL format - valid "
+                  "only for --list option")
 
 # Add verbosity and silent mode
 add_verbosity(parser, True)
@@ -96,15 +108,8 @@ if opt.silent and opt.dump:
 check_verbosity(opt)    
 
 # Fail if no arguments and no options.
-if len(args) == 0 or opt is None:
+if (len(args) == 0 or opt is None) and not opt.list_users:
     parser.error("No arguments found. Use --help for available options.")
-
-# Make sure we have the base user plus at least one new user
-if len(args) < 2:
-    parser.error("Wrong parameter combination or no new users.")
-
-base_user = args[0]
-new_user_list = args[1:]
 
 # Parse source connection values
 try:
@@ -112,27 +117,50 @@ try:
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
-# Parse destination connection values
-try:
-    dest_values = parse_connection(opt.destination)
-except:
-    parser.error("Destination connection values invalid or cannot be parsed.")
+if opt.list_users:
+    PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
+    
+    if opt.list_format.upper() not in PERMITTED_FORMATS:
+        print "WARNING : '%s' is not a valid list format. Using default." % \
+              opt.list_format
+        opt.list_format = "GRID"
+    else:
+        opt.list_format = opt.list_format.upper()
 
-# Build dictionary of options
-options = {
-    "dump"         : opt.dump,
-    "copy_dir"     : opt.copy_dir,
-    "overwrite"    : opt.overwrite,
-    "silent"       : opt.silent,
-    "verbosity"    : opt.verbosity,
-    "global_privs" : opt.global_privs
-}
-
-try:
-    res = userclone.clone_user(source_values, dest_values, base_user,
-                               new_user_list, options)
-except MySQLUtilError, e:
-    print "ERROR:", e.errmsg
-    exit(1)
+    userclone.show_users(source_values, opt.verbosity, opt.list_format)
+else:
+    # Make sure we have the base user plus at least one new user
+    if len(args) < 2 and not opt.dump:
+        parser.error("Wrong parameter combination or no new users.")
+    
+    base_user = args[0]
+    new_user_list = args[1:]
+    
+    # Parse destination connection values if not dumping
+    if not opt.dump:
+        try:
+            dest_values = parse_connection(opt.destination)
+        except:
+            parser.error("Destination connection values invalid or cannot "
+                         "be parsed.")
+    else:
+        dest_values = None
+    
+    # Build dictionary of options
+    options = {
+        "dump"         : opt.dump,
+        "copy_dir"     : opt.copy_dir,
+        "overwrite"    : opt.overwrite,
+        "silent"       : opt.silent,
+        "verbosity"    : opt.verbosity,
+        "global_privs" : opt.global_privs
+    }
+    
+    try:
+        res = userclone.clone_user(source_values, dest_values, base_user,
+                                   new_user_list, options)
+    except MySQLUtilError, e:
+        print "ERROR:", e.errmsg
+        exit(1)
     
 exit()

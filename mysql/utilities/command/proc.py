@@ -86,7 +86,7 @@ class ProcessGrep(object):
         else:
             return self.__select
 
-    def execute(self, *connections, **kwrds):
+    def execute(self, connections, **kwrds):
         from mysql.utilities.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import format_tabular_list
@@ -99,8 +99,11 @@ class ProcessGrep(object):
         entries = []
         # Build SQL statement
         for info in connections:
-            if isinstance(info, basestring):
-                info = parse_connection(info)
+            conn = parse_connection(info)
+            if not conn:
+                msg = "'%s' is not a valid connection specifier" % (info,)
+                raise FormatError(msg)
+            info = conn
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__select)
