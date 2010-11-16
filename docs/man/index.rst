@@ -6,8 +6,8 @@ Command-line Utilities
 .. toctree::
 
    mysqldbcopy
-   mysqlimport
-   mysqlexport
+   mysqldbimport
+   mysqldbexport
    mysqlindexcheck
    mysqlmetagrep
    mysqlprocgrep

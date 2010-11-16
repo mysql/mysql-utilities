@@ -28,11 +28,11 @@ perform a variety of tasks. These utilities include the following and are
 located in the scripts folder.
 
 * mysqldbcopy.py : copy one or more databases from one server to another
-* mysqlexport.py : export one or more databases to a file in a variety of
+* mysqldbexport.py : export one or more databases to a file in a variety of
   formats: comma-separated values (CSV), tab-separated values (TAB), executable
   statements (SQL), tabular form (GRID) like mysql monitor, or vertical
   (VERTICAL) like the \G option in mysql monitor.
-* mysqlimport.py : import one or more databases from a file in one of the 
+* mysqldbimport.py : import one or more databases from a file in one of the 
   formats from mysqlexport
 * mysqlindexcheck.py : search for redundant or duplicate indexes in one or
   more tables

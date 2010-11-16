@@ -27,7 +27,7 @@ import mysql.utilities
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo']
+extensions = ['sphinx.ext.doctest', 'sphinx.ext.todo']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -216,8 +216,11 @@ man_pages = [
     ('man/mysqldbcopy', 'mysqldbcopy',
      u'Copy databases from one MySQL server to another',
      [u'MySQL Utilities Team'], 1),
-    ('man/mysqlexport', 'mysqlexport',
+    ('man/mysqldbexport', 'mysqldbexport',
      u'Export a list of databases in a variety of formats',
+     [u'MySQL Utilities Team'], 1),
+    ('man/mysqldbimport', 'mysqldbimport',
+     u'Import object definitions or data into a database',
      [u'MySQL Utilities Team'], 1),
     ('man/mysqlindexcheck', 'mysqlindexcheck',
      u'Check for redundant or duplicate indexes on a list tables or databases',
