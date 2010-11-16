@@ -1,14 +1,17 @@
 # Keep the imports sorted (alphabetically) in each group. Makes
 # merging easier.
 
+import glob
 import os
 import setuptools
 import sys
 
 from distutils import log
 from distutils.command.build_scripts import build_scripts
-from distutils.command.install_data import install_data
+from distutils.command.install import install as _install
+from distutils.core import Command
 from distutils.util import convert_path
+from sphinx.setup_command import BuildDoc
 
 import distutils.core
 
@@ -37,22 +40,8 @@ META_INFO = {
     }
 
 INSTALL = {
-    'packages': [
-        "mysql.utilities",
-        "mysql.utilities.command",
-        "mysql.utilities.common",
-        ],
-    'scripts': [
-        'scripts/mysqldbcopy.py',
-        'scripts/mysqldbexport.py',
-        'scripts/mysqldbimport.py',
-        'scripts/mysqlindexcheck.py',
-        'scripts/mysqlmetagrep.py',
-        'scripts/mysqlprocgrep.py',
-        'scripts/mysqlreplicate.py',
-        'scripts/mysqlserverclone.py',
-        'scripts/mysqluserclone.py',
-        ],
+    'packages': setuptools.find_packages(exclude=["tests"]),
+    'scripts': glob.glob('scripts/*.py'),
     'data_files': [
         ('man/man1', [
                 'build/sphinx/man/mysqldbcopy.1',
@@ -84,21 +73,51 @@ if sys.platform.startswith("win32"):
                 }
             })
 else:
-    from distutils.core import setup
+    from setuptools import setup
     META_INFO['name'] = 'mysql-utilities'
 
-class MyInstallData(install_data):
-    """Class for providing a customized version of install_data.
+class install_man(Command):
+    description = "install (Unix) manual pages"
 
-    Before installing the data, the manuals will be built since these
-    are considered data from the view of distutils.
-    """
+    user_options = [
+        ('install-base=', None, "base installation directory"),
+        ('force', 'f', 'force installation (overwrite existing files)'),
+        ('build-dir=', None, 'Build directory'),
+        ('skip-build', None, "skip the build steps"),
+    ]
+
+    boolean_options = ['force']
+
+    def initialize_options(self):
+        self.install_base = None
+        self.build_dir = None
+        self.force = None
+        self.skip_build = None
+
+    def finalize_options(self):
+        self.set_undefined_options('install',
+                                   ('install_data', 'install_base'),
+                                   ('force', 'force'),
+                                   ('skip_build', 'skip_build'),
+                                   )
+        self.set_undefined_options('build_sphinx',
+                                   ('build_dir', 'build_dir'),
+                                   )
+        self.target_dir = os.path.join(self.install_base, 'man')
+        self.source_dir = os.path.join(self.build_dir, 'man')
+        print dir(self)
 
     def run(self):
-        self.run_command('build_man')
-        # distutils is compatible with 2.1 so we cannot use super() to
-        # call it.
-        install_data.run(self)
+        if not self.skip_build:
+            self.run_command('build_man')
+        for man_file in glob.glob(os.path.join(self.source_dir, '*.[12345678]')):
+            man_dir = 'man' + os.path.splitext(man_file)[1][1:]
+            man_page = os.path.basename(man_file)
+            self.mkpath(man_dir)
+            self.copy_file(man_file, os.path.join(self.target_dir, man_dir, man_page))
+
+class install(_install):
+    sub_commands = _install.sub_commands + [('install_man', lambda self: True)]
 
 class MyBuildScripts(build_scripts):
     """Class for providing a customized version of build_scripts.
@@ -137,7 +156,12 @@ class MyBuildScripts(build_scripts):
 COMMANDS = {
     'cmdclass': {
         'build_scripts': MyBuildScripts,
-        'install_data': MyInstallData,
+        'install_man': install_man,
+        'install': install,
+        'build_man': BuildDoc,
+        },
+    'options': {
+        'build_man': { 'builder': 'man' },
         },
     }
 
