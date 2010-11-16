@@ -12,7 +12,8 @@ SYNOPSIS
 
   mysqluserclone --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                 [[--help | --version] | [ --dump  | --verbose | --force |
+                 [[--help | --version | --list | --format=<format>] |
+                 [ --dump  | --verbose | --force |
                  --include-global-privileges ] <base_user>
                  <new_user>[:<password>] [,<new_user>[:<password>]]]
 
@@ -33,6 +34,14 @@ as root on the local machine, use this command::
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
 in the operation.
+
+You can also use the utility to list users for a server by specifying the
+--list option. This prints a list of the users on the source (no destination
+is needed). You can also control the output of the list using the --format
+option. For example, the following shows all of the users on the localhost
+server in the most verbose output in a TAB format.
+
+  mysqluserclone --source=root@localhost --list --format=TAB
 
 OPTIONS
 -------
@@ -62,7 +71,7 @@ OPTIONS
    Path to use when copying data (stores temporary files) - default =
    current directory
 
-.. option:: -d, --dump
+.. option:: -d, --dump - does not require a destination
 
    dump GRANT statements for user
 
@@ -82,6 +91,15 @@ OPTIONS
 .. option:: --include-global-privileges
 
    include privileges that match ``base_user@%`` as well as ``base_user@host``
+
+.. option:: --list
+
+   list all users on the source - does not require a destination
+
+.. option::  --format=LIST_FORMAT
+
+   display the list of users in either GRID (default), TAB, CSV, or VERTICAL
+   format - valid only for --list option
 
 
 NOTES

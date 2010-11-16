@@ -23,7 +23,55 @@ to the new users.
 """
 
 import MySQLdb
+import sys
 from mysql.utilities.exception import MySQLUtilError
+
+def show_users(src_val, verbosity, format):
+    """Show all users except root and anonymous users on the server.
+    
+    src_val[in]        a dictionary containing connection information for the
+                       source including:
+                       (user, password, host, port, socket)
+    verbosty[in]       level of information to display
+    format[in]         format of output
+    """
+
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.format import format_tabular_list
+    from mysql.utilities.common.format import format_vertical_list
+
+    try:
+        servers = connect_servers(src_val, None, False, "5.1.0")
+    except MySQLUtilError, e:
+        raise e
+
+    source = servers[0]
+
+    if verbosity <= 1:
+        _QUERY = """
+            SELECT user, host FROM mysql.user 
+            WHERE user != 'root' and user != ''
+        """
+        cols = ("user", "host")
+    else:
+        _QUERY = """
+            SELECT user.user, user.host, db FROM mysql.user LEFT JOIN mysql.db
+            ON user.user = db.user AND user.host = db.host 
+            WHERE user.user != 'root' and user.user != ''
+        """
+        cols = ("user", "host", "database")
+
+    users = source.exec_query(_QUERY)
+
+    if format == "TAB":
+        format_tabular_list(sys.stdout, cols, users, True, '\t', True)
+    elif format == "CSV":
+        format_tabular_list(sys.stdout, cols, users, True, ',', True)
+    elif format == "VERTICAL":
+        format_vertical_list(sys.stdout, cols, users)
+    else:  # default to table format
+        format_tabular_list(sys.stdout, cols, users, True, None)
+    
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
     """ Clone a user to one or more new user accounts
@@ -71,7 +119,11 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     global_privs = options.get("global_privs", False)
 
     try:
-        servers = connect_servers(src_val, dest_val, silent, "5.1.0")
+        # Don't require destination for dumping base user grants
+        if dump_sql:
+            servers = connect_servers(src_val, None, silent, "5.1.0")
+        else:
+            servers = connect_servers(src_val, dest_val, silent, "5.1.0")
     except MySQLUtilError, e:
         raise e
 
@@ -91,7 +143,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         raise MySQLUtilError("Base user does not exist!")
 
     # Process dump operation
-    if len(new_user_list) >= 1 and dump_sql and not silent:
+    if dump_sql and not silent:
         print "Dumping grants for user " + base_user
         user_source.print_grants()
         return True

@@ -93,7 +93,7 @@ PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL")
 if opt.index_format.upper() not in PERMITTED_FORMATS:
     print "WARNING : '%s' is not a valid index format. Using default." % \
           opt.index_format
-    opt.index_format = "TABLE"
+    opt.index_format = "GRID"
 else:
     opt.index_format = opt.index_format.upper()
 
