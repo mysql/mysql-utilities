@@ -37,11 +37,9 @@ META_INFO = {
         'Topic :: Utilities',
         ],
     'setup_requires': [
-        'Python >=2.6, <3.0',
         'Sphinx',
         ],
     'install_requires': [
-        'Python >=2.6, <3.0',
         'MySQLdb',
         ],
     }
@@ -49,20 +47,6 @@ META_INFO = {
 INSTALL = {
     'packages': setuptools.find_packages(exclude=["tests"]),
     'scripts': glob.glob('scripts/*.py'),
-    'data_files': [
-        ('man/man1', [
-                'build/sphinx/man/mysqldbcopy.1',
-                'build/sphinx/man/mysqldbexport.1',
-                'build/sphinx/man/mysqldbimport.1',
-                'build/sphinx/man/mysqlindexcheck.1',
-                'build/sphinx/man/mysqlmetagrep.1',
-                'build/sphinx/man/mysqlprocgrep.1',
-                'build/sphinx/man/mysqlreplicate.1',
-                'build/sphinx/man/mysqlserverclone.1',
-                'build/sphinx/man/mysqluserclone.1',
-                'build/sphinx/man/mut.1',
-                ] ),
-        ],
     }
 
 ARGS = {
