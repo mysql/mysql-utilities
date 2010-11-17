@@ -8,7 +8,6 @@ import sys
 
 from distutils import log
 from distutils.command.build_scripts import build_scripts
-from distutils.command.install import install as _install
 from distutils.core import Command
 from distutils.util import convert_path
 from sphinx.setup_command import BuildDoc
@@ -36,6 +35,14 @@ META_INFO = {
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
         'Topic :: Utilities',
+        ],
+    'setup_requires': [
+        'Python >=2.6, <3.0',
+        'Sphinx',
+        ],
+    'install_requires': [
+        'Python >=2.6, <3.0',
+        'MySQLdb',
         ],
     }
 
@@ -105,7 +112,6 @@ class install_man(Command):
                                    )
         self.target_dir = os.path.join(self.install_base, 'man')
         self.source_dir = os.path.join(self.build_dir, 'man')
-        print dir(self)
 
     def run(self):
         if not self.skip_build:
@@ -115,9 +121,6 @@ class install_man(Command):
             man_page = os.path.basename(man_file)
             self.mkpath(man_dir)
             self.copy_file(man_file, os.path.join(self.target_dir, man_dir, man_page))
-
-class install(_install):
-    sub_commands = _install.sub_commands + [('install_man', lambda self: True)]
 
 class MyBuildScripts(build_scripts):
     """Class for providing a customized version of build_scripts.
@@ -156,14 +159,28 @@ class MyBuildScripts(build_scripts):
 COMMANDS = {
     'cmdclass': {
         'build_scripts': MyBuildScripts,
-        'install_man': install_man,
-        'install': install,
-        'build_man': BuildDoc,
-        },
-    'options': {
-        'build_man': { 'builder': 'man' },
         },
     }
+
+if not sys.platform.startswith("win32"):
+    from distutils.command.install import install
+    from distutils.command.build import build
+
+    class MyInstall(install):
+        sub_commands = install.sub_commands + [('install_man', lambda self: True)]
+
+    class MyBuild(build):
+        sub_commands = build.sub_commands + [('build_man', lambda self: True)]
+
+    COMMANDS['cmdclass'].update({
+            'install': MyInstall,
+            'build': MyBuild,
+            'build_man': BuildDoc,
+            'install_man': install_man,
+            })
+    COMMANDS.setdefault('options',{}).update({
+            'build_man': { 'builder': 'man' },
+            })
 
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
