@@ -328,6 +328,153 @@ class Server(object):
         AND SCHEMA_NAME != 'mysql'
         """
         return self.exec_query(_GET_DATABASES)
+        
+    
+    def get_storage_engines(self):
+        """Return list of storage engines on this server.
+        
+        Returns (list) (engine, support, comment)
+        """
+        
+        _QUERY = """
+            SELECT UPPER(engine), UPPER(support)
+            FROM INFORMATION_SCHEMA.ENGINES
+            ORDER BY engine
+        """
+        
+        # Guard for connect() prerequisite
+        assert self.db_conn, "You must call connect before getting engines."
+        
+        cur = self.db_conn.cursor()
+        try:
+            cur.execute(_QUERY)
+        except MySQLdb.Error, e:
+            raise MySQLUtilError("Query failed. %d: %s" %
+                                 (e.args[0], e.args[1]))
+        except Exception, e:
+            raise MySQLUtilError("Unknown error. Command: %s" % _QUERY)
+        results = cur.fetchall()
+        return results
+    
+    
+    def check_storage_engines(self, other_list):
+        """Compare storage engines from another server.
+        
+        This method compares the list of storage engines for the current
+        server against a list supplied as **other_list**. It returns two
+        lists - one for the storage engines on this server not on the other
+        list, and another for the storage engines on the other list not on this
+        server.
+        
+        Note: type case sensitive - make sure list is in uppercase 
+        
+        other_list[in]     A list from another server in the form
+                           (engine, support) - same output as
+                           get_storage_engines()
+                           
+        Returns (list, list)
+        """
+        # Guard for connect() prerequisite
+        assert self.db_conn, "You must call connect before check engine lists."
+
+
+        def _convert_set_to_list(set_items):
+            if len(set_items) > 0:
+                item_list = []
+                for item in set_items:
+                    item_list.append(item)
+            else:
+                item_list = None
+            return item_list
+            
+        # trivial, but guard against misuse
+        this_list = self.get_storage_engines()
+        if other_list is None:
+            return (this_list, None)
+            
+        same = set(this_list) & set(other_list)
+        master_extra = _convert_set_to_list(set(this_list) - same)
+        slave_extra = _convert_set_to_list(set(other_list) - same)
+        
+        return (master_extra, slave_extra)
+                    
+
+    def get_innodb_stats(self):
+        """Return type of InnoDB engine and its version information.
+        
+        This method returns a tuple containing the type of InnoDB storage
+        engine (builtin or plugin) and the version number reported.
+        
+        Returns (tuple) (type = 'builtin' or 'plugin', version_number,
+                         have_innodb = True or False)
+        """
+        # Guard for connect() prerequisite
+        assert self.db_conn, "You must call connect before get innodb stats."
+
+        _BUILTIN = """
+            SELECT (support='YES' OR support='DEFAULT' OR support='ENABLED')
+            AS `exists` FROM INFORMATION_SCHEMA.ENGINES
+            WHERE engine = 'innodb';
+        """
+        _PLUGIN = """
+            SELECT (plugin_library LIKE 'ha_innodb_plugin%') AS `exists`
+            FROM INFORMATION_SCHEMA.PLUGINS
+            WHERE LOWER(plugin_name) = 'innodb' AND
+                  LOWER(plugin_status) = 'active';
+        """
+        _VERSION = """
+            SELECT plugin_version, plugin_type_version
+            FROM INFORMATION_SCHEMA.PLUGINS
+            WHERE LOWER(plugin_name) = 'innodb';
+        """
+        
+        inno_type = None
+        cur = self.db_conn.cursor()
+        try:
+            cur.execute(_BUILTIN)
+        except MySQLdb.Error, e:
+            raise MySQLUtilError("Query failed. %d: %s" %
+                                 (e.args[0], e.args[1]))
+        except Exception, e:
+            raise MySQLUtilError("Unknown error. Command: %s" % _BUILTIN)
+        results = cur.fetchall()
+        if results is not None and results != () and results[0][0] is not None:
+            inno_type = "builtin"
+
+        try:
+            cur.execute(_PLUGIN)
+        except MySQLdb.Error, e:
+            raise MySQLUtilError("Query failed. %d: %s" %
+                                 (e.args[0], e.args[1]))
+        except Exception, e:
+            raise MySQLUtilError("Unknown error. Command: %s" % _PLUGIN)
+        results = cur.fetchall()
+        if results is not None and results != () and results[0][0] is not None:
+            inno_type = "plugin "
+        
+        try:
+            cur.execute(_VERSION)
+        except MySQLdb.Error, e:
+            raise MySQLUtilError("Query failed. %d: %s" %
+                                 (e.args[0], e.args[1]))
+        except Exception, e:
+            raise MySQLUtilError("Unknown error. Command: %s" % _VERSION)
+        results = cur.fetchall()
+        version = []
+        if results is not None:
+            version.append(results[0][0])
+            version.append(results[0][1])
+        else:
+            version.append(None)
+            version.append(None)
+        
+        results = self.show_server_variable("have_innodb")
+        if results is not None and results[0][1].lower() == "yes":
+            have_innodb = True
+        else:
+            have_innodb = False
+    
+        return (inno_type, version[0], version[1], have_innodb)
 
 
     def read_and_exec_SQL(self, input_file, verbose=False):

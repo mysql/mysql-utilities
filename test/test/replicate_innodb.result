@@ -1,0 +1,61 @@
+Test case 1 - show warnings if innodb different
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+WARNING: Innodb settings differ between master and slave.
+# Master's InnoDB Stats:
++----------+-----------------+----------------------+--------------+
+| type     | plugin_version  | plugin_type_version  | have_innodb  |
++----------+-----------------+----------------------+--------------+
+| XXXXXXXX | XXXXXXXXXXXXXXX | XXXXXXXXXXXXXXXXXXXX | True         |
++----------+-----------------+----------------------+--------------+
+# Slave's InnoDB Stats:
++----------+-----------------+----------------------+--------------+
+| type     | plugin_version  | plugin_type_version  | have_innodb  |
++----------+-----------------+----------------------+--------------+
+| XXXXXXXX | XXXXXXXXXXXXXXX | XXXXXXXXXXXXXXXXXXXX | False        |
++----------+-----------------+----------------------+--------------+
+# Checking storage engines...
+WARNING: The master and slave have differing storage engine configurations!
+# Storage engine configuration on Master:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| INNODB  | YES      |
++---------+----------+
+# Storage engine configuration on Slave:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| INNODB  | NO       |
++---------+----------+
+# Checking for binary logging on master...
+# Setting up replication...
+# Flushing tables on master with read lock...
+# Connecting slave to master...
+# Starting slave...
+# status: Waiting for master to send event
+# error: 0:
+# Unlocking tables on master...
+# ...done.
+Test case 2 - use pedantic to fail if innodb different
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Master's InnoDB Stats:
++----------+-----------------+----------------------+--------------+
+| type     | plugin_version  | plugin_type_version  | have_innodb  |
++----------+-----------------+----------------------+--------------+
+| XXXXXXXX | XXXXXXXXXXXXXXX | XXXXXXXXXXXXXXXXXXXX | True         |
++----------+-----------------+----------------------+--------------+
+# Slave's InnoDB Stats:
++----------+-----------------+----------------------+--------------+
+| type     | plugin_version  | plugin_type_version  | have_innodb  |
++----------+-----------------+----------------------+--------------+
+| XXXXXXXX | XXXXXXXXXXXXXXX | XXXXXXXXXXXXXXXXXXXX | False        |
++----------+-----------------+----------------------+--------------+
+ERROR: Innodb settings differ between master and slave.

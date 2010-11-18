@@ -12,7 +12,7 @@ SYNOPSIS
   mysqlreplicate --master=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  --slave=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[--help | --version] | 
-                 [--verbose | --testdb=<test database>]
+                 [--verbose | --testdb=<test database> | --pedandic]
                  --rpl_user=<uid:passwd>]
 
 DESCRIPTION
@@ -30,6 +30,28 @@ hosts using the default settings, use this command::
 
 You can also specify a database to be used to test replication as well as
 a unix socket file for connecting to a master running on a local host.
+
+The utility will report conditions where the storage engines on the master
+and the slave differ. Warnings are issued by default or you can use the
+--pedantic option to require the storage engines to be the same on both
+the master and slave. This would include not only that both servers have
+the same storage engines enabled but also that the default storage engine
+is the same.
+
+Furthermore, the utility will also report a warning if the InnoDB storage
+engine differs from the master and slave. Similarly, --pedantic requires
+the InnoDB storage engine to the be the same on the master and slave.
+
+The -vv option will also display any discrepencies among the storage engines
+and InnoDB values with or without the --pedantic option.
+
+For example, the following command ensures the replication between the
+master and slave is successful if and only if the InnoDB storage engines
+are the same and both servers have the same storage engines with the
+same default specified::
+
+  mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3307
+                 --rpl-user=rpl:rpl -vv --pedantic
 
 OPTIONS
 -------
@@ -65,17 +87,33 @@ OPTIONS
 
    control how much information is displayed. e.g., -v =
    verbose, -vv = more verbose, -vvv = debug
+   
+.. option:: -p, --pedantic
+
+   fail if storage engines differ among master and slave (optional)
 
 
 NOTES
 -----
 
 The login user must have the appropriate permissions to grant access to all
-databases and the ability to create a user account.
+databases and the ability to create a user account. For example, the user
+account used to connect to the master must have the WITH GRANT OPTION
+privilege.
 
 The server ID on the master and slave must be unique. The utility will
 report an error if the server ID is 0 or is the same on the master and
 slave. Set these values before starting this utility.
+
+RECOMMENDATIONS
+---------------
+
+You should use read_only = True in the my.cnf file for the slave to ensure no
+accidental data changes (e.g. INSERT, DELETE, UPDATE, etc.) are permitted
+on the slave.
+
+Use the --pedantic and --vv options for setting up replication on production
+servers to avoid possible problems with differing storage engines.
 
 COPYRIGHT
 ---------

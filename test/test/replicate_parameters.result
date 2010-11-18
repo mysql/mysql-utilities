@@ -20,6 +20,7 @@ Options:
                        <user>:<password>@<host>:<port>:<socket>
   --rpl-user=RPL_USER  the user and password for the replication user
                        requirement - e.g. rpl:passwd - default = rpl:rpl
+  -p, --pedantic       Fail if storage engines differ among master and slave.
   --test-db=TEST_DB    database name to use in testing  replication setup
                        (optional)
   -v, --verbose        Control how much information is displayed. e.g., -v =
@@ -30,6 +31,8 @@ Test case 3 - use the verbose feature
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Checking storage engines...
 # Checking for binary logging on master...
 # Setting up replication...
 # Flushing tables on master with read lock...

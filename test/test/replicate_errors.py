@@ -156,12 +156,8 @@ class test(replicate.test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
-        self.servers.clear_last_port()
-        self.servers.clear_last_port()
-        self.servers.clear_last_port()
         if self.server3:
             res = self.servers.stop_server(self.server3)
-            self.servers.clear_last_port()
             self.server3 = None
         return replicate.test.cleanup(self)
 

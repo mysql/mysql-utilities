@@ -66,6 +66,11 @@ parser.add_option("--rpl-user", action="store", dest="rpl_user",
                        "user requirement - e.g. rpl:passwd " 
                        "- default = %default")
 
+# Pedantic mode for failing if storage engines differ
+parser.add_option("-p", "--pedantic", action="store_true", default=False,
+                  dest="pedantic", help="Fail if storage engines differ "
+                  "among master and slave.")
+
 # Test replication option
 parser.add_option("--test-db", action="store", dest="test_db",
                   type = "string", help="database name to use in testing "
@@ -91,7 +96,8 @@ except:
     
 try:
     res = rpl.replicate(m_values, s_values, opt.rpl_user,
-                        opt.test_db, opt.verbosity >= 1)
+                        opt.test_db, opt.verbosity >= 1,
+                        opt.pedantic)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

@@ -12,17 +12,13 @@ class test(mysql_test.System_test):
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
-    def spawn_new_server(self, server, server_id, name):
-        # For this setup, we clone the original server making two new servers
-        # to be used as a master and a slave for the tests then destroy them
-        # in cleanup()
-
+    def spawn_new_server(self, server, server_id, name, mysqld=""):
         port1 = int(self.servers.get_next_port())
         try:
             res = self.servers.start_new_server(self.server0, 
                                                 port1, server_id,
                                                 "root", name,
-                                                "--log-bin=mysql-bin")
+                                                "--log-bin=mysql-bin"+mysqld)
         except MySQLUtilError, e:
             raise MUTException("Cannot spawn %s: %s" % (name, e.errmsg))
             
@@ -73,15 +69,12 @@ class test(mysql_test.System_test):
             
         return True
     
-    def run_test_case(self, server1, server2, s_id,
+    def run_test_case(self, slave, master, s_id,
                       comment, options=None, save_for_compare=False,
                       expected_result=0):
-        #
-        # Note: server1 is slave, server2 is master
-        #
-        
-        master_str = "--master=%s" % self.build_connection_string(server2)
-        slave_str = " --slave=%s" % self.build_connection_string(server1)
+
+        master_str = "--master=%s" % self.build_connection_string(master)
+        slave_str = " --slave=%s" % self.build_connection_string(slave)
         conn_str = master_str + slave_str
         
         # Test case 1 - setup replication among two servers
@@ -101,7 +94,7 @@ class test(mysql_test.System_test):
 
         # Now test the result and record the action.
         try:
-            res = server1.exec_query("SHOW SLAVE STATUS")
+            res = slave.exec_query("SHOW SLAVE STATUS")
             if not save_for_compare:
                 self.results.append(res)
         except MySQLUtilError, e:
@@ -178,6 +171,19 @@ class test(mysql_test.System_test):
             return res
 
         return (True, None)
+        
+    def mask_results(self):
+        self.mask_column_result("| builtin", "|", 2, " XXXXXXXX ")
+        self.mask_column_result("| XXXXXXX", "|", 3, " XXXXXXXXXXXXXXX ")
+        self.mask_column_result("| XXXXXXX", "|", 4, " XXXXXXXXXXXXXXXXXXXX ")
+        
+        self.replace_result("#  slave id =", "#  slave id = XXX\n")
+        self.replace_result("# master id =", "# master id = XXX\n")
+        
+        self.remove_result("# Creating replication user...")
+        self.remove_result("CREATE USER 'rpl'@'localhost'")
+        self.remove_result("# Granting replication access")
+        self.remove_result("# CHANGE MASTER TO MASTER_HOST = 'localhost'")
     
     def record(self):
         # Not a comparative test, returning True

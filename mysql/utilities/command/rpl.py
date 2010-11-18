@@ -26,8 +26,17 @@ import sys
 import MySQLdb
 from mysql.utilities.exception import MySQLUtilError
 
+def _print_list(list, cols, comment):
+    """Print a list of information in GRID format to stdout.
+    """
+    from mysql.utilities.common.format import format_tabular_list
+
+    print comment
+    format_tabular_list(sys.stdout, cols, list)
+    
+
 def replicate(master_vals, slave_vals, rpl_user,
-              test_db=None, verbose=False):
+              test_db=None, verbose=False, pedantic=False):
     """Setup replication among a master and a slave.
     
     master_vals[in]    Master connection in form user:passwd@host:port:sock
@@ -37,6 +46,8 @@ def replicate(master_vals, slave_vals, rpl_user,
                        optional - default = False
     verbose[in]        If True, turn on additional information messages
                        optional - default = False
+    pedantic[in]       If True, fail if storage engines are not matching
+                       on slave and master otherwise warn user
     """
     
     from mysql.utilities.common.server import connect_servers
@@ -93,6 +104,54 @@ def replicate(master_vals, slave_vals, rpl_user,
     if verbose:
         print "# master id = %s" % master_server_id
         print "#  slave id = %s" % slave_server_id
+
+    if verbose:
+        print "# Checking InnoDB statistics for type and version conflicts."
+
+    try:
+        master_innodb_stats = master.get_innodb_stats()
+    except MySQLUtilError, e:
+        raise e
+    
+    try:
+        slave_innodb_stats = slave.get_innodb_stats()
+    except MySQLUtilError, e:
+        raise e
+    
+    if master_innodb_stats != slave_innodb_stats:
+        if not pedantic:
+            print "WARNING: Innodb settings differ between master and slave."
+        if verbose or pedantic:
+            cols = ['type', 'plugin_version', 'plugin_type_version',
+                    'have_innodb']
+            rows = []
+            rows.append(master_innodb_stats)
+            _print_list(rows, cols, "# Master's InnoDB Stats:")
+            rows = []
+            rows.append(slave_innodb_stats)
+            _print_list(rows, cols, "# Slave's InnoDB Stats:")
+        if pedantic:
+            raise MySQLUtilError("Innodb settings differ between master "
+                                 "and slave.")
+            
+    if verbose:
+        print "# Checking storage engines..."
+    results = master.check_storage_engines(slave.get_storage_engines())
+    if results[0] is not None or results[1] is not None:
+        if not pedantic:
+            print "WARNING: The master and slave have differing " \
+                  "storage engine configurations!"
+        if verbose or pedantic:
+            cols = ['engine', 'support']
+            if results[0] is not None:
+                _print_list(results[0], cols,
+                            "# Storage engine configuration on Master:")
+            if results[1] is not None:
+                _print_list(results[1], cols,
+                            "# Storage engine configuration on Slave:")
+        if pedantic:
+            raise MySQLUtilError("The master and slave have differing " 
+                                 "storage engine configurations!")
 
     # Create an instance of the replication object
     rpl = Rpl(master, slave, verbose)
