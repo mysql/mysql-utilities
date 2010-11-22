@@ -1,0 +1,106 @@
+Test case 1 - show warnings if slave has different default engines
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Checking storage engines...
+WARNING: The master and slave have differing storage engine configurations!
+# Storage engine configuration on Master:
++------------+----------+
+| engine     | support  |
++------------+----------+
+| BLACKHOLE  | YES      |
+| MYISAM     | DEFAULT  |
++------------+----------+
+# Storage engine configuration on Slave:
++------------+----------+
+| engine     | support  |
++------------+----------+
+| MYISAM     | YES      |
+| BLACKHOLE  | DEFAULT  |
++------------+----------+
+# Checking for binary logging on master...
+# Setting up replication...
+# Flushing tables on master with read lock...
+# Connecting slave to master...
+# Starting slave...
+# status: Waiting for master to send event
+# error: 0:
+# Unlocking tables on master...
+# ...done.
+Test case 2 - use pedantic to fail if slave has different default engines
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Checking storage engines...
+# Storage engine configuration on Master:
++------------+----------+
+| engine     | support  |
++------------+----------+
+| BLACKHOLE  | YES      |
+| MYISAM     | DEFAULT  |
++------------+----------+
+# Storage engine configuration on Slave:
++------------+----------+
+| engine     | support  |
++------------+----------+
+| MYISAM     | YES      |
+| BLACKHOLE  | DEFAULT  |
++------------+----------+
+ERROR: The master and slave have differing storage engine configurations!
+Test case 3 - show warnings if master has different default engines
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Checking storage engines...
+WARNING: The master and slave have differing storage engine configurations!
+# Storage engine configuration on Master:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| MYISAM  | YES      |
+| MEMORY  | DEFAULT  |
++---------+----------+
+# Storage engine configuration on Slave:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| MYISAM  | DEFAULT  |
+| MEMORY  | YES      |
++---------+----------+
+# Checking for binary logging on master...
+# Setting up replication...
+# Flushing tables on master with read lock...
+# Connecting slave to master...
+# Starting slave...
+# status: Waiting for master to send event
+# error: 0:
+# Unlocking tables on master...
+# ...done.
+Test case 4 - use pedantic to fail if master has different default engines
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# master id = XXX
+#  slave id = XXX
+# Checking InnoDB statistics for type and version conflicts.
+# Checking storage engines...
+# Storage engine configuration on Master:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| MYISAM  | YES      |
+| MEMORY  | DEFAULT  |
++---------+----------+
+# Storage engine configuration on Slave:
++---------+----------+
+| engine  | support  |
++---------+----------+
+| MYISAM  | DEFAULT  |
+| MEMORY  | YES      |
++---------+----------+
+ERROR: The master and slave have differing storage engine configurations!
