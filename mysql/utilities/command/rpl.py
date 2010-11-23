@@ -23,7 +23,6 @@ master/slave replication topology among two servers.
 
 import re
 import sys
-import MySQLdb
 from mysql.utilities.exception import MySQLUtilError
 
 def _print_list(list, cols, comment):

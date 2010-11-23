@@ -22,7 +22,7 @@ This module contains abstractions of a MySQL table and an index.
 import multiprocessing
 import re
 import sys
-import MySQLdb
+import mysql.connector
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -310,22 +310,21 @@ class Table:
         return True = table exists, False = table does not exist
         """
         
-        cur = self.server.cursor()
         db, table = (None, None)
         if tbl_name:
             db, table = _parse_object_name(tbl_name)
         else:
             db = self.db_name
             table = self.tbl_name
-        res = cur.execute("SELECT TABLE_NAME " +
-                          "FROM INFORMATION_SCHEMA.TABLES " +
-                          "WHERE TABLE_SCHEMA = '%s'" % db +
-                          " and TABLE_NAME = '%s'" % table)
-        cur.close()
-        if res:
-            return True
-        else:
-            return False
+        try:
+            res = self.server.exec_query("SELECT TABLE_NAME " +
+                                         "FROM INFORMATION_SCHEMA.TABLES " +
+                                         "WHERE TABLE_SCHEMA = '%s'" % db +
+                                         " and TABLE_NAME = '%s'" % table)
+        except Exception, e:
+            raise e
+        #print "res", res
+        return (res is not None and len(res) >= 1)
         
     
     def get_column_metadata(self, columns=None):
@@ -336,64 +335,63 @@ class Table:
         Returns column metadata list
         """
 
-        cur = self.server.cursor()
-
+        rows = None
+        
         # Get field masks for blob and quoted fields
         # Build an array of dictionaries describing the fields
         special_cols = []
-        try:
-            if columns is None:
-                res = cur.execute("explain %s" % self.table)
-                if res:
-                    rows = cur.fetchall()
-            else:
-                rows = columns
-            if rows is not None:
-                for row in rows:
-                    if len(row) > 1:
-                        has_char = (row[1].lower().find("char") >= 0)
-                        has_enum = (row[1].lower().find("enum") >= 0)
-                        has_set = (row[1].lower().find("set") >= 0)
-                        has_date = (row[1].lower().find("date") >= 0)
-                        has_time = (row[1].lower().find("time") >= 0)
-                        col_data = {
-                            "has_blob" : (row[1].lower().find("blob") >= 0) \
-                                         or (row[1].lower().find("text") >= 0),
-                            "is_text"  : has_char or has_enum or has_set,
-                            "is_time"  : has_date or has_time,
-                            "name"     : row[0]
-                        }
-                    else: # No column information - make all text
-                        col_data = {
-                            "has_blob" : False,
-                            "is_text"  : True,
-                            "is_time"  : False,
-                            "name"     : row[0]
-                        }
-                    special_cols.append(col_data)
-                        
-        except MySQLUtilError, e:
-            raise e
-        cur.close
+        if columns is None:
+            try:
+                rows = self.server.exec_query("explain %s" % self.table)
+            except Exception, e:
+                raise e
+        else:
+            rows = columns
+        if rows is not None:
+            for row in rows:
+                if len(row) > 1:
+                    has_char = (row[1].lower().find("char") >= 0)
+                    has_enum = (row[1].lower().find("enum") >= 0)
+                    has_set = (row[1].lower().find("set") >= 0)
+                    has_date = (row[1].lower().find("date") >= 0)
+                    has_time = (row[1].lower().find("time") >= 0)
+                    col_data = {
+                        "has_blob" : (row[1].lower().find("blob") >= 0) \
+                                     or (row[1].lower().find("text") >= 0),
+                        "is_text"  : has_char or has_enum or has_set,
+                        "is_time"  : has_date or has_time,
+                        "name"     : row[0]
+                    }
+                else: # No column information - make all text
+                    col_data = {
+                        "has_blob" : False,
+                        "is_text"  : True,
+                        "is_time"  : False,
+                        "name"     : row[0]
+                    }
+                special_cols.append(col_data)
         return special_cols
     
 
-    def get_col_names(self):
+    def get_col_names(self, col_metadata=None):
         """Get column names for the export operation.
+        
+        col_metadata[in]   If provided, get column names from metadata
+        
+        Return (list) column names
         """
 
-        cur = self.server.cursor()
         cols = []
-        try:
-            res = cur.execute("explain %s" % self.table)
-            if res:
-                rows = cur.fetchall()
-                for row in rows:
-                    cols.append(row[0])
-                        
-        except MySQLUtilError, e:
-            raise e
-        cur.close
+        if col_metadata is None:
+            try:
+                rows = self.server.exec_query("explain %s" % self.table)
+            except Exception, e:
+                raise e
+            for row in rows:
+                cols.append(row[0])
+        else:
+            for col in col_metadata:
+                cols.append(col.get("name"))
         return cols
     
 
@@ -539,19 +537,20 @@ class Table:
 
                 Note: if num_conn <= 1 - returns number of rows
         """
-        cur = self.server.cursor()
 
         # Get number of rows
         num_rows = 0
         try:
-            res = cur.execute("USE %s" % self.db_name)
-            res = cur.execute("SHOW TABLE STATUS LIKE '%s'" % self.tbl_name)
-            if res:
-                row = cur.fetchone()
-                num_rows = int(row[4])
-        except MySQLUtilError, e:
+            res = self.server.exec_query("USE %s" % self.db_name)
+        except Exception, e:
+            pass
+        try:
+            res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" % \
+                                         self.tbl_name)
+        except Exception, e:
             raise e
-        cur.close()
+        if res:
+            num_rows = int(res[0][4])
 
         if num_conn <= 1:
             return num_rows
@@ -600,9 +599,6 @@ class Table:
         except MySQLUtilError, e:
             raise e
 
-        # get cursor
-        cur = dest.cursor()
-                    
         # First, turn off foreign keys if turned on
         try:
             fkey_on = dest.toggle_fkeys(False)
@@ -735,25 +731,39 @@ class Table:
 
         segment_size = self.get_segment_size(num_conn)
 
-        cur = self.server.cursor()
-
         # Execute query to get all of the data
         try:
-            res = cur.execute("SELECT * FROM %s" % self.table)
-        except MySQLUtilError, e:
+            cur = self.server.exec_query("SELECT * FROM %s" % self.table,
+                                         (), False, False, True)
+        except Exception, e:
             raise e
 
         while True:
-            if num_conn < 1:
-                rows = cur.fetchmany(1)
-            elif num_conn == 1:
-                rows = cur.fetchall()
-            else:
-                rows = cur.fetchmany(segment_size)
-            if not rows:
+            try:
+                rows = None
+                if num_conn < 1:
+                    rows = []
+                    row = cur.fetchone()
+                    if row is None:
+                        raise StopIteration()
+                    rows.append(row)
+                    #print "ROWS 1:", rows
+                elif num_conn == 1:
+                    rows = cur.fetchall()
+                    #print "ROWS 2:", rows
+                    yield rows        
+                    raise StopIteration()
+                else:
+                    rows = cur.fetchmany(segment_size)
+                    if rows == []:
+                        raise StopIteration()
+                    #print "ROWS 3:", rows
+            except mysql.connector.Error, e:
+                raise e
+            if rows is None:
                 raise StopIteration()
-            yield rows        
-
+            yield rows
+            
         cur.close()
 
     
@@ -787,7 +797,7 @@ class Table:
     def get_tbl_indexes(self):
         """Return a result set containing all indexes for a given table
         
-        Returns MySQLdb result set
+        Returns result set
         """
         try:
             res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)

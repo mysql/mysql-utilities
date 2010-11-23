@@ -20,7 +20,7 @@ This module contains and abstraction of a MySQL user object.
 """
 
 import re
-import MySQLdb
+import mysql.connector
 from mysql.utilities.exception import MySQLUtilError
 
 def parse_user_host(user_name):
@@ -78,7 +78,6 @@ class User(object):
                            on the class instance user name.
         """
         
-        cur = self.server1.cursor()
         query_str = "CREATE USER "
         user, passwd, host = None, None, None
         if new_user:
@@ -92,14 +91,12 @@ class User(object):
             query_str += "IDENTIFIED BY '%s'" % (passwd)
         if self.verbose:
             print query_str
-        try:
-            res = cur.execute(query_str)
-            
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("%d: %s" % (e.args[0], e.args[1]))
-        finally:
-            cur.close()
 
+        try:
+            res = self.server1.exec_query(query_str, (), False, False)
+        except Exception, e:
+            raise e
+        
     def drop(self, new_user=None):
         """Drop user from the server
 
@@ -111,7 +108,6 @@ class User(object):
                            on the class instance user name.
         """
         
-        cur = self.server1.cursor()
         query_str = "DROP USER "
         if new_user:
             user, passwd, host = parse_user_host(new_user)
@@ -123,11 +119,9 @@ class User(object):
             print query_str
             
         try:
-            res = cur.execute(query_str)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("%d: %s" % (e.args[0], e.args[1]))
-        finally:
-            cur.close()
+            res = self.server1.exec_query(query_str, (), False, False)
+        except Exception, e:
+            raise e
 
     def exists(self, user_name=None):
         """Check to see if the user exists
@@ -139,26 +133,24 @@ class User(object):
         return True = user exists, False = user does not exist
         """
         
-        cur = self.server1.cursor()
         user, host, passwd = self.user, self.host, self.passwd
         if user_name:
             user, passwd, host = parse_user_host(user_name)
 
-        res = cur.execute("SELECT * FROM mysql.user WHERE user = '%s'"
-                          " and host = '%s'" % (user, host))
-        cur.close()
-        
-        if res:
-            return True
-        else:
-            return False        
+        try:
+            res = self.server1.exec_query("SELECT * FROM mysql.user "
+                                          "WHERE user = %s and host = %s",
+                                          (user, host))
+        except Exception, e:
+            raise e
+        return (res is not None and len(res) >= 1)
 
     def get_grants(self, globals=False):
         """Retrieve the grants for the current user
 
         globals[in]        Include global privileges in clone (i.e. user@%)
         
-        returns MySQLdb.result set or None if no grants defined
+        returns result set or None if no grants defined
         """
         grants = []
         try:
@@ -171,7 +163,7 @@ class User(object):
         if globals:
             try:
                 res = self.server1.exec_query("SHOW GRANTS FOR '%s'" % \
-                                              self.user + "@'%%'")
+                                              self.user + "@'%'")
                 for grant in res:
                     grants.append(grant)
             except MySQLUtilError, e:
@@ -192,7 +184,8 @@ class User(object):
                            r"ON\s+(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
                            % (re.escape(access), re.escape(db), re.escape(obj)))
         for grant in self.get_grants(True):
-            if regex.match(grant[0]):
+            #print "G:", grant[0], regex.match(grant[0]) is not None
+            if regex.match(grant[0]) is not None:
                 return True
 
     def print_grants(self):
@@ -249,12 +242,8 @@ class User(object):
             if self.verbose:
                 print grant
                 
-            cur = server.cursor()
             try:
-                res = cur.execute(grant)
-            except MySQLdb.Error, e:
-                raise MySQLUtilError("%d: %s" % (e.args[0], e.args[1]))
-                break
-            finally:
-                cur.close()
+                res = server.exec_query(grant, (), False, False)
+            except Exception, e:
+                raise e
 

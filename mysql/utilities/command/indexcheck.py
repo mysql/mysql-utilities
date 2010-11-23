@@ -23,7 +23,6 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
-import MySQLdb
 from mysql.utilities.exception import MySQLUtilError
 
 def check_index(src_val, table_args, options):

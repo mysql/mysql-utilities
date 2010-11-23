@@ -28,7 +28,7 @@ class test(import_basic.test):
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
         res = self.server2.exec_query("SHOW DATABASES LIKE 'util_test'")
-        if res == ():
+        if res == () or res == []:
             self.results.append("Database was NOT created.\n")
         else:
             self.results.append("Database was created.\n")

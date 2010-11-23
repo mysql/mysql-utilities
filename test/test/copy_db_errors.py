@@ -130,6 +130,7 @@ class test(copy_db.test):
         res = self.server1.exec_query("GRANT SHOW VIEW, EVENT "
                                       "ON util_test.* TO " + \
                                       "'sam'@'localhost'")
+        
         comment = "Test case 11 - source user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:

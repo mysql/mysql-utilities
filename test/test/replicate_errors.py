@@ -146,6 +146,14 @@ class test(replicate.test):
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_result("ERROR: Query failed. 1227: Access denied;",
                             "ERROR: Query failed. 1227: Access denied;\n")
+        if os.name == "posix":
+            self.replace_result("Error 2002: Can't connect to",
+                                "Error ####: Can't connect to local MySQL server "
+                                "####...\n")
+        else:
+            self.replace_result("Error 2003: Can't connect to",
+                                "Error ####: Can't connect to local MySQL server "
+                                "####...\n")
 
         return True
 

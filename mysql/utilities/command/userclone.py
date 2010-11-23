@@ -22,7 +22,6 @@ MySQL user to one or more new user accounts copying all grant statements
 to the new users.
 """
 
-import MySQLdb
 import sys
 from mysql.utilities.exception import MySQLUtilError
 

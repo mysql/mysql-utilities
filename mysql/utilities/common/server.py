@@ -24,7 +24,7 @@ server operations used in multiple utilities.
 import os
 import re
 import sys
-import MySQLdb
+import mysql.connector
 from mysql.utilities.exception import MySQLUtilError
 
 def _print_connection(prefix, conn_val):
@@ -155,23 +155,17 @@ class Server(object):
         self.connect_error = None
         
         
-    def __del__(self):
-        """Destructor
-        
-        Closes MySQLdb connections if open.
-        """
-        if self.db_conn:
-            self.db_conn.close()
-    
-    
-    def connect(self):
+    def connect(self, charset="latin1"):
         """Connect to server
         
         Attempts to connect to the server as specified by the connection
         parameters.
         
         Note: This method must be called before executing queries.
-
+        
+        charset[in]        Default character set for the connection.
+                           (default latin1)
+                           
         Raises MySQLUtilError if error during connect
         """
         try:
@@ -184,11 +178,11 @@ class Server(object):
                 parameters['unix_socket'] = self.socket
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
-            self.db_conn = MySQLdb.connect(**parameters)
-        except MySQLdb.Error, e:
+            parameters['charset'] = charset
+            self.db_conn = mysql.connector.connect(**parameters)
+        except mysql.connector.Error, e:
             raise MySQLUtilError("Cannot connect to the %s server.\n"
-                                 "Error %d: %s" % (self.role,
-                                                   e.args[0], e.args[1]))
+                                 "Error %s" % (self.role, e.msg))
             return False
         self.connect_error = None
 
@@ -244,72 +238,90 @@ class Server(object):
             raise e
         if not fkey and turn_on:
             try:
-                res = self.exec_query(fkey_query, "ON")
+                res = self.exec_query(fkey_query % "ON")
             except MySQLUtilError, e:
                 raise e
         elif fkey and not turn_on:
             try:
-                res = self.exec_query(fkey_query, "OFF")
+                res = self.exec_query(fkey_query % "OFF")
             except MySQLUtilError, e:
                 raise e
         return fkey
 
 
-    def cursor(self):
-        """Return the cursor object.
-        """
-
-        # Guard for connect() prerequisite
-        assert self.db_conn, "You must call connect before executing a query."
-
-        return self.db_conn.cursor()
-
-    
-    def exec_query(self, query_str, params=(), columns=False):
+    def exec_query(self, query_str, params=(),
+                   columns=False, fetchall=True, buffered=True):
         """Execute a query and return result set
         
+        This is the singular method to execute queries. It should be the only
+        method used as it contains critical error code to catch the issue
+        with mysql.connector throwing an error on an empty result set.
+        
         Note: will handle exception and print error if query fails
+        
+        Note: if fetchall is False, the method returns the cursor instance
         
         query_str[in]      The query to execute
         params[in]         Parameters for query
         columns[in]        Add column headings as first row
+                           (default is False)
+        fetchall[in]       Execute the fetch as part of the operation
+                           (default is True)
+        buffered[in]       If True, use a buffered cursor
+                           (default is True)
     
-        Returns MySQLdb result set
+        Returns result set or cursor
         """
 
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before executing a query."
         
-        cur = self.db_conn.cursor()
+        results = ()
+        cur = self.db_conn.cursor(buffered)
+        
+        #print "query_str:", query_str, "\nparams:", params
         try:
-            cur.execute(query_str, params)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("Query failed. %d: %s" %
-                                 (e.args[0], e.args[1]))
+            if params == ():
+                res = cur.execute(query_str)
+            else:
+                res = cur.execute(query_str, params)
+        except mysql.connector.Error, e:
+            cur.close()
+            raise MySQLUtilError("Query failed. " + e.__str__())
         except Exception, e:
+            cursor.close()
             raise MySQLUtilError("Unknown error. Command: %s" % query_str)
-        results = cur.fetchall()
-        if columns:
-            col_headings = cur.description
-            stop = len(col_headings)
-            col_names = []
-            for col in col_headings:
-                col_names.append(col[0])
-            results = col_names, results
-        cur.close()
-        self.db_conn.commit()        
-        return results
-    
+        if fetchall or columns:
+            try:
+                results = cur.fetchall()
+            except mysql.connector.errors.InterfaceError, e:
+                if e.msg.lower() == "no result set to fetch from.":
+                    pass # This error means there were not results.
+                else:
+                    raise e
+                
+            if columns:
+                col_headings = cur.column_names
+                stop = len(col_headings)
+                col_names = []
+                for col in col_headings:
+                    col_names.append(col)
+                results = col_names, results
+            cur.close()
+            self.db_conn.commit()        
+            return results
+        else:
+            return cur            
     
     def show_server_variable(self, variable):
         """Returns one or more rows from the SHOW VARIABLES command.
         
         variable[in]       The variable or wildcard string
     
-        Returns MySQLdb result set
+        Returns result set
         """
 
-        return self.exec_query("SHOW VARIABLES LIKE %s", (variable,))
+        return self.exec_query("SHOW VARIABLES LIKE '%s'" % variable)
 
 
     def get_all_databases(self):
@@ -317,7 +329,7 @@ class Server(object):
         except for internal databases (mysql, INFORMATION_SCHEMA,
         PERFORMANCE_SCHEMA)
         
-        Returns MySQLdb result set
+        Returns result set
         """
         
         _GET_DATABASES = """
@@ -341,21 +353,8 @@ class Server(object):
             FROM INFORMATION_SCHEMA.ENGINES
             ORDER BY engine
         """
+        return self.exec_query(_QUERY)
         
-        # Guard for connect() prerequisite
-        assert self.db_conn, "You must call connect before getting engines."
-        
-        cur = self.db_conn.cursor()
-        try:
-            cur.execute(_QUERY)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("Query failed. %d: %s" %
-                                 (e.args[0], e.args[1]))
-        except Exception, e:
-            raise MySQLUtilError("Unknown error. Command: %s" % _QUERY)
-        results = cur.fetchall()
-        return results
-    
     
     def check_storage_engines(self, other_list):
         """Compare storage engines from another server.
@@ -429,37 +428,25 @@ class Server(object):
         """
         
         inno_type = None
-        cur = self.db_conn.cursor()
         try:
-            cur.execute(_BUILTIN)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("Query failed. %d: %s" %
-                                 (e.args[0], e.args[1]))
+            results = self.exec_query(_BUILTIN)
         except Exception, e:
-            raise MySQLUtilError("Unknown error. Command: %s" % _BUILTIN)
-        results = cur.fetchall()
+            raise e
         if results is not None and results != () and results[0][0] is not None:
             inno_type = "builtin"
 
         try:
-            cur.execute(_PLUGIN)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("Query failed. %d: %s" %
-                                 (e.args[0], e.args[1]))
+            results = self.exec_query(_PLUGIN)
         except Exception, e:
-            raise MySQLUtilError("Unknown error. Command: %s" % _PLUGIN)
-        results = cur.fetchall()
-        if results is not None and results != () and results[0][0] is not None:
+            raise e
+        if results is not None and results != () and \
+           results != [] and results[0][0] is not None:
             inno_type = "plugin "
         
         try:
-            cur.execute(_VERSION)
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("Query failed. %d: %s" %
-                                 (e.args[0], e.args[1]))
+            results = self.exec_query(_VERSION)
         except Exception, e:
-            raise MySQLUtilError("Unknown error. Command: %s" % _VERSION)
-        results = cur.fetchall()
+            raise e
         version = []
         if results is not None:
             version.append(results[0][0])

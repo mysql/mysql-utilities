@@ -52,7 +52,10 @@ class test(mysql_test.System_test):
             raise MUTException("%s: failed" % comment)
 
         # Mask known platform-dependent lines
-        self.mask_result("Error 2005:", "(1", '#######')
+        self.mask_result("Error 2003:", "2003", "####")
+        self.replace_result("Error ####: Can't connect to MySQL server",
+                            "Error ####: Can't connect to MySQL server"
+                            " on 'nothere:####'\n")
        
         cmd_str += "--new-id=%d " % self.servers.get_next_id() + newport + \
                    " --root-password=root "

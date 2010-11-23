@@ -144,10 +144,11 @@ def format_vertical_list(file, columns, rows):
         row_num += 1
         file.write('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
                                                                       row_num,
-                                                                      ' ', 8)) 
+                                                                      ' ', 8))
         for i in range(0, stop):
             file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
                                                 row[i]))
+            
     if row_num > 0:
         print "%d rows." % int(row_num)
                     

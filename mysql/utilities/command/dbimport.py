@@ -25,7 +25,6 @@ import csv
 import re
 import sys
 from itertools import imap
-import MySQLdb
 import MySQLdb.converters
 from mysql.utilities.exception import MySQLUtilError
 

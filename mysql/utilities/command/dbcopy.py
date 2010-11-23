@@ -22,7 +22,6 @@ is exactly the same among two servers.
 """ 
 
 import sys
-import MySQLdb
 from mysql.utilities.exception import MySQLUtilError
 
 def copy_db(src_val, dest_val, db_list, options):

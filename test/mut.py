@@ -278,7 +278,7 @@ parser.add_option("--testdir", action="store", dest="testdir",
 
 # Add starting port
 parser.add_option("--start-port", action="store", dest="start_port",
-                  type = "string", help="starting port for spawned servers",
+                  type = "int", help="starting port for spawned servers",
                   default=START_PORT)
 
 # Add record option
@@ -415,6 +415,7 @@ else:
             server_list.add_new_server(conn)
             print "CONNECTED"
             res = conn.show_server_variable("basedir")
+            #print res
             basedir = res[0][1]
         except MySQLUtilError, e:
             print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
@@ -591,8 +592,12 @@ for test_tuple in test_files:
     try:
         run_ok = test_case.run()
     except MUTException, e:
-        run_msg = e.errmsg
-        run_ok = False
+        if opt.debug:
+            # Using debug should result in a skipped result check.
+            run_ok
+        else:
+            run_msg = e.errmsg
+            run_ok = False
         
     if run_ok:
         # Calculate number of spaces based on test name
@@ -609,6 +614,9 @@ for test_tuple in test_files:
             if not res:
                 sys.stdout.write("  %sWARNING%s: Test record failed." % \
                       (BOLD_ON, BOLD_OFF))
+                
+        elif opt.debug:
+            print "\nEnd debug results.\n"
 
         # Display status of test
         else:
@@ -646,7 +654,7 @@ for test_tuple in test_files:
         test_cleanup_ok = False
 
     # Display the time if not recording
-    if not opt.record and run_ok:
+    if not opt.record and run_ok and not opt.debug:
         _print_elapsed_time(start_test)
 
     # Display warning about cleanup

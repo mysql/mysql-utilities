@@ -24,7 +24,6 @@ This module contains abstractions of MySQL replication functionality.
 #import os
 import re
 import time
-import MySQLdb
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.common.user import User
 
@@ -133,7 +132,7 @@ class Rpl(object):
          
         # Stop slave first
         res = self.slave.exec_query("SHOW SLAVE STATUS")
-        if res != ():
+        if res != () and res != []:
             if res[0][10] == "Yes" or res[0][11] == "Yes":
                 res = self.slave.exec_query("STOP SLAVE")
         

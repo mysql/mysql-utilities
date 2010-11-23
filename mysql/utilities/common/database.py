@@ -23,7 +23,7 @@ multiple utilities.
 import datetime
 import os
 import re
-import MySQLdb
+import mysql.connector
 from mysql.utilities.exception import MySQLUtilError
 
 # List of database objects for enumeration
@@ -88,22 +88,20 @@ class Database(object):
         
         if not server:
             server = self.source
-        cur = server.cursor()
         db = None
         if db_name:
             db = db_name
         else:
             db = self.db_name
-            
-        res = cur.execute("SELECT SCHEMA_NAME " +
-                          "FROM INFORMATION_SCHEMA.SCHEMATA " +
-                          "WHERE SCHEMA_NAME = '%s'" % db)
-        cur.close()
-        
-        if res:
-            return True
-        else:
-            return False
+        try:            
+            res = server.exec_query("SELECT SCHEMA_NAME " +
+                                    "FROM INFORMATION_SCHEMA.SCHEMATA " +
+                                    "WHERE SCHEMA_NAME = '%s'" % db)
+        except Exception, e:
+            raise e
+        #print "exists", res, (res is not None and len(res) >= 1)
+        return (res is not None and len(res) >= 1)
+
     
     def drop(self, server, silent, db_name=None):
         """Drop the database
@@ -117,7 +115,6 @@ class Database(object):
         return True = database successfully dropped, False = error
         """
 
-        cur = server.cursor()
         db = None
         if db_name:
             db = db_name
@@ -126,19 +123,15 @@ class Database(object):
         op_ok = False
         if silent:
             try:
-                res = cur.execute("DROP DATABASE %s" % (db))
+                res = server.exec_query("DROP DATABASE %s" % (db))
             except:
                 pass
-            cur.close()
         else:
             try:
-                res = cur.execute("DROP DATABASE %s" % (db))
+                res = server.exec_query("DROP DATABASE %s" % (db))
                 op_ok = True
-            except MySQLdb.Error, e:
-                raise MySQLUtilError("%d: %s" % (e.args[0], e.args[1]))
-            finally:
-                cur.close()
-        return op_ok
+            except Exception, e:
+                raise e
         
         
     def create(self, server, db_name=None):
@@ -152,7 +145,6 @@ class Database(object):
         return True = database successfully created, False = error
         """
 
-        cur = server.cursor()
         db = None
         if db_name:
             db = db_name
@@ -160,12 +152,10 @@ class Database(object):
             db = self.db_name
         op_ok = False
         try:
-            res = cur.execute("CREATE DATABASE %s" % (db))
+            res = server.exec_query("CREATE DATABASE %s" % (db))
             op_ok = True
-        except MySQLdb.Error, e:
-            raise MySQLUtilError("%d: %s" % (e.args[0], e.args[1]))
-        finally:
-            cur.close()
+        except Exception, e:
+            raise e
         return op_ok
     
     def __make_create_statement(self, obj_type, obj):
@@ -216,6 +206,7 @@ class Database(object):
                 create_str = re.sub(r' "%s"\.' % self.db_name, 
                                     r' "%s".' % self.new_db,
                                     create_str)
+                create_str = create_str
         return create_str
 
 
@@ -423,7 +414,7 @@ class Database(object):
         # First, turn off foreign keys if turned on
         if fkey:
             try:
-                res = self.destination.exec_query(fkey_query, "OFF")
+                res = self.destination.exec_query(fkey_query % "OFF")
             except MySQLUtilError, e:
                 raise e
         
@@ -500,7 +491,7 @@ class Database(object):
         # Now, turn on foreign keys if they were on at the start
         if fkey:
             try:
-                res = self.destination.exec_query(fkey_query, "ON")
+                res = self.destination.exec_query(fkey_query % "ON")
             except MySQLUtilError, e:
                 raise e
 
@@ -576,7 +567,7 @@ class Database(object):
 
         TODO: Change implementation to return classes instead of a result set.
     
-        Returns MySQLdb result set
+        Returns mysql.connector result set
         """
 
         _FULL = """
@@ -630,7 +621,7 @@ class Database(object):
                 TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA 
                 AND 
                 TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME 
-            WHERE TABLES.TABLE_SCHEMA = %s AND TABLE_TYPE <> 'VIEW'
+            WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW'
             ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
                      COLUMNS.ORDINAL_POSITION
             """
@@ -645,7 +636,7 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.VIEWS 
-            WHERE TABLE_SCHEMA = %s
+            WHERE TABLE_SCHEMA = '%s'
             """
         elif obj_type == _TRIG:
             _NAMES = """
@@ -661,7 +652,7 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TRIGGERS 
-            WHERE TRIGGER_SCHEMA = %s
+            WHERE TRIGGER_SCHEMA = '%s'
             """
         elif obj_type == _PROC:
             _NAMES = """
@@ -676,7 +667,7 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.proc
-            WHERE DB = %s AND TYPE = 'PROCEDURE'
+            WHERE DB = '%s' AND TYPE = 'PROCEDURE'
             """
         elif obj_type == _FUNC:
             _NAMES = """
@@ -691,7 +682,7 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.proc 
-            WHERE DB = %s AND TYPE = 'FUNCTION'
+            WHERE DB = '%s' AND TYPE = 'FUNCTION'
             """
         elif obj_type == _EVENT:
             _NAMES = """
@@ -706,7 +697,7 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.event 
-            WHERE DB = %s
+            WHERE DB = '%s'
             """
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """
@@ -715,21 +706,21 @@ class Database(object):
                        NULL as TABLE_NAME, NULL AS COLUMN_NAME,
                        NULL AS ROUTINE_NAME
                 FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
-                WHERE table_schema = %s
+                WHERE table_schema = '%s'
             ) UNION (
                 SELECT grantee, privilege_type, table_schema, table_name,
                        NULL, NULL 
                 FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES 
-                WHERE table_schema = %s
+                WHERE table_schema = '%s'
             ) UNION (
                 SELECT grantee, privilege_type, table_schema, table_name,
                        column_name, NULL 
                 FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES 
-                WHERE table_schema = %s
+                WHERE table_schema = '%s'
             ) UNION (
                 SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
                        Routine_name, NULL, Routine_type 
-                FROM mysql.procs_priv WHERE Db = %s
+                FROM mysql.procs_priv WHERE Db = '%s'
             ) ORDER BY GRANTEE ASC, PRIVILEGE_TYPE ASC, TABLE_SCHEMA ASC,
                        TABLE_NAME ASC, COLUMN_NAME ASC, ROUTINE_NAME ASC
             """
@@ -737,10 +728,9 @@ class Database(object):
             return None
         
         if obj_type == _GRANT:
-            return self.source.exec_query(_OBJECT_QUERY,
-                                          (self.db_name, self.db_name,
-                                           self.db_name, self.db_name,),
-                                          get_columns)
+            query = _OBJECT_QUERY % (self.db_name, self.db_name,
+                                     self.db_name, self.db_name)
+            return self.source.exec_query(query, None, get_columns)
         else:
             if columns == "NAMES":
                 prefix = _NAMES
@@ -748,8 +738,12 @@ class Database(object):
                 prefix = _FULL
             else:
                 prefix = _MINIMAL
-            return self.source.exec_query(prefix + _OBJECT_QUERY,
-                                          (self.db_name,), get_columns)
+            try:
+                query = prefix + _OBJECT_QUERY % self.db_name
+                res = self.source.exec_query(query, None, get_columns)
+            except Exception, e:
+                raise e
+            return res
 
 
     def _check_user_permissions(self, uname, host, access):
@@ -764,7 +758,6 @@ class Database(object):
         
         from mysql.utilities.common.user import User
         
-        result = True    
         user = User(self.source, uname+'@'+host)
         result = user.has_privilege(access[0], '*', access[1])
         return result

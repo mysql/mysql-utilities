@@ -67,11 +67,11 @@ class test(clone_db.test):
             raise MUTException("%s: failed" % comment)
                 
         try:
-            self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%%'")
+            self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%'")
         except MySQLUtilError, e:
             raise MUTException("%s: failed: %s" % (comment, e.errmsg))
         try:
-            self.server1.exec_query("GRANT SELECT ON mysql.* TO 'joe'@'%%'")
+            self.server1.exec_query("GRANT SELECT ON mysql.* TO 'joe'@'%'")
         except MySQLUtilError, e:
             raise MUTException("%s: failed: %s" % (comment, e.errmsg))
         
@@ -146,6 +146,10 @@ class test(clone_db.test):
             pass
         try:
             self.server1.exec_query("DROP USER 'joe'")
+        except:
+            pass
+        try:
+            self.server1.exec_query("DROP USER 'joe'@'%'")
         except:
             pass
         try:

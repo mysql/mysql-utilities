@@ -91,10 +91,13 @@ class test(mysql_test.System_test):
 
         # Now show how --include-global-privileges works.
         try:
-            self.server1.exec_query("CREATE USER joe_pass@'%%'")
+            self.server1.exec_query("CREATE USER 'joe_pass'@'%'")
+        except:
+            pass
+        try:
             self.server1.exec_query("GRANT ALL ON util_test.* TO "
-                                    "joe_pass@'%%'")
-        except MySQLUtilError, e:
+                                    "'joe_pass'@'%'")
+        except Exception, e:
             raise MUTException("Cannot create user with global grants: %s" %
                                e.errmsg)
 
@@ -135,7 +138,7 @@ class test(mysql_test.System_test):
             res = self.server1.exec_query(query)
         except:
             return False
-        res = self.drop_user("joe_pass@%", self.server1)
+        res = self.drop_user("'joe_pass'@'%'", self.server1)
         if not res:
             return False
         res = self.drop_user("joe_pass@user", self.server1)

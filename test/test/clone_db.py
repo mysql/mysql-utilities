@@ -43,7 +43,7 @@ class test(mysql_test.System_test):
     def get_result(self):
         msg = None
         if self.server1 and self.results[0] == 0:
-            query = "SHOW DATABASES LIKE 'util_%%'"
+            query = "SHOW DATABASES LIKE 'util_%'"
             try:
                 res = self.server1.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
@@ -59,7 +59,7 @@ class test(mysql_test.System_test):
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
+            res = server.exec_query("SHOW DATABASES LIKE 'util_%'")
         except:
             return True # Ok to exit here as there weren't any dbs to drop
         try:
