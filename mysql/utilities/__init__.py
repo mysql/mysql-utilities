@@ -1,7 +1,7 @@
 # Major, Minor, Patch, Status
 VERSION = (0, 1, 0, 'alpha')
-VERSION_STRING = "{0}.{1}.{2}".format(*VERSION[0:3])
-RELEASE_STRING = "{0}.{1}.{2}-{3}".format(*VERSION)
+VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
+RELEASE_STRING = "%s.%s.%s-%s" % VERSION
 COPYRIGHT = "2010, Oracle and/or its affiliates. All rights reserved."
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This program is free software; see the source for copying
