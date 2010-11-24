@@ -123,12 +123,14 @@ class Database(object):
         op_ok = False
         if silent:
             try:
-                res = server.exec_query("DROP DATABASE %s" % (db))
+                res = server.exec_query("DROP DATABASE %s" % (db),
+                                        (), False, False)
             except:
                 pass
         else:
             try:
-                res = server.exec_query("DROP DATABASE %s" % (db))
+                res = server.exec_query("DROP DATABASE %s" % (db),
+                                        (), False, False)
                 op_ok = True
             except Exception, e:
                 raise e
@@ -152,7 +154,8 @@ class Database(object):
             db = self.db_name
         op_ok = False
         try:
-            res = server.exec_query("CREATE DATABASE %s" % (db))
+            res = server.exec_query("CREATE DATABASE %s" % (db),
+                                    (), False, False)
             op_ok = True
         except Exception, e:
             raise e
@@ -278,12 +281,12 @@ class Database(object):
         # Suppress the error on drop
         if self.cloning:
             try:
-                self.source.exec_query(drop_str)
+                self.source.exec_query(drop_str, (), False, False)
             except:
                 pass
         else:
             try:
-                self.destination.exec_query(drop_str)
+                self.destination.exec_query(drop_str, (), False, False)
             except:
                 pass
             
@@ -319,11 +322,12 @@ class Database(object):
                 print create_str
         res = None
         try:
-            res = self.destination.exec_query("USE %s" % self.new_db)
+            res = self.destination.exec_query("USE %s" % self.new_db,
+                                              (), False, False)
         except:
             pass
         try:
-            res = self.destination.exec_query(create_str)
+            res = self.destination.exec_query(create_str, (), False, False)
         except Exception, e:
             raise MySQLUtilError("Cannot operate on %s object. Error: %s" % 
                                  (obj_type, e.errmsg))
@@ -414,7 +418,8 @@ class Database(object):
         # First, turn off foreign keys if turned on
         if fkey:
             try:
-                res = self.destination.exec_query(fkey_query % "OFF")
+                res = self.destination.exec_query(fkey_query % "OFF",
+                                                  (), False, False)
             except MySQLUtilError, e:
                 raise e
         
@@ -474,7 +479,7 @@ class Database(object):
                         try:
                             tbl = Table(self.source,
                                         "%s.%s" % (self.db_name, tblname),
-                                        self.verbose)
+                                        self.verbose, True)
                             if tbl is None:
                                 raise MySQLUtilError("Cannot create table "
                                                      "object before copy.")
@@ -491,7 +496,8 @@ class Database(object):
         # Now, turn on foreign keys if they were on at the start
         if fkey:
             try:
-                res = self.destination.exec_query(fkey_query % "ON")
+                res = self.destination.exec_query(fkey_query % "ON",
+                                                  (), False, False)
             except MySQLUtilError, e:
                 raise e
 

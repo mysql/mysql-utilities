@@ -7,4 +7,3 @@
 # main.example, This is a test (bug#xxxxx)
 #
 main.proc_grep, Output generated is non-deterministic
-main.copy_db_multithreaded, Test fails with mysql.connector.

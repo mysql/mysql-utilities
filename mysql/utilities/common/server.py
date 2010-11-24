@@ -238,19 +238,19 @@ class Server(object):
             raise e
         if not fkey and turn_on:
             try:
-                res = self.exec_query(fkey_query % "ON")
+                res = self.exec_query(fkey_query % "ON", (), False, False)
             except MySQLUtilError, e:
                 raise e
         elif fkey and not turn_on:
             try:
-                res = self.exec_query(fkey_query % "OFF")
+                res = self.exec_query(fkey_query % "OFF", (), False, False)
             except MySQLUtilError, e:
                 raise e
         return fkey
 
 
     def exec_query(self, query_str, params=(),
-                   columns=False, fetchall=True, buffered=True):
+                   columns=False, fetch=True, raw=True):
         """Execute a query and return result set
         
         This is the singular method to execute queries. It should be the only
@@ -265,9 +265,10 @@ class Server(object):
         params[in]         Parameters for query
         columns[in]        Add column headings as first row
                            (default is False)
-        fetchall[in]       Execute the fetch as part of the operation
+        fetch[in]          Execute the fetch as part of the operation and
+                           use a buffered cursor
                            (default is True)
-        buffered[in]       If True, use a buffered cursor
+        raw[in]            If True, use a buffered raw cursor
                            (default is True)
     
         Returns result set or cursor
@@ -277,7 +278,18 @@ class Server(object):
         assert self.db_conn, "You must call connect before executing a query."
         
         results = ()
-        cur = self.db_conn.cursor(buffered)
+        # If we are fetching all, we need to use a buffered 
+        if fetch: 
+            if raw:
+                #print "USING: buffered raw!"
+                cur = self.db_conn.cursor(
+                    cursor_class=mysql.connector.cursor.MySQLCursorBufferedRaw)
+            else:
+                #print "USING: buffered only"
+                cur = self.db_conn.cursor(buffered)
+        else:
+            #print "USING: default cursor!"
+            cur = self.db_conn.cursor()
         
         #print "query_str:", query_str, "\nparams:", params
         try:
@@ -291,7 +303,7 @@ class Server(object):
         except Exception, e:
             cursor.close()
             raise MySQLUtilError("Unknown error. Command: %s" % query_str)
-        if fetchall or columns:
+        if fetch or columns:
             try:
                 results = cur.fetchall()
             except mysql.connector.errors.InterfaceError, e:
@@ -489,7 +501,7 @@ class Server(object):
                     if verbose:
                         print cmd
                     try:
-                        res = self.exec_query(cmd)
+                        res = self.exec_query(cmd, (), False, False)
                     except MySQLUtilError, e:
                         raise e
         file.close()

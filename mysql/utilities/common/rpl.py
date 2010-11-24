@@ -109,8 +109,9 @@ class Rpl(object):
                         (r_user, self.slave.host)
             if r_pass:
                 query_str += "IDENTIFIED BY '%s'" % r_pass
-            res = self.master.exec_query(query_str)
-            if res != ():
+            try:
+                self.master.exec_query(query_str, (), False, False)
+            except:
                 print "ERROR: Cannot grant replication slave to " + \
                       "replication user."
                 return False
@@ -119,7 +120,7 @@ class Rpl(object):
         if self.verbose:
             print "# Flushing tables on master with read lock..."
         query_str = "FLUSH TABLES WITH READ LOCK"
-        res = self.master.exec_query(query_str)
+        res = self.master.exec_query(query_str, (), False, False)
         
         # Read master log file information
         res = self.master.exec_query("SHOW MASTER STATUS")
@@ -134,7 +135,7 @@ class Rpl(object):
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != () and res != []:
             if res[0][10] == "Yes" or res[0][11] == "Yes":
-                res = self.slave.exec_query("STOP SLAVE")
+                res = self.slave.exec_query("STOP SLAVE", (), False, False)
         
         # Connect slave to master
         if self.verbose:
@@ -146,14 +147,14 @@ class Rpl(object):
         change_master += "MASTER_PORT = %s, " % self.master.port
         change_master += "MASTER_LOG_FILE = '%s', " % master_file
         change_master += "MASTER_LOG_POS = %s" % master_pos
-        res = self.slave.exec_query(change_master)
+        res = self.slave.exec_query(change_master, (), False, False)
         if self.verbose:
             print "# %s" % change_master
         
         # Start slave
         if self.verbose:
             print "# Starting slave..."
-        res = self.slave.exec_query("START SLAVE")
+        res = self.slave.exec_query("START SLAVE", (), False, False)
         
         # Check slave status
         i = 0
@@ -177,7 +178,7 @@ class Rpl(object):
         if self.verbose:
             print "# Unlocking tables on master..."
         query_str = "UNLOCK TABLES"
-        res = self.master.exec_query(query_str)
+        res = self.master.exec_query(query_str, (), False, False)
         if result is True:
             self.replicating = True
         return result
@@ -198,14 +199,16 @@ class Rpl(object):
         print "# Testing replication setup..."
         if self.verbose:
             print "# Creating a test database on master named %s..." % db
-        res = self.master.exec_query("CREATE DATABASE %s" % db)
+        res = self.master.exec_query("CREATE DATABASE %s" % db,
+                                     (), False, False)
         i = 0
         while i < num_tries:
             time.sleep (1)
             res = self.slave.exec_query("SHOW DATABASES")
             for row in res:
                 if row[0] == db:
-                    res = self.master.exec_query("DROP DATABASE %s" % db)
+                    res = self.master.exec_query("DROP DATABASE %s" % db,
+                                                 (), False, False)
                     print "# Success! Replication is running."
                     i = num_tries
                     break

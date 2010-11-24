@@ -216,7 +216,7 @@ class Index(object):
             name, sub_part = (col[0], col[1])
             col_str = col_str + "%s" % (name)
             if sub_part > 0:
-                col_str = col_str + "(%d)" % (sub_part)
+                col_str = col_str + "(%s)" % (sub_part)
             i = i + 1
             if (stop > 1) and (i < stop):
                 col_str = col_str + ", "
@@ -263,13 +263,15 @@ class Table:
         - Copy table data
     """   
     
-    def __init__(self, server1, name, verbose=False):
+    def __init__(self, server1, name, verbose=False, get_cols=False):
         """Constructor
         
         server[in]         A Server object
         name[in]           Name of table in the form (db.table)
         verbose[in]        print extra data during operations (optional)
-                           default value = False
+                           (default is False)
+        get_cols[in]       If True, get the column metadata on construction
+                           (default is False)
         """
     
         self.verbose = verbose
@@ -284,7 +286,10 @@ class Table:
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
-        self.col_metadata = None
+        if get_cols:
+            self.col_metadata = self.get_column_metadata()
+        else:
+            self.col_metadata = None
         self.dest_vals = None
 
         # Get max allowed packet
@@ -541,7 +546,8 @@ class Table:
         # Get number of rows
         num_rows = 0
         try:
-            res = self.server.exec_query("USE %s" % self.db_name)
+            res = self.server.exec_query("USE %s" % self.db_name,
+                                         (), False, False)
         except Exception, e:
             pass
         try:
@@ -615,7 +621,7 @@ class Table:
         # Insert the data first
         for data_insert in insert_data:
             try:
-                res = dest.exec_query(data_insert)
+                res = dest.exec_query(data_insert, (), False, False)
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem inserting data. "
                                      "Error = %s" % e.errmsg)
@@ -623,7 +629,8 @@ class Table:
         # Now insert the blob data if there is any
         for blob_insert in blob_data:
             try:
-                res = dest.exec_query(blob_insert[0], blob_insert[1])
+                res = dest.exec_query(blob_insert[0], blob_insert[1],
+                                      (), False, False)
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem updating blob field. "
                                      "Error = %s" % e.errmsg)

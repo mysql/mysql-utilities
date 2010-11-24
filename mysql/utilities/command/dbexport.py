@@ -138,30 +138,17 @@ def export_metadata(src_val, db_list, options):
                     if len(rows[1]) < 1:
                         print " (none found)"
                     else:
-                        # do the conversion for printing sets and other weird
-                        # fields that mysql.connector doesn't convert
-                        stop = len(rows[0])
-                        data_rows = []
-                        for row in rows[1]:
-                            data_row = []
-                            for i in range(0,stop):
-                                if rows[0][i].upper() == "SQL_MODE":
-                                    data_row.append('')
-                                else:
-                                    data_row.append(row[i])
-                            data_rows.append(data_row)
-
                         print
                         if format == "VERTICAL":
-                            format_vertical_list(sys.stdout, rows[0], data_rows)
+                            format_vertical_list(sys.stdout, rows[0], rows[1])
                         elif format == "TAB":
-                            format_tabular_list(sys.stdout, rows[0], data_rows,
+                            format_tabular_list(sys.stdout, rows[0], rows[1],
                                                 not no_headers, '\t')
                         elif format == "CSV":
-                            format_tabular_list(sys.stdout, rows[0], data_rows,
+                            format_tabular_list(sys.stdout, rows[0], rows[1],
                                                 not no_headers, ',')
                         else:  # default to table format
-                            format_tabular_list(sys.stdout, rows[0], data_rows,
+                            format_tabular_list(sys.stdout, rows[0], rows[1],
                                                 True, None, False, True)
 
         except MySQLUtilError, e:
@@ -320,7 +307,7 @@ def export_data(src_val, db_list, options):
                 break
             for table in tables:
                 tbl_name = "%s.%s" % (db_name, table[0])
-                cur_table = Table(source, tbl_name)
+                cur_table = Table(source, tbl_name, False, True)
                 col_metadata = cur_table.get_column_metadata()
                 if single and (format != "SQL" and format != "S" and \
                                format != "GRID" and format != "G" and \
