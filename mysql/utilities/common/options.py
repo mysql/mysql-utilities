@@ -155,7 +155,7 @@ def parse_connection(connection_values):
     ``connect`` call in the following manner::
 
       options = parse_connection(spec)
-      conn = MySQLdb.connect(**options)
+      conn = mysql.connector.connect(**options)
 
     conn_values[in]     Connection values in the form:
                         user:password@host:port:socket

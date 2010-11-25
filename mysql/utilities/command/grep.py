@@ -17,6 +17,8 @@
 
 import sys
 
+import mysql.connector
+
 from ..common.options import parse_connection
 from ..common.format import format_tabular_list
 
@@ -134,8 +136,8 @@ def _obj2sql(obj):
 
     This function convert Python objects to SQL values using the
     conversion functions in the database connector package."""
-    from MySQLdb.converters import conversions
-    return conversions[type(obj)](obj, conversions)
+    from mysql.connector.conversion import MySQLConverter
+    return MySQLConverter().quote(obj)
 
 def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     """Generate a SELECT statement for finding an object.
@@ -207,7 +209,7 @@ class ObjectGrep(object):
     def sql(self):
         return self.__sql;
 
-    def execute(self, connections, output=sys.stdout, connector=MySQLdb):
+    def execute(self, connections, output=sys.stdout, connector=mysql.connector):
         from mysql.utilities.exception import FormatError, EmptyResultError
 
         entries = []
@@ -217,6 +219,7 @@ class ObjectGrep(object):
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
             info = conn
+            print info
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)

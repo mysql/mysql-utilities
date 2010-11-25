@@ -19,6 +19,8 @@
 import re
 import sys
 
+import mysql.connector
+
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
 ID      = "Id"
@@ -42,8 +44,8 @@ def _obj2sql(obj):
 
     This function convert Python objects to SQL values using the
     conversion functions in the database connector package."""
-    from MySQLdb.converters import conversions
-    return conversions[type(obj)](obj, conversions)
+    from mysql.connector.conversion import MySQLConverter
+    return MySQLConverter().quote(obj)
 
 _SELECT_PROC_FRM = """
 SELECT
@@ -109,7 +111,7 @@ class ProcessGrep(object):
         from ..common.format import format_tabular_list
 
         output = kwrds.get('output', sys.stdout)
-        connector = kwrds.get('connector', MySQLdb)
+        connector = kwrds.get('connector', mysql.connector)
 
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")

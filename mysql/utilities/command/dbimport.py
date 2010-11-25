@@ -25,7 +25,6 @@ import csv
 import re
 import sys
 from itertools import imap
-import MySQLdb.converters
 from mysql.utilities.exception import MySQLUtilError
 
 # List of database objects for enumeration
@@ -547,8 +546,8 @@ def _to_sql(obj):
     
     Returns (string) converted value
     """
-    cvtr = MySQLdb.converters.conversions
-    return cvtr[type(obj)](obj, MySQLdb.converters.conversions)
+    from mysql.connector.conversion import MySQLConverter
+    return MySQLConverter().quote(obj)
 
 
 def _build_insert_data(col_names, tbl_name, data):

@@ -48,7 +48,7 @@ Classes
       This will return SQL code for executing the search in the form of a
       `SELECT`_ statement.
 
-   .. method:: execute(connections[, output=sys.output, connector=MySQLdb])
+   .. method:: execute(connections[, output=sys.output, connector=mysql.connector])
 
       Execute the search on each of the connections in turn and print an
       aggregate of the result as a grid table.

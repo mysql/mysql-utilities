@@ -80,7 +80,7 @@ Classes
                 options.
       :rtype: string
 
-   .. method:: execute(connection, ...[, output=sys.stdout, connector=MySQLdb])
+   .. method:: execute(connection, ...[, output=sys.stdout, connector=mysql.connector])
 
       Execute the search on each of the connections supplied. If
       *output* is not ``None``, then the value will be treated as a
