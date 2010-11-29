@@ -49,10 +49,7 @@ class test(replicate.test):
         
         self.remove_result("# status:")
         self.remove_result("# error: ")
-        self.mask_result("# CHANGE MASTER TO MASTER_HOST",
-                         "MASTER_LOG_POS = ", "MASTER_LOG_POST = XXXX")
-        self.mask_result("# CHANGE MASTER TO MASTER_HOST",
-                         "MASTER_PORT = ", "MASTER_PORT = XXXX")
+        self.remove_result("# CHANGE MASTER TO MASTER_HOST")
         self.mask_result("# master id =", "= ", "= XXX")
         self.mask_result("#  slave id =", "= ", "= XXX")
 

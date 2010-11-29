@@ -215,13 +215,11 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         if not silent:
             print "# Setting the root password..."
         if os.name == "posix":
-            cmd = mysqladmin_path + " --no-defaults -v -u%s " % \
-                  (conn["user"]) + "--socket=%s password %s " % \
-                  (new_sock, rootpass)
+            cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
+                  "--socket=%s password %s " % (new_sock, rootpass)
         else:
-            cmd = mysqladmin_path + " --no-defaults -v -u%s " % \
-                  (conn["user"]) + "password %s --port=%s" % \
-                  (rootpass, int(new_port))
+            cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
+                  "password %s --port=%s" % (rootpass, int(new_port))
         if verbose and not silent:
             proc = subprocess.Popen(cmd, shell=True)
         else:

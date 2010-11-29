@@ -21,7 +21,6 @@ class test(export_parameters_def.test):
                 return False
         except MUTException, e:
             raise e
-        self.server1 = self.servers.get_server(0)
 
         try:
             self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "

@@ -150,7 +150,7 @@ class Server_list(object):
             return self.server_list[index][0]
             
         
-    def start_new_server(self, server, port, server_id, passwd,
+    def start_new_server(self, cur_server, port, server_id, passwd,
                          role="server", parameters=None):
         """Start a new server with optional parameters
         
@@ -158,7 +158,7 @@ class Server_list(object):
         parameters using the mysqlserverclone.py utility by cloning the
         server passed. It will also connect to the new server.
         
-        server[in]          Server instance to clone
+        cur_server[in]      Server instance to clone
         port[in]            Port
         server_id[in]       Server id
         password[in]        Root password for new server
@@ -179,7 +179,7 @@ class Server_list(object):
         
         # Attempt to clone existing server
         cmd = "mysqlserverclone.py --server="
-        cmd += self.get_connection_string(server)
+        cmd += self.get_connection_string(cur_server)
         if passwd:
            cmd += " --root-password=%s " % passwd
         cmd += " --new-port=%s " % port
@@ -211,6 +211,22 @@ class Server_list(object):
         except MySQLUtilError, e:
             raise MySQLUtilError("Cannot connect to spawned server: %s" % \
                                  e.errmsg)
+            
+        # If connected user is not root, clone it to the new instance.
+        conn_val = self.get_connection_values(cur_server)
+        if conn_val["user"].lower() != "root":
+            user_str = conn_val["user"]
+            if conn_val.get("passwd") is not None:
+                user_str += ":%s" % conn_val["passwd"]
+            user_str += "@%s" % conn_val["host"]
+            cmd = "mysqluserclone.py -s --source=%s --destination=%s" % \
+                  (self.get_connection_string(cur_server),
+                   self.get_connection_string(self.new_server)) + \
+                  "%s %s" % (user_str, user_str)
+            res = _exec_util(cmd, "cmd.txt", self.utildir)
+            if res != 0:
+                raise MySQLUtilError("Cannot clone connected user.")
+
         return server
     
     
@@ -283,8 +299,10 @@ class Server_list(object):
         orig_server = self.server_list[0][0]
         num_to_add = num_servers - len(self.server_list)
         
+        cur_num_servers = self.num_servers()
         for server_num in range(0, num_to_add):
-            datadir = "new_server_%d" % (server_num + 1)
+            datadir = "new_server_%d" % (cur_num_servers)
+            cur_num_servers += 1
             try:
                 server = self.start_new_server(orig_server,
                                                self.get_next_port(),
@@ -336,6 +354,27 @@ class Server_list(object):
             if server[1]:
                 num_spawned_servers += 1
         return num_spawned_servers
+
+
+    def get_connection_values(self, server):
+        """Return a dictionary of connection values for a particular server.
+        
+        server[in]         A Server object
+        
+        Returns dictionary
+        """
+
+        conn_vals = {
+            "user"   : server.user,
+            "host"   : server.host
+        }
+        if server.passwd:
+            conn_vals["passwd"] = server.passwd
+        if server.socket:
+            conn_vals["socket"] = server.socket
+        if server.port:
+            conn_vals["port"] = server.port
+        return conn_vals
 
 
     def get_connection_parameters(self, server):
@@ -605,6 +644,35 @@ class System_test(object):
                     else:
                         self.results.insert(linenum,
                                             line[0:loc] + mask + line[start:])
+            linenum += 1
+
+
+    def mask_result_portion(self, prefix, target, end_target, mask):
+        """ Mask out a portion of a string for the results using
+        a end target to make the masked area a specific length.
+
+        str[in]            string to mask
+        prefix[in]         starting prefix of string to mask
+        target[in]         substring to search for to mask
+        end_target[in]     substring to mark end of mask
+        mask[in]           mask string (e.g. '######")
+        """
+        linenum = 0
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                loc = line.find(target)
+                if loc >= 0:
+                    end = line.find(end_target)
+                    if end >= 0:
+                        self.results.pop(linenum)
+                        if end > len(line):
+                            self.results.insert(linenum,
+                                                line[0:loc] + mask + "\n")
+                        else:
+                            self.results.insert(linenum,
+                                                line[0:loc] + mask +
+                                                line[end:])
             linenum += 1
 
     

@@ -10,10 +10,24 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
+        # Need at least one server.
+        self.server1 = None
+        self.need_servers = False
+        if not self.check_num_servers(2):
+            self.need_servers = True
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
+        num_server = self.servers.num_servers()
+        if self.need_servers:
+            try:
+                self.servers.spawn_new_servers(2)
+            except MySQLUtilError, e:
+                raise MUTException("Cannot spawn needed servers: %s" % \
+                                   e.errmsg)
+        else:
+            num_server -= 1 # Get last server in list
+        self.server1 = self.servers.get_server(num_server)
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         self.drop_all()
         try:
@@ -24,7 +38,6 @@ class test(mysql_test.System_test):
         return True
     
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
         
         from_conn = self.build_connection_string(self.server1)
@@ -38,11 +51,11 @@ class test(mysql_test.System_test):
         if not res:
             raise MUTException("%s: failed" % comment)
             
-        self.mask_column_result("| %s:*@" % conn_val[0], "|", 3, "XXXXX ")
-        self.mask_column_result("| %s:*@" % conn_val[0], "|", 8, "XXX ")
-        self.mask_column_result("| %s:*@" % conn_val[0], "|", 9, "XXXXX ")
-        self.mask_result("| %s:*@" % conn_val[0], "| %s:*@" % conn_val[0],
-                         "| XXXXXXXXXXXXXXXXXXXXX")
+        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 3, "XXXXX ")
+        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 8, "XXX ")
+        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 9, "XXXXX ")
+        #self.mask_result("| %s:*@" % conn_val[0], "| %s:*@" % conn_val[0],
+        #                 "| XXXXXXXXXXXXXXXXXXXXX")
         
         return True
           

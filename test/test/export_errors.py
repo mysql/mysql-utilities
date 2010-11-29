@@ -16,7 +16,10 @@ class test(export_basic.test):
 
     def setup(self):
         self.server1 = self.servers.get_server(0)
-        res = self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+        try:
+            res = self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+        except:
+            pass
         return export_basic.test.setup(self)
     
     def run(self):

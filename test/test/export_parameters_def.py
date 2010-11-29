@@ -18,7 +18,6 @@ class test(export_basic.test):
         return export_basic.test.setup(self)
          
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
        
         from_conn = "--server=" + self.build_connection_string(self.server1)

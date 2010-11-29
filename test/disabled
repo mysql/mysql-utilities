@@ -7,3 +7,4 @@
 # main.example, This is a test (bug#xxxxx)
 #
 main.proc_grep, Output generated is non-deterministic
+main.copy_db_multithreaded, Does not run on all platforms. Need to move to an optional performance suite.

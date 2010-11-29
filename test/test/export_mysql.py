@@ -12,22 +12,25 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
+        # Need at least one server.
         self.server1 = None
-        self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(2):
-            self.need_server = True
+        self.need_servers = False
+        if not self.check_num_servers(3):
+            self.need_servers = True
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
-        if self.need_server:
+        num_servers = self.servers.num_servers()
+        if self.need_servers:
             try:
-                self.servers.spawn_new_servers(2)
+                self.servers.spawn_new_servers(num_servers+2)
             except MySQLUtilError, e:
                 raise MUTException("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
-        self.server2 = self.servers.get_server(1)
+        else:
+            num_servers -= 2 # Get last 2 servers in list
+        self.server1 = self.servers.get_server(num_servers)
+        self.server2 = self.servers.get_server(num_servers+1)
         self.drop_all()
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         try:
@@ -71,7 +74,6 @@ class test(mysql_test.System_test):
         file.close()
     
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
         
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
