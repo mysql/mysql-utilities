@@ -112,14 +112,12 @@ OPTIONS
 
    Do not abort when a test fails
 
-.. option:: --verbose, -v
+.. option:: -v, --verbose
 
-   display additional information during operation
-
-.. option:: --debug, -d
-
-   display actual results of test cases to screen and ignore result
-   processing - used to diagnose test execution problems
+   control how much information is displayed. e.g., -v =
+   verbose, -vv = more verbose, -vvv = debug. Use -vvv to display actual
+   results of test cases to the screen and ignore result processing - used to
+   diagnose test execution problems
 
 NOTES
 -----

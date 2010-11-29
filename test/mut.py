@@ -33,7 +33,7 @@ import sys
 import time
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.tools import get_tool_path
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.exception import MUTException, MySQLUtilError
 from test import Server_list
 
@@ -298,29 +298,26 @@ parser.add_option("--width", action="store", dest="width",
                   type = "int", help="display width",
                   default=PRINT_WIDTH)
 
-# Verbose mode
-parser.add_option("--verbose", "-v", action="store_true", dest="verbose",
-                  help="display additional information during operation")
-
 # Force mode
 parser.add_option("-f", "--force", action="store_true", dest="force",
                   help="do not abort when a test fails")
 
-# Debug mode
-parser.add_option("--debug", "-d", action="store_true", dest="debug",
-                  help="display actual results of test cases to screen "
-                       "and ignore result processing - used to diagnose "
-                       "test execution problems")
+# Add verbosity mode
+add_verbosity(parser, False)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Check for debug
+debug_mode = (opt.verbosity >= 3)
+verbose_mode = (opt.verbosity >= 1)
 
 # Cannot use --do-test= with listing tests.
 if opt.wildcard and len(args) > 0:
     parser.error("Cannot mix --do-test= and a list of tests.")
 
 # Cannot use --debug with listing tests.
-if opt.debug and len(args) > 1:
+if debug_mode and len(args) > 1:
     parser.error("Cannot mix --debug and a list of tests.")
 
 # Must use --record with a specific test
@@ -377,7 +374,7 @@ if opt.start_test:
 else:
     start_sequence = False
      
-server_list = Server_list([], opt.start_port, opt.utildir, opt.verbose)
+server_list = Server_list([], opt.start_port, opt.utildir, verbose_mode)
 basedir = None
 
 # Print status of connections
@@ -548,7 +545,7 @@ for test_tuple in test_files:
     test_class = __import__(test)
     test_case = test_class.test(server_list,
                                 opt.testdir + "/" + test_suite,
-                                opt.utildir, opt.verbose, opt.debug)
+                                opt.utildir, verbose_mode, debug_mode)
     
     last_test = test_case
     # Print name of the test
@@ -592,7 +589,7 @@ for test_tuple in test_files:
     try:
         run_ok = test_case.run()
     except MUTException, e:
-        if opt.debug:
+        if debug_mode:
             # Using debug should result in a skipped result check.
             run_ok
         else:
@@ -615,7 +612,7 @@ for test_tuple in test_files:
                 sys.stdout.write("  %sWARNING%s: Test record failed." % \
                       (BOLD_ON, BOLD_OFF))
                 
-        elif opt.debug:
+        elif debug_mode:
             print "\nEnd debug results.\n"
 
         # Display status of test
@@ -637,8 +634,6 @@ for test_tuple in test_files:
                 run_ok = False
                 failed_tests.append(test)
                 
-        if opt.verbose:
-            print test_case.__doc__
     else:
         _report_error("Test execution failed.", test_name, "FAIL", start_test)
         print "%s\n" % run_msg
@@ -654,7 +649,7 @@ for test_tuple in test_files:
         test_cleanup_ok = False
 
     # Display the time if not recording
-    if not opt.record and run_ok and not opt.debug:
+    if not opt.record and run_ok and not debug_mode:
         _print_elapsed_time(start_test)
 
     # Display warning about cleanup
@@ -669,6 +664,9 @@ for test_tuple in test_files:
             sys.stdout.write(str)
         sys.stdout.write("\n")    
     
+    if verbose_mode:
+        print test_case.__doc__
+
     # Check force option
     if not run_ok and not opt.force:
         break
