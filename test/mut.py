@@ -31,7 +31,6 @@ import string
 import subprocess
 import sys
 import time
-import MySQLdb
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.options import parse_connection
