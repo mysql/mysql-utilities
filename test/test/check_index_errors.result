@@ -2,6 +2,9 @@ Test case 1 - error: no db specified
 Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck.py: error: You must specify at least one table or database to check.
+Test case 2 - error: invalid source specified
+# Source on nohost: ... ERROR: Cannot connect to the Source server.
+Error XXXX: Access denied
 Test case 3 - error: invalid login to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied

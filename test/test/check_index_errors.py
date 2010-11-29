@@ -25,12 +25,11 @@ class test(check_index.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        # This test is invalid and needs to be fixed. If you have a
-        # root@localhost user with no password, this will pass.
-        # comment = "Test case 2 - error: no source specified"
-        # res = self.run_test_case(1, "mysqlindexcheck.py util_test", comment)
-        # if not res:
-        #     raise MUTException("%s: failed" % comment)
+        comment = "Test case 2 - error: invalid source specified"
+        res = self.run_test_case(1, "mysqlindexcheck.py util_test "
+                                 "--server=nope:nada@nohost", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
 
         comment = "Test case 3 - error: invalid login to server"
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
