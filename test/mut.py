@@ -427,6 +427,7 @@ else:
         exit(1)
 
 # Check for running servers
+processes = []
 if server_list.num_servers():
     processes = _check_for_running_servers(opt.start_port)            
 

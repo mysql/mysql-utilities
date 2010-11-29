@@ -185,7 +185,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     port_int = int(new_port)
     
     conn = {
-        "user"   : conn_val["user"],
+        "user"   : "root",
         "passwd" : "",
         "host"   : conn_val["host"],
         "port"   : port_int,
