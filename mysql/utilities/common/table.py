@@ -423,10 +423,10 @@ class Table:
                 blob_insert += special_cols[col]["name"] + "` = %s "
                 data = row[col]
             else:
+                if col > 0 and col < stop:
+                    where_clause += " AND "
                 where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
                                                   row[col])
-                if col < stop-2:
-                    where_clause += " AND "
         return (blob_insert + where_clause, data)
     
     

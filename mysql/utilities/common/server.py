@@ -289,7 +289,7 @@ class Server(object):
                 cur = self.db_conn.cursor(buffered)
         else:
             #print "USING: default cursor!"
-            cur = self.db_conn.cursor()
+            cur = self.db_conn.cursor(raw=True)
         
         #print "query_str:", query_str, "\nparams:", params
         try:
