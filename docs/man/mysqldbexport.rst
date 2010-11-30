@@ -19,12 +19,9 @@ DESCRIPTION
 -----------
 
 This utility permits a database administrator to export the metadata
-(objects) or data from one or more databases.
-
-The utility allows you to export either the object definitions, the
-data, or both for a list of databases. For example, to export the
-metadata of the database 'dev' from server1 on port 3306 producing
-**CREATE** statements, use this command::
+(object definitions, hence definitions) or data or both from one or more
+databases. For example, to export the definitions of the database 'dev' from
+server1 on port 3306 producing **CREATE** statements, use this command::
 
   mysqldbexport --server=root@server1:3306 --export=definitions dev
   
@@ -33,10 +30,12 @@ producing bulk insert statements, use this command::
 
   mysqldbexport --server=root@server1:3306 --bulk-insert --export=data dev
 
-Also, to export both the data and definitions of the database 'dev' from
+To export both the data and definitions of the database 'dev' from
 server1 on port 3306 producing bulk insert statements, use this command::
 
   mysqldbexport --server=root@server1:3306 --bulk-insert --export=both dev
+  
+Note: by default, the utility will export only definitions.
 
 You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This can allow you to extract a
@@ -88,6 +87,20 @@ specifying the :option:`--no-headers` option.
 You can turn off all feedback information by specifying the
 :option:`--silent` option.
 
+You can also have the utility write the data for the tables to separate files
+by using the --file-per-table option. This would create files with a file
+name composed of the database and table name followed by the format of the
+file. For example, the following command produces files named
+db1.<table name>.csv.::
+
+  mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
+  
+This utility differs from mysqldump in that it can produce output in a
+variety of formats to make your data extraction/transport much easier. It
+permits you to export your data in the format most suitable to an external
+tool, another MySQL server, or a yet another use without the need to
+reformat the data.
+
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
 in the operation. See :ref:`mysqldbexport-notes` below for more details.
@@ -127,6 +140,14 @@ OPTIONS
 .. option:: --bulk-insert, -b
 
    Use bulk insert statements for data (default:False)
+   
+.. option:: --file-per-table
+
+   Write table data to separate files. Valid only for --export=data or
+   --export=both. Files will be named <db_name>.<tbl_name>.<format>. For
+   example, a CSV export of two tables in db1, t1 and t2, results in files
+   named db1.t1.csv and db1.t2.csv. If definitions are included, they are
+   written to stdout as normal.
 
 .. option:: --no-headers, -h
 

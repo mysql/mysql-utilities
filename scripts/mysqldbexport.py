@@ -92,6 +92,11 @@ parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
                   default=False, help="Do not export blob data.")
 
+# File-per-table mode
+parser.add_option("--file-per-table", action="store_true", dest="file_per_tbl",
+                  default=False, help="Write table data to separate files. "
+                  "Valid only for --export=data or --export=both.")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -165,11 +170,14 @@ elif opt.export == "B":
 if opt.skip_blobs and not opt.export == "DATA":
     print "# WARNING: --skip-blobs option ignored for metadata export."
     
+if opt.file_per_tbl and (opt.export == "DEFINITIONS" or opt.export == "BOTH"):
+    print "# WARNING: --file-per-table option ignored for metadata export."
+
 if "DATA" in skips and opt.export == "DATA":
     print "ERROR: You cannot use --export=data and --skip-data when exporting " \
           "table data."
     exit(1)
-
+    
 # Set options for database operations.
 options = {
     "skip_tables"   : "TABLES" in skips,
@@ -188,7 +196,8 @@ options = {
     "single"        : not opt.bulk_import,
     "silent"        : opt.silent,
     "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3
+    "debug"         : opt.verbosity >= 3,
+    "file_per_tbl"  : opt.file_per_tbl
 }
 
 # Parse server connection values

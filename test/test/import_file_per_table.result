@@ -1,0 +1,118 @@
+Test case 1 - SQL format with --file-per-table
+# Testing file-per-table import:
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t1.sql.
+#...done.
+# Data from util_test.t1:
+01 Test Basic database example 
+02 Test Basic database example 
+03 Test Basic database example 
+04 Test Basic database example 
+05 Test Basic database example 
+06 Test Basic database example 
+07 Test Basic database example 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t2.sql.
+#...done.
+# Data from util_test.t2:
+11 Test Basic database example 
+12 Test Basic database example 
+13 Test Basic database example 
+Test case 2 - GRID format with --file-per-table
+# Testing file-per-table import:
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t1.grid.
+#...done.
+# Data from util_test.t1:
+01 Test Basic database example 
+02 Test Basic database example 
+03 Test Basic database example 
+04 Test Basic database example 
+05 Test Basic database example 
+06 Test Basic database example 
+07 Test Basic database example 
+07 Test Basic database example 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t2.grid.
+#...done.
+# Data from util_test.t2:
+11 Test Basic database example 
+12 Test Basic database example 
+13 Test Basic database example 
+13 Test Basic database example 
+Test case 3 - CSV format with --file-per-table
+# Testing file-per-table import:
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t1.csv.
+#...done.
+# Data from util_test.t1:
+01 Test Basic database example 
+02 Test Basic database example 
+03 Test Basic database example 
+04 Test Basic database example 
+05 Test Basic database example 
+06 Test Basic database example 
+07 Test Basic database example 
+07 Test Basic database example 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t2.csv.
+#...done.
+# Data from util_test.t2:
+11 Test Basic database example 
+12 Test Basic database example 
+13 Test Basic database example 
+13 Test Basic database example 
+Test case 4 - TAB format with --file-per-table
+# Testing file-per-table import:
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t1.tab.
+#...done.
+# Data from util_test.t1:
+01 Test Basic database example 
+02 Test Basic database example 
+03 Test Basic database example 
+04 Test Basic database example 
+05 Test Basic database example 
+06 Test Basic database example 
+07 Test Basic database example 
+07 Test Basic database example 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t2.tab.
+#...done.
+# Data from util_test.t2:
+11 Test Basic database example 
+12 Test Basic database example 
+13 Test Basic database example 
+13 Test Basic database example 
+Test case 5 - VERTICAL format with --file-per-table
+# Testing file-per-table import:
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t1.vertical.
+#...done.
+# Data from util_test.t1:
+01 Test Basic database example 
+02 Test Basic database example 
+03 Test Basic database example 
+04 Test Basic database example 
+05 Test Basic database example 
+06 Test Basic database example 
+07 Test Basic database example 
+07 Test Basic database example 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t2.vertical.
+#...done.
+# Data from util_test.t2:
+11 Test Basic database example 
+12 Test Basic database example 
+13 Test Basic database example 
+13 Test Basic database example 

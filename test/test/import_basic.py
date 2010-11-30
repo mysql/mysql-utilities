@@ -136,7 +136,10 @@ class test(mysql_test.System_test):
             except:
                 pass
         if self.export_import_file:
-            os.unlink(self.export_import_file)
+            try:
+                os.unlink(self.export_import_file)
+            except:
+                pass
         return self.drop_all()
 
 

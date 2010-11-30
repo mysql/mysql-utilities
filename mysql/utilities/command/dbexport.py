@@ -160,7 +160,8 @@ def export_metadata(src_val, db_list, options):
 
 
 def _export_row(data_rows, cur_table, col_metadata,
-                format, single, skip_blobs, first=False, no_headers=False):
+                format, single, skip_blobs, first=False,
+                no_headers=False, outfile=None):
     """Export a row
     
     This method will print a row to stdout based on the format chosen -
@@ -176,6 +177,7 @@ def _export_row(data_rows, cur_table, col_metadata,
     first[in]          if True, this is the first row to be exported - this
                        causes the header to be printed if chosen.
     no_headers[in]     if True, do not print headers
+    outfile[in]        if is not None, write table data to this file.
     """
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
@@ -183,6 +185,8 @@ def _export_row(data_rows, cur_table, col_metadata,
     tbl_name = cur_table.tbl_name
     db_name = cur_table.db_name
     full_name = "%s.%s" % (db_name, tbl_name)
+    if format != "SQL" and format != "S" and outfile is None:
+        outfile = sys.stdout # default file handle
     if format == "SQL" or format == "S":
         if single:
             if single:
@@ -195,9 +199,11 @@ def _export_row(data_rows, cur_table, col_metadata,
                                                       col_metadata)
                 if len(columns[1]) > 0:
                     blob_rows.extend(columns[1])
-                sys.stdout.write("INSERT INTO %s VALUES%s" %
-                                 (full_name, columns[0]))
-                print ";"
+                row_str = "INSERT INTO %s VALUES%s;" % (full_name, columns[0])
+                if outfile is not None:
+                    outfile.write(row_str + "\n")
+                else:
+                    print row_str
         else:
             # Generate bulk insert statements
             data_lists = cur_table.make_bulk_insert(data_rows, db_name,
@@ -207,7 +213,10 @@ def _export_row(data_rows, cur_table, col_metadata,
             
             if len(rows) > 0:
                 for row in rows:
-                    print "%s;" % row
+                    if outfile is not None:
+                        outfile.write("%s;\n" % row)
+                    else:
+                        print "%s;" % row
             else:
                 print "# Table %s has no data." % tbl_name
                 
@@ -219,19 +228,22 @@ def _export_row(data_rows, cur_table, col_metadata,
             else:
                 print "# Blob data for table %s:" % tbl_name
                 for blob_row in blob_rows:
-                    sys.stdout.write(blob_row[0] % blob_row[1])
-                    print ";"
+                    row_str = blob_row[0] % blob_row[1] + ";"
+                    if outfile is not None:
+                        outfile.write(row_str + "\n")
+                    else:
+                        print row_str
     elif format == "VERTICAL":
-        format_vertical_list(sys.stdout, cur_table.get_col_names(col_metadata),
+        format_vertical_list(outfile, cur_table.get_col_names(col_metadata),
                              data_rows)
     elif format == "TAB":
-        format_tabular_list(sys.stdout, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
                             data_rows, first, '\t', not no_headers)
     elif format == "CSV":
-        format_tabular_list(sys.stdout, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
                             data_rows, first, ',', not no_headers)
     else:  # default to table format - header is always printed
-        format_tabular_list(sys.stdout, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
                             data_rows)
 
 
@@ -249,7 +261,8 @@ def export_data(src_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, no_header, display, format, and debug)
+                       skip_data, no_header, display, format, file_per_tbl,
+                       and debug)
 
     Returns bool True = success, False = error
     """
@@ -264,6 +277,7 @@ def export_data(src_val, db_list, options):
     single = options.get("single", False)
     skip_blobs = options.get("skip_blobs", False)
     silent = options.get("silent", False)
+    file_per_table = options.get("file_per_tbl", False)
     
     try:
         servers = connect_servers(src_val, None, silent, "5.1.30")
@@ -299,6 +313,8 @@ def export_data(src_val, db_list, options):
             if format == "SQL":
                 print "USE %s;" % db_name
             print "# Exporting data from %s" % db_name
+            if file_per_table:
+                print "# Writing table data to files."
         
         # Perform the extraction
         try:
@@ -317,12 +333,31 @@ def export_data(src_val, db_list, options):
                 else:
                     retrieval_mode = 1
                     first = False
-                print "# Data for table %s: " % tbl_name
+
+                message = "# Data for table %s: " % tbl_name
+
+                # switch for writing to files
+                if file_per_table:
+                    if format == "SQL" or format == "S":
+                        file_name = tbl_name + ".sql"
+                    else:
+                        file_name = tbl_name + ".%s" % format.lower()
+                    outfile = open(file_name, "w")
+                    outfile.write(message + "\n")
+                else:
+                    outfile = None
+                    print message
+
                 for data_rows in cur_table.retrieve_rows(retrieval_mode):
                     _export_row(data_rows, cur_table, col_metadata,
-                                format, single, skip_blobs, first, no_headers)
+                                format, single, skip_blobs, first, no_headers,
+                                outfile)
                     if first:
                         first = False
+
+                if file_per_table:
+                    outfile.close()
+
         except MySQLUtilError, e:
             raise e
             

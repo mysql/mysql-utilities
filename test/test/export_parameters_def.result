@@ -27,6 +27,8 @@ Options:
   -h, --no-headers      do not display the column headers - ignored for GRID
                         format
   --skip-blobs          Do not export blob data.
+  --file-per-table      Write table data to separate files. Valid only for
+                        --export=data or --export=both.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
