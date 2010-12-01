@@ -24,7 +24,7 @@ class test(import_basic.test):
         
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         try:
-            res = self.server2.read_and_exec_SQL(data_file, self.verbose)
+            res = self.server2.read_and_exec_SQL(data_file, self.debug)
         except MySQLUtilError, e:
             raise MUTException("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)

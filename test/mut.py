@@ -472,17 +472,24 @@ for root, dirs, files in os.walk(opt.testdir):
         # Include only tests that are .py files and ignore mut library files
         if ext == ".py" and fname != "__init__" and fname != "mutlib":
             test_ref = (directory, root, fname)
+
             # Do selective tests based on matches for --do-test=
-            if opt.wildcard:
-                if opt.wildcard == fname[0:len(opt.wildcard)]:
-                    test_files.append(test_ref)
-            elif opt.skip_tests:
-                if opt.skip_tests != fname[0:len(opt.skip_tests)]:
-                    test_files.append(test_ref)
-            # Add test if no wildcard and suite (dir) is included
+            # Don't execute performance tests unless specifically
+            # told to do so.
+            if (opt.suites is not None and "performance" not in opt.suites and \
+               directory == "performance") or (directory == "performance" \
+               and opt.suites is None):
+                pass
             else:
-                test_ref = (directory, root, fname)
-                test_files.append(test_ref)
+                if opt.wildcard:
+                    if opt.wildcard == fname[0:len(opt.wildcard)]:
+                        test_files.append(test_ref)
+                elif opt.skip_tests:
+                    if opt.skip_tests != fname[0:len(opt.skip_tests)]:
+                        test_files.append(test_ref)
+                # Add test if no wildcard and suite (dir) is included
+                else:
+                    test_files.append(test_ref)
 
 # If no tests, there's nothing to do!
 if len(test_files) == 0:

@@ -17,7 +17,7 @@ class test(mysql_test.System_test):
         data_file = self.testdir + "data/index_test.sql"
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+            res = self.server1.read_and_exec_SQL(data_file, self.debug)
         except MySQLUtilError, e:
             raise MUTException("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)

@@ -31,7 +31,7 @@ class test(mysql_test.System_test):
         self.drop_all()
         data_file = self.testdir + "/data/basic_users.sql"
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.verbose)
+            res = self.server1.read_and_exec_SQL(data_file, self.debug)
         except MySQLUtilError, e:
             raise MUTException("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
