@@ -12,12 +12,7 @@ class test(proc_grep.test):
     """
 
     def check_prerequisites(self):
-        # Need at least one server.
-        self.server1 = None
-        self.need_servers = False
-        if not self.check_num_servers(2):
-            self.need_servers = True
-        return self.check_num_servers(1)
+        return proc_grep.test.check_prerequisites(self)
 
     def setup(self):
         return proc_grep.test.setup(self)
@@ -36,7 +31,7 @@ class test(proc_grep.test):
 
         comment = "Test case 2 - do the SQL for a simple search"
         cmd_str = "mysqlprocgrep.py --sql "
-        cmd_str += "--match-user='%s' " % conn_val[0]
+        cmd_str += "--match-user=%s " % conn_val[0]
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)

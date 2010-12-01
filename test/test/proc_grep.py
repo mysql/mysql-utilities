@@ -10,9 +10,6 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
-        # Need non-Windows platform
-        if os.name == "nt":
-            raise MUTException("Test requires a non-Windows platform.")
         # Need at least one server.
         self.server1 = None
         self.need_servers = False
@@ -47,7 +44,7 @@ class test(mysql_test.System_test):
         conn_val = self.get_connection_values(self.server1)
         
         cmd = "mysqlprocgrep.py --server=%s " % from_conn
-        cmd += " --match-user='%s' " % conn_val[0]
+        cmd += " --match-user=%s " % conn_val[0]
         
         test_case_num = 1
         
@@ -65,16 +62,19 @@ class test(mysql_test.System_test):
         # CSV masks
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
         self.mask_column_result("root[...]", ",", 2, "XXXXX")
+        self.mask_column_result("root[...]", ",", 4, "localhost")
         self.mask_column_result("root[...]", ",", 7, "XXXXX")
 
         # TAB masks
         self.mask_column_result("root:*@localhost", "\t", 1, "root[...]")
         self.mask_column_result("root[...]", "\t", 2, "XXXXX")
+        self.mask_column_result("root[...]", "\t", 4, "localhost")
         self.mask_column_result("root[...]", "\t", 7, "XXXXX")
          
         # Vertical masks
         self.replace_result(" Connection: ", " Connection: XXXXX\n")
         self.replace_result("         Id: ", "         Id: XXXXX\n")
+        self.replace_result("       Host: ", "       Host: localhost\n")
         self.replace_result("       Time: ", "       Time: XXXXX\n")
         
         # Grid masks
@@ -82,6 +82,7 @@ class test(mysql_test.System_test):
         self.replace_result("+---", "+---+\n")
         self.mask_column_result("| root", "|", 2, " root[...]  ")
         self.mask_column_result("| root[...] ", "|", 3, " XXXXX ")
+        self.mask_column_result("| root[...] ", "|", 5, " localhost  ")
         self.mask_column_result("| root[...] ", "|", 8, " XXXXX ")
         self.replace_result("| Connection",
                             "| Connection | Id   | User | Host       "
