@@ -10,6 +10,9 @@ class test(mysql_test.System_test):
     """
 
     def check_prerequisites(self):
+        # Need non-Windows platform
+        if os.name == "nt":
+            raise MUTException("Test requires a non-Windows platform.")
         # Need at least one server.
         self.server1 = None
         self.need_servers = False
@@ -44,18 +47,46 @@ class test(mysql_test.System_test):
         conn_val = self.get_connection_values(self.server1)
         
         cmd = "mysqlprocgrep.py --server=%s " % from_conn
-       
-        comment = "Test case 1 - find processes for current user"
-        cmd += "--match-user='%s' " % conn_val[0]
-        res = self.run_test_case(0, cmd, comment)
-        if not res:
-            raise MUTException("%s: failed" % comment)
-            
-        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 3, "XXXXX ")
-        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 8, "XXX ")
-        #self.mask_column_result("| %s:*@" % conn_val[0], "|", 9, "XXXXX ")
-        #self.mask_result("| %s:*@" % conn_val[0], "| %s:*@" % conn_val[0],
-        #                 "| XXXXXXXXXXXXXXXXXXXXX")
+        cmd += " --match-user='%s' " % conn_val[0]
+        
+        test_case_num = 1
+        
+        _FORMATS = ("CSV","TAB","VERTICAL","GRID")
+        for format in _FORMATS:
+            comment = "Test case %d - find processes for current user" % \
+                      test_case_num + " format=%s" % format
+            test_case_num += 1
+            cmd += " --format=%s " % format
+            res = self.run_test_case(0, cmd, comment)
+            if not res:
+                raise MUTException("%s: failed" % comment)
+            self.results.append("\n")
+
+        # CSV masks
+        self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
+        self.mask_column_result("root[...]", ",", 2, "XXXXX")
+        self.mask_column_result("root[...]", ",", 7, "XXXXX")
+
+        # TAB masks
+        self.mask_column_result("root:*@localhost", "\t", 1, "root[...]")
+        self.mask_column_result("root[...]", "\t", 2, "XXXXX")
+        self.mask_column_result("root[...]", "\t", 7, "XXXXX")
+         
+        # Vertical masks
+        self.replace_result(" Connection: ", " Connection: XXXXX\n")
+        self.replace_result("         Id: ", "         Id: XXXXX\n")
+        self.replace_result("       Time: ", "       Time: XXXXX\n")
+        
+        # Grid masks
+        # Here, we truncate all horizontal bars for deterministic results
+        self.replace_result("+---", "+---+\n")
+        self.mask_column_result("| root", "|", 2, " root[...]  ")
+        self.mask_column_result("| root[...] ", "|", 3, " XXXXX ")
+        self.mask_column_result("| root[...] ", "|", 8, " XXXXX ")
+        self.replace_result("| Connection",
+                            "| Connection | Id   | User | Host       "
+                            "| Db    | Command  | Time  | State      "
+                            "| Info [...] |\n")
         
         return True
           

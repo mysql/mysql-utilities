@@ -12,7 +12,12 @@ class test(proc_grep.test):
     """
 
     def check_prerequisites(self):
-        return proc_grep.test.check_prerequisites(self)
+        # Need at least one server.
+        self.server1 = None
+        self.need_servers = False
+        if not self.check_num_servers(2):
+            self.need_servers = True
+        return self.check_num_servers(1)
 
     def setup(self):
         return proc_grep.test.setup(self)

@@ -20,6 +20,9 @@ Options:
   --kill-connection     Kill all matching connections.
   --kill-query          Kill query for all matching processes.
   --print               Print all matching processes.
+  -f FORMAT, --format=FORMAT
+                        display the output in either GRID (default), TAB, CSV,
+                        or VERTICAL format
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --match-user=PATTERN  Match the 'User' column of the PROCESSLIST table

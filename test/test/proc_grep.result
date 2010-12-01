@@ -1,12 +1,61 @@
-Test case 1 - find processes for current user
-+------------------------+--------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+
-| Connection             | Id     | User  | Host       | Db    | Command  | Time  | State      | Info                                                                                                                      |
-+------------------------+--------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+
-| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Query    |XXX |XXXXX | SELECT
+Test case 1 - find processes for current user format=CSV
+Connection,Id,User,Host,Db,Command,Time,State,Info
+root[...],XXXXX,root,localhost,,Query,XXXXX,executing,"SELECT
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST
+WHERE
+    User LIKE 'root'"
+root[...],XXXXX,root,localhost,,Sleep,XXXXX,,
+
+Test case 2 - find processes for current user format=TAB
+Connection	Id	User	Host	Db	Command	Time	State	Info
+root[...]
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST
+WHERE
+    User LIKE 'root'"
+root[...]
+
+Test case 3 - find processes for current user format=VERTICAL
+*************************       1. row *************************
+ Connection: XXXXX
+         Id: XXXXX
+       User: root
+       Host: localhost
+         Db: None
+    Command: Query
+       Time: XXXXX
+      State: executing
+       Info: SELECT
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST
+WHERE
+    User LIKE 'root'
+*************************       2. row *************************
+ Connection: XXXXX
+         Id: XXXXX
+       User: root
+       Host: localhost
+         Db: None
+    Command: Sleep
+       Time: XXXXX
+      State: 
+       Info: None
+2 rows.
+
+Test case 4 - find processes for current user format=GRID
++---+
+| Connection | Id   | User | Host       | Db    | Command  | Time  | State      | Info [...] |
++---+
+| root[...]  | XXXXX | root  | localhost  | None  | Query    | XXXXX | executing  | SELECT
   Id, User, Host, Db, Command, Time, State, Info
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
     User LIKE 'root'  |
-| XXXXXXXXXXXXXXXXXXXXX  |XXXXX | root  | localhost  | None  | Sleep    |XXX |XXXXX | None                                                                                                                      |
-+------------------------+--------+-------+------------+-------+----------+-------+------------+---------------------------------------------------------------------------------------------------------------------------+
+| root[...]  | XXXXX | root  | localhost  | None  | Sleep    | XXXXX |            | None                                                                                                                      |
++---+
+

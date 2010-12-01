@@ -52,6 +52,13 @@ parser.add_option(
     dest="actions", default=[],
     help="Print all matching processes.")
 
+# Output format
+parser.add_option(
+    "-f", "--format", 
+    action="store", dest="format", default="GRID",
+    help="display the output in either GRID (default), "
+    "TAB, CSV, or VERTICAL format")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -64,6 +71,15 @@ for col in USER, HOST, DB, COMMAND, INFO, STATE:
         help="Match the '{0}' column of the PROCESSLIST table".format(col))
 
 (options, args) = parser.parse_args()
+
+_PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
+
+if options.format.upper() not in _PERMITTED_FORMATS:
+    print "# WARNING : '%s' is not a valid output format. Using default." % \
+          options.format
+    options.format = "GRID"
+else:
+    options.format = options.format.upper()
 
 # Print SQL if only --sql-body is given
 if options.sql_body:
@@ -83,7 +99,7 @@ if options.print_sql:
     print command.sql(options.sql_body).strip()
 else:
     try:
-        command.execute(options.server)
+        command.execute(options.server, format=options.format)
     except (EmptyResultError) as details:
         print >>sys.stderr, "No matches"
         exit(1)
