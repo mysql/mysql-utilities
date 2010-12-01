@@ -629,12 +629,13 @@ class Table:
         # Now insert the blob data if there is any
         for blob_insert in blob_data:
             try:
-                res = dest.exec_query(blob_insert[0], blob_insert[1],
+                # Must convert blob data to a raw string for cursor to handle.
+                res = dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
                                       (), False, False)
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem updating blob field. "
                                      "Error = %s" % e.errmsg)
-        
+ 
         # Now, turn on foreign keys if they were on at the start
         if fkey_on:
             try:
