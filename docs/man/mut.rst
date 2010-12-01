@@ -39,6 +39,10 @@ For example, to execute all available tests using a mysql instance on the
 local machine with the root user, you can execute the following command::
 
   mut.py --server:root:xxxx@localhost:3306
+  
+The utility has a special test suite named 'performance' where performance
+related tests are placed. This suite is not included by default and must be
+specified with the --suite option to execute the tests.
 
 OPTIONS
 -------
