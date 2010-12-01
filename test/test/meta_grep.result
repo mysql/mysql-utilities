@@ -1,0 +1,64 @@
+Test case 1 - find objects simple search
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TABLE        | t1           | util_test  |
+| root[...]  | TABLE        | t2           | util_test  |
+| root[...]  | TABLE        | t3           | util_test  |
+| root[...]  | TABLE        | t4           | util_test  |
++---+
+
+Test case 2 - find objects name search
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TRIGGER      | trg          | util_test  |
+| root[...]  | TABLE        | t2           | util_test  |
++---+
+
+Test case 3 - find objects regexp search
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TRIGGER      | trg          | util_test  |
+| root[...]  | TABLE        | t2           | util_test  |
++---+
+
+Test case 4 - find objects regexp search with type 
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TABLE        | t2           | util_test  |
++---+
+
+Test case 5 - find objects  format=CSV
+Connection,Object Type,Object Name,Database
+root[...],TRIGGER,trg,util_test
+root[...],TABLE,t2,util_test
+
+Test case 6 - find objects  format=TAB
+Connection	Object Type	Object Name	Database
+root[...]
+root[...]
+
+Test case 7 - find objects  format=VERTICAL
+*************************       1. row *************************
+ Connection: XXXXX
+ Object Type: TRIGGER
+ Object Name: trg
+    Database: util_test
+*************************       2. row *************************
+ Connection: XXXXX
+ Object Type: TABLE
+ Object Name: t2
+    Database: util_test
+2 rows.
+
+Test case 8 - find objects  format=GRID
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TRIGGER      | trg          | util_test  |
+| root[...]  | TABLE        | t2           | util_test  |
++---+
+
