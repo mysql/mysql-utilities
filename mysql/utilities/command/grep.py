@@ -20,7 +20,7 @@ import sys
 import mysql.connector
 
 from ..common.options import parse_connection
-from ..common.format import format_tabular_list
+from ..common.format import format_tabular_list, format_vertical_list
 
 # Mapping database object to information schema names and fields. I
 # wish that the tables would have had simple names and not qualify the
@@ -209,9 +209,11 @@ class ObjectGrep(object):
     def sql(self):
         return self.__sql;
 
-    def execute(self, connections, output=sys.stdout, connector=mysql.connector):
+    def execute(self, connections, output=sys.stdout, connector=mysql.connector,
+                **kwrds):
         from mysql.utilities.exception import FormatError, EmptyResultError
 
+        format = kwrds.get('format', "GRID")
         entries = []
         for info in connections:
             conn = parse_connection(info)
@@ -219,7 +221,6 @@ class ObjectGrep(object):
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
             info = conn
-            print info
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)
@@ -227,8 +228,17 @@ class ObjectGrep(object):
 
         headers = ["Connection"]
         headers.extend(col[0].title() for col in cursor.description)
-        if len(entries) > 0:
-            format_tabular_list(output, headers, entries)
+        if len(entries) > 0 and output:
+            if format == "CSV":
+                format_tabular_list(output, headers, entries,
+                                    True, ',', True)
+            elif format == "TAB":
+                format_tabular_list(output, headers, entries,
+                                    True, '\t', True)
+            elif format == "VERTICAL":
+                format_vertical_list(output, headers, entries)
+            else: # Default is GRID
+                format_tabular_list(output, headers, entries)
         else:
             msg = "Nothing matches '%s' in any %s" % (self.__pattern, _join_words(self.__types, conjunction="or"))
             raise EmptyResultError(msg)

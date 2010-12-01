@@ -64,7 +64,23 @@ parser.add_option(
     dest="database_pattern", default=None,
     help="Only look at objects in databases matching this pattern")
 
+# Output format
+parser.add_option(
+    "-f", "--format", 
+    action="store", dest="format", default="GRID",
+    help="display the output in either GRID (default), "
+    "TAB, CSV, or VERTICAL format")
+
 options, args = parser.parse_args()
+
+_PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
+
+if options.format.upper() not in _PERMITTED_FORMATS:
+    print "# WARNING : '%s' is not a valid output format. Using default." % \
+          options.format
+    options.format = "GRID"
+else:
+    options.format = options.format.upper()
 
 _LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a
 connection specification. Use --pattern if this is really what you
@@ -92,6 +108,6 @@ try:
     if options.print_sql:
         print command.sql()
     else:
-        command.execute(options.server)
+        command.execute(options.server, format=options.format)
 except mysql.utilities.exception.Error as details:
     parser.error(details)

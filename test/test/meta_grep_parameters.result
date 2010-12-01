@@ -1,0 +1,124 @@
+Test case 1 - do the help
+Usage: mysqlmetagrep.py --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep - search metadata
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -b, --body            Search the body of routines, triggers, and events as
+                        well
+  --type=TYPES          Types to search: a comma-separated list of one or more
+                        of: 'database', 'trigger', 'user', 'routine',
+                        'column', 'table', 'partition', 'event', 'view'
+  -G, --basic-regexp, --regexp
+                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
+  -p, --print-sql, --sql
+                        Print the statement instead of sending it to the
+                        server
+  -e PATTERN, --pattern=PATTERN
+                        Pattern to use when matching. Required if the pattern
+                        looks like a connection specification.
+  --database=DATABASE_PATTERN
+                        Only look at objects in databases matching this
+                        pattern
+  -f FORMAT, --format=FORMAT
+                        display the output in either GRID (default), TAB, CSV,
+                        or VERTICAL format
+Test case 2 - do the SQL for a simple search
+
+  SELECT 
+    'SCHEMA' AS `Object Type`,
+    schema_name AS `Object Name`,
+    schema_name AS `Database`
+  FROM
+    information_schema.schemata
+  WHERE
+    schema_name REGEXP 't2'
+UNION
+  SELECT 
+    'TRIGGER' AS `Object Type`,
+    trigger_name AS `Object Name`,
+    trigger_schema AS `Database`
+  FROM
+    information_schema.triggers
+  WHERE
+    trigger_name REGEXP 't2' OR action_statement REGEXP 't2'
+UNION
+  SELECT DISTINCT
+    'USER' AS `Object Type`,
+    grantee AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.schema_privileges
+  WHERE
+    grantee REGEXP 't2' OR privilege_type REGEXP 't2'
+UNION
+  SELECT 
+    routine_type AS `Object Type`,
+    routine_name AS `Object Name`,
+    routine_schema AS `Database`
+  FROM
+    information_schema.routines
+  WHERE
+    routine_name REGEXP 't2' OR routine_body REGEXP 't2'
+UNION
+  SELECT 
+    'TABLE' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.columns
+  WHERE
+    column_name REGEXP 't2'
+UNION
+  SELECT 
+    'TABLE' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.tables
+  WHERE
+    table_name REGEXP 't2'
+UNION
+  SELECT 
+    'TABLE' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.partitions
+  WHERE
+    partition_name REGEXP 't2'
+UNION
+  SELECT 
+    'EVENT' AS `Object Type`,
+    event_name AS `Object Name`,
+    event_schema AS `Database`
+  FROM
+    information_schema.events
+  WHERE
+    event_name REGEXP 't2' OR event_body REGEXP 't2'
+UNION
+  SELECT 
+    'VIEW' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.views
+  WHERE
+    table_name REGEXP 't2'
+
+Test case 3 - do the SQL for a simple search with type
+
+  SELECT 
+    'TABLE' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`
+  FROM
+    information_schema.tables
+  WHERE
+    table_name REGEXP 't2'
+

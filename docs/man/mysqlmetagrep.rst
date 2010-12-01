@@ -74,6 +74,10 @@ Options
 .. option:: --database <pattern>
 
    Only look in databases matching this pattern.
+   
+.. option:: --format <format>, -f <format>
+
+   display the output in either GRID (default), TAB, CSV, or VERTICAL format
 
 .. option:: --version
 
