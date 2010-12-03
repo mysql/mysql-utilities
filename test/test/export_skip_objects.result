@@ -1,0 +1,154 @@
+Test case 1 - baseline
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+NAME
+p1
+# FUNCTIONS in util_test:
+NAME
+f1
+# EVENTS in util_test:
+NAME
+e1
+# GRANTS in util_test:
+GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
+'joe'@'user',ALTER,util_test,,,
+'joe'@'user',ALTER ROUTINE,util_test,,,
+'joe'@'user',CREATE,util_test,,,
+'joe'@'user',CREATE ROUTINE,util_test,,,
+'joe'@'user',CREATE TEMPORARY TABLES,util_test,,,
+'joe'@'user',CREATE VIEW,util_test,,,
+'joe'@'user',DELETE,util_test,,,
+'joe'@'user',DROP,util_test,,,
+'joe'@'user',EVENT,util_test,,,
+'joe'@'user',EXECUTE,util_test,,,
+'joe'@'user',INDEX,util_test,,,
+'joe'@'user',INSERT,util_test,,,
+'joe'@'user',LOCK TABLES,util_test,,,
+'joe'@'user',REFERENCES,util_test,,,
+'joe'@'user',SELECT,util_test,,,
+'joe'@'user',SHOW VIEW,util_test,,,
+'joe'@'user',TRIGGER,util_test,,,
+'joe'@'user',UPDATE,util_test,,,
+#...done.
+Test case 2 - no data,,grants
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+NAME
+p1
+# FUNCTIONS in util_test:
+NAME
+f1
+# EVENTS in util_test:
+NAME
+e1
+#...done.
+Test case 3 - no data,,grants,events
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+NAME
+p1
+# FUNCTIONS in util_test:
+NAME
+f1
+#...done.
+Test case 4 - no data,,grants,events,functions
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+# PROCEDURES in util_test:
+NAME
+p1
+#...done.
+Test case 5 - no data,,grants,events,functions,procedures
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+# TRIGGERS in util_test:
+TRIGGER_NAME
+trg
+#...done.
+Test case 6 - no data,,grants,events,functions,procedures,triggers
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+# VIEWS in util_test:
+TABLE_NAME
+v1
+#...done.
+Test case 7 - no data,,grants,events,functions,procedures,triggers,views
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_NAME
+t1
+t2
+t3
+t4
+#...done.
+Test case 8 - no data,,grants,events,functions,procedures,triggers,views,tables
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+#...done.
