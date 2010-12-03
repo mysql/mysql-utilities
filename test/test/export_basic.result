@@ -224,7 +224,7 @@ INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
-Test case 5 - export data and metadata with silent
+Test case 5 - export data and metadata with quiet
 DROP DATABASE IF EXISTS util_test;
 CREATE DATABASE util_test;
 USE util_test;

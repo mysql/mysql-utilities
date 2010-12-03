@@ -53,6 +53,7 @@ def export_metadata(src_val, db_list, options):
     no_headers = options.get("no_headers", False)
     column_type = options.get("display", "BRIEF")
     skip_create = options.get("skip_create", False)
+    quiet = options.get("quiet", False)
     silent = options.get("silent", False)
     skip_tables = options.get("skip_tables", False)
     skip_views = options.get("skip_views", False)
@@ -63,7 +64,7 @@ def export_metadata(src_val, db_list, options):
     skip_grants = options.get("skip_grants", False)
 
     try:
-        servers = connect_servers(src_val, None, silent, "5.1.30")
+        servers = connect_servers(src_val, None, quiet, "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -90,7 +91,7 @@ def export_metadata(src_val, db_list, options):
             raise MySQLUtilError("Source database does not exist - %s" %
                                  db_name)
 
-        if not silent:
+        if not quiet:
             print "# Exporting metadata from %s" % db_name
 
         # Perform the extraction
@@ -103,7 +104,7 @@ def export_metadata(src_val, db_list, options):
                 print "USE %s;" % db_name
                 for dbobj in db.get_next_object():
                     if dbobj[0] == "GRANT" and not skip_grants:
-                        if not silent:
+                        if not quiet:
                             print "# Grant:"
                         if dbobj[1][3]:
                             create_str = "GRANT %s ON %s.%s TO %s" % \
@@ -116,7 +117,7 @@ def export_metadata(src_val, db_list, options):
                             create_str = re.sub("%", "%%", create_str)
                         print create_str
                     else:
-                        if not silent:
+                        if not quiet:
                             print "# %s: %s.%s" % (dbobj[0], db_name,
                                                    dbobj[1][0])
                         if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
@@ -171,8 +172,9 @@ def export_metadata(src_val, db_list, options):
         except MySQLUtilError, e:
             raise e
 
-    if not silent:
+    if not quiet:
         print "#...done."
+
     return True
 
 
@@ -293,11 +295,11 @@ def export_data(src_val, db_list, options):
     column_type = options.get("display", "BRIEF")
     single = options.get("single", False)
     skip_blobs = options.get("skip_blobs", False)
-    silent = options.get("silent", False)
+    quiet = options.get("quiet", False)
     file_per_table = options.get("file_per_tbl", False)
 
     try:
-        servers = connect_servers(src_val, None, silent, "5.1.30")
+        servers = connect_servers(src_val, None, quiet, "5.1.30")
     except MySQLUtilError, e:
         raise e
 
@@ -326,7 +328,7 @@ def export_data(src_val, db_list, options):
             raise MySQLUtilError("Source database does not exist - %s" %
                                  db_name)
 
-        if not silent:
+        if not quiet:
             if format == "SQL":
                 print "USE %s;" % db_name
             print "# Exporting data from %s" % db_name
@@ -378,6 +380,7 @@ def export_data(src_val, db_list, options):
         except MySQLUtilError, e:
             raise e
 
-    if not silent:
+    if not quiet:
         print "#...done."
+
     return True

@@ -13,19 +13,21 @@ SYNOPSIS
  mut [[--help | --version ] | --verbose | --sorted | --record |
             --utildir=<path> | --width=<num> | --start-port=<num> |
             --testdir=<path> | --do-test=<prefix> | --force |
-            [ --server=<user:passwd@host:port:socket> |
-            [, --server=<user:passwd@host:port:socket> ] |
+            [ --server=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+            [, --server=<user>[<passwd>]@<host>:[<port>][:<socket>] ] |
             [ --suite=<suite> | [, --suite=<suite> ]] |
             [ --skip-suite=<suite> | [, --skip-suite=<suite> ]] |
               --skip-tests=<test_prefix> | --skip-long |
-            [ --skip-test=<test> | [, --skip-test=<test> ]] |
-            [ <test> | <suite>.<test> | [, <test> | <suite>.<test> ]]
+            [ --skip-test=<testname> | [, --skip-test=<testname> ]] |
+            [ <testname> | <suite>.<testname> |
+            [, <testname> | <suite>.<testname> ]]
 
 DESCRIPTION
 -----------
 
 This utility is designed to execute predefined tests to test the MySQL
-utilities.
+Utilities. The tests are divided into suites (stored as folders). By default,
+all tests located in the /test folder are considered the 'main' suite.
 
 You can select any number of tests to run, select one or more suites to
 restrict the tests, exclude suites and tests, and specify the location of
@@ -33,16 +35,11 @@ the utilities and tests.
 
 The utility requires the existance of at least one server with which to use to
 clone for testing purposes. You must specify at least one server, but you may
-specify multiple servers for tests designed to use existing servers.
+specify multiple servers for tests designed to use additional servers.
 
-For example, to execute all available tests using a mysql instance on the
-local machine with the root user, you can execute the following command::
-
-  mut.py --server:root:xxxx@localhost:3306
-  
 The utility has a special test suite named 'performance' where performance
 related tests are placed. This suite is not included by default and must be
-specified with the --suite option to execute the tests.
+specified with the --suite= option to execute the performance tests.
 
 OPTIONS
 -------
@@ -106,7 +103,7 @@ OPTIONS
 
 .. option:: --utildir <path>
 
-   Path to utility directory
+   location of utilities
 
 .. option:: --width <number>
 
@@ -128,6 +125,42 @@ NOTES
 
 The information specified for the server must be a valid login
 account.
+
+EXAMPLES
+--------
+
+The following example demonstrates how to use mut to execute a subset of the
+tests using an existing server which is cloned.::
+
+    $ python mut.py --server=root@localhost --do-tests=clone_user --width=70
+
+    MySQL Utilities Testing - MUT
+
+    Parameters used:
+      Display Width       = 70
+      Sorted              = True
+      Force               = False
+      Test directory      = './test'
+      Utilities directory = '../scripts'
+      Starting port       = 3310
+      Test wildcard       = 'clone_user%'
+
+    Servers:
+      Connecting to localhost as user root on port 3306: CONNECTED
+
+    ----------------------------------------------------------------------
+    TEST NAME                                                STATUS   TIME
+    ======================================================================
+    main.clone_user                                          [pass]     54
+    main.clone_user_errors                                   [pass]     27
+    main.clone_user_parameters                               [pass]     17
+    ----------------------------------------------------------------------
+    Testing completed: Friday 03 December 2010 09:50:06
+
+    All 3 tests passed.
+
+Notice in the example above the test name, status, and relative time is
+displayed.
 
 COPYRIGHT
 ---------

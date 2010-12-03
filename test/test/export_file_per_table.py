@@ -22,24 +22,24 @@ class test(export_parameters_def.test):
         except MUTException, e:
             raise e
         return True
-         
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-       
+
         from_conn = "--server=" + self.build_connection_string(self.server1)
-       
+
         try:
             self.server1.exec_query("CREATE DATABASE util_test_mt")
         except:
             raise MUTException("Cannot create database for test case 1.")
-       
+
         cmd_str = "mysqldbexport.py %s util_test_mt --export=definitions " \
                   "--file-per-table" % from_conn
         comment = "Test case 1 - warning: def only with --file-per-table"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-        
+
         try:
             self.server1.exec_query("DROP DATABASE util_test_mt")
         except:
@@ -48,9 +48,9 @@ class test(export_parameters_def.test):
         _FORMAT_DISPLAY = ("SQL","GRID","CSV","TAB","VERTICAL")
 
         cmd_str = "mysqldbexport.py util_test --export=data " \
-                  "--file-per-table %s --silent --format=" % from_conn
+                  "--file-per-table %s --quiet --format=" % from_conn
         starting_case_num = 2
- 
+
         for format in _FORMAT_DISPLAY:
             cmd_variant = cmd_str + format
             comment = "Test case %s - %s format with --file-per-table" % \
@@ -61,7 +61,7 @@ class test(export_parameters_def.test):
                 raise MUTException("%s: failed" % comment)
 
             # Now check the output for the correct files and delete them.
-            self.results.append("# Checking for file-per-table creation:\n")                 
+            self.results.append("# Checking for file-per-table creation:\n")
             for i in range(1,5):
                 file_name = "util_test.t%d.%s" % (i, format.lower())
                 if os.path.exists(file_name):
@@ -76,15 +76,12 @@ class test(export_parameters_def.test):
             self.results.append("\n")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return export_parameters_def.test.cleanup(self)
-
-
-

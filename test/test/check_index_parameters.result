@@ -64,7 +64,7 @@ Test case 4 - show drops for a table without dupe indexes
 # Table util_test_c.t6 is not indexed.
 #
 # ...done.
-Test case 5 - same as test case 2 but silent
+Test case 5 - same as test case 2 but quiet
 # Source on localhost: ... connected.
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
@@ -81,7 +81,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 ALTER TABLE util_test_a.t1 DROP INDEX s4;
 ALTER TABLE util_test_a.t1 DROP INDEX s2;
 #
-Test case 6 - same as test case 4 but silent
+Test case 6 - same as test case 4 but quiet
 # Source on localhost: ... connected.
 Test case 7 - show indexes
 # Source on localhost: ... connected.

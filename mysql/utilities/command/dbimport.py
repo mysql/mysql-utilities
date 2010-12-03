@@ -19,7 +19,7 @@
 """
 This file contains the import operations that will import object metadata or
 table data.
-""" 
+"""
 
 import csv
 import re
@@ -32,22 +32,22 @@ _DATA_DECORATE = "DATA FOR TABLE"
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
     "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 _IMPORT_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT,
-                _GRANT, _DATA_DECORATE]    
+                _GRANT, _DATA_DECORATE]
 _DEFINITION_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT]
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
-    
+
     This method reads the file attempting to read and translate the data
     based on the format specified.
-    
+
     file[in]          Opened file handle
     format[in]        One of SQL,CSV,TAB,GRID,or VERTICAL
     skip_comments[in] If True, do not return lines starting with '#'
-    
+
     Returns (tuple) - one row of data
     """
-    
+
     if format == "SQL":
         # Easiest - just read a row and return it.
         for row in file.readlines():
@@ -144,14 +144,14 @@ def _read_row(file, format, skip_comments=False):
                 if len(row[0]) == 0 or row[0][0] != '#' or \
                    row[0][0] == '#' and not skip_comments:
                     yield row
-        
+
 
 def _check_for_object_list(row, obj_type):
     """Check to see if object is in the list of valid objects.
- 
+
     row[in]           A row containing an object
     obj_type[in]      Object type to find
-    
+
     Returns (bool) - True = object is obj_type
                      False = object is not obj_type
     """
@@ -162,25 +162,25 @@ def _check_for_object_list(row, obj_type):
             return False
     else:
         return False
-    
-    
+
+
 def read_next(file, format, no_headers=False):
     """Read properly formatted import file and return the statements.
 
     This method reads the next object from the file returning a tuple
     containing the type of object - either a definition, SQL statment,
     or the beginning of data rows and the actual data from the file.
-    
+
     It uses the _read_row() method to read the file returning either
     a list of SQL commands (i.e. from a --format=SQL file) or a list
     of the data from the file (_read_row() converts all non-SQL formatted
     files into lists). This allows the caller to request an object block
     at a time from the file without knowing the format of the file.
-   
+
     file[in]          Opened file handle
     format[in]        One of SQL,CSV,TAB,GRID,or VERTICAL
     no_headers[in]    If True, file has headers (we skip them)
-    
+
     Returns (tuple) - ('SQL'|'DATA'|'BEGIN_DATA'|'<object>', <data read>)
     """
     cmd_type = ""
@@ -226,7 +226,7 @@ def read_next(file, format, no_headers=False):
         yield (cmd_type, sql_cmd) # need last row.
     else:
         table_rows = []
-        found_obj = ""    
+        found_obj = ""
         for row in _read_row(file, format, False):
             # Check to see if we have a marker for rows of objects or data
             for obj in _IMPORT_LIST:
@@ -253,14 +253,14 @@ def read_next(file, format, no_headers=False):
                 if len(row[0]) > 0 and row[0][0] == "#":
                     continue
                 else:
-                    yield (cmd_type, row)    
+                    yield (cmd_type, row)
         if row[0][0] != "#":
             yield (cmd_type, row)
 
 
 def _get_db(row):
     """Get the database name from the object.
-    
+
     row[in]           A row (list) of information from the file
 
     Returns (string) database name or None if not found
@@ -288,10 +288,10 @@ def _get_db(row):
 
 def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
     """Build the CREATE TABLE command for a table.
-    
+
     This method uses the data from the _read_next() method to build a
     table from its parts as read from a non-SQL formatted file.
-    
+
     db_name[in]       Database name for the object
     tbl_name[in]      Name of the table
     engine[in]        Storage engine name for the table
@@ -339,7 +339,7 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
         key_list = keys
         key_str = ",\n  KEY `%s` (" % cur_col[const_name_index]
         constraints.append((cur_col[const_name_index], cur_col[ref_tbl_index],
-                            cur_col[ref_col_index], cur_col[ref_col_ref])) 
+                            cur_col[ref_col_index], cur_col[ref_col_ref]))
     if len(key_str) > 0:
         stop = len(key_list)
         for key in range(0,stop):
@@ -361,9 +361,9 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
 
 def _build_column_ref(row):
     """Build a dictionary of column references
-    
+
     row[in]           The header with column names.
-    
+
     Returns (dictionary) where dict[col_name] = index position
     """
     indexes = { }
@@ -376,12 +376,12 @@ def _build_column_ref(row):
 
 def _build_create_objects(obj_type, db, definitions):
     """Build the CREATE and GRANT SQL statments for object definitions.
-    
+
     This method takes the object information read from the file using the
     _read_next() method and constructs SQL definition statements for each
     object. It receives a block of objects and creates a statement for
     each object.
-    
+
     obj_type[in]      The object type
     db[in]            The database
     definitions[in]   The list of object definition data from the file
@@ -434,7 +434,7 @@ def _build_create_objects(obj_type, db, definitions):
             create_str += "SQL SECURITY %s " % \
                           defn[col_ref.get("SECURITY_TYPE",3)]
             create_str += "VIEW `%s`.`%s` AS " % \
-                          (defn[col_ref.get("TABLE_SCHEMA",0)], 
+                          (defn[col_ref.get("TABLE_SCHEMA",0)],
                            defn[col_ref.get("TABLE_NAME",1)])
             create_str += "%s; " % defn[col_ref.get("VIEW_DEFINITION",4)]
             create_strings.append(create_str)
@@ -494,15 +494,15 @@ def _build_create_objects(obj_type, db, definitions):
         else:
             raise MySQLUtilError("Unknown object type discovered: %s", obj_type)
     return create_strings
-        
-        
+
+
 def _build_col_metadata(obj_type, definitions):
     """Build a list of column metadata for a table.
-    
+
     This method takes the object information read from the file using the
     _read_next() method and constructs a list of columns for any tables
     found.
-    
+
     obj_type[in]      The object type
     definitions[in]   The list of object definition data from the file
 
@@ -543,7 +543,7 @@ def _to_sql(obj):
     """Convert a value to a suitable SQL value placing quotes where needed.
 
     obj[in]           object (value) to convert
-    
+
     Returns (string) converted value
     """
     from mysql.connector.conversion import MySQLConverter
@@ -552,7 +552,7 @@ def _to_sql(obj):
 
 def _build_insert_data(col_names, tbl_name, data):
     """Build simple INSERT statements for data.
-    
+
     col_names[in]     A list of column names for the data
     tbl_name[in]      Table name
     data[in]          The data values
@@ -560,19 +560,19 @@ def _build_insert_data(col_names, tbl_name, data):
     Returns (string) the INSERT statement.
     """
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
-           ") VALUES (" + ','.join(imap(_to_sql, data))  + ");" 
+           ") VALUES (" + ','.join(imap(_to_sql, data))  + ");"
 
 
 def _skip_sql(sql, options):
     """Check to see if we skip this SQL statement
-    
+
     sql[in]           SQL statement to evaluate
     options[in]       Option dictionary containing the --skip_* options
 
     Returns (bool) True - skip the statement, False - do not skip
     """
 
-    prefix = sql[0:100].upper().strip()    
+    prefix = sql[0:100].upper().strip()
     if prefix[0:len("CREATE")] == "CREATE":
         # need to test for tables, views, events, triggers, proc, func, db
         index = sql.find(" TABLE ")
@@ -613,7 +613,7 @@ def _skip_sql(sql, options):
 
 def _skip_object(obj_type, options):
     """Check to see if we skip this object type
-    
+
     obj_type[in]      Type of object for the --skip_* option
                       (e.g. "tables", "data", "views", etc.)
     options[in]       Option dictionary containing the --skip_* options
@@ -643,17 +643,17 @@ def _skip_object(obj_type, options):
         return options.get("skip_blobs", False)
     else:
         return False
-    
+
 
 def _exec_statements(statements, destination, format, options, dryrun=False):
     """Execute a list of SQL statements
-    
+
     statements[in]    A list of SQL statements to execute
     destination[in]   A connection to the destination server
     format[in]        Format of import file
     options[in]       Option dictionary containing the --skip_* options
     dryrun[in]        If True, print the SQL statements and do not execute
-    
+
     Returns (bool) - True if all execute, raises error if one fails
     """
     for statement in statements:
@@ -689,21 +689,21 @@ def _get_column_metadata(tbl_class, table_col_list):
 
 def import_file(dest_val, file_name, options):
     """Import a file
-    
+
     This method reads a file and, if needed, transforms the file into
     discrete SQL statements for execution on the destination server.
-    
+
     It accepts any of the formal structured files produced by the
     mysqlexport utility including formats SQL, CSV, TAB, GRID, and
     VERTICAL.
-    
+
     It will read these files and skip or include the definitions or data
     as specified in the options. An error is raised for any conversion
     errors or errors while executing the statements.
-    
+
     Users are highly encouraged to use the --dryrun option which will
     print the SQL statements without executing them.
-    
+
     dest_val[in]       a dictionary containing connection information for the
                        destination including:
                        (user, password, host, port, socket)
@@ -715,12 +715,12 @@ def import_file(dest_val, file_name, options):
 
     Returns bool True = success, False = error
     """
-    
+
     from mysql.utilities.common.database import Database
     from mysql.utilities.common.table import Table
     from mysql.utilities.common.server import connect_servers
 
-    # Helper method to dig through the definitions for create statements    
+    # Helper method to dig through the definitions for create statements
     def _process_definitions(statements, table_col_list, db_name):
         # First, get the SQL strings
         sql_strs = _build_create_objects(obj_type, db_name, definitions)
@@ -729,7 +729,7 @@ def import_file(dest_val, file_name, options):
         col_list = _build_col_metadata(obj_type, definitions)
         if len(col_list) > 0:
             table_col_list.extend(col_list)
-                
+
     def _process_data(tbl_name, statements, columns,
                       table_col_list, table_rows, skip_blobs):
         # if there is data here, build bulk inserts
@@ -757,22 +757,22 @@ def import_file(dest_val, file_name, options):
     # Gather options
     format = options.get("format", "SQL").upper()
     no_headers = options.get("no_headers", False)
-    silent = options.get("silent", False)
+    quiet = options.get("quiet", False)
     import_type = options.get("import_type", "DEFINITIONS").upper()
     single = options.get("single", True)
     dryrun = options.get("dryrun", False)
     do_drop = options.get("do_drop", False)
     skip_blobs = options.get("skip_blobs", False)
-    
+
     # Attempt to connect to the destination server
     try:
-        servers = connect_servers(dest_val, None, silent, "5.1.30")
+        servers = connect_servers(dest_val, None, quiet, "5.1.30")
     except MySQLUtilError, e:
         raise e
 
     destination = servers[0]
 
-    if not silent:
+    if not quiet:
         if import_type == "BOTH":
             str = "definitions and data"
         else:
@@ -795,7 +795,7 @@ def import_file(dest_val, file_name, options):
     statements = []
     table_col_list = []
     tbl_name = ""
-    
+
     # Read the file one object/definition group at a time
     for row in read_next(file, format.upper()):
         # If this is the first pass, get the database name from the file
@@ -811,7 +811,7 @@ def import_file(dest_val, file_name, options):
                 if import_type != "DATA":
                     if not _skip_object("CREATE_DB", options):
                         statements.append("CREATE DATABASE `%s`;" % db_name)
-                
+
         # This is the first time through the loop so we must
         # check user permissions on source for all databases
         if db_name is not None:
@@ -830,7 +830,7 @@ def import_file(dest_val, file_name, options):
             if format != "SQL" and len(row[1]) == 1:
                 raise MySQLUtilError("Cannot read an import file "
                                       "generated with --display=NAMES")
-                
+
             if import_type == "DEFINITIONS" or import_type == "BOTH":
                 if format == "SQL":
                     statements.append(row[1])
@@ -844,13 +844,13 @@ def import_file(dest_val, file_name, options):
                         obj_type = row[0]
                         definitions = []
                     if not _skip_object(row[0], options):
-                        definitions.append(row[1]) 
+                        definitions.append(row[1])
         else:
             # see if there are any definitions to process
             if len(definitions) > 0:
                 _process_definitions(statements, table_col_list, db_name)
                 definitions = []
-                
+
             if import_type == "DATA" or import_type == "BOTH":
                 if _skip_object("DATA", options):
                     continue  # skip data
@@ -882,16 +882,15 @@ def import_file(dest_val, file_name, options):
         _process_data(tbl_name, statements, columns,
                       table_col_list, table_rows, skip_blobs)
         table_rows = []
-        
-    # Now process the statements                            
+
+    # Now process the statements
     try:
         _exec_statements(statements, destination, format, options, dryrun)
     except MySQLUtilError, e:
         raise e
-    
+
     file.close()
-    
-    if not silent:
+
+    if not quiet:
         print "#...done."
     return True
-

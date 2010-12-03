@@ -58,18 +58,18 @@ START_PORT = 3310
 def _check_for_running_servers(start_port):
     """Check to see if there are any servers running from the test
     directory.
-    
+
     start_port[in]      The starting port number for spawned servers
 
     This method uses ps for posix systems and netstat for Windows machines
     to determine the list of running servers.
-    
+
     For posix, it matches on the datadir and if datadir is the path for the
     test directory, the server will be added to the list.
-    
+
     For nt, it matches on the port in the range starting_port,
     starting_port + 10.
-    
+
     Returns list - tuples of the form: (process_id, [datadir|port])
     """
     datadir = os.getcwd()
@@ -115,10 +115,10 @@ def _shutdown_running_servers(server_list, processes, basedir):
     Returns bool - True - servers shutdown attempted
                    False - no servers to shutdown
     """
-    
+
     if len(processes) < 1:
         return False
-    for process in processes:        
+    for process in processes:
         datadir = os.getcwd()
         connection = {
             "user"   : "root",
@@ -139,7 +139,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
             svr.connect()
         except:  # if we cannot connect, don't try to shut it down.
             ok_to_shutdown = False
-            
+
         # 2) if nt, verify datadirectory
         if os.name == "nt":
             res = svr.show_server_variable("datadir")
@@ -153,7 +153,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
                        (int(process[0]), process[1])
             elif os.name == "nt":
                 print "  Process id: %6d, Port: %s" % \
-                       (int(process[0]), process[1])            
+                       (int(process[0]), process[1])
             try:
                 server_list.stop_server(svr)
             except:
@@ -163,7 +163,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
 # Utility function
 def _print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
-    
+
     start_test[in]      The starting time of the test
     """
     stop_test = time.time()
@@ -175,7 +175,7 @@ def _print_elapsed_time(start_test):
 # Utility function
 def _report_error(message, test_name, mode, start_test, error=True):
     """ Print an error message to stdout (screen)
-    
+
     message[in]         Error message to print
     test_name[in]       The name of the current test
     mode[in]            Event mode (PASS, FAIL, WARN, etc)
@@ -187,12 +187,12 @@ def _report_error(message, test_name, mode, start_test, error=True):
     sys.stdout.write("[%s%s%s]" % (BOLD_ON, mode, BOLD_OFF))
     stop_test = time.time()
     _print_elapsed_time(start_test)
-    if error:   
+    if error:
         fishy = "ERROR"
     else:
         fishy = "WARNING"
     print "\n%s%s%s: %s\n" % (BOLD_ON, fishy, BOLD_OFF, message)
-    failed_tests.append(test)    
+    failed_tests.append(test)
 
 # Helper method to manage exception handling
 def _exec_and_report(procedure, default_message, test_name, action,
@@ -290,7 +290,7 @@ parser.add_option("--sorted", action="store_true", dest="sorted",
 
 # Add utility directory option
 parser.add_option("--utildir", action="store", dest="utildir",
-                  type = "string", help="path to utility directory",
+                  type = "string", help="location of utilities",
                   default=UTIL_PATH)
 
 # Add display width option
@@ -323,11 +323,11 @@ if debug_mode and len(args) > 1:
 # Must use --record with a specific test
 if opt.record and len(args) != 1:
     parser.error("Must specify a single test when using record.")
-    
+
 # Append default paths if options not specified
 sys.path.append(opt.testdir)
 sys.path.append(opt.utildir)
-    
+
 # Process the server connections
 
 # Print preamble
@@ -345,15 +345,15 @@ if opt.suites:
     sys.stdout.write("  Include only suites = ")
     for suite in opt.suites:
         sys.stdout.write("%s " % (suite))
-    print 
+    print
 
 # Check to see if we're skipping suites
 if opt.skip_suites:
     sys.stdout.write("  Exclude suites      = ")
     for suite in opt.skip_suites:
         sys.stdout.write("%s " % (suite))
-    print 
-    
+    print
+
 # Is there a --do-test?
 if opt.wildcard:
     print "  Test wildcard       = '%s%%'" % opt.wildcard
@@ -364,16 +364,16 @@ if opt.skip_test:
     for test in opt.skip_test:
         sys.stdout.write("%s " % (test))
     print
-    
+
 if opt.skip_tests:
     print "  Skip wildcard       = '%s%%'" % opt.skip_tests
-     
+
 if opt.start_test:
     print "  Start test sequence = '%s%%'" % opt.start_test
     start_sequence = True
 else:
     start_sequence = False
-     
+
 server_list = Server_list([], opt.start_port, opt.utildir, verbose_mode)
 basedir = None
 
@@ -389,13 +389,13 @@ else:
         except:
             parser.error("Problem parsing server connection '%s'" % server)
 
-        i += 1   
+        i += 1
         # Fail if port and socket are both None
         if conn_val["port"] is None and conn_val["unix_socket"] is None:
             parser.error("You must specify either a port or a socket " \
                   "in the server string: \n       %s" % server)
 
-        sys.stdout.write("  Connecting to %s as user %s on port %s: " % 
+        sys.stdout.write("  Connecting to %s as user %s on port %s: " %
                          (conn_val["host"], conn_val["user"],
                           conn_val["port"]))
         sys.stdout.flush()
@@ -404,7 +404,7 @@ else:
             conn_val["port"] = int(conn_val["port"])
         else:
             conn_val["port"] = 0
-            
+
         conn = Server(conn_val, "server%d" % i)
         try:
             conn.connect()
@@ -425,15 +425,15 @@ else:
 # Check for running servers
 processes = []
 if server_list.num_servers():
-    processes = _check_for_running_servers(opt.start_port)            
+    processes = _check_for_running_servers(opt.start_port)
 
 # Kill any servers running from the test directory
 if len(processes) > 0:
     print
     print "WARNING: There are existing servers running that may have been\n" \
           "spawned by an earlier execution. Attempting shutdown.\n"
-    _shutdown_running_servers(server_list, processes, basedir)                
-    
+    _shutdown_running_servers(server_list, processes, basedir)
+
 test_files = []
 failed_tests = []
 
@@ -450,25 +450,25 @@ for root, dirs, files in os.walk(opt.testdir):
                 continue
         if directory == "":
             directory = "main"
-            
+
         # Get file and extension
         fname, ext = os.path.splitext(f)
-        
+
         # Check for suite.test as well as simply test
         if args and fname not in args and directory + "." + fname not in args:
             continue
-        
+
         # See if test is to be skipped
         if opt.skip_test:
             if fname in opt.skip_test or \
                directory + "." + fname in opt.skip_test:
                 continue
-            
+
         # See if suite is to be skipped
         if opt.skip_suites:
             if directory in opt.skip_suites:
                 continue
-            
+
         # Include only tests that are .py files and ignore mut library files
         if ext == ".py" and fname != "__init__" and fname != "mutlib":
             test_ref = (directory, root, fname)
@@ -494,7 +494,7 @@ for root, dirs, files in os.walk(opt.testdir):
 # If no tests, there's nothing to do!
 if len(test_files) == 0:
     print "No tests match criteria specified."
-            
+
 # Sort test cases if option turned on
 if opt.sorted:
     test_files.sort()
@@ -517,21 +517,21 @@ have_disabled = len(disable_list)
 
 # Print header
 print "\n" + "-" * opt.width
-print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME" 
+print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME"
 print "=" * opt.width
 
 # Run the tests selected
 num_tests_run = 0
 last_test = None
 for test_tuple in test_files:
-    
+
     # Skip tests for start-test sequence
     if start_sequence:
         if opt.start_test == test_tuple[2][0:len(opt.start_test)]:
             start_sequence = False
         else:
             continue
-        
+
     # Get test parts - directory not used
     test = test_tuple[2]
     test_name = ""
@@ -544,21 +544,21 @@ for test_tuple in test_files:
     else:
         test_name = "main"
     test_name += "." + test
-        
+
     # record start time
     start_test = time.time()
-    
+
     # Create a reference to the test class
     test_class = __import__(test)
     test_case = test_class.test(server_list,
                                 opt.testdir + "/" + test_suite,
                                 opt.utildir, verbose_mode, debug_mode)
-    
+
     last_test = test_case
     # Print name of the test
     sys.stdout.write(test_name)
     sys.stdout.flush()
-    
+
     # Skip disabled tests
     if have_disabled > 0 and not opt.force:
         skipped = False
@@ -575,7 +575,7 @@ for test_tuple in test_files:
         _report_error("Test marked as long running test.", test_name,
                       "SKIP", start_test, False)
         continue
-    
+
     # Check prerequisites for number of servers. Skip test is there are not
     # enough servers to connect.
     if not _exec_and_report(test_case.check_prerequisites,
@@ -588,7 +588,7 @@ for test_tuple in test_files:
                            "Cannot establish setup conditions to run test.",
                            test_name, "SKIP", start_test, test_case.cleanup):
         continue
-    
+
     # Run the test
     run_ok = True
     results = None
@@ -602,12 +602,12 @@ for test_tuple in test_files:
         else:
             run_msg = e.errmsg
             run_ok = False
-        
+
     if run_ok:
         # Calculate number of spaces based on test name
         linelen = opt.width - (len(test_name) + 13)
         sys.stdout.write(' ' * linelen)
-        
+
         # Record results of test
         if opt.record:
             sys.stdout.write("RECORD")
@@ -618,7 +618,7 @@ for test_tuple in test_files:
             if not res:
                 sys.stdout.write("  %sWARNING%s: Test record failed." % \
                       (BOLD_ON, BOLD_OFF))
-                
+
         elif debug_mode:
             print "\nEnd debug results.\n"
 
@@ -635,17 +635,17 @@ for test_tuple in test_files:
                 results = (False, ("Test results cannot be established.\n",
                                    e.errmsg + "\n"))
                 msg = e.errmsg
-                
+
             if results[0] == False:
                 sys.stdout.write("[%sFAIL%s]\n" % (BOLD_ON, BOLD_OFF))
                 run_ok = False
                 failed_tests.append(test)
-                
+
     else:
         _report_error("Test execution failed.", test_name, "FAIL", start_test)
         print "%s\n" % run_msg
         run_ok = False
-                            
+
     # Cleanup the database settings if needed
     test_cleanup_ok = True
     cleanup_msg = None
@@ -661,23 +661,23 @@ for test_tuple in test_files:
 
     # Display warning about cleanup
     if not test_cleanup_ok:
-        print "\n%sWARNING%s: Test cleanup failed." % (BOLD_ON, BOLD_OFF) 
+        print "\n%sWARNING%s: Test cleanup failed." % (BOLD_ON, BOLD_OFF)
         if cleanup_msg is not None:
             print "%s\n" % cleanup_msg
 
     if results is not None and results[1]:
-        sys.stdout.write("\n%sERROR:%s " % (BOLD_ON, BOLD_OFF))    
+        sys.stdout.write("\n%sERROR:%s " % (BOLD_ON, BOLD_OFF))
         for str in results[1]:
             sys.stdout.write(str)
-        sys.stdout.write("\n")    
-    
+        sys.stdout.write("\n")
+
     if verbose_mode:
         print test_case.__doc__
 
     # Check force option
     if not run_ok and not opt.force:
         break
-        
+
 # Print postamble
 print "-" * opt.width
 print datetime.datetime.now().strftime("Testing completed: "
@@ -701,7 +701,7 @@ if server_list.num_spawned_servers():
     server_list.shutdown_spawned_servers()
 
 del server_list
-        
+
 sys.stdout.write("\n")
 
 exit(0)

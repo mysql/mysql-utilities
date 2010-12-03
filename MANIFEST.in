@@ -1,4 +1,0 @@
-include *.txt
-recursive-include tests *.py
-recursive-include man *.rst
-prune dist

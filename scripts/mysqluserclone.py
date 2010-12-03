@@ -58,7 +58,7 @@ parser.add_option("--source", action="store", dest="source",
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
-                  type = "string", 
+                  type = "string",
                   help="connection information for destination server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
@@ -89,23 +89,23 @@ parser.add_option("--list", action="store_true", dest="list_users",
 
 # format for list
 parser.add_option("--format", action="store", dest="list_format",
-                  default="GRID", help="display the list of users in either " 
+                  default="GRID", help="display the list of users in either "
                   "GRID (default), TAB, CSV, or VERTICAL format - valid "
                   "only for --list option")
 
-# Add verbosity and silent mode
+# Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
 # Now we process the rest of the arguments where the first is the
 # base user and the next N are the new users.
 opt, args = parser.parse_args()
 
-# Fail if dump and silent set
-if opt.silent and opt.dump:
-    parser.error("You cannot use --silent and --dump together.")
+# Fail if dump and quiet set
+if opt.quiet and opt.dump:
+    parser.error("You cannot use --quiet and --dump together.")
 
-# Warn if silent and verbosity are both specified
-check_verbosity(opt)    
+# Warn if quiet and verbosity are both specified
+check_verbosity(opt)
 
 # Fail if no arguments and no options.
 if (len(args) == 0 or opt is None) and not opt.list_users:
@@ -119,7 +119,7 @@ except:
 
 if opt.list_users:
     PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
-    
+
     if opt.list_format.upper() not in PERMITTED_FORMATS:
         print "WARNING : '%s' is not a valid list format. Using default." % \
               opt.list_format
@@ -132,10 +132,10 @@ else:
     # Make sure we have the base user plus at least one new user
     if len(args) < 2 and not opt.dump:
         parser.error("Wrong parameter combination or no new users.")
-    
+
     base_user = args[0]
     new_user_list = args[1:]
-    
+
     # Parse destination connection values if not dumping
     if not opt.dump:
         try:
@@ -145,22 +145,22 @@ else:
                          "be parsed.")
     else:
         dest_values = None
-    
+
     # Build dictionary of options
     options = {
         "dump"         : opt.dump,
         "copy_dir"     : opt.copy_dir,
         "overwrite"    : opt.overwrite,
-        "silent"       : opt.silent,
+        "quiet"        : opt.quiet,
         "verbosity"    : opt.verbosity,
         "global_privs" : opt.global_privs
     }
-    
+
     try:
         res = userclone.clone_user(source_values, dest_values, base_user,
                                    new_user_list, options)
     except MySQLUtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
-    
+
 exit()

@@ -1,1 +1,1 @@
-v0.1.0 2010-08-16 -- Initial release
+v1.0.0 2010-12-08 -- Initial release

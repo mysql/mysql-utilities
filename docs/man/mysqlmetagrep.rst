@@ -7,7 +7,10 @@
 SYNOPSIS
 --------
 
-  mysqlmetagrep [ <options> ] --pattern=<pattern> --server=user:pass@host:port:socket ...
+  mysqlmetagrep [ --version | --help ] | --format=<format> |
+                --body | --types<object types> | --regexp | --sql |
+                --database=<pattern> | --pattern=<pattern>
+                --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
 
 DESCRIPTION
 -----------
@@ -34,7 +37,24 @@ operator instead by using the :option:`--regexp` option.
 
 Note that since the **REGEXP** operator does a substring searching, it
 is necessary to anchor the expression to the beginning of the string
-if you want to match the beginning of the string. 
+if you want to match the beginning of the string.
+
+You also have the choice to view the output in one of the following
+formats using the :option:`--format` option.
+
+**GRID**
+  Displays output formatted like that of the mysql monitor in a grid
+  or table layout. This is the default.
+
+**CSV**
+  Displays the output in a comma-separated list.
+
+**TAB**
+  Displays the output in a tab-separated list.
+
+**VERTICAL**
+  Displays the output in a single column similar to the ``\G`` option
+  for the mysql monitor commands.
 
 Options
 -------
@@ -44,7 +64,7 @@ Options
    Only search for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
-  
+
    Default is to search for/in all kinds of types.
 
 .. option:: --body, -b
@@ -74,7 +94,7 @@ Options
 .. option:: --database <pattern>
 
    Only look in databases matching this pattern.
-   
+
 .. option:: --format <format>, -f <format>
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format

@@ -19,20 +19,20 @@
 """
 This file contains the copy database operation which ensures a database
 is exactly the same among two servers.
-""" 
+"""
 
 import sys
 from mysql.utilities.exception import MySQLUtilError
 
 def copy_db(src_val, dest_val, db_list, options):
     """ Copy a database
-    
+
     This method will copy a database and all of its objects and data from
     one server (source) to another (destination). Options are available to
     selectively ignore each type of object. The force parameter is
     used to permit the copy to overwrite an existing destination database
     (default is to not overwrite).
-    
+
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -42,25 +42,25 @@ def copy_db(src_val, dest_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, copy_dir, verbose, force, silent,
+                       skip_data, copy_dir, verbose, force, quiet,
                        connections, and debug)
 
     Notes:
         copy_dir - a directory to use for temporary files (default is None)
         force    - if True, the database on the destination will be dropped
                    if it exists (default is False)
-        silent   - do not print any information during operation 
+        quiet    - do not print any information during operation
                    (default is False)
-                       
+
     Returns bool True = success, False = error
     """
-    
+
     from mysql.utilities.common.database import Database
     from mysql.utilities.common.server import connect_servers
-    
+
     try:
         servers = connect_servers(src_val, dest_val,
-                                  options.get("silent", False), "5.1.30")
+                                  options.get("quiet", False), "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -69,7 +69,7 @@ def copy_db(src_val, dest_val, db_list, options):
     destination = servers[1]
 
     cloning = (src_val == dest_val) or dest_val is None
-                            
+
     # Check user permissions on source and destination for all databases
     for db_name in db_list:
         try:
@@ -97,7 +97,7 @@ def copy_db(src_val, dest_val, db_list, options):
                                        options.get("skip_grants", False))
         except MySQLUtilError, e:
             raise e
-            
+
     for db_name in db_list:
 
         # Error is source db and destination db are the same and we're cloning
@@ -105,17 +105,17 @@ def copy_db(src_val, dest_val, db_list, options):
             raise MySQLUtilError("Destination database name is same as "
                                  "source - source = %s, destinion = %s" %
                                  (db_name[0], db_name[1]))
-    
+
         # Display copy message
-        if not options.get("silent", False):
+        if not options.get("quiet", False):
             msg = "# Copying database %s " % db_name[0]
             if db_name[1]:
                 msg += "renamed as %s" % (db_name[1])
             print msg
-        
+
         # Get a Database class instance
         db = Database(source, db_name[0], options)
-        
+
         # Error is source database does not exist
         if not db.exists():
             raise MySQLUtilError("Source database does not exist - %s" %
@@ -128,7 +128,7 @@ def copy_db(src_val, dest_val, db_list, options):
                     options.get("threads", False))
         except MySQLUtilError, e:
             raise e
-            
-    if not options.get("silent", False):
+
+    if not options.get("quiet", False):
         print "#...done."
     return True

@@ -27,7 +27,7 @@ from mysql.utilities.exception import MySQLUtilError
 
 def show_users(src_val, verbosity, format):
     """Show all users except root and anonymous users on the server.
-    
+
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -48,14 +48,14 @@ def show_users(src_val, verbosity, format):
 
     if verbosity <= 1:
         _QUERY = """
-            SELECT user, host FROM mysql.user 
+            SELECT user, host FROM mysql.user
             WHERE user != 'root' and user != ''
         """
         cols = ("user", "host")
     else:
         _QUERY = """
             SELECT user.user, user.host, db FROM mysql.user LEFT JOIN mysql.db
-            ON user.user = db.user AND user.host = db.host 
+            ON user.user = db.user AND user.host = db.host
             WHERE user.user != 'root' and user.user != ''
         """
         cols = ("user", "host", "database")
@@ -70,21 +70,21 @@ def show_users(src_val, verbosity, format):
         format_vertical_list(sys.stdout, cols, users)
     else:  # default to table format
         format_tabular_list(sys.stdout, cols, users, True, None)
-    
+
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
     """ Clone a user to one or more new user accounts
-    
+
     This method will create one or more new user accounts copying the
     grant statements from a given user. If source and destination are the
     same, the copy will occur on a single server otherwise, the caller may
     specify a destination server to where the user accounts will be copied.
-    
+
     NOTES:
     The user is responsible for making sure the databases and objects
     referenced in the cloned GRANT statements exist prior to running this
     utility.
-    
+
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -100,10 +100,10 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
                                     (no new users are created)
                          force    - drop new users if they exist
                          verbosity - print add'l information during operation
-                         silent   - do not print information during operation
-                                    Note: Error messages are printed regardless
-                         global_privs - include global privileges (i.e. user@%) 
-                       
+                         quiet   - do not print information during operation
+                                   Note: Error messages are printed regardless
+                         global_privs - include global privileges (i.e. user@%)
+
     Returns bool True = success, raises MySQLUtilError if error
     """
 
@@ -114,15 +114,15 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     copy_dir = options.get("copy_dir", False)
     overwrite = options.get("overwrite", False)
     verbosity = options.get("verbosity", False)
-    silent = options.get("silent", False)
+    quiet = options.get("quiet", False)
     global_privs = options.get("global_privs", False)
 
     try:
         # Don't require destination for dumping base user grants
         if dump_sql:
-            servers = connect_servers(src_val, None, silent, "5.1.0")
+            servers = connect_servers(src_val, None, quiet, "5.1.0")
         else:
-            servers = connect_servers(src_val, dest_val, silent, "5.1.0")
+            servers = connect_servers(src_val, dest_val, quiet, "5.1.0")
     except MySQLUtilError, e:
         raise e
 
@@ -130,36 +130,36 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     destination = servers[1]
     if destination is None:
         destination = servers[0]
-    
+
     # Create an instance of the user class for source.
     user_source = User(source, base_user, verbosity >= 1)
 
     # Create an instance of the user class for destination.
     user_dest = User(destination, base_user, verbosity >= 1)
-    
+
     # Check to ensure base user exists.
     if not user_source.exists(base_user):
         raise MySQLUtilError("Base user does not exist!")
 
     # Process dump operation
-    if dump_sql and not silent:
+    if dump_sql and not quiet:
         print "Dumping grants for user " + base_user
         user_source.print_grants()
         return True
-    
+
     # Check to ensure new users don't exist.
     if overwrite is None:
         for new_user in new_user_list:
             if user_dest.exists(new_user):
                 raise MySQLUtilError("User %s already exists. Use --force "
                       "to drop and recreate user." % new_user)
-    
-    if not silent:
+
+    if not quiet:
         print "# Cloning %d users..." % (len(new_user_list))
-    
+
     # Perform the clone here. Loop through new users and clone.
     for new_user in new_user_list:
-        if not silent:
+        if not quiet:
             print "# Cloning %s to user %s " % (base_user, new_user)
         # Check to see if user exists.
         if user_dest.exists(new_user):
@@ -170,7 +170,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         except MySQLUtilError, e:
             raise
 
-    if not silent:    
+    if not quiet:
         print "# ...done."
 
     return True

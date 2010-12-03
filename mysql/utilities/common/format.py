@@ -27,46 +27,46 @@ METHODS
 import csv
 import os
 
-def _format_col_separator(file, columns, col_widths, silent=False):
+def _format_col_separator(file, columns, col_widths, quiet=False):
     """Format a row of the header with column separators
 
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     col_widths[in]     width of each column
-    silent[in]         if True, do not print
+    quiet[in]          if True, do not print
     """
-    if silent:
+    if quiet:
         return
     stop = len(columns)
     for i in range(0, stop):
         width = int(col_widths[i]+2)
-        file.write('{0}{1:{1}<{2}}'.format("+", "-", width)) 
+        file.write('{0}{1:{1}<{2}}'.format("+", "-", width))
     file.write("+\n")
-    
-def _format_row_separator(file, columns, col_widths, row, silent=False):
+
+def _format_row_separator(file, columns, col_widths, row, quiet=False):
     """Format a row of data with column separators.
 
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     col_widths[in]     width of each column
     rows[in]           data to print
-    silent[in]         if True, do not print
+    quiet[in]          if True, do not print
     """
     i = 0
     for col in columns:
-        if not silent:
+        if not quiet:
             file.write("| ")
         file.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
         i += 1
-    if not silent:
+    if not quiet:
         file.write("|")
     file.write("\n")
 
 def format_tabular_list(file, columns, rows, print_header=True,
-                       separator=None, silent=False,
+                       separator=None, quiet=False,
                        print_footer=True):
     """Format a list in a pretty grid format.
-    
+
     This method will format and write a list of rows in a grid or ?SV list.
 
     file[in]           file to print to (e.g. sys.stdout)
@@ -74,10 +74,10 @@ def format_tabular_list(file, columns, rows, print_header=True,
     rows[in]           list of rows to print
     print_header[in]   if False, do not print header
     separator[in]      if set, use the char specified for a ?SV output
-    silent[in]         if True, do not print the grid text (no borders)
+    quiet[in]          if True, do not print the grid text (no borders)
     print_footer[in]   if False, do not print footer
     """
-    
+
     # do nothing if no rows.
     if len(rows) == 0:
         return
@@ -104,30 +104,30 @@ def format_tabular_list(file, columns, rows, print_header=True,
                 col_size = len("%s" % row[i]) + 1
                 if col_size > col_widths[i]:
                     col_widths[i] = col_size
-                    
+
         # print header
         if print_header:
-            _format_col_separator(file, columns, col_widths, silent)
-            _format_row_separator(file, columns, col_widths, columns, silent)
-        _format_col_separator(file, columns, col_widths, silent)
+            _format_col_separator(file, columns, col_widths, quiet)
+            _format_row_separator(file, columns, col_widths, columns, quiet)
+        _format_col_separator(file, columns, col_widths, quiet)
         for row in rows:
-            _format_row_separator(file, columns, col_widths, row, silent)
+            _format_row_separator(file, columns, col_widths, row, quiet)
         if print_footer:
-            _format_col_separator(file, columns, col_widths, silent)
-    
-    
+            _format_col_separator(file, columns, col_widths, quiet)
+
+
 def format_vertical_list(file, columns, rows):
     """Format a list in a vertical format.
-    
+
     This method will format and write a list of rows in a vertical format
     similar to the \G format in the mysql monitor.
 
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
-    silent[in]         if True, do not print the grid text (no borders)
+    quiet[in]          if True, do not print the grid text (no borders)
     """
-    
+
     # do nothing if no rows.
     if len(rows) == 0:
         return
@@ -148,8 +148,6 @@ def format_vertical_list(file, columns, rows):
         for i in range(0, stop):
             file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
                                                 row[i]))
-            
+
     if row_num > 0:
         file.write("%d rows.\n" % int(row_num))
-                    
-

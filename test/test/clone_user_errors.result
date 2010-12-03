@@ -13,10 +13,10 @@ Test case 4 - error: no new user
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone.py: error: Wrong parameter combination or no new users.
-Test case 5 - error: cannot use dump and silent together
+Test case 5 - error: cannot use dump and quiet together
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
-mysqluserclone.py: error: You cannot use --silent and --dump together.
+mysqluserclone.py: error: You cannot use --quiet and --dump together.
 Test case 6 - error: cannot parser source connection
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 

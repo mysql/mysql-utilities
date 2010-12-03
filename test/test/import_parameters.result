@@ -30,7 +30,7 @@ Options:
                         EVENTS, GRANTS, DATA, CREATE_DB
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -s, --silent          Turn off all messages for silent execution.
+  -q, --quiet           Turn off all messages for quiet execution.
 Generating import file
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -325,4 +325,4 @@ INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test 
 INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
 INSERT INTO util_test.t4 VALUES  (3, 2)
 #...done.
-Test case 21 - no messages (silent)
+Test case 21 - no messages (quiet)

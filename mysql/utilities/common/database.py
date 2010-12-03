@@ -42,16 +42,16 @@ class Database(object):
         - Print CREATE statements for all objects
     """
     obj_type = _DATABASE
-    
+
     def __init__(self, source, name, options={}):
         """Constructor
-        
+
         source[in]         A Server object
         name[in]           Name of database
         verbose[in]        print extra data during operations (optional)
                            default value = False
         options[in]        Array of options for controlling what is included
-                           and how operations perform (e.g., verbose) 
+                           and how operations perform (e.g., verbose)
         """
         self.source = source
         self.db_name = name
@@ -69,13 +69,13 @@ class Database(object):
         self.init_called = False
         self.destination = None # Used for copy mode
         self.cloning = False    # Used for clone mode
-        
+
         self.objects = []
         self.new_objects = []
-        
+
     def exists(self, server=None, db_name=None):
         """Check to see if the database exists
-        
+
         server[in]         A Server object
                            (optional) If omitted, operation is performed
                            using the source server connection.
@@ -85,7 +85,7 @@ class Database(object):
 
         return True = database exists, False = database does not exist
         """
-        
+
         if not server:
             server = self.source
         db = None
@@ -93,7 +93,7 @@ class Database(object):
             db = db_name
         else:
             db = self.db_name
-        try:            
+        try:
             res = server.exec_query("SELECT SCHEMA_NAME " +
                                     "FROM INFORMATION_SCHEMA.SCHEMATA " +
                                     "WHERE SCHEMA_NAME = '%s'" % db)
@@ -102,12 +102,12 @@ class Database(object):
         #print "exists", res, (res is not None and len(res) >= 1)
         return (res is not None and len(res) >= 1)
 
-    
-    def drop(self, server, silent, db_name=None):
+
+    def drop(self, server, quiet, db_name=None):
         """Drop the database
-        
+
         server[in]         A Server object
-        silent[in]         ignore error on drop
+        quiet[in]          ignore error on drop
         db_name[in]        database name
                            (optional) If omitted, operation is performed
                            on the class instance table name.
@@ -121,7 +121,7 @@ class Database(object):
         else:
             db = self.db_name
         op_ok = False
-        if silent:
+        if quiet:
             try:
                 res = server.exec_query("DROP DATABASE %s" % (db),
                                         (), False, False)
@@ -134,11 +134,11 @@ class Database(object):
                 op_ok = True
             except Exception, e:
                 raise e
-        
-        
+
+
     def create(self, server, db_name=None):
         """Create the database
-        
+
         server[in]         A Server object
         db_name[in]        database name
                            (optional) If omitted, operation is performed
@@ -160,23 +160,23 @@ class Database(object):
         except Exception, e:
             raise e
         return op_ok
-    
+
     def __make_create_statement(self, obj_type, obj):
         """Construct a CREATE statement for a database object.
-        
+
         This method will get the CREATE statement from the method
         get_create_statement() and also replace all occurrances of the
         old database name with the new.
-        
+
         obj_type[in]       Object type (string) e.g. DATABASE
         obj[in]            A row from the get_db_objects() method
                            that contains the elements of the object
- 
+
         Note: This does not work for tables.
 
         Returns the CREATE string
         """
-        
+
         if not self.new_db:
             self.new_db = self.db_name
         create_str = None
@@ -200,13 +200,13 @@ class Database(object):
                 create_str = re.sub(r" %s\." % self.db_name,
                                     r" %s." % self.new_db,
                                     create_str)
-                create_str = re.sub(r" `%s`\." % self.db_name, 
+                create_str = re.sub(r" `%s`\." % self.db_name,
                                     r" `%s`." % self.new_db,
                                     create_str)
-                create_str = re.sub(r" '%s'\." % self.db_name, 
+                create_str = re.sub(r" '%s'\." % self.db_name,
                                     r" '%s'." % self.new_db,
                                     create_str)
-                create_str = re.sub(r' "%s"\.' % self.db_name, 
+                create_str = re.sub(r' "%s"\.' % self.db_name,
                                     r' "%s".' % self.new_db,
                                     create_str)
                 create_str = create_str
@@ -215,10 +215,10 @@ class Database(object):
 
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.
-        
+
         This method retrieves the list of objects for a specific object
         type and adds it to the class' master object list.
-        
+
         obj_type[in]       Object type (string) e.g. DATABASE
         """
 
@@ -227,16 +227,16 @@ class Database(object):
             for row in rows:
                 tuple = (obj_type, row)
                 self.objects.append(tuple)
-                
+
 
     def init(self):
         """Get all objects for the database based on options set.
-        
+
         This method initializes the database object with a list of all
         objects except those object types that are excluded. It calls
         the helper method self.__add_db_objects() for each type of
         object.
-        
+
         NOTE: This method must be called before the copy method. A
               guard is in place to ensure this.
         """
@@ -262,11 +262,11 @@ class Database(object):
         # Get grants
         if not self.skip_grants:
             self.__add_db_objects(_GRANT)
-    
+
     def __drop_object(self, obj_type, name):
         """Drop a database object.
-        
-        Attempts a silent drop of a database object (no errors are
+
+        Attempts a quiet drop of a database object (no errors are
         printed).
 
         obj_type[in]       Object type (string) e.g. DATABASE
@@ -289,21 +289,21 @@ class Database(object):
                 self.destination.exec_query(drop_str, (), False, False)
             except:
                 pass
-            
+
 
     def __create_object(self, obj_type, obj, show_grant_msg,
-                        silent=False):
+                        quiet=False):
         """Create a database object.
 
         obj_type[in]       Object type (string) e.g. DATABASE
         obj[in]            A row from the get_db_object_names() method
                            that contains the elements of the object
         show_grant_msg[in] If true, display diagnostic information
-        silent[in]         do not print informational messages
+        quiet[in]          do not print informational messages
 
         Note: will handle exception and print error if query fails
         """
-        
+
         create_str = None
         if obj_type == _TABLE and self.cloning:
             create_str = "CREATE TABLE %s.%s LIKE %s.%s" % \
@@ -311,7 +311,7 @@ class Database(object):
         else:
             create_str = self.__make_create_statement(obj_type, obj)
         str = "# Copying"
-        if not silent:
+        if not quiet:
             if obj_type == _GRANT:
                 if show_grant_msg:
                     print "%s GRANTS from %s" % (str, self.db_name)
@@ -329,37 +329,37 @@ class Database(object):
         try:
             res = self.destination.exec_query(create_str, (), False, False)
         except Exception, e:
-            raise MySQLUtilError("Cannot operate on %s object. Error: %s" % 
+            raise MySQLUtilError("Cannot operate on %s object. Error: %s" %
                                  (obj_type, e.errmsg))
 
-    def __copy_table_data(self, name, silent=False):
+    def __copy_table_data(self, name, quiet=False):
         """Clone table data.
-        
+
         This method will copy all of the data for a table
         from the old database to the new database.
 
         name[in]           Name of the object
-        silent[in]         do not print informational messages
+        quiet[in]          do not print informational messages
 
         Note: will handle exception and print error if query fails
         """
-        
-        if not silent:
+
+        if not quiet:
             print "# Copying table data."
         query_str = "INSERT INTO %s.%s SELECT * FROM %s.%s" % \
                     (self.new_db, name, self.db_name, name)
-        if self.verbose and not silent:
+        if self.verbose and not quiet:
             print query_str
         try:
             self.source.exec_query(query_str)
         except MySQLUtilError, e:
             raise e
-        
-    
+
+
     def copy(self, new_db, input_file, options,
              new_server=None, connections=1):
         """Copy a database.
-        
+
         This method will copy a database and all of its objecs and data
         to another, new database. Options set at instantiation will determine
         if there are objects that are excluded from the copy. Likewise,
@@ -369,7 +369,7 @@ class Database(object):
         The method can also be used to copy a database to another server
         by providing the new server object (new_server). Copy to the same
         name by setting new_db = old_db or as a new database.
-        
+
         new_db[in]         Name of the new database
         input_file[in]     Full path of input file (or None)
         options[in]        Options for copy e.g. force, copy_dir, etc.
@@ -377,9 +377,9 @@ class Database(object):
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
         """
-        
+
         from mysql.utilities.common.table import Table
- 
+
         # Must call init() first!
         # Guard for init() prerequisite
         assert self.init_called, "You must call db.init() before db.copy()."
@@ -388,7 +388,7 @@ class Database(object):
         self.new_db = new_db
         copy_file = None
         self.destination = new_server
-        
+
         # We know we're cloning if there is no new connection.
         self.cloning = (new_server is None)
 
@@ -412,9 +412,9 @@ class Database(object):
                 fkey = False
         except MySQLUtilError, e:
             raise e
-            
+
         fkey_query = "SET foreign_key_checks = %s"
-            
+
         # First, turn off foreign keys if turned on
         if fkey:
             try:
@@ -422,7 +422,7 @@ class Database(object):
                                                   (), False, False)
             except MySQLUtilError, e:
                 raise e
-        
+
         # Check to see if database exists
         exists = False
         drop_server = None
@@ -446,7 +446,7 @@ class Database(object):
                 self.create(self.source, new_db)
             else:
                 self.create(self.destination, new_db)
-            
+
         # Create the objects in the new database
         for obj in self.objects:
 
@@ -454,26 +454,26 @@ class Database(object):
             # Grants do not need to be dropped for overwriting
             if options.get("force", False) and obj[0] != _GRANT:
                 self.__drop_object(obj[0], obj[1][0])
-                
+
             # Create the object
             try:
                 self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                     options.get("silent", False))
+                                     options.get("quiet", False))
             except MySQLUtilError, e:
                 raise e
-            
+
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
-                
+
             # Now copy the data if enabled
             if not self.skip_data:
                 if obj[0] == _TABLE:
                     tblname = obj[1][0]
                     if self.cloning:
-                        self.__copy_table_data(tblname, options.get("silent",
+                        self.__copy_table_data(tblname, options.get("quiet",
                                                                     False))
                     else:
-                        if not options.get("silent", False):
+                        if not options.get("quiet", False):
                             print "# Copying data for TABLE %s.%s" % \
                                    (self.db_name, tblname)
                         try:
@@ -483,11 +483,11 @@ class Database(object):
                             if tbl is None:
                                 raise MySQLUtilError("Cannot create table "
                                                      "object before copy.")
-                                
+
                             tbl.copy_data(self.destination, new_db, connections)
                         except MySQLUtilError, e:
                             raise e
-                        
+
         # Cleanup
         if copy_file:
             if os.access(copy_file, os.F_OK):
@@ -504,15 +504,15 @@ class Database(object):
 
     def get_create_statement(self, db, name, obj_type):
         """Return the create statement for the object
-        
+
         db[in]             Database name
-        name[in]           Name of the object 
+        name[in]           Name of the object
         obj_type[in]       Object type (string) e.g. DATABASE
                            Note: this is used to form the correct SHOW command
-    
+
         Returns create statement
         """
-    
+
         row = None
         if obj_type == _DATABASE:
             name_str = name
@@ -523,7 +523,7 @@ class Database(object):
                                          (obj_type, name_str))
         except MySQLUtilError, e:
             raise e
-        
+
         create_statement = None
         if row:
             if obj_type == _TABLE or obj_type == _VIEW or \
@@ -536,14 +536,14 @@ class Database(object):
         if create_statement.find("%"):
             create_statement = re.sub("%", "%%", create_statement)
         return create_statement
-        
-        
+
+
     def get_next_object(self):
         """Retrieve the next object in the database list.
-        
+
         This method is an iterator for retrieving the objects in the database
         as specified in the init() method. You must call this method first.
-        
+
         Returns next object in list or throws exception at EOL.
         """
 
@@ -553,17 +553,17 @@ class Database(object):
 
         for obj in self.objects:
             yield obj
-            
+
 
     def get_db_objects(self, obj_type, columns='NAMES', get_columns=False):
         """Return a result set containing a list of objects for a given
         database based on type.
-        
+
         This method returns either a list of names for the object type
         specified, a brief list of minimal columns for creating the
         objects, or the full list of columns from INFORMATION_SCHEMA. It can
         also provide the list of column names if desired.
-        
+
         obj_type[in]       Type of object to retrieve
         columns[in]        Column mode - NAMES (default), BRIEF, or FULL
                            Note: not valid for GRANT objects.
@@ -572,7 +572,7 @@ class Database(object):
                            return only the result set.
 
         TODO: Change implementation to return classes instead of a result set.
-    
+
         Returns mysql.connector result set
         """
 
@@ -581,7 +581,7 @@ class Database(object):
         """
         if obj_type == _TABLE:
             _NAMES = """
-            SELECT DISTINCT TABLES.TABLE_NAME 
+            SELECT DISTINCT TABLES.TABLE_NAME
             """
             _FULL = """
             SELECT TABLES.*, COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
@@ -593,7 +593,7 @@ class Database(object):
                 REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_SCHEMA,
                 REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
                 REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-                KEY_COLUMN_USAGE.CONSTRAINT_NAME, 
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME,
                 KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
@@ -610,7 +610,7 @@ class Database(object):
                 REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_NAME,
                 REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
                 REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-                KEY_COLUMN_USAGE.CONSTRAINT_NAME, 
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME,
                 KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
@@ -618,15 +618,15 @@ class Database(object):
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TABLES JOIN INFORMATION_SCHEMA.COLUMNS ON
                 TABLES.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA AND
-                TABLES.TABLE_NAME = COLUMNS.TABLE_NAME 
+                TABLES.TABLE_NAME = COLUMNS.TABLE_NAME
             LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS ON
-                TABLES.TABLE_SCHEMA = REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA 
-                AND 
-                TABLES.TABLE_NAME = REFERENTIAL_CONSTRAINTS.TABLE_NAME 
-            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE ON 
-                TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA 
-                AND 
-                TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME 
+                TABLES.TABLE_SCHEMA = REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
+                AND
+                TABLES.TABLE_NAME = REFERENTIAL_CONSTRAINTS.TABLE_NAME
+            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE ON
+                TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA
+                AND
+                TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME
             WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW'
             ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
                      COLUMNS.ORDINAL_POSITION
@@ -637,11 +637,11 @@ class Database(object):
             """
             _MINIMAL = """
             SELECT TABLE_SCHEMA, TABLE_NAME, DEFINER, SECURITY_TYPE,
-                   VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE, 
-                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION                   
+                   VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION
             """
             _OBJECT_QUERY = """
-            FROM INFORMATION_SCHEMA.VIEWS 
+            FROM INFORMATION_SCHEMA.VIEWS
             WHERE TABLE_SCHEMA = '%s'
             """
         elif obj_type == _TRIG:
@@ -652,12 +652,12 @@ class Database(object):
             SELECT TRIGGER_NAME, DEFINER, EVENT_MANIPULATION,
                    EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE,
                    ACTION_ORIENTATION, ACTION_TIMING,
-                   ACTION_STATEMENT, SQL_MODE, 
+                   ACTION_STATEMENT, SQL_MODE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DATABASE_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM INFORMATION_SCHEMA.TRIGGERS 
+            FROM INFORMATION_SCHEMA.TRIGGERS
             WHERE TRIGGER_SCHEMA = '%s'
             """
         elif obj_type == _PROC:
@@ -667,7 +667,7 @@ class Database(object):
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
-                   BODY, SQL_MODE,  
+                   BODY, SQL_MODE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
             """
@@ -682,12 +682,12 @@ class Database(object):
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
-                   BODY, SQL_MODE,  
+                   BODY, SQL_MODE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM mysql.proc 
+            FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'FUNCTION'
             """
         elif obj_type == _EVENT:
@@ -702,7 +702,7 @@ class Database(object):
                    DB_COLLATION
             """
             _OBJECT_QUERY = """
-            FROM mysql.event 
+            FROM mysql.event
             WHERE DB = '%s'
             """
         elif obj_type == _GRANT:
@@ -711,28 +711,28 @@ class Database(object):
                 SELECT GRANTEE, PRIVILEGE_TYPE, TABLE_SCHEMA,
                        NULL as TABLE_NAME, NULL AS COLUMN_NAME,
                        NULL AS ROUTINE_NAME
-                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES 
+                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES
                 WHERE table_schema = '%s'
             ) UNION (
                 SELECT grantee, privilege_type, table_schema, table_name,
-                       NULL, NULL 
-                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES 
+                       NULL, NULL
+                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES
                 WHERE table_schema = '%s'
             ) UNION (
                 SELECT grantee, privilege_type, table_schema, table_name,
-                       column_name, NULL 
-                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES 
+                       column_name, NULL
+                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES
                 WHERE table_schema = '%s'
             ) UNION (
                 SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
-                       Routine_name, NULL, Routine_type 
+                       Routine_name, NULL, Routine_type
                 FROM mysql.procs_priv WHERE Db = '%s'
             ) ORDER BY GRANTEE ASC, PRIVILEGE_TYPE ASC, TABLE_SCHEMA ASC,
                        TABLE_NAME ASC, COLUMN_NAME ASC, ROUTINE_NAME ASC
             """
         else:
             return None
-        
+
         if obj_type == _GRANT:
             query = _OBJECT_QUERY % (self.db_name, self.db_name,
                                      self.db_name, self.db_name)
@@ -754,32 +754,32 @@ class Database(object):
 
     def _check_user_permissions(self, uname, host, access):
         """ Check user permissions for a given privilege
-    
+
         uname[in]          user name to check
         host[in]           host name of connection
         acess[in]          privilege to check (e.g. "SELECT")
-        
+
         Returns True if user has permission, False if not
         """
-        
+
         from mysql.utilities.common.user import User
-        
+
         user = User(self.source, uname+'@'+host)
         result = user.has_privilege(access[0], '*', access[1])
         return result
-    
-    
+
+
     def check_read_access(self, user, host, skip_views,
                           skip_proc, skip_func, skip_grants,
                           skip_events):
         """ Check access levels for reading database objects
-        
+
         This method will check the user's permission levels for copying a
         database from this server.
-        
+
         It will also skip specific checks if certain objects are not being
         copied (i.e., views, procs, funcs, grants).
-    
+
         user[in]           user name to check
         host[in]           host name to check
         skip_views[in]     True = no views processed
@@ -787,13 +787,13 @@ class Database(object):
         skip_func[in]      True = no functions processed
         skip_grants[in]    True = no grants processed
         skip_events[in]    True = no events processed
-        
+
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
                      the server context.
         """
-    
-        # Build minimal list of privileges for source access    
+
+        # Build minimal list of privileges for source access
         source_privs = []
         priv_tuple = (self.db_name, "SELECT")
         source_privs.append(priv_tuple)
@@ -809,7 +809,7 @@ class Database(object):
         if not skip_events:
             priv_tuple = (self.db_name, "EVENT")
             source_privs.append(priv_tuple)
-        
+
         # Check permissions on source
         for priv in source_privs:
             if not self._check_user_permissions(user, host, priv):
@@ -818,39 +818,39 @@ class Database(object):
                                      (user, self.source.role, self.db_name) +
                                      "User needs %s privilege on %s." %
                                      (priv[1], priv[0]))
-            
+
         return True
-    
-    
+
+
     def check_write_access(self, user, host, skip_views,
                            skip_proc, skip_func, skip_grants):
         """ Check access levels for creating and writing database objects
-        
+
         This method will check the user's permission levels for copying a
         database to this server.
-        
+
         It will also skip specific checks if certain objects are not being
         copied (i.e., views, procs, funcs, grants).
-    
+
         user[in]           user name to check
         host[in]           host name to check
         skip_views[in]     True = no views processed
         skup_proc[in]      True = no procedures processed
         skip_func[in]      True = no functions processed
         skip_grants[in]    True = no grants processed
-        
+
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
                      the server context.
         """
-    
+
         dest_privs = [(self.db_name, "CREATE"),
                       (self.db_name, "SUPER"),
                       ("*", "SUPER")]
         if not skip_grants:
             priv_tuple = (self.db_name, "WITH GRANT OPTION")
             dest_privs.append(priv_tuple)
-            
+
         # Check privileges on destination
         for priv in dest_privs:
             if not self._check_user_permissions(user, host, priv):
@@ -859,6 +859,5 @@ class Database(object):
                                      "in %s. User needs %s privilege on %s." %
                                      (user, self.source.role, priv[0],
                                       priv[1], priv[0]))
-                
-        return True
 
+        return True

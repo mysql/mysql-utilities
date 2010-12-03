@@ -15,7 +15,7 @@ and more, the MySQL Utilities were created to help out with common tasks for
 both beginners and experienced database administrators.
 
 What are the MySQL Utilities?
-=============================
+-----------------------------
 
 MySQL Utilities are designed as a collection of easy to use Python scripts that
 can be combined into more powerful features. The scripts internally make use of
@@ -32,7 +32,7 @@ located in the scripts folder.
   formats: comma-separated values (CSV), tab-separated values (TAB), executable
   statements (SQL), tabular form (GRID) like mysql monitor, or vertical
   (VERTICAL) like the \G option in mysql monitor.
-* mysqldbimport.py : import one or more databases from a file in one of the 
+* mysqldbimport.py : import one or more databases from a file in one of the
   formats from mysqlexport
 * mysqlindexcheck.py : search for redundant or duplicate indexes in one or
   more tables
@@ -49,7 +49,7 @@ following sections, we present an example of a custom utility. First, we
 examine what the mysql.utilities module library has available.
 
 The MySQL Utilities Library
-===========================
+---------------------------
 
 There are a number of modules in the mysql.utilities sub folders that provide
 abstracts of many of the operations for a MySQL database system. The following
@@ -76,16 +76,16 @@ their task and each is fully documented.
 
 Now that you are familiar with the MySQL utilities and the supporting library
 modules, let us take a look at an example of combining some of these modules to
-solve a problem. 
+solve a problem.
 
-Example 
-=======
+Example
+-------
 
 Suppose you want to develop a new database solution and need to use real world
 data and user accounts for testing. The MySQL utility, mysqlserverclone, looks
 like a possibility but it only makes an instance of a running server - it does
-not copy data. However, mysqldbcopy makes a copy of the data and mysqluserclone 
-makes clones of the users. You could run each of these utilities in sequence, 
+not copy data. However, mysqldbcopy makes a copy of the data and mysqluserclone
+makes clones of the users. You could run each of these utilities in sequence,
 and that would work, but we are lazy at heart so we want something that will not
 only copy everything but also find it for us - we want a one command solution.
 
@@ -121,7 +121,7 @@ of the heavy diagnosis and error handling is done for us so we just need to
 check for exceptions.::
 
     from mysql.utilities.common.options import parse_connection
-    
+
     try:
         conn = parse_connection(opt.server)
     except:
@@ -132,7 +132,7 @@ server using the Server class from the server module and then connect. Once
 again, we check for exceptions.::
 
     from mysql.utilities.common.server import Server
-    
+
     server1 = Server(conn, "source")
     try:
         server1.connect()
@@ -162,7 +162,7 @@ your own list of databases (e.g. --databases=db1,db2,db3).::
     else:
         for db in opt.dbs_to_copy.split(","):
             db_list.append((db, None))
-        
+
 Notice we are creating a list of tuples. This is because the dbcopy module
 uses a list of tuples in the form (old_db, new_db) to allow you to copy a
 database to a new name. For our purposes, we don't want a rename so we leave
@@ -196,17 +196,17 @@ a number of parameters for the new server instance. We will supply those in a
 similar way as options.::
 
     parser.add_option("--new-data", action="store", dest="new_data",
-                      type="string", help="the full path to the location " 
+                      type="string", help="the full path to the location "
                       "of the data directory for the new instance")
     parser.add_option("--new-port", action="store", dest="new_port",
-                      type="string", default="3307", help="the new port " 
+                      type="string", default="3307", help="the new port "
                            "for the new instance - default=%default")
     parser.add_option("--new-id", action="store", dest="new_id",
-                      type="string", default="2", help="the server_id for " 
+                      type="string", default="2", help="the server_id for "
                            "the new instance - default=%default")
-    
+
     from mysql.utilities.command import serverclone
-    
+
     try:
         res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
                                         opt.new_id, "root", None, False, True)
@@ -216,7 +216,7 @@ similar way as options.::
 
 As you can see, the operation is very simple. We just added a few options we
 needed like --new-data, --new-port, and --new-id (much like mysqlserverclone)
-and supplied some default values for the other parameters. 
+and supplied some default values for the other parameters.
 
 Next, we need to start copying the databases. Once again, we will use the
 command module for mysqldbcopy to do all of the work for us. First, we need the
@@ -240,52 +240,52 @@ works (i.e. if any objects are skipped). For our purposes, we want all objects
 to be copied so we will supply only the minimal settings and let the library
 use the defaults. This example shows how you can 'fine tune' the scripts to
 meet your specific needs without having to specify a lot of additional options
-in your script. We will set the silent option on so we won't clutter the screen
+in your script. We will set the quiet option on so we won't clutter the screen
 with messages and tell the copy to skip databases that don't exist (in case we
 supply the --databases option and provide a database that doesn't exist).::
 
     options = {
-        "silent" : True,
-        "force"  : True
+        "quiet" : True,
+        "force" : True
     }
 
 The actual copy of the databases is easy. Just call the method and supply the
 list of databases.::
 
     from mysql.utilities.command import dbcopy
-    
+
     try:
         dbcopy.copy_db(conn, dest_values, db_list, options)
     except exception.MySQLUtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
-    
+
 Lastly, we copy the user accounts. Once again, we need to provide a dictionary
 of options and we will call the command module directly. Note however, the
 userclone module provides a method that clones one user to one or more users so
 we will have to loop through the users and clone them one at a time.::
 
     from mysql.utilities.command import userclone
-    
+
     options = {
         "overwrite" : True,
-        "silent"    : True,
+        "quiet"     : True,
         "globals"   : True
     }
-    
+
     for user in user_list:
         try:
             res = userclone.clone_user(conn, dest_values, user,
                                        (user,), options)
         except exception.MySQLUtilError, e:
             print "ERROR:", e.errmsg
-            exit(1) 
+            exit(1)
 
 We're done. As you can see, constructing new solutions from the MySQL utility
-command and common modules is easy and is limited only by your imagination. 
+command and common modules is easy and is limited only by your imagination.
 
 Enhancing the Example
-=====================
+---------------------
 
 A complete solution for the example named copy_server.py is located in the
 /docs/intro/examples folder. It is complete in so far as this document explains,
@@ -304,10 +304,9 @@ robust utility.
 * stopping new client connections to the server during the copy
 
 Conclusion
-==========
+----------
 
 If you find some primitives missing or would like to see more specific
 functionality in the library or scripts, please contact us with your ideas or
 better still - write them yourselves! We welcome all suggestions in code or
 text.
-

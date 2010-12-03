@@ -16,19 +16,19 @@ class test(copy_db.test):
 
     def setup(self):
         return copy_db.test.setup(self)
-         
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = self.testdir + "result.txt"
-       
+
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server2)
-       
+
         cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
-        
+
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.
-        
+
         cmd_opts = "util_test:util_db_clone"
         comment = "Test case 1 - normal run"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
@@ -54,8 +54,8 @@ class test(copy_db.test):
             raise MUTException("%s: failed" % comment)
         self.results.append(self.check_objects(self.server1, "util_db_clone"))
 
-        cmd_opts = "--force --skip=data --silent util_test:util_db_clone"
-        comment = "Test case 5 - silent copy"
+        cmd_opts = "--force --skip=data --quiet util_test:util_db_clone"
+        comment = "Test case 5 - quiet copy"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
@@ -65,15 +65,12 @@ class test(copy_db.test):
                             "# Destination: root@localhost:[] ... connected\n")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return copy_db.test.cleanup(self)
-
-
-

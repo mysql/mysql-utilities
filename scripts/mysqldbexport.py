@@ -42,7 +42,7 @@ USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
 
 def print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
-    
+
     start_test[in]      The starting time of the test
     """
     stop_test = time.time()
@@ -100,25 +100,25 @@ parser.add_option("--file-per-table", action="store_true", dest="file_per_tbl",
 # Add the skip common options
 add_skip_options(parser)
 
-# Add verbosity and silent mode
+# Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# Warn if silent and verbosity are both specified
-check_verbosity(opt)    
+# Warn if quiet and verbosity are both specified
+check_verbosity(opt)
 
 try:
     skips = check_skip_options(opt.skip_objects)
 except MySQLUtilError, e:
     print "ERROR: %s" % e.errmsg
     exit(1)
-    
+
 # Fail if no arguments
 if len(args) == 0:
     parser.error("You must specify at least one database to export.")
-    
+
 _PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL",
                       "S", "G", "T", "C", "V")
 
@@ -149,7 +149,7 @@ if opt.display.upper() not in _PERMITTED_DISPLAY_TYPES:
     opt.display = "BRIEF"
 else:
     opt.display = opt.display.upper()
-    
+
 _PERMITTED_EXPORTS = ("DATA", "DEFINITIONS", "BOTH", "D", "F", "B")
 
 if opt.export.upper() not in _PERMITTED_EXPORTS:
@@ -158,7 +158,7 @@ if opt.export.upper() not in _PERMITTED_EXPORTS:
     opt.export = "DEFINITIONS"
 else:
     opt.export = opt.export.upper()
-    
+
 # Convert to full word for easier coding in command module
 if opt.export == "D":
     opt.export = "DATA"
@@ -166,10 +166,10 @@ elif opt.export == "F":
     opt.export = "DEFINITIONS"
 elif opt.export == "B":
     opt.export = "BOTH"
-    
+
 if opt.skip_blobs and not opt.export == "DATA":
     print "# WARNING: --skip-blobs option ignored for metadata export."
-    
+
 if opt.file_per_tbl and (opt.export == "DEFINITIONS" or opt.export == "BOTH"):
     print "# WARNING: --file-per-table option ignored for metadata export."
 
@@ -177,7 +177,7 @@ if "DATA" in skips and opt.export == "DATA":
     print "ERROR: You cannot use --export=data and --skip-data when exporting " \
           "table data."
     exit(1)
-    
+
 # Set options for database operations.
 options = {
     "skip_tables"   : "TABLES" in skips,
@@ -194,7 +194,7 @@ options = {
     "no_headers"    : opt.no_headers,
     "display"       : opt.display,
     "single"        : not opt.bulk_import,
-    "silent"        : opt.silent,
+    "quiet"         : opt.quiet,
     "verbosity"     : opt.verbosity,
     "debug"         : opt.verbosity >= 3,
     "file_per_tbl"  : opt.file_per_tbl

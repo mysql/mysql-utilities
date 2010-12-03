@@ -28,21 +28,21 @@ import time
 import shutil
 
 def clone_server(conn_val, new_data, new_port, new_id, rootpass,
-                 mysqld_options=None, verbose=False, silent=False):
+                 mysqld_options=None, verbose=False, quiet=False):
     """ Clone an existing server
-    
+
     This method creates a new instance of a running server using a datadir
     set to the new_data parametr, with a port set to new_port, server_id
     set to new_id and a root password of rootpass. You can also specify
     additional parameters for the mysqld command line as well as turn on
     verbose mode to display more diagnostic information during the clone
     process.
-    
+
     The method will build a new base database installation from the .sql
     files used to construct a new installation. Once the database is
     created, the server will be started.
-    
-    dest_val[in]        a dictionary containing connection information 
+
+    dest_val[in]        a dictionary containing connection information
                         including:
                         (user, password, host, port, socket)
     new_data[in]        An existing path to create the new database and use
@@ -53,7 +53,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     mysqld_options[in]  Additional command line options for mysqld
     verbose[in]         Print additional information during operation
                         (default is False)
-    silent[in]          If True, do not print messages.
+    quiet[in]           If True, do not print messages.
                         (default is False)
     """
 
@@ -67,26 +67,26 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         server1.connect()
     except MySQLUtilError, e:
         raise e
-        
-    if not silent:
+
+    if not quiet:
         print "# Cloning the MySQL server running on %s." % conn_val["host"]
-    
+
     # If datadir exists, delete it
     if os.path.exists(new_data):
         shutil.rmtree(new_data, True)
-    
+
     # Create new data directory if it does not exist
-    if not silent:
+    if not quiet:
         print "# Creating new data directory..."
     if not os.path.exists(new_data):
         try:
             res = os.mkdir(new_data)
         except:
             raise MySQLUtilError("Unable to create directory '%s'" % new_data)
-        
+
     basedir = ""
     # Get basedir
-    if not silent:
+    if not quiet:
         print "# Configuring new instance..."
     try:
         rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
@@ -97,7 +97,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     else:
         raise MySQLUtilError("Unable to determine basedir of running server.")
 
-    if not silent:    
+    if not quiet:
         print "# Locating mysql tools..."
     if os.name == "posix":
         mysqld_path = get_tool_path(basedir, "mysqld")
@@ -115,8 +115,8 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     test_data_timezone = get_tool_path(basedir,
                                         "mysql_test_data_timezone.sql")
     help_data = get_tool_path(basedir, "fill_help_tables.sql")
-    
-    if verbose and not silent:
+
+    if verbose and not quiet:
         print "Location of files:"
         print "                      mysqld: %s" % mysqld_path
         print "                  mysqladmin: %s" % mysqladmin_path
@@ -124,11 +124,11 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         print "mysql_system_tables_data.sql: %s" % system_tables_data
         print "mysql_test_data_timezone.sql: %s" % test_data_timezone
         print "        fill_help_tables.sql: %s" % help_data
-    
+
     # Create the new mysql data with mysql_import_db-like process
-    if not silent:
+    if not quiet:
         print "# Setting up empty database and mysql tables..."
-    
+
     # Create the bootstrap file
     f_boot = open("bootstrap.sql", 'w')
     f_boot.write("CREATE DATABASE mysql;\n")
@@ -138,27 +138,27 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     f_boot.writelines(open(test_data_timezone).readlines())
     f_boot.writelines(open(help_data).readlines())
     f_boot.close()
-    
+
     # Bootstap to setup mysql tables
     fnull = open(os.devnull, 'w')
     cmd = mysqld_path + " --no-defaults --bootstrap " + \
             " --datadir=%s --basedir=%s " % (new_data, mysql_basedir) + \
             " < bootstrap.sql"
     proc = None
-    if verbose and not silent:
+    if verbose and not quiet:
         proc = subprocess.Popen(cmd, shell=True)
     else:
         proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
-    
+
     # Wait for subprocess to finish
     res = proc.wait()
-    
+
     # Drop the bootstrap file
     if os.path.isfile("bootstrap.sql"):
         os.unlink("bootstrap.sql")
-    
+
     # Start the instance
-    if not silent:
+    if not quiet:
         print "# Starting new instance of the server..."
     cmd = mysqld_path + " --no-defaults "
     if mysqld_options:
@@ -170,20 +170,20 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     cmd += "--server-id=%s " % (new_id)
     cmd += "--basedir=%s " % (mysql_basedir)
     cmd += "--socket=%s/mysql.sock " % (new_data)
-    if verbose and not silent:
+    if verbose and not quiet:
         proc = subprocess.Popen(cmd, shell=True)
     else:
         proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
-    
+
     # Try to connect to the new MySQL instance
-    if not silent:
+    if not quiet:
         print "# Testing connection to new instance..."
     new_sock = None
     port_int = None
     if os.name == "posix":
         new_sock = os.path.join(new_data, "mysql.sock")
     port_int = int(new_port)
-    
+
     conn = {
         "user"   : "root",
         "passwd" : "",
@@ -192,7 +192,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         "unix_socket" : new_sock
     }
     server2 = Server(conn, "clone")
-    
+
     stop = 10 # stop after 10 attempts
     i = 0
     while i < stop:
@@ -202,17 +202,17 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
             server2.connect()
             i = stop + 1
         finally:
-            if verbose and not silent:
+            if verbose and not quiet:
                 print "# trying again..."
-            
+
     if i == stop:
         raise MySQLUtilError("Unable to communicate with new instance.")
-    elif not silent:
+    elif not quiet:
         print "# Success!"
-    
+
     # Set the root password
     if rootpass:
-        if not silent:
+        if not quiet:
             print "# Setting the root password..."
         if os.name == "posix":
             cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
@@ -220,14 +220,16 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         else:
             cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
                   "password %s --port=%s" % (rootpass, int(new_port))
-        if verbose and not silent:
+        if verbose and not quiet:
             proc = subprocess.Popen(cmd, shell=True)
         else:
             proc = subprocess.Popen(cmd, shell=True,
                                     stdout=fnull, stderr=fnull)
-    
+
         # Wait for subprocess to finish
         res = proc.wait()
-    
+
+    if not quiet:
+        print "#...done."
+
     fnull.close()
-    

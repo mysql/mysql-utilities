@@ -34,22 +34,22 @@ def _print_connection(prefix, conn_val):
     sys.stdout.write("# %s on %s: ... " % (prefix, conn_val["host"]))
 
 
-def connect_servers(src_val, dest_val, silent=False, version=None,
+def connect_servers(src_val, dest_val, quiet=False, version=None,
                     src_name="Source", dest_name="Destination"):
     """ Connect to a source and destination server.
-    
+
     This method takes two groups of --server=user:password@host:port:socket
     values and attempts to connect one as a source connection and the other
     as the destination connection. If the source and destination are the
     same server, destination is set to None.
-    
+
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, passwd, host, port, socket)
     dest_val[in]       a dictionary containing connection information for the
                        destination including:
                        (user, passwd, host, port, socket)
-    silent[in]         do not print any information during the operation
+    quiet[in]          do not print any information during the operation
                        (default is False)
     version[in]        if specified (default is None), perform version
                        checking and fail if server version is < version
@@ -74,8 +74,8 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
     # If we're cloning so use same server for faster copy
     if not cloning and dest_val is None:
         dest_val = src_val
-        
-    if not silent:
+
+    if not quiet:
         _print_connection(src_name, src_val)
 
     # Try to connect to the MySQL database server (source).
@@ -89,11 +89,11 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
                                      (src_name, version))
     except MySQLUtilError, e:
         raise e
-        
-    if not silent:
+
+    if not quiet:
         sys.stdout.write("connected.\n")
 
-    if not silent:
+    if not quiet:
         if not cloning:
             _print_connection(dest_name, dest_val)
         elif dest_val is not None:
@@ -111,10 +111,10 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
                                          "higher." % (dest_name, version))
         except MySQLUtilError, e:
             raise e
-        
-    if not silent and dest_val is not None:
+
+    if not quiet and dest_val is not None:
         sys.stdout.write("connected.\n")
-        
+
     servers = (source, destination)
     return servers
 
@@ -122,7 +122,7 @@ def connect_servers(src_val, dest_val, silent=False, version=None,
 class Server(object):
     """The Server class can be used to connect to a running MySQL server.
     The following utilities are provided:
-    
+
         - Connect to the server
         - Retrieve a server variable
         - Execute a query
@@ -132,10 +132,10 @@ class Server(object):
         - Return list of all indexes for a table
         - Read SQL statements from a file and execute
     """
-    
+
     def __init__(self, conn_val, role="Server", verbose=False):
         """Constructor
-        
+
         dest_val[in]       a dictionary containing connection information
                            (user, passwd, host, port, socket)
         role[in]           Name or role of server (e.g., server, master)
@@ -153,19 +153,19 @@ class Server(object):
         if conn_val["port"] is not None:
             self.port = int(conn_val["port"])
         self.connect_error = None
-        
-        
+
+
     def connect(self, charset="latin1"):
         """Connect to server
-        
+
         Attempts to connect to the server as specified by the connection
         parameters.
-        
+
         Note: This method must be called before executing queries.
-        
+
         charset[in]        Default character set for the connection.
                            (default latin1)
-                           
+
         Raises MySQLUtilError if error during connect
         """
         try:
@@ -189,9 +189,9 @@ class Server(object):
 
     def check_version_compat(self, t_major, t_minor, t_rel):
         """ Checks version of the server against requested version.
-        
+
         This method can be used to check for version compatibility.
-        
+
         t_major[in]        target server version (major)
         t_minor[in]        target server version (minor)
         t_rel[in]          target server version (release)
@@ -219,17 +219,17 @@ class Server(object):
                     if int(t_rel) > int(rel):
                         return False
         return True
-    
-    
+
+
     def toggle_fkeys(self, turn_on=True):
         """ Turn foreign key checks on or off
-        
+
         turn_on[in]        if True, turns on fkey check
                            if False, turns off fkey check
 
         Returns original value = True == ON, False == OFF
         """
-        
+
         fkey_query = "SET foreign_key_checks = %s"
         try:
             res = self.show_server_variable("foreign_key_checks")
@@ -252,15 +252,15 @@ class Server(object):
     def exec_query(self, query_str, params=(),
                    columns=False, fetch=True, raw=True):
         """Execute a query and return result set
-        
+
         This is the singular method to execute queries. It should be the only
         method used as it contains critical error code to catch the issue
         with mysql.connector throwing an error on an empty result set.
-        
+
         Note: will handle exception and print error if query fails
-        
+
         Note: if fetchall is False, the method returns the cursor instance
-        
+
         query_str[in]      The query to execute
         params[in]         Parameters for query
         columns[in]        Add column headings as first row
@@ -270,16 +270,16 @@ class Server(object):
                            (default is True)
         raw[in]            If True, use a buffered raw cursor
                            (default is True)
-    
+
         Returns result set or cursor
         """
 
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before executing a query."
-        
+
         results = ()
-        # If we are fetching all, we need to use a buffered 
-        if fetch: 
+        # If we are fetching all, we need to use a buffered
+        if fetch:
             if raw:
                 #print "USING: buffered raw!"
                 cur = self.db_conn.cursor(
@@ -290,7 +290,7 @@ class Server(object):
         else:
             #print "USING: default cursor!"
             cur = self.db_conn.cursor(raw=True)
-        
+
         #print "query_str:", query_str, "\nparams:", params
         try:
             if params == ():
@@ -311,7 +311,7 @@ class Server(object):
                     pass # This error means there were not results.
                 else:
                     raise e
-                
+
             if columns:
                 col_headings = cur.column_names
                 stop = len(col_headings)
@@ -320,16 +320,16 @@ class Server(object):
                     col_names.append(col)
                 results = col_names, results
             cur.close()
-            self.db_conn.commit()        
+            self.db_conn.commit()
             return results
         else:
-            return cur            
-    
+            return cur
+
     def show_server_variable(self, variable):
         """Returns one or more rows from the SHOW VARIABLES command.
-        
+
         variable[in]       The variable or wildcard string
-    
+
         Returns result set
         """
 
@@ -340,49 +340,49 @@ class Server(object):
         """Return a result set containing all databases on the server
         except for internal databases (mysql, INFORMATION_SCHEMA,
         PERFORMANCE_SCHEMA)
-        
+
         Returns result set
         """
-        
+
         _GET_DATABASES = """
-        SELECT SCHEMA_NAME 
-        FROM INFORMATION_SCHEMA.SCHEMATA 
-        WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA' 
-        AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA' 
+        SELECT SCHEMA_NAME
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
+        AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
         AND SCHEMA_NAME != 'mysql'
         """
         return self.exec_query(_GET_DATABASES)
-        
-    
+
+
     def get_storage_engines(self):
         """Return list of storage engines on this server.
-        
+
         Returns (list) (engine, support, comment)
         """
-        
+
         _QUERY = """
             SELECT UPPER(engine), UPPER(support)
             FROM INFORMATION_SCHEMA.ENGINES
             ORDER BY engine
         """
         return self.exec_query(_QUERY)
-        
-    
+
+
     def check_storage_engines(self, other_list):
         """Compare storage engines from another server.
-        
+
         This method compares the list of storage engines for the current
         server against a list supplied as **other_list**. It returns two
         lists - one for the storage engines on this server not on the other
         list, and another for the storage engines on the other list not on this
         server.
-        
-        Note: type case sensitive - make sure list is in uppercase 
-        
+
+        Note: type case sensitive - make sure list is in uppercase
+
         other_list[in]     A list from another server in the form
                            (engine, support) - same output as
                            get_storage_engines()
-                           
+
         Returns (list, list)
         """
         # Guard for connect() prerequisite
@@ -397,25 +397,25 @@ class Server(object):
             else:
                 item_list = None
             return item_list
-            
+
         # trivial, but guard against misuse
         this_list = self.get_storage_engines()
         if other_list is None:
             return (this_list, None)
-            
+
         same = set(this_list) & set(other_list)
         master_extra = _convert_set_to_list(set(this_list) - same)
         slave_extra = _convert_set_to_list(set(other_list) - same)
-        
+
         return (master_extra, slave_extra)
-                    
+
 
     def get_innodb_stats(self):
         """Return type of InnoDB engine and its version information.
-        
+
         This method returns a tuple containing the type of InnoDB storage
         engine (builtin or plugin) and the version number reported.
-        
+
         Returns (tuple) (type = 'builtin' or 'plugin', version_number,
                          have_innodb = True or False)
         """
@@ -438,7 +438,7 @@ class Server(object):
             FROM INFORMATION_SCHEMA.PLUGINS
             WHERE LOWER(plugin_name) = 'innodb';
         """
-        
+
         inno_type = None
         try:
             results = self.exec_query(_BUILTIN)
@@ -454,7 +454,7 @@ class Server(object):
         if results is not None and results != () and \
            results != [] and results[0][0] is not None:
             inno_type = "plugin "
-        
+
         try:
             results = self.exec_query(_VERSION)
         except Exception, e:
@@ -466,25 +466,25 @@ class Server(object):
         else:
             version.append(None)
             version.append(None)
-        
+
         results = self.show_server_variable("have_innodb")
         if results is not None and results[0][1].lower() == "yes":
             have_innodb = True
         else:
             have_innodb = False
-    
+
         return (inno_type, version[0], version[1], have_innodb)
 
 
     def read_and_exec_SQL(self, input_file, verbose=False):
         """Read an input file containing SQL statements and execute them.
-    
+
         input_file[in]     The full path to the file
         verbose[in]        Print the command read
                            Default = False
 
         Returns True = success, False = error
-        
+
         TODO : Make method read multi-line queries.
         """
         file = open(input_file)

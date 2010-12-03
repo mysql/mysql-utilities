@@ -42,7 +42,7 @@ USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
 
 def print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
-    
+
     start_test[in]      The starting time of the test
     """
     stop_test = time.time()
@@ -97,25 +97,25 @@ parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
 # Add the skip common options
 add_skip_options(parser)
 
-# Add verbosity and silent mode
+# Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# Warn if silent and verbosity are both specified
-check_verbosity(opt)    
+# Warn if quiet and verbosity are both specified
+check_verbosity(opt)
 
 try:
     skips = check_skip_options(opt.skip_objects)
 except MySQLUtilError, e:
     print "ERROR: %s" % e.errmsg
     exit(1)
-    
+
 # Fail if no arguments
 if len(args) == 0:
     parser.error("You must specify at least one file to import.")
-    
+
 _PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL",
                       "S", "G", "T", "C", "V")
 
@@ -146,7 +146,7 @@ if opt.import_type.upper() not in _PERMITTED_EXPORTS:
     opt.import_type = "DEFINITIONS"
 else:
     opt.import_type = opt.import_type.upper()
-    
+
 # Convert to full word for easier coding in command module
 if opt.import_type == "D":
     opt.import_type = "DATA"
@@ -154,10 +154,10 @@ elif opt.import_type == "F":
     opt.import_type = "DEFINITIONS"
 elif opt.import_type == "B":
     opt.import_type = "BOTH"
-    
+
 if opt.skip_blobs and not opt.import_type == "DATA":
     print "# WARNING: --skip-blobs option ignored for metadata import."
-    
+
 if "DATA" in skips and opt.import_type == "DATA":
     print "ERROR: You cannot use --import=data and --skip-data when " \
           "importing table data."
@@ -185,7 +185,7 @@ options = {
     "import_type"   : opt.import_type,
     "dryrun"        : opt.dryrun,
     "do_drop"       : opt.do_drop,
-    "silent"        : opt.silent,
+    "quiet"         : opt.quiet,
     "verbosity"     : opt.verbosity,
     "debug"         : opt.verbosity >= 3
 }
@@ -211,7 +211,7 @@ try:
 
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
-        
+
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
