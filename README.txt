@@ -12,8 +12,35 @@ To install the scripts together with the libraries::
 
     python setup.py install
 
+In order for the installation from source to work correctly, you have
+to have Python installed on your computer and also Connector/Python.
+
 Note: for some platforms, you may need to execute this command with
 administrative privileges.
+
+
+Windows Notes
+-------------
+
+If you are using Windows, you have to ensure that the script directory
+is in the path and that the Python extensions are recognized as script
+files.  The procedures are a little different between Windows
+PowerShell and a normal CMD shell, so we outline both procedures.
+
+To ensure that the Python extensions are recognized as script files,
+you have to add the extensions to the PATHEXT variable. In a CMD
+Window, this is done using::
+
+    set PATHEXT="%PATHEXT%;.PY;.PYW;.PYC;.PYO"
+
+and in a PowerShell you do this using::
+
+    $env:PATHEXT="$env:PATHEXT;.PY;.PYW;.PYC;.PYO"
+
+If you have Python installed, it will already have mappings for .PY
+(Python script), .PYW (Python Windowless Application), .PYC (Compiled
+Python Script), and .PYO (Compiled and Optimized Python Script).
+
 
 Documentation
 =============
