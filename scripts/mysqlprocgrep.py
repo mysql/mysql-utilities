@@ -100,6 +100,9 @@ if options.print_sql:
 else:
     try:
         command.execute(options.server, format=options.format)
-    except (EmptyResultError) as details:
+    except EmptyResultError as details:
         print >>sys.stderr, "No matches"
+        exit(1)
+    except Exception as details:
+        print >>sys.stderr, details
         exit(1)
