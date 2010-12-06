@@ -88,7 +88,13 @@ try:
             })
 except ImportError:
     # TODO: install pre-generated manual pages
-    pass                        # No Sphinx installed
+    # No Sphinx installed
+
+    from distutils.command.install import install
+
+    COMMANDS['cmdclass'].update({
+            'install': install,
+    })
 
 class MyBuildScripts(distutils.command.build_scripts.build_scripts):
     """Class for providing a customized version of build_scripts.
