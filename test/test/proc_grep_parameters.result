@@ -33,6 +33,8 @@ Options:
   --match-info=PATTERN  Match the 'INFO' column of the PROCESSLIST table
   --match-state=PATTERN
                         Match the 'STATE' column of the PROCESSLIST table
+  --age=AGE             Only show processes that been in the current state
+                        more than a given time
 Test case 2 - do the SQL for a simple search
 SELECT
   Id, User, Host, Db, Command, Time, State, Info
