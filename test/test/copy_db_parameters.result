@@ -39,7 +39,7 @@ Options:
                         files) - default = current directory
   -f, --force           drop the new database or object if it exists
   --threads=THREADS     use multiple threads (connections) for insert
-  -e EXCLUDE, --exclude=EXCLUDE
+  -x EXCLUDE, --exclude=EXCLUDE
                         Exclude one or more objects from the operation using
                         either a specific name (e.g. db1.t1) or a REGEXP
                         search pattern. Repeat option for multiple exclusions.

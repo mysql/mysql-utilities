@@ -90,7 +90,7 @@ parser.add_option("--threads", action="store", dest="threads",
                   "for insert")
 
 # Add the exclude database option
-parser.add_option("-e", "--exclude", action="append", dest="exclude",
+parser.add_option("-x", "--exclude", action="append", dest="exclude",
                   type="string", default=None, help="Exclude one or more "
                   "objects from the operation using either a specific name "
                   "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
