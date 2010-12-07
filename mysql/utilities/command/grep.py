@@ -120,11 +120,20 @@ _OBJMAP = {
         },
 }
 
+_GROUP_MATCHES_FRM = """
+SELECT 
+  `Object Type`, `Object Name`, `Database`,
+  `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
+FROM ({0}) AS all_results
+  GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`"""
+
 _SELECT_TYPE_FRM = """
   SELECT {select_option}
     {object_type} AS `Object Type`,
     {object_name} AS `Object Name`,
-    {schema_field} AS `Database`
+    {schema_field} AS `Database`,
+    {field_type} AS `Field Type`,
+    {field_name} AS `Field`
   FROM
     information_schema.{table_name}
   WHERE
@@ -200,7 +209,7 @@ class ObjectGrep(object):
     def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
                  check_body=False, use_regexp=False):
         stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
-        self.__sql = "UNION".join(stmts)
+        self.__sql = _GROUP_MATCHES_FRM.format("UNION".join(stmts))
 
         # Need to save the pattern for informative error messages later
         self.__pattern = pattern 
