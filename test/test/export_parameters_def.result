@@ -35,7 +35,7 @@ Options:
                         EVENTS, GRANTS, DATA, CREATE_DB
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -s, --silent          Turn off all messages for silent execution.
+  -q, --quiet           Turn off all messages for quiet execution.
 Test case 2 - no grants
 # Source on localhost: ... connected.
 # Exporting metadata from util_test

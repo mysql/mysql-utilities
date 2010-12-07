@@ -7,7 +7,12 @@
 SYNOPSIS
 --------
 
-  mysqlprocgrep [ <options> ] --server=user:pass@host:port:socket ...
+  mysqlprocgrep [ --version | --help ] | --format=<format> |
+                --kill-connection | --kill-query | --regexp | --sql-body |
+                --print | --verbose | --match-user=<pattern> |
+                --match-host=<pattern> | --match-command=<pattern> |
+                --match-info=<pattern> | --match-state=<pattern> |
+                --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
 
 DESCRIPTION
 -----------
@@ -17,6 +22,23 @@ occurrences of the --server option and will either print the result (the
 default) or execute certain actions on it. The match conditions are given as
 options to the tool and in order for a row to match, all the
 conditions given have to match.
+
+You also have the choice to view the output in one of the following
+formats using the :option:`--format` option.
+
+**GRID**
+  Displays output formatted like that of the mysql monitor in a grid
+  or table layout. This is the default.
+
+**CSV**
+  Displays the output in a comma-separated list.
+
+**TAB**
+  Displays the output in a tab-separated list.
+
+**VERTICAL**
+  Displays the output in a single column similar to the ``\G`` option
+  for the mysql monitor commands.
 
 
 Options
@@ -129,15 +151,17 @@ Options
 Specifying time
 ~~~~~~~~~~~~~~~
 
-A time period specification consists of a number with an optional
-suffix denoting the size of the period and there can be an optional +
-or - sign as prefix. A + sign before the period means greater than the
-given period, a - sign means less than the given period, while no sign
-means within that period.
+Time for the :option:`--age` option can be specified in two formats:
+either using the ``hh:mm:ss`` format, with hours and minutes optional,
+or as a sequence of numbers with a suffix giving the period size.
 
 The allowable suffixes are **s** (second), **m** (minute), **h**
-(hour), **d** (day), and **w** (week).
+(hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
+15 minutes.
 
+For both formats, the specification can optionally be preceeded by a
+``+`` or a ``-``, where a ``+`` means older than the given time, and
+``-`` means younger than the given age.
 
 EXAMPLES
 --------
@@ -149,11 +173,11 @@ connections.
 To kill all connections created by user "mats" that are younger than 1
 minute::
 
-  mysqlprocgrep --server=root@localhost --match-user=mats --age=-1m --kill-query
+  mysqlprocgrep --server=root@localhost --match-user=mats --age=1m --kill-query
 
 To kill all queries that has been idle for more than 1 hour::
 
-  mysqlprocgrep --server=root@localhost --match-command=sleep --age=+1h --kill
+  mysqlprocgrep --server=root@localhost --match-command=sleep --age=1h --kill
 
 COPYRIGHT
 ---------

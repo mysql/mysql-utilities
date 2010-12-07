@@ -70,6 +70,11 @@ for col in USER, HOST, DB, COMMAND, INFO, STATE:
         dest="matches", type="string", metavar="PATTERN", default=[],
         help="Match the '{0}' column of the PROCESSLIST table".format(col))
 
+parser.add_option(
+    "--age",
+    dest="age", default=None,
+    help="Only show processes that been in the current state more than a given time")
+
 (options, args) = parser.parse_args()
 
 _PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
@@ -94,12 +99,16 @@ elif options.server is not None and len(options.server) > 0 and options.print_sq
 if len(options.actions) == 0:
     options.actions.append(PRINT_PROCESS)
 
-command = ProcessGrep(options.matches, options.actions, options.use_regexp)
-if options.print_sql:
-    print command.sql(options.sql_body).strip()
-else:
-    try:
+try:
+    command = ProcessGrep(options.matches, options.actions, options.use_regexp,
+                          age=options.age)
+    if options.print_sql:
+        print command.sql(options.sql_body).strip()
+    else:
         command.execute(options.server, format=options.format)
-    except (EmptyResultError) as details:
-        print >>sys.stderr, "No matches"
-        exit(1)
+except EmptyResultError as details:
+    print >>sys.stderr, "No matches"
+    exit(1)
+except Exception as details:
+    print >>sys.stderr, 'ERROR:', details
+    exit(2)

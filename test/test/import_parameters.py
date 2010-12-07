@@ -15,16 +15,16 @@ class test(import_basic.test):
 
     def setup(self):
         return import_basic.test.setup(self)
-        
+
     def do_skip_test(self, cmd_str, comment, expected_res=0):
         # Precheck: check db and save the results.
         self.results.append("BEFORE:\n")
         self.results.append(self.check_objects(self.server2, "util_test"))
- 
+
         res = self.run_test_case(expected_res, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-            
+
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
         res = self.server2.exec_query("SHOW DATABASES LIKE 'util_test'")
@@ -36,25 +36,25 @@ class test(import_basic.test):
         try:
             self.drop_db(self.server2, "util_test")
         except:
-            pass # ok if this fails - it is a spawned server 
-         
+            pass # ok if this fails - it is a spawned server
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-       
+
         from_conn = "--server=" + self.build_connection_string(self.server1)
         to_conn = "--server=" + self.build_connection_string(self.server2)
-       
+
         cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
                   (to_conn, self.export_import_file)
-        
+
         cmd_opts = " --help"
         comment = "Test case 1 - help"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
+
         # Now test the skips
-        
+
         # Note: data and blobs must be done separately
         _SKIPS = ("grants", "events", "functions", "procedures",
                   "triggers", "views", "tables", "create_db")
@@ -83,11 +83,11 @@ class test(import_basic.test):
                 except MUTException, e:
                     raise e
                 case_num += 1
-                
-                
+
+
         # Now test --skip=data, --skip-blobs
         # Create an import file with blobs
-        
+
         try:
             res = self.server1.exec_query("ALTER TABLE util_test.t3 "
                                           "ADD COLUMN me_blob BLOB")
@@ -95,7 +95,7 @@ class test(import_basic.test):
                                           "me_blob = 'This, is a BLOB!'")
         except MySQLUtilError, e:
             raise MUTException("Failed to add blob column: %s" % e.errmsg)
-            
+
         export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
                      from_conn
         export_cmd += "--format=%s --display=BRIEF > %s " % \
@@ -132,28 +132,25 @@ class test(import_basic.test):
         if not res:
             raise MUTException("%s: failed" % comment)
         case_num += 1
-        
-        # Lastly, do a silent import
 
-        cmd_str = "mysqldbimport.py %s %s --import=both --silent " % \
+        # Lastly, do a quiet import
+
+        cmd_str = "mysqldbimport.py %s %s --import=both --quiet " % \
                   (to_conn, self.export_import_file)
         cmd_str += " --format=CSV --bulk-insert "
-        comment = "Test case %d - no %s" % (case_num, "messages (silent)")
+        comment = "Test case %d - no %s" % (case_num, "messages (quiet)")
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
         case_num += 1
-        
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return import_basic.test.cleanup(self)
-
-
-

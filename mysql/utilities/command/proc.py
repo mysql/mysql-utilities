@@ -23,14 +23,14 @@ import mysql.connector
 
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
-ID      = "Id"
-USER    = "User"
-HOST    = "Host"
-DB      = "Db"
-COMMAND = "Command"
-TIME    = "Time"
-STATE   = "State"
-INFO    = "Info"
+ID      = "ID"
+USER    = "USER"
+HOST    = "HOST"
+DB      = "DB"
+COMMAND = "COMMAND"
+TIME    = "TIME"
+STATE   = "STATE"
+INFO    = "INFO"
 
 def _spec(info):
     """Create a server specification string from an info structure."""
@@ -53,11 +53,10 @@ SELECT
 FROM
   INFORMATION_SCHEMA.PROCESSLIST{condition}"""
 
-def _make_select(matches, use_regexp):
+def _make_select(matches, use_regexp, conditions):
     """Generate a SELECT statement for matching the processes.
     """
     oper = 'REGEXP' if use_regexp else 'LIKE'
-    conditions = []
     for field, pattern in matches:
         conditions.append("    {0} {1} {2}".format(field, oper, _obj2sql(pattern)))
     if len(conditions) > 0:
@@ -65,6 +64,44 @@ def _make_select(matches, use_regexp):
     else:
         condition = ""
     return _SELECT_PROC_FRM.format(condition=condition)
+
+# Map to map single-letter suffixes number of seconds
+_SECS = { 's': 1, 'm': 60, 'h': 3600, 'd': 24 * 3600, 'w': 7 * 24 * 3600 }
+
+_INCORRECT_FORMAT_MSG = "'{0}' does not have correct format"
+
+def _make_age_cond(age):
+    from mysql.utilities.exception import FormatError
+
+    # Accept an age description return a timedelta representing the
+    # age.  We allow the forms: hh:mm:ss, mm:ss, 4h3m, with suffixes d
+    # (days), w (weeks), h (hours), m (minutes), and s(seconds)
+    mobj = re.match(r"([+-])?(?:(?:(\d?\d):)?(\d?\d):)?(\d?\d)\Z", age)
+    if mobj:
+        sign, hrs, mins, secs = mobj.groups()
+        if not hrs:
+            hrs = 0
+        if not mins:
+            mins = 0
+        seconds = int(secs) + 60 * (int(mins) + 60 * int(hrs))
+        oper = "<=" if sign and sign == "-" else ">="
+        return '    {0} {1} {2}'.format(TIME, oper, seconds)
+    mobj = re.match(r"([+-])?(\d+[dwhms])+", age)
+    if mobj:
+        sign = None
+        if mobj.group(1):
+            sign = age[0]
+            age = age[1:]
+        seconds = 0
+        periods = [x for x in re.split("(\d+[dwhms])", age)]
+        if len(''.join(x[0::2])) > 0:
+            raise FormatError(_INCORRECT_FORMAT_MSG.format(age))
+        args = {}
+        for period in periods[1::2]:
+            seconds += int(period[0:-1]) * _SECS[period[-1:]]
+        oper = "<=" if sign and sign == "-" else ">="
+        return '    {0} {1} {2}'.format(TIME, oper, seconds)
+    raise FormatError(_INCORRECT_FORMAT_MSG.format(age))
 
 _KILL_BODY = """
 DECLARE kill_done INT;
@@ -87,8 +124,9 @@ BEGIN{body}
 END"""
 
 class ProcessGrep(object):
-    def __init__(self, matches, actions=[], use_regexp=False):
-        self.__select = _make_select(matches, use_regexp).strip()
+    def __init__(self, matches, actions=[], use_regexp=False, age=None):
+        conds = [_make_age_cond(age)] if age else []
+        self.__select = _make_select(matches, use_regexp, conds).strip()
         self.__actions = actions
 
     def sql(self, only_body=False):

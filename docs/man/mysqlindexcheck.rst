@@ -12,8 +12,8 @@ SYNOPSIS
   mysqlcheckindex --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                   --silent | --index-format=[GRID|SQL|TAB|CSV] |
-                   --stat [--best=<num_rows> | --worst=<num rows> ]]
+                   --quiet | --index-format=[GRID|SQL|TAB|CSV] |
+                   --stats [--best=<num_rows> | --worst=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
@@ -51,13 +51,6 @@ indexes, you can specify the -d option (see below). You can also
 examine the existing indexes using the :option:`-v` option which
 prints the equivalent **CREATE INDEX** (or **ALTER TABLE** for primary
 keys).
-
-For example, to scan all of the tables in my_db, tables db1.t1 and
-db2.t2 and see the indexes and the DROP statements for the duplicate
-and redundant indexes, use this command::
-
-   mysqlcheckindex --server=root@localhost:3306 -i \
-                   my_db db1.t1 db2.t2
 
 You can also display the best and worst non-primary key indexes for
 each table with the :option:`--best` and :option:`--worst`
@@ -143,6 +136,40 @@ NOTES
 
 The login user must have the appropriate permissions to read all databases
 and tables listed.
+
+EXAMPLES
+--------
+
+To scan all of the tables in the employees database to see the possible
+redundant and duplicate indexes as well as the DROP statements for the indexes,
+use this command::
+
+    $ python .mysqlindexcheck.py --server=root@localhost employees
+    # Source on localhost: ... connected.
+    # The following indexes are duplicates or redundant \\
+      for table employees.dept_emp:
+    #
+    CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
+    #     may be redundant or duplicate of:
+    ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
+    # The following indexes are duplicates or redundant \\
+      for table employees.dept_manager:
+    #
+    CREATE INDEX emp_no ON employees.dept_manager (emp_no) USING BTREE
+    #     may be redundant or duplicate of:
+    ALTER TABLE employees.dept_manager ADD PRIMARY KEY (emp_no, dept_no)
+    # The following indexes are duplicates or redundant \\
+      for table employees.salaries:
+    #
+    CREATE INDEX emp_no ON employees.salaries (emp_no) USING BTREE
+    #     may be redundant or duplicate of:
+    ALTER TABLE employees.salaries ADD PRIMARY KEY (emp_no, from_date)
+    # The following indexes are duplicates or redundant \\
+      for table employees.titles:
+    #
+    CREATE INDEX emp_no ON employees.titles (emp_no) USING BTREE
+    #     may be redundant or duplicate of:
+    ALTER TABLE employees.titles ADD PRIMARY KEY (emp_no, title, from_date)
 
 COPYRIGHT
 ---------

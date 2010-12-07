@@ -37,40 +37,40 @@ class test(mysql_test.System_test):
                                data_file + e.errmsg)
         return True
 
-    
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-        
+
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
-        
+
         cmd = "mysqldbexport.py %s util_test  " % from_conn
-       
+
         comment = "Test case 1 - export metadata only"
         cmd_str = cmd + " --export=definitions --format=SQL --skip=events "
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
+
         comment = "Test case 2 - export data only - single rows"
-        cmd_str = cmd + " --export=data --format=SQL " 
+        cmd_str = cmd + " --export=data --format=SQL "
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
+
         comment = "Test case 3 - export data only - bulk insert"
-        cmd_str = cmd + " --export=data --format=SQL --bulk-insert" 
+        cmd_str = cmd + " --export=data --format=SQL --bulk-insert"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
+
         comment = "Test case 4 - export data and metadata"
         cmd_str = cmd + " --export=both --format=SQL --skip=events"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
-        comment = "Test case 5 - export data and metadata with silent"
-        cmd_str = cmd + " --export=both --format=SQL --skip=events --silent"
+
+        comment = "Test case 5 - export data and metadata with quiet"
+        cmd_str = cmd + " --export=both --format=SQL --skip=events --quiet"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
@@ -82,21 +82,21 @@ class test(mysql_test.System_test):
             raise MUTException("%s: failed" % comment)
 
         self.replace_result("Time:", "Time:       XXXXXX\n")
-        
+
         _REPLACEMENTS = ("PROCEDURE", "FUNCTION", "TRIGGER", "SQL")
-        
+
         for replace in _REPLACEMENTS:
             self.mask_result_portion("CREATE", "DEFINER=", replace,
                                      "DEFINER=`XXXX`@`XXXXXXXXX` ")
 
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
@@ -108,7 +108,7 @@ class test(mysql_test.System_test):
         except:
             return False
         return True
-    
+
     def drop_all(self):
         try:
             self.drop_db(self.server1, "util_test")
@@ -120,7 +120,3 @@ class test(mysql_test.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

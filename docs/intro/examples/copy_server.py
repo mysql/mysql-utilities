@@ -59,17 +59,17 @@ parser.add_option("--server", action="store", dest="server",
 
 # Data directory for new instance
 parser.add_option("--new-data", action="store", dest="new_data",
-                  type="string", help="the full path to the location " 
+                  type="string", help="the full path to the location "
                   "of the data directory for the new instance")
 
 # Port for the new instance
 parser.add_option("--new-port", action="store", dest="new_port",
-                  type="string", default="3307", help="the new port " 
+                  type="string", default="3307", help="the new port "
                        "for the new instance - default=%default")
 
 # Server id for the new instance
 parser.add_option("--new-id", action="store", dest="new_id",
-                  type="string", default="2", help="the server_id for " 
+                  type="string", default="2", help="the server_id for "
                        "the new instance - default=%default")
 
 # List of databases
@@ -144,8 +144,8 @@ dest_values = {
 
 # Build dictionary of options
 options = {
-    "silent" : True,
-    "force"  : True
+    "quiet" : True,
+    "force" : True
 }
 
 print "# Copying databases..."
@@ -154,11 +154,11 @@ try:
 except exception.MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
-    
+
 # Build dictionary of options
 options = {
     "overwrite" : True,
-    "silent"    : True,
+    "quiet"     : True,
     "globals"   : True
 }
 
@@ -169,8 +169,6 @@ for user in user_list:
                                    (user,), options)
     except exception.MySQLUtilError, e:
         print "ERROR:", e.errmsg
-        exit(1) 
-    
-print "# ...done."
-    
+        exit(1)
 
+print "# ...done."

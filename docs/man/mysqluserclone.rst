@@ -13,7 +13,7 @@ SYNOPSIS
   mysqluserclone --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[--help | --version | --list | --format=<format>] |
-                 [ --dump  | --verbose | --force |
+                 [ --dump  | --verbose | --force | --quiet |
                  --include-global-privileges ] <base_user>
                  <new_user>[:<password>] [,<new_user>[:<password>]]]
 
@@ -25,12 +25,6 @@ account on one server as a template, clone a MySQL user such that one
 or more new user accounts are created on another (or the same) server
 with the same privileges as the original user.
 
-For example, to clone 'joe' as 'sam' and 'sally' with passwords and logging in
-as root on the local machine, use this command::
-
-  mysqluserclone --source=root@localhost:3306 joe@localhost \\
-                 sam:secret1@somehost, sally:secret2@localhost
-
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects
 in the operation.
@@ -38,10 +32,7 @@ in the operation.
 You can also use the utility to list users for a server by specifying the
 --list option. This prints a list of the users on the source (no destination
 is needed). You can also control the output of the list using the --format
-option. For example, the following shows all of the users on the localhost
-server in the most verbose output in a TAB format.
-
-  mysqluserclone --source=root@localhost --list --format=TAB
+option.
 
 OPTIONS
 -------
@@ -79,9 +70,9 @@ OPTIONS
 
    drop the new user if it exists
 
-.. option:: --silent
+.. option:: -q, --quiet
 
-   turn off all messages for silent execution
+   turn off all messages for quiet execution
 
 .. option:: -v, --verbose
 
@@ -110,6 +101,34 @@ users, access (read) the mysql database, and grant privileges. At a
 minimum, this requires the login user to have read on the mysql
 database, the **WITH GRANT OPTION** for all databases listed in the
 **GRANT** statements found, and the ability to create a user account.
+
+EXAMPLES
+--------
+
+To clone 'joe' as 'sam' and 'sally' with passwords and logging in as root on
+the local machine, use this command::
+
+    $ python mysqluserclone.py --source=root@localhost \\
+      --destination=root@localhost \\
+      joe@localhost sam:secret1@localhost sally:secret2@localhost
+    # Source on localhost: ... connected.
+    # Destination on localhost: ... connected.
+    # Cloning 2 users...
+    # Cloning joe@localhost to user sam:secret1@localhost
+    # Cloning joe@localhost to user sally:secret2@localhost
+    # ...done.
+
+The following shows all of the users on the localhost server in the most
+verbose output in a CSV format.::
+
+    $ python mysqluserclone.py --source=root@localhost --list --format=CSV -vvv
+    # Source on localhost: ... connected.
+    user,host,database
+    joe,localhost,util_test
+    rpl,localhost,
+    sally,localhost,util_test
+    sam,localhost,util_test
+    joe,user,util_test
 
 COPYRIGHT
 ---------

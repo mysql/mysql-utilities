@@ -9,7 +9,8 @@ SYNOPSIS
 
 ::
 
- mysqlserverclone  [[ --help | --version] | <login information>
+ mysqlserverclone  [[ --help | --version] | --quiet |
+                   --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
                    [ --new-data=<datadir> | --new-port=<port> |
                      --new-id=<server_id> ] | --root-password=<passwd> ]
 
@@ -21,12 +22,6 @@ running server.  The utility will create a new datadir (--new-data),
 and start the server with a socket file. You can optionally add a
 password for the login user account on the new instance.
 
-For example, to create a new instance of a typical MySQL instances,
-use this command::
-
- mysqlserverclone --server=root:passwd@localhost --new-id=3 \
-                  --new-data=/Users/joe/data --root-password=xxxx  
-
 OPTIONS
 -------
 
@@ -36,7 +31,7 @@ OPTIONS
 
 .. option:: --help, -h
 
-   show the help page       
+   show the help page
 
 .. option:: --server <source>
 
@@ -47,6 +42,10 @@ OPTIONS
 
    control how much information is displayed. e.g., -v =
    verbose, -vv = more verbose, -vvv = debug
+
+.. option:: -q, --quiet
+
+   turn off all messages for quiet execution
 
 .. option:: --new-data <path to new datadir>
 
@@ -74,6 +73,27 @@ NOTES
 
 The login user must have the appropriate permissions to grant access
 to all databases and the ability to create a user account.
+
+EXAMPLES
+--------
+
+The following demonstrates how to create a new instance of a running server
+and setting the root password and turning binary logging on.::
+
+    $ mkdir /source/test123
+    $ python mysqlserverclone.py --server=root:pass@localhost \
+      --new-data=/Users/cbell/source/test123 --new-port=3310 \
+      --root-password=pass --mysqld=--log-bin=mysql-bin
+    # Cloning the MySQL server running on localhost.
+    # Creating new data directory...
+    # Configuring new instance...
+    # Locating mysql tools...
+    # Setting up empty database and mysql tables...
+    # Starting new instance of the server...
+    # Testing connection to new instance...
+    # Success!
+    # Setting the root password...
+    # ...done.
 
 COPYRIGHT
 ---------

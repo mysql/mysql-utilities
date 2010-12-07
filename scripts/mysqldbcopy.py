@@ -42,7 +42,7 @@ USAGE = "%prog --source=user:pass@host:port:socket " \
 
 def print_elapsed_time(start_test):
     """ Print the elapsed time to stdout (screen)
-    
+
     start_test[in]      The starting time of the test
     """
     stop_test = time.time()
@@ -69,7 +69,7 @@ parser.add_option("--source", action="store", dest="source",
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
-                  type = "string", 
+                  type = "string",
                   help="connection information for destination server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
@@ -92,7 +92,7 @@ parser.add_option("--threads", action="store", dest="threads",
 # Add the skip common options
 add_skip_options(parser)
 
-# Add verbosity and silent mode
+# Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
@@ -112,8 +112,8 @@ if opt.destination is None:
 if len(args) == 0:
     parser.error("You must specify at least one database to copy.")
 
-# Warn if silent and verbosity are both specified
-check_verbosity(opt)    
+# Warn if quiet and verbosity are both specified
+check_verbosity(opt)
 
 # Set options for database operations.
 options = {
@@ -129,7 +129,7 @@ options = {
     "copy_dir"      : opt.copy_dir,
     "force"         : opt.force,
     "verbose"       : opt.verbosity >= 1,
-    "silent"        : opt.silent,
+    "quiet"         : opt.quiet,
     "threads"       : opt.threads,
     "debug"         : opt.verbosity == 3
 }

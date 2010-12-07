@@ -34,9 +34,9 @@ _MAXAVERAGE_CALC = 100
 
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
-    
+
     qualified_name[in] MySQL object string (e.g. db.table)
-                       
+
     Returns tuple containing name split
     """
 
@@ -55,11 +55,11 @@ class Index(object):
         - Check for duplicates
         - Create DROP statement for index
         - Print index CREATE statement
-    """   
-    
+    """
+
     def __init__(self, db, index_tuple, verbose=False):
         """Constructor
-        
+
         db[in]             Name of database
         index_tuple[in]    A tuple from the get_tbl_indexes() result set
         verbose[in]        print extra data during operations (optional)
@@ -93,7 +93,7 @@ class Index(object):
         Returns True if col_a has the same name as col_b and if the
         subparts are col_a.sub <= col_b.sub.
         """
-        
+
         sz_this = col_a[1]
         sz_that = col_b[1]
         # if column has the same name
@@ -117,12 +117,12 @@ class Index(object):
 
     def __check_column_list(self, index):
         """Compare the column list of this index with another
-        
+
         index[in]          Instance of Index to compare
 
         Returns True if column list is a subset of index.
         """
-        
+
         # Uniqueness counts - can't be duplicate if uniquess differs
         #                     except for primary keys which are always unique
         if index.name != "PRIMARY":
@@ -163,7 +163,7 @@ class Index(object):
 
         Returns True if this index is a subset of the Index presented.
         """
-        
+
         # Don't compare the same index - no two indexes can have the same name
         if (self.name == index.name):
             return False
@@ -192,7 +192,7 @@ class Index(object):
 
         Returns the DROP statement for this index.
         """
-        
+
         if self.name == "PRIMARY":
            return None
         query_str = "ALTER TABLE %s.%s DROP INDEX %s" % \
@@ -202,13 +202,13 @@ class Index(object):
 
     def __get_column_list(self):
         """Get the column list for an index
-        
+
         This method is used to print the CREATE and DROP statements
-        
+
         Returns a string representing the list of columns for a
         column list. e.g. 'a, b(10), c'
         """
-        
+
         col_str = ""
         stop = len(self.columns)
         i = 0
@@ -221,12 +221,12 @@ class Index(object):
             if (stop > 1) and (i < stop):
                 col_str = col_str + ", "
         return col_str
-    
-    
+
+
     def print_index_sql(self):
         """Print the CREATE INDEX for indexes and ALTER TABLE for a primary key
         """
-        
+
         if self.name == "PRIMARY":
             print "ALTER TABLE %s.%s ADD PRIMARY KEY (%s)" % \
                   (self.db, self.table, self.__get_column_list())
@@ -261,11 +261,11 @@ class Table:
         - Extract table data
         - Import table data
         - Copy table data
-    """   
-    
+    """
+
     def __init__(self, server1, name, verbose=False, get_cols=False):
         """Constructor
-        
+
         server[in]         A Server object
         name[in]           Name of table in the form (db.table)
         verbose[in]        print extra data during operations (optional)
@@ -273,13 +273,13 @@ class Table:
         get_cols[in]       If True, get the column metadata on construction
                            (default is False)
         """
-    
+
         self.verbose = verbose
         self.server = server1
         self.table = name
         self.db_name, self.tbl_name = _parse_object_name(name)
         self.obj_type = "TABLE"
-       
+
         # We store each type of index in a separate list to make it easier
         # to manipulate
         self.btree_indexes = []
@@ -301,20 +301,20 @@ class Table:
         # Watch for invalid values
         if self.max_packet_size > _MAXPACKET_SIZE:
             self.max_packet_size = _MAXPACKET_SIZE
-            
-        self._insert = "INSERT INTO %s.%s VALUES " 
+
+        self._insert = "INSERT INTO %s.%s VALUES "
 
 
     def exists(self, tbl_name=None):
         """Check to see if the table exists
-        
+
         tbl_name[in]       table name (db.table)
                            (optional) If omitted, operation is performed
                            on the class instance table name.
 
         return True = table exists, False = table does not exist
         """
-        
+
         db, table = (None, None)
         if tbl_name:
             db, table = _parse_object_name(tbl_name)
@@ -330,8 +330,8 @@ class Table:
             raise e
         #print "res", res
         return (res is not None and len(res) >= 1)
-        
-    
+
+
     def get_column_metadata(self, columns=None):
         """Get information about the table for the bulk insert operation.
 
@@ -341,7 +341,7 @@ class Table:
         """
 
         rows = None
-        
+
         # Get field masks for blob and quoted fields
         # Build an array of dictionaries describing the fields
         special_cols = []
@@ -376,13 +376,13 @@ class Table:
                     }
                 special_cols.append(col_data)
         return special_cols
-    
+
 
     def get_col_names(self, col_metadata=None):
         """Get column names for the export operation.
-        
+
         col_metadata[in]   If provided, get column names from metadata
-        
+
         Return (list) column names
         """
 
@@ -398,11 +398,11 @@ class Table:
             for col in col_metadata:
                 cols.append(col.get("name"))
         return cols
-    
+
 
     def _build_update_blob(self, row, new_db, name, special_cols, blob_col):
         """ Build an UPDATE statement to update blob fields.
-        
+
         row[in]            a row to process
         new_db[in]         new database name
         name[in]           name of the table
@@ -413,7 +413,7 @@ class Table:
 
         Returns tuple (UPDATE string, blob data)
         """
-        
+
         blob_insert = "UPDATE %s.%s SET `" % (new_db, name)
         where_clause = "WHERE "
         data_clause = None
@@ -428,11 +428,11 @@ class Table:
                 where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
                                                   row[col])
         return (blob_insert + where_clause, data)
-    
-    
+
+
     def get_column_string(self, row, new_db, col_metadata=None):
         """Return a formatted list of column data.
-        
+
         row[in]            a row to process
         new_db[in]         new database name
         col_metadata[in]   list of columns for special string handling
@@ -448,7 +448,7 @@ class Table:
         stop = len(row)
         for col in range(0,stop):
             if row[col] == None:
-                val_str += "NULL" 
+                val_str += "NULL"
             else:
                 # Save blob updates for later...
                 if col_metadata[col]["has_blob"]: # It is a blob field!
@@ -470,18 +470,18 @@ class Table:
             if (col + 1) < stop:
                 val_str += ", "
         val_str += ")"
-        
+
         return (val_str, blob_inserts)
 
-    
+
     def make_bulk_insert(self, rows, new_db, col_metadata=None):
         """Create bulk insert statements for the data
-        
+
         Reads data from a table (rows) and builds group INSERT statements for
         bulk inserts.
 
         Note: This method does not print any information to stdout.
-    
+
         rows[in]           a list of rows to process
         new_db[in]         new database name
         col_metadata[in]   the column metadata - call get_column_metadata() to
@@ -509,7 +509,7 @@ class Table:
 
             col_data = self.get_column_string(row, new_db, col_metadata)
             val_str = col_data[0]
-            
+
             if len(col_data[1]) > 0:
                 blob_inserts.extend(col_data[1])
 
@@ -530,11 +530,11 @@ class Table:
             data_inserts.append(insert_str)
 
         return (data_inserts, blob_inserts)
-        
+
 
     def get_segment_size(self, num_conn=1):
         """Get the segment size based on number of connections (threads).
-        
+
         num_conn[in]       Number of threads(connections) to use
                            Default = 1 (one large segment)
 
@@ -560,7 +560,7 @@ class Table:
 
         if num_conn <= 1:
             return num_rows
-        
+
         # Calculate number of threads and segment size to fetch
         thread_limit = num_conn
         if thread_limit > _MAXTHREADS_INSERT:
@@ -568,7 +568,7 @@ class Table:
         if num_rows > (_MAXROWS_PER_THREAD * thread_limit):
             max_threads = thread_limit
         else:
-            max_threads = int(num_rows / _MAXROWS_PER_THREAD) 
+            max_threads = int(num_rows / _MAXROWS_PER_THREAD)
         if max_threads == 0:
             max_threads = 1
         if max_threads > 1 and self.verbose:
@@ -579,25 +579,25 @@ class Table:
 
     def _bulk_insert(self, rows, new_db, destination=None):
         """Import data using bulk insert
-        
+
         Reads data from a table and builds group INSERT statements for writing
         to the destination server specified (new_db.name).
-        
+
         This method is designed to be used in a thread for parallel inserts.
         As such, it requires its own connection to the destination server.
 
         Note: This method does not print any information to stdout.
-    
+
         rows[in]           a list of rows to process
         new_db[in]         new database name
         destination[in]    the destination server
         """
-        
+
         from mysql.utilities.common.server import Server
-        
+
         if self.dest_vals is None:
             self.dest_vals = self.get_dest_values(destination)
-        
+
         # Spawn a new connection
         dest = Server(self.dest_vals, "thread")
         try:
@@ -610,14 +610,14 @@ class Table:
             fkey_on = dest.toggle_fkeys(False)
         except MySQLUtilError, e:
             raise e
-            
+
         if self.col_metadata is None:
             self.col_metadata = self.get_column_metadata()
 
         data_lists = self.make_bulk_insert(rows, new_db, self.col_metadata)
         insert_data = data_lists[0]
         blob_data = data_lists[1]
-        
+
         # Insert the data first
         for data_insert in insert_data:
             try:
@@ -625,7 +625,7 @@ class Table:
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem inserting data. "
                                      "Error = %s" % e.errmsg)
-        
+
         # Now insert the blob data if there is any
         for blob_insert in blob_data:
             try:
@@ -635,7 +635,7 @@ class Table:
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem updating blob field. "
                                      "Error = %s" % e.errmsg)
- 
+
         # Now, turn on foreign keys if they were on at the start
         if fkey_on:
             try:
@@ -643,17 +643,17 @@ class Table:
             except MySQLUtilError, e:
                 raise e
         del dest
-            
-            
+
+
     def insert_rows(self, rows, new_db, destination=None, spawn=False):
         """Insert rows in the table using bulk copy.
-        
+
         This method opens a new connect to the destination server to insert
         the data with a bulk copy. If spawn is True, the method spawns a new
         process and returns it. This allows for using a multi-threaded insert
         which can be faster on some platforms. If spawn is False, the method
         will open a new connection to insert the data.
-        
+
         num_conn[in]       Number of threads(connections) to use for insert
         rows[in]           List of rows to insert
         new_db[in]         Rename the db to this name
@@ -665,14 +665,14 @@ class Table:
         Returns If spawn == True, process
                 If spawn == False, None
         """
-        
+
         if self.col_metadata is None:
             self.col_metadata = self.get_column_metadata()
-            
+
         if self.dest_vals is None:
             self.dest_vals = self.get_dest_values(destination)
-        
-        proc = None    
+
+        proc = None
         try:
             if spawn:
                 proc = multiprocessing.Process(target=self._bulk_insert,
@@ -682,18 +682,18 @@ class Table:
         except MySQLUtilError, e:
             raise e
         return proc
-        
-        
-    def copy_data(self, destination, new_db=None, connections=1):                        
+
+
+    def copy_data(self, destination, new_db=None, connections=1):
         """Retrieve data from a table and copy to another server and database.
-        
+
         Reads data from a table and inserts the correct INSERT statements into
         the file provided.
-        
+
         Note: if connections < 1 - retrieve the data one row at-a-time
-    
+
         destination[in]    Destination server
-        new_db[in]         Rename the db to this name 
+        new_db[in]         Rename the db to this name
         connections[in]    Number of threads(connections) to use for insert
         """
 
@@ -709,32 +709,32 @@ class Table:
                 p = self.insert_rows(rows, new_db, destination, num_conn > 1)
                 if p is not None:
                     p.start()
-                    pthreads.append(p)    
+                    pthreads.append(p)
             except MySQLUtilError, e:
                 raise e
 
         if num_conn > 1:
-            # Wait for all to finish            
+            # Wait for all to finish
             num_complete = 0
             while num_complete < len(pthreads):
                 for p in pthreads:
                     if not p.is_alive():
                         num_complete += 1
 
-        
-    def retrieve_rows(self, num_conn=1):                        
+
+    def retrieve_rows(self, num_conn=1):
         """Retrieve the table data in rows.
-        
+
         This method can be used to retrieve rows from a table as a generator
         specifying how many rows to retrieve at one time (segment_size is
         calculated based on number of rows / number of connections).
 
         Note: if num_conn < 1 - retrieve the data one row at-a-time
-        
+
         num_conn[in]       Number of threads(connections) to use
                            Default = 1 (one large segment)
 
-        Returns (yield) row data 
+        Returns (yield) row data
         """
 
         segment_size = self.get_segment_size(num_conn)
@@ -759,7 +759,7 @@ class Table:
                 elif num_conn == 1:
                     rows = cur.fetchall()
                     #print "ROWS 2:", rows
-                    yield rows        
+                    yield rows
                     raise StopIteration()
                 else:
                     rows = cur.fetchmany(segment_size)
@@ -771,16 +771,16 @@ class Table:
             if rows is None:
                 raise StopIteration()
             yield rows
-            
+
         cur.close()
 
-    
+
     def get_dest_values(self, destination = None):
         """Get the destination connection values if not already set.
 
         destination[in]    Connection values for destination server
-        
-        Returns connection values for destination if set or self.server 
+
+        Returns connection values for destination if set or self.server
         """
         # Get connection to database
         if destination is None:
@@ -799,12 +799,12 @@ class Table:
                 "unix_socket" : destination.socket,
                 "port"        : destination.port
             }
-        return conn_val        
-    
-    
+        return conn_val
+
+
     def get_tbl_indexes(self):
         """Return a result set containing all indexes for a given table
-        
+
         Returns result set
         """
         try:
@@ -812,32 +812,32 @@ class Table:
         except MySQLUtilError, e:
             raise e
         return res
-    
+
 
     def __append(self, indexes, index):
         """Encapsulated append() method to ensure the primary key index
         is placed at the front of the list.
         """
-        
+
         # Put the primary key first so that it can be compared to all indexes
         if index.name == "PRIMARY":
             indexes.insert(0, index)
         else:
             indexes.append(index)
-            
-        
+
+
     def __check_index(self, index, indexes, master_list):
         """Check a single index for duplicate or redundancy against a list
         of other Indexes.
-        
+
         index[in]          The Index to compare
         indexes[in]        A list of Index instances to compare
         master_list[in]    A list of know duplicate Index instances
-        
+
         Returns a tuple of whether duplicates are found and if found the
         list of duplicate indexes for this table
         """
-        
+
         duplicates_found = False
         duplicate_list = []
         if indexes and index:
@@ -852,13 +852,13 @@ class Table:
                         idx.duplicate_of = index
                         duplicate_list.append(idx)
         return (duplicates_found, duplicate_list)
-        
-    
+
+
     def __check_index_list(self, indexes):
         """Check a list of Index instances for duplicates.
-        
+
         indexes[in]        A list of Index instances to compare
-        
+
         Returns a tuple of whether duplicates are found and if found the
         list of duplicate indexes for this table
         """
@@ -874,8 +874,8 @@ class Table:
                 duplicates_found = True
                 duplicate_list.extend(res[1])
         return (duplicates_found, duplicate_list)
-        
-        
+
+
     def _get_index_list(self):
         """ Get the list of indexes for a table.
         Returns list containing indexes.
@@ -884,13 +884,13 @@ class Table:
             rows = self.get_tbl_indexes()
         except MySQLUtilError, e:
             raise e
-        return rows        
+        return rows
 
 
     def get_indexes(self):
         """Retrieve the indexes from the server and load them into lists
         based on type.
-        
+
         Returns True - table has indexes, False - table has no indexes
         """
 
@@ -905,7 +905,7 @@ class Table:
             rows = self._get_index_list()
         except MySQLUtilError, e:
             raise e
-        
+
         # Return False if no indexes found.
         if not rows:
             return False
@@ -913,7 +913,7 @@ class Table:
         prev_name = ""
         for row in rows:
             if (row[2] != prev_name) or (prev_name == ""):
-                prev_name = row[2]                
+                prev_name = row[2]
                 idx = Index(self.db_name, row)
                 if idx.type == "BTREE":
                     self.__append(self.btree_indexes, idx)
@@ -926,18 +926,18 @@ class Table:
             elif idx:
                 idx.add_column(row[4], row[7])
         return True
-    
-    
-    def check_indexes(self, show_drops=False, silent=False):
+
+
+    def check_indexes(self, show_drops=False, quiet=False):
         """Check for duplicate or redundant indexes and display all matches
 
         show_drops[in]     (optional) If True the DROP statements are printed
-        silent[in]         (optional) If True, do not print info messages
-       
+        quiet[in]         (optional) If True, do not print info messages
+
         Note: You must call get_indexes() prior to calling this method. If
         get_indexes() is not called, no duplicates will be found.
         """
-        
+
         dupes = []
         res = self.__check_index_list(self.btree_indexes)
         # if there are duplicates, add them to the dupes list
@@ -974,7 +974,7 @@ class Table:
                     print "%s;" % (index.get_drop_statement())
                 print "#"
         else:
-            if not silent:
+            if not quiet:
                 print "# Table %s has no duplicate indexes." % (self.table)
 
 
@@ -989,7 +989,7 @@ class Table:
         best[in]           (optional) if True, print best performing indexes
                                       if False, print worst performing indexes
         """
-       
+
         _QUERY = """
             SELECT
                 t.TABLE_SCHEMA AS `db`, t.TABLE_NAME AS `table`,
@@ -1022,10 +1022,10 @@ class Table:
                 0.01)) <= 1.00
             ORDER BY `sel_percent`
         """
-        
+
         from mysql.utilities.common.format import format_tabular_list
         from mysql.utilities.common.format import format_vertical_list
-        
+
         rows = []
         type = "best"
         if not best:
@@ -1089,7 +1089,7 @@ class Table:
 
         format[in]         format out output = SQL, TABLE, TAB, CSV
         """
-        
+
         print "# Showing indexes from %s:\n#" % (self.table)
         if format == "SQL":
             self.__print_index_list(self.btree_indexes, format, True)
@@ -1105,7 +1105,7 @@ class Table:
             self.__print_index_list(master_indexes, format, True)
         print "#"
 
-    
+
     def has_primary_key(self):
         """ Check to see if there is a primary key.
         Returns bool - True - a primary key was found,
@@ -1120,5 +1120,3 @@ class Table:
             if row[2] == "PRIMARY":
                 primary_key = True
         return primary_key
-           
-

@@ -11,7 +11,7 @@ SYNOPSIS
 
  mysqldbcopy --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
              --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
-             (<db_name>[:<new_name>])+ [--verbose | --overwrite |
+             (<db_name>[:<new_name>])+ [--verbose | --quiet |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version |
              --threads=<num threads>]
@@ -21,20 +21,13 @@ DESCRIPTION
 
 This utility permits a database administrator to copy a database from
 one server (source) either to another server (destinaton) as the same
-name or a different name or to the same server (destination) as a
-different name (e.g. clone).
+name or a different name or to the same server (destination) as the same or
+as a different name (e.g. clone).
 
 The operation copies all objects (tables, views, triggers, events, procedures,
 functions, and database-level grants) to the destination server. The utility
 will also copy all data. There are options to turn off copying any or all of
-the objects as well as not copying the data. 
-
-For example, to copy the database 'dev' from server1 on port 3306 to
-server2 via a socket connection renaming the database to 'dev_test',
-use this command::
-
-  mysqldbcopy --source=root@server1:3306 dev:dev_test \
-              --destination=root@server2::/mysql.sock
+the objects as well as not copying the data.
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects in
@@ -51,7 +44,7 @@ The following command line options are accepted by **mysqldbcopy**:
 
 .. option:: --help
 
-   show the help page       
+   show the help page
 
 .. option:: --source <source>
 
@@ -76,13 +69,13 @@ The following command line options are accepted by **mysqldbcopy**:
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
-.. option:: -o, --overwrite
+.. option:: -f, --force
 
    drop the new database or object if it exists
 
-.. option:: --silent
+.. option:: -q, --quiet
 
-   turn off all messages for silent execution
+   turn off all messages for quiet execution
 
 .. option:: -v, --verbose
 
@@ -116,12 +109,38 @@ depending on the security privileges present and whether the database
 contains certain objects (e.g. views, events) and whether binary
 logging is turned on (i.e. the need for **SUPER**).
 
-NOTICE
-------
-
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is copied.
+
+EXAMPLES
+--------
+
+The following example demonstrates how to use the utility to copy a database
+named 'util_test' to a new name 'util_test_copy' on the same server.::
+
+    $ python mysqldbcopy.py \\
+      --source=root:pass@localhost:3310:/test123/mysql.sock \\
+      --destination=root:pass@localhost:3310:/test123/mysql.sock \\
+      util_test:util_test_copy
+    # Source on localhost: ... connected.
+    # Destination on localhost: ... connected.
+    # Copying database util_test renamed as util_test_copy
+    # Copying TABLE util_test.t1
+    # Copying table data.
+    # Copying TABLE util_test.t2
+    # Copying table data.
+    # Copying TABLE util_test.t3
+    # Copying table data.
+    # Copying TABLE util_test.t4
+    # Copying table data.
+    # Copying VIEW util_test.v1
+    # Copying TRIGGER util_test.trg
+    # Copying PROCEDURE util_test.p1
+    # Copying FUNCTION util_test.f1
+    # Copying EVENT util_test.e1
+    # Copying GRANTS from util_test
+    #...done.
 
 COPYRIGHT
 ---------

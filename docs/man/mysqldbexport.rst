@@ -10,32 +10,19 @@ SYNOPSIS
 ::
 
  mysqldbexport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
-             (<db_name>[, <db_name>])+ [--silent | --help | --no-headers | 
+             (<db_name>[, <db_name>])+ [--quiet | --help | --no-headers |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
-             --version | --bulk-insert]
+             --veerbose | --version | --bulk-insert | --file-per-table |
+             --export=[DEFINITIONS|DATA|BOTH] |
+             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] ]
 
 DESCRIPTION
 -----------
 
 This utility permits a database administrator to export the metadata
 (object definitions, hence definitions) or data or both from one or more
-databases. For example, to export the definitions of the database 'dev' from
-server1 on port 3306 producing **CREATE** statements, use this command::
-
-  mysqldbexport --server=root@server1:3306 --export=definitions dev
-  
-Similarly, to export the data of the database 'dev' from server1 on port 3306
-producing bulk insert statements, use this command::
-
-  mysqldbexport --server=root@server1:3306 --bulk-insert --export=data dev
-
-To export both the data and definitions of the database 'dev' from
-server1 on port 3306 producing bulk insert statements, use this command::
-
-  mysqldbexport --server=root@server1:3306 --bulk-insert --export=both dev
-  
-Note: by default, the utility will export only definitions.
+databases. By default, the utility will export only definitions.
 
 You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This can allow you to extract a
@@ -58,26 +45,26 @@ formats using the :option:`--format` option.
 
 **CSV**
   Displays the output in a comma-separated list.
-  
+
 **TAB**
   Displays the output in a tab-separated list.
-  
+
 **VERTICAL**
   Displays the output in a single column similar to the ``\G`` option
   for the mysql monitor commands.
-  
+
   You also have the option to specify how much data to display in one
   of the following displays using the :option:`--display` option.
 
 **BRIEF**
   Show only the minimal columns for recreating the objects.
-  
+
 **FULL**
   Show the complete column list for recreating the objects.
-  
+
 **NAMES**
   Show only the names of the objects.
-  
+
 Note: When combining :option:`--format` and :option:`--display`, the
 :option:`--display` option is ignored for SQL generation.
 
@@ -85,7 +72,7 @@ You can turn off the headers when using formats CSV and TAB by
 specifying the :option:`--no-headers` option.
 
 You can turn off all feedback information by specifying the
-:option:`--silent` option.
+:option:`--quiet` option.
 
 You can also have the utility write the data for the tables to separate files
 by using the --file-per-table option. This would create files with a file
@@ -94,7 +81,7 @@ file. For example, the following command produces files named
 db1.<table name>.csv.::
 
   mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
-  
+
 This utility differs from mysqldump in that it can produce output in a
 variety of formats to make your data extraction/transport much easier. It
 permits you to export your data in the format most suitable to an external
@@ -112,7 +99,7 @@ OPTIONS
 
    show program's version number and exit
 
-.. option:: --help                
+.. option:: --help
 
 .. option:: --server <server>
 
@@ -140,7 +127,7 @@ OPTIONS
 .. option:: --bulk-insert, -b
 
    Use bulk insert statements for data (default:False)
-   
+
 .. option:: --file-per-table
 
    Write table data to separate files. Valid only for --export=data or
@@ -153,9 +140,9 @@ OPTIONS
 
    do not display the column headers - ignored for GRID format
 
-.. option:: --silent
+.. option:: -q, --quiet
 
-   turn off all messages for silent execution
+   turn off all messages for quiet execution
 
 .. option:: -v, --verbose
 
@@ -191,12 +178,75 @@ depending on the security privileges present and whether the database
 contains certain objects (e.g. views, events) and whether binary
 logging is turned on (i.e. the need for **SUPER**).
 
-NOTICE
-------
-
 Some combinations of the options may result in errors during the operation.
 For example, eliminating tables but not views may result in an error when the
 view is imported on another server.
+
+EXAMPLES
+--------
+
+To export the definitions of the database 'dev' from a MySQL server on
+localhast via port 3306 producing **CREATE** statements, use this command::
+
+    $ python mysqldbexport.py --server=root:pass@localhost \\
+      --skip=GRANTS --export=DEFINITIONS util_test
+    # Source on localhost: ... connected.
+    # Exporting metadata from util_test
+    DROP DATABASE IF EXISTS util_test;
+    CREATE DATABASE util_test;
+    USE util_test;
+    # TABLE: util_test.t1
+    CREATE TABLE `t1` (
+      `a` char(30) DEFAULT NULL
+    ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+    # TABLE: util_test.t2
+    CREATE TABLE `t2` (
+      `a` char(30) DEFAULT NULL
+    ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+    # TABLE: util_test.t3
+    CREATE TABLE `t3` (
+      `a` int(11) NOT NULL AUTO_INCREMENT,
+      `b` char(30) DEFAULT NULL,
+      PRIMARY KEY (`a`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+    # TABLE: util_test.t4
+    CREATE TABLE `t4` (
+      `c` int(11) NOT NULL,
+      `d` int(11) NOT NULL,
+      KEY `ref_t3` (`c`),
+      CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    # VIEW: util_test.v1
+    [...]
+    #...done.
+
+Similarly, to export the data of the database 'util_test' producing bulk
+insert statements, use this command::
+
+    $ python mysqldbexport.py --server=root:pass@localhost \\
+      --export=DATA --bulk-insert util_test
+    # Source on localhost: ... connected.
+    USE util_test;
+    # Exporting data from util_test
+    # Data for table util_test.t1:
+    INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),
+      ('02 Test Basic database example'),
+      ('03 Test Basic database example'),
+      ('04 Test Basic database example'),
+      ('05 Test Basic database example'),
+      ('06 Test Basic database example'),
+      ('07 Test Basic database example');
+    # Data for table util_test.t2:
+    INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),
+      ('12 Test Basic database example'),
+      ('13 Test Basic database example');
+    # Data for table util_test.t3:
+    INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),
+      (2, '15 test fkeys'),
+      (3, '16 test fkeys');
+    # Data for table util_test.t4:
+    INSERT INTO util_test.t4 VALUES  (3, 2);
+    #...done.
 
 COPYRIGHT
 ---------

@@ -15,13 +15,13 @@ class test(copy_user.test):
 
     def setup(self):
         return copy_user.test.setup(self)
-            
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
 
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server2)
-       
+
         cmd_str = "mysqluserclone.py --source=noone:nope@localhost:3306 " + \
                   to_conn
         comment = "Test case 1 - error: invalid login to source server"
@@ -47,9 +47,9 @@ class test(copy_user.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        comment = "Test case 5 - error: cannot use dump and silent together"
+        comment = "Test case 5 - error: cannot use dump and quiet together"
         res = self.run_test_case(2, cmd_str + " root@localhost " \
-                                 " x@f --silent --dump", comment)
+                                 " x@f --quiet --dump", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
 
@@ -70,12 +70,9 @@ class test(copy_user.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return copy_user.test.cleanup(self)
-
-
-

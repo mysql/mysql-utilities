@@ -45,7 +45,7 @@ Options:
                         EVENTS, GRANTS, DATA, CREATE_DB
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -s, --silent          Turn off all messages for silent execution.
+  -q, --quiet           Turn off all messages for quiet execution.
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
@@ -62,4 +62,4 @@ Test case 4 - no data
 # Copying GRANTS from util_test
 #...done.
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 5 - silent copy
+Test case 5 - quiet copy

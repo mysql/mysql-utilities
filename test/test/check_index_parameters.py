@@ -15,18 +15,18 @@ class test(check_index.test):
 
     def setup(self):
         return check_index.test.setup(self)
-        
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s " % from_conn
-       
+
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-       
+
         comment = "Test case 2 - show drops for a table with dupe indexes"
         res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops "
                                  "-vv", comment)
@@ -44,14 +44,14 @@ class test(check_index.test):
                                  "-vv", comment)
         if not res:
             return False
- 
-        comment = "Test case 5 - same as test case 2 but silent"
+
+        comment = "Test case 5 - same as test case 2 but quiet"
         res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops ",
                                  comment)
         if not res:
             return False
 
-        comment = "Test case 6 - same as test case 4 but silent"
+        comment = "Test case 6 - same as test case 4 but quiet"
         res = self.run_test_case(0, cmd_str + "util_test_c.t6 -d ",
                                  comment)
         if not res:
@@ -71,14 +71,12 @@ class test(check_index.test):
 
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return check_index.test.cleanup(self)
-
-

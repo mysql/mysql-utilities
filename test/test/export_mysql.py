@@ -48,14 +48,14 @@ class test(mysql_test.System_test):
         else:
             raise MySQLUtilError("Unable to determine basedir of running "
                                  "server.")
-        
+
         if os.name == "posix":
             self.mysql_path = get_tool_path(basedir, "mysql")
         else:
             self.mysql_path = get_tool_path(basedir, "mysql.exe")
 
         return True
-    
+
     def show_data(self, tbl):
         comment = "Showing data for table %s \n" % tbl
         self.results.append(comment)
@@ -72,10 +72,10 @@ class test(mysql_test.System_test):
         for row in file.readlines():
             self.results.append(row)
         file.close()
-    
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
-        
+
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server2)
         self.server2_conn = "-u%s -p%s " % (conn_val[0], conn_val[1])
@@ -83,25 +83,25 @@ class test(mysql_test.System_test):
             self.server2_conn += "--port=%s " % conn_val[3]
         if conn_val[4] is not None:
             self.server2_conn += "--socket=%s " % conn_val[4]
-        
+
         cmd = "mysqldbexport.py %s util_test  " % from_conn
-       
+
         comment = "Test case 1 - export metadata to new server via the " \
                   "mysql monitor"
-        cmd_str = cmd + " --export=definitions --format=SQL --silent " \
+        cmd_str = cmd + " --export=definitions --format=SQL --quiet " \
                   " --skip=events,grants | %s %s "  % \
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-                    
+
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",
                                                False))
 
         comment = "Test case 2 - export the data to new server via the " \
                   "mysql monitor"
-        cmd_str = cmd + " --export=data --format=SQL --silent " \
+        cmd_str = cmd + " --export=data --format=SQL --quiet " \
                   " --skip=events,grants | %s %s "  % \
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
@@ -117,20 +117,20 @@ class test(mysql_test.System_test):
             self.server2.exec_query("DROP DATABASE util_test")
         except:
             raise MUTException("Cannot drop database before import.")
-            
+
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",
                                                False))
 
         comment = "Test case 3 - export all objects and data to new server " \
                   "via the mysql monitor"
-        cmd_str = cmd + " --export=both --format=SQL --silent " \
+        cmd_str = cmd + " --export=both --format=SQL --quiet " \
                   " --skip=events,grants | %s %s "  % \
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTException("%s: failed" % comment)
-        
+
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",
                                                False))
@@ -139,15 +139,15 @@ class test(mysql_test.System_test):
         self.show_data("t2")
         self.show_data("t3")
         self.show_data("t4")
-        
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
@@ -159,7 +159,7 @@ class test(mysql_test.System_test):
         except:
             return False
         return True
-    
+
     def drop_all(self):
         try:
             self.drop_db(self.server1, "util_test")
@@ -171,7 +171,3 @@ class test(mysql_test.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

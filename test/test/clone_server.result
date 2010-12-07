@@ -17,6 +17,7 @@ Options:
   --mysqld=MYSQLD       Additional options for mysqld
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           Turn off all messages for quiet execution.
 Test case 2 - error: no --new-data option
 Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/data2 --new-port=3310 --new-id=12 --root-password=root
 
@@ -41,3 +42,4 @@ ERROR: Unable to create directory '/not/there/yes'
 # Testing connection to new instance...
 # Success!
 # Setting the root password...
+#...done.

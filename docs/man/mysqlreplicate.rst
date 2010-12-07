@@ -11,8 +11,8 @@ SYNOPSIS
 
   mysqlreplicate --master=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  --slave=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                 [[--help | --version] | 
-                 [--verbose | --testdb=<test database> | --pedandic]
+                 [[--help | --version] | --quiet |
+                 --verbose | --testdb=<test database> | --pedantic
                  --rpl_user=<uid:passwd>]
 
 DESCRIPTION
@@ -21,12 +21,6 @@ DESCRIPTION
 This utility permits an administrator to start replication among two
 servers. The user provides login information to the slave and provides
 connection information for connecting to the master.
-
-For example, to setup replication between a MySQL instance on two different
-hosts using the default settings, use this command::
-
-  mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3307
-                 --rpl-user=rpl:rpl
 
 You can also specify a database to be used to test replication as well as
 a unix socket file for connecting to a master running on a local host.
@@ -45,22 +39,14 @@ the InnoDB storage engine to the be the same on the master and slave.
 The -vv option will also display any discrepencies among the storage engines
 and InnoDB values with or without the --pedantic option.
 
-For example, the following command ensures the replication between the
-master and slave is successful if and only if the InnoDB storage engines
-are the same and both servers have the same storage engines with the
-same default specified::
-
-  mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3307
-                 --rpl-user=rpl:rpl -vv --pedantic
-
 OPTIONS
 -------
 
-.. option:: --version 
+.. option:: --version
 
    show version number and exit
 
-.. option:: --help 
+.. option:: --help
 
    show help page
 
@@ -74,7 +60,7 @@ OPTIONS
    connection information for slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --rpl-user <replication-user> 
+.. option:: --rpl-user <replication-user>
 
    the user and password for the replication user requirement -
    e.g. rpl:passwd - default = rpl:rpl
@@ -87,7 +73,7 @@ OPTIONS
 
    control how much information is displayed. e.g., -v =
    verbose, -vv = more verbose, -vvv = debug
-   
+
 .. option:: -p, --pedantic
 
    fail if storage engines differ among master and slave (optional)
@@ -104,6 +90,43 @@ privilege.
 The server ID on the master and slave must be unique. The utility will
 report an error if the server ID is 0 or is the same on the master and
 slave. Set these values before starting this utility.
+
+EXAMPLES
+--------
+
+To setup replication between a MySQL instance on two different hosts using
+the default settings, use this command::
+
+    $ mysqlreplicate --master=root@localhost:3306 \\
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # ...done.
+
+The following command ensures the replication between the master and slave is
+successful if and only if the InnoDB storage engines are the same and both
+servers have the same storage engines with the same default specified.::
+
+    $ mysqlreplicate --master=root@localhost:3306 \\
+      --slave=root@localhost:3307 --rpl-user=rpl:rpl -vv --pedantic
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # master id = 2
+    #  slave id = 99
+    # Checking InnoDB statistics for type and version conflicts.
+    # Checking storage engines...
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # Flushing tables on master with read lock...
+    # Connecting slave to master...
+    # CHANGE MASTER TO MASTER_HOST = [...omitted...]
+    # Starting slave...
+    # status: Waiting for master to send event
+    # error: 0:
+    # Unlocking tables on master...
+    # ...done.
 
 RECOMMENDATIONS
 ---------------
