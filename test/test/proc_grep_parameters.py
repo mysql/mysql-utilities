@@ -36,12 +36,12 @@ class test(proc_grep.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        self.mask_result("    User LIKE 'root'", "    User LIKE 'root'",
-                         "    User LIKE 'XXXX'")
+        self.mask_result("    USER LIKE 'root'", "    USER LIKE 'root'",
+                         "    USER LIKE 'XXXX'")
         
         # Mask funny output on Windows
         if os.name != "posix":
-            self.replace_result("    User LIKE ", "    User LIKE 'XXXX'\n")
+            self.replace_result("    USER LIKE ", "    USER LIKE 'XXXX'\n")
         
         return True
   

@@ -25,18 +25,18 @@ Options:
                         or VERTICAL format
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  --match-user=PATTERN  Match the 'User' column of the PROCESSLIST table
-  --match-host=PATTERN  Match the 'Host' column of the PROCESSLIST table
-  --match-db=PATTERN    Match the 'Db' column of the PROCESSLIST table
+  --match-user=PATTERN  Match the 'USER' column of the PROCESSLIST table
+  --match-host=PATTERN  Match the 'HOST' column of the PROCESSLIST table
+  --match-db=PATTERN    Match the 'DB' column of the PROCESSLIST table
   --match-command=PATTERN
-                        Match the 'Command' column of the PROCESSLIST table
-  --match-info=PATTERN  Match the 'Info' column of the PROCESSLIST table
+                        Match the 'COMMAND' column of the PROCESSLIST table
+  --match-info=PATTERN  Match the 'INFO' column of the PROCESSLIST table
   --match-state=PATTERN
-                        Match the 'State' column of the PROCESSLIST table
+                        Match the 'STATE' column of the PROCESSLIST table
 Test case 2 - do the SQL for a simple search
 SELECT
   Id, User, Host, Db, Command, Time, State, Info
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    User LIKE 'XXXX'
+    USER LIKE 'XXXX'

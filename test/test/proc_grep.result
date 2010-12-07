@@ -5,7 +5,7 @@ root[...],XXXXX,root,localhost,,Query,XXXXX,executing,"SELECT
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    User LIKE 'root'"
+    USER LIKE 'root'"
 root[...],XXXXX,root,localhost,,Sleep,XXXXX,,
 
 Test case 2 - find processes for current user format=TAB
@@ -15,7 +15,7 @@ root[...]
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    User LIKE 'root'"
+    USER LIKE 'root'"
 root[...]
 
 Test case 3 - find processes for current user format=VERTICAL
@@ -33,7 +33,7 @@ Test case 3 - find processes for current user format=VERTICAL
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    User LIKE 'root'
+    USER LIKE 'root'
 *************************       2. row *************************
  Connection: XXXXX
          Id: XXXXX
@@ -55,7 +55,7 @@ Test case 4 - find processes for current user format=GRID
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
-    User LIKE 'root'  |
+    USER LIKE 'root'  |
 | root[...]  | XXXXX | root  | localhost  | None  | Sleep    | XXXXX |            | None                                                                                                                      |
 +---+
 
