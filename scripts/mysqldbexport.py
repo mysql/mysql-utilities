@@ -97,6 +97,13 @@ parser.add_option("--file-per-table", action="store_true", dest="file_per_tbl",
                   default=False, help="Write table data to separate files. "
                   "Valid only for --export=data or --export=both.")
 
+# Add the exclude database option
+parser.add_option("-x", "--exclude", action="append", dest="exclude",
+                  type="string", default=None, help="Exclude one or more "
+                  "objects from the operation using either a specific name "
+                  "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
+                  "for multiple exclusions.")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -108,6 +115,21 @@ opt, args = parser.parse_args()
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
+
+# Build exclusion lists
+exclude_objects = []
+exclude_object_names = []
+if opt.exclude is not None:
+    try:
+        for item in opt.exclude:
+            if item.find(".") > 0:
+                db, name = item.split(".")
+                exclude_object_names.append((db, name))
+            else:
+                exclude_objects.append(item)
+    except:
+        print "WARNING: Cannot parse exclude list. " + \
+              "Proceeding without exclusions."
 
 try:
     skips = check_skip_options(opt.skip_objects)
@@ -180,24 +202,26 @@ if "DATA" in skips and opt.export == "DATA":
 
 # Set options for database operations.
 options = {
-    "skip_tables"   : "TABLES" in skips,
-    "skip_views"    : "VIEWS" in skips,
-    "skip_triggers" : "TRIGGERS" in skips,
-    "skip_procs"    : "PROCEDURES" in skips,
-    "skip_funcs"    : "FUNCTIONS" in skips,
-    "skip_events"   : "EVENTS" in skips,
-    "skip_grants"   : "GRANTS" in skips,
-    "skip_create"   : "CREATE_DB" in skips,
-    "skip_data"     : "DATA" in skips,
-    "skip_blobs"    : opt.skip_blobs,
-    "format"        : opt.format,
-    "no_headers"    : opt.no_headers,
-    "display"       : opt.display,
-    "single"        : not opt.bulk_import,
-    "quiet"         : opt.quiet,
-    "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3,
-    "file_per_tbl"  : opt.file_per_tbl
+    "skip_tables"      : "TABLES" in skips,
+    "skip_views"       : "VIEWS" in skips,
+    "skip_triggers"    : "TRIGGERS" in skips,
+    "skip_procs"       : "PROCEDURES" in skips,
+    "skip_funcs"       : "FUNCTIONS" in skips,
+    "skip_events"      : "EVENTS" in skips,
+    "skip_grants"      : "GRANTS" in skips,
+    "skip_create"      : "CREATE_DB" in skips,
+    "skip_data"        : "DATA" in skips,
+    "skip_blobs"       : opt.skip_blobs,
+    "format"           : opt.format,
+    "no_headers"       : opt.no_headers,
+    "display"          : opt.display,
+    "single"           : not opt.bulk_import,
+    "quiet"            : opt.quiet,
+    "verbosity"        : opt.verbosity,
+    "debug"            : opt.verbosity >= 3,
+    "file_per_tbl"     : opt.file_per_tbl,
+    "exclude_names"    : exclude_object_names,
+    "exclude_patterns" : exclude_objects
 }
 
 # Parse server connection values

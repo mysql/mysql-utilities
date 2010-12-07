@@ -15,7 +15,8 @@ SYNOPSIS
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
              --veerbose | --version | --bulk-insert | --file-per-table |
              --export=[DEFINITIONS|DATA|BOTH] |
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] ]
+             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] ] |
+             --exclude=<name>[|,--exclude=<name>]
 
 DESCRIPTION
 -----------
@@ -81,6 +82,12 @@ file. For example, the following command produces files named
 db1.<table name>.csv.::
 
   mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
+
+You can exclude specific objects by name using the --exclude option whereby you
+specify a name in the form of <db>.<object> or you can supply a regex search
+pattern. For example, --exclude=db1.trig1 will exclude the single trigger and
+`--exclude=trig_` will exclude all objects from all databases whose name begins
+with trig and has a following character or digit.
 
 This utility differs from mysqldump in that it can produce output in a
 variety of formats to make your data extraction/transport much easier. It
@@ -155,6 +162,12 @@ OPTIONS
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
+.. option:: -x EXCLUDE --exclude=EXCLUDE
+
+   exclude one or more objects from the operation using either a specific name
+   (e.g. db1.t1) or a REGEXP search pattern. Repeat option for multiple
+   exclusions.
+
 .. option:: --skip-blobs
 
    Do not export blob data.
@@ -181,6 +194,8 @@ logging is turned on (i.e. the need for **SUPER**).
 Some combinations of the options may result in errors during the operation.
 For example, eliminating tables but not views may result in an error when the
 view is imported on another server.
+
+The --exclude option does not apply to grants.
 
 EXAMPLES
 --------

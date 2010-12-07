@@ -39,7 +39,8 @@ def export_metadata(src_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, no_header, display, format, and debug)
+                       skip_data, no_header, display, format,
+                       debug, exclude_names, exclude_patterns)
 
     Returns bool True = success, False = error
     """
@@ -54,7 +55,6 @@ def export_metadata(src_val, db_list, options):
     column_type = options.get("display", "BRIEF")
     skip_create = options.get("skip_create", False)
     quiet = options.get("quiet", False)
-    silent = options.get("silent", False)
     skip_tables = options.get("skip_tables", False)
     skip_views = options.get("skip_views", False)
     skip_triggers = options.get("skip_triggers", False)
@@ -297,6 +297,11 @@ def export_data(src_val, db_list, options):
     skip_blobs = options.get("skip_blobs", False)
     quiet = options.get("quiet", False)
     file_per_table = options.get("file_per_tbl", False)
+    skip_views = options.get("skip_views", False)
+    skip_procs = options.get("skip_procs", False)
+    skip_funcs = options.get("skip_funcs", False)
+    skip_events = options.get("skip_events", False)
+    skip_grants = options.get("skip_grants", False)
 
     try:
         servers = connect_servers(src_val, None, quiet, "5.1.30")
@@ -310,11 +315,8 @@ def export_data(src_val, db_list, options):
         try:
             source_db = Database(source, db_name)
             source_db.check_read_access(src_val["user"], src_val["host"],
-                                        options.get("skip_views", False),
-                                        options.get("skip_procs", False),
-                                        options.get("skip_funcs", False),
-                                        options.get("skip_grants", False),
-                                        options.get("skip_events", False))
+                                        skip_views, skip_procs, skip_funcs,
+                                        skip_grants, skip_events)
         except MySQLUtilError, e:
             raise e
 

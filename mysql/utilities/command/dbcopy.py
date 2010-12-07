@@ -43,7 +43,7 @@ def copy_db(src_val, dest_val, db_list, options):
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
                        skip_data, copy_dir, verbose, force, quiet,
-                       connections, debug, excl_names, excl_patterns)
+                       connections, debug, exclude_names, exclude_patterns)
 
     Notes:
         copy_dir - a directory to use for temporary files (default is None)

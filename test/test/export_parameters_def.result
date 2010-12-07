@@ -29,6 +29,10 @@ Options:
   --skip-blobs          Do not export blob data.
   --file-per-table      Write table data to separate files. Valid only for
                         --export=data or --export=both.
+  -x EXCLUDE, --exclude=EXCLUDE
+                        Exclude one or more objects from the operation using
+                        either a specific name (e.g. db1.t1) or a REGEXP
+                        search pattern. Repeat option for multiple exclusions.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,

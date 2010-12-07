@@ -1,0 +1,54 @@
+Test case 1 - exclude by name
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+# VIEWS in util_test: (none found)
+# TRIGGERS in util_test:
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test:
+f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
+#...done.
+Test case 2 - exclude by regex
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+# VIEWS in util_test:
+util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+# TRIGGERS in util_test:
+trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
+# FUNCTIONS in util_test: (none found)
+#...done.
+Test case 3 - exclude by name and regex
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+# VIEWS in util_test: (none found)
+# TRIGGERS in util_test: (none found)
+# PROCEDURES in util_test: (none found)
+# FUNCTIONS in util_test: (none found)
+#...done.
+Test case 4 - exclude everything by regex
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test: (none found)
+# VIEWS in util_test: (none found)
+# TRIGGERS in util_test: (none found)
+# PROCEDURES in util_test: (none found)
+# FUNCTIONS in util_test: (none found)
+#...done.

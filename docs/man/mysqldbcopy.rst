@@ -32,7 +32,7 @@ the objects as well as not copying the data.
 You can exclude specific objects by name using the --exclude option whereby you
 specify a name in the form of <db>.<object> or you can supply a regex search
 pattern. For example, --exclude=db1.trig1 will exclude the single trigger and
---exlude=trig_ will exclude all objects from all databases whose name begins
+`--exclude=trig_` will exclude all objects from all databases whose name begins
 with trig and has a following character or digit.
 
 You must provide login information (e.g., user, host, password, etc.
