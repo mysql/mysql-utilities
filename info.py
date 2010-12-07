@@ -19,7 +19,7 @@ META_INFO = {
     'url': 'http://launchpad.net/mysql-utilities',
     'license': 'GNU GPLv2 (with FOSS License Exception)',
     'classifiers': [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 2.6',
         'Environment :: Console',
         'Environment :: Win32 (MS Windows)',
