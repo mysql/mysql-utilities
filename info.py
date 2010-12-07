@@ -14,9 +14,10 @@ META_INFO = {
     'name': 'mysql-utilities',
     'description': 'MySQL Utilities',
     'maintainer': 'MySQL Utilities Team',
-    'maintainer_email': "internals@lists.mysql.com", # !!!
+    'maintainer_email': "gui-tools@lists.mysql.com",
     'version': mysql.utilities.VERSION_STRING,
-    'url': 'http://launchpad.net/???', # !!! Launchpad URL
+    'url': 'http://launchpad.net/mysql-utilities',
+    'license': 'GNU GPLv2 (with FOSS License Exception)',
     'classifiers': [
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 2.6',
