@@ -43,10 +43,10 @@ def quote(string):
 
 # Add some more advanced parsing here to handle types better.
 parser.add_option(
-    '--type',
-    dest="types", default=','.join(OBJECT_TYPES),
-    help="Types to search: a comma-separated list of one or more of: "
-         + ', '.join(map(quote, OBJECT_TYPES)))
+    '--search-objects', '--object-types', 
+    dest="object_types", default=','.join(OBJECT_TYPES),
+    help="The object type to search in: a comma-separated list"
+    " of one or more of: " + ', '.join(map(quote, OBJECT_TYPES)))
 parser.add_option(
     "-G", "--basic-regexp", "--regexp",
     dest="use_regexp", action="store_true", default=False,
@@ -86,28 +86,33 @@ _LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a
 connection specification. Use --pattern if this is really what you
 want"""
 
-# We do not allow patterns that look like connection specification 
-if options.pattern:
-    pattern = options.pattern
-else:
+_AT_LEAST_ONE_SERVER_MSG = """You need at least one server if you're
+not using the --sql option"""
+
+_NO_SERVERS_ALLOWED_MSG = """You should not include servers in the
+call if you are using the --sql option"""
+
+# A --pattern is required.
+if not options.pattern:
     parser.error("No pattern supplied.")
 
-# Check that --sql option is not used with server, and servers are
+# Check that --sql option is not used with --server, and --server are
 # supplied if --sql is not used.
-if (options.server is None or len(options.server) == 0) and not options.print_sql:
-    parser.error("You need at least one server if you're not using the --sql option")
-elif options.server is not None and len(options.server) > 0 and options.print_sql:
-    parser.error("You should not include servers in the call if you are using the --sql option")
+if options.print_sql:
+    if options.server is not None and len(options.server) > 0:
+        parser.error(_NO_SERVERS_ALLOWED_MSG)
+else:        
+    if options.server is None or len(options.server) == 0:
+        parser.error(_AT_LEAST_ONE_SERVER_MSG)
 
-types = re.split(r"\s*,\s*", options.types)
-command = ObjectGrep(pattern, options.database_pattern, types, options.check_body, options.use_regexp)
-
-import mysql.utilities.exception
+object_types = re.split(r"\s*,\s*", options.object_types)
+command = ObjectGrep(options.pattern, options.database_pattern, object_types,
+                     options.check_body, options.use_regexp)
 
 try:
     if options.print_sql:
         print command.sql()
     else:
         command.execute(options.server, format=options.format)
-except mysql.utilities.exception.Error as details:
-    parser.error(details)
+except Exception as details:
+    print >>sys.stderr, 'ERROR:', details

@@ -74,7 +74,7 @@ class test(mysql_test.System_test):
         comment = "Test case %d - find objects regexp search with type " % \
                   test_case_num
         test_case_num += 1
-        cmd = cmd_base + "-Gb --pattern=t2 --type=table"
+        cmd = cmd_base + "-Gb --pattern=t2 --search=table"
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTException("%s: failed" % comment)

@@ -109,13 +109,14 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
-.. option:: --type <type>,...
+.. option:: --search-objects <type>, ...
+            --object-types <type>, ...
 
    Only search for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
 
-   Default is to search for/in all kinds of types.
+   Default is to search in objects of all kinds of types.
 
 .. option:: --body, -b
 

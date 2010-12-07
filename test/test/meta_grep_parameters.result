@@ -10,9 +10,11 @@ Options:
                         <user>:<password>@<host>:<port>:<socket>
   -b, --body            Search the body of routines, triggers, and events as
                         well
-  --type=TYPES          Types to search: a comma-separated list of one or more
-                        of: 'database', 'trigger', 'user', 'routine',
-                        'column', 'table', 'partition', 'event', 'view'
+  --search-objects=OBJECT_TYPES, --object-types=OBJECT_TYPES
+                        The object type to search in: a comma-separated list
+                        of one or more of: 'database', 'trigger', 'user',
+                        'routine', 'column', 'table', 'partition', 'event',
+                        'view'
   -G, --basic-regexp, --regexp
                         Use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
@@ -30,10 +32,16 @@ Options:
                         or VERTICAL format
 Test case 2 - do the SQL for a simple search
 
+SELECT 
+  `Object Type`, `Object Name`, `Database`,
+  `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
+FROM (
   SELECT 
     'SCHEMA' AS `Object Type`,
     schema_name AS `Object Name`,
-    schema_name AS `Database`
+    schema_name AS `Database`,
+    'DATABASE' AS `Field Type`,
+    schema_name AS `Field`
   FROM
     information_schema.schemata
   WHERE
@@ -42,7 +50,9 @@ UNION
   SELECT 
     'TRIGGER' AS `Object Type`,
     trigger_name AS `Object Name`,
-    trigger_schema AS `Database`
+    trigger_schema AS `Database`,
+    'TRIGGER' AS `Field Type`,
+    trigger_name AS `Field`
   FROM
     information_schema.triggers
   WHERE
@@ -51,7 +61,9 @@ UNION
   SELECT DISTINCT
     'USER' AS `Object Type`,
     grantee AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'USER' AS `Field Type`,
+    grantee AS `Field`
   FROM
     information_schema.schema_privileges
   WHERE
@@ -60,7 +72,9 @@ UNION
   SELECT 
     routine_type AS `Object Type`,
     routine_name AS `Object Name`,
-    routine_schema AS `Database`
+    routine_schema AS `Database`,
+    'ROUTINE' AS `Field Type`,
+    routine_name AS `Field`
   FROM
     information_schema.routines
   WHERE
@@ -69,7 +83,9 @@ UNION
   SELECT 
     'TABLE' AS `Object Type`,
     table_name AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'COLUMN' AS `Field Type`,
+    column_name AS `Field`
   FROM
     information_schema.columns
   WHERE
@@ -78,7 +94,9 @@ UNION
   SELECT 
     'TABLE' AS `Object Type`,
     table_name AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'TABLE' AS `Field Type`,
+    table_name AS `Field`
   FROM
     information_schema.tables
   WHERE
@@ -87,7 +105,9 @@ UNION
   SELECT 
     'TABLE' AS `Object Type`,
     table_name AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'PARTITION' AS `Field Type`,
+    partition_name AS `Field`
   FROM
     information_schema.partitions
   WHERE
@@ -96,7 +116,9 @@ UNION
   SELECT 
     'EVENT' AS `Object Type`,
     event_name AS `Object Name`,
-    event_schema AS `Database`
+    event_schema AS `Database`,
+    'EVENT' AS `Field Type`,
+    event_name AS `Field`
   FROM
     information_schema.events
   WHERE
@@ -105,20 +127,30 @@ UNION
   SELECT 
     'VIEW' AS `Object Type`,
     table_name AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'VIEW' AS `Field Type`,
+    table_name AS `Field`
   FROM
     information_schema.views
   WHERE
     table_name REGEXP 't2'
-
+) AS all_results
+  GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
 Test case 3 - do the SQL for a simple search with type
 
+SELECT 
+  `Object Type`, `Object Name`, `Database`,
+  `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
+FROM (
   SELECT 
     'TABLE' AS `Object Type`,
     table_name AS `Object Name`,
-    table_schema AS `Database`
+    table_schema AS `Database`,
+    'TABLE' AS `Field Type`,
+    table_name AS `Field`
   FROM
     information_schema.tables
   WHERE
     table_name REGEXP 't2'
-
+) AS all_results
+  GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`

@@ -38,7 +38,7 @@ class test(meta_grep.test):
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 3 - do the SQL for a simple search with type"
-        cmd_str = "mysqlmetagrep.py --sql --type=table"
+        cmd_str = "mysqlmetagrep.py --sql --search-objects=table"
         cmd_str += " -Gb --pattern=t2"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
