@@ -12,12 +12,12 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility searches for objects on all the servers provided via repeated
-occurrences of the --server option matching a given pattern
-and show a table of the objects that match. The first non-option
-argument it taken to be the pattern unless the :option:`--pattern`
-option is used, in which case all non-option arguments are treated as
-connection specifications.
+This utility searches for objects on all the servers provided via
+repeated occurrences of the :option:`--server` option matching a given
+pattern and show a table of the objects that match. The first
+non-option argument it taken to be the pattern unless the
+:option:`--pattern` option is used, in which case all non-option
+arguments are treated as connection specifications.
 
 Internally, the utility creates an SQL statement for searching the
 necessary tables in the **INFORMATION_SCHEMA** database on the
@@ -28,15 +28,85 @@ can use the :option:`--sql` option. This can be useful if you want to
 feed the output of the statement to other utilities such as
 :manpage:`mysqlevent(1)`.
 
+The MySQL server uses two forms of patterns when matching strings:
+:ref:`simple_pattern` and :ref:`posix_regexp`.
+
 Normally, the **LIKE** operator is used to match the name (and
 optionally, the body) but this can be changed to use the **REGEXP**
 operator instead by using the :option:`--regexp` option.
 
 Note that since the **REGEXP** operator does a substring searching, it
 is necessary to anchor the expression to the beginning of the string
-if you want to match the beginning of the string. 
+if you want to match the beginning of the string.
 
-Options
+
+.. _simple_pattern:
+
+SQL Simple Patterns
+^^^^^^^^^^^^^^^^^^^
+
+The simple patterns defined by SQL standard consist of a string of
+characters with two characters that have special meaning: **%**
+(percent) matches zero or more characters and **_** (underscore)
+matches exactly one character.
+
+For example:
+
+``'mats%'``
+  Matches any string that starts with 'mats'.
+``'%kindahl%'``
+  Matches any string consisting containing the word 'kindahl'.
+``'%_'``
+  Matches any string consisting of one or more characters.
+
+
+.. _posix_regexp:
+
+POSIX Regular Expressions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+POSIX regular expressions are more powerful than the simple patterns
+defined in the SQL standard. A regular expression is a string of
+characters, optionally containing characters with special meaning:
+
+**.**
+   Matches any character.
+**^**
+   Matches the beginning of a string.
+**$**
+   Matches the end of a string.
+**[axy]**
+   Matches either **a**, **x**, or **y**.
+**[a-f]**
+   Matches any character in the range **a** to
+   **f** (that is, **a**, **b**, **c**, **d**,
+   **e**, or **f**).
+**[^axy]**
+   Matches any character *except* **a**, **x**,
+   or **y**.
+**a\***
+   Matches a sequence of zero or more **a**.
+**a+**
+   Matches a sequence of one or more **a**.
+**a?**
+   Matches zero or one **a**.
+**ab|cd**
+   Matches either **ab** or **cd**.
+**a{5}**
+   Matches 5 instances of **a**.
+**a{2,5}**
+   Matches between 2 and 5 instances of **a**.
+**(abc)+**
+   Matches one or more repetitions of **abc**.
+
+This is but a brief set of examples of regular expressions. The full
+syntax is described in the `MySQL manual`_, but can often be found in
+:manpage:`regex(7)`.
+
+.. _`MySQL manual`: http://dev.mysql.com/doc/refman/5.1/en/regexp.html
+
+
+OPTIONS
 -------
 
 .. option:: --type <type>,...
@@ -44,7 +114,7 @@ Options
    Only search for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
-  
+
    Default is to search for/in all kinds of types.
 
 .. option:: --body, -b
@@ -93,7 +163,7 @@ EXAMPLES
 
 Find all objects where the name match the pattern ``'t\_'``::
 
-    $ mysqlmetagrep 't_' --server=mats@localhost
+    $ mysqlmetagrep --pattern="t_" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+
@@ -105,7 +175,7 @@ Find all objects where the name match the pattern ``'t\_'``::
 To find all object that contain ``'t2'`` in the name or the body (for
 routines, triggers, and events)::
 
-    $ mysqlmetagrep -b '%t2%' --server=mats@localhost:3306
+    $ mysqlmetagrep -b --pattern="%t2%" --server=mats@localhost:3306
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+
@@ -113,15 +183,17 @@ routines, triggers, and events)::
     | root:*@localhost:3306  | TABLE        | t2           | test      |
     +------------------------+--------------+--------------+-----------+
 
-Same thing, but using the **REGEXP** operator::
+Same thing, but using the **REGEXP** operator. Note that it is not
+necessary to add wildcards before the pattern::
 
-    $ mysqlmetagrep -Gb 't2' --server=mats@localhost
+    $ mysqlmetagrep -Gb --pattern="t2" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
     | Connection             | Object Type  | Object Name  | Database  |
     +------------------------+--------------+--------------+-----------+
     | root:*@localhost:3306  | TRIGGER      | tr_foo       | test      |
     | root:*@localhost:3306  | TABLE        | t2           | test      |
     +------------------------+--------------+--------------+-----------+
+
 
 COPYRIGHT
 ---------
