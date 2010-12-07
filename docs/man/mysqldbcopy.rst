@@ -75,6 +75,12 @@ The following command line options are accepted by **mysqldbcopy**:
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
+.. option:: -e EXCLUDE, --exclude=EXCLUDE
+
+   exclude one or more objects from the operation using either a specific name
+   (e.g. db1.t1) or a REGEXP search pattern. Repeat option for multiple
+   exclusions.
+
 .. option:: -f, --force
 
    drop the new database or object if it exists
