@@ -1,12 +1,12 @@
-===============
+###############
 MySQL Utilities
-===============
+###############
 
 MySQL Utilities contain a collection of scripts useful for managing
 and administering MySQL servers.
 
 Installation
-============
+------------
 
 To install the scripts together with the libraries::
 
@@ -20,7 +20,7 @@ administrative privileges.
 
 
 Windows Notes
--------------
+~~~~~~~~~~~~~
 
 If you are using Windows, you have to ensure that the script directory
 is in the path and that the Python extensions are recognized as script
@@ -43,7 +43,7 @@ Python Script), and .PYO (Compiled and Optimized Python Script).
 
 
 Documentation
-=============
+-------------
 
 To create documentation in html format::
 
@@ -60,14 +60,14 @@ To create documentation in epub format::
     python setup.py build_sphinx -b epub
 
 Unit Tests
-==========
+----------
 
 To run the existing unit tests::
 
     python setup.py test
 
 Systems Tests
-=============
+-------------
 
 To execute the system and acceptance tests created for the utilities, change
 to the /test directory and execute::
@@ -81,7 +81,7 @@ tests. You can specify one or more tests as arguments to the command. See the
 manual for more information about the MySQL Utilities Testing utility (mut).
 
 Operating System Notes
-======================
+----------------------
 
 The MySQL Utilities are designed to run on any platform that supports Python
 2.6 or higher. You should ensure you have Python installed and configured
@@ -90,7 +90,7 @@ correctly before installing.
 There are no known issues on any platform.
 
 Contributors
-============
+------------
 
 Mats Kindahl <mats.kindahl@oracle.com>
 Charles Bell <chuck.bell@oracle.com>
