@@ -89,6 +89,13 @@ parser.add_option("--threads", action="store", dest="threads",
                   default=1, help="use multiple threads (connections) "
                   "for insert")
 
+# Add the exclude database option
+parser.add_option("-e", "--exclude", action="append", dest="exclude",
+                  type="string", default=None, help="Exclude one or more "
+                  "objects from the operation using either a specific name "
+                  "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
+                  "for multiple exclusions.")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -115,23 +122,40 @@ if len(args) == 0:
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
 
+# Build exclusion lists
+exclude_objects = []
+exclude_object_names = []
+if opt.exclude is not None:
+    try:
+        for item in opt.exclude:
+            if item.find(".") > 0:
+                db, name = item.split(".")
+                exclude_object_names.append((db, name))
+            else:
+                exclude_objects.append(item)
+    except:
+        print "WARNING: Cannot parse exclude list. " + \
+              "Proceeding without exclusions."
+
 # Set options for database operations.
 options = {
-    "skip_tables"   : "TABLES" in skips,
-    "skip_views"    : "VIEWS" in skips,
-    "skip_triggers" : "TRIGGERS" in skips,
-    "skip_procs"    : "PROCEDURES" in skips,
-    "skip_funcs"    : "FUNCTIONS" in skips,
-    "skip_events"   : "EVENTS" in skips,
-    "skip_grants"   : "GRANTS" in skips,
-    "skip_create"   : "CREATE_DB" in skips,
-    "skip_data"     : "DATA" in skips,
-    "copy_dir"      : opt.copy_dir,
-    "force"         : opt.force,
-    "verbose"       : opt.verbosity >= 1,
-    "quiet"         : opt.quiet,
-    "threads"       : opt.threads,
-    "debug"         : opt.verbosity == 3
+    "skip_tables"      : "TABLES" in skips,
+    "skip_views"       : "VIEWS" in skips,
+    "skip_triggers"    : "TRIGGERS" in skips,
+    "skip_procs"       : "PROCEDURES" in skips,
+    "skip_funcs"       : "FUNCTIONS" in skips,
+    "skip_events"      : "EVENTS" in skips,
+    "skip_grants"      : "GRANTS" in skips,
+    "skip_create"      : "CREATE_DB" in skips,
+    "skip_data"        : "DATA" in skips,
+    "copy_dir"         :  opt.copy_dir,
+    "force"            : opt.force,
+    "verbose"          : opt.verbosity >= 1,
+    "quiet"            : opt.quiet,
+    "threads"          : opt.threads,
+    "debug"            : opt.verbosity == 3,
+    "exclude_names"    : exclude_object_names,
+    "exclude_patterns" : exclude_objects
 }
 
 # Parse source connection values

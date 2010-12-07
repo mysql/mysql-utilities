@@ -65,6 +65,8 @@ class Database(object):
         self.skip_grants = options.get("skip_grants", False)
         self.skip_create = options.get("skip_create", False)
         self.skip_data = options.get("skip_data", False)
+        self.exclude_names = options.get("exclude_names", None)
+        self.exclude_patterns = options.get("exclude_patterns", None)
         self.new_db = None
         self.init_called = False
         self.destination = None # Used for copy mode
@@ -555,6 +557,42 @@ class Database(object):
             yield obj
 
 
+    def __build_exclude_names(self, exclude_param):
+        """Return a string to add to where clause to exclude objects by
+        name.
+
+        This method will skip any db.name combinations that do not match
+        the current database.
+
+        exclude_param[in]  Name of column to check.
+
+        Returns (string) String to add to where clause or ""
+        """
+        str = ""
+        for obj_name in self.exclude_names:
+            db = obj_name[0]
+            name = obj_name[1]
+            if db == self.db_name:
+                str += " AND %s != '%s'" % (exclude_param, name.strip("'"))
+
+        return str
+
+
+    def __build_exclude_patterns(self, exclude_param):
+        """Return a string to add to where clause to exclude objects by
+        REGEXP.
+
+        exclude_param[in]  Name of column to check.
+
+        Returns (string) String to add to where clause or ""
+        """
+        str = ""
+        for pattern in self.exclude_patterns:
+            str += " AND %s NOT REGEXP '%s'" % (exclude_param,
+                                                pattern.strip("'"))
+        return str
+
+
     def get_db_objects(self, obj_type, columns='NAMES', get_columns=False):
         """Return a result set containing a list of objects for a given
         database based on type.
@@ -579,6 +617,7 @@ class Database(object):
         _FULL = """
         SELECT *
         """
+        exclude_param = ""
         if obj_type == _TABLE:
             _NAMES = """
             SELECT DISTINCT TABLES.TABLE_NAME
@@ -627,10 +666,11 @@ class Database(object):
                 TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA
                 AND
                 TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME
-            WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW'
+            WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW' %s
             ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
                      COLUMNS.ORDINAL_POSITION
             """
+            exclude_param = "TABLES.TABLE_NAME"
         elif obj_type == _VIEW:
             _NAMES = """
             SELECT TABLE_NAME
@@ -642,8 +682,9 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.VIEWS
-            WHERE TABLE_SCHEMA = '%s'
+            WHERE TABLE_SCHEMA = '%s' %s
             """
+            exclude_param = "VIEWS.TABLE_NAME"
         elif obj_type == _TRIG:
             _NAMES = """
             SELECT TRIGGER_NAME
@@ -658,8 +699,9 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TRIGGERS
-            WHERE TRIGGER_SCHEMA = '%s'
+            WHERE TRIGGER_SCHEMA = '%s' %s
             """
+            exclude_param = "TRIGGERS.TRIGGER_NAME"
         elif obj_type == _PROC:
             _NAMES = """
             SELECT NAME
@@ -673,8 +715,9 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.proc
-            WHERE DB = '%s' AND TYPE = 'PROCEDURE'
+            WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
             """
+            exclude_param = "NAME"
         elif obj_type == _FUNC:
             _NAMES = """
             SELECT NAME
@@ -688,8 +731,9 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.proc
-            WHERE DB = '%s' AND TYPE = 'FUNCTION'
+            WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
             """
+            exclude_param = "NAME"
         elif obj_type == _EVENT:
             _NAMES = """
             SELECT NAME
@@ -703,8 +747,9 @@ class Database(object):
             """
             _OBJECT_QUERY = """
             FROM mysql.event
-            WHERE DB = '%s'
+            WHERE DB = '%s' %s
             """
+            exclude_param = "NAME"
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """
             (
@@ -745,7 +790,13 @@ class Database(object):
             else:
                 prefix = _MINIMAL
             try:
-                query = prefix + _OBJECT_QUERY % self.db_name
+                # Form exclusion string
+                exclude_str = ""
+                if self.exclude_names is not None:
+                    exclude_str += self.__build_exclude_names(exclude_param)
+                if self.exclude_patterns is not None:
+                    exclude_str += self.__build_exclude_patterns(exclude_param)
+                query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
                 res = self.source.exec_query(query, None, get_columns)
             except Exception, e:
                 raise e

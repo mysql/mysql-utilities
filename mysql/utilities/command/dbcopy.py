@@ -43,7 +43,7 @@ def copy_db(src_val, dest_val, db_list, options):
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
                        skip_data, copy_dir, verbose, force, quiet,
-                       connections, and debug)
+                       connections, debug, excl_names, excl_patterns)
 
     Notes:
         copy_dir - a directory to use for temporary files (default is None)
@@ -58,9 +58,15 @@ def copy_db(src_val, dest_val, db_list, options):
     from mysql.utilities.common.database import Database
     from mysql.utilities.common.server import connect_servers
 
+    quiet = options.get("quiet", False)
+    skip_views = options.get("skip_views", False)
+    skip_procs = options.get("skip_procs", False)
+    skip_funcs = options.get("skip_funcs", False)
+    skip_events = options.get("skip_events", False)
+    skip_grants = options.get("skip_grants", False)
+
     try:
-        servers = connect_servers(src_val, dest_val,
-                                  options.get("quiet", False), "5.1.30")
+        servers = connect_servers(src_val, dest_val, quiet, "5.1.30")
         #print servers
     except MySQLUtilError, e:
         raise e
@@ -85,16 +91,11 @@ def copy_db(src_val, dest_val, db_list, options):
             dest_db = Database(dest, db)
 
             source_db.check_read_access(src_val["user"], src_val["host"],
-                                        options.get("skip_views", False),
-                                        options.get("skip_procs", False),
-                                        options.get("skip_funcs", False),
-                                        options.get("skip_grants", False),
-                                        options.get("skip_events", False))
+                                        skip_views, skip_procs, skip_funcs,
+                                        skip_grants, skip_events)
             dest_db.check_write_access(dest_val["user"], dest_val["host"],
-                                       options.get("skip_views", False),
-                                       options.get("skip_procs", False),
-                                       options.get("skip_funcs", False),
-                                       options.get("skip_grants", False))
+                                        skip_views, skip_procs, skip_funcs,
+                                        skip_grants)
         except MySQLUtilError, e:
             raise e
 
@@ -107,7 +108,7 @@ def copy_db(src_val, dest_val, db_list, options):
                                  (db_name[0], db_name[1]))
 
         # Display copy message
-        if not options.get("quiet", False):
+        if not quiet:
             msg = "# Copying database %s " % db_name[0]
             if db_name[1]:
                 msg += "renamed as %s" % (db_name[1])
@@ -129,6 +130,6 @@ def copy_db(src_val, dest_val, db_list, options):
         except MySQLUtilError, e:
             raise e
 
-    if not options.get("quiet", False):
+    if not quiet:
         print "#...done."
     return True

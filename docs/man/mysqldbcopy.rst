@@ -14,7 +14,7 @@ SYNOPSIS
              (<db_name>[:<new_name>])+ [--verbose | --quiet |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version |
-             --threads=<num threads>]
+             --threads=<num threads>] | --exclude=<name>[|,--exclude=<name>]
 
 DESCRIPTION
 -----------
@@ -28,6 +28,12 @@ The operation copies all objects (tables, views, triggers, events, procedures,
 functions, and database-level grants) to the destination server. The utility
 will also copy all data. There are options to turn off copying any or all of
 the objects as well as not copying the data.
+
+You can exclude specific objects by name using the --exclude option whereby you
+specify a name in the form of <db>.<object> or you can supply a regex search
+pattern. For example, --exclude=db1.trig1 will exclude the single trigger and
+--exlude=trig_ will exclude all objects from all databases whose name begins
+with trig and has a following character or digit.
 
 You must provide login information (e.g., user, host, password, etc.
 for a user that has the appropriate rights to access all objects in
@@ -112,6 +118,8 @@ logging is turned on (i.e. the need for **SUPER**).
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is copied.
+
+The --exclude option does not apply to grants.
 
 EXAMPLES
 --------
