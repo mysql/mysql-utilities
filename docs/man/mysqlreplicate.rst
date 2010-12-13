@@ -36,7 +36,7 @@ Furthermore, the utility will also report a warning if the InnoDB storage
 engine differs from the master and slave. Similarly, --pedantic requires
 the InnoDB storage engine to the be the same on the master and slave.
 
-The -vv option will also display any discrepencies among the storage engines
+The -vv option will also display any discrepancies among the storage engines
 and InnoDB values with or without the --pedantic option.
 
 OPTIONS
