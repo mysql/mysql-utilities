@@ -53,10 +53,14 @@ def _format_row_separator(file, columns, col_widths, row, quiet=False):
     quiet[in]          if True, do not print
     """
     i = 0
+    num_cols = len(columns)
     for col in columns:
         if not quiet:
             file.write("| ")
-        file.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
+        if num_cols == 1:
+            file.write("{0:<{1}} ".format("%s" % row, col_widths[i]))
+        else:
+            file.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
         i += 1
     if not quiet:
         file.write("|")
@@ -101,14 +105,22 @@ def format_tabular_list(file, columns, rows, print_header=True,
         stop = len(columns)
         for row in rows:
             for i in range(0, stop):
-                col_size = len("%s" % row[i]) + 1
+                if stop == 1:
+                    col_size = len("%s" % row) + 1
+                else:
+                    col_size = len("%s" % row[i]) + 1
                 if col_size > col_widths[i]:
                     col_widths[i] = col_size
 
         # print header
         if print_header:
             _format_col_separator(file, columns, col_widths, quiet)
-            _format_row_separator(file, columns, col_widths, columns, quiet)
+            if len(columns) == 1:
+                _format_row_separator(file, columns, col_widths, columns[0],
+                                      quiet)
+            else:
+                _format_row_separator(file, columns, col_widths, columns,
+                                      quiet)
         _format_col_separator(file, columns, col_widths, quiet)
         for row in rows:
             _format_row_separator(file, columns, col_widths, row, quiet)
@@ -146,8 +158,12 @@ def format_vertical_list(file, columns, rows):
                                                                       row_num,
                                                                       ' ', 8))
         for i in range(0, stop):
-            file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
-                                                row[i]))
+            if stop == 1:
+                file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
+                                                    row))
+            else:
+                file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
+                                                    row[i]))
 
     if row_num > 0:
         file.write("%d rows.\n" % int(row_num))
