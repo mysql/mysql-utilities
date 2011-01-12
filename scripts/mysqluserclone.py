@@ -137,7 +137,7 @@ else:
     new_user_list = args[1:]
 
     # Parse destination connection values if not dumping
-    if not opt.dump:
+    if not opt.dump and opt.destination is not None:
         try:
             dest_values = parse_connection(opt.destination)
         except:

@@ -22,7 +22,7 @@ class test(mysql_test.System_test):
             raise MUTException("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
-        
+
     def show_user_grants(self, user):
         query = "SHOW GRANTS FOR %s" % (user)
         try:
@@ -32,14 +32,14 @@ class test(mysql_test.System_test):
                     self.results.append(row[0]+"\n")
         except MySQLUtilError, e:
             raise MUTException("Failed to get grants for %s." % user)
-            
+
     def run(self):
         self.res_fname = self.testdir + "result.txt"
 
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server1)
         cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
-       
+
         # Test case 1 - clone a user to a single user
         comment = "Test case 1 - clone a single user joe_pass@user to " + \
                   "a single user: jill@user"
@@ -114,14 +114,26 @@ class test(mysql_test.System_test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
+
+        from_conn = "--source=" + self.build_connection_string(self.server1)
+        cmd_str = "mysqluserclone.py %s -f " % from_conn
+
+        # Test case 1 - clone a user to a single user
+        comment = "Test case 8 - clone a single user joe_pass@user to " + \
+                  "a single user: jill@user with only source specified"
+        res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
+                                 comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_user(self, user_name, server):
         user = User(server, user_name, False)
         if user.exists():
@@ -129,7 +141,7 @@ class test(mysql_test.System_test):
             if res is not None:
                 print "cleanup: failed to drop user %s" % user_name
         return True
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
@@ -160,8 +172,3 @@ class test(mysql_test.System_test):
         if not res:
             return False
         return True
-
-
-
-
-
