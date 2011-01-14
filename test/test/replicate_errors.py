@@ -60,7 +60,14 @@ class test(replicate.test):
         str = self.build_connection_string(self.server1)
         same_str = "--master=%s --slave=%s " % (str, str)
 
-        comment = "Test case 5 - error: slave and master same machine"
+        comment = "Test case 5a - error: slave and master same machine"
+        res = mysql_test.System_test.run_test_case(self, 1, cmd_str +
+                        same_str + "--rpl-user=rpl:whatsit", comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        same_str = "--master=root@this:3306 --slave=root@that:3306"
+        comment = "Test case 5b - error: slave and master same port"
         res = mysql_test.System_test.run_test_case(self, 1, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
@@ -146,14 +153,14 @@ class test(replicate.test):
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_result("ERROR: Query failed. 1227: Access denied;",
                             "ERROR: Query failed. 1227: Access denied;\n")
-        if os.name == "posix":
-            self.replace_result("Error 2002: Can't connect to",
-                                "Error ####: Can't connect to local MySQL server "
-                                "####...\n")
-        else:
-            self.replace_result("Error 2003: Can't connect to",
-                                "Error ####: Can't connect to local MySQL server "
-                                "####...\n")
+
+        self.replace_result("Error 2002: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server "
+                            "####...\n")
+
+        self.replace_result("Error 2003: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server "
+                            "####...\n")
 
         return True
 

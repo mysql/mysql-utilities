@@ -13,8 +13,11 @@ Test case 4 - error: invalid login to server (slave)
 # master on localhost: ... connected.
 # slave on nada: ... ERROR: Cannot connect to the slave server.
 Error ####: Can't connect to local MySQL server ####...
-Test case 5 - error: slave and master same machine
+Test case 5a - error: slave and master same machine
 ERROR: You must specify two different servers for the operation.
+Test case 5b - error: slave and master same port
+# master on this: ... ERROR: Cannot connect to the master server.
+Error ####: Can't connect to local MySQL server ####...
 Test case 6 - error: No binary logging on master
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
