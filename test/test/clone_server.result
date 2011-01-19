@@ -42,4 +42,6 @@ ERROR: Unable to create directory '/not/there/yes'
 # Testing connection to new instance...
 # Success!
 # Setting the root password...
+# Connection Information:
+#  -uroot [...]
 #...done.
