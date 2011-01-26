@@ -100,6 +100,8 @@ class test(mysql_test.System_test):
             raise MUTException("Cannot connect to spawned server.")
             return False
         
+        self.replace_result("#  -uroot", "#  -uroot [...]\n")
+        
         return True
 
     def get_result(self):

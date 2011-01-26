@@ -230,6 +230,15 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         res = proc.wait()
 
     if not quiet:
+        conn_str = "# Connection Information:\n"
+        conn_str += "#  -uroot"
+        if rootpass:
+            conn_str += " -p%s" % rootpass
+        if os.name == "posix":
+            conn_str += " --socket=%s" % new_sock
+        else:
+            conn_str += " --port=%s" % new_port
+        print conn_str
         print "#...done."
 
     fnull.close()

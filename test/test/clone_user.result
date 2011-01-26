@@ -57,3 +57,8 @@ GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
 GRANT USAGE ON *.* TO 'joe_pass'@'%'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
 # ...done.
+Test case 8 - clone a single user joe_pass@user to a single user: jill@user with only source specified
+# Source on localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user jill:duh@user 
+# ...done.
