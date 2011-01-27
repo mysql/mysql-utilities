@@ -18,6 +18,29 @@ to have Python installed on your computer and also Connector/Python.
 Note: for some platforms, you may need to execute this command with
 administrative privileges.
 
+To get help for ``setup.py``, you can do::
+
+    python setup.py --help
+
+To get a complete list of commands available for ``setup.py``, you can
+do::
+
+    python setup.py --help-commands
+
+
+Requirements
+~~~~~~~~~~~~
+
+MySQL Utilities have some dependencies on other packages:
+- Python 2.6 or later but Python 3.x is not supported (yet).
+- Sphinx version 1.0 or later is needed to build the manuals from
+  Sphinx markup. If you do not bother about building the manuals,
+  earlier versions of Sphinx work fine, but check what builders are
+  available in your installed version of Sphinx.
+- Sphinx requires docutils to build the documentation and 0.6 or later
+  to build manual pages.
+- Sphinx also requires Jinja2 2.1 or later to generate HTML pages.
+
 
 Windows Notes
 ~~~~~~~~~~~~~
@@ -41,23 +64,42 @@ If you have Python installed, it will already have mappings for .PY
 (Python script), .PYW (Python Windowless Application), .PYC (Compiled
 Python Script), and .PYO (Compiled and Optimized Python Script).
 
+If you have problems with build_* commands not working or not showing
+in the help, please check your prerequisites.  Commands are in many
+cases not installed if the prerequisites are not met; this is
+deliberate.
+
 
 Documentation
 -------------
 
-To create documentation in html format::
+If you have Sphinx installed, you can build documentation is a variety
+of different formats such as HTML, EPUB, and Unix manual pages.
+
+To create documentation in HTML format::
 
     python setup.py build_sphinx -b html
 
-To create documentation in man format::
+To create documentation in man format either one of the following
+commands can be used::
 
     python setup.py build_sphinx -b man
-or
     python setup.py build_man
 
-To create documentation in epub format::
+Building Unix manual pages require Sphinx version 1.0 or later and
+docutils 0.6 or later.
+
+Manual pages are currently not pre-generated, so you have to build
+them to get them installed.
+
+To create documentation in EPUB format::
 
     python setup.py build_sphinx -b epub
+
+For more information on Sphinx:
+
+   http://sphinx.pocoo.org/
+
 
 Unit Tests
 ----------
@@ -65,6 +107,7 @@ Unit Tests
 To run the existing unit tests::
 
     python setup.py test
+
 
 Systems Tests
 -------------
@@ -80,14 +123,25 @@ for use in running the tests. By default, the command above will execute all
 tests. You can specify one or more tests as arguments to the command. See the
 manual for more information about the MySQL Utilities Testing utility (mut).
 
+
 Operating System Notes
 ----------------------
 
-The MySQL Utilities are designed to run on any platform that supports Python
-2.6 or higher. You should ensure you have Python installed and configured
-correctly before installing.
+The MySQL Utilities are designed to run on any platform that supports
+Python 2.6 or higher. You should ensure you have Python and all the
+pre-requisites listed above installed and configured correctly before
+installing the utilities.
 
 There are no known issues on any platform.
+
+
+Reporting bugs
+--------------
+
+Bugs are reported in the Oracle/MySQL bugs system at:
+
+    http://bugs.mysql.com/
+
 
 Contributors
 ------------

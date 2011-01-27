@@ -1,11 +1,7 @@
-# Boilerplate code to install setuptools if it is not installed
-import ez_setup
-ez_setup.use_setuptools()
 
 import distutils.command.build_scripts
 import distutils.util
 import glob
-import setuptools
 import os
 
 import mysql.utilities
@@ -35,9 +31,19 @@ META_INFO = {
     }
 
 INSTALL = {
-    'packages': setuptools.find_packages(exclude=["tests"]),
+    'packages': [
+        'mysql',
+        'mysql.utilities',
+        'mysql.utilities.command',
+        'mysql.utilities.common',
+        ],
     'scripts': glob.glob('scripts/*.py'),
-    'setup_requires': [
-        'Sphinx >=1.0',
+    'requires': [
+        'distutils',
+        'sphinx (>=1.0)',
+        'jinja2 (>=2.1)',
+        ],
+    'provides': [
+        'mysql.utilities',
         ],
     }

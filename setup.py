@@ -1,20 +1,17 @@
 #!/usr/bin/python
 
-# Boilerplate code to install setuptools if it is not installed
-import ez_setup
-ez_setup.use_setuptools()
-
 # Keep the imports sorted (alphabetically) in each group. Makes
 # merging easier.
 
 import distutils.core
-import glob
 import os
-import setuptools
 import sys
 
-import mysql.utilities
+# Setup function to use
+from distutils.core import setup
 
+from distutils.command.build_scripts import build_scripts as _build_scripts
+from distutils.command.install_scripts import install_scripts as _install_scripts
 from info import META_INFO, INSTALL
 
 COMMANDS = {
@@ -23,8 +20,50 @@ COMMANDS = {
     }
 
 ARGS = {
-    'test_suite': 'tests.test_all',
 }
+
+PROFILE_SCRIPT = '''
+prepend_path () (
+    IFS=':'
+    for D in $PATH; do
+        if test x$D != x$1; then
+            OUTPATH="${OUTPATH:+$OUTPATH:}$D"
+        fi
+    done
+    echo "$1:$OUTPATH"
+)
+
+PATH=`prepend_path %s`
+'''
+
+class install_scripts(_install_scripts):
+    description = (_install_scripts.description
+                   + " and add path to /etc/profile.d")
+
+    profile_file = "/etc/profile.d/mysql-utilities.sh"
+
+    def run(self):
+        # We should probably use distutils.dist.execute here to allow
+        # --dry-run to work properly.
+        from distutils import log, dir_util
+        if os.path.exists(os.path.dirname(self.profile_file)):
+            outfile = self.profile_file
+            if os.path.isdir(outfile) and not os.path.islink(outfile):
+                dir_util.remove_tree(outfile)
+            elif os.path.exists(outfile):
+                log.info("Removing %s", outfile)
+                os.unlink(outfile)
+            script = PROFILE_SCRIPT % (self.install_dir,)
+            log.info("Writing %s", outfile)
+            open(outfile, "w+").write(script)
+            _install_scripts.run(self)
+        else:
+            log.info("Not adding %s", self.profile_file)
+
+    def get_outputs(self):
+        outputs = _install_scripts.get_outputs(self)
+        outputs.append(self.profile_file)
+        return outputs
 
 class install_man(distutils.core.Command):
     description = "install (Unix) manual pages"
@@ -32,7 +71,7 @@ class install_man(distutils.core.Command):
     user_options = [
         ('install-base=', None, "base installation directory"),
         ('force', 'f', 'force installation (overwrite existing files)'),
-        ('build-dir=', None, 'Build directory'),
+        ('build-dir=', 'b', 'Build directory'),
         ('skip-build', None, "skip the build steps"),
     ]
 
@@ -56,30 +95,38 @@ class install_man(distutils.core.Command):
         self.source_dir = os.path.join(self.build_dir, 'man')
 
     def run(self):
-        for man_file in self.get_outputs():
+        from glob import glob
+        from distutils import log
+
+        outfiles = []
+        man_files = glob(os.path.join(self.source_dir, '*.[12345678]'))
+        for man_file in man_files:
             man_dir = 'man' + os.path.splitext(man_file)[1][1:]
             man_page = os.path.basename(man_file)
             self.mkpath(man_dir)
             man_install = os.path.join(self.target_dir, man_dir, man_page)
             self.copy_file(man_file, man_install)
+            outfiles.append(man_install)
+        self.outfiles = outfiles
 
     def get_outputs(self):
-        return glob.glob(os.path.join(self.source_dir, '*.[12345678]'))
+        return self.outfiles or []
 
 # See if we have Sphinx installed, otherwise, just ignore building
 # documentation.
 try:
     import sphinx.setup_command
-    from distutils.command.install import install
+    from distutils.command.install import install as _install
 
-    class MyInstall(install):
-        sub_commands = install.sub_commands + [
+    class install(_install):
+        sub_commands = _install.sub_commands + [
             ('install_man', lambda self: True),
             ]
 
     COMMANDS['cmdclass'].update({
-            'install': MyInstall,
+            'install': install,
             'install_man': install_man,
+            'build_sphinx': sphinx.setup_command.BuildDoc,
             'build_man': sphinx.setup_command.BuildDoc,
             })
 
@@ -96,7 +143,7 @@ except ImportError:
             'install': install,
     })
 
-class MyBuildScripts(distutils.command.build_scripts.build_scripts):
+class build_scripts(_build_scripts):
     """Class for providing a customized version of build_scripts.
 
     When ``run`` is called, this command class will:
@@ -111,8 +158,10 @@ class MyBuildScripts(distutils.command.build_scripts.build_scripts):
 
     def run(self):
         from distutils import log
+
         if not self.scripts:
             return
+
         saved_scripts = self.scripts
         self.scripts = []
         for script in saved_scripts:
@@ -127,15 +176,16 @@ class MyBuildScripts(distutils.command.build_scripts.build_scripts):
                 self.scripts.append(script_copy)
         # distutils is compatible with 2.1 so we cannot use super() to
         # call it.
-        distutils.command.build_scripts.build_scripts.run(self)
+        _build_scripts.run(self)
         self.scripts = saved_scripts
 
 if os.name != "nt":
     COMMANDS['cmdclass'].update({
-        'build_scripts': MyBuildScripts,
+        'build_scripts': build_scripts,
+        'install_scripts': install_scripts,
         })
 
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
-setuptools.setup(**ARGS)
+setup(**ARGS)

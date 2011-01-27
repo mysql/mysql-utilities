@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 import sys
-import cx_Freeze
 
 from info import META_INFO, INSTALL, COMMANDS
+
+from cx_Freeze import setup     # Setup function to use
 
 if sys.platform.startswith("win32"):
     META_INFO['name'] = 'MySQL Utilities'
@@ -20,5 +21,5 @@ ARGS = {
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
-cx_Freeze.setup(**ARGS)
+setup(**ARGS)
 
