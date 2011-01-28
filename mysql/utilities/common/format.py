@@ -53,11 +53,12 @@ def _format_row_separator(file, columns, col_widths, row, quiet=False):
     quiet[in]          if True, do not print
     """
     i = 0
-    for col in columns:
+    if len(columns) == 1 and row != columns:
+        row = [row]
+    for i, col in enumerate(columns):
         if not quiet:
             file.write("| ")
         file.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
-        i += 1
     if not quiet:
         file.write("|")
     file.write("\n")

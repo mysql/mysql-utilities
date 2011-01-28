@@ -58,7 +58,8 @@ def replicate(master_vals, slave_vals, rpl_user,
     if "unix_socket" in slave_vals and "unix_socket" in master_vals:
         dupes = (slave_vals["unix_socket"] == master_vals["unix_socket"])
     else:
-        dupes = (slave_vals["port"] == master_vals["port"]) 
+        dupes = (slave_vals["port"] == master_vals["port"]) and \
+                (slave_vals["host"] == master_vals["host"])
     if dupes:
         raise MySQLUtilError("You must specify two different servers for "
                              "the operation.")
