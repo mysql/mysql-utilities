@@ -1,0 +1,179 @@
+Test case 1 - Use --help 
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff - compare object definitions among objects where the difference is
+how db1.obj1 differs from db2.obj2
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server1=SERVER1     connection information for first server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --server2=SERVER2     connection information for second server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f DIFFTYPE, --format=DIFFTYPE
+                        display differences using one of the following
+                        formats: ('unified', 'context', 'differ') default =
+                        unified
+  --width=WIDTH         display width
+  --force               do not abort when a diff test fails
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           Turn off all messages for quiet execution.
+Test case 2 - Use diff  --format=unified
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1                           [PASS]
+# Comparing util_test.p1 to util_test.p1                           [PASS]
+# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Object definitions are not the same:
+--- util_test.t1 
++++ util_test.t1 
+@@ -1,3 +1,4 @@
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.
+Test case 3 - Use diff  --format=context
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1                           [PASS]
+# Comparing util_test.p1 to util_test.p1                           [PASS]
+# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Object definitions are not the same:
+*** util_test.t1 
+--- util_test.t1 
+***************
+*** 1,3 ****
+  CREATE TABLE `t1` (
+!   `a` char(30) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+--- 1,4 ----
+  CREATE TABLE `t1` (
+!   `a` char(30) DEFAULT NULL,
+!   `b` int(11) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.
+Test case 4 - Use diff  --format=differ
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1                           [PASS]
+# Comparing util_test.p1 to util_test.p1                           [PASS]
+# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Object definitions are not the same:
+  CREATE TABLE `t1` (
+-   `a` char(30) DEFAULT NULL
++   `a` char(30) DEFAULT NULL,
+?                            +
++   `b` int(11) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.
+Test case 5 - Use --force 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1                           [PASS]
+# Comparing util_test.p1 to util_test.p1                           [PASS]
+# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Object definitions are not the same:
+--- util_test.t1 
++++ util_test.t1 
+@@ -1,3 +1,4 @@
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# Comparing util_test.t2 to util_test.t2                           [FAIL]
+# Object definitions are not the same:
+--- util_test.t2 
++++ util_test.t2 
+@@ -1,3 +1,3 @@
+ CREATE TABLE `t2` (
+   `a` char(30) DEFAULT NULL
+-) ENGINE=MyISAM DEFAULT CHARSET=latin1
++) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# Comparing util_test.t3 to util_test.t3                           [PASS]
+# Comparing util_test.t4 to util_test.t4                           [PASS]
+# Comparing util_test.trg to util_test.trg                         [PASS]
+# Comparing util_test.v1 to util_test.v1                           [PASS]
+Diff failed. One or more differences found.
+Test case 6 - Use --quiet 
+Test case 7 - Use --width=65 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1                 [PASS]
+# Comparing util_test.p1 to util_test.p1                 [PASS]
+# Comparing util_test.t1 to util_test.t1                 [FAIL]
+# Object definitions are not the same:
+--- util_test.t1 
++++ util_test.t1 
+@@ -1,3 +1,4 @@
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.
+Test case 8 - Use --width=55 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.f1 to util_test.f1       [PASS]
+# Comparing util_test.p1 to util_test.p1       [PASS]
+# Comparing util_test.t1 to util_test.t1       [FAIL]
+# Object definitions are not the same:
+--- util_test.t1 
++++ util_test.t1 
+@@ -1,3 +1,4 @@
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.
+Test case 9 - Use -vvv 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+
+# Definition for object util_test.f1:
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1)
+
+# Definition for object util_test.f1:
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1)
+# Comparing util_test.f1 to util_test.f1                           [PASS]
+
+# Definition for object util_test.p1:
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50")
+
+# Definition for object util_test.p1:
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50")
+# Comparing util_test.p1 to util_test.p1                           [PASS]
+
+# Definition for object util_test.t1:
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+# Definition for object util_test.t1:
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL,
+  `b` int(11) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Object definitions are not the same:
+--- util_test.t1 
++++ util_test.t1 
+@@ -1,3 +1,4 @@
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Diff failed. One or more differences found.

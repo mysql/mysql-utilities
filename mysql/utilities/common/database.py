@@ -591,6 +591,62 @@ class Database(object):
             str += " AND %s NOT REGEXP '%s'" % (exclude_param,
                                                 pattern.strip("'"))
         return str
+    
+
+    def get_object_type(self, object_name):
+        """Return the object type of an object
+        
+        This method attempts to locate the object name among the objects
+        in the database. It returns the object type if found or None
+        if not found.
+        
+        object_name[in]    Name of the object to find
+        
+        Returns (string) object type or None if not found
+        """
+        object_type = None
+        
+        _OBJTYPE_QUERY = """
+            (
+               SELECT TABLE_TYPE as object_type
+               FROM INFORMATION_SCHEMA.TABLES
+               WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLES.TABLE_NAME = '%s'
+            )
+            UNION
+            (
+                SELECT 'TRIGGER' as object_type
+                FROM INFORMATION_SCHEMA.TRIGGERS
+                WHERE TRIGGER_SCHEMA = '%s' and TRIGGER_NAME = '%s'
+            )
+            UNION
+            (
+                SELECT TYPE as object_type
+                FROM mysql.proc
+                WHERE DB = '%s' AND NAME = '%s'
+            )
+            UNION
+            (
+                SELECT 'EVENT' as object_type
+                FROM mysql.event
+                WHERE DB = '%s' and NAME = '%s'
+            )
+        """
+        
+        try:
+            res = self.source.exec_query(_OBJTYPE_QUERY %
+                                         (self.db_name, object_name,
+                                          self.db_name, object_name,
+                                          self.db_name, object_name,
+                                          self.db_name, object_name))
+        except Exception, e:
+            raise e
+        
+        if res != [] and res is not None and len(res) > 0:
+            object_type = res[0][0]
+            if object_type == 'BASE TABLE':
+                object_type = 'TABLE'
+        
+        return object_type
 
 
     def get_db_objects(self, obj_type, columns='NAMES', get_columns=False):
