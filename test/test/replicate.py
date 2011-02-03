@@ -12,18 +12,6 @@ class test(mysql_test.System_test):
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
-    def spawn_new_server(self, server, server_id, name, mysqld=""):
-        port1 = int(self.servers.get_next_port())
-        try:
-            res = self.servers.start_new_server(self.server0, 
-                                                port1, server_id,
-                                                "root", name,
-                                                "--log-bin=mysql-bin"+mysqld)
-        except MySQLUtilError, e:
-            raise MUTException("Cannot spawn %s: %s" % (name, e.errmsg))
-            
-        return res
-
     def setup(self):
         self.server0 = self.servers.get_server(0)
         self.server1 = None
@@ -42,8 +30,9 @@ class test(mysql_test.System_test):
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.spawn_new_server(self.server1, self.s1_serverid,
-                                       "rep_slave")
+            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
+                                               "rep_slave", ' --mysqld='
+                                                '"--log-bin=mysql-bin "')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server1 = res[0]
@@ -60,8 +49,9 @@ class test(mysql_test.System_test):
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
-            res = self.spawn_new_server(self.server2, self.s2_serverid,
-                                        "rep_master")
+            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
+                                                "rep_master", ' --mysqld='
+                                                '"--log-bin=mysql-bin "')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server2 = res[0]

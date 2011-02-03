@@ -20,6 +20,9 @@
 This module contains a test framework for testing MySQL Utilities.
 """
 
+# TODO: Make it possible to stop and delete a specific server from the Server
+#       class.
+
 from abc import abstractmethod, ABCMeta
 import commands
 import difflib
@@ -94,6 +97,7 @@ class Server_list(object):
         self.verbose = verbose      # Option for verbosity
         self.new_id = 100           # Starting server id for spawned servers
         self.server_list = servers  # List of servers available
+        self.cleanup_list = []      # List of files to remove at shutdown
         if servers is None:
             self.server_list = []
 
@@ -314,6 +318,26 @@ class Server_list(object):
                 raise e
 
 
+    def spawn_new_server(self, orig_server, server_id, name, mysqld=None):
+        """Spawn a new server with options.
+
+        orig_server[in]    Existing server
+        server_id[in]      New server id
+        name[in]           Name of spawned server
+        mysqld[in]         Options for new server
+
+        Returns True - success False - failed
+        """
+        port1 = int(self.get_next_port())
+        try:
+            res = self.start_new_server(orig_server, port1, server_id,
+                                        "root", name, mysqld)
+        except MySQLUtilError, e:
+            raise MUTException("Cannot spawn %s: %s" % (name, e.errmsg))
+
+        return res
+
+
     def shutdown_spawned_servers(self):
         """Shutdown all spawned servers.
         """
@@ -433,7 +457,25 @@ class Server_list(object):
                     if arg.find(datadir) >= 0:
                         return proginfo[1]
         return -1
-
+    
+    def add_cleanup_file(self, filename):
+        """Add a file to the list of files to cleanup at shutdown.
+        
+        filename[in]       The file to remove
+        """
+        self.cleanup_list.append(filename)
+        
+        
+    def remove_files(self):
+        """Remove temporary files added during tests.
+        """
+        for item in self.cleanup_list:
+            if item is not None:
+                try:
+                    os.unlink(item)
+                except:
+                    pass
+                
 
 class System_test(object):
     """The System_test class is used by the MySQL Utilities Test (MUT) facility

@@ -35,10 +35,10 @@ class test(replicate.test):
             self.s5_serverid = int(res[0][1])
         else:
             self.s5_serverid = self.servers.get_next_id()
-            res = self.spawn_new_server(self.server5, self.s5_serverid,
-                                       "rep_slave_no_innodb",
-                                        ' --mysqld="--log-bin=mysql-bin '
-                                        ' --skip-innodb"')
+            res = self.servers.spawn_new_server(self.server0, self.s5_serverid,
+                                                "rep_slave_no_innodb",
+                                              ' --mysqld="--log-bin=mysql-bin '
+                                              ' --skip-innodb"')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server5 = res[0]

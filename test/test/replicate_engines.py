@@ -40,10 +40,10 @@ class test(replicate.test):
             self.s3_serverid = int(res[0][1])
         else:
             self.s3_serverid = self.servers.get_next_id()
-            res = self.spawn_new_server(self.server3, self.s3_serverid,
-                                       "rep_slave_missing_engines",
-                                        ' --mysqld="--log-bin=mysql-bin '
-                                        '--default_storage_engine=blackhole"')
+            res = self.servers.spawn_new_server(self.server0, self.s3_serverid,
+                                                "rep_slave_missing_engines",
+                                              ' --mysqld="--log-bin=mysql-bin '
+                                         '--default_storage_engine=blackhole"')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server3 = res[0]
@@ -60,10 +60,10 @@ class test(replicate.test):
             self.s4_serverid = int(res[0][1])
         else:
             self.s4_serverid = self.servers.get_next_id()
-            res = self.spawn_new_server(self.server4, self.s4_serverid,
-                                        "rep_master_missing_engines",
-                                        ' --mysqld="--log-bin=mysql-bin '
-                                        '--default_storage_engine=memory"')
+            res = self.servers.spawn_new_server(self.server0, self.s4_serverid,
+                                               "rep_master_missing_engines",
+                                              ' --mysqld="--log-bin=mysql-bin '
+                                            '--default_storage_engine=memory"')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server4 = res[0]

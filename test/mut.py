@@ -700,6 +700,11 @@ if server_list.num_spawned_servers():
     print "\nShutting down spawned servers "
     server_list.shutdown_spawned_servers()
 
+if (server_list.cleanup_list) > 0:
+    sys.stdout.write("\nDeleting temporary files...")
+    server_list.remove_files()
+    print "success."
+
 del server_list
 
 sys.stdout.write("\n")

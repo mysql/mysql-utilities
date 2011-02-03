@@ -1,0 +1,22 @@
+Test Case 1 : Errors for logs, binlog, innodb 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,db_dir_size,data_size,misc_files,total
+mysql,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX
+util_test,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+# The general_log is turned off on the server.
+# The slow_query_log is turned off on the server.
+log_name,size
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# Binary logging is turned off on the server.
+# Server is not an active slave - no relay log information.
+# InnoDB is disabled on this server.
+#...done.
+

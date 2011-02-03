@@ -13,8 +13,9 @@ class test(mysql_test.System_test):
     def check_prerequisites(self):
         # Need at least one server.
         self.server1 = None
+        self.server2 = None
         self.need_servers = False
-        if not self.check_num_servers(3):
+        if not self.check_num_servers(2):
             self.need_servers = True
         return self.check_num_servers(1)
 
@@ -23,14 +24,50 @@ class test(mysql_test.System_test):
         num_servers = self.servers.num_servers()
         if self.need_servers:
             try:
-                self.servers.spawn_new_servers(num_servers+2)
+                self.servers.spawn_new_servers(num_servers+1)
             except MySQLUtilError, e:
                 raise MUTException("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
-            num_servers -= 2 # Get last 2 servers in list
-        self.server1 = self.servers.get_server(num_servers)
-        self.server2 = self.servers.get_server(num_servers+1)
+            num_servers -= 1 # Get last server in list
+        self.server0 = self.servers.get_server(0)
+
+        index = self.servers.find_server_by_name("export_basic")
+        if index >= 0:
+            self.server1 = self.servers.get_server(index)
+            try:
+                res = self.server1.show_server_variable("server_id")
+            except MySQLUtilError, e:
+                raise MUTException("Cannot get export_basic server " +
+                                   "server_id: %s" % e.errmsg)
+            self.s1_serverid = int(res[0][1])
+        else:
+            self.s1_serverid = self.servers.get_next_id()
+            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
+                                               "export_basic")
+            if not res:
+                raise MUTException("Cannot spawn export_basic server.")
+            self.server1 = res[0]
+            self.servers.add_new_server(self.server1, True)
+
+        index = self.servers.find_server_by_name("import_basic")
+        if index >= 0:
+            self.server2 = self.servers.get_server(index)
+            try:
+                res = self.server2.show_server_variable("server_id")
+            except MySQLUtilError, e:
+                raise MUTException("Cannot get import_basic server " +
+                                   "server_id: %s" % e.errmsg)
+            self.s2_serverid = int(res[0][1])
+        else:
+            self.s2_serverid = self.servers.get_next_id()
+            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
+                                               "import_basic")
+            if not res:
+                raise MUTException("Cannot spawn import_basic server.")
+            self.server2 = res[0]
+            self.servers.add_new_server(self.server2, True)
+
         self.drop_all()
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         try:

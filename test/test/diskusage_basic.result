@@ -1,0 +1,9 @@
+Test Case 1 : Testing disk space (simple)
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+#...done.

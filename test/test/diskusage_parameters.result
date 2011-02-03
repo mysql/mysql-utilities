@@ -1,0 +1,199 @@
+Test Case 1 : Showing help 
+Usage: mysqldiskusage.py --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage - show disk usage for databases
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f FORMAT, --format=FORMAT
+                        display the output in either GRID (default), TAB, CSV,
+                        or VERTICAL format
+  -h, --no-headers      do show column headers
+  -b, --binlog          include binary log usage
+  -r, --relaylog        include relay log usage
+  -l, --logs            include general and slow log usage
+  -i, --innodb          include InnoDB tablespace usage
+  -m, --empty           include empty databases
+  -a, --all             show all usage including empty databases
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           Turn off all messages for quiet execution.
+
+Test Case 2 : No headers 
+# Source on localhost: ... connected.
+# Database totals:
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+#...done.
+
+Test Case 3 : Show binlog usage 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# binary log information:
+Current binary log file = XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
+#...done.
+
+Test Case 4 : Show log usage 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+log_name,size
+clone.log,XXXX
+clone-slow.log,XXXX
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+#...done.
+
+Test Case 5 : Show InnoDB usage 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# InnoDB tablespace information:
+innodb_file,size
+ib_logfile0,XXXXXXXX
+ib_logfile1,XXXXXXXX
+ibdata1,XXXXXXXX
+
+Total size of InnoDB files = XXXXXXXX
+
+InnoDB freespace = XXXXXXXX
+
+#...done.
+
+Test Case 6 : Include empty database 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+mt_db,0
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+#...done.
+
+Test Case 7 : Show all usage 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+mt_db,0
+mysql,XXXXXXX
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+log_name,size
+clone.log,XXXX
+clone-slow.log,XXXX
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# binary log information:
+Current binary log file = XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
+# Server is not an active slave - no relay log information.
+# InnoDB tablespace information:
+innodb_file,size
+ib_logfile0,XXXXXXXX
+ib_logfile1,XXXXXXXX
+ibdata1,XXXXXXXX
+
+Total size of InnoDB files = XXXXXXXX
+
+InnoDB freespace = XXXXXXXX
+
+#...done.
+
+Test Case 8 : Show all plus verbose 
+# Source on localhost: ... connected.
+# Database totals:
+db_name,db_dir_size,data_size,misc_files,total
+mt_db,0,0,0,0
+mysql,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX
+util_test,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+log_name,size
+clone.log,XXXX
+clone-slow.log,XXXX
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# binary log information:
+Current binary log file = XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
+# Server is not an active slave - no relay log information.
+# InnoDB tablespace information:
+innodb_file,size,type,specificaton
+ib_logfile0,XXXXXXXX,log file,
+ib_logfile1,XXXXXXXX,log file,
+ibdata1,XXXXXXXX,shared tablespace,ibdata1:10M:autoextend
+
+Total size of InnoDB files = XXXXXXXX
+
+Tablespace ibdata1:10M:autoextend can be extended by using ibdata1:10M[...]
+
+InnoDB freespace = XXXXXXXX
+
+#...done.
+
+Test Case 9 : Show all plus quiet 
+# Source on localhost: ... connected.
+db_name,total
+mt_db,0
+mysql,XXXXXXX
+util_test,XXXXXXX
+log_name,size
+clone.log,XXXX
+clone-slow.log,XXXX
+error_log.err,XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+# Server is not an active slave - no relay log information.
+innodb_file,size
+ib_logfile0,XXXXXXXX
+ib_logfile1,XXXXXXXX
+ibdata1,XXXXXXXX
+
