@@ -38,12 +38,12 @@ OPTIONS
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: -q, --quiet
+.. option:: --quiet, -q
 
    turn off all messages for quiet execution
 
@@ -81,7 +81,7 @@ The following demonstrates how to create a new instance of a running server
 and setting the root password and turning binary logging on.::
 
     $ mkdir /source/test123
-    $ python mysqlserverclone.py --server=root:pass@localhost \
+    $ mysqlserverclone --server=root:pass@localhost \
       --new-data=/Users/cbell/source/test123 --new-port=3310 \
       --root-password=pass --mysqld=--log-bin=mysql-bin
     # Cloning the MySQL server running on localhost.

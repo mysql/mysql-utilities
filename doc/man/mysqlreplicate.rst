@@ -33,11 +33,11 @@ the same storage engines enabled but also that the default storage engine
 is the same.
 
 Furthermore, the utility will also report a warning if the InnoDB storage
-engine differs from the master and slave. Similarly, --pedantic requires
-the InnoDB storage engine to the be the same on the master and slave.
+engine differs from the master and slave. Similarly, :option:`--pedantic`
+requires the InnoDB storage engine to the be the same on the master and slave.
 
-The -vv option will also display any discrepancies among the storage engines
-and InnoDB values with or without the --pedantic option.
+The :option:`-vv` option will also display any discrepancies among the storage
+engines and InnoDB values with or without the :option:`--pedantic` option.
 
 OPTIONS
 -------
@@ -63,18 +63,18 @@ OPTIONS
 .. option:: --rpl-user <replication-user>
 
    the user and password for the replication user requirement -
-   e.g. rpl:passwd - default = rpl:rpl
+   For example, rpl:passwd - default = rpl:rpl
 
 .. option:: --test-db <test database>
 
    database name to use in testing replication setup (optional)
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: -p, --pedantic
+.. option:: --pedantic, -p
 
    fail if storage engines differ among master and slave (optional)
 
@@ -132,11 +132,12 @@ RECOMMENDATIONS
 ---------------
 
 You should use read_only = True in the my.cnf file for the slave to ensure no
-accidental data changes (e.g. INSERT, DELETE, UPDATE, etc.) are permitted
+accidental data changes such as INSERT, DELETE, UPDATE, etc. are permitted
 on the slave.
 
-Use the --pedantic and --vv options for setting up replication on production
-servers to avoid possible problems with differing storage engines.
+Use the :option:`--pedantic` and :option:`-vv` options for setting up
+replication on production servers to avoid possible problems with differing
+storage engines.
 
 COPYRIGHT
 ---------

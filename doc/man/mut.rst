@@ -39,7 +39,7 @@ specify multiple servers for tests designed to use additional servers.
 
 The utility has a special test suite named 'performance' where performance
 related tests are placed. This suite is not included by default and must be
-specified with the --suite= option to execute the performance tests.
+specified with the :option:`--suite=` option to execute the performance tests.
 
 OPTIONS
 -------
@@ -113,9 +113,9 @@ OPTIONS
 
    Do not abort when a test fails
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug. Use -vvv to display actual
    results of test cases to the screen and ignore result processing - used to
    diagnose test execution problems
@@ -132,7 +132,7 @@ EXAMPLES
 The following example demonstrates how to use mut to execute a subset of the
 tests using an existing server which is cloned.::
 
-    $ python mut.py --server=root@localhost --do-tests=clone_user --width=70
+    $ python mut --server=root@localhost --do-tests=clone_user --width=70
 
     MySQL Utilities Testing - MUT
 

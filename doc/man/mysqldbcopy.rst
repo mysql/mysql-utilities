@@ -22,22 +22,23 @@ DESCRIPTION
 This utility permits a database administrator to copy a database from
 one server (source) either to another server (destinaton) as the same
 name or a different name or to the same server (destination) as the same or
-as a different name (e.g. clone).
+as a different name (clone).
 
 The operation copies all objects (tables, views, triggers, events, procedures,
 functions, and database-level grants) to the destination server. The utility
 will also copy all data. There are options to turn off copying any or all of
 the objects as well as not copying the data.
 
-You can exclude specific objects by name using the --exclude option whereby you
-specify a name in the form of <db>.<object> or you can supply a regex search
-pattern. For example, --exclude=db1.trig1 will exclude the single trigger and
-`--exclude=trig_` will exclude all objects from all databases whose name begins
-with trig and has a following character or digit.
+You can exclude specific objects by name using the :option:`--exclude` option
+whereby you specify a name in the form of <db>.<object> or you can supply a
+regex search pattern. For example, :option:`--exclude=db1.trig1` will exclude
+the single trigger and :option:`--exclude=trig_` will exclude all objects from
+all databases whose name begins with trig and has a following character or
+digit.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects in
-the operation. See :ref:`mysqldb-notes` below for more details.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqldb-notes` below for more details.
 
 OPTIONS
 -------
@@ -75,23 +76,23 @@ The following command line options are accepted by **mysqldbcopy**:
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
-.. option:: -x EXCLUDE, --exclude=EXCLUDE
+.. option:: --exclude=EXCLUDE, -x EXCLUDE
 
    exclude one or more objects from the operation using either a specific name
-   (e.g. db1.t1) or a REGEXP search pattern. Repeat option for multiple
+   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
    exclusions.
 
-.. option:: -f, --force
+.. option:: --force, -f
 
    drop the new database or object if it exists
 
-.. option:: -q, --quiet
+.. option:: --quiet, -q
 
    turn off all messages for quiet execution
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --threads
@@ -118,14 +119,14 @@ grants.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
-contains certain objects (e.g. views, events) and whether binary
-logging is turned on (i.e. the need for **SUPER**).
+contains certain objects such as views or events and whether binary
+logging is turned on (hence the need for **SUPER**).
 
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is copied.
 
-The --exclude option does not apply to grants.
+The :option:`--exclude` option does not apply to grants.
 
 EXAMPLES
 --------
@@ -133,7 +134,7 @@ EXAMPLES
 The following example demonstrates how to use the utility to copy a database
 named 'util_test' to a new name 'util_test_copy' on the same server.::
 
-    $ python mysqldbcopy.py \\
+    $ mysqldbcopy.py \\
       --source=root:pass@localhost:3310:/test123/mysql.sock \\
       --destination=root:pass@localhost:3310:/test123/mysql.sock \\
       util_test:util_test_copy

@@ -46,11 +46,10 @@ can specify a list of tables (in the form *db.tablename*) which will
 limit the scan to only those tables in the databases listed and those
 tables listed.
 
-If you want to see the example DROP statements to drop the redundant
-indexes, you can specify the -d option (see below). You can also
-examine the existing indexes using the :option:`-v` option which
-prints the equivalent **CREATE INDEX** (or **ALTER TABLE** for primary
-keys).
+If you want to see the example DROP statements to drop the redundant indexes,
+you can specify the :option:`--show-drops` option (see below). You can also
+examine the existing indexes using the :option:`--verbose` option which prints
+the equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
 You can also display the best and worst non-primary key indexes for
 each table with the :option:`--best` and :option:`--worst`
@@ -76,9 +75,9 @@ one of the following formats:
 Note: the :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects
-in the operation.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqlindexcheck-notes` below for more details.
 
 OPTIONS
 -------
@@ -108,9 +107,9 @@ OPTIONS
 
    skip tables that do not exist
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --format <index-format>
@@ -144,7 +143,7 @@ To scan all of the tables in the employees database to see the possible
 redundant and duplicate indexes as well as the DROP statements for the indexes,
 use this command::
 
-    $ python .mysqlindexcheck.py --server=root@localhost employees
+    $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.
     # The following indexes are duplicates or redundant \\
       for table employees.dept_emp:

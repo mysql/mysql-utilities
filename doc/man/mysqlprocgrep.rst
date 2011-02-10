@@ -18,10 +18,10 @@ DESCRIPTION
 -----------
 
 This utility scan the process lists for all the servers provided via repeated
-occurrences of the --server option and will either print the result (the
-default) or execute certain actions on it. The match conditions are given as
-options to the tool and in order for a row to match, all the
-conditions given have to match.
+occurrences of the :option:`--server` option and will either print the result
+(the default) or execute certain actions on it. The match conditions are given
+as options to the tool and in order for a row to match, all the conditions
+given have to match.
 
 You also have the choice to view the output in one of the following
 formats using the :option:`--format` option.
@@ -91,11 +91,11 @@ Options
    is given. If a kill option is given, this option will print
    information about the processes before killing them.
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
    Be more verbose and print messages about execution. Can be given
    multiple times, in which case the verbosity level increases.
-   e.g., -v = verbose, -vv = more verbose, -vvv = debug
+   For example, -v = verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --regexp, --basic-regexp, -G
 

@@ -36,7 +36,6 @@ from mysql.utilities.exception import MySQLUtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldiskusage "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqldiskusage - show disk usage for databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1 --all"
 
