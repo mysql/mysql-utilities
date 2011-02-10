@@ -25,14 +25,14 @@ account on one server as a template, clone a MySQL user such that one
 or more new user accounts are created on another (or the same) server
 with the same privileges as the original user.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects
-in the operation.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqluserclone-notes` below for more details.
 
 You can also use the utility to list users for a server by specifying the
---list option. This prints a list of the users on the source (no destination
-is needed). You can also control the output of the list using the --format
-option.
+--list option. This prints a list of the users on the source (no destination is
+needed). You can also control the output of the list using the
+:option:`--format` option.
 
 OPTIONS
 -------
@@ -62,21 +62,21 @@ OPTIONS
    Path to use when copying data (stores temporary files) - default =
    current directory
 
-.. option:: -d, --dump - does not require a destination
+.. option:: --dump, -d 
 
    dump GRANT statements for user
 
-.. option:: -f, --force
+.. option:: --force, -f
 
    drop the new user if it exists
 
-.. option:: -q, --quiet
+.. option:: --quiet, -q
 
    turn off all messages for quiet execution
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --include-global-privileges
@@ -90,7 +90,7 @@ OPTIONS
 .. option::  --format=LIST_FORMAT
 
    display the list of users in either GRID (default), TAB, CSV, or VERTICAL
-   format - valid only for --list option
+   format - valid only for :option:`--list` option
 
 
 NOTES
@@ -108,7 +108,7 @@ EXAMPLES
 To clone 'joe' as 'sam' and 'sally' with passwords and logging in as root on
 the local machine, use this command::
 
-    $ python mysqluserclone.py --source=root@localhost \\
+    $ mysqluserclone --source=root@localhost \\
       --destination=root@localhost \\
       joe@localhost sam:secret1@localhost sally:secret2@localhost
     # Source on localhost: ... connected.
@@ -121,7 +121,7 @@ the local machine, use this command::
 The following shows all of the users on the localhost server in the most
 verbose output in a CSV format.::
 
-    $ python mysqluserclone.py --source=root@localhost --list --format=CSV -vvv
+    $ mysqluserclone --source=root@localhost --list --format=CSV -vvv
     # Source on localhost: ... connected.
     user,host,database
     joe,localhost,util_test

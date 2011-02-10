@@ -62,9 +62,9 @@ specifying the :option:`--no-headers` option.
 You can turn off all feedback information by specifying the
 :option:`--quiet` option.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects in
-the operation. See :ref:`mysqldbimport-notes` below for more details.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqldbimport-notes` below for more details.
 
 OPTIONS
 -------
@@ -80,19 +80,19 @@ OPTIONS
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: -f FORMAT, --format=FORMAT
+.. option:: --format=FORMAT, -f FORMAT
 
    display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
    or VERTICAL|V format
 
-.. option:: -i import, --import=import
+.. option:: --import=import, -i import
 
    control the import of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = import only the
    definitions for the objects in the database list, or BOTH|B =
    import the metadata followed by the data (default: import metadata)
 
-.. option:: -d, --drop-first
+.. option:: --drop-first, -d
 
    Drop database before importing.
 
@@ -101,21 +101,21 @@ OPTIONS
    import the files and generate the statements but do not execute
    them - useful for testing file validity
 
-.. option:: -b, --bulk-insert
+.. option:: --bulk-insert, -b
 
    Use bulk insert statements for data (default:False)
 
-.. option:: -h, --no-headers
+.. option:: --no-headers, -h
 
    do not display the column headers - ignored for GRID format
 
-.. option:: -q, --quiet
+.. option:: --quiet, -q
 
    turn off all messages for quiet execution
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --skip <skip-objects>
@@ -139,8 +139,8 @@ grant privileges.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
-contains certain objects (e.g. views, events) and whether binary
-logging is turned on (i.e. the need for **SUPER**).
+contains certain objects such as views or events and whether binary
+logging is turned on (hence the need for **SUPER**).
 
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
@@ -152,7 +152,7 @@ EXAMPLES
 To import the metadata of the database 'util_test' to server1 on port 3306
 using a file in CSV format, use this command::
 
-    $ python mysqldbimport.py --import=definitions --server=root@localhost \\
+    $ mysqldbimport --import=definitions --server=root@localhost \\
       --format=csv data.csv
     # Source on localhost: ... connected.
     # Importing definitions from data.csv.
@@ -161,7 +161,7 @@ using a file in CSV format, use this command::
 Similarly, to import the data of the database 'util_test' to server1 on port
 3306 producing bulk insert statements, use this command::
 
-    $ python mysqldbimport.py --import=data --bulk-insert \\
+    $ mysqldbimport --import=data --bulk-insert \\
       --server=root@localhost --format=csv data.csv
     # Source on localhost: ... connected.
     # Importing data from data.csv.
@@ -171,7 +171,7 @@ Also, to import both the data and definitions of the database 'util_test' to
 server1 on port 3306 producing bulk insert statements from a file that contains
 SQL statements, use this command::
 
-    $ python mysqldbimport.py --import=both --bulk-insert \\
+    $ mysqldbimport --import=both --bulk-insert \\
       --server=root@localhost --format=sql data.sql
     # Source on localhost: ... connected.
     # Importing definitions and data from data.sql.

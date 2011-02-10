@@ -48,9 +48,9 @@ using the :option:`--format` option.
 You can turn off the headers when using formats CSV and TAB by
 specifying the :option:`--no-headers` option.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects in
-the operation. See :ref:`mysqldiskusage-notes` below for more details.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqldiskusage-notes` below for more details.
 
 OPTIONS
 -------
@@ -68,41 +68,41 @@ OPTIONS
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: -f FORMAT, --format=FORMAT
+.. option:: --format=FORMAT, -f FORMAT
 
    display the output in either GRID (default), TAB, CSV,
    or VERTICAL format
 
-.. option:: -h, --no-headers
+.. option:: --no-headers, -h
 
    do not display the column headers - ignored for grid format
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option::  -b, --binlog
+.. option::  --binlog, -b
 
     include binary log usage
 
-.. option::  -r, --relaylog
+.. option::  --relaylog, -r
 
     include relay log usage
 
-.. option::  -l, --logs
+.. option::  --logs, -l
 
     include general, error, and slow log usage
     
-.. option::  -i, --InnoDB
+.. option::  --InnoDB, -i
 
     include InnoDB tablespace usage
 
-.. option::  -m, --empty
+.. option::  --empty, -m
 
     include empty databases
 
-.. option::  -a, --all
+.. option::  --all, -a
 
     show all usage including empty databases
     
@@ -131,7 +131,7 @@ EXAMPLES
 To show only the disk space usage for the employees and test databases in
 ggrid format, use this command::
 
-    $ python mysqldiskusage.py --server=root@localhost db1 db2 db3
+    $ mysqldiskusage --server=root@localhost db1 db2 db3
     # Source on localhost: ... connected.
     # Database totals:
     +------------+--------------+
@@ -147,7 +147,7 @@ ggrid format, use this command::
 
 To see all disk usage for the server in CSV format, use this command::
 
-    $ python mysqldiskusage.py --server=root@localhost --format=csv -a -vv
+    $ mysqldiskusage --server=root@localhost --format=csv -a -vv
     # Source on localhost: ... connected.
     # Database totals:
     db_name,db_dir_size,data_size,misc_files,total

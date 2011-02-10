@@ -36,7 +36,6 @@ from mysql.utilities.exception import MySQLUtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbexport "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqldbexport - export metadata and data from databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
 

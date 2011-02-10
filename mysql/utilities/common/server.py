@@ -65,55 +65,58 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
                           if source and destination are same server
             if error, returns (None, None)
     """
+    
+    def _connect_server(name, values, version, quiet):
+        server_conn = None
+        if not quiet:
+            _print_connection(name, values)
+    
+        # Try to connect to the MySQL database server.
+        server_conn = Server(values, name)
+        try:
+            server_conn.connect()
+            if version is not None:
+                if not server_conn.check_version_compat(major, minor, rel):
+                    raise MySQLUtilError("The %s version is incompatible. Utility "
+                                         "requires version %s or higher." %
+                                         (name, version))
+        except MySQLUtilError, e:
+            raise e
+    
+        if not quiet:
+            sys.stdout.write("connected.\n")
+
+        return server_conn
+
     source = None
     destination = None
     cloning = (src_val == dest_val) or dest_val is None
     if version is not None:
         major, minor, rel = version.split(".")
 
-    # If we're cloning so use same server for faster copy
-    if not cloning and dest_val is None:
-        dest_val = src_val
-
-    if not quiet:
-        _print_connection(src_name, src_val)
-
-    # Try to connect to the MySQL database server (source).
-    source = Server(src_val, src_name)
-    try:
-        source.connect()
-        if version is not None:
-            if not source.check_version_compat(major, minor, rel):
-                raise MySQLUtilError("The %s version is incompatible. Utility "
-                                     "requires version %s or higher." %
-                                     (src_name, version))
-    except MySQLUtilError, e:
-        raise e
-
-    if not quiet:
-        sys.stdout.write("connected.\n")
-
-    if not quiet:
-        if not cloning:
-            _print_connection(dest_name, dest_val)
-        elif dest_val is not None:
-            _print_connection(dest_name, src_val)
-
-    if not cloning:
-        # Try to connect to the MySQL database server (destination).
-        destination = Server(dest_val, dest_name)
+    if type(src_val) == type({}): 
+        # If we're cloning so use same server for faster copy
+        if not cloning and dest_val is None:
+            dest_val = src_val
+    
         try:
-            destination.connect()
-            if version is not None:
-                if not source.check_version_compat(major, minor, rel):
-                    raise MySQLUtilError("The %s version is incompatible."
-                                         " Utility requires version %s or "
-                                         "higher." % (dest_name, version))
+            source = _connect_server(src_name, src_val, version, quiet)
         except MySQLUtilError, e:
             raise e
-
-    if not quiet and dest_val is not None:
-        sys.stdout.write("connected.\n")
+    
+        if not cloning:
+            try:
+                destination = _connect_server(dest_name, dest_val, version, quiet)
+            except MySQLUtilError, e:
+                raise e
+        elif not quiet and dest_val is not None:
+            _print_connection(dest_name, src_val)
+            sys.stdout.write("connected.\n")
+    elif type(src_val) != Server:
+        raise MySQLUtilError("Cannot determine type of parameter.")
+    else:
+        source = src_val
+        destination = dest_val
 
     servers = (source, destination)
     return servers

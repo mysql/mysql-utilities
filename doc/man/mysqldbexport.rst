@@ -76,18 +76,19 @@ You can turn off all feedback information by specifying the
 :option:`--quiet` option.
 
 You can also have the utility write the data for the tables to separate files
-by using the --file-per-table option. This would create files with a file
-name composed of the database and table name followed by the format of the
-file. For example, the following command produces files named
-db1.<table name>.csv.::
+by using the :option:`--file-per-table` option. This would create files with a
+file name composed of the database and table name followed by the format of the
+file. For example, the following command produces files named db1.<table
+name>.csv.::
 
   mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
 
-You can exclude specific objects by name using the --exclude option whereby you
-specify a name in the form of <db>.<object> or you can supply a regex search
-pattern. For example, --exclude=db1.trig1 will exclude the single trigger and
-`--exclude=trig_` will exclude all objects from all databases whose name begins
-with trig and has a following character or digit.
+You can exclude specific objects by name using the :option:`--exclude` option
+whereby you specify a name in the form of <db>.<object> or you can supply a
+regex search pattern. For example, :option:`--exclude=db1.trig1` will exclude
+the single trigger and :option:`--exclude=trig_` will exclude all objects from
+all databases whose name begins with trig and has a following character or
+digit.
 
 This utility differs from mysqldump in that it can produce output in a
 variety of formats to make your data extraction/transport much easier. It
@@ -95,9 +96,9 @@ permits you to export your data in the format most suitable to an external
 tool, another MySQL server, or a yet another use without the need to
 reformat the data.
 
-You must provide login information (e.g., user, host, password, etc.
-for a user that has the appropriate rights to access all objects
-in the operation. See :ref:`mysqldbexport-notes` below for more details.
+You must provide login information such as user, host, password, etc. for a
+user that has the appropriate rights to access all objects in the operation.
+See :ref:`mysqldbexport-notes` below for more details.
 
 OPTIONS
 -------
@@ -137,23 +138,23 @@ OPTIONS
 
 .. option:: --file-per-table
 
-   Write table data to separate files. Valid only for --export=data or
-   --export=both. Files will be named <db_name>.<tbl_name>.<format>. For
-   example, a CSV export of two tables in db1, t1 and t2, results in files
-   named db1.t1.csv and db1.t2.csv. If definitions are included, they are
-   written to stdout as normal.
+   Write table data to separate files. Valid only for :option:`--export=data`
+   or :option:`--export=both`. Files will be named
+   <db_name>.<tbl_name>.<format>. For example, a CSV export of two tables in
+   db1, t1 and t2, results in files named db1.t1.csv and db1.t2.csv. If
+   definitions are included, they are written to stdout as normal.
 
 .. option:: --no-headers, -h
 
    do not display the column headers - ignored for GRID format
 
-.. option:: -q, --quiet
+.. option:: --quiet, -q
 
    turn off all messages for quiet execution
 
-.. option:: -v, --verbose
+.. option:: --verbose, -v
 
-   control how much information is displayed. e.g., -v =
+   control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
 .. option:: --skip <skip-objects>
@@ -165,7 +166,7 @@ OPTIONS
 .. option:: -x EXCLUDE --exclude=EXCLUDE
 
    exclude one or more objects from the operation using either a specific name
-   (e.g. db1.t1) or a REGEXP search pattern. Repeat option for multiple
+   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
    exclusions.
 
 .. option:: --skip-blobs
@@ -188,14 +189,14 @@ mysql database.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
-contains certain objects (e.g. views, events) and whether binary
-logging is turned on (i.e. the need for **SUPER**).
+contains certain objects such as views or events and whether binary
+logging is turned on (hence the need for **SUPER**).
 
 Some combinations of the options may result in errors during the operation.
 For example, eliminating tables but not views may result in an error when the
 view is imported on another server.
 
-The --exclude option does not apply to grants.
+The :option:`--exclude` option does not apply to grants.
 
 EXAMPLES
 --------
@@ -203,7 +204,7 @@ EXAMPLES
 To export the definitions of the database 'dev' from a MySQL server on
 localhast via port 3306 producing **CREATE** statements, use this command::
 
-    $ python mysqldbexport.py --server=root:pass@localhost \\
+    $ mysqldbexport --server=root:pass@localhost \\
       --skip=GRANTS --export=DEFINITIONS util_test
     # Source on localhost: ... connected.
     # Exporting metadata from util_test
@@ -238,7 +239,7 @@ localhast via port 3306 producing **CREATE** statements, use this command::
 Similarly, to export the data of the database 'util_test' producing bulk
 insert statements, use this command::
 
-    $ python mysqldbexport.py --server=root:pass@localhost \\
+    $ mysqldbexport --server=root:pass@localhost \\
       --export=DATA --bulk-insert util_test
     # Source on localhost: ... connected.
     USE util_test;
