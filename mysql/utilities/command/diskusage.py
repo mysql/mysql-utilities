@@ -761,6 +761,15 @@ def show_innodb_usage(server, datadir, options):
         print "# InnoDB is disabled on this server."
         return True
 
+    # Modified check for version 5.5
+    res = server.exec_query("USE INFORMATION_SCHEMA")
+    res = server.exec_query("SELECT engine, support "
+                            "FROM INFORMATION_SCHEMA.ENGINES "
+                            "WHERE engine='InnoDB'")
+    if res != [] and res[0][1].upper() == "NO":
+        print "# InnoDB is disabled on this server."
+        return True
+
     # Check to see if innodb_file_per_table is ON
     res = server.show_server_variable('innodb_file_per_table')
     if res != [] and res[0][1].upper() == "ON":

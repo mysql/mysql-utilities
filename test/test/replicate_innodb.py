@@ -12,6 +12,8 @@ class test(replicate.test):
     """
 
     def check_prerequisites(self):
+        if self.servers.get_server(0).check_version_compat(5, 5, 0):
+            raise MUTException("Test requires server version 5.5.")
         return self.check_num_servers(1)
 
     def setup(self):
@@ -38,7 +40,8 @@ class test(replicate.test):
             res = self.servers.spawn_new_server(self.server0, self.s5_serverid,
                                                 "rep_slave_no_innodb",
                                               ' --mysqld="--log-bin=mysql-bin '
-                                              ' --skip-innodb"')
+                                              ' --skip-innodb --default-'
+                                              'storage-engine=MyISAM"')
             if not res:
                 raise MUTException("Cannot spawn replication slave server.")
             self.server5 = res[0]

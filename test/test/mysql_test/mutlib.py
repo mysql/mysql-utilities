@@ -333,7 +333,7 @@ class Server_list(object):
             res = self.start_new_server(orig_server, port1, server_id,
                                         "root", name, mysqld)
         except MySQLUtilError, e:
-            raise MUTException("Cannot spawn %s: %s" % (name, e.errmsg))
+            raise MySQLUtilError("Cannot spawn %s: %s" % (name, e.errmsg))
 
         return res
 
