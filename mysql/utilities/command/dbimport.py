@@ -279,7 +279,8 @@ def _get_db(row):
             if row[0] == "GRANT":
                 db_name = row[1][2]
             else:
-                if len(row[1][0]) > 0 and row[1][0].upper() != "NONE":
+                if len(row[1][0]) > 0 and \
+                   row[1][0].upper() not in ('NONE', 'DEF'):
                     db_name = row[1][0] # --display=BRIEF
                 else:
                     db_name = row[1][1] # --display=FULL

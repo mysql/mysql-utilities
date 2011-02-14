@@ -201,6 +201,8 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         try:
             server2.connect()
             i = stop + 1
+        except:
+            pass
         finally:
             if verbose and not quiet:
                 print "# trying again..."

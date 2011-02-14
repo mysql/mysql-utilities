@@ -59,8 +59,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-clone.log,XXXX
-clone-slow.log,XXXX
+slow.log,XXXX
+general.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -110,8 +110,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-clone.log,XXXX
-clone-slow.log,XXXX
+slow.log,XXXX
+general.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -149,8 +149,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-clone.log,XXXX
-clone-slow.log,XXXX
+slow.log,XXXX
+general.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -172,7 +172,7 @@ ibdata1,XXXXXXXX,shared tablespace,ibdata1:10M:autoextend
 
 Total size of InnoDB files = XXXXXXXX
 
-Tablespace ibdata1:10M:autoextend can be extended by using ibdata1:10M[...]
+Tablespace ibdata1:10M:autoextend...
 
 InnoDB freespace = XXXXXXXX
 
@@ -185,8 +185,8 @@ mt_db,0
 mysql,XXXXXXX
 util_test,XXXXXXX
 log_name,size
-clone.log,XXXX
-clone-slow.log,XXXX
+slow.log,XXXX
+general.log,XXXX
 error_log.err,XXXX
 log_file,size
 mysql-bin.000001,XXXX

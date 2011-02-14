@@ -14,6 +14,8 @@ class test(mysql_test.System_test):
         # Need at least one server.
         self.server1 = None
         self.server2 = None
+        self.gen_log = None
+        self.slow_log = None
         self.error_log = None
         return self.check_num_servers(1)
 
@@ -31,14 +33,19 @@ class test(mysql_test.System_test):
                                    "server_id: %s" % e.errmsg)
             self.s1_serverid = int(res[0][1])
         else:
+            self.gen_log = os.path.join(os.getcwd(), "general.log")
+            self.slow_log = os.path.join(os.getcwd(), "slow.log")
             self.error_log = os.path.join(os.getcwd(), "error_log.err")
             self.s1_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                 "diskusage_all",
                                                 ' --mysqld="--log-bin=mysql-'
-                                                'bin --log --slow-query-log'
+                                                'bin --log --slow-query-log '
+                                                '--slow-query-log-file=%s '
+                                                '--general-log-file=%s '
                                                 ' --log-error=%s"' %
-                                                self.error_log)
+                                                (self.gen_log, self.slow_log,
+                                                 self.error_log))
             if not res:
                 raise MUTException("Cannot spawn diskusage_all server.")
             self.server1 = res[0]
@@ -59,8 +66,8 @@ class test(mysql_test.System_test):
         self.mask_column_result("| util_test  ", "|", 3, " XXXXXXX  ")
 
         self.mask_column_result("ib", ",", 2, "XXXXXXXX")
-        self.mask_column_result("clone.log", ",", 2, "XXXX")
-        self.mask_column_result("clone-slow.log", ",", 2, "XXXX")
+        self.mask_column_result("general.log", ",", 2, "XXXX")
+        self.mask_column_result("slow.log", ",", 2, "XXXX")
         self.mask_column_result("mysql-bin", ",", 2, "XXXX")
         self.mask_column_result("util_test", ",", 2, "XXXXXXX")
 
@@ -90,7 +97,11 @@ class test(mysql_test.System_test):
                             "Total size of InnoDB files = XXXXXXXX\n")
         self.replace_result("InnoDB freespace",
                             "InnoDB freespace = XXXXXXXX\n")
+        
+        self.remove_result("performance_schema")
 
+        self.replace_result("Tablespace ibdata1:10M:autoextend",
+                            "Tablespace ibdata1:10M:autoextend...\n")
 
     def run(self):
         self.res_fname = self.testdir + "result.txt"
@@ -139,5 +150,7 @@ class test(mysql_test.System_test):
                 os.unlink(self.res_fname)
             except:
                 pass
+        self.servers.add_cleanup_file(self.gen_log)
+        self.servers.add_cleanup_file(self.slow_log)
         self.servers.add_cleanup_file(self.error_log)
         return self.drop_all()

@@ -167,6 +167,10 @@ class test(export_basic.test):
         self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
+        self.replace_result("CREATE DEFINER=`root`@`localhost` EVENT `e1`",
+                            "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
+                            "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
+ 
 
         self._mask_grid()
         self._mask_csv()
@@ -176,6 +180,11 @@ class test(export_basic.test):
         return True
 
     def _mask_grid(self):
+	self.mask_column_result("| def ", "|", 2, " None           ")
+        self.mask_column_result("| None           | util_test       | trg", "|",
+                                2, " None             ")
+        self.mask_column_result("| None             | util_test       | trg", "|",
+                                6, " None                  ")
         self.mask_column_result("| None           | util_test     | t", "|",
                                 16, " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| None           | util_test     | t", "|",
@@ -220,6 +229,8 @@ class test(export_basic.test):
                                 10, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("e1,root@localhost,", ",",
                                 13, "XX")
+        self.mask_column_result("def,util_test,", ",", 1, "")
+        self.mask_column_result(",util_test,trg", ",", 5, "")
         self.mask_column_result(",util_test,t", ",",
                                 10, "XXXXXXXXXX")
         self.mask_column_result(",util_test,t", ",",
@@ -259,6 +270,9 @@ class test(export_basic.test):
                                 10, "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("e1	root@localhost", "\t",
                                 13, "XX")
+        self.mask_column_result("def	util_test	t", "\t", 1, "")
+        self.mask_column_result("def	util_test	v", "\t", 1, "")
+        self.mask_column_result("	util_test	trg", "\t", 5, "")
         self.mask_column_result("	util_test	t", "\t",
                                 10, "XXXXXX")
         self.mask_column_result("	util_test	t", "\t",
@@ -338,7 +352,14 @@ class test(export_basic.test):
                             "          MAX_DATA_LENGTH: XXXXXXX\n")
         self.replace_result("                DATA_FREE:",
                             "                DATA_FREE: XXXXXXXXXXX\n")
-
+	self.replace_result("            TABLE_CATALOG: def",
+                            "            TABLE_CATALOG: None\n")
+        self.replace_result("        TABLE_CATALOG: def",
+                            "        TABLE_CATALOG: None\n")
+        self.replace_result("            TRIGGER_CATALOG: def",
+                            "            TRIGGER_CATALOG: None\n")
+        self.replace_result("       EVENT_OBJECT_CATALOG: def",
+                            "       EVENT_OBJECT_CATALOG: None\n")
   
     def get_result(self):
         return self.compare(__name__, self.results)

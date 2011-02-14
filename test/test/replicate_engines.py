@@ -12,6 +12,8 @@ class test(replicate.test):
     """
 
     def check_prerequisites(self):
+        if self.servers.get_server(0).check_version_compat(5, 5, 0):
+            raise MUTException("Test requires server version 5.1.")
         return self.check_num_servers(1)
 
     def setup(self):
