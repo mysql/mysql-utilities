@@ -11,6 +11,7 @@ import sys
 from distutils.core import setup
 
 from distutils.command.build_scripts import build_scripts as _build_scripts
+from distutils.command.install import install as _install
 from distutils.command.install_scripts import install_scripts as _install_scripts
 from info import META_INFO, INSTALL
 
@@ -40,29 +41,47 @@ class install_scripts(_install_scripts):
     description = (_install_scripts.description
                    + " and add path to /etc/profile.d")
 
+    user_options = _install_scripts.user_options + [
+        ("skip-profile", None, "Skip installing a profile script"),
+        ]
+
+    boolean_options = _install_scripts.boolean_options + ['skip-profile']
+
     profile_file = "/etc/profile.d/mysql-utilities.sh"
 
+    def initialize_options(self):
+        _install_scripts.initialize_options(self)
+        self.skip_profile = None
+
+    def finalize_options(self):
+        _install_scripts.finalize_options(self)
+        self.set_undefined_options('install',
+                                   ('skip_profile', 'skip_profile'))
+
     def run(self):
+        from distutils import log, dir_util
+        _install_scripts.run(self)
         # We should probably use distutils.dist.execute here to allow
         # --dry-run to work properly.
-        from distutils import log, dir_util
-        if os.path.exists(os.path.dirname(self.profile_file)):
-            outfile = self.profile_file
-            if os.path.isdir(outfile) and not os.path.islink(outfile):
-                dir_util.remove_tree(outfile)
-            elif os.path.exists(outfile):
-                log.info("Removing %s", outfile)
-                os.unlink(outfile)
-            script = PROFILE_SCRIPT % (self.install_dir,)
-            log.info("Writing %s", outfile)
-            open(outfile, "w+").write(script)
-            _install_scripts.run(self)
-        else:
-            log.info("Not adding %s", self.profile_file)
+        if not self.skip_profile:
+            if os.path.exists(os.path.dirname(self.profile_file)):
+                outfile = self.profile_file
+                if os.path.isdir(outfile) and not os.path.islink(outfile):
+                    dir_util.remove_tree(outfile)
+                elif os.path.exists(outfile):
+                    log.info("Removing %s", outfile)
+                    os.unlink(outfile)
+                script = PROFILE_SCRIPT % (self.install_dir,)
+                log.info("Writing %s", outfile)
+                open(outfile, "w+").write(script)
+            else:
+                log.info("Not adding %s%s", self.profile_file,
+                         " (skipped)" if self.skip_profile else "")
 
     def get_outputs(self):
         outputs = _install_scripts.get_outputs(self)
-        outputs.append(self.profile_file)
+        if not self.skip_profile:
+            outputs.append(self.profile_file)
         return outputs
 
 class install_man(distutils.core.Command):
@@ -114,17 +133,33 @@ class install_man(distutils.core.Command):
 
 # See if we have Sphinx installed, otherwise, just ignore building
 # documentation.
+class install(_install):
+    user_options = _install.user_options + [
+        ("skip-profile", None, "Skip installing a profile script"),
+        ]
+
+    boolean_options = _install.boolean_options + ['skip-profile']
+
+    def initialize_options(self):
+        _install.initialize_options(self)
+        self.skip_profile = False
+
+    def finalize_options(self):
+        _install.finalize_options(self)
+
+COMMANDS['cmdclass'].update({
+        'install': install,
+        })
+
 try:
     import sphinx.setup_command
-    from distutils.command.install import install as _install
 
-    class install(_install):
-        sub_commands = _install.sub_commands + [
-            ('install_man', lambda self: True),
-            ]
+    # Add install_man command if we have Sphinx
+    install.sub_commands = _install.sub_commands + [
+        ('install_man', lambda self: True),
+        ]
 
     COMMANDS['cmdclass'].update({
-            'install': install,
             'install_man': install_man,
             'build_sphinx': sphinx.setup_command.BuildDoc,
             'build_man': sphinx.setup_command.BuildDoc,
@@ -134,14 +169,7 @@ try:
             'build_man': { 'builder': 'man' },
             })
 except ImportError:
-    # TODO: install pre-generated manual pages
-    # No Sphinx installed
-
-    from distutils.command.install import install
-
-    COMMANDS['cmdclass'].update({
-            'install': install,
-    })
+    pass
 
 class build_scripts(_build_scripts):
     """Class for providing a customized version of build_scripts.
