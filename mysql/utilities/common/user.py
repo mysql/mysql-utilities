@@ -66,6 +66,7 @@ class User(object):
         self.server1 = server1
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbose = verbose
+        self.current_user = None
 
     def create(self, new_user=None):
         """Create the user
@@ -152,10 +153,20 @@ class User(object):
         
         returns result set or None if no grants defined
         """
+        # Get the users' connection user@host if not retrieved
+        if self.current_user is None:
+            res = self.server1.exec_query("SELECT CURRENT_USER()")
+            parts = res[0][0].split('@')
+            # If we're connected as some other user, use the user@host
+            # defined at instantiation
+            if parts[0] != self.user:
+                self.current_user = "'%s'@'%s'" % (self.user, self.host)
+            else:
+                self.current_user = "'%s'@'%s'" % (parts[0], parts[1])
         grants = []
         try:
-            res = self.server1.exec_query("SHOW GRANTS FOR '%s'@'%s'" % 
-                                          (self.user, self.host))
+            res = self.server1.exec_query("SHOW GRANTS FOR %s" % 
+                                          self.current_user)
             for grant in res:
                 grants.append(grant)
         except MySQLUtilError, e:
