@@ -243,11 +243,8 @@ def _get_log_information(server, log_name, suffix='_file'):
     if res != [] and res[0][1].upper() == 'OFF':
         print "# The %s is turned off on the server." % log_name
     else:
-        try:
-            log_file, log_path, log_size = _build_logfile_list(server, log_name,
-                                                           suffix)
-        except MySQLUtilError, e:
-            raise e
+        log_file, log_path, log_size = _build_logfile_list(server, log_name,
+                                                       suffix)
         if log_file is None or log_path is None or \
            not os.access(log_path, os.R_OK):
             print "# %s information is not accessible. " % log_name + \
@@ -584,33 +581,18 @@ def show_logfile_usage(server, options):
     if not quiet:
         print "# Log information."
     total = 0
-    try:
-        gen_log, gen_log_size = _get_log_information(server,
-                                                     'general_log')
-        total += gen_log_size
-    except MySQLUtilError, e:
-        raise e
-    try:
-        slow_log, slow_log_size = _get_log_information(server,
-                                                       'slow_query_log')
-        total += slow_log_size
-    except MySQLUtilError, e:
-        raise e
-    try:
-        error_log, error_log_size = _get_log_information(server,
-                                                         'log_error', '')
-        total += error_log_size
-    except MySQLUtilError, e:
-        raise e
-
+    
+    _LOG_NAMES = [
+        ('general_log', '_file'), ('slow_query_log', '_file'),
+        ('log_error', '')
+    ]
     logs = []
-    if gen_log is not None:
-        logs.append((gen_log, gen_log_size))
-    if slow_log is not None:
-        logs.append((slow_log, slow_log_size))
-    if error_log is not None:
-        logs.append((error_log, error_log_size))
-
+    for log_name in _LOG_NAMES:
+        log, size = _get_log_information(server, log_name[0], log_name[1])
+        if log is not None:
+            logs.append((log, size))
+        total += size
+    
     fmt_logs = []
     columns = ['log_name', 'size']
     if len(logs) > 0:
@@ -852,17 +834,14 @@ def show_innodb_usage(server, datadir, options):
               "Check your permissions."
 
     if not innodb_file_per_table:
-        try:
-            res = server.exec_query(_QUERY_DATAFREE)
-            if res != []:
-                if len(res) > 1:
-                    raise MySQLUtilError("Found multiple rows for freespace.")
-                else:
-                    size = int(res[0][0])
-                    if not quiet:
-                        _print_size("InnoDB freespace = ", size)
-                        print
-        except MySQLUtilError, e:
-            raise e
+        res = server.exec_query(_QUERY_DATAFREE)
+        if res != []:
+            if len(res) > 1:
+                raise MySQLUtilError("Found multiple rows for freespace.")
+            else:
+                size = int(res[0][0])
+                if not quiet:
+                    _print_size("InnoDB freespace = ", size)
+                    print
 
     return True

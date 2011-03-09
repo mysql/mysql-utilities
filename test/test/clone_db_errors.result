@@ -1,7 +1,7 @@
 Test case 1 - error: same database
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: Destination database name is same as source - source = util_test, destinion = util_test
+ERROR: Destination database name is same as source - source = util_test, destination = util_test
 Test case 2 - error: old database doesn't exist
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

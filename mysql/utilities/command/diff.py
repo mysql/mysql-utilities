@@ -44,13 +44,10 @@ def object_diff(server1_val, server2_val, object1, object2, options):
     """
     from mysql.utilities.common.dbcheck import diff_objects, server_connect
 
-    try:
-        server1, server2 = server_connect(server1_val, server2_val,
-                                          object1, object2, options)
-        result = diff_objects(server1, server2,
-                              object1, object2, options)
-    except MySQLUtilError, e:
-        raise e
+    server1, server2 = server_connect(server1_val, server2_val,
+                                      object1, object2, options)
+    result = diff_objects(server1, server2,
+                          object1, object2, options)
     
     return result
 
@@ -84,13 +81,10 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     
     force = options.get("force", False)
 
-    try:
-        server1, server2 = server_connect(server1_val, server2_val,
-                                          db1, db2, options)
-        in_both, in_db1, in_db2 = get_common_objects(server1, server2,
-                                                     db1, db2, True, options)
-    except MySQLUtilError, e:
-        raise e
+    server1, server2 = server_connect(server1_val, server2_val,
+                                      db1, db2, options)
+    in_both, in_db1, in_db2 = get_common_objects(server1, server2,
+                                                 db1, db2, True, options)
     
     if (len(in_db1) > 0 or len(in_db2) > 0) and not force:
         return False
@@ -100,10 +94,7 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     for item in in_both:
         object1 = "%s.%s" % (db1, item[1][0])
         object2 = "%s.%s" % (db2, item[1][0])
-        try:
-            result = object_diff(server1, server2, object1, object2, options)
-        except MySQLUtilError, e:
-            raise e
+        result = object_diff(server1, server2, object1, object2, options)
         if result is not None:
             success = False
             if not force:

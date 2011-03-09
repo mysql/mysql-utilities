@@ -15,12 +15,9 @@ class test(export_parameters_def.test):
         return export_parameters_def.test.check_prerequisites(self)
 
     def setup(self):
-        try:
-            res = export_parameters_def.test.setup(self)
-            if not res:
-                return False
-        except MUTException, e:
-            raise e
+        res = export_parameters_def.test.setup(self)
+        if not res:
+            return False
         return True
 
     def run(self):

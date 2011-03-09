@@ -64,12 +64,8 @@ def replicate(master_vals, slave_vals, rpl_user,
         raise MySQLUtilError("You must specify two different servers for "
                              "the operation.")
 
-    try:
-        servers = connect_servers(master_vals, slave_vals, False, "5.0.0",
-                                  "master", "slave")
-    except MySQLUtilError, e:
-        raise e
-    
+    servers = connect_servers(master_vals, slave_vals, False, "5.0.0",
+                              "master", "slave")
     master = servers[0]
     slave = servers[1]
 
@@ -108,15 +104,8 @@ def replicate(master_vals, slave_vals, rpl_user,
     if verbose:
         print "# Checking InnoDB statistics for type and version conflicts."
 
-    try:
-        master_innodb_stats = master.get_innodb_stats()
-    except MySQLUtilError, e:
-        raise e
-    
-    try:
-        slave_innodb_stats = slave.get_innodb_stats()
-    except MySQLUtilError, e:
-        raise e
+    master_innodb_stats = master.get_innodb_stats()
+    slave_innodb_stats = slave.get_innodb_stats()
     
     if master_innodb_stats != slave_innodb_stats:
         if not pedantic:

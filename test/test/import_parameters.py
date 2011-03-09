@@ -78,10 +78,7 @@ class test(import_basic.test):
                     cmd_opts += ","
                 cmd_opts += "%s" % skip
                 comment = "Test case %d - no %s" % (case_num, skip)
-                try:
-                    self.do_skip_test(cmd_opts, comment)
-                except MUTException, e:
-                    raise e
+                self.do_skip_test(cmd_opts, comment)
                 case_num += 1
 
 

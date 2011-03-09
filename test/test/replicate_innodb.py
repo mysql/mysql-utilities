@@ -21,10 +21,7 @@ class test(replicate.test):
         self.server5 = None
         self.s5_serverid = None
 
-        try:
-            replicate.test.setup(self)
-        except MUTException, e:
-            raise e
+        replicate.test.setup(self)
         
         index = self.servers.find_server_by_name("rep_slave_no_innodb")
         if index >= 0:

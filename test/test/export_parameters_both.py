@@ -27,12 +27,9 @@ class test(export_parameters_def.test):
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.
 
-        try:
-            func = export_parameters_def.test.test_format_and_display_values
-            func(self, "%s util_test --export=both --format=" % cmd_str, 1,
-                 False, False, False, True)
-        except MUTException, e:
-            raise e
+        func = export_parameters_def.test.test_format_and_display_values
+        func(self, "%s util_test --export=both --format=" % cmd_str, 1,
+             False, False, False, True)
         
         return True
   

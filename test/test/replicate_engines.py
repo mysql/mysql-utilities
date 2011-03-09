@@ -26,10 +26,7 @@ class test(replicate.test):
         self.s3_serverid = None
         self.s4_serverid = None
 
-        try:
-            replicate.test.setup(self)
-        except MUTException, e:
-            raise e
+        replicate.test.setup(self)
         
         index = self.servers.find_server_by_name("rep_slave_missing_engines")
         if index >= 0:

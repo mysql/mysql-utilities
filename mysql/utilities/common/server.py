@@ -73,15 +73,12 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
     
         # Try to connect to the MySQL database server.
         server_conn = Server(values, name)
-        try:
-            server_conn.connect()
-            if version is not None:
-                if not server_conn.check_version_compat(major, minor, rel):
-                    raise MySQLUtilError("The %s version is incompatible. Utility "
-                                         "requires version %s or higher." %
-                                         (name, version))
-        except MySQLUtilError, e:
-            raise e
+        server_conn.connect()
+        if version is not None:
+            if not server_conn.check_version_compat(major, minor, rel):
+                raise MySQLUtilError("The %s version is incompatible. Utility "
+                                     "requires version %s or higher." %
+                                     (name, version))
     
         if not quiet:
             sys.stdout.write("connected.\n")
@@ -99,16 +96,10 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
         if not cloning and dest_val is None:
             dest_val = src_val
     
-        try:
-            source = _connect_server(src_name, src_val, version, quiet)
-        except MySQLUtilError, e:
-            raise e
+        source = _connect_server(src_name, src_val, version, quiet)
     
         if not cloning:
-            try:
-                destination = _connect_server(dest_name, dest_val, version, quiet)
-            except MySQLUtilError, e:
-                raise e
+            destination = _connect_server(dest_name, dest_val, version, quiet)
         elif not quiet and dest_val is not None:
             _print_connection(dest_name, src_val)
             sys.stdout.write("connected.\n")
@@ -234,21 +225,12 @@ class Server(object):
         """
 
         fkey_query = "SET foreign_key_checks = %s"
-        try:
-            res = self.show_server_variable("foreign_key_checks")
-            fkey = (res[0][1] == "ON")
-        except MySQLUtilError, e:
-            raise e
+        res = self.show_server_variable("foreign_key_checks")
+        fkey = (res[0][1] == "ON")
         if not fkey and turn_on:
-            try:
-                res = self.exec_query(fkey_query % "ON", (), False, False)
-            except MySQLUtilError, e:
-                raise e
+            res = self.exec_query(fkey_query % "ON", (), False, False)
         elif fkey and not turn_on:
-            try:
-                res = self.exec_query(fkey_query % "OFF", (), False, False)
-            except MySQLUtilError, e:
-                raise e
+            res = self.exec_query(fkey_query % "OFF", (), False, False)
         return fkey
 
 
@@ -443,25 +425,16 @@ class Server(object):
         """
 
         inno_type = None
-        try:
-            results = self.exec_query(_BUILTIN)
-        except Exception, e:
-            raise e
+        results = self.exec_query(_BUILTIN)
         if results is not None and results != () and results[0][0] is not None:
             inno_type = "builtin"
 
-        try:
-            results = self.exec_query(_PLUGIN)
-        except Exception, e:
-            raise e
+        results = self.exec_query(_PLUGIN)
         if results is not None and results != () and \
            results != [] and results[0][0] is not None:
             inno_type = "plugin "
 
-        try:
-            results = self.exec_query(_VERSION)
-        except Exception, e:
-            raise e
+        results = self.exec_query(_VERSION)
         version = []
         if results is not None:
             version.append(results[0][0])
@@ -503,9 +476,6 @@ class Server(object):
                 if cmd[0] != '#':
                     if verbose:
                         print cmd
-                    try:
-                        res = self.exec_query(cmd, (), False, False)
-                    except MySQLUtilError, e:
-                        raise e
+                    res = self.exec_query(cmd, (), False, False)
         file.close()
         return res

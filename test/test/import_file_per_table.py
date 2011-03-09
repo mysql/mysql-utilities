@@ -15,12 +15,9 @@ class test(import_basic.test):
         return import_basic.test.check_prerequisites(self)
 
     def setup(self):
-        try:
-            res = import_basic.test.setup(self)
-            if not res:
-                return False
-        except MUTException, e:
-            raise e
+        res = import_basic.test.setup(self)
+        if not res:
+            return False
 
         data_file = os.path.normpath(self.testdir + "/data/basic_data.sql")
         try:
@@ -67,10 +64,7 @@ class test(import_basic.test):
             # Now check the output for the correct files and delete them.
             self.results.append("# Testing file-per-table import:\n")
             for i in range(1,3):
-                try:
-                    self.delete_data("util_test.t%d" % i)
-                except MUTException, e:
-                    raise e
+                self.delete_data("util_test.t%d" % i)
 
                 file_name = "util_test.t%d.%s" % (i, format.lower())
                 cmd_variant = imp_cmd_str + format + " " + file_name

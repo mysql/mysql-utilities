@@ -307,15 +307,12 @@ class Server_list(object):
         for server_num in range(0, num_to_add):
             datadir = "new_server_%d" % (cur_num_servers)
             cur_num_servers += 1
-            try:
-                server = self.start_new_server(orig_server,
-                                               self.get_next_port(),
-                                               self.get_next_id(), "root",
-                                               datadir)
-                self.server_list.append((server[0], True,
-                                         self.get_process_id(datadir)))
-            except MySQLUtilError, e:
-                raise e
+            server = self.start_new_server(orig_server,
+                                           self.get_next_port(),
+                                           self.get_next_id(), "root",
+                                           datadir)
+            self.server_list.append((server[0], True,
+                                     self.get_process_id(datadir)))
 
 
     def spawn_new_server(self, orig_server, server_id, name, mysqld=None):

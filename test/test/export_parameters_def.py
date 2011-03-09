@@ -97,11 +97,8 @@ class test(export_basic.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
-        try:
-            func = self.test_format_and_display_values
-            func("%s util_test --export=definitions --format=" % cmd_str, 13)
-        except MUTException, e:
-            raise e
+        self.test_format_and_display_values(cmd_str + " util_test --export="+\
+                                            "definitions --format=", 13)
 
         return True
 

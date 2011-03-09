@@ -123,16 +123,13 @@ class test(mysql_test.System_test):
         test_num = 1
         for display in _DISPLAYS:
             for format in _FORMATS:
-                try:
-                    comment = "Test Case %d : Testing import with " % test_num
-                    comment += "%s format " % format
-                    comment += "and %s display" % display
-                    # We test DEFINITIONS and DATA only in other tests
-                    self.run_import_test(0, from_conn, to_conn,
-                                         format, "BOTH", comment,
-                                         " --display=%s" % display)
-                except MUTException, e:
-                    raise e
+                comment = "Test Case %d : Testing import with " % test_num
+                comment += "%s format " % format
+                comment += "and %s display" % display
+                # We test DEFINITIONS and DATA only in other tests
+                self.run_import_test(0, from_conn, to_conn,
+                                     format, "BOTH", comment,
+                                     " --display=%s" % display)
                 self.drop_db(self.server2, "util_test")
                 test_num += 1
         return True
