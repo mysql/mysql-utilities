@@ -91,6 +91,14 @@ class test(mysql_test.System_test):
                                  comment)
         if not res:
             raise MUTException("%s: failed" % comment)
+            
+        # The following are necessary due to changes in character spaces
+        # introduced with Python 2.7.X in the difflib.
+        
+        self.replace_result("+++ util_test.t1", "+++ util_test.t1\n")
+        self.replace_result("+++ util_test.t2", "+++ util_test.t2\n")
+        self.replace_result("--- util_test.t1", "--- util_test.t1\n")
+        self.replace_result("--- util_test.t2", "--- util_test.t2\n")
 
         return True
           
