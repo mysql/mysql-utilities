@@ -63,7 +63,7 @@ parser.add_option("-f", "--format", action="store", dest="format",
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
-                  default=False, help="do show column headers")
+                  default=False, help="do not show column headers")
 
 # Binlogs option
 parser.add_option("-b", "--binlog", action="store_true", dest="do_binlog",
