@@ -11,7 +11,7 @@ SYNOPSIS
 
   mysqldiff --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
             [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
-              --help | --version | --verbose | --force --width=<width> |
+              --help | --version | --verbose | --force | --width=<width> |
               --quiet | [|--unified|--context|--differ]
               [<db1:db2> [<db1:db2>*] |
                <db1.obj1:db2.obj2> [<db1.obj1:db2.obj2>*]]
@@ -70,9 +70,9 @@ OPTIONS
    connection information for the first server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --server1 <source>
+.. option:: --server2 <source>
 
-   connection information for the first server in the form:
+   connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --verbose, -v
@@ -92,6 +92,10 @@ OPTIONS
 
    Display the differences in differ-style format
    
+.. option:: --width
+
+   change the display width of the test report
+
 .. option:: --force
 
    Do not halt at the first difference found. Process all objects.
