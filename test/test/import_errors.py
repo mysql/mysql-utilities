@@ -26,15 +26,12 @@ class test(import_basic.test):
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
         test_num = 1
         for format in _FORMATS:
-            try:
-                comment = "Test Case %d : Testing import with " % test_num
-                comment += "%s format and NAMES display"
-                # We test DEFINITIONS and DATA only in other tests
-                self.run_import_test(1, from_conn, to_conn,
-                                     format, "BOTH", comment,
-                                     " --display=NAMES")
-            except MUTException, e:
-                raise e
+            comment = "Test Case %d : Testing import with " % test_num
+            comment += "%s format and NAMES display"
+            # We test DEFINITIONS and DATA only in other tests
+            self.run_import_test(1, from_conn, to_conn,
+                                 format, "BOTH", comment,
+                                 " --display=NAMES")
             self.drop_db(self.server2, "util_test")
             test_num += 1
 

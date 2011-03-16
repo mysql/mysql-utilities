@@ -130,11 +130,8 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
 
-    try:
-        servers = connect_servers(server1_val, server2_val, quiet, "5.1.30",
-                                  "server1", "server2")
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(server1_val, server2_val, quiet, "5.1.30",
+                              "server1", "server2")
     server1 = servers[0]
     server2 = servers[1]
     if server2 is None:
@@ -161,11 +158,8 @@ def get_common_objects(server1, server2, db1, db2,
                                       items in db2 not in db1
     """
 
-    try:
-        db1_objects = _get_objects(server1, db1, options)
-        db2_objects = _get_objects(server2, db2, options)
-    except MySQLUtilError, e:
-        raise e
+    db1_objects = _get_objects(server1, db1, options)
+    db2_objects = _get_objects(server2, db2, options)
         
     # Compare lists
     in_db1_not_db2 = list(set(db1_objects)-set(db2_objects))
@@ -202,15 +196,8 @@ def diff_objects(server1, server2, object1, object2, options):
     difftype = options.get("difftype", "unified")
     width = options.get("width", 75)
 
-    try:
-        object1_create = _get_create_object(server1, object1, options)
-    except MySQLUtilError, e:
-        raise e
-    
-    try:
-        object2_create = _get_create_object(server2, object2, options)
-    except MySQLUtilError, e:
-        raise e
+    object1_create = _get_create_object(server1, object1, options)
+    object2_create = _get_create_object(server2, object2, options)
 
     if not quiet:
         msg = "# Comparing %s to %s " % (object1, object2)

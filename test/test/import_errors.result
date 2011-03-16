@@ -65,10 +65,8 @@ ERROR: User joe on the Source server does not have permissions to create all obj
 Test case 12 - error: bad SQL statements
 # Source on localhost: ... connected.
 # Importing definitions from test/data/bad_sql.sql.
->>>>
+ERROR: Invalid statement:
 CREATE TABLES util_test.t1 (a char(30)) ENGINE=MEMORY;
-<<<<
-ERROR: Query failed. 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'TABLES util_test.t1 (a char(30)) ENGINE=MEMORY' at line 1
 Test case 13 - error: --skip=create_db & --drop-first
 ERROR: You cannot combine --drop-first and --skip=create_db.
 Test case 14 - warning: --skip-blobs

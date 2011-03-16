@@ -63,23 +63,16 @@ def export_metadata(src_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    try:
-        servers = connect_servers(src_val, None, quiet, "5.1.30")
-        #print servers
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(src_val, None, quiet, "5.1.30")
 
     source = servers[0]
 
     # Check user permissions on source for all databases
     for db_name in db_list:
-        try:
-            source_db = Database(source, db_name)
-            source_db.check_read_access(src_val["user"], src_val["host"],
-                                        skip_views, skip_procs, skip_funcs,
-                                        skip_grants, skip_events)
-        except MySQLUtilError, e:
-            raise e
+        source_db = Database(source, db_name)
+        source_db.check_read_access(src_val["user"], src_val["host"],
+                                    skip_views, skip_procs, skip_funcs,
+                                    skip_grants, skip_events)
 
     for db_name in db_list:
 
@@ -95,82 +88,79 @@ def export_metadata(src_val, db_list, options):
             print "# Exporting metadata from %s" % db_name
 
         # Perform the extraction
-        try:
-            if format == "SQL":
-                db.init()
-                if not skip_create:
-                    print "DROP DATABASE IF EXISTS %s;" % db_name
-                    print "CREATE DATABASE %s;" % db_name
-                print "USE %s;" % db_name
-                for dbobj in db.get_next_object():
-                    if dbobj[0] == "GRANT" and not skip_grants:
-                        if not quiet:
-                            print "# Grant:"
-                        if dbobj[1][3]:
-                            create_str = "GRANT %s ON %s.%s TO %s" % \
-                                         (dbobj[1][1], db_name,
-                                          dbobj[1][3], dbobj[1][0])
-                        else:
-                            create_str = "GRANT %s ON %s.* TO %s" % \
-                                         (dbobj[1][1], db_name, dbobj[1][0])
-                        if create_str.find("%"):
-                            create_str = re.sub("%", "%%", create_str)
-                        print create_str
+        if format == "SQL":
+            db.init()
+            if not skip_create:
+                print "DROP DATABASE IF EXISTS %s;" % db_name
+                print "CREATE DATABASE %s;" % db_name
+            print "USE %s;" % db_name
+            for dbobj in db.get_next_object():
+                if dbobj[0] == "GRANT" and not skip_grants:
+                    if not quiet:
+                        print "# Grant:"
+                    if dbobj[1][3]:
+                        create_str = "GRANT %s ON %s.%s TO %s" % \
+                                     (dbobj[1][1], db_name,
+                                      dbobj[1][3], dbobj[1][0])
                     else:
-                        if not quiet:
-                            print "# %s: %s.%s" % (dbobj[0], db_name,
-                                                   dbobj[1][0])
-                        if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
-                           (dbobj[0] == "FUNCTION" and not skip_funcs) or \
-                           (dbobj[0] == "EVENT" and not skip_events) or \
-                           (dbobj[0] == "TRIGGER" and not skip_triggers):
-                            print "DELIMITER ||"
-                        print "%s;" % db.get_create_statement(db_name,
-                                                              dbobj[1][0],
-                                                              dbobj[0])
-                        if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
-                           (dbobj[0] == "FUNCTION" and not skip_funcs) or \
-                           (dbobj[0] == "EVENT" and not skip_events) or \
-                           (dbobj[0] == "TRIGGER" and not skip_triggers):
-                            print "||"
-                            print "DELIMITER ;"
-            else:
-                objects = []
-                if not skip_tables:
-                    objects.append("TABLE")
-                if not skip_views:
-                    objects.append("VIEW")
-                if not skip_triggers:
-                    objects.append("TRIGGER")
-                if not skip_procs:
-                    objects.append("PROCEDURE")
-                if not skip_funcs:
-                    objects.append("FUNCTION")
-                if not skip_events:
-                    objects.append("EVENT")
-                if not skip_grants:
-                    objects.append("GRANT")
-                for obj_type in objects:
-                    sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
-                    rows = db.get_db_objects(obj_type, column_type, True)
-                    if len(rows[1]) < 1:
-                        print " (none found)"
-                    else:
-                        print
-                        if format == "VERTICAL":
-                            format_vertical_list(sys.stdout, rows[0], rows[1])
-                        elif format == "TAB":
-                            format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                not no_headers, '\t')
-                        elif format == "CSV":
-                            format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                not no_headers, ',')
-                        else:  # default to table format
-                            format_tabular_list(sys.stdout, rows[0], rows[1],
-                                                True, None, False, True)
+                        create_str = "GRANT %s ON %s.* TO %s" % \
+                                     (dbobj[1][1], db_name, dbobj[1][0])
+                    if create_str.find("%"):
+                        create_str = re.sub("%", "%%", create_str)
+                    print create_str
+                else:
+                    if not quiet:
+                        print "# %s: %s.%s" % (dbobj[0], db_name,
+                                               dbobj[1][0])
+                    if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
+                       (dbobj[0] == "FUNCTION" and not skip_funcs) or \
+                       (dbobj[0] == "EVENT" and not skip_events) or \
+                       (dbobj[0] == "TRIGGER" and not skip_triggers):
+                        print "DELIMITER ||"
+                    print "%s;" % db.get_create_statement(db_name,
+                                                          dbobj[1][0],
+                                                          dbobj[0])
+                    if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
+                       (dbobj[0] == "FUNCTION" and not skip_funcs) or \
+                       (dbobj[0] == "EVENT" and not skip_events) or \
+                       (dbobj[0] == "TRIGGER" and not skip_triggers):
+                        print "||"
+                        print "DELIMITER ;"
+        else:
+            objects = []
+            if not skip_tables:
+                objects.append("TABLE")
+            if not skip_views:
+                objects.append("VIEW")
+            if not skip_triggers:
+                objects.append("TRIGGER")
+            if not skip_procs:
+                objects.append("PROCEDURE")
+            if not skip_funcs:
+                objects.append("FUNCTION")
+            if not skip_events:
+                objects.append("EVENT")
+            if not skip_grants:
+                objects.append("GRANT")
+            for obj_type in objects:
+                sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
+                rows = db.get_db_objects(obj_type, column_type, True)
+                if len(rows[1]) < 1:
+                    print " (none found)"
+                else:
+                    print
+                    if format == "VERTICAL":
+                        format_vertical_list(sys.stdout, rows[0], rows[1])
+                    elif format == "TAB":
+                        format_tabular_list(sys.stdout, rows[0], rows[1],
+                                            not no_headers, '\t')
+                    elif format == "CSV":
+                        format_tabular_list(sys.stdout, rows[0], rows[1],
+                                            not no_headers, ',')
+                    else:  # default to table format
+                        format_tabular_list(sys.stdout, rows[0], rows[1],
+                                            True, None, False, True)
 
-        except MySQLUtilError, e:
-            raise e
 
     if not quiet:
         print "#...done."
@@ -303,22 +293,16 @@ def export_data(src_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    try:
-        servers = connect_servers(src_val, None, quiet, "5.1.30")
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(src_val, None, quiet, "5.1.30")
 
     source = servers[0]
 
     # Check user permissions on source for all databases
     for db_name in db_list:
-        try:
-            source_db = Database(source, db_name)
-            source_db.check_read_access(src_val["user"], src_val["host"],
-                                        skip_views, skip_procs, skip_funcs,
-                                        skip_grants, skip_events)
-        except MySQLUtilError, e:
-            raise e
+        source_db = Database(source, db_name)
+        source_db.check_read_access(src_val["user"], src_val["host"],
+                                    skip_views, skip_procs, skip_funcs,
+                                    skip_grants, skip_events)
 
     for db_name in db_list:
 
@@ -338,49 +322,44 @@ def export_data(src_val, db_list, options):
                 print "# Writing table data to files."
 
         # Perform the extraction
-        try:
-            tables = db.get_db_objects("TABLE")
-            if len(tables) < 1:
-                break
-            for table in tables:
-                tbl_name = "%s.%s" % (db_name, table[0])
-                cur_table = Table(source, tbl_name, False, True)
-                col_metadata = cur_table.get_column_metadata()
-                if single and (format != "SQL" and format != "S" and \
-                               format != "GRID" and format != "G" and \
-                               format != "VERTICAL" and format != "V"):
-                    retrieval_mode = -1
-                    first = True
+        tables = db.get_db_objects("TABLE")
+        if len(tables) < 1:
+            break
+        for table in tables:
+            tbl_name = "%s.%s" % (db_name, table[0])
+            cur_table = Table(source, tbl_name, False, True)
+            col_metadata = cur_table.get_column_metadata()
+            if single and format not in ("SQL", "GRID", "VERTICAL"):
+                retrieval_mode = -1
+                first = True
+            else:
+                retrieval_mode = 1
+                first = False
+
+            message = "# Data for table %s: " % tbl_name
+
+            # switch for writing to files
+            if file_per_table:
+                if format == "SQL" or format == "S":
+                    file_name = tbl_name + ".sql"
                 else:
-                    retrieval_mode = 1
+                    file_name = tbl_name + ".%s" % format.lower()
+                outfile = open(file_name, "w")
+                outfile.write(message + "\n")
+            else:
+                outfile = None
+                print message
+
+            for data_rows in cur_table.retrieve_rows(retrieval_mode):
+                _export_row(data_rows, cur_table, col_metadata,
+                            format, single, skip_blobs, first, no_headers,
+                            outfile)
+                if first:
                     first = False
 
-                message = "# Data for table %s: " % tbl_name
+            if file_per_table:
+                outfile.close()
 
-                # switch for writing to files
-                if file_per_table:
-                    if format == "SQL" or format == "S":
-                        file_name = tbl_name + ".sql"
-                    else:
-                        file_name = tbl_name + ".%s" % format.lower()
-                    outfile = open(file_name, "w")
-                    outfile.write(message + "\n")
-                else:
-                    outfile = None
-                    print message
-
-                for data_rows in cur_table.retrieve_rows(retrieval_mode):
-                    _export_row(data_rows, cur_table, col_metadata,
-                                format, single, skip_blobs, first, no_headers,
-                                outfile)
-                    if first:
-                        first = False
-
-                if file_per_table:
-                    outfile.close()
-
-        except MySQLUtilError, e:
-            raise e
 
     if not quiet:
         print "#...done."

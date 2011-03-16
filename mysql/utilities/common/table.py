@@ -321,14 +321,11 @@ class Table:
         else:
             db = self.db_name
             table = self.tbl_name
-        try:
-            res = self.server.exec_query("SELECT TABLE_NAME " +
-                                         "FROM INFORMATION_SCHEMA.TABLES " +
-                                         "WHERE TABLE_SCHEMA = '%s'" % db +
-                                         " and TABLE_NAME = '%s'" % table)
-        except Exception, e:
-            raise e
-        #print "res", res
+        res = self.server.exec_query("SELECT TABLE_NAME " +
+                                     "FROM INFORMATION_SCHEMA.TABLES " +
+                                     "WHERE TABLE_SCHEMA = '%s'" % db +
+                                     " and TABLE_NAME = '%s'" % table)
+
         return (res is not None and len(res) >= 1)
 
 
@@ -346,10 +343,7 @@ class Table:
         # Build an array of dictionaries describing the fields
         special_cols = []
         if columns is None:
-            try:
-                rows = self.server.exec_query("explain %s" % self.table)
-            except Exception, e:
-                raise e
+            rows = self.server.exec_query("explain %s" % self.table)
         else:
             rows = columns
         if rows is not None:
@@ -388,10 +382,7 @@ class Table:
 
         cols = []
         if col_metadata is None:
-            try:
-                rows = self.server.exec_query("explain %s" % self.table)
-            except Exception, e:
-                raise e
+            rows = self.server.exec_query("explain %s" % self.table)
             for row in rows:
                 cols.append(row[0])
         else:
@@ -550,11 +541,8 @@ class Table:
                                          (), False, False)
         except Exception, e:
             pass
-        try:
-            res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" % \
-                                         self.tbl_name)
-        except Exception, e:
-            raise e
+        res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" % \
+                                     self.tbl_name)
         if res:
             num_rows = int(res[0][4])
 
@@ -600,16 +588,10 @@ class Table:
 
         # Spawn a new connection
         dest = Server(self.dest_vals, "thread")
-        try:
-            dest.connect()
-        except MySQLUtilError, e:
-            raise e
+        dest.connect()
 
         # First, turn off foreign keys if turned on
-        try:
-            fkey_on = dest.toggle_fkeys(False)
-        except MySQLUtilError, e:
-            raise e
+        fkey_on = dest.toggle_fkeys(False)
 
         if self.col_metadata is None:
             self.col_metadata = self.get_column_metadata()
@@ -638,10 +620,7 @@ class Table:
 
         # Now, turn on foreign keys if they were on at the start
         if fkey_on:
-            try:
-                fkey_on = dest.toggle_fkeys(True)
-            except MySQLUtilError, e:
-                raise e
+            fkey_on = dest.toggle_fkeys(True)
         del dest
 
 
@@ -673,14 +652,12 @@ class Table:
             self.dest_vals = self.get_dest_values(destination)
 
         proc = None
-        try:
-            if spawn:
-                proc = multiprocessing.Process(target=self._bulk_insert,
-                                              args=(rows, new_db, destination))
-            else:
-                self._bulk_insert(rows, new_db, destination)
-        except MySQLUtilError, e:
-            raise e
+        if spawn:
+            proc = multiprocessing.Process(target=self._bulk_insert,
+                                          args=(rows, new_db, destination))
+        else:
+            self._bulk_insert(rows, new_db, destination)
+
         return proc
 
 
@@ -705,13 +682,10 @@ class Table:
         # Read and copy the data
         pthreads = []
         for rows in self.retrieve_rows(num_conn):
-            try:
-                p = self.insert_rows(rows, new_db, destination, num_conn > 1)
-                if p is not None:
-                    p.start()
-                    pthreads.append(p)
-            except MySQLUtilError, e:
-                raise e
+            p = self.insert_rows(rows, new_db, destination, num_conn > 1)
+            if p is not None:
+                p.start()
+                pthreads.append(p)
 
         if num_conn > 1:
             # Wait for all to finish
@@ -740,34 +714,28 @@ class Table:
         segment_size = self.get_segment_size(num_conn)
 
         # Execute query to get all of the data
-        try:
-            cur = self.server.exec_query("SELECT * FROM %s" % self.table,
-                                         (), False, False, True)
-        except Exception, e:
-            raise e
+        cur = self.server.exec_query("SELECT * FROM %s" % self.table,
+                                     (), False, False, True)
 
         while True:
-            try:
-                rows = None
-                if num_conn < 1:
-                    rows = []
-                    row = cur.fetchone()
-                    if row is None:
-                        raise StopIteration()
-                    rows.append(row)
-                    #print "ROWS 1:", rows
-                elif num_conn == 1:
-                    rows = cur.fetchall()
-                    #print "ROWS 2:", rows
-                    yield rows
+            rows = None
+            if num_conn < 1:
+                rows = []
+                row = cur.fetchone()
+                if row is None:
                     raise StopIteration()
-                else:
-                    rows = cur.fetchmany(segment_size)
-                    if rows == []:
-                        raise StopIteration()
-                    #print "ROWS 3:", rows
-            except mysql.connector.Error, e:
-                raise e
+                rows.append(row)
+                #print "ROWS 1:", rows
+            elif num_conn == 1:
+                rows = cur.fetchall()
+                #print "ROWS 2:", rows
+                yield rows
+                raise StopIteration()
+            else:
+                rows = cur.fetchmany(segment_size)
+                if rows == []:
+                    raise StopIteration()
+                #print "ROWS 3:", rows
             if rows is None:
                 raise StopIteration()
             yield rows
@@ -807,10 +775,7 @@ class Table:
 
         Returns result set
         """
-        try:
-            res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)
-        except MySQLUtilError, e:
-            raise e
+        res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)
         return res
 
 
@@ -880,10 +845,7 @@ class Table:
         """ Get the list of indexes for a table.
         Returns list containing indexes.
         """
-        try:
-            rows = self.get_tbl_indexes()
-        except MySQLUtilError, e:
-            raise e
+        rows = self.get_tbl_indexes()
         return rows
 
 
@@ -901,10 +863,7 @@ class Table:
 
         if self.verbose:
             print "# Getting indexes for %s" % (self.table)
-        try:
-            rows = self._get_index_list()
-        except MySQLUtilError, e:
-            raise e
+        rows = self._get_index_list()
 
         # Return False if no indexes found.
         if not rows:
@@ -1030,15 +989,12 @@ class Table:
         type = "best"
         if not best:
             type = "worst"
-        try:
-            if best:
-                rows= self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
-                                             (self.db_name, self.tbl_name,))
-            else:
-                rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
-                                             (self.db_name, self.tbl_name,))
-        except MySQLUtilError, e:
-            raise e
+        if best:
+            rows= self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
+                                         (self.db_name, self.tbl_name,))
+        else:
+            rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
+                                         (self.db_name, self.tbl_name,))
         if rows:
             print "#"
             print "# Showing the top 5 %s performing indexes from %s:\n#" % \
@@ -1112,10 +1068,7 @@ class Table:
                        False - no primary key.
         """
         primary_key = False
-        try:
-            rows = self._get_index_list()
-        except MySQLUtilError, e:
-            raise e
+        rows = self._get_index_list()
         for row in rows:
             if row[2] == "PRIMARY":
                 primary_key = True

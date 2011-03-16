@@ -15,12 +15,9 @@ class test(export_parameters_def.test):
         return export_parameters_def.test.check_prerequisites(self)
 
     def setup(self):
-        try:
-            res = export_parameters_def.test.setup(self)
-            if not res:
-                return False
-        except MUTException, e:
-            raise e
+        res = export_parameters_def.test.setup(self)
+        if not res:
+            return False
 
         try:
             self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
@@ -63,11 +60,8 @@ class test(export_parameters_def.test):
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.
 
-        try:
-            func = export_parameters_def.test.test_format_and_display_values
-            func(self, "%s util_test --export=data --format=" % cmd_str, 4)
-        except MUTException, e:
-            raise e
+        func = export_parameters_def.test.test_format_and_display_values
+        func(self, "%s util_test --export=data --format=" % cmd_str, 4)
 
         return True
   

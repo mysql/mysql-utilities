@@ -39,11 +39,7 @@ def show_users(src_val, verbosity, format):
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
 
-    try:
-        servers = connect_servers(src_val, None, False, "5.1.0")
-    except MySQLUtilError, e:
-        raise e
-
+    servers = connect_servers(src_val, None, False, "5.1.0")
     source = servers[0]
 
     if verbosity <= 1:
@@ -117,14 +113,11 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     quiet = options.get("quiet", False)
     global_privs = options.get("global_privs", False)
 
-    try:
-        # Don't require destination for dumping base user grants
-        if dump_sql:
-            servers = connect_servers(src_val, None, quiet, "5.1.0")
-        else:
-            servers = connect_servers(src_val, dest_val, quiet, "5.1.0")
-    except MySQLUtilError, e:
-        raise e
+    # Don't require destination for dumping base user grants
+    if dump_sql:
+        servers = connect_servers(src_val, None, quiet, "5.1.0")
+    else:
+        servers = connect_servers(src_val, dest_val, quiet, "5.1.0")
 
     source = servers[0]
     destination = servers[1]

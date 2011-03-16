@@ -39,10 +39,7 @@ class test(mysql_test.System_test):
             raise MUTException("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
 
-        try:
-            rows = self.server2.exec_query("SHOW VARIABLES LIKE 'basedir'")
-        except MySQLUtilError, e:
-            raise e
+        rows = self.server2.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if rows:
             basedir = rows[0][1]
         else:

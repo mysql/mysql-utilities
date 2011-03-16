@@ -63,10 +63,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
 
     # Try to connect to the MySQL database server.
     server1 = Server(conn_val, "source")
-    try:
-        server1.connect()
-    except MySQLUtilError, e:
-        raise e
+    server1.connect()
 
     if not quiet:
         print "# Cloning the MySQL server running on %s." % conn_val["host"]
@@ -88,10 +85,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     # Get basedir
     if not quiet:
         print "# Configuring new instance..."
-    try:
-        rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
-    except MySQLUtilError, e:
-        raise e
+    rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
     if rows:
         basedir = rows[0][1]
     else:

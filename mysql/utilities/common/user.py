@@ -93,10 +93,7 @@ class User(object):
         if self.verbose:
             print query_str
 
-        try:
-            res = self.server1.exec_query(query_str, (), False, False)
-        except Exception, e:
-            raise e
+        res = self.server1.exec_query(query_str, (), False, False)
         
     def drop(self, new_user=None):
         """Drop user from the server
@@ -119,10 +116,7 @@ class User(object):
         if self.verbose:
             print query_str
             
-        try:
-            res = self.server1.exec_query(query_str, (), False, False)
-        except Exception, e:
-            raise e
+        res = self.server1.exec_query(query_str, (), False, False)
 
     def exists(self, user_name=None):
         """Check to see if the user exists
@@ -138,12 +132,10 @@ class User(object):
         if user_name:
             user, passwd, host = parse_user_host(user_name)
 
-        try:
-            res = self.server1.exec_query("SELECT * FROM mysql.user "
-                                          "WHERE user = %s and host = %s",
-                                          (user, host))
-        except Exception, e:
-            raise e
+        res = self.server1.exec_query("SELECT * FROM mysql.user "
+                                      "WHERE user = %s and host = %s",
+                                      (user, host))
+
         return (res is not None and len(res) >= 1)
 
     def get_grants(self, globals=False):
@@ -229,10 +221,7 @@ class User(object):
             # Create an instance of the user class.
             user = User(server, new_user, self.verbose)
             if not user.exists():
-                try:
-                    user.create()
-                except MySQLUtilError, e:
-                    raise e
+                user.create()
 
             base_user_ticks = "'" + self.user + "'@'" + self.host + "'"
             user, passwd, host = parse_user_host(new_user)
@@ -253,8 +242,5 @@ class User(object):
             if self.verbose:
                 print grant
                 
-            try:
-                res = server.exec_query(grant, (), False, False)
-            except Exception, e:
-                raise e
+            res = server.exec_query(grant, (), False, False)
 

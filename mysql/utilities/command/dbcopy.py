@@ -65,11 +65,7 @@ def copy_db(src_val, dest_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    try:
-        servers = connect_servers(src_val, dest_val, quiet, "5.1.30")
-        #print servers
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(src_val, dest_val, quiet, "5.1.30")
 
     source = servers[0]
     destination = servers[1]
@@ -78,33 +74,28 @@ def copy_db(src_val, dest_val, db_list, options):
 
     # Check user permissions on source and destination for all databases
     for db_name in db_list:
-        try:
-            source_db = Database(source, db_name[0])
-            if destination is None:
-                dest = source
-            else:
-                dest = destination
-            if db_name[1] is None:
-                db = db_name[0]
-            else:
-                db = db_name[1]
-            dest_db = Database(dest, db)
+        source_db = Database(source, db_name[0])
+        if destination is None:
+            destination = source
+        if db_name[1] is None:
+            db = db_name[0]
+        else:
+            db = db_name[1]
+        dest_db = Database(destination, db)
 
-            source_db.check_read_access(src_val["user"], src_val["host"],
-                                        skip_views, skip_procs, skip_funcs,
-                                        skip_grants, skip_events)
-            dest_db.check_write_access(dest_val["user"], dest_val["host"],
-                                        skip_views, skip_procs, skip_funcs,
-                                        skip_grants)
-        except MySQLUtilError, e:
-            raise e
+        source_db.check_read_access(src_val["user"], src_val["host"],
+                                    skip_views, skip_procs, skip_funcs,
+                                    skip_grants, skip_events)
+        dest_db.check_write_access(dest_val["user"], dest_val["host"],
+                                    skip_views, skip_procs, skip_funcs,
+                                    skip_grants)
 
     for db_name in db_list:
 
         # Error is source db and destination db are the same and we're cloning
-        if destination is None and db_name[0] == db_name[1]:
+        if destination == source and db_name[0] == db_name[1]:
             raise MySQLUtilError("Destination database name is same as "
-                                 "source - source = %s, destinion = %s" %
+                                 "source - source = %s, destination = %s" %
                                  (db_name[0], db_name[1]))
 
         # Display copy message
@@ -124,11 +115,8 @@ def copy_db(src_val, dest_val, db_list, options):
 
         # Perform the copy
         db.init()
-        try:
-            db.copy(db_name[1], None, options, destination,
-                    options.get("threads", False))
-        except MySQLUtilError, e:
-            raise e
+        db.copy(db_name[1], None, options, destination,
+                options.get("threads", False))
 
     if not quiet:
         print "#...done."

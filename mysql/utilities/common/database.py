@@ -123,13 +123,12 @@ class Database(object):
             db = db_name
         else:
             db = self.db_name
-        try:
-            res = server.exec_query("SELECT SCHEMA_NAME " +
-                                    "FROM INFORMATION_SCHEMA.SCHEMATA " +
-                                    "WHERE SCHEMA_NAME = '%s'" % db)
-        except Exception, e:
-            raise e
-        #print "exists", res, (res is not None and len(res) >= 1)
+            
+        _QUERY = """
+            SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA 
+            WHERE SCHEMA_NAME = '%s'
+        """
+        res = server.exec_query(_QUERY % db)
         return (res is not None and len(res) >= 1)
 
 
@@ -158,12 +157,9 @@ class Database(object):
             except:
                 pass
         else:
-            try:
-                res = server.exec_query("DROP DATABASE %s" % (db),
-                                        (), False, False)
-                op_ok = True
-            except Exception, e:
-                raise e
+            res = server.exec_query("DROP DATABASE %s" % (db),
+                                    (), False, False)
+            op_ok = True
 
 
     def create(self, server, db_name=None):
@@ -183,12 +179,9 @@ class Database(object):
         else:
             db = self.db_name
         op_ok = False
-        try:
-            res = server.exec_query("CREATE DATABASE %s" % (db),
-                                    (), False, False)
-            op_ok = True
-        except Exception, e:
-            raise e
+        res = server.exec_query("CREATE DATABASE %s" % (db),
+                                (), False, False)
+        op_ok = True
         return op_ok
 
     def __make_create_statement(self, obj_type, obj):
@@ -380,10 +373,7 @@ class Database(object):
                     (self.new_db, name, self.db_name, name)
         if self.verbose and not quiet:
             print query_str
-        try:
-            self.source.exec_query(query_str)
-        except MySQLUtilError, e:
-            raise e
+        self.source.exec_query(query_str)
 
 
     def copy(self, new_db, input_file, options,
@@ -420,7 +410,7 @@ class Database(object):
         self.destination = new_server
 
         # We know we're cloning if there is no new connection.
-        self.cloning = (new_server is None)
+        self.cloning = (new_server == self.source)
 
         # Turn off input file if we aren't cloning
         if not self.cloning:
@@ -434,24 +424,15 @@ class Database(object):
         else:
             self.destination = self.source
 
-        try:
-            res = self.destination.show_server_variable("foreign_key_checks")
-            if res:
-                fkey = (res[0][1] == "ON")
-            else:
-                fkey = False
-        except MySQLUtilError, e:
-            raise e
+        res = self.destination.show_server_variable("foreign_key_checks")
+        fkey = (res is not None) and (res[0][1] == "ON")
 
         fkey_query = "SET foreign_key_checks = %s"
 
         # First, turn off foreign keys if turned on
         if fkey:
-            try:
-                res = self.destination.exec_query(fkey_query % "OFF",
-                                                  (), False, False)
-            except MySQLUtilError, e:
-                raise e
+            res = self.destination.exec_query(fkey_query % "OFF",
+                                              (), False, False)
 
         # Check to see if database exists
         exists = False
@@ -486,11 +467,8 @@ class Database(object):
                 self.__drop_object(obj[0], obj[1][0])
 
             # Create the object
-            try:
-                self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                     options.get("quiet", False))
-            except MySQLUtilError, e:
-                raise e
+            self.__create_object(obj[0], obj[1], not grant_msg_displayed,
+                                 options.get("quiet", False))
 
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
@@ -506,17 +484,14 @@ class Database(object):
                         if not options.get("quiet", False):
                             print "# Copying data for TABLE %s.%s" % \
                                    (self.db_name, tblname)
-                        try:
-                            tbl = Table(self.source,
-                                        "%s.%s" % (self.db_name, tblname),
-                                        self.verbose, True)
-                            if tbl is None:
-                                raise MySQLUtilError("Cannot create table "
-                                                     "object before copy.")
+                        tbl = Table(self.source,
+                                    "%s.%s" % (self.db_name, tblname),
+                                    self.verbose, True)
+                        if tbl is None:
+                            raise MySQLUtilError("Cannot create table "
+                                                 "object before copy.")
 
-                            tbl.copy_data(self.destination, new_db, connections)
-                        except MySQLUtilError, e:
-                            raise e
+                        tbl.copy_data(self.destination, new_db, connections)
 
         # Cleanup
         if copy_file:
@@ -525,11 +500,8 @@ class Database(object):
 
         # Now, turn on foreign keys if they were on at the start
         if fkey:
-            try:
-                res = self.destination.exec_query(fkey_query % "ON",
-                                                  (), False, False)
-            except MySQLUtilError, e:
-                raise e
+            res = self.destination.exec_query(fkey_query % "ON",
+                                              (), False, False)
 
 
     def get_create_statement(self, db, name, obj_type):
@@ -548,11 +520,8 @@ class Database(object):
             name_str = name
         else:
             name_str = db + "." + name
-        try:
-            row = self.source.exec_query("SHOW CREATE %s %s" % \
-                                         (obj_type, name_str))
-        except MySQLUtilError, e:
-            raise e
+        row = self.source.exec_query("SHOW CREATE %s %s" % \
+                                     (obj_type, name_str))
 
         create_statement = None
         if row:
@@ -634,12 +603,9 @@ class Database(object):
         """
         object_type = None
                 
-        try:
-            res = self.source.exec_query(_OBJTYPE_QUERY %
-                                         { 'db_name'  : self.db_name,
-                                           'obj_name' : object_name })
-        except Exception, e:
-            raise e
+        res = self.source.exec_query(_OBJTYPE_QUERY %
+                                     { 'db_name'  : self.db_name,
+                                       'obj_name' : object_name })
         
         if res != [] and res is not None and len(res) > 0:
             object_type = res[0][0]
@@ -845,17 +811,14 @@ class Database(object):
                 prefix = _FULL
             else:
                 prefix = _MINIMAL
-            try:
-                # Form exclusion string
-                exclude_str = ""
-                if self.exclude_names is not None:
-                    exclude_str += self.__build_exclude_names(exclude_param)
-                if self.exclude_patterns is not None:
-                    exclude_str += self.__build_exclude_patterns(exclude_param)
-                query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
-                res = self.source.exec_query(query, None, get_columns)
-            except Exception, e:
-                raise e
+            # Form exclusion string
+            exclude_str = ""
+            if self.exclude_names is not None:
+                exclude_str += self.__build_exclude_names(exclude_param)
+            if self.exclude_patterns is not None:
+                exclude_str += self.__build_exclude_patterns(exclude_param)
+            query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
+            res = self.source.exec_query(query, None, get_columns)
             return res
 
 

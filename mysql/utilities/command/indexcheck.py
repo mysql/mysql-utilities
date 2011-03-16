@@ -63,10 +63,7 @@ def check_index(src_val, table_args, options):
     from mysql.utilities.common.table import Table
 
     # Try to connect to the MySQL database server.
-    try:
-        servers = connect_servers(src_val, None, verbosity == 1, "5.0.0")
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(src_val, None, verbosity == 1, "5.0.0")
 
     source = servers[0]
 

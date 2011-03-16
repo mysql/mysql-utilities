@@ -662,16 +662,11 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
             print statement
         else:
             try:
-                if format == "SQL":
-                    if not _skip_sql(statement, options):
-                        destination.exec_query(statement)
-                else:
+                if format != "SQL" or not _skip_sql(statement, options):
                     destination.exec_query(statement)
             except MySQLUtilError, e:
-                print ">>>>"
-                print statement
-                print "<<<<"
-                raise e
+                raise MySQLUtilError("Invalid statement:\n%s" %
+                                     statement)
     return True
 
 
@@ -766,10 +761,7 @@ def import_file(dest_val, file_name, options):
     skip_blobs = options.get("skip_blobs", False)
 
     # Attempt to connect to the destination server
-    try:
-        servers = connect_servers(dest_val, None, quiet, "5.1.30")
-    except MySQLUtilError, e:
-        raise e
+    servers = connect_servers(dest_val, None, quiet, "5.1.30")
 
     destination = servers[0]
 
@@ -816,15 +808,12 @@ def import_file(dest_val, file_name, options):
         # This is the first time through the loop so we must
         # check user permissions on source for all databases
         if db_name is not None:
-            try:
-                dest_db = Database(destination, db_name)
-                dest_db.check_write_access(dest_val["user"], dest_val["host"],
-                                           options.get("skip_views", False),
-                                           options.get("skip_procs", False),
-                                           options.get("skip_funcs", False),
-                                           options.get("skip_grants", False))
-            except MySQLUtilError, e:
-                raise e
+            dest_db = Database(destination, db_name)
+            dest_db.check_write_access(dest_val["user"], dest_val["host"],
+                                       options.get("skip_views", False),
+                                       options.get("skip_procs", False),
+                                       options.get("skip_funcs", False),
+                                       options.get("skip_grants", False))
 
         # Now check to see if we want definitions, data, or both:
         if row[0] == "SQL" or row[0] in _DEFINITION_LIST:
@@ -885,10 +874,7 @@ def import_file(dest_val, file_name, options):
         table_rows = []
 
     # Now process the statements
-    try:
-        _exec_statements(statements, destination, format, options, dryrun)
-    except MySQLUtilError, e:
-        raise e
+    _exec_statements(statements, destination, format, options, dryrun)
 
     file.close()
 
