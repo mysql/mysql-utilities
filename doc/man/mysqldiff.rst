@@ -70,9 +70,9 @@ OPTIONS
    connection information for the first server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --server1 <source>
+.. option:: --server2 <source>
 
-   connection information for the first server in the form:
+   connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --verbose, -v
