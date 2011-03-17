@@ -20,6 +20,7 @@ This module contains methods for working with mysql server tools.
 """
 
 import os
+import shutil
 
 def _add_basedir(search_paths, path_str):
     """ Add a basedir and all known sub directories
@@ -37,11 +38,13 @@ def _add_basedir(search_paths, path_str):
     search_paths.append(os.path.join(path_str, "libexec"))    
     search_paths.append(os.path.join(path_str, "mysql"))    
 
-def get_tool_path(basedir, tool, required=True):
+def get_tool_path(basedir, tool, fix_ext=True, required=True):
     """ Search for a MySQL tool and return the full path
 
     basedir[in]         The initial basedir to search (from mysql server)
     tool[in]            The name of the tool to find
+    fix_ext[in]         If True (default is True), add .exe if running on
+                        Windows.
     required[in]        If True (default is True), and error will be
                         generated and the utility aborted if the tool is
                         not found.
@@ -56,7 +59,8 @@ def get_tool_path(basedir, tool, required=True):
     _add_basedir(search_paths, "/usr/local/mysql/")
     _add_basedir(search_paths, "/usr/sbin/")
     _add_basedir(search_paths, "/usr/share/")
- 
+    if os.name == "nt" and fix_ext:
+        tool = tool + ".exe"
     # Search for the tool
     for path in search_paths:
         norm_path = os.path.normpath(path)
@@ -68,4 +72,24 @@ def get_tool_path(basedir, tool, required=True):
         raise MySQLUtilError("Cannot find location of %s." % tool)
         
     return None
-                        
+
+def delete_directory(dir):
+    """Remove a directory (folder) and its contents.
+    
+    dir[in]           target directory
+    """
+    import time
+    
+    if os.path.exists(dir):
+        # It can take up to 10 seconds for Windows to 'release' a directory
+        # once a process has terminated. We wait...
+        if os.name == "nt":
+            stop = 10
+            i = 1
+            while i < stop and os.path.exists(dir):
+                shutil.rmtree(dir, True)
+                time.sleep(1)
+                i += 1
+        else:
+            shutil.rmtree(dir, True)
+

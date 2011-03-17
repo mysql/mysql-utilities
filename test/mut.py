@@ -21,17 +21,14 @@ This file contains the MySQL Utilities Test facility for running system
 tests on the MySQL Utilities.
 """
 
-import commands
 import csv
 import datetime
 import optparse
 import os
 import re
-import string
-import subprocess
 import sys
 import time
-from mysql.utilities.common.server import Server
+from mysql.utilities.common.server import Server, find_running_servers
 from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.exception import MUTException, MySQLUtilError
@@ -53,56 +50,6 @@ if os.name == "posix":
     BOLD_ON = '\033[1m'
     BOLD_OFF = '\033[0m'
 START_PORT = 3310
-
-# See if there are any orphan servers
-def _check_for_running_servers(start_port):
-    """Check to see if there are any servers running from the test
-    directory.
-
-    start_port[in]      The starting port number for spawned servers
-
-    This method uses ps for posix systems and netstat for Windows machines
-    to determine the list of running servers.
-
-    For posix, it matches on the datadir and if datadir is the path for the
-    test directory, the server will be added to the list.
-
-    For nt, it matches on the port in the range starting_port,
-    starting_port + 10.
-
-    Returns list - tuples of the form: (process_id, [datadir|port])
-    """
-    datadir = os.getcwd()
-    processes = []
-    if os.name == "posix":
-        output = commands.getoutput("ps -f|grep mysqld")
-        lines = output.splitlines()
-        for line in lines:
-            proginfo = string.split(line)
-            # look for datadir
-            for arg in proginfo[8:]:
-                if arg.find(datadir) >= 0:
-                    processes.append((proginfo[1], arg[10:]))
-                    break
-    elif os.name == "nt":
-        f_out = open("portlist", 'w+')
-        proc = subprocess.Popen("netstat -anop tcp", shell=True,
-                                stdout=f_out, stderr=f_out)
-        res = proc.wait()
-        f_out.close()
-        f_out = open("portlist", 'r')
-        for line in f_out.readlines():
-            proginfo = string.split(line)
-            if proginfo:
-                port = proginfo[1][proginfo[1].find(":")+1:]
-                if proginfo[1][0] == '0' and port.isdigit():
-                    # look for port
-                    if int(port) >= start_port and \
-                       int(port) <= start_port + 10:
-                        processes.append((proginfo[4], port))
-        f_out.close()
-        os.unlink("portlist")
-    return processes
 
 # Shutdown any servers that are running
 def _shutdown_running_servers(server_list, processes, basedir):
@@ -132,6 +79,13 @@ def _shutdown_running_servers(server_list, processes, basedir):
         elif os.name == "nt":
             connection["port"] = process[1]
 
+        if os.name == "posix":
+            print "  Process id: %6d, Data path: %s" % \
+                   (int(process[0]), process[1])
+        elif os.name == "nt":
+            print "  Process id: %6d, Port: %s" % \
+                   (int(process[0]), process[1])
+
         # 1) connect to the server.
         svr = Server(connection)
         ok_to_shutdown = True
@@ -139,25 +93,20 @@ def _shutdown_running_servers(server_list, processes, basedir):
             svr.connect()
         except:  # if we cannot connect, don't try to shut it down.
             ok_to_shutdown = False
+            print "    WARNING: shutdown failed - cannot connect."
 
         # 2) if nt, verify datadirectory
-        if os.name == "nt":
+        if os.name == "nt" and ok_to_shutdown:
             res = svr.show_server_variable("datadir")
             server_datadir = res[0][1]
             ok_to_shudown = (server_datadir.find(datadir) >= 0)
 
         # 3) call shutdown method from mutlib Server_list class
         if ok_to_shutdown and svr:
-            if os.name == "posix":
-                print "  Process id: %6d, Data path: %s" % \
-                       (int(process[0]), process[1])
-            elif os.name == "nt":
-                print "  Process id: %6d, Port: %s" % \
-                       (int(process[0]), process[1])
             try:
                 server_list.stop_server(svr)
-            except:
-                print "    Warning: Shutdown failed!"
+            except MySQLUtilError, e:
+                print "    WARNING: shutdown failed: " + e.errmsg
     return True
 
 # Utility function
@@ -425,7 +374,7 @@ else:
 # Check for running servers
 processes = []
 if server_list.num_servers():
-    processes = _check_for_running_servers(opt.start_port)
+    processes = find_running_servers(False, opt.start_port, 3333, os.getcwd())
 
 # Kill any servers running from the test directory
 if len(processes) > 0:

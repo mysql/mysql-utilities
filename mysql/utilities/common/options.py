@@ -163,7 +163,8 @@ def parse_connection(connection_values):
     Returns dictionary (user, passwd, host, port, socket)
             or None if parsing error
     """
-
+    import os
+    
     grp = _CONN_CRE.match(connection_values)
     if not grp:
         from mysql.utilities.exception import FormatError
@@ -179,7 +180,7 @@ def parse_connection(connection_values):
 
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.
-    if socket is not None:
+    if socket is not None and os.name == "posix":
         connection['unix_socket'] = socket
 
     return connection

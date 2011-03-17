@@ -149,6 +149,8 @@ def export_metadata(src_val, db_list, options):
                     print " (none found)"
                 else:
                     print
+                    # Cannot use print_list here becasue we must manipulate
+                    # the behavior of format_tabular_list
                     if format == "VERTICAL":
                         format_vertical_list(sys.stdout, rows[0], rows[1])
                     elif format == "TAB":
@@ -242,6 +244,8 @@ def _export_row(data_rows, cur_table, col_metadata,
                         outfile.write(row_str + "\n")
                     else:
                         print row_str
+    # Cannot use print_list here becasue we must manipulate
+    # the behavior of format_tabular_list
     elif format == "VERTICAL":
         format_vertical_list(outfile, cur_table.get_col_names(col_metadata),
                              data_rows)

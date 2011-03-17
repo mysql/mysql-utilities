@@ -36,8 +36,7 @@ def show_users(src_val, verbosity, format):
     """
 
     from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.format import format_tabular_list
-    from mysql.utilities.common.format import format_vertical_list
+    from mysql.utilities.common.format import print_list
 
     servers = connect_servers(src_val, None, False, "5.1.0")
     source = servers[0]
@@ -58,14 +57,7 @@ def show_users(src_val, verbosity, format):
 
     users = source.exec_query(_QUERY)
 
-    if format == "TAB":
-        format_tabular_list(sys.stdout, cols, users, True, '\t', True)
-    elif format == "CSV":
-        format_tabular_list(sys.stdout, cols, users, True, ',', True)
-    elif format == "VERTICAL":
-        format_vertical_list(sys.stdout, cols, users)
-    else:  # default to table format
-        format_tabular_list(sys.stdout, cols, users, True, None)
+    print_list(sys.stdout, format, cols, users)
 
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):

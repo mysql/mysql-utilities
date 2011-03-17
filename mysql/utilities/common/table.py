@@ -982,8 +982,7 @@ class Table:
             ORDER BY `sel_percent`
         """
 
-        from mysql.utilities.common.format import format_tabular_list
-        from mysql.utilities.common.format import format_vertical_list
+        from mysql.utilities.common.format import print_list
 
         rows = []
         type = "best"
@@ -1001,26 +1000,18 @@ class Table:
                   (type, self.table)
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")
-            if format == "TAB":
-                format_tabular_list(sys.stdout, cols, rows, True, '\t', True)
-            elif format == "CSV":
-                format_tabular_list(sys.stdout, cols, rows, True, ',', True)
-            elif format == "VERTICAL":
-                format_vertical_list(sys.stdout, cols, rows)
-            else:  # default to table format
-                format_tabular_list(sys.stdout, cols, rows, True, None)
+            print_list(sys.stdout, format, cols, rows, False)
 
 
-    def __print_index_list(self, indexes, format, header=False):
+    def __print_index_list(self, indexes, format, no_header=False):
         """Print the list of indexes
 
         indexes[in]        list of indexes to print
         format[in]         format out output = SQL, TABLE, TAB, CSV
-        header[in]         (optional) if True, print the header for the cols
+        no_header[in]      (optional) if True, do not print the header
         """
 
-        from mysql.utilities.common.format import format_tabular_list
-        from mysql.utilities.common.format import format_vertical_list
+        from mysql.utilities.common.format import print_list
 
         if format == "SQL":
             for index in indexes:
@@ -1030,14 +1021,7 @@ class Table:
             rows = []
             for index in indexes:
                 rows.append(index.get_row())
-            if format == "TAB":
-                format_tabular_list(sys.stdout, cols, rows, header, '\t', True)
-            elif format == "CSV":
-                format_tabular_list(sys.stdout, cols, rows, header, ',', True)
-            elif format == "VERTICAL":
-                format_vertical_list(sys.stdout, cols, rows)
-            else:  # default to table format
-                format_tabular_list(sys.stdout, cols, rows, header, None)
+            print_list(sys.stdout, format, cols, rows, no_header)
 
 
     def print_indexes(self, format):
@@ -1048,17 +1032,17 @@ class Table:
 
         print "# Showing indexes from %s:\n#" % (self.table)
         if format == "SQL":
-            self.__print_index_list(self.btree_indexes, format, True)
-            self.__print_index_list(self.hash_indexes, format)
-            self.__print_index_list(self.rtree_indexes, format)
-            self.__print_index_list(self.fulltext_indexes, format)
+            self.__print_index_list(self.btree_indexes, format)
+            self.__print_index_list(self.hash_indexes, format, False)
+            self.__print_index_list(self.rtree_indexes, format, False)
+            self.__print_index_list(self.fulltext_indexes, format, False)
         else:
             master_indexes = []
             master_indexes.extend(self.btree_indexes)
             master_indexes.extend(self.hash_indexes)
             master_indexes.extend(self.rtree_indexes)
             master_indexes.extend(self.fulltext_indexes)
-            self.__print_index_list(master_indexes, format, True)
+            self.__print_index_list(master_indexes, format)
         print "#"
 
 

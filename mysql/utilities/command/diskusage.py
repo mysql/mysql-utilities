@@ -44,28 +44,6 @@ _QUERY_DBSIZE = """
     GROUP BY db_name
 """
 
-def _print_list(format, columns, rows, no_headers=False):
-    """Print a list based on format.
-
-    format[in]        Format (GRID, CSV, TAB, VERTICAL)
-    columns[in]       Column headings
-    rows[in]          Rows to print
-    no_headers[in]    If True, do not print headings
-    """
-
-    from mysql.utilities.common.format import format_tabular_list
-    from mysql.utilities.common.format import format_vertical_list
-
-    if format == "VERTICAL":
-        format_vertical_list(sys.stdout, columns, rows)
-    elif format == "TAB":
-        format_tabular_list(sys.stdout, columns, rows, not no_headers, '\t')
-    elif format == "CSV":
-        format_tabular_list(sys.stdout, columns, rows, not no_headers, ',')
-    else:  # default to table format
-        format_tabular_list(sys.stdout, columns, rows, True, None, False, True)
-
-
 def _print_size(prefix, total):
     """Print size formatted with commas and estimated to the largest XB.
 
@@ -514,6 +492,8 @@ def show_database_usage(server, datadir, dblist, options):
 
     returns True or exception on error
     """
+    
+    from mysql.utilities.common.format import print_list
 
     format = options.get("format", "GRID")
     no_headers = options.get("no_headers", False)
@@ -552,7 +532,7 @@ def show_database_usage(server, datadir, dblist, options):
 
     if not quiet:
         print "# Database totals:"
-    _print_list(format, columns, rows, no_headers)
+    print_list(sys.stdout, format, columns, rows, no_headers)
     if not quiet:
         _print_size("\nTotal database disk usage = ", db_total)
         print
@@ -571,6 +551,7 @@ def show_logfile_usage(server, options):
 
     return True or raise exception on error
     """
+    from mysql.utilities.common.format import print_list
 
     format = options.get("format", "GRID")
     no_headers = options.get("no_headers", False)
@@ -612,7 +593,7 @@ def show_logfile_usage(server, options):
         else:
             fmt_logs = logs
 
-        _print_list(format, columns, fmt_logs, no_headers)
+        print_list(sys.stdout, format, columns, fmt_logs, no_headers)
         if not quiet:
             _print_size("\nTotal size of logs = ", total)
             print
@@ -634,6 +615,7 @@ def show_log_usage(server, datadir, options):
 
     return True or raise exception on error
     """
+    from mysql.utilities.common.format import print_list
 
     format = options.get("format", "GRID")
     no_headers = options.get("no_headers", False)
@@ -706,7 +688,7 @@ def show_log_usage(server, datadir, options):
             fmt_logs = logs
             columns.append('size')
 
-        _print_list(format, columns, fmt_logs, no_headers)
+        print_list(sys.stdout, format, columns, fmt_logs, no_headers)
         if not quiet:
             _print_size("\nTotal size of %ss = " % log_type, total)
             print
@@ -729,6 +711,7 @@ def show_innodb_usage(server, datadir, options):
 
     return True or raise exception on error
     """
+    from mysql.utilities.common.format import print_list
 
     format = options.get("format", "GRID")
     no_headers = options.get("no_headers", False)
@@ -813,7 +796,7 @@ def show_innodb_usage(server, datadir, options):
         else:
             fmt_innodb = innodb
 
-        _print_list(format, columns, fmt_innodb, no_headers)
+        print_list(sys.stdout, format, columns, fmt_innodb, no_headers)
         if not quiet:
             _print_size("\nTotal size of InnoDB files = ", total)
             print

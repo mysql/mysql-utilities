@@ -93,22 +93,19 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
 
     if not quiet:
         print "# Locating mysql tools..."
-    if os.name == "posix":
-        mysqld_path = get_tool_path(basedir, "mysqld")
-        mysqladmin_path = get_tool_path(basedir, "mysqladmin")
-    else:
-        mysqld_path = get_tool_path(basedir, "mysqld.exe")
-        mysqladmin_path = get_tool_path(basedir, "mysqladmin.exe")
-    mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys", False)
+    mysqld_path = get_tool_path(basedir, "mysqld")
+    mysqladmin_path = get_tool_path(basedir, "mysqladmin")
+    mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys",
+                                  False, False)
     mysql_basedir = basedir
     if os.path.exists(basedir + "local/mysql/share/"):
         mysql_basedir += "local/mysql/"
-    system_tables = get_tool_path(basedir, "mysql_system_tables.sql")
+    system_tables = get_tool_path(basedir, "mysql_system_tables.sql", False)
     system_tables_data = get_tool_path(basedir,
-                                        "mysql_system_tables_data.sql")
+                                        "mysql_system_tables_data.sql", False)
     test_data_timezone = get_tool_path(basedir,
-                                        "mysql_test_data_timezone.sql")
-    help_data = get_tool_path(basedir, "fill_help_tables.sql")
+                                        "mysql_test_data_timezone.sql", False)
+    help_data = get_tool_path(basedir, "fill_help_tables.sql", False)
 
     if verbose and not quiet:
         print "Location of files:"

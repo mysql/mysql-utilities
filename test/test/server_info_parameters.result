@@ -1,0 +1,106 @@
+Test case 1 - show help
+Usage: mysqlserverinfo.py --server=user:pass@host:port:socket -f GRID
+
+mysqlserverinfo - show server information
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f FORMAT, --format=FORMAT
+                        display the output in either GRID (default), TAB, CSV,
+                        or VERTICAL format
+  -h, --no-headers      do not show column headers
+  -d, --show-defaults   show defaults from the config file per server
+  -s, --start           start server in read only mode if offline
+  --basedir=BASEDIR     the base directory for the server
+  --datadir=DATADIR     the data directory for the server
+  --port-range=PORTS    the port range to search for running mysql servers on
+                        Windows systems
+  --show-servers        show any known MySQL servers running on this host
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+Test case 2 - no headers
+# Source on localhost: ... connected.
+localhost:XXXX [...]
+#...done.
+Test case 3 -  --format=GRID --no-headers
+# Source on localhost: ... connected.
++---------+
+| XXXX ...|
++---------+
+#...done.
+Test case 4 -  --format=CSV --no-headers
+# Source on localhost: ... connected.
+localhost:XXXX [...]
+#...done.
+Test case 5 -  --format=TAB --no-headers
+# Source on localhost: ... connected.
+localhost:XXXX [...]
+#...done.
+Test case 6 -  --format=VERTICAL --no-headers
+# Source on localhost: ... connected.
+*************************       1. row *************************
+         server: localhost: XXXX
+        version: XXXX
+        datadir: XXXX
+        basedir: XXXX
+     plugin_dir: XXXX
+    config_file: XXXX
+     binary_log: XXXX
+ binary_log_pos: XXXX
+      relay_log: XXXX
+  relay_log_pos: XXXX
+1 rows.
+#...done.
+Test case 7 - verbose run against online server
+# Source on localhost: ... connected.
+*************************       1. row *************************
+         server: localhost: XXXX
+        version: XXXX
+        datadir: XXXX
+        basedir: XXXX
+     plugin_dir: XXXX
+    config_file: XXXX
+     binary_log: XXXX
+ binary_log_pos: XXXX
+      relay_log: XXXX
+  relay_log_pos: XXXX
+1 rows.
+#...done.
+Test case 8 - show servers
+# 
+# The following MySQL servers are active on this host:
+# 
+# Source on localhost: ... connected.
+*************************       1. row *************************
+         server: localhost: XXXX
+        version: XXXX
+        datadir: XXXX
+        basedir: XXXX
+     plugin_dir: XXXX
+    config_file: XXXX
+     binary_log: XXXX
+ binary_log_pos: XXXX
+      relay_log: XXXX
+  relay_log_pos: XXXX
+1 rows.
+#...done.
+Test case 9 - run against offline server
+# Server is offline. Starting read-only instance of the server ... done.
+# Source on localhost: ... connected.
+# Shutting down server ... done.
+*************************       1. row *************************
+         server: localhost: XXXX
+        version: XXXX
+        datadir: XXXX
+        basedir: XXXX
+     plugin_dir: XXXX
+    config_file: XXXX
+     binary_log: XXXX
+ binary_log_pos: XXXX
+      relay_log: XXXX
+  relay_log_pos: XXXX
+1 rows.
+#...done.
