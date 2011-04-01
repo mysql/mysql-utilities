@@ -1,1 +1,32 @@
-v1.0.0 2010-12-08 -- Initial release
+
+Release 1.0.1dev1 (Released February 17, 2011)
+----------------------------------------------
+
+- BUG#59095: Mysqlserverclone does not print connection information
+- BUG#59096: Mysqluserclone requires double entry of connection information
+- BUG#59265: single column tabular list incorrect
+- BUG#59477: mysqlreplicate fails when the 2 servers have the same port number
+- BUG#60008: MySQL Utilities tests fail under MySQL 5.5
+- BUG#59083: Problems with installing from repository
+- WL#5730: mysqldiskusage - Show disk usage
+- WL#5803: mysqldiff - Database definition difference
+
+Release 1.0.0p1 (Released December 07, 2010)
+--------------------------------------------
+
+- WL#5443: mysqldbcopy - Database Copy
+- WL#5586: mysqldbimport, mysqldbexport - Import and export data
+
+Release 1.0.0 (Released December 07, 2010)
+------------------------------------------
+
+- WL#5442: mysqlreplicate - Replication quick setup
+- WL#5445: mysqlindexcheck - Index check
+- WL#5446: mysqlprocgrep - Find and operate on processes
+- WL#5447: mysqluserclone - Clone user
+- WL#5464: Unit test framework
+- WL#5505: Systems and Acceptance Testing Framework
+- WL#5528: Distribution and Installation Framework
+- WL#5578: mysqlserverclone - Clone server instance
+- WL#5593: mysqlmetagrep - Search database object definitions
+- WL#5615: Documentation Framework

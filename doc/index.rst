@@ -21,7 +21,7 @@ Contents:
    intro/index
    command/index
    man/index
-
+   changes
 
 Indices and tables
 ==================
