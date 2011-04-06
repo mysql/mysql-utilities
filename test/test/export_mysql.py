@@ -46,10 +46,7 @@ class test(mysql_test.System_test):
             raise MySQLUtilError("Unable to determine basedir of running "
                                  "server.")
 
-        if os.name == "posix":
-            self.mysql_path = get_tool_path(basedir, "mysql")
-        else:
-            self.mysql_path = get_tool_path(basedir, "mysql.exe")
+        self.mysql_path = get_tool_path(basedir, "mysql")
 
         return True
 

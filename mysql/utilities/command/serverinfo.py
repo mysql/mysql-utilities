@@ -1,0 +1,373 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+
+"""
+This file contains the reporting mechanisms for reporting disk usage.
+"""
+
+import locale
+import os
+import subprocess
+import sys
+
+from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.common.options import parse_connection
+
+_COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
+            'config_file', 'binary_log', 'binary_log_pos', 'relay_log',
+            'relay_log_pos']
+
+def _get_binlog(server):
+    """Retrieve binary log and binary log position
+    
+    server[in]        Server instance
+    
+    Returns tuple (binary log, binary log position)
+    """
+    binlog = None
+    binlog_pos = None
+    res = server.exec_query("SHOW MASTER STATUS")
+    if res != [] and res is not None:
+        binlog = res[0][0]
+        binlog_pos = res[0][1]
+    return (binlog, binlog_pos)
+    
+
+def _get_relay_log(server):
+    """Retrieve relay log and relay log position
+    
+    server[in]        Server instance
+    
+    Returns tuple (relay log, relay log position)
+    """
+    relay_log = None
+    relay_log_pos = None
+    res = server.exec_query("SHOW SLAVE STATUS")
+    if res != [] and res is not None:
+        relay_log = res[0][7]
+        relay_log_pos = res[0][8]
+    return (relay_log, relay_log_pos)
+    
+
+def _server_info(server_val, get_defaults=False, options={}):
+    """Show information about a running server
+    
+    This method gathers information from a running server. This information is
+    returned as a tuple to be displayed to the user in a format specified. The
+    information returned includes the following:
+    
+    * server connection information
+    * version number of the server
+    * data directory path
+    * base directory path
+    * plugin directory path
+    * configuration file location and name
+    * current binary log file
+    * current binary log position
+    * current relay log file
+    * current relay log position
+    
+    server_val[in]    the server connection values or a connected server
+    get_defaults[in]  if True, get the default settings for the server
+    options[in]       options for connecting to the server
+    
+    Return tuple - information about server
+    """
+    import tempfile
+    
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.tools import get_tool_path
+
+    verbosity = options.get("verbosity", 0)
+
+    # Parse source connection values
+    source_values = parse_connection(server_val)
+
+    # Connect to the server
+    servers = connect_servers(source_values, None, False, "5.1.30")
+    server = servers[0]
+
+    rows = server.exec_query("SHOW VARIABLES LIKE 'basedir'")
+    if rows:
+        basedir = rows[0][1]
+    else:
+        raise MySQLUtilError("Unable to determine basedir of running server.")
+
+    my_def_search = []
+    my_def_path = get_tool_path(basedir, "my_print_defaults")
+    if os.name == "posix":
+        my_def_search = ["/etc/my.cnf", "/etc/mysql/my.cnf",
+                         os.path.join(basedir, "my.cnf"), "~/.my.cnf"]
+    else:
+        my_def_search = ["c:\windows\my.ini","c:\my.ini", "c:\my.cnf",
+                         os.path.join(os.curdir, "my.ini")]
+    my_def_search.append(os.path.join(os.curdir, "my.cnf"))
+
+    # Make 'key' value
+    server_id = source_values['host']
+    # Use string mapping because port is an integer
+    server_id += ":%s" % source_values['port']
+    if source_values.get('socket', None) is not None:
+        server_id += ":" + source_values.get('socket')
+
+    defaults = []
+    if get_defaults:
+        if verbosity > 0:
+            file = tempfile.TemporaryFile()
+        else:
+            file = open(os.devnull, "w+b")
+        subprocess.call([my_def_path, "mysqld"], stdout=file)
+        file.seek(0)
+        defaults.append("\nDefaults for server " + server_id)
+        for line in file.readlines():
+            defaults.append(line.rstrip())
+
+    # Get server version
+    version = None
+    try:
+        res = server.show_server_variable('version')
+        version = res[0][1]
+    except:
+        raise MySQLUtilError("Cannot get version for server " + server_id)
+
+    # Find config file
+    config_file = ""
+    for search_path in my_def_search:
+        if os.path.exists(search_path):
+            if len(config_file) > 0:
+                config_file += ", " + search_path
+            else:
+                config_file = search_path
+
+    # Find datadir, basedir, plugin-dir, binary log, relay log
+    res = server.show_server_variable("datadir")
+    datadir = res[0][1]
+    res = server.show_server_variable("basedir")
+    basedir = res[0][1]
+    res = server.show_server_variable("plugin_dir")
+    plugin_dir = res[0][1]
+    binlog, binlog_pos = _get_binlog(server)
+    relay_log, relay_log_pos = _get_relay_log(server)
+
+    return ((server_id, version, datadir, basedir, plugin_dir, config_file,
+             binlog, binlog_pos, relay_log, relay_log_pos), defaults)
+
+
+def _start_server(server_val, basedir, datadir, options={}):
+    """Start an instance of a server in read only mode
+    
+    This method is used to start the server in read only mode. It will launch
+    the server with --skip-grant-tables and --read_only options set.
+    
+    Caller must stop the server with _stop_server().
+    
+    server_val[in]    dictionary of server connection values
+    basedir[in]       the base directory for the server
+    datadir[in]       the data directory for the server
+    options[in]       dictionary of options (verbosity)
+    """
+    from mysql.utilities.common.tools import get_tool_path
+    from mysql.utilities.common.server import Server
+    import time
+    
+    verbosity = options.get("verbosity", 0)
+    
+    # Start the instance
+    mysqld_path = get_tool_path(basedir, "mysqld")
+
+    sys.stdout.write("# Server is offline. Starting read-only "
+                     "instance of the server ... ")
+    sys.stdout.flush()
+    
+    args = [
+        " -uroot",
+        "--skip-grant-tables",
+        "--read_only",
+        "--port=%(port)s" % server_val,
+        "--basedir=" + basedir,
+        "--datadir=" + datadir,
+    ]
+    socket = server_val.get('unix_socket', None)
+    if socket is not None:
+        args.append("--socket=%(unix_socket)s" % server_val)
+    if verbosity > 0:
+        proc = subprocess.Popen(args, executable=mysqld_path)
+    else:
+        out = open(os.devnull, 'w')
+        proc = subprocess.Popen(args, executable=mysqld_path,
+                                stdout=out, stderr=out)
+
+    server = Server(server_val, "read_only")
+    # Now wait for the server to become ready - could be up to 10 seconds
+    # for Windows machines.
+    if os.name == "nt":
+        time.sleep(10)
+    else:
+        time.sleep(1)
+    server.connect()
+    sys.stdout.write("done.\n")
+    
+
+def _stop_server(server_val, basedir, options={}):
+    """Stop an instance of a server started in read only mode
+    
+    This method is used to stop the server started in read only mode. It will
+    launch mysqladmin to stop the server.
+    
+    Caller must start the server with _start_server().
+    
+    server_val[in]    dictionary of server connection values
+    basedir[in]       the base directory for the server
+    options[in]       dictionary of options (verbosity)
+    """
+    from mysql.utilities.common.tools import get_tool_path
+
+    verbosity = options.get("verbosity", 0)
+    socket = server_val.get("unix_socket", None)
+    mysqladmin_path = get_tool_path(basedir, "mysqladmin")
+    sys.stdout.write("# Shutting down server ... ")
+    sys.stdout.flush()
+
+    if os.name == "posix":
+        cmd = mysqladmin_path + " shutdown -uroot "
+        if socket is not None:
+            cmd = cmd + " --socket=%s " % socket
+    else:
+        cmd = mysqladmin_path + " shutdown -uroot " + \
+              " --port=%(port)s" % server_val
+    if verbosity > 0:
+        proc = subprocess.Popen(cmd, shell=True)
+    else:
+        fnull = open(os.devnull, 'w')
+        proc = subprocess.Popen(cmd, shell=True,
+                                stdout=fnull, stderr=fnull)
+    # Wait for subprocess to finish
+    res = proc.wait()
+    sys.stdout.write("done.\n")
+
+
+def _show_running_servers(start=3306, end=3333):
+    """Display a list of running MySQL servers.
+    
+    start[in]         starting port for Windows servers
+    end[in]           ending port for Windows servers
+    """
+    from mysql.utilities.common.server import find_running_servers
+
+    sys.stdout.write("# \n")
+    processes = find_running_servers(True, start, end)
+    if len(processes) > 0:
+        sys.stdout.write("# The following MySQL servers are active "
+                         "on this host:\n")
+        for process in processes:
+            if os.name == "posix":
+                sys.stdout.write("#  Process id: %6d, Data path: %s\n" % 
+                                 (int(process[0]), process[1]))
+            elif os.name == "nt":
+                sys.stdout.write("#  Process id: %6d, Port: %s\n" % 
+                                 (int(process[0]), process[1]))
+    else:
+        sys.stdout.write("# No active MySQL servers found.\n")
+    sys.stdout.write("# \n")
+    
+
+def show_server_info(servers, options):
+    """Show server information for a list of servers
+    
+    This method will gather information about a running server. If the
+    show_defaults option is specified, the method will also read the
+    configuration file and return a list of the server default settings.
+    
+    If the format option is set, the output will be in the format specified.
+    
+    If the no_headers option is set, the output will not have a header row (no
+    column names) except for format = VERTICAL.
+    
+    If the basedir and start options are set, the method will attempt to start
+    the server in read only mode to get the information. Specifying only
+    basedir will not start the server. The extra start option is designed to
+    make sure the user wants to start the offline server. The user may not wish
+    to do this if there are certain error conditions and/or logs in place that
+    may be overwritten.
+    
+    servers[in]       list of server connections in the form
+                      <user>:<password>@<host>:<port>:<socket>
+    options[in]       dictionary of options (no_headers, format, basedir,
+                      start, show_defaults)
+    
+    Returns tuple ((server information), defaults) 
+    """
+    from mysql.utilities.common.server import test_connect
+    from mysql.utilities.common.format import print_list
+    
+    no_headers = options.get("no_headers", False)
+    format = options.get("format", "GRID")
+    show_defaults = options.get("show_defaults", False)
+    basedir = options.get("basedir", None)
+    datadir = options.get("datadir", None)
+    start = options.get("start", False)
+    verbosity = options.get("verbosity", 0)
+    show_servers = options.get("show_servers", 0)
+    
+    if show_servers:
+        if os.name == 'nt':
+            ports = options.get("ports", "3306:3333")
+            start, end = ports.split(":")
+            _show_running_servers(start, end)
+        else:
+            _show_running_servers()
+
+    defaults_rows = []
+    rows = []
+    server_val = {}
+    get_defaults = True
+    for server in servers:
+        server_alive = True
+        server_started = False
+        if not test_connect(server):
+            if basedir is None or datadir is None:
+                raise MySQLUtilError("Server is offline. To connection, "
+                                     "you must provide basedir, datadir, "
+                                     "and the start option")
+            else:
+                if start:
+                    try:
+                        server_val = parse_connection(server)
+                    except:
+                        raise MySQLUtilError("Source connection values in"
+                                             "valid or cannot be parsed.")
+                    res = _start_server(server_val, basedir, datadir, options)
+                    server_started = True                    
+                else:
+                    server_alive = False
+        if server_alive:
+            info, defaults = _server_info(server, get_defaults, options)
+            if info is not None:
+                rows.append(info)
+            if defaults is not None and len(defaults_rows) == 0:
+                defaults_rows = defaults
+                get_defaults = False
+        if server_started:
+            # Need to stop the server!
+            res = _stop_server(server_val, basedir, options)
+
+    print_list(sys.stdout, format, _COLUMNS, rows, no_headers)
+
+    if show_defaults and len(defaults_rows) > 0:
+        for row in defaults_rows:
+            sys.stdout.write("  %s\n" % row)

@@ -146,7 +146,7 @@ class ProcessGrep(object):
     def execute(self, connections, **kwrds):
         from mysql.utilities.exception import EmptyResultError
         from ..common.options import parse_connection
-        from ..common.format import format_tabular_list, format_vertical_list
+        from ..common.format import print_list
 
         output = kwrds.get('output', sys.stdout)
         connector = kwrds.get('connector', mysql.connector)
@@ -175,16 +175,7 @@ class ProcessGrep(object):
         
         # If output is None, nothing is printed
         if len(entries) > 0 and output:
-            if format == "CSV":
-                format_tabular_list(output, headers, entries,
-                                    True, ',', True)
-            elif format == "TAB":
-                format_tabular_list(output, headers, entries,
-                                    True, '\t', True)
-            elif format == "VERTICAL":
-                format_vertical_list(output, headers, entries)
-            else: # Default is GRID
-                format_tabular_list(output, headers, entries)
+            print_list(output, format, headers, entries)
         elif PRINT_PROCESS in self.__actions:
             raise EmptyResultError("No matches found")
 

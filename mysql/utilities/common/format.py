@@ -152,3 +152,26 @@ def format_vertical_list(file, columns, rows):
 
     if row_num > 0:
         file.write("%d rows.\n" % int(row_num))
+
+
+def print_list(file, format, columns, rows, no_headers=False):
+    """Print a list based on format.
+    
+    Prints a list of rows in the format chosen. Default is GRID.
+
+    file[in]          file to print to (e.g. sys.stdout)
+    format[in]        Format (GRID, CSV, TAB, VERTICAL)
+    columns[in]       Column headings
+    rows[in]          Rows to print
+    no_headers[in]    If True, do not print headings (column names)
+    """
+
+    if format == "VERTICAL":
+        format_vertical_list(file, columns, rows)
+    elif format == "TAB":
+        format_tabular_list(file, columns, rows, not no_headers, '\t')
+    elif format == "CSV":
+        format_tabular_list(file, columns, rows, not no_headers, ',')
+    else:  # default to table format
+        format_tabular_list(file, columns, rows, not no_headers)
+

@@ -27,7 +27,6 @@ from abc import abstractmethod, ABCMeta
 import commands
 import difflib
 import os
-import shutil
 import string
 import subprocess
 import sys
@@ -234,7 +233,7 @@ class Server_list(object):
         return server
     
     
-    def stop_server(self, server, wait=10):
+    def stop_server(self, server, wait=10, drop=True):
         """Stop a running server.
         
         This method will stop a server using the mysqladmin utility to
@@ -243,12 +242,15 @@ class Server_list(object):
         server[in]          Server instance to clone
         wait[in]            Number of wait cycles for shutdown
                             default = 10
+        drop[in]            If True, drop datadir
                             
         Returns - True = server shutdown, False - unknown state or error
         """
         # Nothing to do if server is None        
         if server is None:
             return True
+        
+        from mysql.utilities.common.tools import delete_directory
 
         # Build the shutdown command
         cmd = ""
@@ -269,16 +271,8 @@ class Server_list(object):
         os.unlink("temp.txt")
                 
         # If datadir exists, delete it
-        if os.path.exists(datadir):
-            if os.name == "posix":
-                shutil.rmtree(datadir, True)
-            else:
-                stop = 10
-                i = 1
-                while i < stop and os.path.exists(datadir):
-                    shutil.rmtree(datadir, True)
-                    time.sleep(1)
-                    i += 1
+        if drop:
+            delete_directory(datadir)
                     
         if os.path.exists("cmd.txt"):
             try:
@@ -653,12 +647,16 @@ class System_test(object):
 
         prefix[in]         starting prefix of string to mask
         """
+        linenums = []
         linenum = 0
         for line in self.results:
             index = line.find(prefix)
             if index == 0:
-                self.results.pop(linenum)
+                linenums.append(int(linenum))
             linenum += 1
+        # Must remove lines in reverse order
+        for linenum in range(len(linenums)-1, -1, -1):
+            self.results.pop(linenums[linenum])
 
     
     def mask_result(self, prefix, target, mask):

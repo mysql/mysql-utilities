@@ -18,8 +18,8 @@
 #
 
 """
-This file contains the import database utility which allows users to import
-metadata for objects in a database and data for tables.
+This file contains the disk usage utility for showing the estimated disk
+storage of the databases and system files.
 """
 
 import optparse

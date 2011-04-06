@@ -34,6 +34,100 @@ def _print_connection(prefix, conn_val):
     sys.stdout.write("# %s on %s: ... " % (prefix, conn_val["host"]))
 
 
+def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
+    """Check to see if there are any servers running on the local host.
+
+    This method attempts to locate all running servers. If provided, it will
+    also limit the search to specific ports of datadirectory prefixes.
+    
+    This method uses ps for posix systems and netstat for Windows machines
+    to determine the list of running servers.
+
+    For posix, it matches on the datadir and if datadir is the path for the
+    test directory, the server will be added to the list.
+
+    For nt, it matches on the port in the range starting_port,
+    starting_port + 10.
+
+    all[in]             If True, find all processes else only user processes
+    start[in]           For Windows/NT systems: Starting port value to search.
+                        Default = 3306
+    end[in]             For Windows/NT systems: Ending port value to search.
+                        Default = 3333
+    datadir_prefix[in]  For posix systems, if not None, find only those servers
+                        whose datadir starts with this prefix.
+
+    Returns list - tuples of the form: (process_id, [datadir|port])
+    """
+    import string
+    import subprocess
+    import tempfile
+
+    processes = []
+    if os.name == "posix":
+        file = tempfile.TemporaryFile()
+        if all:
+            output = subprocess.call(["ps", "-A"], stdout=file)
+        else:
+            output = subprocess.call(["ps", "-f"], stdout=file)
+        file.seek(0)
+        for line in file.readlines():
+            mysqld_safe = False
+            mysqld = False
+            datadir = False
+            grep = False
+            datadir_arg = ""
+            proginfo = string.split(line)
+            for arg in proginfo:
+                if "datadir" in arg:
+                    datadir = True
+                    datadir_arg = arg
+                if "mysqld" in arg:
+                    mysqld = True
+                if "mysqld_safe" in arg:
+                    mysqld_safe = True
+                if "grep" in arg:
+                    grep = True
+            # Check to see if this is a mysqld server and not mysqld_safe proc
+            if ((mysqld and datadir) or (mysqld and not grep)) and \
+               not mysqld_safe:
+                # If provided, check datadir prefix
+                if all:
+                    proc_id = proginfo[0]
+                else:
+                    proc_id = proginfo[1]
+                if datadir_prefix is not None:
+                    if datadir_prefix in datadir_arg:
+                        processes.append((proc_id, datadir_arg[10:]))
+                else:
+                    processes.append((proc_id, datadir_arg[10:]))
+    elif os.name == "nt":
+        f_out = open("portlist", 'w+')
+        proc = subprocess.Popen("netstat -anop tcp", shell=True,
+                                stdout=f_out, stderr=f_out)
+        res = proc.wait()
+        f_out.close()
+        f_out = open("portlist", 'r')
+        for line in f_out.readlines():
+            proginfo = string.split(line)
+            if proginfo:
+                # Look for port on either local or foreign address
+                port = proginfo[1][proginfo[1].find(":")+1:]
+                if proginfo[1][0] == '0' and port.isdigit():
+                    if int(port) >= start and int(port) <= end:
+                        processes.append((proginfo[4], port))
+                        break
+                if len(proginfo) > 2:
+                    port = proginfo[2][proginfo[2].find(":")+1:]
+                    if port.isdigit() and \
+                       int(port) >= int(start) and int(port) <= int(end):
+                        processes.append((proginfo[4], port))
+                        break
+        f_out.close()
+        os.unlink("portlist")
+    return processes
+
+
 def connect_servers(src_val, dest_val, quiet=False, version=None,
                     src_name="Source", dest_name="Destination"):
     """ Connect to a source and destination server.
@@ -113,6 +207,27 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
     return servers
 
 
+def test_connect(server_dict):
+    """Test connection to a server.
+    
+    server_dict[in]    a dictionary containing connection information for the
+                       source including:
+                       (user, passwd, host, port, socket)
+
+    Returns True if connection success, False if error
+    """
+    from mysql.utilities.common.options import parse_connection
+    from mysql.utilities.exception import FormatError
+    
+    # Parse source connection values
+    src_val = parse_connection(server_dict)
+    try:
+        s = connect_servers(src_val, None, True, None, "test", None)
+    except MySQLUtilError, e:
+        return False
+    return True
+
+
 class Server(object):
     """The Server class can be used to connect to a running MySQL server.
     The following utilities are provided:
@@ -168,7 +283,7 @@ class Server(object):
                 'host': self.host,
                 'port': self.port,
                 }
-            if self.socket:
+            if self.socket and os.name == "posix":
                 parameters['unix_socket'] = self.socket
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
@@ -293,8 +408,8 @@ class Server(object):
                 results = cur.fetchall()
             except mysql.connector.errors.InterfaceError, e:
                 if e.msg.lower() == "no result set to fetch from.":
-                    pass # This error means there were not results.
-                else:
+                    pass # This error means there were no results.
+                else:    # otherwise, re-raise error
                     raise e
 
             if columns:
