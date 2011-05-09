@@ -1,3 +1,12 @@
+Release 1.0.1rc1 (Released April 25, 2011)
+------------------------------------------
+
+- BUG#11844871: Exception handling needs improvement
+- BUG#11854512: Changes to diff in Python 2.7
+- BUG#11873948: Enable commit emails for mysql-utilities
+- BUG#59478: Wrong user@host used for remove login
+- BUG#60852: mysqldiskusage does not work
+- WL#5753: mysqlserverinfo - MySQL Server Information
 
 Release 1.0.1dev1 (Released February 17, 2011)
 ----------------------------------------------
