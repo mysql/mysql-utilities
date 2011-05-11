@@ -125,6 +125,10 @@ will be limited to information from the system tables and therefore should be
 considered an estimate. This is because the utility will not be able to include
 .frm and related miscellaneous files in the calculations.
 
+If the user has read access to the data directory, disk space usage shown will
+include the sum of all storage engine specific files such as the .MYI and
+.MYD files for MyISAM and similarly include the tablespace files for InnoDB.
+
 EXAMPLES
 --------
 

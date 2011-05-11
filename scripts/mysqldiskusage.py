@@ -127,7 +127,7 @@ except MySQLUtilError, e:
 
 if not os.access(datadir, os.R_OK):
     print "\nNOTICE: Your user account does not have read access to the " + \
-          "datadir. Data sizes will be \ncalculated and actual file sizes " + \
+          "datadir. Data sizes will be calculated and actual file sizes " + \
           "may be omitted. Some features may be unavailable.\n"
 
 # Set options for database operations.
