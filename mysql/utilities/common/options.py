@@ -133,11 +133,17 @@ def check_verbosity(options):
 
 
 _CONN_CRE = re.compile(
-    r"(\w+)"                    # User name
-    r"(?:\:(\w+))?"             # Optional password
+    r"(\w+)"                     # User name
+    r"(?:\:(\w+))?"              # Optional password
     r"@"
-    r"([\w+|\d+|.]+)"           # Domain name or IP address
-    r"(?:\:(\d+))?"             # Optional port number
+    # we match either: labels sized from 1-63 chars long, first label has alpha character
+    # or we match IPv4 addresses
+    # it is missing a RE for IPv6
+    r"((?:(?:(?:(?!-)(?:[\w\d-])*[A-Za-z](?:[\w\d-])*(?:(?<!-))){1,63})"\
+     "(?:(?:\.)?(?:(?!-)[\w\d-]{1,63}(?<!-)))*|"\
+     "(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))))"  # IPv4
+                                 # Domain name or IP address
+    r"(?:\:(\d+))?"              # Optional port number
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
