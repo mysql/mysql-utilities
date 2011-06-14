@@ -21,7 +21,7 @@ class test(diskusage_basic.test):
 
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
 
-        _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL", "NOT_THERE")
+        _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
 
         cmd_base = "mysqldiskusage.py %s util_test --format=" % from_conn
         test_num = 1
@@ -34,6 +34,12 @@ class test(diskusage_basic.test):
                 raise MUTException("DISKUSAGE: %s: failed" % comment)
 
             test_num += 1
+
+        comment = "Test Case %d : Testing disk space with " % test_num
+        comment += "NOT_THERE format "
+        res = self.run_test_case(2, cmd_base+"NOT_THERE", comment)
+        if not res:
+            raise MUTException("DISKUSAGE: %s: failed" % comment)
 
         diskusage_basic.test.mask(self)
 

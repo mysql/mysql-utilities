@@ -40,15 +40,6 @@ Total database disk usage = XXXXXXX
 
 #...done.
 Test Case 5 : Testing disk space with NOT_THERE format 
-# WARNING : 'NOT_THERE' is not a valid output format. Using default.
-# Source on localhost: ... connected.
-# Database totals:
-+------------+----------+
-| db_name    |   total  |
-+------------+----------+
-| util_test  | XXXXXXX  |
-+------------+----------+
+Usage: mysqldiskusage.py --server=user:pass@host:port:socket db1 --all
 
-Total database disk usage = XXXXXXX
-
-#...done.
+mysqldiskusage.py: error: NOT_THERE is not a valid format option.

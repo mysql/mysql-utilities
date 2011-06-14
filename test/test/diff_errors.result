@@ -1,4 +1,4 @@
-Test case 1 - Use diff  --differ
+Test case 1 - Use diff  --difftype=differ
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.f1 to util_test.f1                           [PASS]
@@ -52,7 +52,7 @@ Test case 11 - some objects don't exist in dbs
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 WARNING: Objects in server1:util_test but not in server2:util_test:
-  TABLE: t5
+       TABLE: t5
 WARNING: Objects in server2:util_test but not in server1:util_test:
-  TABLE: t6
+       TABLE: t6
 Diff failed. One or more differences found.

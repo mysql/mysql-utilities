@@ -31,6 +31,7 @@ from mysql.utilities.command import diskusage
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.options import check_format_option
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -55,7 +56,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Setup utility-specific options:
 
-# Input format
+# Output format
 parser.add_option("-f", "--format", action="store", dest="format",
                   help="display the output in either GRID (default), "
                        "TAB, CSV, or VERTICAL format", default="GRID")
@@ -96,14 +97,11 @@ add_verbosity(parser, True)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-_PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
-
-if opt.format.upper() not in _PERMITTED_FORMATS:
-    print "# WARNING : '%s' is not a valid output format. Using default." % \
-          opt.format
-    opt.format = "GRID"
-else:
-    opt.format = opt.format.upper()
+# Fail if format specified is invalid
+try:
+    opt.format = check_format_option(opt.format).upper()
+except MySQLUtilError, e:
+    parser.error(e.errmsg)
 
 from mysql.utilities.common.server import connect_servers
 
