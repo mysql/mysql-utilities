@@ -40,7 +40,8 @@ class test(mysql_test.System_test):
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                 "diskusage_all",
                                                 ' --mysqld="--log-bin=mysql-'
-                                                'bin --log --slow-query-log '
+                                                'bin --general-log '
+                                                '--slow-query-log '
                                                 '--slow-query-log-file=%s '
                                                 '--general-log-file=%s '
                                                 ' --log-error=%s"' %

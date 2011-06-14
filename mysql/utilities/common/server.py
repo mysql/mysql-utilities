@@ -559,7 +559,8 @@ class Server(object):
             version.append(None)
 
         results = self.show_server_variable("have_innodb")
-        if results is not None and results[0][1].lower() == "yes":
+        if results is not None and results != [] and \
+           results[0][1].lower() == "yes":
             have_innodb = True
         else:
             have_innodb = False
@@ -594,3 +595,34 @@ class Server(object):
                     res = self.exec_query(cmd, (), False, False)
         file.close()
         return res
+
+
+    def binlog_enabled(self):
+        """Check binary logging status for the client.
+        
+        Returns bool - True - binary logging is ON, False = OFF
+        """
+        res = self.show_server_variable("sql_log_bin")
+        if not res:
+            raise MySQLUtilError("Cannot retrieve status of "
+                                 "sql_log_bin variable.")
+        if res[0][1] == "OFF" or res[0][1] == "0":
+            return False
+        return True
+
+
+    def toggle_binlog(self, action="disable"):
+        """Enable or disable binary logging for the client.
+        
+        Note: user must have SUPER privilege
+        
+        action[in]         if 'disable', turn off the binary log
+                           elif 'enable' turn binary log on
+                           do nothing if action != 'enable' or 'disable'
+        """
+        
+        if action.lower() == 'disable':
+            self.exec_query("SET SQL_LOG_BIN=0")
+        elif action.lower() == 'enable':
+            self.exec_query("SET SQL_LOG_BIN=1")
+

@@ -279,6 +279,7 @@ class Table:
         self.table = name
         self.db_name, self.tbl_name = _parse_object_name(name)
         self.obj_type = "TABLE"
+        self.pri_idx = None
 
         # We store each type of index in a separate list to make it easier
         # to manipulate
@@ -847,6 +848,26 @@ class Table:
         """
         rows = self.get_tbl_indexes()
         return rows
+    
+    
+    def get_primary_index(self):
+        """Retrieve the primary index columns for this table.
+        """
+        pri_idx = []
+        
+        rows = self.server.exec_query("EXPLAIN " + self.table)
+
+        # Return False if no indexes found.
+        if not rows:
+            return pri_idx
+        
+        for row in rows:
+            if row[3] == 'PRI':
+                pri_idx.append(row)
+
+        self.pri_idx = pri_idx
+        
+        return pri_idx            
 
 
     def get_indexes(self):

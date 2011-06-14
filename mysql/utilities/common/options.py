@@ -28,6 +28,10 @@ import optparse
 import re
 
 from .. import VERSION_FRM
+from mysql.utilities.exception import MySQLUtilError
+
+_PERMITTED_FORMATS = ["GRID", "TAB", "CSV", "VERTICAL"]
+_PERMITTED_DIFFS = ["unified", "context", "differ"]
 
 def setup_common_options(program_name, desc_str, usage_str, append=False):
     """Setup option parser and options common to all MySQL Utilities.
@@ -106,6 +110,30 @@ def check_skip_options(skip_list):
     return new_skip_list
 
 
+def check_format_option(option, sql=False, initials=False):
+    """Check format option for validity.
+    
+    option[in]        value specified
+    sql[in]           if True, add 'SQL' format
+                      default=False
+    initials[in]      if True, add initial caps for compares
+                      default=False
+    
+    Returns corrected format value
+    """
+    formats = _PERMITTED_FORMATS
+    if sql:
+        formats.append('SQL')
+    candidates = [ f for f in formats if f.startswith(option.upper()) ]
+    if len(candidates) > 1:
+        message = ''.join([value, "is ambigous. Alternatives:"] + candidates)
+        raise MySQLUtilError(message)
+    if len(candidates) == 0:
+        raise MySQLUtilError(option + " is not a valid format option.")
+
+    return candidates[0]
+
+
 def add_verbosity(parser, quiet=True):
     """Add the verbosity and quiet options.
 
@@ -130,6 +158,20 @@ def check_verbosity(options):
        options.verbosity is not None and options.verbosity > 0:
         print "WARNING: --verbosity is ignored when --quiet is specified."
         options.verbosity = None
+
+
+def add_difftype(parser, default="unified"):
+    """Add the difftype option.
+    
+    parser[in]        the parser instance
+    default[in]       the default option
+                      (default is unified)
+    """
+    parser.add_option("-d", "--difftype", action="store", dest="difftype",
+                      type="choice", default="unified",
+                      choices=['unified', 'context', 'differ'],
+                      help="display differences in context format either "
+                      "unified, context, or differ (default: unified).", )
 
 
 _CONN_CRE = re.compile(

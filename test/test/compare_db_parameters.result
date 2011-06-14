@@ -1,0 +1,1581 @@
+Test case 1 - Use --help 
+Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+
+mysqldbcompare - compare databases for consistency
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --server1=SERVER1     connection information for first server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --server2=SERVER2     connection information for second server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -f FORMAT, --format=FORMAT
+                        display the output in either GRID (default), TAB, CSV,
+                        or VERTICAL format
+  --skip-object-compare
+                        skip object comparison step
+  --skip-row-count      skip row count step
+  --skip-diff           skip the object diff step
+  --skip-data-check     skip data consistency check
+  --width=WIDTH         display width
+  -a, --run-all-tests   do not abort when a diff test fails
+  --disable-binary-logging
+                        Turn binary logging off during operation if enabled
+                        (SQL_LOG_BIN=1). Note: may require SUPER privilege.
+                        Prevents compare operations from being written to the
+                        binary log.
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           Turn off all messages for quiet execution.
+  -d DIFFTYPE, --difftype=DIFFTYPE
+                        display differences in context format either unified,
+                        context, or differ (default: unified).
+Test case 2 - Use  -a --difftype=unified --format=grid
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,5 +1,5 @@
+-+-------+--------------------+
+-| code  | name               |
+-+-------+--------------------+
+-| 2     | Never Enough Inc.  |
+-+-------+--------------------+
+++-------+----------------------+
++| code  | name                 |
+++-------+----------------------+
++| 2     | Wesayso Corporation  |
+++-------+----------------------+
+
+Rows in inventory.supplier not in inventory.supplier
++-------+--------------------+
+| code  | name               |
++-------+--------------------+
+| 3     | Never Enough Inc.  |
++-------+--------------------+
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,7 +1,7 @@
+-+---------------+-----------------+------+-------+------------+--------+-----------+
+-| stock_number  | description     | qty  | cost  | type       | notes  | supplier  |
+-+---------------+-----------------+------+-------+------------+--------+-----------+
+-| 11040         | Leather care    | 1    | 9.99  | other      |        | 1         |
+-| 11186         | Plastic polish  | 1    | 9.99  | polishing  |        | 1         |
+-| 11146         | Speed shine     | 1    | 9.99  | repair     |        | 1         |
+-+---------------+-----------------+------+-------+------------+--------+-----------+
+++---------------+-----------------+------+--------+------------+--------+-----------+
++| stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
+++---------------+-----------------+------+--------+------------+--------+-----------+
++| 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
++| 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
++| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
+++---------------+-----------------+------+--------+------------+--------+-----------+
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
+| 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+
+
+Database consistency check failed.
+
+# ...done
+Test case 3 - Use  -a --difftype=unified --format=csv
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 4 - Use  -a --difftype=unified --format=tab
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code	name
+-2	Never Enough Inc.
++2	Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code	name
+3	Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number	description	qty	cost	type	notes	supplier
+-11040	Leather care	1	9.99	other		1
+-11186	Plastic polish	1	9.99	polishing		1
+-11146	Speed shine	1	9.99	repair		1
++11040	Leather care	1	10.00	other		1
++11186	Plastic polish	1	10.00	polishing		1
++11146	Speed shine	1	10.00	repair		1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11104	Interior cleaner	1	9.99	cleaning		1
+11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11136	Rubber cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11106	Wheel cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+11116	Microfiber wax removal towel	3	16.99	waxing		1
+10665	Glass polish pad	3	10.00	polishing		1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 5 - Use  -a --difftype=unified --format=vertical
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,4 +1,4 @@
+ *************************       1. row *************************
+  code: 2
+- name: Never Enough Inc.
++ name: Wesayso Corporation
+ 1 rows.
+
+Rows in inventory.supplier not in inventory.supplier
+*************************       1. row *************************
+ code: 3
+ name: Never Enough Inc.
+1 rows.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -2,7 +2,7 @@
+  stock_number: 11040
+   description: Leather care
+           qty: 1
+-         cost: 9.99
++         cost: 10.00
+          type: other
+         notes: 
+      supplier: 1
+@@ -10,7 +10,7 @@
+  stock_number: 11186
+   description: Plastic polish
+           qty: 1
+-         cost: 9.99
++         cost: 10.00
+          type: polishing
+         notes: 
+      supplier: 1
+@@ -18,7 +18,7 @@
+  stock_number: 11146
+   description: Speed shine
+           qty: 1
+-         cost: 9.99
++         cost: 10.00
+          type: repair
+         notes: 
+      supplier: 1
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11104
+  description: Interior cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 11136
+  description: Rubber cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       4. row *************************
+ stock_number: 11173
+  description: Vinyl and rubber dressing
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       5. row *************************
+ stock_number: 11106
+  description: Wheel cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       6. row *************************
+ stock_number: 11270
+  description: Carpet cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+6 rows.
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11269
+  description: Microfiber spray on car wash towel
+          qty: 3
+         cost: 16.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11116
+  description: Microfiber wax removal towel
+          qty: 3
+         cost: 16.99
+         type: waxing
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
+        notes: 
+     supplier: 1
+3 rows.
+
+
+Database consistency check failed.
+
+# ...done
+Test case 6 - Use  -a --difftype=context --format=grid
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+*** inventory.supplier
+--- inventory.supplier
+***************
+*** 1,5 ****
+! +-------+--------------------+
+! | code  | name               |
+! +-------+--------------------+
+! | 2     | Never Enough Inc.  |
+! +-------+--------------------+
+--- 1,5 ----
+! +-------+----------------------+
+! | code  | name                 |
+! +-------+----------------------+
+! | 2     | Wesayso Corporation  |
+! +-------+----------------------+
+
+Rows in inventory.supplier not in inventory.supplier
++-------+--------------------+
+| code  | name               |
++-------+--------------------+
+| 3     | Never Enough Inc.  |
++-------+--------------------+
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+*** inventory.supplies
+--- inventory.supplies
+***************
+*** 1,7 ****
+! +---------------+-----------------+------+-------+------------+--------+-----------+
+! | stock_number  | description     | qty  | cost  | type       | notes  | supplier  |
+! +---------------+-----------------+------+-------+------------+--------+-----------+
+! | 11040         | Leather care    | 1    | 9.99  | other      |        | 1         |
+! | 11186         | Plastic polish  | 1    | 9.99  | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 9.99  | repair     |        | 1         |
+! +---------------+-----------------+------+-------+------------+--------+-----------+
+--- 1,7 ----
+! +---------------+-----------------+------+--------+------------+--------+-----------+
+! | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
+! +---------------+-----------------+------+--------+------------+--------+-----------+
+! | 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
+! | 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
+! +---------------+-----------------+------+--------+------------+--------+-----------+
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
+| 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+
+
+Database consistency check failed.
+
+# ...done
+Test case 7 - Use  -a --difftype=context --format=csv
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+*** inventory.supplier
+--- inventory.supplier
+***************
+*** 1,2 ****
+  code,name
+! 2,Never Enough Inc.
+--- 1,2 ----
+  code,name
+! 2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+*** inventory.supplies
+--- inventory.supplies
+***************
+*** 1,4 ****
+  stock_number,description,qty,cost,type,notes,supplier
+! 11040,Leather care,1,9.99,other,,1
+! 11186,Plastic polish,1,9.99,polishing,,1
+! 11146,Speed shine,1,9.99,repair,,1
+--- 1,4 ----
+  stock_number,description,qty,cost,type,notes,supplier
+! 11040,Leather care,1,10.00,other,,1
+! 11186,Plastic polish,1,10.00,polishing,,1
+! 11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 8 - Use  -a --difftype=context --format=tab
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+*** inventory.supplier
+--- inventory.supplier
+***************
+*** 1,2 ****
+  code	name
+! 2	Never Enough Inc.
+--- 1,2 ----
+  code	name
+! 2	Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code	name
+3	Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+*** inventory.supplies
+--- inventory.supplies
+***************
+*** 1,4 ****
+  stock_number	description	qty	cost	type	notes	supplier
+! 11040	Leather care	1	9.99	other		1
+! 11186	Plastic polish	1	9.99	polishing		1
+! 11146	Speed shine	1	9.99	repair		1
+--- 1,4 ----
+  stock_number	description	qty	cost	type	notes	supplier
+! 11040	Leather care	1	10.00	other		1
+! 11186	Plastic polish	1	10.00	polishing		1
+! 11146	Speed shine	1	10.00	repair		1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11104	Interior cleaner	1	9.99	cleaning		1
+11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11136	Rubber cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11106	Wheel cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+11116	Microfiber wax removal towel	3	16.99	waxing		1
+10665	Glass polish pad	3	10.00	polishing		1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 9 - Use  -a --difftype=context --format=vertical
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+*** inventory.supplier
+--- inventory.supplier
+***************
+*** 1,4 ****
+  *************************       1. row *************************
+   code: 2
+!  name: Never Enough Inc.
+  1 rows.
+--- 1,4 ----
+  *************************       1. row *************************
+   code: 2
+!  name: Wesayso Corporation
+  1 rows.
+
+Rows in inventory.supplier not in inventory.supplier
+*************************       1. row *************************
+ code: 3
+ name: Never Enough Inc.
+1 rows.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+*** inventory.supplies
+--- inventory.supplies
+***************
+*** 2,8 ****
+   stock_number: 11040
+    description: Leather care
+            qty: 1
+!          cost: 9.99
+           type: other
+          notes: 
+       supplier: 1
+--- 2,8 ----
+   stock_number: 11040
+    description: Leather care
+            qty: 1
+!          cost: 10.00
+           type: other
+          notes: 
+       supplier: 1
+***************
+*** 10,16 ****
+   stock_number: 11186
+    description: Plastic polish
+            qty: 1
+!          cost: 9.99
+           type: polishing
+          notes: 
+       supplier: 1
+--- 10,16 ----
+   stock_number: 11186
+    description: Plastic polish
+            qty: 1
+!          cost: 10.00
+           type: polishing
+          notes: 
+       supplier: 1
+***************
+*** 18,24 ****
+   stock_number: 11146
+    description: Speed shine
+            qty: 1
+!          cost: 9.99
+           type: repair
+          notes: 
+       supplier: 1
+--- 18,24 ----
+   stock_number: 11146
+    description: Speed shine
+            qty: 1
+!          cost: 10.00
+           type: repair
+          notes: 
+       supplier: 1
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11104
+  description: Interior cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 11136
+  description: Rubber cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       4. row *************************
+ stock_number: 11173
+  description: Vinyl and rubber dressing
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       5. row *************************
+ stock_number: 11106
+  description: Wheel cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       6. row *************************
+ stock_number: 11270
+  description: Carpet cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+6 rows.
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11269
+  description: Microfiber spray on car wash towel
+          qty: 3
+         cost: 16.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11116
+  description: Microfiber wax removal towel
+          qty: 3
+         cost: 16.99
+         type: waxing
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
+        notes: 
+     supplier: 1
+3 rows.
+
+
+Database consistency check failed.
+
+# ...done
+Test case 10 - Use  -a --difftype=differ --format=grid
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+- +-------+--------------------+
++ +-------+----------------------+
+?                              ++
+- | code  | name               |
++ | code  | name                 |
+?                              ++
+- +-------+--------------------+
++ +-------+----------------------+
+?                              ++
+- | 2     | Never Enough Inc.  |
++ | 2     | Wesayso Corporation  |
+- +-------+--------------------+
++ +-------+----------------------+
+?                              ++
+
+Rows in inventory.supplier not in inventory.supplier
++-------+--------------------+
+| code  | name               |
++-------+--------------------+
+| 3     | Never Enough Inc.  |
++-------+--------------------+
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+- +---------------+-----------------+------+-------+------------+--------+-----------+
++ +---------------+-----------------+------+--------+------------+--------+-----------+
+?                                                  +
+- | stock_number  | description     | qty  | cost  | type       | notes  | supplier  |
++ | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
+?                                                  +
+- +---------------+-----------------+------+-------+------------+--------+-----------+
++ +---------------+-----------------+------+--------+------------+--------+-----------+
+?                                                  +
+- | 11040         | Leather care    | 1    | 9.99  | other      |        | 1         |
+?                                            ^ ^^
++ | 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
+?                                            ^^ ^^
+- | 11186         | Plastic polish  | 1    | 9.99  | polishing  |        | 1         |
+?                                            ^ ^^
++ | 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
+?                                            ^^ ^^
+- | 11146         | Speed shine     | 1    | 9.99  | repair     |        | 1         |
+?                                            ^ ^^
++ | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
+?                                            ^^ ^^
+- +---------------+-----------------+------+-------+------------+--------+-----------+
++ +---------------+-----------------+------+--------+------------+--------+-----------+
+?                                                  +
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
+| 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
++---------------+----------------------------------+------+-------+-----------+--------+-----------+
+
+Rows in inventory.supplies not in inventory.supplies
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+| 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
++---------------+-------------------------------------+------+--------+------------+--------+-----------+
+
+
+Database consistency check failed.
+
+# ...done
+Test case 11 - Use  -a --difftype=differ --format=csv
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+  code,name
+- 2,Never Enough Inc.
++ 2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+  stock_number,description,qty,cost,type,notes,supplier
+- 11040,Leather care,1,9.99,other,,1
+?                      ^ ^^
++ 11040,Leather care,1,10.00,other,,1
+?                      ^^ ^^
+- 11186,Plastic polish,1,9.99,polishing,,1
+?                        ^ ^^
++ 11186,Plastic polish,1,10.00,polishing,,1
+?                        ^^ ^^
+- 11146,Speed shine,1,9.99,repair,,1
+?                     ^ ^^
++ 11146,Speed shine,1,10.00,repair,,1
+?                     ^^ ^^
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 12 - Use  -a --difftype=differ --format=tab
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+  code	name
+- 2	Never Enough Inc.
++ 2	Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code	name
+3	Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+  stock_number	description	qty	cost	type	notes	supplier
+- 11040	Leather care	1	9.99	other		1
+?                      ^ ^^
++ 11040	Leather care	1	10.00	other		1
+?                      ^^ ^^
+- 11186	Plastic polish	1	9.99	polishing		1
+?                        ^ ^^
++ 11186	Plastic polish	1	10.00	polishing		1
+?                        ^^ ^^
+- 11146	Speed shine	1	9.99	repair		1
+?                     ^ ^^
++ 11146	Speed shine	1	10.00	repair		1
+?                     ^^ ^^
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11104	Interior cleaner	1	9.99	cleaning		1
+11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11136	Rubber cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11106	Wheel cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number	description	qty	cost	type	notes	supplier
+11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+11116	Microfiber wax removal towel	3	16.99	waxing		1
+10665	Glass polish pad	3	10.00	polishing		1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 13 - Use  -a --difftype=differ --format=vertical
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+  *************************       1. row *************************
+   code: 2
+-  name: Never Enough Inc.
++  name: Wesayso Corporation
+  1 rows.
+
+Rows in inventory.supplier not in inventory.supplier
+*************************       1. row *************************
+ code: 3
+ name: Never Enough Inc.
+1 rows.
+
+TABLE     supplies                                  pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+  *************************       1. row *************************
+   stock_number: 11040
+    description: Leather care
+            qty: 1
+-          cost: 9.99
+?                ^ ^^
++          cost: 10.00
+?                ^^ ^^
+           type: other
+          notes: 
+       supplier: 1
+  *************************       2. row *************************
+   stock_number: 11186
+    description: Plastic polish
+            qty: 1
+-          cost: 9.99
+?                ^ ^^
++          cost: 10.00
+?                ^^ ^^
+           type: polishing
+          notes: 
+       supplier: 1
+  *************************       3. row *************************
+   stock_number: 11146
+    description: Speed shine
+            qty: 1
+-          cost: 9.99
+?                ^ ^^
++          cost: 10.00
+?                ^^ ^^
+           type: repair
+          notes: 
+       supplier: 1
+  3 rows.
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11104
+  description: Interior cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 11136
+  description: Rubber cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       4. row *************************
+ stock_number: 11173
+  description: Vinyl and rubber dressing
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       5. row *************************
+ stock_number: 11106
+  description: Wheel cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       6. row *************************
+ stock_number: 11270
+  description: Carpet cleaner
+          qty: 1
+         cost: 9.99
+         type: cleaning
+        notes: 
+     supplier: 1
+6 rows.
+
+Rows in inventory.supplies not in inventory.supplies
+*************************       1. row *************************
+ stock_number: 11269
+  description: Microfiber spray on car wash towel
+          qty: 3
+         cost: 16.99
+         type: cleaning
+        notes: 
+     supplier: 1
+*************************       2. row *************************
+ stock_number: 11116
+  description: Microfiber wax removal towel
+          qty: 3
+         cost: 16.99
+         type: waxing
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
+        notes: 
+     supplier: 1
+3 rows.
+
+
+Database consistency check failed.
+
+# ...done
+Test case 14 - without force 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+ERROR: The list of objects differs among database inventory and inventory.
+
+Database consistency check failed.
+
+# ...done
+Test case 15 -  -d differ --format=csv --quiet
+# Checking databases inventory on server1 and inventory on server2
+
+ERROR: The list of objects differs among database inventory and inventory.
+Test case 16 -  --format=csv -a --width=65
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                          Defn    Row     Data   
+Type      Object Name                     Diff    Count   Check  
+----------------------------------------------------------------- 
+TABLE     supplier                        pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                        pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 17 -  --format=csv -a --width=55
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+                                Defn    Row     Data   
+Type      Object Name           Diff    Count   Check  
+------------------------------------------------------- 
+TABLE     supplier              pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies              pass    FAIL    FAIL    
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 18 -  --format=csv -vvv -a
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 2
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL   
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int(11) NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int(11) NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL   
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int(11) NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int(11) DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int(11) NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int(11) DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done
+Test case 19 -  --format=csv -vvv -a --disable-binary-logging
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+
+WARNING: Objects in server1:inventory but not in server2:inventory:
+        VIEW: finishing_up
+        VIEW: cleaning
+
+WARNING: Objects in server2:inventory but not in server1:inventory:
+        VIEW: tools
+
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 2
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+                                                    Defn    Row     Data   
+Type      Object Name                               Diff    Count   Check  
+--------------------------------------------------------------------------- 
+TABLE     supplier                                  pass    FAIL    FAIL   
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int(11) NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int(11) NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+
+Row counts are not the same among inventory.supplier and inventory.supplier.
+
+Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+TABLE     supplies                                  pass    FAIL    FAIL   
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int(11) NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int(11) DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int(11) NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int(11) DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+
+Row counts are not the same among inventory.supplies and inventory.supplies.
+
+Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+
+Database consistency check failed.
+
+# ...done

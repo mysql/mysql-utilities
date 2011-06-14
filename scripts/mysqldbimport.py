@@ -32,6 +32,7 @@ from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import check_format_option
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -58,7 +59,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Input format
 parser.add_option("-f", "--format", action="store", dest="format", default="SQL",
-                  help="display the output in either SQL|S (default), "
+                  help="the input file format in either SQL|S (default), "
                        "GRID|G, TAB|T, CSV|C, or VERTICAL|V format")
 
 # Import mode
@@ -115,27 +116,11 @@ except MySQLUtilError, e:
 if len(args) == 0:
     parser.error("You must specify at least one file to import.")
 
-_PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL",
-                      "S", "G", "T", "C", "V")
-
-if opt.format.upper() not in _PERMITTED_FORMATS:
-    print "# WARNING : '%s' is not a valid output format. Using default." % \
-          opt.format
-    opt.format = "SQL"
-else:
-    opt.format = opt.format.upper()
-
-# Convert to full word for easier coding in command module
-if opt.format == "S":
-    opt.format = "SQL"
-elif opt.format == "G":
-    opt.format = "GRID"
-elif opt.format == "T":
-    opt.format = "TAB"
-elif opt.format == "C":
-    opt.format = "CSV"
-elif opt.format == "V":
-    opt.format = "VERTICAL"
+# Fail if format specified is invalid
+try:
+    opt.format = check_format_option(opt.format, True, True).upper()
+except MySQLUtilError, e:
+    parser.error(e.errmsg)
 
 _PERMITTED_EXPORTS = ("DATA", "DEFINITIONS", "BOTH", "D", "F", "B")
 

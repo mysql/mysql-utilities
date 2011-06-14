@@ -27,7 +27,7 @@ import re
 import sys
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.diff import object_diff, database_diff
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.exception import MySQLUtilError
 
@@ -59,18 +59,6 @@ parser.add_option("--server2", action="store", dest="server2",
                   help="connection information for second server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Add unified difference format
-parser.add_option("-u", "--unified", action="store_true", dest="unified",
-                  help="display differences in unified format")
-
-# Add unified difference format
-parser.add_option("-c", "--context", action="store_true", dest="context",
-                  help="display differences in context format")
-
-# Add unified difference format
-parser.add_option("-d", "--differ", action="store_true", dest="differ",
-                  help="display differences in differ-style format")
-
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
                   type = "int", help="display width",
@@ -83,32 +71,20 @@ parser.add_option("--force", action="store_true", dest="force",
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
+# Add difftype option
+add_difftype(parser)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
 
-# Check diff type
-if not opt.unified and not opt.context and not opt.differ:
-    difftype = 'unified'
-elif (opt.unified and opt.context) or \
-     (opt.unified and opt.differ) or \
-     (opt.context and opt.differ):
-    print "WARNING: you must specify only one difference format. Using default."
-    difftype = 'unified'
-elif opt.unified:
-    difftype = 'unified'
-elif opt.context:
-    difftype = 'context'
-else:
-    difftype = 'differ'
-
 # Set options for database operations.
 options = {
     "quiet"            : opt.quiet,
     "verbosity"        : opt.verbosity,
-    "difftype"         : difftype,
+    "difftype"         : opt.difftype,
     "force"            : opt.force,
     "width"            : opt.width
 }

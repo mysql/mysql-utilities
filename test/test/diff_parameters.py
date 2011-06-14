@@ -38,7 +38,7 @@ class test(diff.test):
 
         for format in _FORMATS:
             test_num += 1
-            cmd_opts = " --%s" % format
+            cmd_opts = " --difftype=%s" % format
             comment = "Test case %d - Use diff %s" % (test_num, cmd_opts)
             res = self.run_test_case(1, cmd_str + cmd_opts, comment)
             if not res:
