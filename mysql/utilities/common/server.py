@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2011 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -129,13 +129,14 @@ def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
 
 
 def connect_servers(src_val, dest_val, quiet=False, version=None,
-                    src_name="Source", dest_name="Destination"):
+                    src_name="Source", dest_name="Destination",
+                    unique=False):
     """ Connect to a source and destination server.
 
     This method takes two groups of --server=user:password@host:port:socket
     values and attempts to connect one as a source connection and the other
     as the destination connection. If the source and destination are the
-    same server, destination is set to None.
+    same server and the unique parameter is False, destination is set to None.
 
     src_val[in]        a dictionary containing connection information for the
                        source including:
@@ -152,6 +153,8 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
                        (default is "Source")
     dest_name[in]      name to use for destination server
                        (default is "Destination")
+    unique[in]         if True, servers must be different when dest_val is
+                       not None (default is False)
 
     Returns tuple (source, destination) where
             source = connection to source server
@@ -178,6 +181,18 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
             sys.stdout.write("connected.\n")
 
         return server_conn
+    
+    # Check for uniqueness
+    if unique and dest_val is not None:
+        dupes = False
+        if "unix_socket" in src_val and "unix_socket" in dest_val:
+            dupes = (src_val["unix_socket"] == dest_val["unix_socket"])
+        else:
+            dupes = (src_val["port"] == dest_val["port"]) and \
+                    (src_val["host"] == dest_val["host"])
+        if dupes:
+            raise MySQLUtilError("You must specify two different servers for "
+                                 "the operation.")
 
     source = None
     destination = None

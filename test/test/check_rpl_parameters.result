@@ -1,0 +1,126 @@
+Test case 1 - show help
+Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
+
+mysqlcheckrpl - check replication
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --master=MASTER       connection information for master server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --slave=SLAVE         connection information for slave server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --master-info-file=MASTER_INFO
+                        The name of the master information file on the
+                        slave.default = 'master.info' read from the data
+                        directory. Note: this option requires that the utility
+                        run on the slave with appropriate file read access to
+                        the data directory.
+  -s, --show-slave-status
+                        Show slave status
+  --width=WIDTH         display width
+  --suppress            Suppress warning messages
+  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           Turn off all messages for quiet execution.
+Test case 2 - master_info
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+
+ master id = XXXXX
+  slave id = XXXXX
+
+Is slave connected to master?                                        [pass]
+Check master information file                                        [FAIL]
+
+Cannot read master information file: m.info.
+
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+
+  Master lower_case_table_names: XX
+   Slave lower_case_table_names: XX
+
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+Test case 3 - width
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                           Status
+-----------------------------------------------------------------
+Checking for binary logging on master                      [pass]
+Are there binlog exceptions?                               [pass]
+Replication user exists?                                   [pass]
+Checking server_id values                                  [pass]
+Is slave connected to master?                              [pass]
+Check master information file                              [pass]
+Checking InnoDB compatibility                              [pass]
+Checking storage engines compatibility                     [pass]
+Checking lower_case_table_names settings                   [pass]
+Checking slave delay (seconds behind master)               [pass]
+# ...done.
+Test case 4 - quiet
+Test case 5 - test failure with quiet
+Test: Check master information file failed. Errors:
+Cannot read master information file: m.info.
+Test case 6 - test warning without quiet
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [WARN]
+
++---------+--------+------------+
+| server  | do_db  | ignore_db  |
++---------+--------+------------+
+| slave   |        | t123       |
++---------+--------+------------+
+
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+Test case 7 - test warning with quiet
+WARNING: Are there binlog exceptions?
++---------+--------+------------+
+| server  | do_db  | ignore_db  |
++---------+--------+------------+
+| slave   |        | t123       |
++---------+--------+------------+
+Test case 8 - test suppress warning without quiet
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [WARN]
+
++---------+--------+------------+
+| server  | do_db  | ignore_db  |
++---------+--------+------------+
+| slave   |        | t123       |
++---------+--------+------------+
+
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+Test case 9 - test suppress warning with quiet

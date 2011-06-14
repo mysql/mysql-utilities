@@ -1,0 +1,116 @@
+Test case 1 - normal run
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+Test case 2 - verbose run
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+
+ master id = XXXXX
+  slave id = XXXXX
+
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+
+#
+# Master information file: 
+#
+               Master_Log_File : XXXXX
+           Read_Master_Log_Pos : XXXXX
+                   Master_Host : XXXXX
+                   Master_User : rpl
+               Master_Password : rpl
+                   Master_Port : XXXXX
+                 Connect_Retry : 60
+            Master_SSL_Allowed : 0
+            Master_SSL_CA_File : 
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : 
+             Master_SSL_Cipher : 
+                Master_SSL_Key : 
+
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+
+  Master lower_case_table_names: XX
+   Slave lower_case_table_names: XX
+
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+Test case 3 - with show slave status
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : XXXXX
+                   Master_User : rpl
+                   Master_Port : XXXXX
+                 Connect_Retry : 60
+               Master_Log_File : XXXXX
+           Read_Master_Log_Pos : XXXXX
+                Relay_Log_File : XXXXX
+                 Relay_Log_Pos : XXXXX
+         Relay_Master_Log_File : XXXXX
+              Slave_IO_Running : Yes
+             Slave_SQL_Running : Yes
+               Replicate_Do_DB : 
+           Replicate_Ignore_DB : 
+            Replicate_Do_Table : 
+        Replicate_Ignore_Table : 
+       Replicate_Wild_Do_Table : 
+   Replicate_Wild_Ignore_Table : 
+                    Last_Errno : 0
+                    Last_Error : 
+                  Skip_Counter : 0
+           Exec_Master_Log_Pos : XXXXX
+               Relay_Log_Space : XXXXX
+               Until_Condition : None
+                Until_Log_File : 
+                 Until_Log_Pos : 0
+            Master_SSL_Allowed : No
+            Master_SSL_CA_File : 
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : 
+             Master_SSL_Cipher : 
+                Master_SSL_Key : 
+         Seconds_Behind_Master : 0
+ Master_SSL_Verify_Server_Cert : No
+                 Last_IO_Errno : 0
+                 Last_IO_Error : 
+                Last_SQL_Errno : 0
+                Last_SQL_Error : 
+# ...done.

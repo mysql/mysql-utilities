@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,15 +27,17 @@ import sys
 
 from mysql.utilities.exception import MySQLUtilError
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.command import rpl
+from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
 # Constants
-NAME = "MySQL Utilities - mysqlreplicate "
-DESCRIPTION = "mysqlreplicate - establish replication with a master"
-USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
-        "--server-id=3 --rpl_user=rpl:passwd "
+NAME = "MySQL Utilities - mysqlcheckrpl "
+DESCRIPTION = "mysqlcheckrpl - check replication"
+USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 "
+
+PRINT_WIDTH = 75
 
 # Setup the command parser
 parser = optparse.OptionParser(
@@ -59,25 +61,30 @@ parser.add_option("--slave", action="store", dest="slave",
                   help="connection information for slave server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Replication user and password
-parser.add_option("--rpl-user", action="store", dest="rpl_user",
-                  type = "string", default="rpl:rpl",
-                  help="the user and password for the replication " 
-                       "user requirement - e.g. rpl:passwd " 
-                       "- default = %default")
+# Add --master-info-file
+parser.add_option("--master-info-file", action="store", dest="master_info",
+                  type="string", default="master.info",
+                  help="The name of the master information file on the slave."
+                       "default = 'master.info' read from the data directory."
+                       " Note: this option requires that the utility run on "
+                       "the slave with appropriate file read access to the "
+                       "data directory.")
 
-# Pedantic mode for failing if storage engines differ
-parser.add_option("-p", "--pedantic", action="store_true", default=False,
-                  dest="pedantic", help="Fail if storage engines differ "
-                  "among master and slave.")
+# Add --show-slave-status
+parser.add_option("--show-slave-status", "-s", action="store_true",
+                  dest="slave_status", default=False, help="Show slave status")
 
-# Test replication option
-parser.add_option("--test-db", action="store", dest="test_db",
-                  type = "string", help="database name to use in testing "
-                         " replication setup (optional)")
+# Add display width option
+parser.add_option("--width", action="store", dest="width",
+                  type = "int", help="display width",
+                  default=PRINT_WIDTH)
+
+# Add suppress to suppress warning messages
+parser.add_option("--suppress", action="store_true", dest="suppress",
+                  default=False, help="Suppress warning messages")
 
 # Add verbosity
-add_verbosity(parser)
+add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -85,25 +92,30 @@ opt, args = parser.parse_args()
 # Parse source connection values
 try:
     m_values = parse_connection(opt.master)
-except:
+except FormatError, e:
     parser.error("Master connection values invalid or cannot be parsed.")
 
 # Parse source connection values
 try:
     s_values = parse_connection(opt.slave)
-except:
+except FormatError, e:
     parser.error("Slave connection values invalid or cannot be parsed.")
-    
+
 # Create dictionary of options
 options = {
-    'verbosity' : opt.verbosity,
-    'pedantic'  : opt.pedantic,
-    'quiet'     : False
+    'verbosity'    : opt.verbosity,
+    'pedantic'     : False,
+    'quiet'        : opt.quiet,
+    'suppress'     : opt.suppress,
+    'master_info'  : opt.master_info,
+    'slave_status' : opt.slave_status,
+    'width'        : opt.width
 }
-
+  
 try:
-    res = rpl.replicate(m_values, s_values, opt.rpl_user,
-                        options, opt.test_db)
+    res = rpl.check_replication(m_values, s_values, options)
+    if res:
+        exit(1)
 except MySQLUtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

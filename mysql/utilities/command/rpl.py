@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2011 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,134 +21,63 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
-import re
 import sys
 from mysql.utilities.exception import MySQLUtilError
 
-def _print_list(list, cols, comment):
-    """Print a list of information in GRID format to stdout.
-    """
-    from mysql.utilities.common.format import format_tabular_list
-
-    print comment
-    format_tabular_list(sys.stdout, cols, list)
-    
-
 def replicate(master_vals, slave_vals, rpl_user,
-              test_db=None, verbose=False, pedantic=False):
+              options, test_db=None):
     """Setup replication among a master and a slave.
     
     master_vals[in]    Master connection in form user:passwd@host:port:sock
     slave_vals[in]     Slave connection in form user:passwd@host:port:sock
     rpl_user[in]       Replication user in the form user:passwd
-    test_db[in]        If True, test replication using this database name
-                       optional - default = False
-    verbose[in]        If True, turn on additional information messages
-                       optional - default = False
-    pedantic[in]       If True, fail if storage engines are not matching
-                       on slave and master otherwise warn user
+    options[in]        dictionary of options (verbosity, quiet, pedantic)
+    test_db[in]        Test replication using this database name (optional)
+                       default = None
     """
     
     from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.rpl import Rpl
-    from mysql.utilities.common.server import Server
-
-    # Fail if master and slave are using the same connection parameters.
-    dupes = False
-    if "unix_socket" in slave_vals and "unix_socket" in master_vals:
-        dupes = (slave_vals["unix_socket"] == master_vals["unix_socket"])
-    else:
-        dupes = (slave_vals["port"] == master_vals["port"]) and \
-                (slave_vals["host"] == master_vals["host"])
-    if dupes:
-        raise MySQLUtilError("You must specify two different servers for "
-                             "the operation.")
+    from mysql.utilities.common.rpl import Replication
+    
+    verbosity = options.get("verbosity", 0)
 
     servers = connect_servers(master_vals, slave_vals, False, "5.0.0",
-                              "master", "slave")
+                              "master", "slave", True)
     master = servers[0]
     slave = servers[1]
-
-    # Get server_id from Master
-    try:
-        res = master.show_server_variable("server_id")
-    except MySQLUtilError, e:
-        raise MySQLUtilError("Cannot retrieve server id from master.")
     
-    master_server_id = int(res[0][1])
-        
-    if master_server_id == 0:
-        raise MySQLUtilError("Master server_id is set to 0.")
+    # Create an instance of the replication object
+    rpl = Replication(master, slave, verbosity > 0)
+    errors = rpl.check_server_ids()
+    for error in errors:
+        print error
+            
+    # Check for server_id uniqueness
+    if verbosity > 0:
+        print "# master id = %s" % rpl.master_server_id
+        print "#  slave id = %s" % rpl.slave_server_id
     
-    # Get server_id from Slave
-    try:
-        res = slave.show_server_variable("server_id")
-    except MySQLUtilError, e:
-        raise MySQLUtilError("Cannot retrieve server id from slave.")
-        
-    slave_server_id = int(res[0][1])
-    
-    if slave_server_id == 0:
-        raise MySQLUtilError("Slave server_id is set to 0.")
-    
-    # Check for uniqueness
-    if master_server_id == slave_server_id:
-        raise MySQLUtilError("The slave's server_id is the same as the "
-                             "master. Please set the server_id on the slave "
-                             "then retry command.") 
-    
-    if verbose:
-        print "# master id = %s" % master_server_id
-        print "#  slave id = %s" % slave_server_id
-
-    if verbose:
+    # Check InnoDB compatibility
+    if verbosity > 0:
         print "# Checking InnoDB statistics for type and version conflicts."
 
-    master_innodb_stats = master.get_innodb_stats()
-    slave_innodb_stats = slave.get_innodb_stats()
+    errors = rpl.check_innodb_compatibility(options)
+    for error in errors:
+        print error
     
-    if master_innodb_stats != slave_innodb_stats:
-        if not pedantic:
-            print "WARNING: Innodb settings differ between master and slave."
-        if verbose or pedantic:
-            cols = ['type', 'plugin_version', 'plugin_type_version',
-                    'have_innodb']
-            rows = []
-            rows.append(master_innodb_stats)
-            _print_list(rows, cols, "# Master's InnoDB Stats:")
-            rows = []
-            rows.append(slave_innodb_stats)
-            _print_list(rows, cols, "# Slave's InnoDB Stats:")
-        if pedantic:
-            raise MySQLUtilError("Innodb settings differ between master "
-                                 "and slave.")
-            
-    if verbose:
+    # Checking storage engines                
+    if verbosity > 0:
         print "# Checking storage engines..."
-    results = master.check_storage_engines(slave.get_storage_engines())
-    if results[0] is not None or results[1] is not None:
-        if not pedantic:
-            print "WARNING: The master and slave have differing " \
-                  "storage engine configurations!"
-        if verbose or pedantic:
-            cols = ['engine', 'support']
-            if results[0] is not None:
-                _print_list(results[0], cols,
-                            "# Storage engine configuration on Master:")
-            if results[1] is not None:
-                _print_list(results[1], cols,
-                            "# Storage engine configuration on Slave:")
-        if pedantic:
-            raise MySQLUtilError("The master and slave have differing " 
-                                 "storage engine configurations!")
-
-    # Create an instance of the replication object
-    rpl = Rpl(master, slave, verbose)
-    
+        
+    errors = rpl.check_storage_engines(options)
+    for error in errors:
+        print error
+            
     # Check master for binary logging
     print "# Checking for binary logging on master..."
-    if not rpl.check_master():
-        raise MySQLUtilError("Master must have binary logging turned on.")
+    errors = rpl.check_master_binlog()
+    if not errors == []:
+        raise MySQLUtilError(errors[0])
         
     # Setup replication
     print "# Setting up replication..."
@@ -161,3 +90,50 @@ def replicate(master_vals, slave_vals, rpl_user,
         
     print "# ...done."
 
+
+def check_replication(master_vals, slave_vals, options):
+    """Check replication among a master and a slave.
+    
+    master_vals[in]    Master connection in form user:passwd@host:port:sock
+    slave_vals[in]     Slave connection in form user:passwd@host:port:sock
+    options[in]        dictionary of options (verbosity, quiet, pedantic)
+    
+    Returns bool - True if all tests pass, False if errors, warnings, failures
+    """
+    
+    from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.common.rpl import Replication, get_replication_tests
+    
+    quiet = options.get("quiet", False)
+    width = options.get("width", 75)
+    slave_status = options.get("slave_status", False)
+
+    test_errors = False
+
+    servers = connect_servers(master_vals, slave_vals, quiet, "5.0.0",
+                              "master", "slave", True)
+    
+    # Create an instance of the replication object
+    rpl = Replication(servers[0], servers[1], options.get("verbosity", 0) > 0)
+    
+    if not quiet:
+        print "Test Description",
+        print ' ' * (width-24),
+        print "Status"
+        print '-' * width
+    
+    for test in get_replication_tests(rpl, options):
+        if test.exec_test():
+            test_errors = True
+                
+    if slave_status and not quiet:
+        try:
+            print "\n#\n# Slave status: \n#" 
+            rpl.show_slave_status()
+        except MySQLUtilError, e:
+            print "ERROR:", e.errmsg
+                        
+    if not quiet:
+        print "# ...done."
+        
+    return test_errors

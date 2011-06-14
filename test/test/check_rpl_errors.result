@@ -1,0 +1,17 @@
+Test case 1 - master parameter invalid
+Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
+
+mysqlrplcheck.py: error: Master connection values invalid or cannot be parsed.
+Test case 2 - slave parameter invalid
+Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
+
+mysqlrplcheck.py: error: Slave connection values invalid or cannot be parsed.
+Test case 3 - same server
+ERROR: You must specify two different servers for the operation.
+Test case 4 - error: invalid login to server (master)
+# master on nada: ... ERROR: Cannot connect to the master server.
+Error ####: Can't connect to local MySQL server ####...
+Test case 5 - error: invalid login to server (slave)
+# master on localhost: ... connected.
+# slave on nada: ... ERROR: Cannot connect to the slave server.
+Error ####: Can't connect to local MySQL server ####...
