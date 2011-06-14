@@ -184,10 +184,10 @@ Test case 18 - no events
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
   `a` char(30)
-) ENGINE=MyISAM;
+) ENGINE=MEMORY;
 CREATE TABLE `util_test`.`t2` (
   `a` char(30)
-) ENGINE=InnoDB;
+) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
   `b` char(30),
@@ -236,10 +236,10 @@ Test case 19 - no data
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
   `a` char(30)
-) ENGINE=MyISAM;
+) ENGINE=MEMORY;
 CREATE TABLE `util_test`.`t2` (
   `a` char(30)
-) ENGINE=InnoDB;
+) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
   `b` char(30),
@@ -282,10 +282,10 @@ Test case 20 - no blobs
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
   `a` char(30)
-) ENGINE=MyISAM;
+) ENGINE=MEMORY;
 CREATE TABLE `util_test`.`t2` (
   `a` char(30)
-) ENGINE=InnoDB;
+) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
   `b` char(30),

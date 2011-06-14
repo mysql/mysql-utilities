@@ -1,0 +1,20 @@
+# Source on localhost: ... connected.
+# Exporting metadata from util_test
+# TABLES in util_test:
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+util_test,t1,,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t2,CAYMAN,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t3,BOXSTER,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t3,BOXSTER,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
+util_test,t4,MYISAM,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+util_test,t4,MYISAM,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+util_test,t5,,1,c,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t5,,2,b,char(40),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t5,,3,a,char(10),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t5,,4,d,char(20),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t6,CARRERA,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t7,,1,c,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t8,PANAMERA,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t9,INNODB,1,c,char(10),YES,,,latin1_swedish_ci,,,,,,,,,,
+util_test,t10,,1,b,char(60),YES,,,latin1_swedish_ci,,,,,,,,,,
+# done.

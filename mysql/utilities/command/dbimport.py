@@ -356,7 +356,10 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
             constraint_str += "REFERENCES `%s` (`%s`)" % \
                               (constraint[1], constraint[3])
             create_str += ",\n" + constraint_str
-    create_str += "\n) ENGINE=%s;" % engine
+    create_str += "\n)"
+    if engine is not None and len(engine) > 0:
+        create_str += " ENGINE=%s" % engine
+    create_str += ";"
     return create_str
 
 
@@ -396,6 +399,7 @@ def _build_create_objects(obj_type, db, definitions):
     col_list = []
     stop = len(definitions)
     col_ref = {}
+    engine = None
     # Now the tricky part.
     for i in range(0,stop):
         if skip_header:
@@ -403,6 +407,9 @@ def _build_create_objects(obj_type, db, definitions):
             col_ref = _build_column_ref(definitions[i])
             continue
         defn = definitions[i]
+        # Read engine from first row and save old value.
+        old_engine = engine
+        engine = defn[col_ref.get("ENGINE",2)]
         create_str = ""
         if obj_type == "TABLE":
             if (obj_db == "" and obj_name == ""):
@@ -412,11 +419,8 @@ def _build_create_objects(obj_type, db, definitions):
                 obj_name == defn[col_ref.get("TABLE_NAME",1)]):
                 col_list.append(defn)
             else:
-                # this is a new one, so make the CREATE statement.
-                # we should capture table data from first row like
-                # engine, etc. then add cols to col_list.
                 create_str = _build_create_table(obj_db, obj_name,
-                                                 defn[col_ref.get("ENGINE",2)],
+                                                 old_engine,
                                                  col_list, col_ref)
                 create_strings.append(create_str)
                 obj_db = defn[col_ref.get("TABLE_SCHEMA",0)]
@@ -426,7 +430,7 @@ def _build_create_objects(obj_type, db, definitions):
             # check for end.
             if i+1 == stop:
                 create_str = _build_create_table(obj_db, obj_name,
-                                                 defn[col_ref.get("ENGINE",2)],
+                                                 engine,
                                                  col_list, col_ref)
                 create_strings.append(create_str)
         elif obj_type == "VIEW":
@@ -867,6 +871,12 @@ def import_file(dest_val, file_name, options):
                                 str = _build_insert_data(columns, tbl_name,
                                                          row[1])
                                 statements.append(str)
+
+    # Process remaining definitions                                 
+    if len(definitions) > 0:
+        _process_definitions(statements, table_col_list, db_name)
+        definitions = []
+
     # Process remaining data rows
     if len(table_rows) > 0:
         _process_data(tbl_name, statements, columns,

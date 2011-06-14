@@ -1,0 +1,14 @@
+Test case 1 - Normal run
+# Source on localhost: ... connected.
+# Importing ... bad_engines.csv
+#...done.
+util_test.t1: ENGINE=MEMORY
+util_test.t2: ENGINE=MEMORY
+util_test.t3: ENGINE=MEMORY
+util_test.t4: ENGINE=MyISAM
+util_test.t5: ENGINE=MEMORY
+util_test.t6: ENGINE=MEMORY
+util_test.t7: ENGINE=MEMORY
+util_test.t8: ENGINE=MEMORY
+util_test.t9: ENGINE=InnoDB
+util_test.t10: ENGINE=MEMORY
