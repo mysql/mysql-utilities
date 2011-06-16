@@ -12,7 +12,7 @@ SYNOPSIS
   mysqldiff --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
             [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
-              --quiet | [|--unified|--context|--differ]
+              --quiet | [--difftype=[--unified|--context|--differ]]
               [<db1:db2> [<db1:db2>*] |
                <db1.obj1:db2.obj2> [<db1.obj1:db2.obj2>*]]
 
@@ -80,17 +80,10 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --unified, -u
+.. option:: --difftype=DIFFTYPE, -d <DIFFTYPE>
 
-   Display the differences in unified format (default)
-   
-.. option:: --context, -c
-
-   Display the differences in context format
-   
-.. option:: --differ, -d
-
-   Display the differences in differ-style format
+   display differences in context format either unified,
+   context, or differ (default: unified).
    
 .. option:: --width
 

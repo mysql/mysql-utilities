@@ -28,6 +28,10 @@ import optparse
 import re
 
 from .. import VERSION_FRM
+from mysql.utilities.exception import MySQLUtilError
+
+_PERMITTED_FORMATS = ["GRID", "TAB", "CSV", "VERTICAL"]
+_PERMITTED_DIFFS = ["unified", "context", "differ"]
 
 def setup_common_options(program_name, desc_str, usage_str, append=False):
     """Setup option parser and options common to all MySQL Utilities.
@@ -106,6 +110,30 @@ def check_skip_options(skip_list):
     return new_skip_list
 
 
+def check_format_option(option, sql=False, initials=False):
+    """Check format option for validity.
+    
+    option[in]        value specified
+    sql[in]           if True, add 'SQL' format
+                      default=False
+    initials[in]      if True, add initial caps for compares
+                      default=False
+    
+    Returns corrected format value
+    """
+    formats = _PERMITTED_FORMATS
+    if sql:
+        formats.append('SQL')
+    candidates = [ f for f in formats if f.startswith(option.upper()) ]
+    if len(candidates) > 1:
+        message = ''.join([value, "is ambigous. Alternatives:"] + candidates)
+        raise MySQLUtilError(message)
+    if len(candidates) == 0:
+        raise MySQLUtilError(option + " is not a valid format option.")
+
+    return candidates[0]
+
+
 def add_verbosity(parser, quiet=True):
     """Add the verbosity and quiet options.
 
@@ -132,16 +160,64 @@ def check_verbosity(options):
         options.verbosity = None
 
 
-_CONN_CRE = re.compile(
-    r"(\w+)"                    # User name
-    r"(?:\:(\w+))?"             # Optional password
-    r"@"
-    r"([\w+|\d+|.]+)"           # Domain name or IP address
-    r"(?:\:(\d+))?"             # Optional port number
+def add_difftype(parser, default="unified"):
+    """Add the difftype option.
+    
+    parser[in]        the parser instance
+    default[in]       the default option
+                      (default is unified)
+    """
+    parser.add_option("-d", "--difftype", action="store", dest="difftype",
+                      type="choice", default="unified",
+                      choices=['unified', 'context', 'differ'],
+                      help="display differences in context format either "
+                      "unified, context, or differ (default: unified).", )
+
+
+_CONN_USERPASS = re.compile(
+    r"(\w+)"                     # User name
+    r"(?:\:(\w+))?"              # Optional password
+    )
+
+_CONN_QUOTEDHOST = re.compile(
+    r"((?:^[\'].*[\'])|(?:^[\"].*[\"]))" # quoted host name
+    r"(?:\:(\d+))?"              # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
+    )
+
+_CONN_IPv4 = re.compile(
+    # we match either: labels sized from 1-63 chars long, first label has alpha character
+    # or we match IPv4 addresses
+    # it is missing a RE for IPv6
+    r"((?:(?:(?:(?!-)(?:[\w\d-])*[A-Za-z](?:[\w\d-])*(?:(?<!-))){1,63})"
+     "(?:(?:\.)?(?:(?!-)[\w\d-]{1,63}(?<!-)))*|"
+     "(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))))"  
+                                 # Domain name or IP address
+    r"(?:\:(\d+))?"              # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
+    )
+
+_CONN_IPv6 = re.compile(
+    r"((?!.*::.*::)"             # Only a single whildcard allowed
+     "(?:(?!:)|:(?=:))"          # Colon iff it would be part of a wildcard
+     "(?:"                       # Repeat 6 times:
+     "[0-9a-f]{0,4}"             #   A group of at most four hexadecimal digits
+     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceeded by wildcard
+     "){6}(?:"                   # Either
+     "[0-9a-f]{0,4}"             #   Another group
+     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceeded by wildcard
+     "[0-9a-f]{0,4}"             #   Last group
+     "(?:(?<=::)"                #   Colon iff preceeded by exacly one colon
+     "|(?<!:)|(?<=:)(?<!::) :)"  # OR
+     "|"                         #   A v4 address with NO leading zeros 
+     "(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)"
+     "(?: \.(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))"
+    r"(?:\:(\d+))?"              # Optional port number
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
 _BAD_CONN_FORMAT = "Connection '{0}' cannot be parsed as a connection"
+_BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
 
 def parse_connection(connection_values):
     """Parse connection values.
@@ -159,17 +235,48 @@ def parse_connection(connection_values):
 
     conn_values[in]     Connection values in the form:
                         user:password@host:port:socket
+                        
+    Notes:
+    
+    This method validates IPv4 addresses and standard IPv6 addresses.
+    
+    This method accepts quoted host portion strings. If the host is marked
+    with quotes, the code extracts this without validation and assigns it to
+    the host variable in the returned tuple. This allows users to specify host
+    names and IP addresses that are outside of the supported validation.
 
     Returns dictionary (user, passwd, host, port, socket)
             or None if parsing error
     """
     import os
+    from mysql.utilities.exception import FormatError
     
-    grp = _CONN_CRE.match(connection_values)
-    if not grp:
-        from mysql.utilities.exception import FormatError
+    def _match(pattern, search_str):
+        grp = pattern.match(search_str)
+        if not grp:
+            raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+        return grp.groups()
+
+    # Split on the '@'
+    try:
+        userpass, hostportsock = connection_values.split('@')
+    except:
         raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
-    user, passwd, host, port, socket = grp.groups()
+
+    # Get user, password    
+    user, passwd = _match(_CONN_USERPASS, userpass)
+
+    if hostportsock[0] in ['"', "'"]:
+        # need to strip the quotes
+        host, port, socket = _match(_CONN_QUOTEDHOST, hostportsock)
+        if host[0] == '"':
+            host = host.strip('"')
+        if host[0] == "'":
+            host = host.strip("'")
+    elif len(hostportsock.split(":")) <= 3:  # if fewer colons, must be IPv4
+        host, port, socket = _match(_CONN_IPv4, hostportsock)
+    else:
+        host, port, socket = _match(_CONN_IPv6, hostportsock)
 
     connection = {
         "user"   : user,

@@ -13,7 +13,7 @@ SYNOPSIS
  mysqldiskusage --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
-             --format=[GRID|TAB|CSV|VERTICAL]
+             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
              [| <db>]
 
 DESCRIPTION

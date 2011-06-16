@@ -31,7 +31,7 @@ class test(diff.test):
                   (s1_conn, s2_conn)
 
         test_num = 1
-        cmd_opts = " --differ" 
+        cmd_opts = " --difftype=differ" 
         comment = "Test case %d - Use diff %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:

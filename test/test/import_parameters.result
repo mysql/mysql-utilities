@@ -9,8 +9,8 @@ Options:
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        display the output in either SQL|S (default), GRID|G,
-                        TAB|T, CSV|C, or VERTICAL|V format
+                        the input file format in either SQL|S (default),
+                        GRID|G, TAB|T, CSV|C, or VERTICAL|V format
   -i IMPORT_TYPE, --import=IMPORT_TYPE
                         control the import of either DATA|D = only the table
                         data for the tables in the database list,

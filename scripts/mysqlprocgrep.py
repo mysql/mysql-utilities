@@ -11,6 +11,8 @@ from mysql.utilities.exception import FormatError, EmptyResultError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.options import check_format_option
+from mysql.utilities.exception import MySQLUtilError
 
 def add_pattern(option, opt, value, parser, field):
     entry = (field, value)
@@ -77,14 +79,11 @@ parser.add_option(
 
 (options, args) = parser.parse_args()
 
-_PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
-
-if options.format.upper() not in _PERMITTED_FORMATS:
-    print "# WARNING : '%s' is not a valid output format. Using default." % \
-          options.format
-    options.format = "GRID"
-else:
-    options.format = options.format.upper()
+# Fail if format specified is invalid
+try:
+    options.format = check_format_option(options.format).upper()
+except MySQLUtilError, e:
+    parser.error(e.errmsg)
 
 # Print SQL if only --sql-body is given
 if options.sql_body:
