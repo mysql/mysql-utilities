@@ -33,8 +33,8 @@ from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
 # Constants
-NAME = "MySQL Utilities - mysqlcheckrpl "
-DESCRIPTION = "mysqlcheckrpl - check replication"
+NAME = "MySQL Utilities - mysqlrplcheck "
+DESCRIPTION = "mysqlrplcheck - check replication"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 "
 
 PRINT_WIDTH = 75

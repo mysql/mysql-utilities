@@ -1,7 +1,7 @@
 Test case 1 - show help
 Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
 
-mysqlcheckrpl - check replication
+mysqlrplcheck - check replication
 
 Options:
   --version             show program's version number and exit
