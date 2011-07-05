@@ -128,9 +128,7 @@ def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     return processes
 
 
-def connect_servers(src_val, dest_val, quiet=False, version=None,
-                    src_name="Source", dest_name="Destination",
-                    unique=False):
+def connect_servers(src_val, dest_val, options={}):
     """ Connect to a source and destination server.
 
     This method takes two groups of --server=user:password@host:port:socket
@@ -144,16 +142,17 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
     dest_val[in]       a dictionary containing connection information for the
                        destination including:
                        (user, passwd, host, port, socket)
-    quiet[in]          do not print any information during the operation
+    options[in]        options to control behavior:
+        quiet          do not print any information during the operation
                        (default is False)
-    version[in]        if specified (default is None), perform version
+        version        if specified (default is None), perform version
                        checking and fail if server version is < version
                        specified - an exception is raised
-    src_name[in]       name to use for source server
+        src_name       name to use for source server
                        (default is "Source")
-    dest_name[in]      name to use for destination server
+        dest_name      name to use for destination server
                        (default is "Destination")
-    unique[in]         if True, servers must be different when dest_val is
+        unique         if True, servers must be different when dest_val is
                        not None (default is False)
 
     Returns tuple (source, destination) where
@@ -163,13 +162,23 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
             if error, returns (None, None)
     """
     
-    def _connect_server(name, values, version, quiet):
+    quiet = options.get("quiet", False)
+    src_name = options.get("src_name", "Source")
+    dest_name = options.get("dest_name", "Destination")
+    version = options.get("version", None)
+
+    def _connect_server(name, values, version, quiet):        
+
         server_conn = None
         if not quiet:
             _print_connection(name, values)
     
         # Try to connect to the MySQL database server.
-        server_conn = Server(values, name)
+        server_options = {
+            'conn_vals' : values,
+            'role'      : name,
+        }
+        server_conn = Server(server_options)
         server_conn.connect()
         if version is not None:
             if not server_conn.check_version_compat(major, minor, rel):
@@ -183,7 +192,7 @@ def connect_servers(src_val, dest_val, quiet=False, version=None,
         return server_conn
     
     # Check for uniqueness
-    if unique and dest_val is not None:
+    if options.get("unique", False) and dest_val is not None:
         dupes = False
         if "unix_socket" in src_val and "unix_socket" in dest_val:
             dupes = (src_val["unix_socket"] == dest_val["unix_socket"])
@@ -237,7 +246,12 @@ def test_connect(server_dict):
     # Parse source connection values
     src_val = parse_connection(server_dict)
     try:
-        s = connect_servers(src_val, None, True, None, "test", None)
+        conn_options = {
+            'quiet'     : True,
+            'src_name'  : "test",
+            'dest_name' : None,
+        }
+        s = connect_servers(src_val, None, conn_options)
     except MySQLUtilError, e:
         return False
     return True
@@ -257,29 +271,38 @@ class Server(object):
         - Read SQL statements from a file and execute
     """
 
-    def __init__(self, conn_val, role="Server", verbose=False):
+    def __init__(self, options={}):
         """Constructor
 
-        dest_val[in]       a dictionary containing connection information
+        options[in]        options for controlling behavior:
+            conn_val       a dictionary containing connection information
                            (user, passwd, host, port, socket)
-        role[in]           Name or role of server (e.g., server, master)
-        verbose[in]        print extra data during operations (optional)
+            role           Name or role of server (e.g., server, master)
+            verbose        print extra data during operations (optional)
                            default value = False
+            charset        Default character set for the connection.
+                           (default latin1)
         """
-        self.verbose = verbose
+        
+        assert not options.get("conn_vals") == None
+        
+        self.verbose = options.get("verbose", False)
+        self.conn_val = options.get("conn_vals")
         self.db_conn = None
-        self.role = role
-        self.host = conn_val["host"]
-        self.user = conn_val["user"]
-        self.passwd = conn_val["passwd"]
-        self.socket = conn_val["unix_socket"] if "unix_socket" in conn_val else None
+        self.charset = options.get("charset", "latin1")
+        self.role = options.get("role", "Server")
+        self.host = self.conn_val["host"]
+        self.user = self.conn_val["user"]
+        self.passwd = self.conn_val["passwd"]
+        self.socket = self.conn_val["unix_socket"] \
+                      if "unix_socket" in self.conn_val else None
         self.port = 3306
-        if conn_val["port"] is not None:
-            self.port = int(conn_val["port"])
+        if self.conn_val["port"] is not None:
+            self.port = int(self.conn_val["port"])
         self.connect_error = None
 
 
-    def connect(self, charset="latin1"):
+    def connect(self):
         """Connect to server
 
         Attempts to connect to the server as specified by the connection
@@ -287,8 +310,6 @@ class Server(object):
 
         Note: This method must be called before executing queries.
 
-        charset[in]        Default character set for the connection.
-                           (default latin1)
 
         Raises MySQLUtilError if error during connect
         """
@@ -302,7 +323,7 @@ class Server(object):
                 parameters['unix_socket'] = self.socket
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
-            parameters['charset'] = charset
+            parameters['charset'] = self.charset
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
             raise MySQLUtilError("Cannot connect to the %s server.\n"
@@ -354,18 +375,20 @@ class Server(object):
         Returns original value = True == ON, False == OFF
         """
 
+        query_options = {
+            'fetch' : False
+        }
         fkey_query = "SET foreign_key_checks = %s"
         res = self.show_server_variable("foreign_key_checks")
         fkey = (res[0][1] == "ON")
         if not fkey and turn_on:
-            res = self.exec_query(fkey_query % "ON", (), False, False)
+            res = self.exec_query(fkey_query % "ON", query_options)
         elif fkey and not turn_on:
-            res = self.exec_query(fkey_query % "OFF", (), False, False)
+            res = self.exec_query(fkey_query % "OFF", query_options)
         return fkey
 
 
-    def exec_query(self, query_str, params=(),
-                   columns=False, fetch=True, raw=True):
+    def exec_query(self, query_str, options={}):
         """Execute a query and return result set
 
         This is the singular method to execute queries. It should be the only
@@ -377,17 +400,22 @@ class Server(object):
         Note: if fetchall is False, the method returns the cursor instance
 
         query_str[in]      The query to execute
-        params[in]         Parameters for query
-        columns[in]        Add column headings as first row
+        options[in]        Options to control behavior:
+            params         Parameters for query
+            columns        Add column headings as first row
                            (default is False)
-        fetch[in]          Execute the fetch as part of the operation and
+            fetch          Execute the fetch as part of the operation and
                            use a buffered cursor
                            (default is True)
-        raw[in]            If True, use a buffered raw cursor
+            raw            If True, use a buffered raw cursor
                            (default is True)
 
         Returns result set or cursor
         """
+        params = options.get('params', ())
+        columns = options.get('columns', False)
+        fetch = options.get('fetch', True)
+        raw = options.get('raw', True)
 
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before executing a query."
@@ -607,7 +635,10 @@ class Server(object):
                 if cmd[0] != '#':
                     if verbose:
                         print cmd
-                    res = self.exec_query(cmd, (), False, False)
+                    query_options = {
+                        'fetch' : False
+                    }
+                    res = self.exec_query(cmd, query_options)
         file.close()
         return res
 

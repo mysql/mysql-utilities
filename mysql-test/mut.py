@@ -89,7 +89,10 @@ def _shutdown_running_servers(server_list, processes, basedir):
                    (int(process[0]), process[1])
 
         # 1) connect to the server.
-        svr = Server(connection)
+        server_options = {
+            'conn_vals' : connection,
+        }
+        svr = Server(server_options)
         ok_to_shutdown = True
         try:
             svr.connect()
@@ -428,7 +431,11 @@ else:
         else:
             conn_val["port"] = 0
 
-        conn = Server(conn_val, "server%d" % i)
+        server_options = {
+            'conn_vals' : conn_val,
+            'role'      : "server%d" % i,
+        }
+        conn = Server(server_options)
         try:
             conn.connect()
             server_list.add_new_server(conn)

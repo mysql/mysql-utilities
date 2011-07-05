@@ -65,7 +65,11 @@ def copy_db(src_val, dest_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    servers = connect_servers(src_val, dest_val, quiet, "5.1.30")
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(src_val, dest_val, conn_options)
 
     source = servers[0]
     destination = servers[1]
@@ -82,13 +86,21 @@ def copy_db(src_val, dest_val, db_list, options):
         else:
             db = db_name[1]
         dest_db = Database(destination, db)
+        
+        # Make a dictionary of the options
+        access_options = {
+            'skip_views'  : skip_views,
+            'skip_procs'  : skip_procs,
+            'skip_funcs'  : skip_funcs,
+            'skip_grants' : skip_grants,
+            'skip_events' : skip_events,
+        }
 
         source_db.check_read_access(src_val["user"], src_val["host"],
-                                    skip_views, skip_procs, skip_funcs,
-                                    skip_grants, skip_events)
-        dest_db.check_write_access(dest_val["user"], dest_val["host"],
-                                    skip_views, skip_procs, skip_funcs,
-                                    skip_grants)
+                                    access_options)
+        
+        dest_db.check_write_access(dest_val['user'], dest_val['host'],
+                                   access_options)
 
     for db_name in db_list:
 

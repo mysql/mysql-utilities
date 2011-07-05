@@ -62,7 +62,11 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     from mysql.utilities.common.tools import get_tool_path
 
     # Try to connect to the MySQL database server.
-    server1 = Server(conn_val, "source")
+    server1_options = {
+        'conn_vals' : conn_val,
+        'role'      : "source",
+    }
+    server1 = Server(server1_options)
     server1.connect()
 
     if not quiet:
@@ -182,7 +186,11 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         "port"   : port_int,
         "unix_socket" : new_sock
     }
-    server2 = Server(conn, "clone")
+    server2_options = {
+        'conn_vals' : conn,
+        'role'      : "clone",
+    }
+    server2 = Server(server2_options)
 
     stop = 10 # stop after 10 attempts
     i = 0

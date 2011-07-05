@@ -99,7 +99,10 @@ def _server_info(server_val, get_defaults=False, options={}):
     source_values = parse_connection(server_val)
 
     # Connect to the server
-    servers = connect_servers(source_values, None, False, "5.1.30")
+    conn_options = {
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(source_values, None, conn_options)
     server = servers[0]
 
     rows = server.exec_query("SHOW VARIABLES LIKE 'basedir'")
@@ -212,7 +215,11 @@ def _start_server(server_val, basedir, datadir, options={}):
         proc = subprocess.Popen(args, executable=mysqld_path,
                                 stdout=out, stderr=out)
 
-    server = Server(server_val, "read_only")
+    server_options = {
+        'conn_vals' : server_val,
+        'role'      : "read_only",
+    }
+    server = Server(server_options)
     # Now wait for the server to become ready - could be up to 10 seconds
     # for Windows machines.
     if os.name == "nt":

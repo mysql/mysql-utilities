@@ -204,7 +204,11 @@ class Server_list(object):
         if os.name != "posix":
             conn["unix_socket"] = None
             
-        self.new_server = Server(conn, role)
+        server_options = {
+            'conn_vals' : conn,
+            'role'      : role,
+        }
+        self.new_server = Server(server_options)
         
         server = (self.new_server, None)
 

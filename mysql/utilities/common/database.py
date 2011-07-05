@@ -99,6 +99,9 @@ class Database(object):
         self.init_called = False
         self.destination = None # Used for copy mode
         self.cloning = False    # Used for clone mode
+        self.query_options = {  # Used for skipping fetch of rows
+            'fetch' : False
+        }
 
         self.objects = []
         self.new_objects = []
@@ -153,12 +156,12 @@ class Database(object):
         if quiet:
             try:
                 res = server.exec_query("DROP DATABASE %s" % (db),
-                                        (), False, False)
+                                        self.query_options)
             except:
                 pass
         else:
             res = server.exec_query("DROP DATABASE %s" % (db),
-                                    (), False, False)
+                                    self.query_options)
             op_ok = True
 
 
@@ -180,7 +183,7 @@ class Database(object):
             db = self.db_name
         op_ok = False
         res = server.exec_query("CREATE DATABASE %s" % (db),
-                                (), False, False)
+                                self.query_options)
         op_ok = True
         return op_ok
 
@@ -304,12 +307,12 @@ class Database(object):
         # Suppress the error on drop
         if self.cloning:
             try:
-                self.source.exec_query(drop_str, (), False, False)
+                self.source.exec_query(drop_str, self.query_options)
             except:
                 pass
         else:
             try:
-                self.destination.exec_query(drop_str, (), False, False)
+                self.destination.exec_query(drop_str, self.query_options)
             except:
                 pass
 
@@ -346,11 +349,11 @@ class Database(object):
         res = None
         try:
             res = self.destination.exec_query("USE %s" % self.new_db,
-                                              (), False, False)
+                                              self.query_options)
         except:
             pass
         try:
-            res = self.destination.exec_query(create_str, (), False, False)
+            res = self.destination.exec_query(create_str, self.query_options)
         except Exception, e:
             raise MySQLUtilError("Cannot operate on %s object. Error: %s" %
                                  (obj_type, e.errmsg))
@@ -432,7 +435,7 @@ class Database(object):
         # First, turn off foreign keys if turned on
         if fkey:
             res = self.destination.exec_query(fkey_query % "OFF",
-                                              (), False, False)
+                                              self.query_options)
 
         # Check to see if database exists
         exists = False
@@ -484,9 +487,14 @@ class Database(object):
                         if not options.get("quiet", False):
                             print "# Copying data for TABLE %s.%s" % \
                                    (self.db_name, tblname)
+                        tbl_options = {
+                            'verbose'  : self.verbose,
+                            'get_cols' : True,
+                            'quiet'    : options.get('quiet', False)
+                        }
                         tbl = Table(self.source,
                                     "%s.%s" % (self.db_name, tblname),
-                                    self.verbose, True)
+                                    tbl_options)
                         if tbl is None:
                             raise MySQLUtilError("Cannot create table "
                                                  "object before copy.")
@@ -501,7 +509,7 @@ class Database(object):
         # Now, turn on foreign keys if they were on at the start
         if fkey:
             res = self.destination.exec_query(fkey_query % "ON",
-                                              (), False, False)
+                                              self.query_options)
 
 
     def get_create_statement(self, db, name, obj_type):
@@ -800,10 +808,13 @@ class Database(object):
         else:
             return None
 
+        col_options = {
+            'columns' : get_columns
+        }
         if obj_type == _GRANT:
             query = _OBJECT_QUERY % (self.db_name, self.db_name,
                                      self.db_name, self.db_name)
-            return self.source.exec_query(query, None, get_columns)
+            return self.source.exec_query(query, col_options)
         else:
             if columns == "NAMES":
                 prefix = _NAMES
@@ -818,7 +829,7 @@ class Database(object):
             if self.exclude_patterns is not None:
                 exclude_str += self.__build_exclude_patterns(exclude_param)
             query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
-            res = self.source.exec_query(query, None, get_columns)
+            res = self.source.exec_query(query, col_options)
             return res
 
 
@@ -839,9 +850,7 @@ class Database(object):
         return result
 
 
-    def check_read_access(self, user, host, skip_views,
-                          skip_proc, skip_func, skip_grants,
-                          skip_events):
+    def check_read_access(self, user, host, options):
         """ Check access levels for reading database objects
 
         This method will check the user's permission levels for copying a
@@ -849,14 +858,15 @@ class Database(object):
 
         It will also skip specific checks if certain objects are not being
         copied (i.e., views, procs, funcs, grants).
-
+    
         user[in]           user name to check
         host[in]           host name to check
-        skip_views[in]     True = no views processed
-        skup_proc[in]      True = no procedures processed
-        skip_func[in]      True = no functions processed
-        skip_grants[in]    True = no grants processed
-        skip_events[in]    True = no events processed
+        options[in]        dictionary of values to include:
+            skip_views     True = no views processed
+            skip_proc      True = no procedures processed
+            skip_func      True = no functions processed
+            skip_grants    True = no grants processed
+            skip_events    True = no events processed
 
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
@@ -868,15 +878,16 @@ class Database(object):
         priv_tuple = (self.db_name, "SELECT")
         source_privs.append(priv_tuple)
         # if views are included, we need SHOW VIEW
-        if not skip_views:
+        if not options.get('skip_views', False):
             priv_tuple = (self.db_name, "SHOW VIEW")
             source_privs.append(priv_tuple)
         # if procs or funcs are included, we need read on mysql db
-        if not skip_proc or not skip_func:
+        if not options.get('skip_proc', False) or \
+           not options.get('skip_func', False):
             priv_tuple = ("mysql", "SELECT")
             source_privs.append(priv_tuple)
         # if events, we need event
-        if not skip_events:
+        if not options.get('skip_events', False):
             priv_tuple = (self.db_name, "EVENT")
             source_privs.append(priv_tuple)
 
@@ -892,8 +903,7 @@ class Database(object):
         return True
 
 
-    def check_write_access(self, user, host, skip_views,
-                           skip_proc, skip_func, skip_grants):
+    def check_write_access(self, user, host, options):
         """ Check access levels for creating and writing database objects
 
         This method will check the user's permission levels for copying a
@@ -904,10 +914,13 @@ class Database(object):
 
         user[in]           user name to check
         host[in]           host name to check
-        skip_views[in]     True = no views processed
-        skup_proc[in]      True = no procedures processed
-        skip_func[in]      True = no functions processed
-        skip_grants[in]    True = no grants processed
+        options[in]        dictionary of values to include:
+            skip_views     True = no views processed
+            skip_proc      True = no procedures processed
+            skip_func      True = no functions processed
+            skip_grants    True = no grants processed
+            skip_events    True = no events processed
+
 
         Returns True if user has permissions and raises a MySQLUtilError if the
                      user does not have permission with a message that includes
@@ -917,7 +930,7 @@ class Database(object):
         dest_privs = [(self.db_name, "CREATE"),
                       (self.db_name, "SUPER"),
                       ("*", "SUPER")]
-        if not skip_grants:
+        if not options.get('skip_grants', False):
             priv_tuple = (self.db_name, "WITH GRANT OPTION")
             dest_privs.append(priv_tuple)
 
@@ -927,7 +940,7 @@ class Database(object):
                 raise MySQLUtilError("User %s on the %s server does not "
                                      "have permissions to create all objects "
                                      "in %s. User needs %s privilege on %s." %
-                                     (user, self.source.role, priv[0],
-                                      priv[1], priv[0]))
+                                     (user, self.source.role, priv[0], priv[1],
+                                      priv[0]))
 
         return True

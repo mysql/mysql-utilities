@@ -63,16 +63,28 @@ def export_metadata(src_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    servers = connect_servers(src_val, None, quiet, "5.1.30")
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(src_val, None, conn_options)
 
     source = servers[0]
 
     # Check user permissions on source for all databases
     for db_name in db_list:
         source_db = Database(source, db_name)
+        # Make a dictionary of the options
+        access_options = {
+            'skip_views'  : skip_views,
+            'skip_procs'  : skip_procs,
+            'skip_funcs'  : skip_funcs,
+            'skip_grants' : skip_grants,
+            'skip_events' : skip_events,
+        }
+
         source_db.check_read_access(src_val["user"], src_val["host"],
-                                    skip_views, skip_procs, skip_funcs,
-                                    skip_grants, skip_events)
+                                    access_options)
 
     for db_name in db_list:
 
@@ -151,18 +163,21 @@ def export_metadata(src_val, db_list, options):
                     print
                     # Cannot use print_list here becasue we must manipulate
                     # the behavior of format_tabular_list
+                    list_options = {}
                     if format == "VERTICAL":
                         format_vertical_list(sys.stdout, rows[0], rows[1])
                     elif format == "TAB":
+                        list_options['print_header'] = not no_headers
+                        list_options['separator'] = '\t'
                         format_tabular_list(sys.stdout, rows[0], rows[1],
-                                            not no_headers, '\t')
+                                            list_options)
                     elif format == "CSV":
+                        list_options['print_header'] = not no_headers
+                        list_options['separator'] = ','
                         format_tabular_list(sys.stdout, rows[0], rows[1],
-                                            not no_headers, ',')
+                                            list_options)
                     else:  # default to table format
-                        format_tabular_list(sys.stdout, rows[0], rows[1],
-                                            True, None, False, True)
-
+                        format_tabular_list(sys.stdout, rows[0], rows[1])
 
     if not quiet:
         print "#...done."
@@ -196,6 +211,7 @@ def _export_row(data_rows, cur_table, col_metadata,
     tbl_name = cur_table.tbl_name
     db_name = cur_table.db_name
     full_name = "%s.%s" % (db_name, tbl_name)
+    list_options = {}
     if format != "SQL" and format != "S" and outfile is None:
         outfile = sys.stdout # default file handle
     if format == "SQL" or format == "S":
@@ -250,11 +266,17 @@ def _export_row(data_rows, cur_table, col_metadata,
         format_vertical_list(outfile, cur_table.get_col_names(col_metadata),
                              data_rows)
     elif format == "TAB":
+        list_options['print_header'] = first
+        list_options['separator'] = '\t'
+        list_options['quiet'] = not no_headers
         format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
-                            data_rows, first, '\t', not no_headers)
+                            data_rows, list_options)
     elif format == "CSV":
+        list_options['print_header'] = first
+        list_options['separator'] = ','
+        list_options['quiet'] = not no_headers
         format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
-                            data_rows, first, ',', not no_headers)
+                            data_rows, list_options)
     else:  # default to table format - header is always printed
         format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
                             data_rows)
@@ -297,16 +319,29 @@ def export_data(src_val, db_list, options):
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
 
-    servers = connect_servers(src_val, None, quiet, "5.1.30")
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(src_val, None, conn_options)
 
     source = servers[0]
 
     # Check user permissions on source for all databases
     for db_name in db_list:
         source_db = Database(source, db_name)
+
+        # Make a dictionary of the options
+        access_options = {
+            'skip_views'  : skip_views,
+            'skip_procs'  : skip_procs,
+            'skip_funcs'  : skip_funcs,
+            'skip_grants' : skip_grants,
+            'skip_events' : skip_events,
+        }
+
         source_db.check_read_access(src_val["user"], src_val["host"],
-                                    skip_views, skip_procs, skip_funcs,
-                                    skip_grants, skip_events)
+                                    access_options)
 
     for db_name in db_list:
 
@@ -331,7 +366,12 @@ def export_data(src_val, db_list, options):
             break
         for table in tables:
             tbl_name = "%s.%s" % (db_name, table[0])
-            cur_table = Table(source, tbl_name, False, True)
+            tbl_options = {
+                'verbose'  : False,
+                'get_cols' : True,
+                'quiet'    : quiet
+            }
+            cur_table = Table(source, tbl_name, tbl_options)
             col_metadata = cur_table.get_column_metadata()
             if single and format not in ("SQL", "GRID", "VERTICAL"):
                 retrieval_mode = -1

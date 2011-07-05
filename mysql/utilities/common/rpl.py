@@ -83,6 +83,9 @@ class Replication(object):
         self.master_lctn = None
         self.slave_lctn = None
         self.replicating = False
+        self.query_options = {
+            'fetch' : False
+        }
         
         
     def get_lctn_values(self):
@@ -188,7 +191,10 @@ class Replication(object):
     def show_slave_status(self):
         """Display the slave status from the slave server
         """
-        res = self.slave.exec_query("SHOW SLAVE STATUS", (), True)
+        col_options = {
+            'columns' : True
+        }
+        res = self.slave.exec_query("SHOW SLAVE STATUS", col_options)
         if res != [] and res[1] != []:
             stop = len(res[0])
             cols = res[0]
@@ -577,7 +583,7 @@ class Replication(object):
             if r_pass:
                 query_str += "IDENTIFIED BY '%s'" % r_pass
             try:
-                self.master.exec_query(query_str, (), False, False)
+                self.master.exec_query(query_str, self.query_options)
             except:
                 print "ERROR: Cannot grant replication slave to " + \
                       "replication user."
@@ -587,7 +593,7 @@ class Replication(object):
         if self.verbose:
             print "# Flushing tables on master with read lock..."
         res = self.master.exec_query("FLUSH TABLES WITH READ LOCK",
-                                     (), False, False)
+                                     self.query_options)
         
         # Read master log file information
         res = self.master.exec_query("SHOW MASTER STATUS")
@@ -602,7 +608,7 @@ class Replication(object):
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != () and res != []:
             if res[0][10] == "Yes" or res[0][11] == "Yes":
-                res = self.slave.exec_query("STOP SLAVE", (), False, False)
+                res = self.slave.exec_query("STOP SLAVE", self.query_options)
         
         # Connect slave to master
         if self.verbose:
@@ -614,14 +620,14 @@ class Replication(object):
         change_master += "MASTER_PORT = %s, " % self.master.port
         change_master += "MASTER_LOG_FILE = '%s', " % master_file
         change_master += "MASTER_LOG_POS = %s" % master_pos
-        res = self.slave.exec_query(change_master, (), False, False)
+        res = self.slave.exec_query(change_master, self.query_options)
         if self.verbose:
             print "# %s" % change_master
         
         # Start slave
         if self.verbose:
             print "# Starting slave..."
-        res = self.slave.exec_query("START SLAVE", (), False, False)
+        res = self.slave.exec_query("START SLAVE", self.query_options)
         
         # Check slave status
         i = 0
@@ -645,7 +651,7 @@ class Replication(object):
         if self.verbose:
             print "# Unlocking tables on master..."
         query_str = "UNLOCK TABLES"
-        res = self.master.exec_query(query_str, (), False, False)
+        res = self.master.exec_query(query_str, self.query_options)
         if result is True:
             self.replicating = True
         return result
@@ -667,7 +673,7 @@ class Replication(object):
         if self.verbose:
             print "# Creating a test database on master named %s..." % db
         res = self.master.exec_query("CREATE DATABASE %s" % db,
-                                     (), False, False)
+                                     self.query_options)
         i = 0
         while i < num_tries:
             time.sleep (1)
@@ -675,7 +681,7 @@ class Replication(object):
             for row in res:
                 if row[0] == db:
                     res = self.master.exec_query("DROP DATABASE %s" % db,
-                                                 (), False, False)
+                                                 self.query_options)
                     print "# Success! Replication is running."
                     i = num_tries
                     break

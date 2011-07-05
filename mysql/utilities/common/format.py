@@ -63,9 +63,7 @@ def _format_row_separator(file, columns, col_widths, row, quiet=False):
         file.write("|")
     file.write("\n")
 
-def format_tabular_list(file, columns, rows, print_header=True,
-                       separator=None, quiet=False,
-                       print_footer=True):
+def format_tabular_list(file, columns, rows, options={}):
     """Format a list in a pretty grid format.
 
     This method will format and write a list of rows in a grid or ?SV list.
@@ -73,12 +71,18 @@ def format_tabular_list(file, columns, rows, print_header=True,
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
-    print_header[in]   if False, do not print header
-    separator[in]      if set, use the char specified for a ?SV output
-    quiet[in]          if True, do not print the grid text (no borders)
-    print_footer[in]   if False, do not print footer
+    options[in]        options controlling list:
+        print_header   if False, do not print header
+        separator      if set, use the char specified for a ?SV output
+        quiet          if True, do not print the grid text (no borders)
+        print_footer   if False, do not print footer
     """
 
+    print_header = options.get("print_header", True)
+    separator = options.get("separator", None)
+    quiet = options.get("quiet", False)
+    print_footer = options.get("print_footer", True)
+    
     # do nothing if no rows.
     if len(rows) == 0:
         return
@@ -126,7 +130,6 @@ def format_vertical_list(file, columns, rows):
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
-    quiet[in]          if True, do not print the grid text (no borders)
     """
 
     # do nothing if no rows.
@@ -166,12 +169,17 @@ def print_list(file, format, columns, rows, no_headers=False):
     no_headers[in]    If True, do not print headings (column names)
     """
 
+    list_options = {
+        'print_header' : not no_headers
+    }
     if format == "VERTICAL":
         format_vertical_list(file, columns, rows)
     elif format == "TAB":
-        format_tabular_list(file, columns, rows, not no_headers, '\t')
+        list_options['separator'] = '\t'
+        format_tabular_list(file, columns, rows, list_options)
     elif format == "CSV":
-        format_tabular_list(file, columns, rows, not no_headers, ',')
+        list_options['separator'] = ','
+        format_tabular_list(file, columns, rows, list_options)
     else:  # default to table format
-        format_tabular_list(file, columns, rows, not no_headers)
+        format_tabular_list(file, columns, rows, list_options)
 

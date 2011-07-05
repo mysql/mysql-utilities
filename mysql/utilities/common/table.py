@@ -250,7 +250,7 @@ class Index(object):
         return (self.db, self.table, self.name, self.type, cols)
 
 
-class Table:
+class Table(object):
     """
     The Table class encapsulates a table for a given database. The class
     has the following capabilities:
@@ -263,18 +263,21 @@ class Table:
         - Copy table data
     """
 
-    def __init__(self, server1, name, verbose=False, get_cols=False):
+    def __init__(self, server1, name, options={}):
         """Constructor
 
         server[in]         A Server object
         name[in]           Name of table in the form (db.table)
-        verbose[in]        print extra data during operations (optional)
-                           (default is False)
-        get_cols[in]       If True, get the column metadata on construction
-                           (default is False)
+        options[in]        options for class: verbose, quiet, get_cols,
+            quiet     If True, do not print information messages    
+            verbose   print extra data during operations (optional)
+                      (default is False)
+            get_cols  If True, get the column metadata on construction
+                      (default is False)
         """
 
-        self.verbose = verbose
+        self.verbose = options.get('verbose', False)
+        self.quiet = options.get('quiet', False)
         self.server = server1
         self.table = name
         self.db_name, self.tbl_name = _parse_object_name(name)
@@ -287,7 +290,7 @@ class Table:
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
-        if get_cols:
+        if options.get('get_cols', False):
             self.col_metadata = self.get_column_metadata()
         else:
             self.col_metadata = None
@@ -304,6 +307,9 @@ class Table:
             self.max_packet_size = _MAXPACKET_SIZE
 
         self._insert = "INSERT INTO %s.%s VALUES "
+        self.query_options = {  # Used for skipping fetch of rows
+            'fetch' : False
+        }
 
 
     def exists(self, tbl_name=None):
@@ -539,7 +545,7 @@ class Table:
         num_rows = 0
         try:
             res = self.server.exec_query("USE %s" % self.db_name,
-                                         (), False, False)
+                                         self.query_options)
         except Exception, e:
             pass
         res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" % \
@@ -588,7 +594,11 @@ class Table:
             self.dest_vals = self.get_dest_values(destination)
 
         # Spawn a new connection
-        dest = Server(self.dest_vals, "thread")
+        server_options = {
+            'conn_vals' : self.dest_vals,
+            'role'      : "thread",
+        }
+        dest = Server(server_options)
         dest.connect()
 
         # First, turn off foreign keys if turned on
@@ -604,7 +614,7 @@ class Table:
         # Insert the data first
         for data_insert in insert_data:
             try:
-                res = dest.exec_query(data_insert, (), False, False)
+                res = dest.exec_query(data_insert, self.query_options)
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem inserting data. "
                                      "Error = %s" % e.errmsg)
@@ -614,7 +624,7 @@ class Table:
             try:
                 # Must convert blob data to a raw string for cursor to handle.
                 res = dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
-                                      (), False, False)
+                                      self.query_options)
             except MySQLUtilError, e:
                 raise MySQLUtilError("Problem updating blob field. "
                                      "Error = %s" % e.errmsg)
@@ -716,7 +726,7 @@ class Table:
 
         # Execute query to get all of the data
         cur = self.server.exec_query("SELECT * FROM %s" % self.table,
-                                     (), False, False, True)
+                                     self.query_options)
 
         while True:
             rows = None
@@ -908,11 +918,10 @@ class Table:
         return True
 
 
-    def check_indexes(self, show_drops=False, quiet=False):
+    def check_indexes(self, show_drops=False):
         """Check for duplicate or redundant indexes and display all matches
 
         show_drops[in]     (optional) If True the DROP statements are printed
-        quiet[in]         (optional) If True, do not print info messages
 
         Note: You must call get_indexes() prior to calling this method. If
         get_indexes() is not called, no duplicates will be found.
@@ -954,7 +963,7 @@ class Table:
                     print "%s;" % (index.get_drop_statement())
                 print "#"
         else:
-            if not quiet:
+            if not self.quiet:
                 print "# Table %s has no duplicate indexes." % (self.table)
 
 
@@ -1005,16 +1014,19 @@ class Table:
 
         from mysql.utilities.common.format import print_list
 
+        query_options = {
+            'params' : (self.db_name, self.tbl_name,)
+        }
         rows = []
         type = "best"
         if not best:
             type = "worst"
         if best:
             rows= self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
-                                         (self.db_name, self.tbl_name,))
+                                         query_options)
         else:
             rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
-                                         (self.db_name, self.tbl_name,))
+                                         query_options)
         if rows:
             print "#"
             print "# Showing the top 5 %s performing indexes from %s:\n#" % \

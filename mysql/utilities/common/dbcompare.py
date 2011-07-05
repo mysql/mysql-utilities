@@ -179,8 +179,13 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
 
-    servers = connect_servers(server1_val, server2_val, quiet, "5.1.30",
-                              "server1", "server2")
+    conn_options = {
+        'quiet'     : quiet,
+        'src_name'  : "server1",
+        'dest_name' : "server2",
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(server1_val, server2_val, conn_options)
     server1 = servers[0]
     server2 = servers[1]
     if server2 is None:
@@ -494,19 +499,23 @@ def _get_formatted_rows(rows, table, format='GRID'):
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
     
+    list_options = {}
     result_rows = []
     outfile = tempfile.TemporaryFile()
     if format == 'VERTICAL':
         format_vertical_list(outfile, table.get_col_names(), rows)
     elif format == "TAB":
+        list_options['separator'] = '\t'
         format_tabular_list(outfile, table.get_col_names(), rows,
-                            True, '\t', True)
+                            list_options)
     elif format == "CSV":
+        list_options['separator'] = ','
         format_tabular_list(outfile, table.get_col_names(), rows,
-                            True, ',', True)
+                            list_options)
     else:
+        list_options['quiet'] = False
         format_tabular_list(outfile, table.get_col_names(), rows,
-                            True, None, False, True)
+                            list_options)
     outfile.seek(0)
     for line in outfile.readlines():
         result_rows.append(line.strip('\n'))

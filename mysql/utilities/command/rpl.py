@@ -41,8 +41,13 @@ def replicate(master_vals, slave_vals, rpl_user,
     
     verbosity = options.get("verbosity", 0)
 
-    servers = connect_servers(master_vals, slave_vals, False, "5.0.0",
-                              "master", "slave", True)
+    conn_options = {
+        'src_name'  : "master",
+        'dest_name' : 'slave',
+        'version'   : "5.0.0",
+        'unique'    : True,
+    }
+    servers = connect_servers(master_vals, slave_vals, conn_options)
     master = servers[0]
     slave = servers[1]
     
@@ -110,8 +115,14 @@ def check_replication(master_vals, slave_vals, options):
 
     test_errors = False
 
-    servers = connect_servers(master_vals, slave_vals, quiet, "5.0.0",
-                              "master", "slave", True)
+    conn_options = {
+        'quiet'     : quiet,
+        'src_name'  : "master",
+        'dest_name' : 'slave',
+        'version'   : "5.0.0",
+        'unique'    : True,
+    }
+    servers = connect_servers(master_vals, slave_vals, conn_options)
     
     # Create an instance of the replication object
     rpl = Replication(servers[0], servers[1], options.get("verbosity", 0) > 0)

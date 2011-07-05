@@ -63,7 +63,11 @@ def check_index(src_val, table_args, options):
     from mysql.utilities.common.table import Table
 
     # Try to connect to the MySQL database server.
-    servers = connect_servers(src_val, None, verbosity == 1, "5.0.0")
+    conn_options = {
+        'quiet'     : verbosity == 1,
+        'version'   : "5.0.0",
+    }
+    servers = connect_servers(src_val, None, conn_options)
 
     source = servers[0]
 
@@ -104,7 +108,12 @@ def check_index(src_val, table_args, options):
         print "# Checking indexes..."
     # Check indexes for each table in the list
     for table_name in table_list:
-        tbl = Table(source, table_name, verbosity >= 1)
+        tbl_options = {
+            'verbose'  : verbosity >= 1,
+            'get_cols' : False,
+            'quiet'    : verbosity is None or verbosity < 1
+        }
+        tbl = Table(source, table_name, tbl_options)
         exists = tbl.exists()
         if not exists and not skip:
             raise MySQLUtilError("Table %s does not exist. Use --skip "
@@ -120,8 +129,7 @@ def check_index(src_val, table_args, options):
                 if not tbl.has_primary_key():
                     if verbosity > 1:
                         print "#   Table %s does not contain a PRIMARY key."
-                tbl.check_indexes(show_drops,
-                                  verbosity is None or verbosity < 1)
+                tbl.check_indexes(show_drops)
                 
             # Show best and/or worst indexes
             if stats:

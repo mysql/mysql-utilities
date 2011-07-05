@@ -67,6 +67,9 @@ class User(object):
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbose = verbose
         self.current_user = None
+        self.query_options = {
+            'fetch' : False
+        }
 
     def create(self, new_user=None):
         """Create the user
@@ -93,7 +96,7 @@ class User(object):
         if self.verbose:
             print query_str
 
-        res = self.server1.exec_query(query_str, (), False, False)
+        res = self.server1.exec_query(query_str, self.query_options)
         
     def drop(self, new_user=None):
         """Drop user from the server
@@ -105,7 +108,6 @@ class User(object):
                            (optional) If omitted, operation is performed
                            on the class instance user name.
         """
-        
         query_str = "DROP USER "
         if new_user:
             user, passwd, host = parse_user_host(new_user)
@@ -116,7 +118,7 @@ class User(object):
         if self.verbose:
             print query_str
             
-        res = self.server1.exec_query(query_str, (), False, False)
+        res = self.server1.exec_query(query_str, self.query_options)
 
     def exists(self, user_name=None):
         """Check to see if the user exists
@@ -134,7 +136,7 @@ class User(object):
 
         res = self.server1.exec_query("SELECT * FROM mysql.user "
                                       "WHERE user = %s and host = %s",
-                                      (user, host))
+                                      {'params':(user, host)})
 
         return (res is not None and len(res) >= 1)
 
@@ -242,5 +244,5 @@ class User(object):
             if self.verbose:
                 print grant
                 
-            res = server.exec_query(grant, (), False, False)
+            res = server.exec_query(grant, self.query_options)
 
