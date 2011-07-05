@@ -174,6 +174,61 @@ def add_difftype(parser, default="unified"):
                       "unified, context, or differ (default: unified).", )
 
 
+def add_engines(parser):
+    """Add the engine and default-storage-engine options.
+    
+    parser[in]        the parser instance
+    """
+    # Add engine
+    parser.add_option("--new-storage-engine", action="store", dest="new_engine",
+                      default=None, help="Change all tables to use this "\
+                      "storage engine if storage engine exists on the destination.")
+    # Add default storage engine
+    parser.add_option("--default-storage-engine", action="store",
+                      dest="def_engine", default=None, help="Change all "
+                      "tables to use this storage engine if the original "
+                      "storage engine does not exist on the destination.")
+
+
+def check_engine_options(server, new_engine, def_engine,
+                         fail=False, quiet=False):
+    """Check to see if storage engines specified in options exist.
+    
+    This method will check to see if the storage engine in new exists on the
+    server. If new_engine is None, the check is skipped. If the storage engine
+    does not exist and fail is True, an exception is thrown else if quiet is
+    False, a warning message is printed.
+    
+    Similarly, def_engine will be checked and if not present and fail is True,
+    an exception is thrown else if quiet is False a warning is printed.
+    
+    server[in]         server instance to be checked
+    new_engine[in]     new storage engine
+    def_engine[in]     default storage engine
+    fail[in]           If True, issue exception on failure else print warning
+                       default = False
+    quiet[in]          If True, suppress warning messages (not exceptions)
+                       default = False
+    """
+    def _find_engine(server, target, message, fail, default):
+        if target is not None:
+            found = server.has_storage_engine(target)
+            if not found and fail:
+                raise MySQLUtilError(message)
+            elif not found and not quiet:
+                print message
+        
+    engines = server.get_storage_engines()
+    message = "WARNING: %s storage engine %s is not supported on the server."
+              
+    _find_engine(server, new_engine,
+                 message % ("New", new_engine),
+                 fail, quiet)    
+    _find_engine(server, def_engine,
+                 message % ("Default", def_engine),
+                 fail, quiet)    
+
+
 _CONN_USERPASS = re.compile(
     r"(\w+)"                     # User name
     r"(?:\:(\w+))?"              # Optional password

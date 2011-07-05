@@ -14,6 +14,7 @@ SYNOPSIS
              (<db_name>[:<new_name>])+ [--verbose | --quiet |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version |
+             --new-storage-engine=<engine> | --default-storage-engine=<engine> |
              --threads=<num threads>] | --exclude=<name>[|,--exclude=<name>]
 
 DESCRIPTION
@@ -35,6 +36,22 @@ regex search pattern. For example, :option:`--exclude=db1.trig1` will exclude
 the single trigger and :option:`--exclude=trig_` will exclude all objects from
 all databases whose name begins with trig and has a following character or
 digit.
+
+To change the storage engine for all tables on the destination, specify the
+new engine with the :option:`--new-storage-engine` option. If the new engine
+specified is available on the destination, all tables will be changed to use
+the engine.
+
+Similarly, you can specify a different default storage engine with the
+:option:`--default-storage-engine` option. If the engine specified is
+available on the destination, any table that specifies a storage engine that
+is not on the destination will use the new default engine. Note that this
+overrides the default storage engine mechanism on the server.
+
+If the option :option:`--default-storage-engine` or
+:option:`--new-storage-engine` is supplied and the storage engine specified
+does not exist, a warning shall be issued and the default storage engine
+setting on the server shall be used instead.
 
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
@@ -99,6 +116,16 @@ The following command line options are accepted by **mysqldbcopy**:
 
     use multiple threads for cross-server copy (default = 1)
 
+.. option:: --new-storage-engine=NEW_ENGINE
+
+   Change all tables to use this storage engine if storage engine exists on the
+   destination.
+
+.. option:: --default-storage-engine=DEF_ENGINE
+
+   Change all tables to use this storage engine if the original storage engine
+   does not exist on the destination.
+
 .. _mysqldbcopy-notes:
 
 NOTES
@@ -121,6 +148,9 @@ Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
 contains certain objects such as views or events and whether binary
 logging is turned on (hence the need for **SUPER**).
+
+The --new-storage-engine and --default-storage-engine options apply to all
+tables in the operation.
 
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result

@@ -661,16 +661,25 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
 
     Returns (bool) - True if all execute, raises error if one fails
     """
+    new_engine = options.get("new_engine", None)
+    def_engine = options.get("def_engine", None)
+    quiet = options.get("quiet", False)
     for statement in statements:
-        if dryrun:
-            print statement
-        else:
-            try:
-                if format != "SQL" or not _skip_sql(statement, options):
-                    destination.exec_query(statement)
-            except MySQLUtilError, e:
-                raise MySQLUtilError("Invalid statement:\n%s" %
-                                     statement)
+        if (new_engine is not None or def_engine is not None) and \
+           statement.upper()[0:12] == "CREATE TABLE":
+            i = statement.find(' ', 13)
+            tbl_name = statement[13:i]
+            statement = destination.substitute_engine(tbl_name, statement,
+                                                      new_engine, def_engine,
+                                                      quiet)
+        try:
+            if dryrun:
+                print statement
+            elif format != "SQL" or not _skip_sql(statement, options):
+                destination.exec_query(statement)
+        except MySQLUtilError, e:
+            raise MySQLUtilError("Invalid statement:\n%s" %
+                                 statement)
     return True
 
 
@@ -717,6 +726,7 @@ def import_file(dest_val, file_name, options):
     """
 
     from mysql.utilities.common.database import Database
+    from mysql.utilities.common.options import check_engine_options
     from mysql.utilities.common.table import Table
     from mysql.utilities.common.server import connect_servers
 
@@ -772,6 +782,12 @@ def import_file(dest_val, file_name, options):
     servers = connect_servers(dest_val, None, conn_options)
 
     destination = servers[0]
+
+    # Check storage engines
+    check_engine_options(destination,
+                         options.get("new_engine", None),
+                         options.get("def_engine", None),
+                         False, options.get("quiet", False))
 
     if not quiet:
         if import_type == "BOTH":

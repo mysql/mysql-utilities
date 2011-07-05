@@ -51,8 +51,14 @@ class test(mutlib.System_test):
             raise MUTException("%s: failed" % comment)
 
         comment = "Test case 2 - copy a sample database X"
-        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
         res = self.exec_util(cmd + " util_test", self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTException("%s: failed" % comment)
+            
+        comment = "Test case 3 - copy using different engine"
+        cmd += " util_test:util_db_clone --force --new-storage-engine=MEMORY"
+        res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:
             raise MUTException("%s: failed" % comment)

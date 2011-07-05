@@ -12,7 +12,7 @@ _ENGINE_QUERY = """
 _TABLES = ('t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 't10')
 
 class test(import_basic.test):
-    """check storage engine options for impport utility
+    """check storage engine options for import utility
     This test executes a test for engine parameters for mysqldbimport.
     It uses the import_basic test as a parent for teardown methods.
     """
@@ -95,6 +95,67 @@ class test(import_basic.test):
         
         _get_engines()
         
+        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
+                  (to_conn, import_file)
+        cmd_str += "--new-storage-engine=MEMORY --drop-first --format=CSV"
+        comment = "Test case %d - convert to memory storage engine" % case_num
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        case_num += 1
+
+        _get_engines()
+
+        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
+                  (to_conn, import_file)
+        cmd_str += "--new-storage-engine=NOTTHERE --drop-first --format=CSV"
+        comment = "Test case %d - new storage engine missing" % case_num
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        case_num += 1
+
+        _get_engines()
+
+        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
+                  (to_conn, import_file)
+        cmd_str += "--default-storage-engine=NOPENOTHERE --drop-first" + \
+                   " --format=CSV"
+        comment = "Test case %d - default storage engine missing" % case_num
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        case_num += 1
+
+        _get_engines()
+
+        cmd_str = "mysqldbimport.py %s %s --import=definitions  " % \
+                  (to_conn, import_file)
+        cmd_str += "--new-storage-engine=NOTTHERE --drop-first --format=CSV "
+        cmd_str += "--default-storage-engine=INNODB "
+        comment = "Test case %d - new storage engine missing, default Ok" % \
+                  case_num
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        case_num += 1
+
+        _get_engines()
+
+        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
+                  (to_conn, import_file)
+        cmd_str += "--default-storage-engine=NOPENOTHERE --drop-first" + \
+                   " --format=CSV "
+        cmd_str += "--new-storage-engine=MYISAM"
+        comment = "Test case %d - default storage engine missing, new Ok" % \
+                  case_num
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+        case_num += 1
+
+        _get_engines()
+
         self.replace_result("# Importing", "# Importing ... bad_engines.csv\n")
 
         return True

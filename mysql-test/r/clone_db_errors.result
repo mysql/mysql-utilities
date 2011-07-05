@@ -70,3 +70,43 @@ Test case 10 - no database specified
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: You must specify at least one database to copy.
+Test case 11 - new storage engine missing
+# Source on 127.0.0.1: ... connected.
+# Destination on localhost: ... connected.
+# Copying database util_test renamed as util_db_clone
+WARNING: New storage engine NOTTHERE is not supported on the server.
+# Copying TABLE util_test.t1
+# Copying data for TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying data for TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying data for TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t4
+# Copying VIEW util_test.v1
+# Copying TRIGGER util_test.trg
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying EVENT util_test.e1
+# Copying GRANTS from util_test
+#...done.
+Test case 12 - default storage engine missing
+# Source on 127.0.0.1: ... connected.
+# Destination on localhost: ... connected.
+# Copying database util_test renamed as util_db_clone
+WARNING: Default storage engine NOPENOTHERE is not supported on the server.
+# Copying TABLE util_test.t1
+# Copying data for TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying data for TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying data for TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t4
+# Copying VIEW util_test.v1
+# Copying TRIGGER util_test.trg
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying EVENT util_test.e1
+# Copying GRANTS from util_test
+#...done.

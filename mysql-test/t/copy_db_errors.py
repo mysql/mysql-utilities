@@ -200,6 +200,23 @@ class test(copy_db.test):
         if not res:
             raise MUTException("%s: failed" % comment)
 
+        cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
+        cmd_str += "util_test:util_db_clone --force "
+        cmd_str += "--new-storage-engine=NOTTHERE"
+        comment = "Test case 20 - new storage engine missing"
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+        cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
+        cmd_str += "util_test:util_db_clone --force " + \
+                   "--default-storage-engine=NOPENOTHERE"
+        comment = "Test case 21 - default storage engine missing"
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTException("%s: failed" % comment)
+
+
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")

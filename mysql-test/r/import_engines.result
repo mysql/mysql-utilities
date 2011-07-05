@@ -12,3 +12,101 @@ util_test.t7: ENGINE=MEMORY
 util_test.t8: ENGINE=MEMORY
 util_test.t9: ENGINE=InnoDB
 util_test.t10: ENGINE=MEMORY
+Test case 2 - convert to memory storage engine
+# Source on localhost: ... connected.
+# Importing ... bad_engines.csv
+# Adding missing ENGINE=MEMORY clause for table `util_test`.`t1`.
+# Replacing ENGINE=CAYMAN with ENGINE=MEMORY for table `util_test`.`t2`.
+# Replacing ENGINE=BOXSTER with ENGINE=MEMORY for table `util_test`.`t3`.
+# Replacing ENGINE=MYISAM with ENGINE=MEMORY for table `util_test`.`t4`.
+# Adding missing ENGINE=MEMORY clause for table `util_test`.`t5`.
+# Replacing ENGINE=CARRERA with ENGINE=MEMORY for table `util_test`.`t6`.
+# Adding missing ENGINE=MEMORY clause for table `util_test`.`t7`.
+# Replacing ENGINE=PANAMERA with ENGINE=MEMORY for table `util_test`.`t8`.
+# Replacing ENGINE=INNODB with ENGINE=MEMORY for table `util_test`.`t9`.
+# Adding missing ENGINE=MEMORY clause for table `util_test`.`t10`.
+#...done.
+util_test.t1: ENGINE=MEMORY
+util_test.t2: ENGINE=MEMORY
+util_test.t3: ENGINE=MEMORY
+util_test.t4: ENGINE=MEMORY
+util_test.t5: ENGINE=MEMORY
+util_test.t6: ENGINE=MEMORY
+util_test.t7: ENGINE=MEMORY
+util_test.t8: ENGINE=MEMORY
+util_test.t9: ENGINE=MEMORY
+util_test.t10: ENGINE=MEMORY
+Test case 3 - new storage engine missing
+# Source on localhost: ... connected.
+WARNING: New storage engine NOTTHERE is not supported on the server.
+# Importing ... bad_engines.csv
+#...done.
+util_test.t1: ENGINE=MEMORY
+util_test.t2: ENGINE=MEMORY
+util_test.t3: ENGINE=MEMORY
+util_test.t4: ENGINE=MyISAM
+util_test.t5: ENGINE=MEMORY
+util_test.t6: ENGINE=MEMORY
+util_test.t7: ENGINE=MEMORY
+util_test.t8: ENGINE=MEMORY
+util_test.t9: ENGINE=InnoDB
+util_test.t10: ENGINE=MEMORY
+Test case 4 - default storage engine missing
+# Source on localhost: ... connected.
+WARNING: Default storage engine NOPENOTHERE is not supported on the server.
+# Importing ... bad_engines.csv
+#...done.
+util_test.t1: ENGINE=MEMORY
+util_test.t2: ENGINE=MEMORY
+util_test.t3: ENGINE=MEMORY
+util_test.t4: ENGINE=MyISAM
+util_test.t5: ENGINE=MEMORY
+util_test.t6: ENGINE=MEMORY
+util_test.t7: ENGINE=MEMORY
+util_test.t8: ENGINE=MEMORY
+util_test.t9: ENGINE=InnoDB
+util_test.t10: ENGINE=MEMORY
+Test case 5 - new storage engine missing, default Ok
+# Source on localhost: ... connected.
+WARNING: New storage engine NOTTHERE is not supported on the server.
+# Importing ... bad_engines.csv
+# Adding missing ENGINE=INNODB clause for table `util_test`.`t1`.
+# Replacing ENGINE=MYISAM with ENGINE=INNODB for table `util_test`.`t4`.
+# Adding missing ENGINE=INNODB clause for table `util_test`.`t5`.
+# Adding missing ENGINE=INNODB clause for table `util_test`.`t7`.
+# Adding missing ENGINE=INNODB clause for table `util_test`.`t10`.
+#...done.
+util_test.t1: ENGINE=InnoDB
+util_test.t2: ENGINE=MEMORY
+util_test.t3: ENGINE=MEMORY
+util_test.t4: ENGINE=MyISAM
+util_test.t5: ENGINE=InnoDB
+util_test.t6: ENGINE=MEMORY
+util_test.t7: ENGINE=InnoDB
+util_test.t8: ENGINE=MEMORY
+util_test.t9: ENGINE=InnoDB
+util_test.t10: ENGINE=InnoDB
+Test case 6 - default storage engine missing, new Ok
+# Source on localhost: ... connected.
+WARNING: Default storage engine NOPENOTHERE is not supported on the server.
+# Importing ... bad_engines.csv
+# Adding missing ENGINE=MYISAM clause for table `util_test`.`t1`.
+# Replacing ENGINE=CAYMAN with ENGINE=MYISAM for table `util_test`.`t2`.
+# Replacing ENGINE=BOXSTER with ENGINE=MYISAM for table `util_test`.`t3`.
+# Adding missing ENGINE=MYISAM clause for table `util_test`.`t5`.
+# Replacing ENGINE=CARRERA with ENGINE=MYISAM for table `util_test`.`t6`.
+# Adding missing ENGINE=MYISAM clause for table `util_test`.`t7`.
+# Replacing ENGINE=PANAMERA with ENGINE=MYISAM for table `util_test`.`t8`.
+# Replacing ENGINE=INNODB with ENGINE=MYISAM for table `util_test`.`t9`.
+# Adding missing ENGINE=MYISAM clause for table `util_test`.`t10`.
+#...done.
+util_test.t1: ENGINE=MyISAM
+util_test.t2: ENGINE=MyISAM
+util_test.t3: ENGINE=MyISAM
+util_test.t4: ENGINE=MyISAM
+util_test.t5: ENGINE=MyISAM
+util_test.t6: ENGINE=MyISAM
+util_test.t7: ENGINE=MyISAM
+util_test.t8: ENGINE=MyISAM
+util_test.t9: ENGINE=MyISAM
+util_test.t10: ENGINE=MyISAM

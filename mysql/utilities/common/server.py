@@ -553,6 +553,100 @@ class Server(object):
         return (master_extra, slave_extra)
 
 
+    def has_storage_engine(self, target):
+        """Check to see if an engine exists and is supported.
+        
+        target[in]     name of engine to find
+        
+        Returns bool True - engine exists and is active, false = does not
+                     exist or is not supported/not active/disabled
+        """
+        if len(target) == 0:
+            return True # This says we will use default engine on the server.
+        if target is not None:
+            engines = self.get_storage_engines()
+            for engine in engines:
+                if engine[0].upper() == target.upper() and \
+                   engine[1].upper() in ['YES', 'DEFAULT']:
+                    return True
+        return False
+
+
+    def substitute_engine(self, tbl_name, create_str,
+                          new_engine, def_engine, quiet=False):
+        """Replace storage engine in CREATE TABLE
+        
+        This method will replace the storage engine in the CREATE statement
+        under the following conditions:
+            - If new_engine is specified and it exists on destination, use it.
+            - Else if existing engine does not exist and def_engine is specfied
+              and it exists on destination, use it. Also, don't substitute if
+              the existing engine will not be changed.
+              
+        tbl_name[in]       table name
+        create_str[in]     CREATE statement
+        new_engine[in]     name of storage engine to substitute (convert to)
+        def_engine[in]     name of storage engine to use if existing engines
+                           does not exist
+                           
+        Returns string CREATE string with replacements if found, else return
+                       original string
+        """
+
+        exist_engine = ''
+        replace_msg = "# Replacing ENGINE=%s with ENGINE=%s for table %s."
+        add_msg = "# Adding missing ENGINE=%s clause for table %s."
+        if new_engine is not None or def_engine is not None:
+            i = create_str.find("ENGINE=")
+            if i > 0:
+                j = create_str.find(" ", i)
+                exist_engine = create_str[i+7:j]
+
+        # Set default engine
+        #
+        # If a default engine is specified and is not the same as the
+        # engine specified in the table CREATE statement (existing engine) if
+        # specified, and both engines exist on the server, replace the existing
+        # engine with the default engine.
+        #
+        if def_engine is not None and \
+             exist_engine.upper() != def_engine.upper() and \
+             self.has_storage_engine(def_engine) and \
+             self.has_storage_engine(exist_engine):
+            # If no ENGINE= clause present, add it
+            if len(exist_engine) == 0:
+                i = create_str.find(";")
+                create_str = create_str[0:i] + " ENGINE=%s;"  % def_engine
+            # replace the existing storage engine
+            else:
+                create_str.replace("ENGINE=%s" % exist_engine,
+                                   "ENGINE=%s" % def_engine)
+            if not quiet:
+                if len(exist_engine) > 0:
+                    print replace_msg % (exist_engine, def_engine, tbl_name)
+                else:
+                    print add_msg % (def_engine, tbl_name)
+            exist_engine = def_engine
+
+        # Use new engine
+        if new_engine is not None and \
+           exist_engine.upper() != new_engine.upper() and \
+           self.has_storage_engine(new_engine):
+            if len(exist_engine) == 0:
+                i = create_str.find(";")
+                create_str = create_str[0:i] + " ENGINE=%s;"  % new_engine
+            else:                
+                create_str = create_str.replace("ENGINE=%s" % exist_engine,
+                                                "ENGINE=%s" % new_engine)
+            if not quiet:
+                if len(exist_engine) > 0:
+                    print replace_msg % (exist_engine, new_engine, tbl_name)
+                else:
+                    print add_msg % (new_engine, tbl_name)
+        
+        return create_str
+
+
     def get_innodb_stats(self):
         """Return type of InnoDB engine and its version information.
 

@@ -318,7 +318,7 @@ class Database(object):
 
 
     def __create_object(self, obj_type, obj, show_grant_msg,
-                        quiet=False):
+                        quiet=False, new_engine=None, def_engine=None):
         """Create a database object.
 
         obj_type[in]       Object type (string) e.g. DATABASE
@@ -326,6 +326,9 @@ class Database(object):
                            that contains the elements of the object
         show_grant_msg[in] If true, display diagnostic information
         quiet[in]          do not print informational messages
+        new_engine[in]     Use this engine if not None for object
+        def_engine[in]     If target storage engine doesn't exist, use
+                           this engine.
 
         Note: will handle exception and print error if query fails
         """
@@ -336,6 +339,13 @@ class Database(object):
                          (self.new_db, obj[0], self.db_name, obj[0])
         else:
             create_str = self.__make_create_statement(obj_type, obj)
+        if obj_type == _TABLE:
+            tbl_name = "%s.%s" % (self.new_db, obj[0])
+            create_str = self.destination.substitute_engine(tbl_name,
+                                                            create_str,
+                                                            new_engine,
+                                                            def_engine,
+                                                            quiet)
         str = "# Copying"
         if not quiet:
             if obj_type == _GRANT:
@@ -392,7 +402,7 @@ class Database(object):
         The method can also be used to copy a database to another server
         by providing the new server object (new_server). Copy to the same
         name by setting new_db = old_db or as a new database.
-
+        
         new_db[in]         Name of the new database
         input_file[in]     Full path of input file (or None)
         options[in]        Options for copy e.g. force, copy_dir, etc.
@@ -402,6 +412,7 @@ class Database(object):
         """
 
         from mysql.utilities.common.table import Table
+        from mysql.utilities.common.options import check_engine_options
 
         # Must call init() first!
         # Guard for init() prerequisite
@@ -426,6 +437,12 @@ class Database(object):
                copy_file = options["copy_dir"] + copy_file
         else:
             self.destination = self.source
+
+        # Check storage engines
+        check_engine_options(self.destination,
+                             options.get("new_engine", None),
+                             options.get("def_engine", None),
+                             False, options.get("quiet", False))
 
         res = self.destination.show_server_variable("foreign_key_checks")
         fkey = (res is not None) and (res[0][1] == "ON")
@@ -471,7 +488,9 @@ class Database(object):
 
             # Create the object
             self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                 options.get("quiet", False))
+                                 options.get("quiet", False),
+                                 options.get("new_engine", None),
+                                 options.get("def_engine", None))
 
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True

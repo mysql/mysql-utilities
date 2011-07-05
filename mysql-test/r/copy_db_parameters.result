@@ -50,6 +50,13 @@ Options:
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           Turn off all messages for quiet execution.
+  --new-storage-engine=NEW_ENGINE
+                        Change all tables to use this storage engine if
+                        storage engine exists on the destination.
+  --default-storage-engine=DEF_ENGINE
+                        Change all tables to use this storage engine if the
+                        original storage engine does not exist on the
+                        destination.
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

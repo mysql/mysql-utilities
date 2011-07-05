@@ -15,7 +15,8 @@ SYNOPSIS
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --verbose |
              --version | --bulk-insert | --drop-first ]
              --import=[DEFINITIIONS|DATA|BOTH] |
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
+             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] |
+             --new-storage-engine=<engine> | --default-storage-engine=<engine>
              <file> [|,<file>]
 
 DESCRIPTION
@@ -61,6 +62,22 @@ specifying the :option:`--no-headers` option.
 
 You can turn off all feedback information by specifying the
 :option:`--quiet` option.
+
+To change the storage engine for all tables on the destination, specify the
+new engine with the :option:`--new-storage-engine` option. If the new engine
+specified is available on the destination, all tables will be changed to use
+the engine.
+
+Similarly, you can specify a different default storage engine with the
+:option:`--default-storage-engine` option. If the engine specified is
+available on the destination, any table that specifies a storage engine that
+is not on the destination will use the new default engine. Note that this
+overrides the default storage engine mechanism on the server.
+
+If the option :option:`--default-storage-engine` or
+:option:`--new-storage-engine` is supplied and the storage engine specified
+does not exist, a warning shall be issued and the default storage engine
+setting on the server shall be used instead.
 
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
@@ -127,6 +144,16 @@ OPTIONS
 .. option:: --skip-blobs
 
    Do not import blob data.
+   
+.. option:: --new-storage-engine=NEW_ENGINE
+
+   Change all tables to use this storage engine if storage engine exists on the
+   destination.
+
+.. option:: --default-storage-engine=DEF_ENGINE
+
+   Change all tables to use this storage engine if the original storage engine
+   does not exist on the destination.
 
 .. _`mysqldbimport-notes`:
 
@@ -145,6 +172,9 @@ logging is turned on (hence the need for **SUPER**).
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is imported on another server.
+
+The --new-storage-engine and --default-storage-engine options apply to all
+tables in the operation.
 
 EXAMPLES
 --------

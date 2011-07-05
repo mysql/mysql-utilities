@@ -31,7 +31,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import check_skip_options
+from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.exception import MySQLUtilError
 
 # Constants
@@ -102,6 +102,9 @@ add_skip_options(parser)
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
+# Add engine options
+add_engines(parser)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -155,7 +158,9 @@ options = {
     "threads"          : opt.threads,
     "debug"            : opt.verbosity == 3,
     "exclude_names"    : exclude_object_names,
-    "exclude_patterns" : exclude_objects
+    "exclude_patterns" : exclude_objects,
+    "new_engine"       : opt.new_engine,
+    "def_engine"       : opt.def_engine,
 }
 
 # Parse source connection values

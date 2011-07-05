@@ -29,7 +29,7 @@ import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import setup_common_options, add_engines
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_format_option
@@ -99,6 +99,9 @@ add_skip_options(parser)
 
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
+
+# Add engine options
+add_engines(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -171,7 +174,9 @@ options = {
     "do_drop"       : opt.do_drop,
     "quiet"         : opt.quiet,
     "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3
+    "debug"         : opt.verbosity >= 3,
+    "new_engine"    : opt.new_engine,
+    "def_engine"    : opt.def_engine,
 }
 
 # Parse server connection values
