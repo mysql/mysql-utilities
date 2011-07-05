@@ -1,0 +1,82 @@
+Test Case 1 : Testing import with %s format and NAMES display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 2 : Testing import with %s format and NAMES display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 3 : Testing import with %s format and NAMES display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 4 : Testing import with %s format and NAMES display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Test case 5 - no file specified 
+Usage: mysqldbimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport.py: error: You must specify at least one file to import.
+Test case 6 - bad --skip values
+ERROR: The value wiki-waki is not a valid value for --skip.
+Test case 7 - exporting data and skipping data
+ERROR: You cannot use --import=data and --skip-data when importing table data.
+Test case 8 - cannot parse --server
+Usage: mysqldbimport.py --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport.py: error: Server connection values invalid or cannot be parsed.
+Test case 9 - error: cannot connect to server
+# Source on localhost: ... ERROR: Cannot connect to the Source server.
+Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
+Test case 10 - error: not enough privileges
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+ERROR: User joe on the Source server does not have permissions to create all objects in util_test. User needs CREATE privilege on util_test.
+Test case 11 - error: not enough privileges
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+ERROR: User joe on the Source server does not have permissions to create all objects in util_test. User needs CREATE privilege on util_test.
+Test case 12 - error: bad SQL statements
+# Source on localhost: ... connected.
+# Importing definitions from std_data/bad_sql.sql.
+ERROR: Invalid statement:
+CREATE TABLES util_test.t1 (a char(30)) ENGINE=MEMORY;
+Test case 13 - error: --skip=create_db & --drop-first
+ERROR: You cannot combine --drop-first and --skip=create_db.
+Test case 14 - warning: --skip-blobs
+# WARNING: --skip-blobs option ignored for metadata import.
+# Source on localhost: ... connected.
+# Importing definitions from test_run.txt.
+#...done.
+Test case 15 - error: --skip=data & --import=data
+ERROR: You cannot use --import=data and --skip-data when importing table data.
+Test case 16 - error: bad object definition
+# Source on localhost: ... connected.
+# Importing definitions and data from std_data/bad_object.csv.
+ERROR: Object data invalid: GRANT : ['NAME', 'ORIGIN', 'COLOUR']
