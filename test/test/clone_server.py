@@ -88,7 +88,11 @@ class test(mysql_test.System_test):
         if os.name != "posix":
             conn["unix_socket"] = None
         
-        self.new_server = Server(conn, "cloned_server")
+        server_options = {
+            'conn_vals' : conn,
+            'role'      : "cloned_server",
+        }
+        self.new_server = Server(server_options)
         if self.new_server is None:
             return False
         

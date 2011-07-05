@@ -130,8 +130,13 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
 
-    servers = connect_servers(server1_val, server2_val, quiet, "5.1.30",
-                              "server1", "server2")
+    conn_options = {
+        'quiet'     : quiet,
+        'src_name'  : "server1",
+        'dest_name' : "server2",
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(server1_val, server2_val, conn_options)
     server1 = servers[0]
     server2 = servers[1]
     if server2 is None:

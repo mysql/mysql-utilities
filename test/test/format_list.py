@@ -29,9 +29,9 @@ class test(mysql_test.System_test):
         rows_3 = [('one',None,31),('two',None,32),('three',None,33)]
         cols_3 = ['a','b','c']
 
-        format_tabular_list(self.test_file, cols_1, rows_1, True)
-        format_tabular_list(self.test_file, cols_2, rows_2, True)
-        format_tabular_list(self.test_file, cols_3, rows_3, True)
+        format_tabular_list(self.test_file, cols_1, rows_1)
+        format_tabular_list(self.test_file, cols_2, rows_2)
+        format_tabular_list(self.test_file, cols_3, rows_3)
         format_vertical_list(self.test_file, cols_1, rows_1)
         format_vertical_list(self.test_file, cols_2, rows_2)
         format_vertical_list(self.test_file, cols_3, rows_3)

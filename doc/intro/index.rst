@@ -133,7 +133,11 @@ again, we check for exceptions.::
 
     from mysql.utilities.common.server import Server
 
-    server1 = Server(conn, "source")
+    server_options = {
+        'conn_vals' : conn,
+        'role'      : "source",
+    }
+    server1 = Server(server_options)
     try:
         server1.connect()
     except MySQLUtilError, e:

@@ -38,7 +38,10 @@ def show_users(src_val, verbosity, format):
     from mysql.utilities.common.server import connect_servers
     from mysql.utilities.common.format import print_list
 
-    servers = connect_servers(src_val, None, False, "5.1.0")
+    conn_options = {
+        'version'   : "5.1.0",
+    }
+    servers = connect_servers(src_val, None, conn_options)
     source = servers[0]
 
     if verbosity <= 1:
@@ -106,10 +109,14 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     global_privs = options.get("global_privs", False)
 
     # Don't require destination for dumping base user grants
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.0",
+    }
     if dump_sql:
-        servers = connect_servers(src_val, None, quiet, "5.1.0")
+        servers = connect_servers(src_val, None, conn_options)
     else:
-        servers = connect_servers(src_val, dest_val, quiet, "5.1.0")
+        servers = connect_servers(src_val, dest_val, conn_options)
 
     source = servers[0]
     destination = servers[1]

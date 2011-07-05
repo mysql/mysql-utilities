@@ -112,8 +112,10 @@ except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 try:
-    servers = connect_servers(source_values, None, False, "5.1.30")
-    #print servers
+    conn_options = {
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(source_values, None, conn_options)
 except MySQLUtilError, e:
     parser.error(e.errmsg)
 

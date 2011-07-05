@@ -765,7 +765,11 @@ def import_file(dest_val, file_name, options):
     skip_blobs = options.get("skip_blobs", False)
 
     # Attempt to connect to the destination server
-    servers = connect_servers(dest_val, None, quiet, "5.1.30")
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(dest_val, None, conn_options)
 
     destination = servers[0]
 
@@ -813,11 +817,12 @@ def import_file(dest_val, file_name, options):
         # check user permissions on source for all databases
         if db_name is not None:
             dest_db = Database(destination, db_name)
-            dest_db.check_write_access(dest_val["user"], dest_val["host"],
-                                       options.get("skip_views", False),
-                                       options.get("skip_procs", False),
-                                       options.get("skip_funcs", False),
-                                       options.get("skip_grants", False))
+
+            # Make a dictionary of the options
+            access_options = options.copy()
+
+            dest_db.check_write_access(dest_val['user'], dest_val['host'],
+                                       access_options)
 
         # Now check to see if we want definitions, data, or both:
         if row[0] == "SQL" or row[0] in _DEFINITION_LIST:
