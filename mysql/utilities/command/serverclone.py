@@ -63,7 +63,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
 
     # Try to connect to the MySQL database server.
     server1_options = {
-        'conn_vals' : conn_val,
+        'conn_info' : conn_val,
         'role'      : "source",
     }
     server1 = Server(server1_options)
@@ -187,7 +187,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         "unix_socket" : new_sock
     }
     server2_options = {
-        'conn_vals' : conn,
+        'conn_info' : conn,
         'role'      : "clone",
     }
     server2 = Server(server2_options)

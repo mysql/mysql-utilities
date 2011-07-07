@@ -216,7 +216,7 @@ def _start_server(server_val, basedir, datadir, options={}):
                                 stdout=out, stderr=out)
 
     server_options = {
-        'conn_vals' : server_val,
+        'conn_info' : server_val,
         'role'      : "read_only",
     }
     server = Server(server_options)

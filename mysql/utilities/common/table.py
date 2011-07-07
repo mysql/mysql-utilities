@@ -595,7 +595,7 @@ class Table(object):
 
         # Spawn a new connection
         server_options = {
-            'conn_vals' : self.dest_vals,
+            'conn_info' : self.dest_vals,
             'role'      : "thread",
         }
         dest = Server(server_options)

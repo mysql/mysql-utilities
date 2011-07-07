@@ -89,7 +89,7 @@ class test(mutlib.System_test):
             conn["unix_socket"] = None
         
         server_options = {
-            'conn_vals' : conn,
+            'conn_info' : conn,
             'role'      : "cloned_server",
         }
         self.new_server = Server(server_options)

@@ -134,7 +134,7 @@ again, we check for exceptions.::
     from mysql.utilities.common.server import Server
 
     server_options = {
-        'conn_vals' : conn,
+        'conn_info' : conn,
         'role'      : "source",
     }
     server1 = Server(server_options)

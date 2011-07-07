@@ -96,7 +96,7 @@ except:
 # Get a server class instance
 print "# Connecting to server..."
 server_options = {
-    'conn_vals' : conn,
+    'conn_info' : conn,
     'role'      : "source",
 }
 server1 = Server(server_options)

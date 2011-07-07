@@ -205,7 +205,7 @@ class Server_list(object):
             conn["unix_socket"] = None
             
         server_options = {
-            'conn_vals' : conn,
+            'conn_info' : conn,
             'role'      : role,
         }
         self.new_server = Server(server_options)
@@ -339,9 +339,7 @@ class Server_list(object):
         for server in self.server_list:
             if server[1]:
                 try:
-                    sys.stdout.write("  Shutting down server %s..." % \
-                                     server[0].role)
-                    sys.stdout.flush()
+                    print "  Shutting down server %s..." % server[0].role,
                     self.stop_server(server[0])
                     print "success."
                 except MySQLUtilError, e:
@@ -382,18 +380,7 @@ class Server_list(object):
         
         Returns dictionary
         """
-
-        conn_vals = {
-            "user"   : server.user,
-            "host"   : server.host
-        }
-        if server.passwd:
-            conn_vals["passwd"] = server.passwd
-        if server.socket:
-            conn_vals["socket"] = server.socket
-        if server.port:
-            conn_vals["port"] = server.port
-        return conn_vals
+        return server.get_connection_values()
 
 
     def get_connection_parameters(self, server):

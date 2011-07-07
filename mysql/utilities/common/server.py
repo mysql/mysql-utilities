@@ -26,12 +26,53 @@ import re
 import sys
 import mysql.connector
 from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.common.options import parse_connection
 
-def _print_connection(prefix, conn_val):
-    """ Print connection information
+def get_connection_dictionary(conn_info):
+    """Get the connection dictionary.
+
+    The method accepts one of the following types for conn_info:
+    
+        - dictionary containing connection information including:
+          (user, passwd, host, port, socket)
+        - connection string in the form: user:pass@host:port:socket
+        - an instance of the Server class
+        
+    conn_info[in]          Connection information
+
+    Returns dict - dictionary for connection (user, passwd, host, port, socket)
     """
-    conn_str = None
-    sys.stdout.write("# %s on %s: ... " % (prefix, conn_val["host"]))
+    if conn_info is None:
+        return conn_info
+    conn_val = {}
+    if isinstance(conn_info, dict):
+        conn_val = conn_info
+    elif isinstance(conn_info, Server):
+        # get server's dictionary
+        conn_val = conn_info.get_connection_values()
+    elif isinstance(conn_info, basestring):
+        # parse the string
+        conn_val = parse_connection(conn_info)
+    else:
+        raise MySQLUtilError("Cannot determine connection information type.")
+
+    return conn_val
+
+
+def _print_connection(prefix, conn_info):
+    """ Print connection information
+    
+    The method accepts one of the following types for conn_info:
+    
+        - dictionary containing connection information including:
+          (user, passwd, host, port, socket)
+        - connection string in the form: user:pass@host:port:socket
+        - an instance of the Server class
+        
+    conn_info[in]          Connection information
+    """
+    conn_val = get_connection_dictionary(conn_info)
+    print "# %s on %s: ..." % (prefix, conn_val["host"]),
 
 
 def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
@@ -135,13 +176,16 @@ def connect_servers(src_val, dest_val, options={}):
     values and attempts to connect one as a source connection and the other
     as the destination connection. If the source and destination are the
     same server and the unique parameter is False, destination is set to None.
+     
+    The method accepts one of the following types for the src_val and dest_val:
+    
+        - dictionary containing connection information including:
+          (user, passwd, host, port, socket)
+        - connection string in the form: user:pass@host:port:socket
+        - an instance of the Server class
 
-    src_val[in]        a dictionary containing connection information for the
-                       source including:
-                       (user, passwd, host, port, socket)
-    dest_val[in]       a dictionary containing connection information for the
-                       destination including:
-                       (user, passwd, host, port, socket)
+    src_val[in]        source connection information
+    dest_val[in]       destination connection information
     options[in]        options to control behavior:
         quiet          do not print any information during the operation
                        (default is False)
@@ -170,28 +214,43 @@ def connect_servers(src_val, dest_val, options={}):
     def _connect_server(name, values, version, quiet):        
 
         server_conn = None
-        if not quiet:
-            _print_connection(name, values)
     
         # Try to connect to the MySQL database server.
+        if not quiet:
+            _print_connection(name, values)
+
         server_options = {
-            'conn_vals' : values,
+            'conn_info' : values,
             'role'      : name,
         }
         server_conn = Server(server_options)
         server_conn.connect()
+    
+        return server_conn
+     
+    def _check_version(conn, name, version):    
         if version is not None:
-            if not server_conn.check_version_compat(major, minor, rel):
+            major, minor, rel = version.split(".")
+            if not conn.check_version_compat(major, minor, rel):
                 raise MySQLUtilError("The %s version is incompatible. Utility "
                                      "requires version %s or higher." %
                                      (name, version))
-    
-        if not quiet:
-            sys.stdout.write("connected.\n")
+        
+    source = None
+    destination = None
 
-        return server_conn
-    
-    # Check for uniqueness
+    # Fail if not the same types
+    if not dest_val is None and not isinstance(src_val, type(dest_val)):
+        raise MySQLUtilError("Connection paramters are not the same type.")
+
+    # Get connection dictionaries if src_val,dest_val are not Server instances.
+    if isinstance(src_val, Server):
+        source = src_val
+        destination = dest_val
+    src_val = get_connection_dictionary(src_val)
+    dest_val = get_connection_dictionary(dest_val)
+
+    # Check for uniqueness - dictionary 
     if options.get("unique", False) and dest_val is not None:
         dupes = False
         if "unix_socket" in src_val and "unix_socket" in dest_val:
@@ -200,51 +259,52 @@ def connect_servers(src_val, dest_val, options={}):
             dupes = (src_val["port"] == dest_val["port"]) and \
                     (src_val["host"] == dest_val["host"])
         if dupes:
-            raise MySQLUtilError("You must specify two different servers for "
-                                 "the operation.")
+            raise MySQLUtilError("You must specify two different servers "
+                                 "for the operation.")
 
-    source = None
-    destination = None
     cloning = (src_val == dest_val) or dest_val is None
-    if version is not None:
-        major, minor, rel = version.split(".")
+    # If we're cloning so use same server for faster copy
+    if not cloning and dest_val is None:
+        dest_val = src_val
 
-    if type(src_val) == type({}): 
-        # If we're cloning so use same server for faster copy
-        if not cloning and dest_val is None:
-            dest_val = src_val
-    
+    if source is None:
         source = _connect_server(src_name, src_val, version, quiet)
-    
-        if not cloning:
+        if not quiet:
+            print "connected."
+    _check_version(source, src_name, version)
+
+    if not cloning:
+        if destination is None:
             destination = _connect_server(dest_name, dest_val, version, quiet)
-        elif not quiet and dest_val is not None:
-            _print_connection(dest_name, src_val)
-            sys.stdout.write("connected.\n")
-    elif type(src_val) != Server:
-        raise MySQLUtilError("Cannot determine type of parameter.")
-    else:
-        source = src_val
-        destination = dest_val
+            if not quiet:
+                print "connected."
+        _check_version(destination, dest_name, version)
+    elif not quiet and dest_val is not None:
+        _print_connection(dest_name, src_val)
+        print "connected."
 
     servers = (source, destination)
     return servers
 
 
-def test_connect(server_dict):
+def test_connect(conn_info):
     """Test connection to a server.
     
-    server_dict[in]    a dictionary containing connection information for the
-                       source including:
-                       (user, passwd, host, port, socket)
+    The method accepts one of the following types for conn_info:
+    
+        - dictionary containing connection information including:
+          (user, passwd, host, port, socket)
+        - connection string in the form: user:pass@host:port:socket
+        - an instance of the Server class
+        
+    conn_info[in]          Connection information
 
     Returns True if connection success, False if error
     """
-    from mysql.utilities.common.options import parse_connection
     from mysql.utilities.exception import FormatError
     
     # Parse source connection values
-    src_val = parse_connection(server_dict)
+    src_val = get_connection_dictionary(conn_info)
     try:
         conn_options = {
             'quiet'     : True,
@@ -274,8 +334,15 @@ class Server(object):
     def __init__(self, options={}):
         """Constructor
 
+        The method accepts one of the following types for options['conn_info']:
+        
+            - dictionary containing connection information including:
+              (user, passwd, host, port, socket)
+            - connection string in the form: user:pass@host:port:socket
+            - an instance of the Server class
+             
         options[in]        options for controlling behavior:
-            conn_val       a dictionary containing connection information
+            conn_info      a dictionary containing connection information
                            (user, passwd, host, port, socket)
             role           Name or role of server (e.g., server, master)
             verbose        print extra data during operations (optional)
@@ -284,22 +351,44 @@ class Server(object):
                            (default latin1)
         """
         
-        assert not options.get("conn_vals") == None
+        assert not options.get("conn_info") == None
         
         self.verbose = options.get("verbose", False)
-        self.conn_val = options.get("conn_vals")
         self.db_conn = None
         self.charset = options.get("charset", "latin1")
         self.role = options.get("role", "Server")
-        self.host = self.conn_val["host"]
-        self.user = self.conn_val["user"]
-        self.passwd = self.conn_val["passwd"]
-        self.socket = self.conn_val["unix_socket"] \
-                      if "unix_socket" in self.conn_val else None
-        self.port = 3306
-        if self.conn_val["port"] is not None:
-            self.port = int(self.conn_val["port"])
+        conn_values = get_connection_dictionary(options.get("conn_info"))
+        try:
+            self.host = conn_values["host"]
+            self.user = conn_values["user"]
+            self.passwd = conn_values["passwd"]
+            self.socket = conn_values["unix_socket"] \
+                          if "unix_socket" in conn_values else None
+            self.port = 3306
+            if conn_values["port"] is not None:
+                self.port = int(conn_values["port"])
+        except KeyError:
+            raise MySQLUtilError("Dictionary format not recognized.")
         self.connect_error = None
+
+
+    def get_connection_values(self):
+        """Return a dictionary of connection values for the server.
+        
+        Returns dictionary
+        """
+        conn_vals = {
+            "user"   : self.user,
+            "host"   : self.host
+        }
+        if self.passwd:
+            conn_vals["passwd"] = self.passwd
+        if self.socket:
+            conn_vals["socket"] = self.socket
+        if self.port:
+            conn_vals["port"] = self.port
+
+        return conn_vals
 
 
     def connect(self):
@@ -424,17 +513,13 @@ class Server(object):
         # If we are fetching all, we need to use a buffered
         if fetch:
             if raw:
-                #print "USING: buffered raw!"
                 cur = self.db_conn.cursor(
                     cursor_class=mysql.connector.cursor.MySQLCursorBufferedRaw)
             else:
-                #print "USING: buffered only"
                 cur = self.db_conn.cursor(buffered)
         else:
-            #print "USING: default cursor!"
             cur = self.db_conn.cursor(raw=True)
 
-        #print "query_str:", query_str, "\nparams:", params
         try:
             if params == ():
                 res = cur.execute(query_str)
