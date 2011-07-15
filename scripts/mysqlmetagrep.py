@@ -27,7 +27,7 @@ from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -78,7 +78,7 @@ options, args = parser.parse_args()
 # Fail if format specified is invalid
 try:
     options.format = check_format_option(options.format).upper()
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 _LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a

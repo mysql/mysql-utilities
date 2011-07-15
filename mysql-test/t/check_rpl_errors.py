@@ -3,7 +3,7 @@
 import os
 import check_rpl
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(check_rpl.test):
     """check replication conditions
@@ -33,8 +33,8 @@ class test(check_rpl.test):
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl " 
         try:
             res = self.exec_util(cmd, self.res_fname)
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
@@ -43,14 +43,14 @@ class test(check_rpl.test):
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 2 - slave parameter invalid"
         cmd_opts = " %s --slave=root_root_root" % master_str
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - same server"
         same_str = self.build_connection_string(self.server2)
@@ -58,14 +58,14 @@ class test(check_rpl.test):
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - error: invalid login to server (master)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         slave_str + " --master=nope@nada:localhost:5510",
                         comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         conn_values = self.get_connection_values(self.server1)
         
@@ -74,7 +74,7 @@ class test(check_rpl.test):
                         master_str + " --slave=nope@nada:localhost:5511",
                         comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.do_replacements()
 

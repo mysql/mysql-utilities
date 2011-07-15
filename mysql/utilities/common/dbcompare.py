@@ -21,7 +21,7 @@ This file contains the methods for checking consistency among two databases.
 """
 
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 # The following are the queries needed to perform table data consistency
 # checking.
@@ -84,8 +84,7 @@ def _get_objects(server, database, options):
 
     db_obj = Database(server, database, options)
     if not db_obj.exists():
-        raise MySQLUtilError("The database does not exist: {0}".
-                             format(database))
+        raise UtilDBError("The database does not exist: {0}".format(database))
     db_obj.init()
     db_objects = db_obj.objects
     db_objects.sort()
@@ -115,8 +114,7 @@ def get_create_object(server, object_name, options):
 
     # Error if atabase does not exist
     if not db.exists():
-        raise MySQLUtilError("The database does not exist: {0}".
-                             format(object[0]))
+        raise UtilDBError("The database does not exist: {0}".format(object[0]))
     
     if len(object) == 1:        
         object.append(object[0])
@@ -124,8 +122,8 @@ def get_create_object(server, object_name, options):
     else:
         obj_type = db.get_object_type(object[1])
         if obj_type is None:
-            raise MySQLUtilError("The object {0} does not exist.".
-                                 format(object_name))
+            raise UtilDBError("The object {0} does not exist.".
+                              format(object_name))
     create_stmt = db.get_create_statement(object[0], object[1], obj_type)
         
     if verbosity > 0 and not quiet:
@@ -192,7 +190,7 @@ def server_connect(server1_val, server2_val, object1, object2, options):
         server2 = server1
  
     if server1 == server2 and object1 == object2:
-        raise MySQLUtilError("Comparing the same object on the same server.")
+        raise UtilError("Comparing the same object on the same server.")
 
     return (server1, server2)
 
@@ -358,7 +356,7 @@ def _get_compare_objects(index_cols, table1):
     index_defn = ''.join("{0} {1}, ".
                          format(col[0], col[1]) for col in index_cols)
     if index_defn == "":
-        raise MySQLUtilError("Cannot generate index definition")
+        raise UtilError("Cannot generate index definition")
     else:
         table = _COMPARE_TABLE.format(db=table1.db_name, table=table1.tbl_name,
                                       pkdef=index_defn)
@@ -393,16 +391,16 @@ def _setup_compare(table1, table2):
 
     table2_idx = table2.get_primary_index()
     if len(table1_idx) != len(table2_idx):
-        raise MySQLUtilError("Indexes are not the same.")
+        raise UtilError("Indexes are not the same.")
     elif table1_idx == [] or table2_idx == []:
-        raise MySQLUtilError("No primary key found.")
+        raise UtilError("No primary key found.")
 
     # Build the primary key hash if needed
     tbl1_table, pri_idx1 = _get_compare_objects(table1_idx, table1)
     tbl2_table, pri_idx2 = _get_compare_objects(table1_idx, table2)
     
     if tbl1_table is None or tbl2_table is None:
-        raise MySQLUtilError("Cannot create compare table.")
+        raise UtilError("Cannot create compare table.")
 
     # Create the compare tables
     server1.exec_query(tbl1_table)

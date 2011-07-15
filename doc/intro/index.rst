@@ -140,7 +140,7 @@ again, we check for exceptions.::
     server1 = Server(server_options)
     try:
         server1.connect()
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
 
 The next item is to get a list of all of the databases on the server. We use
@@ -214,7 +214,7 @@ similar way as options.::
     try:
         res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
                                         opt.new_id, "root", None, False, True)
-    except exception.MySQLUtilError, e:
+    except exception.UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 
@@ -260,7 +260,7 @@ list of databases.::
 
     try:
         dbcopy.copy_db(conn, dest_values, db_list, options)
-    except exception.MySQLUtilError, e:
+    except exception.UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 
@@ -281,7 +281,7 @@ we will have to loop through the users and clone them one at a time.::
         try:
             res = userclone.clone_user(conn, dest_values, user,
                                        (user,), options)
-        except exception.MySQLUtilError, e:
+        except exception.UtilError, e:
             print "ERROR:", e.errmsg
             exit(1)
 

@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common.tools import get_tool_path
 
 class test(mutlib.System_test):
@@ -24,8 +24,8 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(num_servers+2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
             num_servers -= 2 # Get last 2 servers in list
@@ -35,15 +35,15 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
 
         rows = self.server2.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if rows:
             basedir = rows[0][1]
         else:
-            raise MySQLUtilError("Unable to determine basedir of running "
+            raise MUTLibError("Unable to determine basedir of running "
                                  "server.")
 
         self.mysql_path = get_tool_path(basedir, "mysql")
@@ -61,7 +61,7 @@ class test(mutlib.System_test):
                   (self.mysql_path, self.server2_conn, tbl)
         res = self.exec_util(cmd, self.res_fname, True)
         if res != 0:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         file = open(self.res_fname)
         for row in file.readlines():
             self.results.append(row)
@@ -87,7 +87,7 @@ class test(mutlib.System_test):
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",
@@ -100,7 +100,7 @@ class test(mutlib.System_test):
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.show_data("t1")
         self.show_data("t2")
@@ -110,7 +110,7 @@ class test(mutlib.System_test):
         try:
             self.server2.exec_query("DROP DATABASE util_test")
         except:
-            raise MUTException("Cannot drop database before import.")
+            raise MUTLibError("Cannot drop database before import.")
 
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",
@@ -123,7 +123,7 @@ class test(mutlib.System_test):
                   (self.mysql_path, self.server2_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.results.append("%s\n" % \
                             self.check_objects(self.server2, "util_test",

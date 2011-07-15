@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """check indexes for duplicates and redundancies
@@ -18,8 +18,8 @@ class test(mutlib.System_test):
         self.drop_all()
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
     
@@ -32,35 +32,35 @@ class test(mutlib.System_test):
         comment = "Test case 1 - check a table without indexes"
         res = self.run_test_case(0, cmd_str + "util_test_c.t6 -vv", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 2 - check a list of tables and databases"
         res = self.run_test_case(0, cmd_str + "util_test_c util_test_a.t1" + \
                                  " util_test_b -vv", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 3 - check all tables for a single database"
         res = self.run_test_case(0, cmd_str + "util_test_a -vv", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - check tables for a non-existant database"
         res = self.run_test_case(1, cmd_str + "util_test_X -vv", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 5 - check indexes for a non-existant table"
         res = self.run_test_case(1, cmd_str + "nosuch.nosuch -vv", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 6 - check indexes for a non-existant table " + \
                   "with skip option"
         res = self.run_test_case(0, cmd_str + "nosuch.nosuch -vv --skip",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
   

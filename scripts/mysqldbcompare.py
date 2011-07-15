@@ -29,7 +29,7 @@ from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.exception import MySQLUtilError, FormatError
+from mysql.utilities.exception import UtilError, FormatError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcompare "
@@ -114,7 +114,7 @@ check_verbosity(opt)
 # Fail if format specified is invalid
 try:
     opt.format = check_format_option(opt.format).upper()
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 # Set options for database operations.
@@ -161,7 +161,7 @@ for db in args:
         res = database_compare(server1_values, server2_values,
                              parts[0], parts[1], options)
         print
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         check_failed = True
         if not opt.run_all_tests:

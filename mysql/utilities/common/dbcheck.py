@@ -21,7 +21,7 @@ This file contains the methods for checking consistency among two databases.
 """
 
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def _get_objects(server, database, options):
     """Get all objects from the database (except grants)
@@ -38,7 +38,7 @@ def _get_objects(server, database, options):
 
     db_obj = Database(server, database, options)
     if not db_obj.exists():
-        raise MySQLUtilError("The database does not exist: %s" % database)
+        raise UtilDBError("The database does not exist: %s" % database)
     db_obj.init()
     db_objects = []
     for item in db_obj.get_next_object():
@@ -90,12 +90,12 @@ def _get_create_object(server, object_name, options):
 
     # Error if atabase does not exist
     if not db.exists():
-        raise MySQLUtilError("The database does not exist: %s" % object[0])
+        raise UtilDBError("The database does not exist: %s" % object[0])
     
     obj_type = db.get_object_type(object[1])
     
     if obj_type is None:
-        raise MySQLUtilError("The object %s does not exist." % object_name)
+        raise UtilDBError("The object %s does not exist." % object_name)
         
     create_stmt = db.get_create_statement(object[0], object[1], obj_type)
     
@@ -143,7 +143,7 @@ def server_connect(server1_val, server2_val, object1, object2, options):
         server2 = server1
  
     if server1 == server2 and object1 == object2:
-        raise MySQLUtilError("Comparing the same object on the same server.")
+        raise UtilError("Comparing the same object on the same server.")
 
     return (server1, server2)
 

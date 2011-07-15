@@ -2,7 +2,7 @@
 
 import os
 import diskusage_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(diskusage_basic.test):
     """Disk usage
@@ -31,7 +31,7 @@ class test(diskusage_basic.test):
 
             res = self.run_test_case(0, cmd_base+format, comment)
             if not res:
-                raise MUTException("DISKUSAGE: %s: failed" % comment)
+                raise MUTLibError("DISKUSAGE: %s: failed" % comment)
 
             test_num += 1
 
@@ -39,7 +39,7 @@ class test(diskusage_basic.test):
         comment += "NOT_THERE format "
         res = self.run_test_case(2, cmd_base+"NOT_THERE", comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
 
         diskusage_basic.test.mask(self)
 

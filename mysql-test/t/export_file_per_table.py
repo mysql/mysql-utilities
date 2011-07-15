@@ -2,7 +2,7 @@
 
 import os
 import export_parameters_def
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(export_parameters_def.test):
     """check file-per-table option for export utility
@@ -28,19 +28,19 @@ class test(export_parameters_def.test):
         try:
             self.server1.exec_query("CREATE DATABASE util_test_mt")
         except:
-            raise MUTException("Cannot create database for test case 1.")
+            raise MUTLibError("Cannot create database for test case 1.")
 
         cmd_str = "mysqldbexport.py %s util_test_mt --export=definitions " \
                   "--file-per-table" % from_conn
         comment = "Test case 1 - warning: def only with --file-per-table"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         try:
             self.server1.exec_query("DROP DATABASE util_test_mt")
         except:
-            raise MUTException("Cannot drop database for test case 1.")
+            raise MUTLibError("Cannot drop database for test case 1.")
 
         _FORMAT_DISPLAY = ("SQL","GRID","CSV","TAB","VERTICAL")
 
@@ -55,7 +55,7 @@ class test(export_parameters_def.test):
             res = self.run_test_case(0, cmd_variant, comment)
             starting_case_num += 1
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
             # Now check the output for the correct files and delete them.
             self.results.append("# Checking for file-per-table creation:\n")
@@ -68,7 +68,7 @@ class test(export_parameters_def.test):
                 else:
                     self.results.append("# %22s ................. [FAIL]\n" % \
                                         file_name)
-                    raise MUTException("File from export missing: %s" % \
+                    raise MUTLibError("File from export missing: %s" % \
                                        file_name)
             self.results.append("\n")
 

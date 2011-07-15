@@ -29,7 +29,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.serverinfo import show_server_info
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqlserverinfo "
@@ -120,7 +120,7 @@ if opt.server is None:
 
 try:
     show_server_info(opt.server, options)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 except Exception, e:

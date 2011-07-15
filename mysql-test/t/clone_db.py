@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """simple db clone
@@ -18,8 +18,8 @@ class test(mutlib.System_test):
         self.drop_all()
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
     
@@ -37,8 +37,8 @@ class test(mutlib.System_test):
             res = self.exec_util(cmd, self.res_fname)
             self.results.append(res)
             return res == 0
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
           
     def get_result(self):
         msg = None
@@ -48,8 +48,8 @@ class test(mutlib.System_test):
                 res = self.server1.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
                     return (True, None)
-            except MySQLUtilError, e:
-                raise MUTException(e.errmsg)
+            except UtilDBError, e:
+                raise MUTLibError(e.errmsg)
         return (False, ("Result failure.\n", "Database clone not found.\n"))
     
     def record(self):

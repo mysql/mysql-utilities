@@ -32,7 +32,7 @@ from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldiskusage "
@@ -100,7 +100,7 @@ opt, args = parser.parse_args()
 # Fail if format specified is invalid
 try:
     opt.format = check_format_option(opt.format).upper()
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 from mysql.utilities.common.server import connect_servers
@@ -116,13 +116,13 @@ try:
         'version'   : "5.1.30",
     }
     servers = connect_servers(source_values, None, conn_options)
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 try:
     res = servers[0].show_server_variable("datadir")
     datadir = res[0][1]
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 if not os.access(datadir, os.R_OK):
@@ -145,7 +145,7 @@ options = {
 # We do database disk usage by default.
 try:
     diskusage.show_database_usage(servers[0], datadir, args, options)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 
@@ -153,7 +153,7 @@ except MySQLUtilError, e:
 if opt.do_logs or opt.do_all:
     try:
         diskusage.show_logfile_usage(servers[0], options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 
@@ -162,7 +162,7 @@ if opt.do_binlog or opt.do_all:
     try:
         options["log_type"] = 'binary log'
         diskusage.show_log_usage(servers[0], datadir, options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 
@@ -171,7 +171,7 @@ if opt.do_relaylog or opt.do_all:
     try:
         options["log_type"] = 'relay log'
         diskusage.show_log_usage(servers[0], datadir, options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 
@@ -179,7 +179,7 @@ if opt.do_relaylog or opt.do_all:
 if opt.do_innodb or opt.do_all:
     try:
         diskusage.show_innodb_usage(servers[0], datadir, options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 

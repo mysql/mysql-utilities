@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """Disk usage
@@ -28,8 +28,8 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get diskusage_all server " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get diskusage_all server " +
                                    "server_id: %s" % e.errmsg)
             self.s1_serverid = int(res[0][1])
         else:
@@ -48,7 +48,7 @@ class test(mutlib.System_test):
                                                 (self.gen_log, self.slow_log,
                                                  self.error_log))
             if not res:
-                raise MUTException("Cannot spawn diskusage_all server.")
+                raise MUTLibError("Cannot spawn diskusage_all server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
 
@@ -56,8 +56,8 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
 
@@ -114,7 +114,7 @@ class test(mutlib.System_test):
         comment = "Test Case %d : Testing disk space (simple)" % test_num
         res = self.run_test_case(0, cmd_base, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
 
         self.mask()
 

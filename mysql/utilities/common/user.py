@@ -21,7 +21,7 @@ This module contains and abstraction of a MySQL user object.
 
 import re
 import mysql.connector
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 def parse_user_host(user_name):
     """Parse user, passwd, host, port from user:passwd@host
@@ -36,7 +36,7 @@ def parse_user_host(user_name):
     if user_credentials:
         user_tuple = user_credentials.groups()
     else:
-        raise MySQLUtilError("Cannot parse user:pass@host : %s." %
+        raise UtilError("Cannot parse user:pass@host : %s." %
                               no_ticks)
     extraneous = no_ticks[user_credentials.end():]
     return user_tuple
@@ -163,7 +163,7 @@ class User(object):
                                           self.current_user)
             for grant in res:
                 grants.append(grant)
-        except MySQLUtilError, e:
+        except UtilDBError, e:
             pass # Error here is ok - no grants found.
         if globals:
             try:
@@ -171,7 +171,7 @@ class User(object):
                                               self.user + "@'%'")
                 for grant in res:
                     grants.append(grant)
-            except MySQLUtilError, e:
+            except UtilDBError, e:
                 pass # Error here is ok - no grants found.
         return grants
 

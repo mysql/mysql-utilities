@@ -58,7 +58,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     """
 
     from mysql.utilities.common.server import Server
-    from mysql.utilities.exception import MySQLUtilError
+    from mysql.utilities.exception import UtilError
     from mysql.utilities.common.tools import get_tool_path
 
     # Try to connect to the MySQL database server.
@@ -83,7 +83,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         try:
             res = os.mkdir(new_data)
         except:
-            raise MySQLUtilError("Unable to create directory '%s'" % new_data)
+            raise UtilError("Unable to create directory '%s'" % new_data)
 
     basedir = ""
     # Get basedir
@@ -93,7 +93,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     if rows:
         basedir = rows[0][1]
     else:
-        raise MySQLUtilError("Unable to determine basedir of running server.")
+        raise UtilError("Unable to determine basedir of running server.")
 
     if not quiet:
         print "# Locating mysql tools..."
@@ -207,7 +207,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
                 print "# trying again..."
 
     if i == stop:
-        raise MySQLUtilError("Unable to communicate with new instance.")
+        raise UtilError("Unable to communicate with new instance.")
     elif not quiet:
         print "# Success!"
 

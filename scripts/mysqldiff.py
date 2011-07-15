@@ -29,7 +29,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldiff "
@@ -121,7 +121,7 @@ for argument in args:
             diff = object_diff(server1_values, server2_values,
                                "%s.%s" % (db1, obj1),
                                "%s.%s" % (db2, obj2), options)
-        except MySQLUtilError, e:
+        except UtilError, e:
             print "ERROR:", e.errmsg
             exit(1)
         if diff is not None:
@@ -132,7 +132,7 @@ for argument in args:
         try:
             res = database_diff(server1_values, server2_values,
                                 db1, db2, options)
-        except MySQLUtilError, e:
+        except UtilError, e:
             print "ERROR:", e.errmsg
             exit(1)
         if not res:

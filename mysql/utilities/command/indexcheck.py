@@ -23,7 +23,7 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def check_index(src_val, table_args, options):
     """ Check for duplicate or redundant indexes for one or more tables
@@ -45,7 +45,7 @@ def check_index(src_val, table_args, options):
                          worst        : show worst performing indexes
                          best         : show best performing indexes
     
-    Returns bool True = success, raises MySQLUtilError if error
+    Returns bool True = success, raises UtilError if error
     """
     
     # Get options
@@ -102,7 +102,7 @@ def check_index(src_val, table_args, options):
 
     # Fail if no tables to check
     if not table_list:
-        raise MySQLUtilError("No tables to check.")
+        raise UtilError("No tables to check.")
 
     if verbosity > 1:
         print "# Checking indexes..."
@@ -116,7 +116,7 @@ def check_index(src_val, table_args, options):
         tbl = Table(source, table_name, tbl_options)
         exists = tbl.exists()
         if not exists and not skip:
-            raise MySQLUtilError("Table %s does not exist. Use --skip "
+            raise UtilError("Table %s does not exist. Use --skip "
                                  "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():

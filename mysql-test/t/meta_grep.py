@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """Process grep
@@ -21,8 +21,8 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
             num_server -= 1 # Get last server in list
@@ -31,8 +31,8 @@ class test(mutlib.System_test):
         self.drop_all()
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
     
@@ -52,7 +52,7 @@ class test(mutlib.System_test):
         cmd = cmd_base + "--pattern=t_"
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
         
         comment = "Test case %d - find objects name search" % test_case_num
@@ -60,7 +60,7 @@ class test(mutlib.System_test):
         cmd = cmd_base + "-b --pattern=%t2%"
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
 
         comment = "Test case %d - find objects regexp search" % test_case_num
@@ -68,7 +68,7 @@ class test(mutlib.System_test):
         cmd = cmd_base + "-Gb --pattern=t2"
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
         
         comment = "Test case %d - find objects regexp search with type " % \
@@ -77,7 +77,7 @@ class test(mutlib.System_test):
         cmd = cmd_base + "-Gb --pattern=t2 --search=table"
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
         
         _FORMATS = ("CSV","TAB","VERTICAL","GRID")
@@ -88,7 +88,7 @@ class test(mutlib.System_test):
             cmd = cmd_base + "--format=%s -Gb --pattern=t2" % format
             res = self.run_test_case(0, cmd, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
             self.results.append("\n")
  
         # CSV masks

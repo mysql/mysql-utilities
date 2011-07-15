@@ -2,7 +2,7 @@
 
 import os
 import replicate
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(replicate.test):
     """setup replication
@@ -13,7 +13,7 @@ class test(replicate.test):
 
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 5, 0):
-            raise MUTException("Test requires server version 5.5.")
+            raise MUTLibError("Test requires server version 5.5.")
         return self.check_num_servers(1)
 
     def setup(self):
@@ -28,8 +28,8 @@ class test(replicate.test):
             self.server5 = self.servers.get_server(index)
             try:
                 res = self.server5.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get replication slave " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get replication slave " +
                                    "server_id: %s" % e.errmsg)
             self.s5_serverid = int(res[0][1])
         else:
@@ -40,7 +40,7 @@ class test(replicate.test):
                                               ' --skip-innodb --default-'
                                               'storage-engine=MyISAM"')
             if not res:
-                raise MUTException("Cannot spawn replication slave server.")
+                raise MUTLibError("Cannot spawn replication slave server.")
             self.server5 = res[0]
             self.servers.add_new_server(self.server5, True)
             
@@ -71,18 +71,18 @@ class test(replicate.test):
         res = self.run_test_case(self.server5, self.server2, self.s5_serverid,
                                  comment, None)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 2 - use pedantic to fail if innodb different"
         res = self.run_test_case(self.server5, self.server2, self.s5_serverid,
                                  comment, " --pedantic", 1)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         try:
             res = self.server5.exec_query("STOP SLAVE")
         except:
-            raise MUTException("%s: Failed to stop slave." % comment)
+            raise MUTLibError("%s: Failed to stop slave." % comment)
 
         replicate.test.mask_results(self)
         

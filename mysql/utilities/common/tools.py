@@ -52,7 +52,7 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True):
     Returns (string) full path to tool
     """
 
-    from mysql.utilities.exception import MySQLUtilError
+    from mysql.utilities.exception import UtilError
 
     search_paths = []
     _add_basedir(search_paths, basedir)
@@ -69,7 +69,7 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True):
             if os.path.isfile(toolpath):
                 return toolpath
     if required:
-        raise MySQLUtilError("Cannot find location of %s." % tool)
+        raise UtilError("Cannot find location of %s." % tool)
         
     return None
 

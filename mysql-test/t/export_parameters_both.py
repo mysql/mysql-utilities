@@ -2,7 +2,7 @@
 
 import os
 import export_parameters_def
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(export_parameters_def.test):
     """check parameters for export utility

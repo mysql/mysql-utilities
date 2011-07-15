@@ -2,7 +2,7 @@
 
 import os
 import import_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 _ENGINE_QUERY = """
     SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES
@@ -31,8 +31,8 @@ class test(import_basic.test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(num_servers)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
             num_servers -= 1 # Get last server in list
@@ -43,8 +43,8 @@ class test(import_basic.test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get import_basic server " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get import_basic server " +
                                    "server_id: %s" % e.errmsg)
             self.s1_serverid = int(res[0][1])
         else:
@@ -52,7 +52,7 @@ class test(import_basic.test):
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                "import_basic")
             if not res:
-                raise MUTException("Cannot spawn import_basic server.")
+                raise MUTLibError("Cannot spawn import_basic server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
         try:
@@ -90,7 +90,7 @@ class test(import_basic.test):
         comment = "Test case %d - Normal run" % case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
         
         _get_engines()
@@ -101,7 +101,7 @@ class test(import_basic.test):
         comment = "Test case %d - convert to memory storage engine" % case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         _get_engines()
@@ -112,7 +112,7 @@ class test(import_basic.test):
         comment = "Test case %d - new storage engine missing" % case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         _get_engines()
@@ -124,7 +124,7 @@ class test(import_basic.test):
         comment = "Test case %d - default storage engine missing" % case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         _get_engines()
@@ -137,7 +137,7 @@ class test(import_basic.test):
                   case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         _get_engines()
@@ -151,7 +151,7 @@ class test(import_basic.test):
                   case_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         _get_engines()

@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException, FormatError
+from mysql.utilities.exception import MUTLibError, FormatError
 from mysql.utilities.common.options import parse_connection
 
 _TEST_RESULTS = [
@@ -128,11 +128,11 @@ class test(mutlib.System_test):
                 # This expected. 
                 self.results.append("FAIL")
             else:
-                raise MUTException("Test Case %s: Parse failed! Error: %s" % \
+                raise MUTLibError("Test Case %s: Parse failed! Error: %s" % \
                                    (test_num+1, e))
         else:
             if test_data[3]:            
-                raise MUTException("Test Case %s: Parse should have failed. " \
+                raise MUTLibError("Test Case %s: Parse should have failed. " \
                                    "Got this instead: %s" % \
                                    (test_num+1, self.conn_vals['host']))
             else:
@@ -150,7 +150,7 @@ class test(mutlib.System_test):
         #    self.conn_vals = parse_connection("root:pass@'mysql.com':3306:/socketfile")
         #    print "HERE:", self.conn_vals
         #except FormatError, e:
-        #    raise MUTException("Test Case XX: Parse failed! Error: %s" % \
+        #    raise MUTLibError("Test Case XX: Parse failed! Error: %s" % \
         #                       (99, e))
         #
         return True

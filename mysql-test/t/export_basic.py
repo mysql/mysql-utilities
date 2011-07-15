@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """Export Data
@@ -22,8 +22,8 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
             num_server -= 1 # Get last server in list
@@ -32,8 +32,8 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
 
@@ -49,37 +49,37 @@ class test(mutlib.System_test):
         cmd_str = cmd + " --export=definitions --format=SQL --skip=events "
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - export data only - single rows"
         cmd_str = cmd + " --export=data --format=SQL "
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - export data only - bulk insert"
         cmd_str = cmd + " --export=data --format=SQL --bulk-insert"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - export data and metadata"
         cmd_str = cmd + " --export=both --format=SQL --skip=events"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 5 - export data and metadata with quiet"
         cmd_str = cmd + " --export=both --format=SQL --skip=events --quiet"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 6 - export data and metadata with debug"
         cmd_str = cmd + " --export=both --format=SQL --skip=events -vvv"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.replace_result("Time:", "Time:       XXXXXX\n")
 

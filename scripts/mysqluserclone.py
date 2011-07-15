@@ -28,7 +28,7 @@ import sys
 
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 from mysql.utilities.command import userclone
 from mysql.utilities import VERSION_FRM
 
@@ -159,7 +159,7 @@ else:
     try:
         res = userclone.clone_user(source_values, dest_values, base_user,
                                    new_user_list, options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 

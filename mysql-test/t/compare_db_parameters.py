@@ -2,7 +2,7 @@
 
 import os
 import compare_db
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 _DIFF_FORMATS = ['unified','context','differ']
 _OUTPUT_FORMATS = ['grid','csv','tab','vertical']
@@ -35,7 +35,7 @@ class test(compare_db.test):
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         compare_db.test.alter_data(self)
         self.server1.exec_query("DROP VIEW inventory.tools")
@@ -47,21 +47,21 @@ class test(compare_db.test):
                 comment = "Test case %d - Use %s" % (test_num, cmd_opts)
                 res = self.run_test_case(1, cmd_str + cmd_opts, comment)
                 if not res:
-                    raise MUTException("%s: failed" % comment)
+                    raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " -d differ --format=csv"
         comment = "Test case %d - without force " % test_num
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts += " --quiet"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --format=csv -a" 
@@ -69,7 +69,7 @@ class test(compare_db.test):
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --format=csv -a" 
@@ -77,21 +77,21 @@ class test(compare_db.test):
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --format=csv -vvv -a" 
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --format=csv -vvv -a --disable-binary-logging" 
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         compare_db.test.do_replacements(self)
         

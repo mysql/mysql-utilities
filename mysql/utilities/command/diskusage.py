@@ -24,7 +24,7 @@ import locale
 import os
 import sys
 
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 _KB = (1024)
@@ -189,7 +189,7 @@ def _build_logfile_list(server, log_name, suffix='_file'):
     else:
         res = server.show_server_variable(log_name+suffix)
         if res == []:
-            raise MySQLUtilError("Cannot get %s_file setting." % log_name)
+            raise UtilError("Cannot get %s_file setting." % log_name)
         log_path = res[0][1]
 
         if os.access(log_path, os.R_OK):
@@ -638,7 +638,7 @@ def show_log_usage(server, datadir, options):
             if res != [] and res is not None:
                 current_log = res[0][7]
         except:
-            raise MySQLUtilError("Cannot get relay log information")
+            raise UtilError("Cannot get relay log information")
         if res == []:
             print "# Server is not an active slave - no relay log information."
             return True
@@ -653,7 +653,7 @@ def show_log_usage(server, datadir, options):
                 if res != []:
                     current_log = res[0][0]
             except:
-                raise MySQLUtilError("Cannot get binary log information.")
+                raise UtilError("Cannot get binary log information.")
 
         if current_log is None:
             print "# Cannot access %s files.\n" % log_type
@@ -665,7 +665,7 @@ def show_log_usage(server, datadir, options):
         logs, total = _build_log_list(datadir,
                                       os.path.splitext(current_log)[0])
         if logs == []:
-            raise MySQLUtilError("The %s are missing." % log_type)
+            raise UtilError("The %s are missing." % log_type)
 
         columns = ['log_file']
         size = 'size'
@@ -763,7 +763,7 @@ def show_innodb_usage(server, datadir, options):
         innodb, total = _build_innodb_list(innodb_file_per_table, innodb_dir,
                                            datadir, tablespaces, verbosity)
         if innodb == []:
-            raise MySQLUtilError("InnoDB is enabled but there is a problem "
+            raise UtilError("InnoDB is enabled but there is a problem "
                                  "reading the tablespace files.")
 
         columns = ['innodb_file', 'size']
@@ -820,7 +820,7 @@ def show_innodb_usage(server, datadir, options):
         res = server.exec_query(_QUERY_DATAFREE)
         if res != []:
             if len(res) > 1:
-                raise MySQLUtilError("Found multiple rows for freespace.")
+                raise UtilError("Found multiple rows for freespace.")
             else:
                 size = int(res[0][0])
                 if not quiet:

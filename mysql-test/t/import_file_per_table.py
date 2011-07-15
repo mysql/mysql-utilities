@@ -2,7 +2,7 @@
 
 import os
 import import_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(import_basic.test):
     """check file-per-table option for import utility
@@ -22,8 +22,8 @@ class test(import_basic.test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server2.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
 
         # Remove the tables with foreign key checks to simplify test.
@@ -35,7 +35,7 @@ class test(import_basic.test):
             self.server2.exec_query("DROP TABLE util_test.t3")
             self.server2.exec_query("DROP TABLE util_test.t4")
         except:
-            raise MUTException("Cannot drop tables t3,t4 (setup).")
+            raise MUTLibError("Cannot drop tables t3,t4 (setup).")
 
         return True
 
@@ -58,7 +58,7 @@ class test(import_basic.test):
                       (starting_case_num, format)
             res = self.run_test_case(0, cmd_variant, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
             starting_case_num += 1
 
             # Now check the output for the correct files and delete them.
@@ -72,7 +72,7 @@ class test(import_basic.test):
                 comment = "Running import..."
                 res = self.run_test_case(0, cmd_variant, comment)
                 if not res:
-                    raise MUTException("%s: failed" % comment)
+                    raise MUTLibError("%s: failed" % comment)
 
                 try:
                     res = self.server2.exec_query("SELECT * FROM "
@@ -85,7 +85,7 @@ class test(import_basic.test):
                         self.results.append(str+"\n")
 
                 except:
-                    raise MUTException("Cannot get rows from "
+                    raise MUTLibError("Cannot get rows from "
                                        "util_test.t%d" % i)
 
                 os.unlink(file_name)
@@ -97,7 +97,7 @@ class test(import_basic.test):
             self.server2.exec_query("SET foreign_key_checks = OFF")
             self.server2.exec_query("DELETE FROM %s" % tbl)
         except:
-            raise MUTException("Cannot delete rows from %s" % tbl)
+            raise MUTLibError("Cannot delete rows from %s" % tbl)
 
     def get_result(self):
         return self.compare(__name__, self.results)

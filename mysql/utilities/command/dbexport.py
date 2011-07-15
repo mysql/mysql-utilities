@@ -23,7 +23,7 @@ table data.
 
 import re
 import sys
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilDBError
 
 def export_metadata(src_val, db_list, options):
     """Produce rows to be used to recreate objects in a database.
@@ -93,8 +93,8 @@ def export_metadata(src_val, db_list, options):
 
         # Error is source database does not exist
         if not db.exists():
-            raise MySQLUtilError("Source database does not exist - %s" %
-                                 db_name)
+            raise UtilDBError("Source database does not exist - %s" % db_name,
+                              -1, db_name)
 
         if not quiet:
             print "# Exporting metadata from %s" % db_name
@@ -350,8 +350,8 @@ def export_data(src_val, db_list, options):
 
         # Error is source database does not exist
         if not db.exists():
-            raise MySQLUtilError("Source database does not exist - %s" %
-                                 db_name)
+            raise UtilDBError("Source database does not exist - %s" % db_name,
+                              -1, db_name)
 
         if not quiet:
             if format == "SQL":

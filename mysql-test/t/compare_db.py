@@ -3,7 +3,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """simple db diff
@@ -25,16 +25,16 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: " + e.errmsg)
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: " + e.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/db_compare_test.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
             res = self.server2.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
 
         return True
@@ -64,8 +64,8 @@ class test(mutlib.System_test):
             res = self.server2.exec_query("DELETE FROM inventory.supplies "
                                           "WHERE cost = 10.00 AND "
                                           "type = 'cleaning'")
-        except MySQLUtilError, e:
-            raise MUTException("Failed to execute query: " + e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Failed to execute query: " + e.errmsg)
 
     
     def run(self):
@@ -81,7 +81,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str + "inventory:inventory -a",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         self.alter_data()
 
@@ -89,7 +89,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         self.do_replacements()
 

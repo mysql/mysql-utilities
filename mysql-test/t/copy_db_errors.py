@@ -2,7 +2,7 @@
 
 import os
 import copy_db
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(copy_db.test):
     """check errors for copy db
@@ -48,26 +48,26 @@ class test(copy_db.test):
         comment = "Test case 1 - error: no destination specified"
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
         cmd_opts = " "
         comment = "Test case 2 - error: no database specified"
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts = " wax\t::sad "
         comment = "Test case 3 - error: cannot parse database list"
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts = "NOT_THERE_AT_ALL:util_db_clone"
         comment = "Test case 4 - error: old database doesn't exist"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s " % to_conn
         cmd_str += "--source=nope:nada@localhost:3306 "
@@ -75,7 +75,7 @@ class test(copy_db.test):
         comment = "Test case 5 - error: cannot connect to source"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         cmd_str = "mysqldbcopy.py %s " % from_conn
         cmd_str += "--destination=nope:nada@localhost:3306 "
@@ -83,7 +83,7 @@ class test(copy_db.test):
         comment = "Test case 6 - error: cannot connect to destination"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         from_conn = "--source=joe@localhost:3306 "
         # Watchout for Windows: it doesn't use sockets!
@@ -97,7 +97,7 @@ class test(copy_db.test):
         comment = "Test case 7 - users with minimal privileges"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         from_conn = "--source=sam@localhost:3306 "
         if os.name == "posix":
@@ -110,7 +110,7 @@ class test(copy_db.test):
         comment = "Test case 8 - source user not enough privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         # Give Sam some privileges on source and retest until copy works
         res = self.server1.exec_query("GRANT SELECT ON util_test.* TO " + \
@@ -118,14 +118,14 @@ class test(copy_db.test):
         comment = "Test case 9 - source user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         res = self.server1.exec_query("GRANT SELECT ON mysql.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 10 - source user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         res = self.server1.exec_query("GRANT SHOW VIEW, EVENT "
                                       "ON util_test.* TO " + \
@@ -134,7 +134,7 @@ class test(copy_db.test):
         comment = "Test case 11 - source user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix":
@@ -147,7 +147,7 @@ class test(copy_db.test):
         comment = "Test case 12 - dest user not enough privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Give Sam some privileges on source and retest until copy works
         res = self.server2.exec_query("GRANT ALL ON util_db_clone.* TO " + \
@@ -155,28 +155,28 @@ class test(copy_db.test):
         comment = "Test case 13 - dest user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         res = self.server2.exec_query("GRANT CREATE USER ON *.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 14 - dest user has some privileges needed"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         res = self.server2.exec_query("GRANT SUPER ON *.* TO " + \
                                       "'sam'@'localhost'")
         comment = "Test case 15 - dest user has privileges needed"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py --source=rocks_rocks_rocks %s " % to_conn
         cmd_str += "util_test:util_db_clone --force "
         comment = "Test case 16 - cannot parse --source"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py --destination=rocks_rocks_rocks %s " % \
                   from_conn
@@ -184,21 +184,21 @@ class test(copy_db.test):
         comment = "Test case 17 - cannot parse --destination"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py --source=rocks_rocks_rocks "
         cmd_str += "util_test:util_db_clone --force "
         comment = "Test case 18 - no destination specified"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
         cmd_str += " "
         comment = "Test case 19 - no database specified"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
         cmd_str += "util_test:util_db_clone --force "
@@ -206,7 +206,7 @@ class test(copy_db.test):
         comment = "Test case 20 - new storage engine missing"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
         cmd_str += "util_test:util_db_clone --force " + \
@@ -214,7 +214,7 @@ class test(copy_db.test):
         comment = "Test case 21 - default storage engine missing"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
 
         # Mask socket for destination server

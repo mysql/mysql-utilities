@@ -2,7 +2,7 @@
 
 import os
 import export_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(export_basic.test):
     """check export db skips
@@ -29,7 +29,7 @@ class test(export_basic.test):
         comment = "Test case %d - baseline" % test_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         _SKIPS=[",grants", ",events", ",functions", ",procedures",
                 ",triggers", ",views", ",tables"]
@@ -41,7 +41,7 @@ class test(export_basic.test):
             comment = "Test case %d - no data,%s" % (test_num, skip_str)
             res = self.run_test_case(0, cmd_opts, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
         return True
 

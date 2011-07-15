@@ -25,7 +25,7 @@ import os
 import subprocess
 import sys
 
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
 
 _COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
@@ -109,7 +109,7 @@ def _server_info(server_val, get_defaults=False, options={}):
     if rows:
         basedir = rows[0][1]
     else:
-        raise MySQLUtilError("Unable to determine basedir of running server.")
+        raise UtilError("Unable to determine basedir of running server.")
 
     my_def_search = []
     my_def_path = get_tool_path(basedir, "my_print_defaults")
@@ -146,7 +146,7 @@ def _server_info(server_val, get_defaults=False, options={}):
         res = server.show_server_variable('version')
         version = res[0][1]
     except:
-        raise MySQLUtilError("Cannot get version for server " + server_id)
+        raise UtilError("Cannot get version for server " + server_id)
 
     # Find config file
     config_file = ""
@@ -348,7 +348,7 @@ def show_server_info(servers, options):
         server_started = False
         if not test_connect(server):
             if basedir is None or datadir is None:
-                raise MySQLUtilError("Server is offline. To connection, "
+                raise UtilError("Server is offline. To connection, "
                                      "you must provide basedir, datadir, "
                                      "and the start option")
             else:
@@ -356,7 +356,7 @@ def show_server_info(servers, options):
                     try:
                         server_val = parse_connection(server)
                     except:
-                        raise MySQLUtilError("Source connection values in"
+                        raise UtilError("Source connection values in"
                                              "valid or cannot be parsed.")
                     res = _start_server(server_val, basedir, datadir, options)
                     server_started = True                    

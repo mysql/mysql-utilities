@@ -2,7 +2,7 @@
 
 import os
 import check_index_parameters
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(check_index_parameters.test):
     """check for best and worst indexes for the check_index_parameters utility
@@ -27,12 +27,12 @@ class test(check_index_parameters.test):
         comment = "Test case 1 - show best indexes on small database"
         res = self.run_test_case(0, cmd_str + "--stats -v --best=5", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - show worst indexes on small database"
         res = self.run_test_case(0, cmd_str + "--stats -v --worst=5", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         return True
   

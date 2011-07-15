@@ -3,7 +3,7 @@
 import os
 import server_info
 
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 _FORMATS = ['GRID','CSV','TAB','VERTICAL']
 
@@ -34,14 +34,14 @@ class test(server_info.test):
         comment = "Test case %d - show help" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         test_num += 1
         cmd_opts = " --format=csv --no-headers"
         comment = "Test case %d - no headers" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         for format in _FORMATS:
             cmd_opts = " --format=%s --no-headers" % format
@@ -49,7 +49,7 @@ class test(server_info.test):
             comment = "Test case %d - %s" % (test_num, cmd_opts)
             res = self.run_test_case(0, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
         self.port = int(self.servers.get_next_port())
         res = self.servers.start_new_server(self.server1, 
@@ -58,7 +58,7 @@ class test(server_info.test):
                                             "root", "temp_server_info")
         self.server3 = res[0]
         if not self.server3:
-            raise MUTException("%s: Failed to create a new slave." % comment)
+            raise MUTLibError("%s: Failed to create a new slave." % comment)
 
         from_conn3 = "--server=" + self.build_connection_string(self.server3)
         cmd_str = "mysqlserverinfo.py %s " % from_conn3
@@ -69,14 +69,14 @@ class test(server_info.test):
         comment = "Test case %d - verbose run against online server" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         test_num += 1
         cmd_opts = " --format=vertical --show-servers"
         comment = "Test case %d - show servers" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
@@ -95,7 +95,7 @@ class test(server_info.test):
         comment = "Test case %d - run against offline server" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)        
 
         server_info.test.do_replacements(self)
         

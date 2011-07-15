@@ -3,7 +3,7 @@
 import os
 import clone_db
 
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 # List of database objects for enumeration
 DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
@@ -38,18 +38,18 @@ class test(clone_db.test):
         comment = "Test case 1 - normal run"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - operation fails - need force"
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts = "--help"
         comment = "Test case 3 - help"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # We exercise --force here to ensure skips don't interfere
         cmd_opts = "--force --skip=data util_test:util_db_clone"
@@ -57,7 +57,7 @@ class test(clone_db.test):
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         self.results.append(self.check_objects(self.server1, "util_db_clone"))
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts = "--force --skip=data --quiet util_test:util_db_clone"
         comment = "Test case 5 - quiet clone"
@@ -66,7 +66,7 @@ class test(clone_db.test):
         # Mask known platform-dependent lines
         self.replace_result("# Reading the file", "# Reading data file.\n")
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
 

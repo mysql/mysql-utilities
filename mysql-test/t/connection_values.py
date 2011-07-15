@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException, FormatError
+from mysql.utilities.exception import UtilError, MUTLibError, FormatError
 from mysql.utilities.common.server import get_connection_dictionary, connect_servers
 
 _TEST_CASES = [
@@ -52,7 +52,7 @@ class test(mutlib.System_test):
                     'dest_name' : None,
                 }
                 s = connect_servers(src_val, None, server_options)
-            except MySQLUtilError, e:
+            except UtilError, e:
                 self.results.append((True, e.errmsg))
             except FormatError, e:
                 self.results.append((True, e))

@@ -3,7 +3,7 @@
 import os
 import mutlib
 import proc_grep
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(proc_grep.test):
     """Process grep
@@ -27,14 +27,14 @@ class test(proc_grep.test):
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - do the SQL for a simple search"
         cmd_str = "mysqlprocgrep.py --sql "
         cmd_str += "--match-user=%s " % conn_val[0]
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.mask_result("    USER LIKE 'root'", "    USER LIKE 'root'",
                          "    USER LIKE 'XXXX'")

@@ -3,7 +3,7 @@
 import os
 import mutlib
 from mysql.utilities.common.user import User
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """clone user
@@ -18,8 +18,8 @@ class test(mutlib.System_test):
         data_file = "./std_data/basic_users.sql"
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
 
@@ -30,8 +30,8 @@ class test(mutlib.System_test):
             if res is not None:
                 for row in res:
                     self.results.append(row[0]+"\n")
-        except MySQLUtilError, e:
-            raise MUTException("Failed to get grants for %s." % user)
+        except UtilDBError, e:
+            raise MUTLibError("Failed to get grants for %s." % user)
 
     def run(self):
         self.res_fname = "result.txt"
@@ -46,7 +46,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.show_user_grants("'jill'@'user'")
 
@@ -56,7 +56,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str + " amy_nopass@user " +
                                  "jack:duh@user john@user", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.show_user_grants("jack@user")
         self.show_user_grants("john@user")
@@ -66,7 +66,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str + " nosuch@user jack@user",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Test case 4 - attempt to clone a user to a user that already exists
         comment= "Test case 4 - attempt to clone a user to a user that " + \
@@ -74,7 +74,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str + " joe_pass@user joe_nopass@user",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Test case 5 - attempt to clone a user to a user that already exists
         #               with overwrite
@@ -84,7 +84,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str + " joe_pass@user " +
                                  "joe_nopass@user --force", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Now show overwritten grants
         self.show_user_grants("joe_nopass@user")
@@ -98,21 +98,21 @@ class test(mutlib.System_test):
             self.server1.exec_query("GRANT ALL ON util_test.* TO "
                                     "'joe_pass'@'%'")
         except Exception, e:
-            raise MUTException("Cannot create user with global grants: %s" %
+            raise MUTLibError("Cannot create user with global grants: %s" %
                                e.errmsg)
 
         comment= "Test case 6 - show clone without --include-global-privileges"
         res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
                                  "joe_nopass@user --force ", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment= "Test case 7 - show clone with --include-global-privileges"
         res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
                                  "joe_nopass@user --force " +
                                  "--include-global-privileges", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
 
         from_conn = "--source=" + self.build_connection_string(self.server1)
@@ -124,7 +124,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
 

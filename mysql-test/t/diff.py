@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """simple db diff
@@ -23,8 +23,8 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
@@ -32,8 +32,8 @@ class test(mutlib.System_test):
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
             res = self.server2.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         try:
             # Now do some alterations...
@@ -46,8 +46,8 @@ class test(mutlib.System_test):
             res = self.server1.exec_query("DROP EVENT util_test.e1")
             res = self.server2.exec_query("USE util_test;")
             res = self.server2.exec_query("DROP EVENT util_test.e1")
-        except MySQLUtilError, e:
-            raise MUTException("Failed to execute query: %s" % e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Failed to execute query: %s" % e.errmsg)
 
         return True
     
@@ -63,26 +63,26 @@ class test(mutlib.System_test):
         comment = "Test case 1 - diff a sample database"
         res = self.run_test_case(1, cmd_str + "util_test:util_test", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - diff a single object - not same"
         res = self.run_test_case(1, cmd_str + "util_test.t2:util_test.t2",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - diff a single object - is same"
         res = self.run_test_case(0, cmd_str + "util_test.t3:util_test.t3",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - diff multiple objects - are same"
         res = self.run_test_case(0, cmd_str + "util_test.t3:util_test.t3 "
                                  "util_test.t4:util_test.t4",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 5 - diff multiple objects + database - some same"
         res = self.run_test_case(1, cmd_str + "util_test.t3:util_test.t3 "
@@ -90,7 +90,7 @@ class test(mutlib.System_test):
                                  "util_test:util_test --force ",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.

@@ -3,7 +3,7 @@
 import os
 import mutlib
 import meta_grep
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(meta_grep.test):
     """Process grep
@@ -28,21 +28,21 @@ class test(meta_grep.test):
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - do the SQL for a simple search"
         cmd_str = "mysqlmetagrep.py --sql "
         cmd_str += " -Gb --pattern=t2"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - do the SQL for a simple search with type"
         cmd_str = "mysqlmetagrep.py --sql --search-objects=table"
         cmd_str += " -Gb --pattern=t2"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
         

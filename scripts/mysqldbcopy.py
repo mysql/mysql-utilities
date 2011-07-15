@@ -32,7 +32,7 @@ from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -110,7 +110,7 @@ opt, args = parser.parse_args()
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR: %s" % e.errmsg
     exit(1)
 
@@ -191,7 +191,7 @@ try:
     dbcopy.copy_db(source_values, dest_values, db_list, options)
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 

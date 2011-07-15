@@ -3,7 +3,7 @@
 import os
 import replicate
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(replicate.test):
     """check replication conditions
@@ -27,29 +27,29 @@ class test(replicate.test):
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         try:
             res = self.exec_util(cmd, self.res_fname)
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
         comment = "Test case 1 - normal run"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 2 - verbose run"
         cmd_opts = " -vv"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - with show slave status"
         cmd_opts = " -s"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         self.do_replacements()
 

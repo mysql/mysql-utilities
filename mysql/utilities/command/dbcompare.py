@@ -23,7 +23,7 @@ This file contains the commands for checking consistency of two databases.
 import sys
 
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 _ROW_FORMAT = "{0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
 _RPT_FORMAT = "{0:{1}} {2:{3}}"
@@ -130,7 +130,7 @@ def _check_databases(server1, server2, db1, db2, options):
                 print row
             print
             if not options['run_all_tests']:
-                raise MySQLUtilError(_ERROR_DB_DIFF)
+                raise UtilError(_ERROR_DB_DIFF)
     
     
 def _check_objects(server1, server2, db1, db2,
@@ -166,7 +166,7 @@ def _check_objects(server1, server2, db1, db2,
                                        "server2:"+db2, "server1:"+db1)
                     print
             else:
-                raise MySQLUtilError(_ERROR_OBJECT_LIST.format(db1, db2))
+                raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
 
     # If in verbose mode, show count of object types.
     if options['verbosity'] > 0:
@@ -216,7 +216,7 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options):
             reporter.report_state('FAIL')
             errors.extend(res)
             if not options['run_all_tests']:
-                raise MySQLUtilError(_ERROR_DB_DIFF)
+                raise UtilError(_ERROR_DB_DIFF)
         else:
             reporter.report_state('pass')
     else:
@@ -245,7 +245,7 @@ def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
             reporter.report_state('FAIL')
             msg = _ERROR_ROW_COUNT.format(obj1, obj2)
             if not options['run_all_tests']:
-                raise MySQLUtilError(msg)
+                raise UtilError(msg)
             else:
                 errors.append(msg)
         else:
@@ -281,7 +281,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                 errors.extend(res)
             else:
                 reporter.report_state('pass')
-        except MySQLUtilError, e:
+        except UtilError, e:
             if e.errmsg == "No primary key found.":
                 reporter.report_state('SKIP')
                 errors.append(e.errmsg)
@@ -362,11 +362,11 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     # Check to see if databases exist
     db1_conn = Database(server1, db1, options)
     if not db1_conn.exists():
-        raise MySQLUtilError(_ERROR_DB_MISSING.format(db1))
+        raise UtilDBError(_ERROR_DB_MISSING.format(db1))
 
     db2_conn = Database(server2, db2, options)
     if not db2_conn.exists():
-        raise MySQLUtilError(_ERROR_DB_MISSING.format(db2))
+        raise UtilDBError(_ERROR_DB_MISSING.format(db2))
 
     message = "# Checking databases {0} on server1 and {1} on server2\n"
     print message.format(db1, db2)

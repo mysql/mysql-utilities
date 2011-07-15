@@ -23,7 +23,7 @@ import multiprocessing
 import re
 import sys
 import mysql.connector
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 _MAXPACKET_SIZE = 1024 * 1024
@@ -615,8 +615,8 @@ class Table(object):
         for data_insert in insert_data:
             try:
                 res = dest.exec_query(data_insert, self.query_options)
-            except MySQLUtilError, e:
-                raise MySQLUtilError("Problem inserting data. "
+            except UtilError, e:
+                raise UtilError("Problem inserting data. "
                                      "Error = %s" % e.errmsg)
 
         # Now insert the blob data if there is any
@@ -625,8 +625,8 @@ class Table(object):
                 # Must convert blob data to a raw string for cursor to handle.
                 res = dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
                                       self.query_options)
-            except MySQLUtilError, e:
-                raise MySQLUtilError("Problem updating blob field. "
+            except UtilError, e:
+                raise UtilError("Problem updating blob field. "
                                      "Error = %s" % e.errmsg)
 
         # Now, turn on foreign keys if they were on at the start

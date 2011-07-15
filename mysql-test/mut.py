@@ -31,7 +31,7 @@ import time
 from mysql.utilities.common.server import Server, find_running_servers
 from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.options import parse_connection, add_verbosity
-from mysql.utilities.exception import MUTException, MySQLUtilError
+from mysql.utilities.exception import MUTLibError
 from mutlib.mutlib import Server_list
 
 # Constants
@@ -110,7 +110,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
         if ok_to_shutdown and svr:
             try:
                 server_list.stop_server(svr)
-            except MySQLUtilError, e:
+            except MUTLibError, e:
                 print "    WARNING: shutdown failed: " + e.errmsg
     return True
 
@@ -156,7 +156,7 @@ def _exec_and_report(procedure, default_message, test_name, action,
         res = procedure()
         if res:
             return True
-    except MUTException, e:
+    except MUTLibError, e:
         extra_message = e.errmsg
     _report_error(default_message, test_name, action, start_test_time)
     # print the error if raised from the test.
@@ -443,7 +443,10 @@ else:
             res = conn.show_server_variable("basedir")
             #print res
             basedir = res[0][1]
-        except MySQLUtilError, e:
+        # Here we capture any exception and print the error message.
+        # Since all util errors (exceptions) derive from Exception, this is
+        # safe.
+        except Exception, e:
             print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
             if conn.connect_error is not None:
                 print conn.connect_error
@@ -572,7 +575,7 @@ for test_tuple in test_files:
     run_msg = None
     try:
         run_ok = test_case.run()
-    except MUTException, e:
+    except MUTLibError, e:
         if debug_mode:
             # Using debug should result in a skipped result check.
             run_ok
@@ -608,7 +611,7 @@ for test_tuple in test_files:
                 if results[0]:
                     sys.stdout.write("[pass]")
                     num_tests_run += 1
-            except MUTException, e:
+            except MUTLibError, e:
                 results = (False, ("Test results cannot be established.\n",
                                    e.errmsg + "\n"))
                 msg = e.errmsg
@@ -628,7 +631,7 @@ for test_tuple in test_files:
     cleanup_msg = None
     try:
         test_cleanup_ok = test_case.cleanup()
-    except MUTException, e:
+    except MUTLibError, e:
         cleanup_msg = e.errmsg
         test_cleanup_ok = False
 

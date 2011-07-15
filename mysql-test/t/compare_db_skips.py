@@ -2,7 +2,7 @@
 
 import os
 import compare_db
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 _SKIPS = ['object-compare', 'row-count', 'diff', 'data-check']
 
@@ -40,14 +40,14 @@ class test(compare_db.test):
             comment = "Test case %d - %s " % (test_num, cmd_opts)
             res = self.run_test_case(1, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " %s --format=csv -a" % skip_all
         comment = "Test case %d - %s " % (test_num, cmd_opts)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         compare_db.test.do_replacements(self)
         

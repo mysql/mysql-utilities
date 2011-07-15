@@ -2,7 +2,7 @@
 
 import os
 import import_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(import_basic.test):
     """Import Data
@@ -42,7 +42,7 @@ class test(import_basic.test):
         # First run the export to a file.
         res = self.run_test_case(0, export_cmd, "Running export...")
         if not res:
-            raise MUTException("EXPORT: %s: failed" % comment)
+            raise MUTLibError("EXPORT: %s: failed" % comment)
 
         import_cmd = "mysqldbimport.py %s " % to_conn
 
@@ -50,7 +50,7 @@ class test(import_basic.test):
         cmd_str = import_cmd + " --import=BOTH --format=SQL"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         import_cmd += "%s --import=BOTH --format=SQL" % self.export_import_file
@@ -59,7 +59,7 @@ class test(import_basic.test):
         cmd_str = import_cmd + " --skip=events,wiki-waki,woo-woo "
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
                     
         comment = "Test case %d - exporting data and skipping data" % \
@@ -67,7 +67,7 @@ class test(import_basic.test):
         cmd_str = import_cmd + " --skip=data --import=data"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
           
         cmd_str = "mysqldbimport.py --server=rocks_rocks_rocks "
@@ -75,7 +75,7 @@ class test(import_basic.test):
         comment = "Test case %d - cannot parse --server" % test_num
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         cmd_str = "mysqldbimport.py %s " % self.export_import_file
@@ -83,7 +83,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: cannot connect to server" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         res = self.server2.exec_query("CREATE USER 'joe'@'localhost'")
@@ -100,7 +100,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: not enough privileges" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         cmd_str = "mysqldbimport.py %s %s --import=definitions" % \
@@ -108,7 +108,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: not enough privileges" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         bad_sql_file = os.path.normpath("./std_data/bad_sql.sql")
@@ -118,7 +118,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: bad SQL statements" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         self.drop_db(self.server2, "util_test")
@@ -131,7 +131,7 @@ class test(import_basic.test):
                   test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         self.drop_db(self.server2, "util_test")
@@ -142,7 +142,7 @@ class test(import_basic.test):
         comment = "Test case %d - warning: --skip-blobs" % test_num
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         cmd_str = import_cmd + " %s --skip=data " % self.export_import_file + \
@@ -150,7 +150,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: --skip=data & --import=data" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
         bad_csv_file = os.path.normpath("./std_data/bad_object.csv")
@@ -160,7 +160,7 @@ class test(import_basic.test):
         comment = "Test case %d - error: bad object definition" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         test_num += 1
         
         if os.name != "posix":

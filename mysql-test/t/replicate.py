@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """setup replication
@@ -24,8 +24,8 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get replication slave " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get replication slave " +
                                    "server_id: %s" % e.errmsg)
             self.s1_serverid = int(res[0][1])
         else:
@@ -34,7 +34,7 @@ class test(mutlib.System_test):
                                                "rep_slave", ' --mysqld='
                                                 '"--log-bin=mysql-bin "')
             if not res:
-                raise MUTException("Cannot spawn replication slave server.")
+                raise MUTLibError("Cannot spawn replication slave server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
 
@@ -43,8 +43,8 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get replication master " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get replication master " +
                                    "server_id: %s" % e.errmsg)
             self.s2_serverid = int(res[0][1])
         else:
@@ -53,7 +53,7 @@ class test(mutlib.System_test):
                                                 "rep_master", ' --mysqld='
                                                 '"--log-bin=mysql-bin "')
             if not res:
-                raise MUTException("Cannot spawn replication slave server.")
+                raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
             
@@ -87,8 +87,8 @@ class test(mutlib.System_test):
             res = slave.exec_query("SHOW SLAVE STATUS")
             if not save_for_compare:
                 self.results.append(res)
-        except MySQLUtilError, e:
-            raise MUTException("Cannot show slave status: %s" % e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Cannot show slave status: %s" % e.errmsg)
 
         if save_for_compare:
             self.results.append(comment+"\n")
@@ -107,23 +107,23 @@ class test(mutlib.System_test):
         res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
                                  comment, None)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         try:
             res = self.server1.exec_query("STOP SLAVE")
         except:
-            raise MUTException("%s: Failed to stop slave." % comment)
+            raise MUTLibError("%s: Failed to stop slave." % comment)
 
         comment = "Test case 2 - replicate server2 as slave of server1 "
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, None)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         try:
             res = self.server2.exec_query("STOP SLAVE")
         except:
-            raise MUTException("%s: Failed to stop slave." % comment)
+            raise MUTLibError("%s: Failed to stop slave." % comment)
 
         return True
 

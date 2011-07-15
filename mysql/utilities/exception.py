@@ -23,26 +23,58 @@ This file contains the exceptions used by MySQL Utilities and their libraries.
 class Error(Exception):
     pass
 
-class OptionError(Exception):
-    """
-    Exception thrown when there either an option is missing or incorrect.
-    """
-
-    def __init__(self, msg):
-        self.msg = msg
-
-
-class MySQLUtilError(Exception):
-    """ General errors
+class UtilError(Exception):
+    """General errors raised by command modules to user scripts.
     
     This exception class is used to report errors from MySQL utilities
-    command and common code.
+    command modules and are used to communicate known errors to the user.
     """
     
-    def __init__(self, message, options=None):
-        self.args = (message, options)
+    def __init__(self, message, errno=0):
+        self.args = (message, errno)
         self.errmsg = message
-        self.options = options
+        self.errno = errno
+
+
+class UtilDBError(UtilError):
+    """Database errors raised when the mysql database server operation fails.
+    """
+    
+    def __init__(self, message, errno=0, db=None):
+        UtilError.__init__(self, message, errno)
+        self.db = db
+
+
+class UtilRplError(UtilError):
+    """Replication errors raised during replication operations.
+    """
+    
+    def __init__(self, message, errno=0, master=None, slave=None):
+        UtilError.__init__(self, message, errno)
+        self.master = master
+        self.slave = slave
+
+
+class UtilBinlogError(UtilError):
+    """Errors raised during binary log operations.
+    """
+    
+    def __init__(self, message, errno=0, file=None, pos=0):
+        UtilError.__init__(self.message, errno)
+        self.file = file
+        self.pos = pos
+
+
+class UtilTestError(UtilError):
+    """Errors during test execution of command or common module tests.
+    
+    This exception is used to raise and error and supply a return value for
+    recording the test result.
+    """
+    def __init__(self, message, errno=0, result=None):
+        UtilError.__init__(self, message, errno)
+        self.result = result
+    
 
 class FormatError(Error):
     """An entity was supplied in the wrong format."""
@@ -52,7 +84,7 @@ class EmptyResultError(Error):
     """An entity was supplied in the wrong format."""
     pass
 
-class MUTException(Exception):
+class MUTLibError(Exception):
     """ MUT errors
     
     This exception class is used to report errors from the testing subsystem.

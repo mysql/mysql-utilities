@@ -2,7 +2,7 @@
 
 import os
 import replicate
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(replicate.test):
     """check parameters for the replicate utility
@@ -23,7 +23,7 @@ class test(replicate.test):
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, "--test-db=db_not_there_yet", True)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         try:
             res = self.server2.exec_query("STOP SLAVE")
@@ -34,13 +34,13 @@ class test(replicate.test):
         res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
                                  comment, "--help", True)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - use the verbose feature"
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, " --verbose", True)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         try:
             res = self.server2.exec_query("STOP SLAVE")

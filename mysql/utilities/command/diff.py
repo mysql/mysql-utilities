@@ -22,7 +22,6 @@ the definitions of two databases.
 """
 
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities.exception import MySQLUtilError
 
 def object_diff(server1_val, server2_val, object1, object2, options):
     """diff the definition of two objects

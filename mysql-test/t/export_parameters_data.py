@@ -2,7 +2,7 @@
 
 import os
 import export_parameters_def
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(export_parameters_def.test):
     """check parameters for export utility
@@ -22,15 +22,15 @@ class test(export_parameters_def.test):
         try:
             self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
                                     " x_blob blob")
-        except MySQLUtilError, e:
-            raise MUTException("Cannot alter table: %s" % e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Cannot alter table: %s" % e.errmsg)
             
         try:
             self.server1.exec_query("UPDATE util_test.t2 SET x_blob = "
                                     "'This is a blob.' ")
 
-        except MySQLUtilError, e:
-            raise MUTException("Cannot update rows: %s" % e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Cannot update rows: %s" % e.errmsg)
 
         return True
          
@@ -45,17 +45,17 @@ class test(export_parameters_def.test):
         comment = "Test case 1 - SQL single rows"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - SQL bulk insert"
         res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 3 - skip blobs"
         res = self.run_test_case(0, cmd_opts + " --skip-blobs", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.

@@ -25,7 +25,7 @@ import os
 import re
 import sys
 import mysql.connector
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.options import parse_connection
 
 def get_connection_dictionary(conn_info):
@@ -54,7 +54,7 @@ def get_connection_dictionary(conn_info):
         # parse the string
         conn_val = parse_connection(conn_info)
     else:
-        raise MySQLUtilError("Cannot determine connection information type.")
+        raise UtilError("Cannot determine connection information type.")
 
     return conn_val
 
@@ -232,16 +232,16 @@ def connect_servers(src_val, dest_val, options={}):
         if version is not None:
             major, minor, rel = version.split(".")
             if not conn.check_version_compat(major, minor, rel):
-                raise MySQLUtilError("The %s version is incompatible. Utility "
-                                     "requires version %s or higher." %
-                                     (name, version))
+                raise UtilError("The %s version is incompatible. Utility "
+                                "requires version %s or higher." %
+                                (name, version))
         
     source = None
     destination = None
 
     # Fail if not the same types
     if not dest_val is None and not isinstance(src_val, type(dest_val)):
-        raise MySQLUtilError("Connection paramters are not the same type.")
+        raise UtilError("Connection paramters are not the same type.")
 
     # Get connection dictionaries if src_val,dest_val are not Server instances.
     if isinstance(src_val, Server):
@@ -259,7 +259,7 @@ def connect_servers(src_val, dest_val, options={}):
             dupes = (src_val["port"] == dest_val["port"]) and \
                     (src_val["host"] == dest_val["host"])
         if dupes:
-            raise MySQLUtilError("You must specify two different servers "
+            raise UtilError("You must specify two different servers "
                                  "for the operation.")
 
     cloning = (src_val == dest_val) or dest_val is None
@@ -301,8 +301,6 @@ def test_connect(conn_info):
 
     Returns True if connection success, False if error
     """
-    from mysql.utilities.exception import FormatError
-    
     # Parse source connection values
     src_val = get_connection_dictionary(conn_info)
     try:
@@ -312,7 +310,7 @@ def test_connect(conn_info):
             'dest_name' : None,
         }
         s = connect_servers(src_val, None, conn_options)
-    except MySQLUtilError, e:
+    except UtilError, e:
         return False
     return True
 
@@ -368,7 +366,7 @@ class Server(object):
             if conn_values["port"] is not None:
                 self.port = int(conn_values["port"])
         except KeyError:
-            raise MySQLUtilError("Dictionary format not recognized.")
+            raise UtilError("Dictionary format not recognized.")
         self.connect_error = None
 
 
@@ -400,7 +398,7 @@ class Server(object):
         Note: This method must be called before executing queries.
 
 
-        Raises MySQLUtilError if error during connect
+        Raises UtilError if error during connect
         """
         try:
             parameters = {
@@ -415,8 +413,8 @@ class Server(object):
             parameters['charset'] = self.charset
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
-            raise MySQLUtilError("Cannot connect to the %s server.\n"
-                                 "Error %s" % (self.role, e.msg))
+            raise UtilDBError("Cannot connect to the %s server.\n"
+                              "Error %s" % (self.role, e.msg), e.errno)
             return False
         self.connect_error = None
 
@@ -527,10 +525,10 @@ class Server(object):
                 res = cur.execute(query_str, params)
         except mysql.connector.Error, e:
             cur.close()
-            raise MySQLUtilError("Query failed. " + e.__str__())
+            raise UtilDBError("Query failed. " + e.__str__())
         except Exception, e:
             cursor.close()
-            raise MySQLUtilError("Unknown error. Command: %s" % query_str)
+            raise UtilError("Unknown error. Command: %s" % query_str, e.errno)
         if fetch or columns:
             try:
                 results = cur.fetchall()
@@ -829,8 +827,7 @@ class Server(object):
         """
         res = self.show_server_variable("sql_log_bin")
         if not res:
-            raise MySQLUtilError("Cannot retrieve status of "
-                                 "sql_log_bin variable.")
+            raise UtilDBError("Cannot retrieve status of sql_log_bin variable.")
         if res[0][1] == "OFF" or res[0][1] == "0":
             return False
         return True

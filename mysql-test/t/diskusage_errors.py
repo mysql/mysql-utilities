@@ -2,7 +2,7 @@
 
 import os
 import diskusage_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(diskusage_basic.test):
     """Disk usage errors
@@ -31,14 +31,14 @@ class test(diskusage_basic.test):
                                             ' --log-error=%s"' % self.error_log)
         self.server1 = res[0]
         if not self.server1:
-            raise MUTException("%s: Failed to create a new slave." % comment)
+            raise MUTLibError("%s: Failed to create a new slave." % comment)
 
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
 
@@ -53,7 +53,7 @@ class test(diskusage_basic.test):
         cmd_opts = " -lambi -vv"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 

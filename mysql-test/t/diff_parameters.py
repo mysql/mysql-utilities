@@ -2,7 +2,7 @@
 
 import os
 import diff
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 _FORMATS = ['unified','context','differ']
 
@@ -34,7 +34,7 @@ class test(diff.test):
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         for format in _FORMATS:
             test_num += 1
@@ -42,42 +42,42 @@ class test(diff.test):
             comment = "Test case %d - Use diff %s" % (test_num, cmd_opts)
             res = self.run_test_case(1, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --force"
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --quiet"
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --width=65" 
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " --width=55" 
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
         cmd_opts = " -vvv" 
         comment = "Test case %d - Use%s " % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.

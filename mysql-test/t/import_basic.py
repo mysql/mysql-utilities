@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """Import Data
@@ -25,8 +25,8 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(num_servers+1)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         else:
             num_servers -= 1 # Get last server in list
@@ -37,8 +37,8 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get export_basic server " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get export_basic server " +
                                    "server_id: %s" % e.errmsg)
             self.s1_serverid = int(res[0][1])
         else:
@@ -46,7 +46,7 @@ class test(mutlib.System_test):
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                "export_basic")
             if not res:
-                raise MUTException("Cannot spawn export_basic server.")
+                raise MUTLibError("Cannot spawn export_basic server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
 
@@ -55,8 +55,8 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get import_basic server " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get import_basic server " +
                                    "server_id: %s" % e.errmsg)
             self.s2_serverid = int(res[0][1])
         else:
@@ -64,7 +64,7 @@ class test(mutlib.System_test):
             res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
                                                "import_basic")
             if not res:
-                raise MUTException("Cannot spawn import_basic server.")
+                raise MUTLibError("Cannot spawn import_basic server.")
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
 
@@ -72,8 +72,8 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
     
@@ -101,12 +101,12 @@ class test(mutlib.System_test):
         # First run the export to a file.
         res = self.run_test_case(0, export_cmd, "Running export...")
         if not res:
-            raise MUTException("EXPORT: %s: failed" % comment)
+            raise MUTLibError("EXPORT: %s: failed" % comment)
         
         # Second, run the import from a file.
         res = self.run_test_case(expected_res, import_cmd, "Running import...")
         if not res:
-            raise MUTException("IMPORT: %s: failed" % comment)
+            raise MUTLibError("IMPORT: %s: failed" % comment)
         
         # Now, check db and save the results.
         self.results.append("AFTER:\n")

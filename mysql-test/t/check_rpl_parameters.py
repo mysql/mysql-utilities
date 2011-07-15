@@ -3,7 +3,7 @@
 import os
 import check_rpl
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(check_rpl.test):
     """check replication conditions
@@ -22,8 +22,8 @@ class test(check_rpl.test):
             self.server3 = self.servers.get_server(index)
             try:
                 res = self.server3.show_server_variable("server_id")
-            except MySQLUtilError, e:
-                raise MUTException("Cannot get replication slave " +
+            except MUTLibError, e:
+                raise MUTLibError("Cannot get replication slave " +
                                    "server_id: %s" % e.errmsg)
             self.s3_serverid = int(res[0][1])
         else:
@@ -33,7 +33,7 @@ class test(check_rpl.test):
                                                 '"--log-bin=mysql-bin '
                                                 '--replicate-ignore-db=t123"')
             if not res:
-                raise MUTException("Cannot spawn replication slave server.")
+                raise MUTLibError("Cannot spawn replication slave server.")
             self.server3 = res[0]
             self.servers.add_new_server(self.server3, True)
         return res
@@ -50,8 +50,8 @@ class test(check_rpl.test):
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         try:
             res = self.exec_util(cmd, self.res_fname)
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
@@ -60,35 +60,35 @@ class test(check_rpl.test):
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 2 - master_info"
         cmd_opts = " --master-info=m.info -v"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 3 - width"
         cmd_opts = " --width=65"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - quiet"
         cmd_opts = " --quiet"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 5 - test failure with quiet"
         cmd_opts = " --master-info=m.info --quiet"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         # Now show how quiet performs with warning and suppress
         
@@ -98,36 +98,36 @@ class test(check_rpl.test):
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         try:
             res = self.exec_util(cmd, self.res_fname)
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
 
         comment = "Test case 6 - test warning without quiet"
         cmd_opts = " "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 7 - test warning with quiet"
         cmd_opts = " --quiet"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 8 - test suppress warning without quiet"
         cmd_opts = " --suppress"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 9 - test suppress warning with quiet"
         cmd_opts = " --suppress --quiet"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.do_replacements()
 

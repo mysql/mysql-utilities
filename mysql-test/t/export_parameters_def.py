@@ -2,7 +2,7 @@
 
 import os
 import export_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(export_basic.test):
     """check parameters for export utility
@@ -28,7 +28,7 @@ class test(export_basic.test):
         comment = "Test case 1 - help"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         # Now test the skips
 
@@ -36,66 +36,66 @@ class test(export_basic.test):
         comment = "Test case 2 - no grants"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",events"
         comment = "Test case 3 - no events"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",functions"
         comment = "Test case 4 - no functions"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",procedures"
         comment = "Test case 5 - no procedures"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",triggers"
         comment = "Test case 6 - no triggers"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",views"
         comment = "Test case 7 - no views"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",tables"
         comment = "Test case 8 - no tables"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)        
 
         cmd_opts += ",create_db"
         comment = "Test case 9 - no create_db"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)        
 
         cmd_opts += ",data"
         comment = "Test case 10 - no data"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         cmd_opts = "%s util_test --format=SQL --export=definitions" % cmd_str
         comment = "Test case 11 - SQL single rows"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 12 - SQL bulk insert"
         res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.test_format_and_display_values(cmd_str + " util_test --export="+\
                                             "definitions --format=", 13)
@@ -118,7 +118,7 @@ class test(export_basic.test):
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTException("%s: failed" % comment)
+                    raise MUTLibError("%s: failed" % comment)
         
         # Now without headers
         if no_headers:
@@ -129,7 +129,7 @@ class test(export_basic.test):
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTException("%s: failed" % comment)
+                    raise MUTLibError("%s: failed" % comment)
         
         # Now the abbreviations
         if abbrev:
@@ -140,7 +140,7 @@ class test(export_basic.test):
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTException("%s: failed" % comment)
+                    raise MUTLibError("%s: failed" % comment)
 
         # Conduct format and display combination tests
         
@@ -157,7 +157,7 @@ class test(export_basic.test):
                     res = self.run_test_case(0, cmd_variant, comment)
                     starting_case_num += 1
                     if not res:
-                        raise MUTException("%s: failed" % comment)
+                        raise MUTLibError("%s: failed" % comment)
 
         # Perform masking for deterministic output
         

@@ -33,7 +33,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbexport "
@@ -133,7 +133,7 @@ if opt.exclude is not None:
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR: %s" % e.errmsg
     exit(1)
 
@@ -144,7 +144,7 @@ if len(args) == 0:
 # Fail if format specified is invalid
 try:
     opt.format = check_format_option(opt.format, True, True).upper()
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 _PERMITTED_DISPLAY_TYPES = ("NAMES", "BRIEF", "FULL")
@@ -231,7 +231,7 @@ try:
         dbexport.export_data(server_values, db_list, options)
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 

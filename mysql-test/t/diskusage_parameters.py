@@ -2,7 +2,7 @@
 
 import os
 import diskusage_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(diskusage_basic.test):
     """Disk usage parameters
@@ -28,7 +28,7 @@ class test(diskusage_basic.test):
         cmd_opts = " --help"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -37,7 +37,7 @@ class test(diskusage_basic.test):
         cmd_opts = " --no-headers "
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -46,7 +46,7 @@ class test(diskusage_basic.test):
         cmd_opts = " --binlog"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -55,25 +55,25 @@ class test(diskusage_basic.test):
         cmd_opts = " --logs"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
         try:
             res = self.server1.show_server_variable('datadir')
             if res == []:
-                raise MUTException("DISKUSAGE: Cannot get datadir.")
+                raise MUTLibError("DISKUSAGE: Cannot get datadir.")
             datadir = res[0][1]
             os.mkdir(os.path.join(datadir, 'mt_db'))
         except:
-            raise MUTException("DISKUSAGE: Can't test empty db.")
+            raise MUTLibError("DISKUSAGE: Can't test empty db.")
 
         # InnoDB
         comment = "Test Case %d : Show InnoDB usage " % test_num
         cmd_opts = " --innodb"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -82,7 +82,7 @@ class test(diskusage_basic.test):
         cmd_opts = " --empty mt_db"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -92,7 +92,7 @@ class test(diskusage_basic.test):
         cmd_opts = " --all"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -101,7 +101,7 @@ class test(diskusage_basic.test):
         cmd_opts = " -lambi -vv"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 
@@ -110,7 +110,7 @@ class test(diskusage_basic.test):
         cmd_opts = " -lambi --quiet"
         res = self.run_test_case(0, cmd_base+cmd_opts, comment)
         if not res:
-            raise MUTException("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
         self.results.append("\n")
         test_num += 1
 

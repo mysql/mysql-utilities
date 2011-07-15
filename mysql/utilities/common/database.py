@@ -24,7 +24,7 @@ import datetime
 import os
 import re
 import mysql.connector
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -365,8 +365,8 @@ class Database(object):
         try:
             res = self.destination.exec_query(create_str, self.query_options)
         except Exception, e:
-            raise MySQLUtilError("Cannot operate on %s object. Error: %s" %
-                                 (obj_type, e.errmsg))
+            raise UtilDBError("Cannot operate on %s object. Error: %s" %
+                              (obj_type, e.errmsg), -1, self.db_name)
 
     def __copy_table_data(self, name, quiet=False):
         """Clone table data.
@@ -467,9 +467,9 @@ class Database(object):
             if options.get("force", False):
                 self.drop(drop_server, True, new_db)
             elif not self.skip_create:
-                raise MySQLUtilError("destination database exists. Use "
-                                      "--force to overwrite existing "
-                                      "database.")
+                raise UtilDBError("destination database exists. Use "
+                                  "--force to overwrite existing "
+                                  "database.", -1, new_db)
 
         # Create new database first
         if not self.skip_create:
@@ -515,8 +515,8 @@ class Database(object):
                                     "%s.%s" % (self.db_name, tblname),
                                     tbl_options)
                         if tbl is None:
-                            raise MySQLUtilError("Cannot create table "
-                                                 "object before copy.")
+                            raise UtilDBError("Cannot create table object "
+                                              "before copy.", -1, self.db_name)
 
                         tbl.copy_data(self.destination, new_db, connections)
 
@@ -887,7 +887,7 @@ class Database(object):
             skip_grants    True = no grants processed
             skip_events    True = no events processed
 
-        Returns True if user has permissions and raises a MySQLUtilError if the
+        Returns True if user has permissions and raises a UtilDBError if the
                      user does not have permission with a message that includes
                      the server context.
         """
@@ -913,11 +913,11 @@ class Database(object):
         # Check permissions on source
         for priv in source_privs:
             if not self._check_user_permissions(user, host, priv):
-                raise MySQLUtilError("User %s on the %s server does not have "
-                                     "permissions to read all objects in %s. " %
-                                     (user, self.source.role, self.db_name) +
-                                     "User needs %s privilege on %s." %
-                                     (priv[1], priv[0]))
+                raise UtilDBError("User %s on the %s server does not have "
+                                  "permissions to read all objects in %s. " %
+                                   (user, self.source.role, self.db_name) +
+                                   "User needs %s privilege on %s." %
+                                   (priv[1], priv[0]), -1, priv[0])
 
         return True
 
@@ -941,7 +941,7 @@ class Database(object):
             skip_events    True = no events processed
 
 
-        Returns True if user has permissions and raises a MySQLUtilError if the
+        Returns True if user has permissions and raises a UtilDBError if the
                      user does not have permission with a message that includes
                      the server context.
         """
@@ -956,10 +956,10 @@ class Database(object):
         # Check privileges on destination
         for priv in dest_privs:
             if not self._check_user_permissions(user, host, priv):
-                raise MySQLUtilError("User %s on the %s server does not "
-                                     "have permissions to create all objects "
-                                     "in %s. User needs %s privilege on %s." %
-                                     (user, self.source.role, priv[0], priv[1],
-                                      priv[0]))
+                raise UtilDBError("User %s on the %s server does not "
+                                  "have permissions to create all objects "
+                                  "in %s. User needs %s privilege on %s." %
+                                  (user, self.source.role, priv[0], priv[1],
+                                   priv[0]), -1, priv[0])
 
         return True

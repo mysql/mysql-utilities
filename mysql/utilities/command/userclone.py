@@ -23,7 +23,7 @@ to the new users.
 """
 
 import sys
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def show_users(src_val, verbosity, format):
     """Show all users except root and anonymous users on the server.
@@ -95,7 +95,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
                                    Note: Error messages are printed regardless
                          global_privs - include global privileges (i.e. user@%)
 
-    Returns bool True = success, raises MySQLUtilError if error
+    Returns bool True = success, raises UtilError if error
     """
 
     from mysql.utilities.common.server import connect_servers
@@ -131,7 +131,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
 
     # Check to ensure base user exists.
     if not user_source.exists(base_user):
-        raise MySQLUtilError("Base user does not exist!")
+        raise UtilError("Base user does not exist!")
 
     # Process dump operation
     if dump_sql and not quiet:
@@ -143,7 +143,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     if overwrite is None:
         for new_user in new_user_list:
             if user_dest.exists(new_user):
-                raise MySQLUtilError("User %s already exists. Use --force "
+                raise UtilError("User %s already exists. Use --force "
                       "to drop and recreate user." % new_user)
 
     if not quiet:
@@ -159,7 +159,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         # Clone user.
         try:
             user_source.clone(new_user, destination, global_privs)
-        except MySQLUtilError, e:
+        except UtilError, e:
             raise
 
     if not quiet:

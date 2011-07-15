@@ -23,7 +23,7 @@ import os
 import re
 import sys
 import time
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilRplError, UtilBinlogError
 
 # List of database objects for enumeration
 DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
@@ -115,7 +115,7 @@ class Replication(object):
             try:
                 res = self.master.show_server_variable("server_id")
             except:
-                raise MySQLUtilError("Cannot retrieve server id from master.")
+                raise UtilRplError("Cannot retrieve server id from master.")
             
             self.master_server_id = int(res[0][1])
             
@@ -124,7 +124,7 @@ class Replication(object):
             try:
                 res = self.slave.show_server_variable("server_id")
             except:
-                raise MySQLUtilError("Cannot retrieve server id from slave.")
+                raise UtilRplError("Cannot retrieve server id from slave.")
                 
             self.slave_server_id = int(res[0][1])
 
@@ -145,7 +145,7 @@ class Replication(object):
         
         res = self.slave.show_server_variable('datadir')
         if res is None or res == []:
-            raise MySQLUtilError("Cannot get datadir.")
+            raise UtilRplError("Cannot get datadir.")
         datadir = res[0][1]
         if filename == 'master.info':
             filename = os.path.join(datadir, filename)
@@ -161,7 +161,7 @@ class Replication(object):
                 contents[_MINFO_COL[i-1]] = mfile.readline().strip('\n')
             mfile.close()
         else:
-            raise MySQLUtilError("Cannot read master information file: "
+            raise UtilRplError("Cannot read master information file: "
                                  "%s." % filename)
 
         return contents
@@ -176,7 +176,7 @@ class Replication(object):
         filename = options.get("master_info", 'master.info')
         res = self.slave.show_server_variable('datadir')
         if res is None or res == []:
-            raise MySQLUtilError("Cannot get datadir.")
+            raise UtilRplError("Cannot get datadir.")
         datadir = res[0][1]
         if filename == 'master.info':
             filename = os.path.join(datadir, filename)
@@ -202,7 +202,7 @@ class Replication(object):
             for i in range(0,stop):
                 print "{0:>30} : {1}".format(cols[i], rows[0][i])
         else:
-            raise MySQLUtilError("Cannot get slave status or slave is "
+            raise UtilRplError("Cannot get slave status or slave is "
                                  "not configured as a slave or not "
                                  "started.")
         
@@ -217,14 +217,14 @@ class Replication(object):
         """
         self.get_server_ids()        
         if self.master_server_id == 0:
-            raise MySQLUtilError("Master server_id is set to 0.")
+            raise UtilRplError("Master server_id is set to 0.")
         
         if self.slave_server_id == 0:
-            raise MySQLUtilError("Slave server_id is set to 0.")
+            raise UtilRplError("Slave server_id is set to 0.")
             
         # Check for server_id uniqueness
         if self.master_server_id == self.slave_server_id:
-            raise MySQLUtilError("The slave's server_id is the same as the "
+            raise UtilRplError("The slave's server_id is the same as the "
                                  "master.")
         
         return []
@@ -269,7 +269,7 @@ class Replication(object):
             if pedantic:
                 for line in errors:
                     print line
-                raise MySQLUtilError("Innodb settings differ between master "
+                raise UtilRplError("Innodb settings differ between master "
                                      "and slave.")
         
         return errors
@@ -308,7 +308,7 @@ class Replication(object):
             if pedantic:
                 for line in errors:
                     print line
-                raise MySQLUtilError("The master and slave have differing " 
+                raise UtilRplError("The master and slave have differing " 
                                      "storage engine configurations!")
     
         return errors
@@ -389,7 +389,7 @@ class Replication(object):
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != []:
             if res[0][2] is None or len(res[0][2]) == 0:
-                raise MySQLUtilError("Slave is not connected to a master.")
+                raise UtilRplError("Slave is not connected to a master.")
                 
             result = self.master.exec_query("SELECT * FROM mysql.user "
                                             "WHERE user = '%s' AND "
@@ -426,7 +426,7 @@ class Replication(object):
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != []:
             if res[0][0] is None or len(res[0][0]) == 0:
-                raise MySQLUtilError("Slave is stopped.")
+                raise UtilRplError("Slave is stopped.")
             m_host = res[0][1]
             m_port = res[0][3]
             m_IO = res[0][10]
@@ -439,7 +439,7 @@ class Replication(object):
                                   "is connected to host=%s, port=%s." %
                                   (m_host, m_port))
         else:
-            raise MySQLUtilError("The server specified as the slave is "
+            raise UtilRplError("The server specified as the slave is "
                                  "not configured as a replication slave.")
         
         return errors
@@ -462,11 +462,11 @@ class Replication(object):
             m_log_file = res[0][0]       # master's binlog file
             m_log_pos = res[0][1]        # master's binlog position
         else:
-            raise MySQLUtilError("Cannot read master status.")
+            raise UtilRplError("Cannot read master status.")
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != []:
             if res[0][0] is None or len(res[0][0]) == 0:
-                raise MySQLUtilError("Slave is stopped.")
+                raise UtilRplError("Slave is stopped.")
             if res[0][33] is None: # if unknown, return the error
                 errors.append("Cannot determine slave delay. Status: UNKNOWN.")
                 return errors
@@ -491,7 +491,7 @@ class Replication(object):
                 errors.append("Slave is %d seconds behind master." %
                               sec_behind)
         else:
-            raise MySQLUtilError("The server specified as the slave is "
+            raise UtilRplError("The server specified as the slave is "
                                  "not configured as a replication slave.")
         
         return errors
@@ -513,7 +513,7 @@ class Replication(object):
         
         res = self.slave.show_server_variable('datadir')
         if res is None or res == []:
-            raise MySQLUtilError("Cannot get datadir.")
+            raise UtilRplError("Cannot get datadir.")
         datadir = res[0][1]
         if filename == 'master.info':
             filename = os.path.join(datadir, filename)
@@ -522,7 +522,7 @@ class Replication(object):
         res = self.slave.exec_query("SHOW SLAVE STATUS")
         if res != []:
             if res[0][0] is None or len(res[0][0]) == 0:
-                raise MySQLUtilError("Slave is stopped.")
+                raise UtilRplError("Slave is stopped.")
             m_host = res[0][1]
             m_port = res[0][3]
             rpl_user = res[0][2]
@@ -749,7 +749,7 @@ class _TestReplication(object):
         if state == "pass": # Only execute epilog if test passes.
             try:
                 self.report_epilog()
-            except MySQLUtilError, e:
+            except UtilRplError, e:
                 print "ERROR:", e.errmsg
                 res = True
         sys.stdout.flush()
@@ -804,7 +804,7 @@ class _TestReplication(object):
                 else:
                     self.report_status("FAIL", res)
                 return True
-        except MySQLUtilError, e:
+        except UtilRplError, e:
             if not self.quiet:
                 self.report_status("FAIL", [e.errmsg])
             else:

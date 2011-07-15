@@ -2,7 +2,7 @@
 
 import os
 import import_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(import_basic.test):
     """check parameters for impport utility
@@ -23,7 +23,7 @@ class test(import_basic.test):
 
         res = self.run_test_case(expected_res, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
@@ -51,7 +51,7 @@ class test(import_basic.test):
         comment = "Test case 1 - help"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Now test the skips
 
@@ -70,7 +70,7 @@ class test(import_basic.test):
             comment = "Generating import file"
             res = self.run_test_case(0, export_cmd, comment)
             if not res:
-                raise MUTException("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % comment)
 
             cmd_opts = "%s --format=%s --skip=" % (cmd_str, format)
             for skip in _SKIPS:
@@ -90,8 +90,8 @@ class test(import_basic.test):
                                           "ADD COLUMN me_blob BLOB")
             res = self.server1.exec_query("UPDATE util_test.t3 SET "
                                           "me_blob = 'This, is a BLOB!'")
-        except MySQLUtilError, e:
-            raise MUTException("Failed to add blob column: %s" % e.errmsg)
+        except UtilDBError, e:
+            raise MUTLibError("Failed to add blob column: %s" % e.errmsg)
 
         export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
                      from_conn
@@ -100,7 +100,7 @@ class test(import_basic.test):
         comment = "Generating import file"
         res = self.run_test_case(0, export_cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # No skips for reference (must skip events for deterministic reasons
         cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
@@ -109,7 +109,7 @@ class test(import_basic.test):
         comment = "Test case %d - no %s" % (case_num, "events")
         res = self.run_test_case(0, cmd_str+"--skip=events", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
@@ -118,7 +118,7 @@ class test(import_basic.test):
         comment = "Test case %d - no %s" % (case_num, "data")
         res = self.run_test_case(0, cmd_str+"--skip=events,data", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
@@ -127,7 +127,7 @@ class test(import_basic.test):
         comment = "Test case %d - no %s" % (case_num, "blobs")
         res = self.run_test_case(0, cmd_str+"--skip=events", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         # Lastly, do a quiet import
@@ -138,7 +138,7 @@ class test(import_basic.test):
         comment = "Test case %d - no %s" % (case_num, "messages (quiet)")
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         case_num += 1
 
         return True

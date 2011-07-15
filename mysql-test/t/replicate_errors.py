@@ -3,7 +3,7 @@
 import os
 import replicate
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(replicate.test):
     """check error conditions
@@ -32,21 +32,21 @@ class test(replicate.test):
                         master_str + " --slave=wikiwokiwonky "
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - error: cannot parse server (master)"
         res = mutlib.System_test.run_test_case(self, 2, cmd_str +
                         slave_str + " --master=wikiwakawonky " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - error: invalid login to server (master)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         slave_str + " --master=nope@nada:localhost:5510 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         conn_values = self.get_connection_values(self.server1)
         
@@ -55,7 +55,7 @@ class test(replicate.test):
                         master_str + " --slave=nope@nada:localhost:5511 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         str = self.build_connection_string(self.server1)
         same_str = "--master=%s --slave=%s " % (str, str)
@@ -64,14 +64,14 @@ class test(replicate.test):
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         same_str = "--master=root@this:3306 --slave=root@that:3306"
         comment = "Test case 5b - error: slave and master same port"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Now we must muck with the servers. We need to turn binary logging
         # off for the next test case.
@@ -84,7 +84,7 @@ class test(replicate.test):
                                             "root", "temprep1")
         self.server3 = res[0]
         if not self.server3:
-            raise MUTException("%s: Failed to create a new slave." % comment)
+            raise MUTLibError("%s: Failed to create a new slave." % comment)
 
         new_server_str = self.build_connection_string(self.server3)
         new_master_str = self.build_connection_string(self.server1)
@@ -96,7 +96,7 @@ class test(replicate.test):
         cmd = cmd_str + "--rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.server3.exec_query("CREATE USER dummy@localhost")
         self.server3.exec_query("GRANT SELECT ON *.* TO dummy@localhost")
@@ -115,13 +115,13 @@ class test(replicate.test):
         cmd += " --rpl-user=rpl:whatsit --master=" + new_master_str 
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         cmd_str = "mysqlreplicate.py %s %s" % (master_str, slave_str)
 
         res = self.server2.show_server_variable("server_id")
         if not res:
-            raise MUTException("Cannot get master's server id.")
+            raise MUTLibError("Cannot get master's server id.")
         master_serverid = res[0][1]
         
         self.server2.exec_query("SET GLOBAL server_id = 0")
@@ -130,13 +130,13 @@ class test(replicate.test):
         cmd = cmd_str + "--rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.server2.exec_query("SET GLOBAL server_id = %s" % master_serverid)
             
         res = self.server1.show_server_variable("server_id")
         if not res:
-            raise MUTException("Cannot get slave's server id.")
+            raise MUTLibError("Cannot get slave's server id.")
         slave_serverid = res[0][1]
         
         self.server1.exec_query("SET GLOBAL server_id = 0")
@@ -145,7 +145,7 @@ class test(replicate.test):
         cmd = cmd_str + "--rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.server1.exec_query("SET GLOBAL server_id = %s" % slave_serverid)
 

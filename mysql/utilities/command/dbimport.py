@@ -25,7 +25,7 @@ import csv
 import re
 import sys
 from itertools import imap
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 # List of database objects for enumeration
 _DATA_DECORATE = "DATA FOR TABLE"
@@ -488,7 +488,7 @@ def _build_create_objects(obj_type, db, definitions):
             try:
                 user, priv, db, tbl = defn[0:4]
             except:
-                raise MySQLUtilError("Object data invalid: %s : %s" % \
+                raise UtilError("Object data invalid: %s : %s" % \
                                      (obj_type, defn))
             if not tbl:
                 tbl = "*"
@@ -497,7 +497,7 @@ def _build_create_objects(obj_type, db, definitions):
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, db, tbl, user)
             create_strings.append(create_str)
         else:
-            raise MySQLUtilError("Unknown object type discovered: %s", obj_type)
+            raise UtilError("Unknown object type discovered: %s", obj_type)
     return create_strings
 
 
@@ -677,9 +677,11 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
                 print statement
             elif format != "SQL" or not _skip_sql(statement, options):
                 destination.exec_query(statement)
-        except MySQLUtilError, e:
-            raise MySQLUtilError("Invalid statement:\n%s" %
-                                 statement)
+        # Here we capture any exception and raise UtilError to communicate to
+        # the script/user. Since all util errors (exceptions) derive from
+        # Exception, this is safe.
+        except Exception, e:
+            raise UtilError("Invalid statement:\n%s" % statement)
     return True
 
 
@@ -755,7 +757,7 @@ def import_file(dest_val, file_name, options):
             fix_cols.append((tbl.tbl_name, columns))
             col_meta = _get_column_metadata(tbl, fix_cols)
         if col_meta is None:
-            raise MySQLUtilError("Cannot build bulk insert statements without "
+            raise UtilError("Cannot build bulk insert statements without "
                                  "the table definition.")
         ins_strs = tbl.make_bulk_insert(table_rows, tbl.db_name, col_meta)
         if len(ins_strs[0]) > 0:
@@ -843,8 +845,8 @@ def import_file(dest_val, file_name, options):
         # Now check to see if we want definitions, data, or both:
         if row[0] == "SQL" or row[0] in _DEFINITION_LIST:
             if format != "SQL" and len(row[1]) == 1:
-                raise MySQLUtilError("Cannot read an import file "
-                                      "generated with --display=NAMES")
+                raise UtilError("Cannot read an import file generated with "
+                                "--display=NAMES")
 
             if import_type == "DEFINITIONS" or import_type == "BOTH":
                 if format == "SQL":

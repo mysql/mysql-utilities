@@ -12,7 +12,7 @@ from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def add_pattern(option, opt, value, parser, field):
     entry = (field, value)
@@ -82,7 +82,7 @@ parser.add_option(
 # Fail if format specified is invalid
 try:
     options.format = check_format_option(options.format).upper()
-except MySQLUtilError, e:
+except UtilError, e:
     parser.error(e.errmsg)
 
 # Print SQL if only --sql-body is given

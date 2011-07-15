@@ -89,6 +89,6 @@ try:
     res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
                                     opt.new_id, opt.rootpass, opt.mysqld,
                                     opt.verbosity >= 1, opt.quiet)
-except exception.MySQLUtilError, e:
+except exception.UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

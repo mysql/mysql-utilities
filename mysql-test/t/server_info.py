@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """simple db serverinfo
@@ -23,8 +23,8 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: " + e.errmsg)
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: " + e.errmsg)
         self.server2 = self.servers.get_server(1)
         return True
     
@@ -54,7 +54,7 @@ class test(mutlib.System_test):
         cmd_opts = " --format=vertical "
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         self.do_replacements()
 
@@ -70,8 +70,8 @@ class test(mutlib.System_test):
         res = 0
         try:
             res = self.exec_util(cmd_str + cmd_opts, self.res_fname_temp)
-        except MySQLUtilError, e:
-            raise MUTException(e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError(e.errmsg)
         if res != 0:
             return False
         
@@ -89,7 +89,7 @@ class test(mutlib.System_test):
         if self.res_fname_temp:
             os.unlink(self.res_fname_temp)
         if not found:
-            raise MUTException("Test Case 2 failed. No defaults found.")
+            raise MUTLibError("Test Case 2 failed. No defaults found.")
         return self.compare(__name__, self.results)
     
     def record(self):

@@ -28,7 +28,7 @@ import optparse
 import re
 
 from .. import VERSION_FRM
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 _PERMITTED_FORMATS = ["GRID", "TAB", "CSV", "VERTICAL"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
@@ -96,7 +96,7 @@ def check_skip_options(skip_list):
     Returns new skip list with items converted to upper case.
     """
 
-    from mysql.utilities.exception import MySQLUtilError
+    from mysql.utilities.exception import UtilError
 
     new_skip_list = []
     if skip_list is not None:
@@ -105,7 +105,7 @@ def check_skip_options(skip_list):
             if object.upper() in _SKIP_VALUES:
                 new_skip_list.append(object.upper())
             else:
-                raise MySQLUtilError("The value %s is not a valid value for "
+                raise UtilError("The value %s is not a valid value for "
                                      "--skip." % object)
     return new_skip_list
 
@@ -127,9 +127,9 @@ def check_format_option(option, sql=False, initials=False):
     candidates = [ f for f in formats if f.startswith(option.upper()) ]
     if len(candidates) > 1:
         message = ''.join([value, "is ambigous. Alternatives:"] + candidates)
-        raise MySQLUtilError(message)
+        raise UtilError(message)
     if len(candidates) == 0:
-        raise MySQLUtilError(option + " is not a valid format option.")
+        raise UtilError(option + " is not a valid format option.")
 
     return candidates[0]
 
@@ -214,7 +214,7 @@ def check_engine_options(server, new_engine, def_engine,
         if target is not None:
             found = server.has_storage_engine(target)
             if not found and fail:
-                raise MySQLUtilError(message)
+                raise UtilError(message)
             elif not found and not quiet:
                 print message
         

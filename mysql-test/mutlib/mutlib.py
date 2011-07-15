@@ -31,7 +31,7 @@ import string
 import subprocess
 import sys
 import time
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import MUTLibError
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -215,9 +215,9 @@ class Server_list(object):
         # Connect to the new instance
         try:
             self.new_server.connect()
-        except MySQLUtilError, e:
-            raise MySQLUtilError("Cannot connect to spawned server: %s" % \
-                                 e.errmsg)
+        except MUTLibError, e:
+            raise MUTLibError("Cannot connect to spawned server: %s" % \
+                               e.errmsg)
             
         # If connected user is not root, clone it to the new instance.
         conn_val = self.get_connection_values(cur_server)
@@ -232,7 +232,7 @@ class Server_list(object):
                   "%s %s" % (user_str, user_str)
             res = _exec_util(cmd, "cmd.txt", self.utildir)
             if res != 0:
-                raise MySQLUtilError("Cannot clone connected user.")
+                raise MUTLibError("Cannot clone connected user.")
 
         return server
     
@@ -296,7 +296,7 @@ class Server_list(object):
         """
 
         if int(num_servers) > MAX_SERVER_POOL:
-            raise MySQLUtilError("Request for servers exceeds maximum of " \
+            raise MUTLibError("Request for servers exceeds maximum of " \
                                  "%d servers." % MAX_SERVER_POOL)
         orig_server = self.server_list[0][0]
         num_to_add = num_servers - len(self.server_list)
@@ -327,8 +327,8 @@ class Server_list(object):
         try:
             res = self.start_new_server(orig_server, port1, server_id,
                                         "root", name, mysqld)
-        except MySQLUtilError, e:
-            raise MySQLUtilError("Cannot spawn %s: %s" % (name, e.errmsg))
+        except MUTLibError, e:
+            raise MUTLibError("Cannot spawn %s: %s" % (name, e.errmsg))
 
         return res
 
@@ -342,7 +342,7 @@ class Server_list(object):
                     print "  Shutting down server %s..." % server[0].role,
                     self.stop_server(server[0])
                     print "success."
-                except MySQLUtilError, e:
+                except MUTLibError, e:
                     print "ERROR!"
                     print "    Unable to shutdown server %s." % server[0].role
             
@@ -571,7 +571,7 @@ class System_test(object):
         Returns (user, password, host, port, socket)
         """
         if server is None:
-            raise MySQLUtilError("Server not initialized!")
+            raise MUTLibError("Server not initialized!")
         return (server.user, server.passwd, server.host,
                 server.port, server.socket, server.role)
 

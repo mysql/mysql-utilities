@@ -3,7 +3,7 @@
 import os
 import clone_db
 
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(clone_db.test):
     """check exclude parameter for clone db
@@ -32,7 +32,7 @@ class test(clone_db.test):
         cmd_opts = "--exclude=util_test.v1 --exclude=util_test.t4"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         clone_db.test.drop_db(self, self.server1, 'util_db_clone')
 
@@ -40,7 +40,7 @@ class test(clone_db.test):
         cmd_opts = "--exclude=^e --exclude=4$"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         clone_db.test.drop_db(self, self.server1, 'util_db_clone')
 
@@ -49,7 +49,7 @@ class test(clone_db.test):
                    "--exclude=v1 --exclude=util_test.trg"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
 

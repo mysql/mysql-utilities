@@ -2,7 +2,6 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
 
 class test(mutlib.System_test):
     """simple db copy
@@ -17,7 +16,7 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         # Need non-Windows platform
         if os.name == "nt":
-            raise MUTException("Test requires a non-Windows platform.")
+            raise MUTLibError("Test requires a non-Windows platform.")
         # Need at least one server.
         self.server1 = self.servers.get_server(0)
         self.server2 = None
@@ -31,17 +30,13 @@ class test(mutlib.System_test):
         except:
             pass
         if len(rows) == 0:
-            raise MUTException("Need employees database loaded on %s" % \
+            raise MUTLibError("Need employees database loaded on %s" % \
                                self.server1.role)
         return res
 
     def setup(self):
         if self.need_server:
-            try:
-                self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            self.servers.spawn_new_servers(2)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         return True
@@ -58,7 +53,7 @@ class test(mutlib.System_test):
               " employees:emp_mt --force --threads=3 "
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
   

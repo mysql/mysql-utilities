@@ -25,7 +25,7 @@ import optparse
 import os.path
 import sys
 
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.command import rpl
@@ -104,7 +104,7 @@ options = {
 try:
     res = rpl.replicate(m_values, s_values, opt.rpl_user,
                         options, opt.test_db)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 

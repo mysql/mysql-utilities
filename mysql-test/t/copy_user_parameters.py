@@ -3,7 +3,7 @@
 import os
 import copy_user
 
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(copy_user.test):
     """clone user parameter checking
@@ -28,19 +28,19 @@ class test(copy_user.test):
         res = self.run_test_case(0, cmd_str + " --dump joe_nopass@user " + \
                                  "jack@user john@user jill@user", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - show the help"
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - use the quiet parameter"
         res = self.run_test_case(0, cmd_str + "joe_nopass@user --force" + \
                                  " jack@user john@user jill@user --quiet ",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
 

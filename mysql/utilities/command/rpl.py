@@ -22,7 +22,7 @@ master/slave replication topology among two servers.
 """
 
 import sys
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def replicate(master_vals, slave_vals, rpl_user,
               options, test_db=None):
@@ -82,12 +82,12 @@ def replicate(master_vals, slave_vals, rpl_user,
     print "# Checking for binary logging on master..."
     errors = rpl.check_master_binlog()
     if not errors == []:
-        raise MySQLUtilError(errors[0])
+        raise UtilError(errors[0])
         
     # Setup replication
     print "# Setting up replication..."
     if not rpl.replicate(rpl_user, 10):
-        raise MySQLUtilError("Cannot setup replication.")
+        raise UtilError("Cannot setup replication.")
         
     # Test the replication setup.
     if test_db:
@@ -141,7 +141,7 @@ def check_replication(master_vals, slave_vals, options):
         try:
             print "\n#\n# Slave status: \n#" 
             rpl.show_slave_status()
-        except MySQLUtilError, e:
+        except UtilRplError, e:
             print "ERROR:", e.errmsg
                         
     if not quiet:

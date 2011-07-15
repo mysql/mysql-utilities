@@ -22,7 +22,7 @@ is exactly the same among two servers.
 """
 
 import sys
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 
 def copy_db(src_val, dest_val, db_list, options):
     """ Copy a database
@@ -106,7 +106,7 @@ def copy_db(src_val, dest_val, db_list, options):
 
         # Error is source db and destination db are the same and we're cloning
         if destination == source and db_name[0] == db_name[1]:
-            raise MySQLUtilError("Destination database name is same as "
+            raise UtilError("Destination database name is same as "
                                  "source - source = %s, destination = %s" %
                                  (db_name[0], db_name[1]))
 
@@ -122,7 +122,7 @@ def copy_db(src_val, dest_val, db_list, options):
 
         # Error is source database does not exist
         if not db.exists():
-            raise MySQLUtilError("Source database does not exist - %s" %
+            raise UtilError("Source database does not exist - %s" %
                                  db_name[0])
 
         # Perform the copy

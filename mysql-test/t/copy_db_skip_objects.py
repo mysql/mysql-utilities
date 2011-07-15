@@ -2,7 +2,7 @@
 
 import os
 import copy_db
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(copy_db.test):
     """check skip objects for copy/clone db
@@ -34,49 +34,49 @@ class test(copy_db.test):
         comment = "Test case 1 - no grants"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",events"
         comment = "Test case 2 - no events"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",functions"
         comment = "Test case 3 - no functions"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",procedures"
         comment = "Test case 4 - no procedures"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",triggers"
         comment = "Test case 5 - no triggers"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",views"
         comment = "Test case 6 - no views"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         cmd_opts += ",tables"
         comment = "Test case 7 - no tables"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
         
         # Create the database to test --skip=create-db
@@ -96,7 +96,7 @@ class test(copy_db.test):
         comment = "Test case 8 - skip create db"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
 
         query = "DROP DATABASE util_db_clone"
@@ -110,7 +110,7 @@ class test(copy_db.test):
         comment = "Test case 9 - skip tables only - will fail"
         res = self.run_test_case(1, cmd_opts, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",

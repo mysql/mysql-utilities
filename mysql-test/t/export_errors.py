@@ -3,7 +3,7 @@
 import os
 import mutlib
 import export_basic
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(export_basic.test):
     """Export errors
@@ -34,33 +34,33 @@ class test(export_basic.test):
         cmd += " --skip=events,wiki-waki,woo-woo "
         res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
                     
         comment = "Test case 2 - exporting data and skipping data"
         cmd += " --skip=data --export=data"
         res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py %s " % from_conn
         comment = "Test case 3 - no database specified"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py --server=rocks_rocks_rocks "
         cmd_str += "util_test "
         comment = "Test case 4 - cannot parse --server"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py "
         cmd_str += "--server=nope:nada@localhost:3306 util_test"
         comment = "Test case 5 - error: cannot connect to server"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         joe_conn = "--server=joe@localhost:3306 "
         # Watchout for Windows: it doesn't use sockets!
@@ -73,20 +73,20 @@ class test(export_basic.test):
         comment = "Test case 6 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py %s notthereatall" % from_conn
         comment = "Test case 7 - database does not exist"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py %s util_test --export=definitions" % \
                   joe_conn
         comment = "Test case 8 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
           

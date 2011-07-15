@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(mutlib.System_test):
     """simple db copy
@@ -23,16 +23,16 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MySQLUtilError, e:
-                raise MUTException("Cannot spawn needed servers: %s" % \
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
                                    e.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MySQLUtilError, e:
-            raise MUTException("Failed to read commands from file %s: " % \
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
         return True
 
@@ -48,20 +48,20 @@ class test(mutlib.System_test):
         res = self.exec_util(cmd + " util_test:util_db_clone", self.res_fname)
         self.results.append(res)
         if res != 0:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - copy a sample database X"
         res = self.exec_util(cmd + " util_test", self.res_fname)
         self.results.append(res)
         if res != 0:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 3 - copy using different engine"
         cmd += " util_test:util_db_clone --force --new-storage-engine=MEMORY"
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
   
@@ -73,15 +73,15 @@ class test(mutlib.System_test):
                 res = self.server2.exec_query(query)
                 if res and res[0][0] == 'util_db_clone':
                     return (True, msg)
-            except MySQLUtilError, e:
-                raise MUTException(e.errmsg)
+            except UtilDBError, e:
+                raise MUTLibError(e.errmsg)
             query = "SHOW DATABASES LIKE 'util_test'"
             try:
                 res = self.server2.exec_query(query)
                 if res and res[0][0] == 'util_test':
                     return (True, msg)
-            except MySQLUtilError, e:
-                raise MUTException(e.errmsg)
+            except UtilDBError, e:
+                raise MUTLibError(e.errmsg)
         return (False, ("Result failure.\n", "Database copy not found.\n"))
     
     def record(self):

@@ -29,7 +29,7 @@ import sys
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import indexcheck
-from mysql.utilities.exception import MySQLUtilError
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -154,6 +154,6 @@ options = {
 
 try:
     res = indexcheck.check_index(source_values, args, options)
-except MySQLUtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

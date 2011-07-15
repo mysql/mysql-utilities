@@ -2,7 +2,7 @@
 
 import os
 import mutlib
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """check indexes for duplicates and redundancies
@@ -13,7 +13,7 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         # Need non-Windows platform
         if os.name == "nt":
-            raise MUTException("Test requires a non-Windows platform.")
+            raise MUTLibError("Test requires a non-Windows platform.")
         res = self.check_num_servers(1)
         self.server1 = self.servers.get_server(0)
         rows = []
@@ -22,7 +22,7 @@ class test(mutlib.System_test):
         except:
             pass
         if len(rows) == 0:
-            raise MUTException("Need employees database loaded on %s" % \
+            raise MUTLibError("Need employees database loaded on %s" % \
                                self.server1.role)
         return res
 
@@ -39,12 +39,12 @@ class test(mutlib.System_test):
         comment = "Test case 1 - show best indexes"
         res = self.run_test_case(0, cmd_str + "--stats -vv --best=5", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - show worst indexes"
         res = self.run_test_case(0, cmd_str + "--stats -vv --worst=5", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Mask the output
         self.mask_column_result("employees", ",", 7, 'NNNNNNN')

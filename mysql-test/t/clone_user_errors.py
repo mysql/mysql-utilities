@@ -3,7 +3,7 @@
 import os
 import clone_user
 
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(clone_user.test):
     """clone user error conditions
@@ -28,44 +28,44 @@ class test(clone_user.test):
         comment = "Test case 1 - error: invalid login to source server"
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py --destination=noone:nope@localhost:3306 " + \
                   from_conn
         comment = "Test case 2 - error: invalid login to destination server"
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
         comment = "Test case 3 - error: no arguments"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - error: no new user"
         res = self.run_test_case(2, cmd_str + "joenopass@localhost", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 5 - error: cannot use dump and quiet together"
         res = self.run_test_case(2, cmd_str + " root@localhost " \
                                  " x@f --quiet --dump", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py --source=wikiwakawonky %s " % to_conn
         comment = "Test case 6 - error: cannot parser source connection"
         res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqluserclone.py --destination=wikiwakawonky %s " % \
                   from_conn
         comment = "Test case 7 - error: cannot parser destination connection"
         res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         return True
 

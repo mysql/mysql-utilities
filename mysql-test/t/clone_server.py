@@ -4,7 +4,7 @@ import os
 import mutlib
 
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import MySQLUtilError, MUTException
+from mysql.utilities.exception import MUTLibError
 
 class test(mutlib.System_test):
     """clone server
@@ -29,19 +29,19 @@ class test(mutlib.System_test):
         comment = "Test case 1 - show help"
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - error: no --new-data option"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - error: no login"
         res = self.run_test_case(1, "mysqlserverclone.py " +
                                  "--server=root:root@nothere --new-data=/nada "
                                  "--new-id=7 " + newport, comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 4 - error: cannot connect"
         res = self.run_test_case(1, "mysqlserverclone.py --server=root:nope@" +
@@ -49,7 +49,7 @@ class test(mutlib.System_test):
                                  "--root-password=nope " + newport,
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
 
         # Mask known platform-dependent lines
         self.mask_result("Error 2003:", "2003", "####")
@@ -63,7 +63,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str + "--new-data=/not/there/yes",
                                  comment)
         if not res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
         
         comment = "Test case 6 - clone the current servers[0]"
         full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
@@ -75,7 +75,7 @@ class test(mutlib.System_test):
             if index <= 0:
                 self.results.append(line)
         if res:
-            raise MUTException("%s: failed" % comment)
+            raise MUTLibError("%s: failed" % comment)
        
         # Create a new instance
         conn = {
@@ -99,9 +99,9 @@ class test(mutlib.System_test):
         # Connect to the new instance
         try:
             self.new_server.connect()
-        except MySQLUtilError, e:
+        except MUTLibError, e:
             self.new_server = None
-            raise MUTException("Cannot connect to spawned server.")
+            raise MUTLibError("Cannot connect to spawned server.")
             return False
         
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
