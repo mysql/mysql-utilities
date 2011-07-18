@@ -23,7 +23,7 @@ import os
 import shutil
 
 def _add_basedir(search_paths, path_str):
-    """ Add a basedir and all known sub directories
+    """Add a basedir and all known sub directories
     
     This method builds a list of possible paths for a basedir for locating
     special MySQL files like mysqld (mysqld.exe), etc.
@@ -39,7 +39,7 @@ def _add_basedir(search_paths, path_str):
     search_paths.append(os.path.join(path_str, "mysql"))    
 
 def get_tool_path(basedir, tool, fix_ext=True, required=True):
-    """ Search for a MySQL tool and return the full path
+    """Search for a MySQL tool and return the full path
 
     basedir[in]         The initial basedir to search (from mysql server)
     tool[in]            The name of the tool to find

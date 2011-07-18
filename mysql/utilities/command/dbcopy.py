@@ -25,7 +25,7 @@ import sys
 from mysql.utilities.exception import UtilError
 
 def copy_db(src_val, dest_val, db_list, options):
-    """ Copy a database
+    """Copy a database
 
     This method will copy a database and all of its objects and data from
     one server (source) to another (destination). Options are available to

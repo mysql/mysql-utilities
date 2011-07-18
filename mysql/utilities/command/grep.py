@@ -171,7 +171,8 @@ def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     return _SELECT_TYPE_FRM.format(**options)
 
 def _spec(info):
-    """Create a server specification string from an info structure."""
+    """Create a server specification string from an info structure.
+    """
     result = "%(user)s:*@%(host)s:%(port)s" % info
     if "unix_socket" in info:
         result += ":" + info["unix_socket"]
@@ -206,8 +207,22 @@ COLUMN = 'column'
 OBJECT_TYPES = _OBJMAP.keys()
 
 class ObjectGrep(object):
+    """Grep for objects
+    """
+    
     def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
                  check_body=False, use_regexp=False):
+        """Constructor
+        
+        pattern[in]          pattern to match
+        database_pattern[in] database pattern to match (if present)
+                             default - None = do not match database
+        types[in]            list of object types to search
+        check_body[in]       if True, search body of routines
+                             default = False
+        use_regexp[in]       if True, use regexp for compare
+                             default = False
+        """
         stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
         self.__sql = _GROUP_MATCHES_FRM.format("UNION".join(stmts))
 
@@ -216,10 +231,28 @@ class ObjectGrep(object):
         self.__types = types
 
     def sql(self):
+        """Get the SQL command
+        
+        Returns string - SQL statement
+        """
         return self.__sql;
 
     def execute(self, connections, output=sys.stdout, connector=mysql.connector,
                 **kwrds):
+        """Execute the search for objects
+        
+        This method searches for objects that match a search criteria for
+        one or more servers.
+        
+        connections[in]    list of connection parameters
+        output[in]         file stream to display information
+                           default = sys.stdout
+        connector[in]      connector to use
+                           default = mysql.connector
+        kwrds[in]          dictionary of options
+          format           format for display
+                           default = GRID
+        """
         from mysql.utilities.exception import FormatError, EmptyResultError
 
         format = kwrds.get('format', "GRID")

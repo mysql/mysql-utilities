@@ -32,8 +32,12 @@ TIME    = "TIME"
 STATE   = "STATE"
 INFO    = "INFO"
 
+#
+# TODO : Can _spec and similar methods be shared for grep.py?
+#
 def _spec(info):
-    """Create a server specification string from an info structure."""
+    """Create a server specification string from an info structure.
+    """
     result = "{user}:*@{host}:{port}".format(**info)
     if "unix_socket" in info:
         result += ":" + info["unix_socket"]
@@ -71,11 +75,18 @@ _SECS = { 's': 1, 'm': 60, 'h': 3600, 'd': 24 * 3600, 'w': 7 * 24 * 3600 }
 _INCORRECT_FORMAT_MSG = "'{0}' does not have correct format"
 
 def _make_age_cond(age):
+    """Make age condition
+    
+    Accept an age description return a timedelta representing the age.  We
+    allow the forms: hh:mm:ss, mm:ss, 4h3m, with suffixes d (days), w (weeks),
+    h (hours), m (minutes), and s(seconds)
+    
+    age[in]            Age (time)
+    
+    Returns string - time delta
+    """
     from mysql.utilities.exception import FormatError
 
-    # Accept an age description return a timedelta representing the
-    # age.  We allow the forms: hh:mm:ss, mm:ss, 4h3m, with suffixes d
-    # (days), w (weeks), h (hours), m (minutes), and s(seconds)
     mobj = re.match(r"([+-])?(?:(?:(\d?\d):)?(\d?\d):)?(\d?\d)\Z", age)
     if mobj:
         sign, hrs, mins, secs = mobj.groups()
@@ -124,12 +135,35 @@ BEGIN{body}
 END"""
 
 class ProcessGrep(object):
+    """Grep processing
+    """
+    
     def __init__(self, matches, actions=[], use_regexp=False, age=None):
+        """Constructor
+        
+        matches[in]    matches identified
+        actions[in]    actions to perform
+        use_regexp[in] if True, use regexp for compare
+                       default = False
+        age[in]        age in time, if provided
+                       default = None
+        """
         conds = [_make_age_cond(age)] if age else []
         self.__select = _make_select(matches, use_regexp, conds).strip()
         self.__actions = actions
 
     def sql(self, only_body=False):
+        """Generate a SQL command for KILL
+        
+        This method generates the KILL <id> SQL command for killing processes.
+        It can also generate SQL to kill procedures by recreating them without
+        a body (if only_body = True).
+        
+        only_body[in]  if True, limit to body of object
+                       default = False
+                       
+        Returns string - SQL statement
+        """
         params = {
             'select': "\n      ".join(self.__select.split("\n")),
             'kill': 'CONNECTION' if KILL_CONNECTION in self.__actions else 'QUERY',
@@ -144,6 +178,20 @@ class ProcessGrep(object):
             return self.__select
 
     def execute(self, connections, **kwrds):
+        """Execute the search for processes, queries, or connections
+        
+        This method searches for processes, queriers, or connections to
+        either kill or display the matches for one or more servers.
+        
+        connections[in]    list of connection parameters
+        kwrds[in]          dictionary of options
+          output           file stream to display information
+                           default = sys.stdout
+          connector        connector to use
+                           default = mysql.connector
+          format           format for display
+                           default = GRID
+        """
         from mysql.utilities.exception import EmptyResultError
         from ..common.options import parse_connection
         from ..common.format import print_list

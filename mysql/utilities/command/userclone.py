@@ -64,7 +64,7 @@ def show_users(src_val, verbosity, format):
 
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
-    """ Clone a user to one or more new user accounts
+    """Clone a user to one or more new user accounts
 
     This method will create one or more new user accounts copying the
     grant statements from a given user. If source and destination are the

@@ -41,7 +41,7 @@ DESCRIPTION = "mysqldbexport - export metadata and data from databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
 
 def print_elapsed_time(start_test):
-    """ Print the elapsed time to stdout (screen)
+    """Print the elapsed time to stdout (screen)
 
     start_test[in]      The starting time of the test
     """

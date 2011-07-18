@@ -26,7 +26,7 @@ or all tables in all databases except internal databases.
 from mysql.utilities.exception import UtilError
 
 def check_index(src_val, table_args, options):
-    """ Check for duplicate or redundant indexes for one or more tables
+    """Check for duplicate or redundant indexes for one or more tables
     
     This method will examine the indexes for one or more tables and identify
     any indexes that are potential duplicates or redundant. It prints the

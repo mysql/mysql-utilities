@@ -619,7 +619,7 @@ class System_test(object):
 
     
     def replace_result(self, prefix, str):
-        """ Replace a string in the results with a new, deterministic string.
+        """Replace a string in the results with a new, deterministic string.
 
         prefix[in]         starting prefix of string to mask
         str[in]            replacement string
@@ -634,7 +634,7 @@ class System_test(object):
 
     
     def remove_result(self, prefix):
-        """ Remove a string in the results.
+        """Remove a string in the results.
 
         prefix[in]         starting prefix of string to mask
         """
@@ -651,7 +651,7 @@ class System_test(object):
 
     
     def mask_result(self, prefix, target, mask):
-        """ Mask out a portion of a string for the results.
+        """Mask out a portion of a string for the results.
 
         str[in]            string to mask
         prefix[in]         starting prefix of string to mask
@@ -676,7 +676,7 @@ class System_test(object):
 
 
     def mask_result_portion(self, prefix, target, end_target, mask):
-        """ Mask out a portion of a string for the results using
+        """Mask out a portion of a string for the results using
         a end target to make the masked area a specific length.
 
         str[in]            string to mask
@@ -705,7 +705,7 @@ class System_test(object):
 
     
     def mask_column_result(self, prefix, separator, num_col, mask):
-        """ Mask out a column portion of a string for the results.
+        """Mask out a column portion of a string for the results.
 
         str[in]            string to mask
         prefix[in]         starting prefix of string to mask
@@ -742,7 +742,7 @@ class System_test(object):
 
     
     def check_objects(self, server, db, events=True):
-        """ Check number of objects.
+        """Check number of objects.
         
         Creates a string containing the number of objects for a given database.
         
@@ -773,7 +773,7 @@ class System_test(object):
 
 
     def compare(self, name, actual):
-        """ Compare an actual set of return values to the result file
+        """Compare an actual set of return values to the result file
         for this test.
 
         name[in]           test name (use __name__)

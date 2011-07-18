@@ -116,7 +116,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
 
 # Utility function
 def _print_elapsed_time(start_test):
-    """ Print the elapsed time to stdout (screen)
+    """Print the elapsed time to stdout (screen)
 
     start_test[in]      The starting time of the test
     """
@@ -128,7 +128,7 @@ def _print_elapsed_time(start_test):
 
 # Utility function
 def _report_error(message, test_name, mode, start_test, error=True):
-    """ Print an error message to stdout (screen)
+    """Print an error message to stdout (screen)
 
     message[in]         Error message to print
     test_name[in]       The name of the current test

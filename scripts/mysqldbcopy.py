@@ -41,7 +41,7 @@ USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket orig_db:new_db"
 
 def print_elapsed_time(start_test):
-    """ Print the elapsed time to stdout (screen)
+    """Print the elapsed time to stdout (screen)
 
     start_test[in]      The starting time of the test
     """

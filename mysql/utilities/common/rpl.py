@@ -65,7 +65,7 @@ class Replication(object):
     None if the check passes (no errors) or a list of strings containing the
     errors or warnings. They shall accept a dictionary of options set to
     options={}. This will allow for reduced code needed to call multiple tests.
-    """   
+    """  
     
     def __init__(self, master, slave, verbose=False):
         """Constructor
@@ -106,28 +106,27 @@ class Replication(object):
         
         
     def get_server_ids(self):
-        """Get server_d setting for master and slave.
+        """Get server_id setting for master and slave.
         
         Returns tuple containing master and slave server_id values
         """
-        # Get server_id from Master
-        if self.master_server_id is None:
-            try:
-                res = self.master.show_server_variable("server_id")
-            except:
-                raise UtilRplError("Cannot retrieve server id from master.")
-            
-            self.master_server_id = int(res[0][1])
-            
-        # Get server_id from Slave
-        if self.slave_server_id is None:
-            try:
-                res = self.slave.show_server_variable("server_id")
-            except:
-                raise UtilRplError("Cannot retrieve server id from slave.")
+        def _get_id(id, server, name):
+            if id is None:
+                try:
+                    res = server.show_server_variable("server_id")
+                except:
+                    raise UtilRplError("Cannot retrieve server id from "
+                                       "%s." % name)
                 
-            self.slave_server_id = int(res[0][1])
-
+                return int(res[0][1])
+            return id
+                
+        # Get server_id from Master
+        self.master_server_id = _get_id(self.master_server_id, self.master,
+                                      "master")
+        # Get server_id from Slave
+        self.slave_server_id = _get_id(self.slave_server_id, self.slave,
+                                       "slave")
         return (self.master_server_id, self.slave_server_id)
 
     

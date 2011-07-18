@@ -29,7 +29,7 @@ import shutil
 
 def clone_server(conn_val, new_data, new_port, new_id, rootpass,
                  mysqld_options=None, verbose=False, quiet=False):
-    """ Clone an existing server
+    """Clone an existing server
 
     This method creates a new instance of a running server using a datadir
     set to the new_data parametr, with a port set to new_port, server_id

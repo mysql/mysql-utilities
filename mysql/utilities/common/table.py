@@ -399,7 +399,7 @@ class Table(object):
 
 
     def _build_update_blob(self, row, new_db, name, special_cols, blob_col):
-        """ Build an UPDATE statement to update blob fields.
+        """Build an UPDATE statement to update blob fields.
 
         row[in]            a row to process
         new_db[in]         new database name
@@ -853,7 +853,7 @@ class Table(object):
 
 
     def _get_index_list(self):
-        """ Get the list of indexes for a table.
+        """Get the list of indexes for a table.
         Returns list containing indexes.
         """
         rows = self.get_tbl_indexes()
@@ -1080,7 +1080,7 @@ class Table(object):
 
 
     def has_primary_key(self):
-        """ Check to see if there is a primary key.
+        """Check to see if there is a primary key.
         Returns bool - True - a primary key was found,
                        False - no primary key.
         """

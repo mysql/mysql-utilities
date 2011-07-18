@@ -60,8 +60,8 @@ _OBJTYPE_QUERY = """
 
 class Database(object):
     """
-    The Table class encapsulates a database. The class
-    has the following capabilities:
+    The Database class encapsulates a database. The class has the following
+    capabilities:
 
         - Check to see if the database exists
         - Drop the database
@@ -853,7 +853,7 @@ class Database(object):
 
 
     def _check_user_permissions(self, uname, host, access):
-        """ Check user permissions for a given privilege
+        """Check user permissions for a given privilege
 
         uname[in]          user name to check
         host[in]           host name of connection
@@ -870,7 +870,7 @@ class Database(object):
 
 
     def check_read_access(self, user, host, options):
-        """ Check access levels for reading database objects
+        """Check access levels for reading database objects
 
         This method will check the user's permission levels for copying a
         database from this server.
@@ -923,7 +923,7 @@ class Database(object):
 
 
     def check_write_access(self, user, host, options):
-        """ Check access levels for creating and writing database objects
+        """Check access levels for creating and writing database objects
 
         This method will check the user's permission levels for copying a
         database to this server.

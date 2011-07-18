@@ -494,26 +494,11 @@ def _get_formatted_rows(rows, table, format='GRID'):
     """
     import os
     import tempfile
-    from mysql.utilities.common.format import format_tabular_list
-    from mysql.utilities.common.format import format_vertical_list
-    
-    list_options = {}
+    from mysql.utilities.common.format import print_list
+
     result_rows = []
     outfile = tempfile.TemporaryFile()
-    if format == 'VERTICAL':
-        format_vertical_list(outfile, table.get_col_names(), rows)
-    elif format == "TAB":
-        list_options['separator'] = '\t'
-        format_tabular_list(outfile, table.get_col_names(), rows,
-                            list_options)
-    elif format == "CSV":
-        list_options['separator'] = ','
-        format_tabular_list(outfile, table.get_col_names(), rows,
-                            list_options)
-    else:
-        list_options['quiet'] = False
-        format_tabular_list(outfile, table.get_col_names(), rows,
-                            list_options)
+    print_list(outfile, format, table.get_col_names(), rows)
     outfile.seek(0)
     for line in outfile.readlines():
         result_rows.append(line.strip('\n'))

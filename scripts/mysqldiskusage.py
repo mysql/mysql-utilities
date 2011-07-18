@@ -40,7 +40,7 @@ DESCRIPTION = "mysqldiskusage - show disk usage for databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1 --all"
 
 def print_elapsed_time(start_test):
-    """ Print the elapsed time to stdout (screen)
+    """Print the elapsed time to stdout (screen)
 
     start_test[in]      The starting time of the test
     """

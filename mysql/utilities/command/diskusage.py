@@ -73,7 +73,7 @@ def _print_size(prefix, total):
 
 
 def _get_formatted_max_width(rows, columns, col):
-    """ Return the max width for a numeric column.
+    """Return the max width for a numeric column.
 
     list[in]          The list to search
     col[in]           Column number to search
@@ -116,7 +116,7 @@ def _get_folder_size(folder):
 
 
 def _get_db_dir_size(folder):
-    """ Calculate total disk space used for a given directory.
+    """Calculate total disk space used for a given directory.
 
     This method will sum all files in the directory except for the
     MyISAM files (.myd, .myi).

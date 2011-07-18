@@ -85,7 +85,7 @@ class EmptyResultError(Error):
     pass
 
 class MUTLibError(Exception):
-    """ MUT errors
+    """MUT errors
     
     This exception class is used to report errors from the testing subsystem.
     """

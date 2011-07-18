@@ -60,7 +60,7 @@ def get_connection_dictionary(conn_info):
 
 
 def _print_connection(prefix, conn_info):
-    """ Print connection information
+    """Print connection information
     
     The method accepts one of the following types for conn_info:
     
@@ -170,7 +170,7 @@ def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
 
 
 def connect_servers(src_val, dest_val, options={}):
-    """ Connect to a source and destination server.
+    """Connect to a source and destination server.
 
     This method takes two groups of --server=user:password@host:port:socket
     values and attempts to connect one as a source connection and the other
@@ -420,7 +420,7 @@ class Server(object):
 
 
     def check_version_compat(self, t_major, t_minor, t_rel):
-        """ Checks version of the server against requested version.
+        """Checks version of the server against requested version.
 
         This method can be used to check for version compatibility.
 
@@ -454,7 +454,7 @@ class Server(object):
 
 
     def toggle_fkeys(self, turn_on=True):
-        """ Turn foreign key checks on or off
+        """Turn foreign key checks on or off
 
         turn_on[in]        if True, turns on fkey check
                            if False, turns off fkey check

@@ -41,7 +41,7 @@ DESCRIPTION = "mysqldbimport - import metadata and data from files"
 USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
 
 def print_elapsed_time(start_test):
-    """ Print the elapsed time to stdout (screen)
+    """Print the elapsed time to stdout (screen)
 
     start_test[in]      The starting time of the test
     """
