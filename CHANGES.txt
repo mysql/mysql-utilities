@@ -1,7 +1,24 @@
-Release 1.0.1rc1 (Released April 25, 2011)
-------------------------------------------
+Release 1.0.2 (Released August 12, 2011)
+-----------------------------------------
+
+- BUG#11829755/60252: Workbench Utilities do not allow hyphen host names
+- BUG#12614037: LICENSE HAS WRONG FSF ADDRESS
+- BUG#12631924: Parsing non-SQL files can result in wrong engine
+- BUG#12632010: Add feature to allow conversion of storage engines on copy or import
+- WL#5761: mysqlrplcheck - Check prerequisities for replication
+- WL#5762: mysqldbcompare - Compare two databases
+- WL#5935: File Cleanup
+- WL#5937: Remove Multiple Option Parameters
+- WL#5943: Refactor connect mechanism to accept class, dictionary, or string
+- WL#5946: Document Library
+- WL#5947: Refactor Exception Handling
+
+Release 1.0.1 (Released May 11, 2011)
+-------------------------------------
 
 - BUG#11844871: Exception handling needs improvement
+- BUG#11846131: Fix documentation errors for mysqldiff
+- BUG#11854150: Fix typo in mysqldiskusage help
 - BUG#11854512: Changes to diff in Python 2.7
 - BUG#11873948: Enable commit emails for mysql-utilities
 - BUG#59478: Wrong user@host used for remove login
