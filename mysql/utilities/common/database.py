@@ -217,8 +217,6 @@ class Database(object):
             else:
                 create_str = "GRANT %s ON %s.* TO %s" % \
                              (obj[1], self.new_db, obj[0])
-            if create_str.find("%"):
-                create_str = re.sub("%", "%%", create_str)
         else:
             create_str = self.get_create_statement(self.db_name,
                                                    obj[0], obj_type)
@@ -559,8 +557,6 @@ class Database(object):
                 create_statement = row[0][3]
             else:
                 create_statement = row[0][2]
-        if create_statement.find("%"):
-            create_statement = re.sub("%", "%%", create_statement)
         return create_statement
 
 

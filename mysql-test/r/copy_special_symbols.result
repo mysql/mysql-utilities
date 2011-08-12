@@ -1,0 +1,7 @@
+Test case 1 - copy a database with special symbols
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+# Copying database util_spec renamed as util_spec_clone
+# Copying FUNCTION util_spec.spec_date
+#...done.
+RETURN DATE_FORMAT(mydatetime, '%d/%m %H:%i')
