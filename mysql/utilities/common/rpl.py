@@ -588,12 +588,6 @@ class Replication(object):
                       "replication user."
                 return False
 
-        # Flush tables on master
-        if self.verbose:
-            print "# Flushing tables on master with read lock..."
-        res = self.master.exec_query("FLUSH TABLES WITH READ LOCK",
-                                     self.query_options)
-        
         # Read master log file information
         res = self.master.exec_query("SHOW MASTER STATUS")
         if not res:
