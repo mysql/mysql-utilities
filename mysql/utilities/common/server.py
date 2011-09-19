@@ -169,6 +169,45 @@ def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     return processes
 
 
+def _connect_server(name, values, quiet):        
+    """Connect to a server
+    
+    name[in]           name of the server
+    values[in]         dictionary of connection values
+    quiet[in]          if True, do not print messages
+    
+    Returns Server class instance
+    """
+    server_conn = None
+
+    # Try to connect to the MySQL database server.
+    if not quiet:
+        _print_connection(name, values)
+
+    server_options = {
+        'conn_info' : values,
+        'role'      : name,
+    }
+    server_conn = Server(server_options)
+    server_conn.connect()
+
+    return server_conn
+ 
+def _require_version(server, version):
+    """Check version of server
+    
+    server[in]         Server instance
+    version[in]        minimal version of the server required
+    
+    Returns boolean - True = version Ok, False = version < required
+    """
+    if version is not None and server is not None:
+        major, minor, rel = version.split(".")
+        if not server.check_version_compat(major, minor, rel):
+            return False
+    return True
+        
+
 def connect_servers(src_val, dest_val, options={}):
     """Connect to a source and destination server.
 
@@ -211,80 +250,56 @@ def connect_servers(src_val, dest_val, options={}):
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
 
-    def _connect_server(name, values, version, quiet):        
-
-        server_conn = None
-    
-        # Try to connect to the MySQL database server.
-        if not quiet:
-            _print_connection(name, values)
-
-        server_options = {
-            'conn_info' : values,
-            'role'      : name,
-        }
-        server_conn = Server(server_options)
-        server_conn.connect()
-    
-        return server_conn
-     
-    def _check_version(conn, name, version):    
-        if version is not None:
-            major, minor, rel = version.split(".")
-            if not conn.check_version_compat(major, minor, rel):
-                raise UtilError("The %s version is incompatible. Utility "
-                                "requires version %s or higher." %
-                                (name, version))
-        
     source = None
     destination = None
 
-    # Fail if not the same types
-    if not dest_val is None and not isinstance(src_val, type(dest_val)):
-        raise UtilError("Connection paramters are not the same type.")
-
-    # Get connection dictionaries if src_val,dest_val are not Server instances.
-    if isinstance(src_val, Server):
-        source = src_val
-        destination = dest_val
-    src_val = get_connection_dictionary(src_val)
-    dest_val = get_connection_dictionary(dest_val)
+    # Get connection dictionaries
+    src_dict = get_connection_dictionary(src_val)
+    dest_dict = get_connection_dictionary(dest_val)
 
     # Check for uniqueness - dictionary 
-    if options.get("unique", False) and dest_val is not None:
+    if options.get("unique", False) and dest_dict is not None:
         dupes = False
-        if "unix_socket" in src_val and "unix_socket" in dest_val:
-            dupes = (src_val["unix_socket"] == dest_val["unix_socket"])
+        if "unix_socket" in src_dict and "unix_socket" in dest_dict:
+            dupes = (src_dict["unix_socket"] == dest_dict["unix_socket"])
         else:
-            dupes = (src_val["port"] == dest_val["port"]) and \
-                    (src_val["host"] == dest_val["host"])
+            dupes = (src_dict["port"] == dest_dict["port"]) and \
+                    (src_dict["host"] == dest_dict["host"])
         if dupes:
             raise UtilError("You must specify two different servers "
                                  "for the operation.")
 
-    cloning = (src_val == dest_val) or dest_val is None
     # If we're cloning so use same server for faster copy
-    if not cloning and dest_val is None:
-        dest_val = src_val
+    cloning = dest_dict is None or (src_dict == dest_dict)
 
-    if source is None:
-        source = _connect_server(src_name, src_val, version, quiet)
+    # Connect to the source server and check version
+    if isinstance(src_val, Server):
+        source = src_val
+    else:
+        source = _connect_server(src_name, src_dict, quiet)
         if not quiet:
             print "connected."
-    _check_version(source, src_name, version)
+    if not _require_version(source, version):
+        raise UtilError("The %s version is incompatible. Utility "
+                        "requires version %s or higher." %
+                        (source.name, version))
 
+    # If not cloning, connect to the destination server and check version
     if not cloning:
-        if destination is None:
-            destination = _connect_server(dest_name, dest_val, version, quiet)
+        if isinstance(dest_val, Server):
+            destination = dest_val
+        else:
+            destination = _connect_server(dest_name, dest_dict, quiet)
             if not quiet:
                 print "connected."
-        _check_version(destination, dest_name, version)
-    elif not quiet and dest_val is not None:
-        _print_connection(dest_name, src_val)
+        if not _require_version(destination, version):
+            raise UtilError("The %s version is incompatible. Utility "
+                            "requires version %s or higher." %
+                            (destination.name, version))
+    elif not quiet and dest_dict is not None:
+        _print_connection(dest_name, src_dict)
         print "connected."
-
-    servers = (source, destination)
-    return servers
+    return (source, destination)
 
 
 def test_connect(conn_info):

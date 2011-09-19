@@ -142,7 +142,7 @@ and fewer problems with missing libraries. Similarly, external libraries
 that resort to platform specific native code are also not used.
 
 The class method and function signatures are designed to make use of a small
-number of required paramters and all optional parameters as a single
+number of required parameters and all optional parameters as a single
 dictionary. Consider the following method. 
 
 def do_something_wonderful(position, obj1, obj2, options={}):
@@ -164,7 +164,7 @@ def do_something_wonderful(position, obj1, obj2, options={}):
     """
 
 This example is typical of the methods and classes in the library. Notice this
-method has three required paramters and a dictionary of options that may exist.
+method has three required parameters and a dictionary of options that may exist.
 
 Each method and function that uses this mechanism defines its own default
 values for the items in the dictionary. A quick look at the method
