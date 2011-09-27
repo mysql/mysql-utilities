@@ -88,6 +88,12 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = "mysqldbexport.py %s util_test --all " % from_conn
+        comment = "Test case 9 - error: db list and --all"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
           
     def get_result(self):

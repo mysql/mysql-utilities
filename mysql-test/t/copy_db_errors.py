@@ -216,6 +216,13 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
+        cmd_str += "util_test:util_db_clone --force --all"
+        comment = "Test case 22 - database listed and --all"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
 
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",

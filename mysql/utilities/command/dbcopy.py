@@ -75,6 +75,19 @@ def copy_db(src_val, dest_val, db_list, options):
     destination = servers[1]
 
     cloning = (src_val == dest_val) or dest_val is None
+    
+    # Get list of all databases from source if --all is specified.
+    # Ignore system databases.
+    if options.get("all", False):
+        # The --all option is valid only if not cloning.
+        if not cloning:
+            if not quiet:
+                print "# Including all databases."
+            rows = source.get_all_databases()
+            for row in rows:
+                db_list.append((row[0], None)) # Keep same name
+        else:
+            raise UtilError("Cannot copy all databases on the same server.")
 
     # Check user permissions on source and destination for all databases
     for db_name in db_list:

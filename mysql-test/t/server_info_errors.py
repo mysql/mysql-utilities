@@ -70,6 +70,7 @@ class test(server_info.test):
         self.datadir3 = res[0][1]
         
         self.servers.stop_server(self.server3, 10, False)
+        self.servers.clear_last_port()
         
         test_num += 1
         cmd_opts = " --format=vertical "

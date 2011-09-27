@@ -173,6 +173,7 @@ class test(replicate.test):
     def cleanup(self):
         if self.server3:
             res = self.servers.stop_server(self.server3)
+            self.servers.clear_last_port()
             self.server3 = None
         return replicate.test.cleanup(self)
 

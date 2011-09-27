@@ -88,4 +88,5 @@ class test(diskusage_basic.test):
         if self.server1:
             res = self.servers.stop_server(self.server1)
             self.server1 = None
+            self.servers.clear_last_port()
         return diskusage_basic.test.cleanup(self)

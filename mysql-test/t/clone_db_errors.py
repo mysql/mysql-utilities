@@ -147,6 +147,22 @@ class test(clone_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = "mysqldbcopy.py %s %s " % (to_conn, from_conn)
+        cmd_str += "util_test:util_db_clone --force --all"
+        comment = "Test case 13 - database listed and --all"
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        from_conn = "--source=" + self.build_connection_string(self.server1)
+        to_conn = "--destination=" + self.build_connection_string(self.server1)
+
+        cmd_str = "mysqldbcopy.py %s %s --all" % (to_conn, from_conn)
+        comment = "Test case 14 - clone with --all"
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
   
     def get_result(self):

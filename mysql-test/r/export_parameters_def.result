@@ -33,6 +33,7 @@ Options:
                         Exclude one or more objects from the operation using
                         either a specific name (e.g. db1.t1) or a REGEXP
                         search pattern. Repeat option for multiple exclusions.
+  -a, --all             include all databases
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,

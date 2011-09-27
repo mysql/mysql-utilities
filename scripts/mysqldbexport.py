@@ -33,6 +33,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_all, check_all
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -104,6 +105,9 @@ parser.add_option("-x", "--exclude", action="append", dest="exclude",
                   "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
                   "for multiple exclusions.")
 
+# Add the all database options
+add_all(parser, "databases")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -137,9 +141,13 @@ except UtilError, e:
     print "ERROR: %s" % e.errmsg
     exit(1)
 
-# Fail if no arguments
-if len(args) == 0:
-    parser.error("You must specify at least one database to export.")
+# Fail if no db arguments or all
+if len(args) == 0 and not opt.all:
+    parser.error("You must specify at least one database to export or "
+                 "use the --all option to export all databases.")
+    
+# Fail if we have arguments and all databases option listed.
+check_all(parser, opt, args, "databases")
 
 # Fail if format specified is invalid
 try:
@@ -205,7 +213,8 @@ options = {
     "debug"            : opt.verbosity >= 3,
     "file_per_tbl"     : opt.file_per_tbl,
     "exclude_names"    : exclude_object_names,
-    "exclude_patterns" : exclude_objects
+    "exclude_patterns" : exclude_objects,
+    "all"              : opt.all,
 }
 
 # Parse server connection values

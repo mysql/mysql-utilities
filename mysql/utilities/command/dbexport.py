@@ -71,6 +71,11 @@ def export_metadata(src_val, db_list, options):
 
     source = servers[0]
 
+    if options.get("all", False):
+        rows = source.get_all_databases()
+        for row in rows:
+            db_list.append(row[0])
+
     # Check user permissions on source for all databases
     for db_name in db_list:
         source_db = Database(source, db_name)
@@ -85,7 +90,7 @@ def export_metadata(src_val, db_list, options):
 
         source_db.check_read_access(src_val["user"], src_val["host"],
                                     access_options)
-
+    
     for db_name in db_list:
 
         # Get a Database class instance
@@ -326,6 +331,11 @@ def export_data(src_val, db_list, options):
     servers = connect_servers(src_val, None, conn_options)
 
     source = servers[0]
+
+    if options.get("all", False):
+        rows = source.get_all_databases()
+        for row in rows:
+            db_list.append(row[0])
 
     # Check user permissions on source for all databases
     for db_name in db_list:

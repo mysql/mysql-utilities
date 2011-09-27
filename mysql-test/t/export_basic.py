@@ -2,41 +2,20 @@
 
 import os
 import mutlib
+import copy_db_parameters
 from mysql.utilities.exception import MUTLibError
 
-class test(mutlib.System_test):
+class test(copy_db_parameters.test):
     """Export Data
-    This test executes the export utility on a single server.
+    This test executes the export utility on a single server. It uses the
+    copy_db_parameters test to setup.
     """
 
     def check_prerequisites(self):
-        # Need at least one server.
-        self.server1 = None
-        self.need_servers = False
-        if not self.check_num_servers(2):
-            self.need_servers = True
-        return self.check_num_servers(1)
+        return copy_db_parameters.test.check_prerequisites(self)
 
     def setup(self):
-        num_server = self.servers.num_servers()
-        if self.need_servers:
-            try:
-                self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
-        else:
-            num_server -= 1 # Get last server in list
-        self.server1 = self.servers.get_server(num_server)
-        self.drop_all()
-        data_file = os.path.normpath("./std_data/basic_data.sql")
-        try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
-        return True
-
+        return copy_db_parameters.test.setup(self)
 
     def run(self):
         self.res_fname = "result.txt"
@@ -117,6 +96,4 @@ class test(mutlib.System_test):
         return True
 
     def cleanup(self):
-        if self.res_fname:
-            os.unlink(self.res_fname)
-        return self.drop_all()
+        return copy_db_parameters.test.cleanup(self)

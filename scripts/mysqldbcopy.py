@@ -32,6 +32,7 @@ from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
+from mysql.utilities.common.options import add_all, check_all
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -96,6 +97,9 @@ parser.add_option("-x", "--exclude", action="append", dest="exclude",
                   "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
                   "for multiple exclusions.")
 
+# Add the all database options
+add_all(parser, "databases")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -118,9 +122,13 @@ except UtilError, e:
 if opt.destination is None:
     parser.error("No destination server specified.")
 
-# Fail if no arguments
-if len(args) == 0:
-    parser.error("You must specify at least one database to copy.")
+# Fail if no db arguments or all
+if len(args) == 0 and not opt.all:
+    parser.error("You must specify at least one database to copy or "
+                 "use the --all option to copy all databases.")
+    
+# Fail if we have arguments and all databases option listed.
+check_all(parser, opt, args, "databases")
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
@@ -161,6 +169,7 @@ options = {
     "exclude_patterns" : exclude_objects,
     "new_engine"       : opt.new_engine,
     "def_engine"       : opt.def_engine,
+    "all"              : opt.all,
 }
 
 # Parse source connection values

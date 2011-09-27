@@ -31,6 +31,14 @@ class test(export_parameters_def.test):
         func(self, "%s util_test --export=both --format=" % cmd_str, 1,
              False, False, False, True)
         
+        from_conn = "--server=" + self.build_connection_string(self.server3)
+        cmd_str = "mysqldbexport.py %s " % from_conn
+        cmd_opts = "--skip=grants,events --all --export=both"
+        comment = "Test case 13 - copy all databases"
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
   
     def get_result(self):

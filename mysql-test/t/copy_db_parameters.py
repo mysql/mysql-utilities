@@ -4,6 +4,8 @@ import os
 import copy_db
 from mysql.utilities.exception import MUTLibError
 
+_SYSTEM_DATABASES = ['MYSQL', 'INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA']
+
 class test(copy_db.test):
     """check parameters for clone db
     This test executes a series of clone database operations on a single
@@ -12,13 +14,51 @@ class test(copy_db.test):
     """
 
     def check_prerequisites(self):
-        return copy_db.test.check_prerequisites(self)
+        self.server1 = None
+        self.server2 = None
+        self.server3 = None
+        self.need_server = False
+        if not self.check_num_servers(3):
+            self.need_server = True
+        return self.check_num_servers(1)
 
     def setup(self):
-        return copy_db.test.setup(self)
+        self.server1 = self.servers.get_server(0)
+        if self.need_server:
+            try:
+                self.servers.spawn_new_servers(3)
+            except MUTLibError, e:
+                raise MUTLibError("Cannot spawn needed servers: %s" % \
+                                   e.errmsg)
+        self.server2 = self.servers.get_server(1)
+        self.drop_all()
+        data_file = os.path.normpath("./std_data/basic_data.sql")
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+
+        self.server3 = self.servers.get_server(2)
+        # Drop all databases on server3
+        try:
+            rows = self.server3.exec_query("SHOW DATABASES")
+            for row in rows:
+                if not row[0].upper() in _SYSTEM_DATABASES:
+                    self.server3.exec_query("DROP DATABASE %s" % row[0])
+            self.server3.exec_query("CREATE DATABASE wesaysocorp")
+        except Exception, e:
+            raise MUTLibError("Failed to drop databases. %s" % e.errmsg)
+
+        try:
+            res = self.server3.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
+                               data_file + e.errmsg)
+
+        return True
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--source=" + self.build_connection_string(self.server1)
@@ -60,6 +100,16 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        from_conn = "--source=" + self.build_connection_string(self.server3)
+
+        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+
+        cmd_opts = "--force --skip=data --all "
+        comment = "Test case 6 - copy all databases - but only the utils"
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")
@@ -73,4 +123,12 @@ class test(copy_db.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        try:
+            self.drop_db(self.server3, "util_test")
+        except:
+            pass
+        try:
+            self.drop_db(self.server3, "wesaysocorp")
+        except:
+            pass
         return copy_db.test.cleanup(self)

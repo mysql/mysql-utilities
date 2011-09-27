@@ -229,6 +229,32 @@ def check_engine_options(server, new_engine, def_engine,
                  fail, quiet)    
 
 
+def add_all(parser, objects):
+    """Add the --all option.
+
+    parser[in]        the parser instance
+    objects[in]       name of the objects for which all includes
+    """
+    parser.add_option("-a", "--all", action="store_true", dest="all",
+                      default=False, help="include all %s" % objects)
+
+
+def check_all(parser, options, args, objects):
+    """Check to see if both all and specific arguments are used.
+    
+    This method will throw an exception if there are arguments listed and
+    the all option has been turned on.
+
+    parser[in]        the parser instance
+    options[in]       command options
+    args[in]          arguments list
+    objects[in]       name of the objects for which all includes
+    """
+    if options.all and len(args) > 0:
+        parser.error("You cannot use the --all option with a list of "
+                     "%s." % objects)
+
+
 _CONN_USERPASS = re.compile(
     r"(\w+)"                     # User name
     r"(?:\:(\w+))?"              # Optional password

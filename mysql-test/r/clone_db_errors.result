@@ -69,7 +69,7 @@ mysqldbcopy.py: error: No destination server specified.
 Test case 10 - no database specified
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: You must specify at least one database to copy.
+mysqldbcopy.py: error: You must specify at least one database to copy or use the --all option to copy all databases.
 Test case 11 - new storage engine missing
 # Source on 127.0.0.1: ... connected.
 # Destination on localhost: ... connected.
@@ -110,3 +110,11 @@ WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 #...done.
+Test case 13 - database listed and --all
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: You cannot use the --all option with a list of databases.
+Test case 14 - clone with --all
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+ERROR: Cannot copy all databases on the same server.
