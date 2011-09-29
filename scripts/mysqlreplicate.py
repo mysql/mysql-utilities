@@ -76,6 +76,23 @@ parser.add_option("--test-db", action="store", dest="test_db",
                   type = "string", help="database name to use in testing "
                          " replication setup (optional)")
 
+# Add master log file option
+parser.add_option("--master-log-file", action="store", dest="master_log_file",
+                  type="string", help="Use this master log file to initiate "
+                  "the slave.", default=None)
+
+# Add master log position option
+parser.add_option("--master-log-pos", action="store", dest="master_log_pos",
+                  type="int", help="Use this position in the master log file "
+                  "to initiate the slave.", default=-1)
+
+# Add start from beginning option
+parser.add_option("-b", "--start-from-beginning", action="store_true",
+                  default=False, dest="from_beginning",
+                  help="Start replication from the first event recorded in "
+                  "the binary logging of the master."
+                  "Not valid with --master-log-file or --master-log-pos.")
+
 # Add verbosity
 add_verbosity(parser)
 
@@ -94,11 +111,24 @@ try:
 except:
     parser.error("Slave connection values invalid or cannot be parsed.")
     
+# Check required --master-log-file for --master-log-pos
+if (opt.master_log_pos >= 0 and opt.master_log_file is None):
+    parser.error("You must specify a master log file to use the master "
+                 "log file position option.")
+    
+if ((opt.master_log_pos >= 0) or (opt.master_log_file is not None)) and \
+   opt.from_beginning:
+    parser.error("The --start-from-beginning option is not valid in "
+                 "combination with --master-log-file or --master-log-pos.")
+    
 # Create dictionary of options
 options = {
-    'verbosity' : opt.verbosity,
-    'pedantic'  : opt.pedantic,
-    'quiet'     : False
+    'verbosity'       : opt.verbosity,
+    'pedantic'        : opt.pedantic,
+    'quiet'           : False,
+    'master_log_file' : opt.master_log_file,
+    'master_log_pos'  : opt.master_log_pos,
+    'from_beginning'  : opt.from_beginning,
 }
 
 try:

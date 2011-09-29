@@ -54,7 +54,7 @@ class User(object):
     """   
     
         
-    def __init__(self, server1, user, verbose=False):
+    def __init__(self, server1, user, verbosity=0):
         """Constructor
         
         server1[in]        Server class
@@ -65,7 +65,7 @@ class User(object):
         
         self.server1 = server1
         self.user, self.passwd, self.host = parse_user_host(user)
-        self.verbose = verbose
+        self.verbosity = verbosity
         self.current_user = None
         self.query_options = {
             'fetch' : False
@@ -93,7 +93,7 @@ class User(object):
             
         if passwd:
             query_str += "IDENTIFIED BY '%s'" % (passwd)
-        if self.verbose:
+        if self.verbosity > 0:
             print query_str
 
         res = self.server1.exec_query(query_str, self.query_options)
@@ -115,7 +115,7 @@ class User(object):
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
             
-        if self.verbose:
+        if self.verbosity > 0:
             print query_str
             
         res = self.server1.exec_query(query_str, self.query_options)
@@ -221,7 +221,7 @@ class User(object):
             server = destination
         for row in res:
             # Create an instance of the user class.
-            user = User(server, new_user, self.verbose)
+            user = User(server, new_user, self.verbosity)
             if not user.exists():
                 user.create()
 
@@ -241,7 +241,7 @@ class User(object):
                 end = grant.index("'", start + len(search_str) + 2) + 2
                 grant = grant[0:start] + grant[end:]
                 
-            if self.verbose:
+            if self.verbosity > 0:
                 print grant
                 
             res = server.exec_query(grant, self.query_options)

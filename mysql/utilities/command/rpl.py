@@ -51,8 +51,11 @@ def replicate(master_vals, slave_vals, rpl_user,
     master = servers[0]
     slave = servers[1]
     
+    rpl_options = options.copy()
+    rpl_options['verbosity'] = verbosity > 0
+    
     # Create an instance of the replication object
-    rpl = Replication(master, slave, verbosity > 0)
+    rpl = Replication(master, slave, rpl_options)
     errors = rpl.check_server_ids()
     for error in errors:
         print error
@@ -124,8 +127,11 @@ def check_replication(master_vals, slave_vals, options):
     }
     servers = connect_servers(master_vals, slave_vals, conn_options)
     
+    rpl_options = options.copy()
+    rpl_options['verbosity'] = options.get("verbosity", 0) > 0
+
     # Create an instance of the replication object
-    rpl = Replication(servers[0], servers[1], options.get("verbosity", 0) > 0)
+    rpl = Replication(servers[0], servers[1], rpl_options)
     
     if not quiet:
         print "Test Description",

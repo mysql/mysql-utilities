@@ -47,6 +47,12 @@ class test(replicate.test):
         except:
             pass
         
+        comment = "Test case 4 - use the start-from-beginning feature"
+        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
+                                 comment, " --start-from-beginning", True)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         self.remove_result("# status:")
         self.remove_result("# error: ")
         self.remove_result("# CHANGE MASTER TO MASTER_HOST")

@@ -134,7 +134,7 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
     
     def drop_user(self, user_name, server):
-        user = User(server, user_name, False)
+        user = User(server, user_name)
         if user.exists():
             res = user.drop()
             if res is not None:

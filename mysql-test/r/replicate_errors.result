@@ -37,3 +37,19 @@ Test case 9 - error: Slave server id = 0
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 ERROR: Slave server_id is set to 0.
+Test case 10 - --master-log-pos but no log file
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --server-id=3 --rpl_user=rpl:passwd 
+
+mysqlreplicate.py: error: You must specify a master log file to use the master log file position option.
+Test case 11 - --master-log-file and --start-from-beginning
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --server-id=3 --rpl_user=rpl:passwd 
+
+mysqlreplicate.py: error: The --start-from-beginning option is not valid in combination with --master-log-file or --master-log-pos.
+Test case 12 - --master-log-pos and --start-from-beginning
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --server-id=3 --rpl_user=rpl:passwd 
+
+mysqlreplicate.py: error: You must specify a master log file to use the master log file position option.
+Test case 13 - --master-log-file+pos and --start-from-beginning
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --server-id=3 --rpl_user=rpl:passwd 
+
+mysqlreplicate.py: error: The --start-from-beginning option is not valid in combination with --master-log-file or --master-log-pos.

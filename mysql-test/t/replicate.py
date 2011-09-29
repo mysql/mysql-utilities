@@ -61,7 +61,7 @@ class test(mutlib.System_test):
     
     def run_test_case(self, slave, master, s_id,
                       comment, options=None, save_for_compare=False,
-                      expected_result=0):
+                      expected_result=0, save_results=True):
 
         master_str = "--master=%s" % self.build_connection_string(master)
         slave_str = " --slave=%s" % self.build_connection_string(slave)
@@ -73,10 +73,10 @@ class test(mutlib.System_test):
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         if options:
             cmd += " %s" % options
-        if not save_for_compare:
+        if not save_for_compare and save_results:
             self.results.append(cmd)
         res = self.exec_util(cmd, self.res_fname)
-        if not save_for_compare:
+        if not save_for_compare and save_results:
             self.results.append(res)
         
         if res != expected_result:
@@ -85,7 +85,7 @@ class test(mutlib.System_test):
         # Now test the result and record the action.
         try:
             res = slave.exec_query("SHOW SLAVE STATUS")
-            if not save_for_compare:
+            if not save_for_compare and save_results:
                 self.results.append(res)
         except UtilDBError, e:
             raise MUTLibError("Cannot show slave status: %s" % e.errmsg)

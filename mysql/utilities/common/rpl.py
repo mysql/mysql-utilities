@@ -67,15 +67,25 @@ class Replication(object):
     options={}. This will allow for reduced code needed to call multiple tests.
     """  
     
-    def __init__(self, master, slave, verbose=False):
+    def __init__(self, master, slave, options):
         """Constructor
         
         master[in]         Master Server object
         slave[in]          Slave Server object
-        verbose[in]        print extra data during operations (optional)
+        options[in]        Options for class
+          verbose          print extra data during operations (optional)
                            default value = False
+          master_log_file  master log file
+                           default value = None
+          master_log_pos   position in log file
+                           default = -1 (no position specified)
+          from_beginning   if True, start from beginning of logged events
+                           default = False
         """
-        self.verbose = verbose
+        self.verbosity = options.get("verbosity", 0)
+        self.master_log_file = options.get("master_log_file", None)
+        self.master_log_pos = options.get("master_log_pos", 0)
+        self.from_beginning = options.get("from_beginning", False)
         self.master = master
         self.slave = slave
         self.master_server_id = None
@@ -563,19 +573,19 @@ class Replication(object):
         # Create user class instance
         user = User(self.master,
                     "%s@%s:%s" % (rpl_user, self.master.host, self.master.port),
-                    self.verbose)
+                    self.verbosity)
 
         r_user, r_pass = re.match("(\w+)(?:\:(\w+))?", rpl_user).groups()
         
         # Check to see if rpl_user is present, else create her
         if not user.exists():
-            if self.verbose:
+            if self.verbosity > 0:
                 print "# Creating replication user..."
             user.create()
         
         # Check to see if rpl_user has the correct grants, else grant rights
         if not user.has_privilege("*", "*", "REPLICATION SLAVE"):
-            if self.verbose:
+            if self.verbosity > 0:
                 print "# Granting replication access to replication user..."
             query_str = "GRANT REPLICATION SLAVE ON *.* TO '%s'@'%s' " % \
                         (r_user, self.slave.host)
@@ -594,8 +604,33 @@ class Replication(object):
             print "ERROR: Cannot retrieve master status."
             exit(1)
             
-        master_file = res[0][0]
-        master_pos = res[0][1]
+        # If master log file, pos not specified, read master log file info
+        read_master_info = False
+        if self.master_log_file is None:
+            res = self.master.exec_query("SHOW MASTER STATUS")
+            if not res:
+                print "ERROR: Cannot retrieve master status."
+                exit(1)
+
+            read_master_info = True
+            self.master_log_file = res[0][0]
+            self.master_log_pos = res[0][1]
+        else:
+            # Check to make sure file is accessible and valid
+            found = False
+            res = self.master.exec_query("SHOW BINARY LOGS",
+                                         self.query_options)
+            if res:
+                for row in res:
+                    if row[0] == self.master_log_file:
+                        found = True
+                        break
+            if not found:
+                raise UtilError("Master binary log file not listed as a "
+                                "valid binary log file on the master.")
+                
+        if self.master_log_file is None:
+            raise UtilError("No master log file specified.")
          
         # Stop slave first
         res = self.slave.exec_query("SHOW SLAVE STATUS")
@@ -604,22 +639,35 @@ class Replication(object):
                 res = self.slave.exec_query("STOP SLAVE", self.query_options)
         
         # Connect slave to master
-        if self.verbose:
+        if self.verbosity > 0:
             print "# Connecting slave to master..."
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % \
                         self.master.host
         change_master += "MASTER_USER = '%s', " % r_user
         change_master += "MASTER_PASSWORD = '%s', " % r_pass
-        change_master += "MASTER_PORT = %s, " % self.master.port
-        change_master += "MASTER_LOG_FILE = '%s', " % master_file
-        change_master += "MASTER_LOG_POS = %s" % master_pos
+        change_master += "MASTER_PORT = %s" % self.master.port
+        if not self.from_beginning:
+            change_master += ", MASTER_LOG_FILE = '%s' " % self.master_log_file
+            if self.master_log_pos >= 0:
+                change_master += ", MASTER_LOG_POS = %s" % self.master_log_pos
         res = self.slave.exec_query(change_master, self.query_options)
-        if self.verbose:
+        if self.verbosity > 0:
             print "# %s" % change_master
         
         # Start slave
-        if self.verbose:
-            print "# Starting slave..."
+        if self.verbosity > 0:
+            if not self.from_beginning:
+                if read_master_info:
+                    print "# Starting slave from master's last position..."
+                else:
+                    msg = "# Starting slave from master log file '%s'" % \
+                          self.master_log_file
+                    if self.master_log_pos >= 0:
+                        msg += " using position %s" % self.master_log_pos
+                    msg += "..."
+                    print msg 
+            else:
+                print "# Starting slave from the beginning..."
         res = self.slave.exec_query("START SLAVE", self.query_options)
         
         # Check slave status
@@ -628,23 +676,18 @@ class Replication(object):
             time.sleep(1)
             res = self.slave.exec_query("SHOW SLAVE STATUS")
             status = res[0][0]
-            if self.verbose:
+            if self.verbosity > 0:
                 print "# status: %s" % status
                 print "# error: %s:%s" % (res[0][34], res[0][35])
             if status == "Waiting for master to send event":
                 break
-            if self.verbose:
+            if self.verbosity > 0:
                 print "# Waiting for slave to synchronize with master"
             i += 1
         if i == num_tries:
             print "ERROR: failed to synch slave with master."
             result = False
             
-        # unlock tables on master
-        if self.verbose:
-            print "# Unlocking tables on master..."
-        query_str = "UNLOCK TABLES"
-        res = self.master.exec_query(query_str, self.query_options)
         if result is True:
             self.replicating = True
         return result
@@ -663,7 +706,7 @@ class Replication(object):
         if not self.replicating:
             print "ERROR: Replication is not running among master and slave."
         print "# Testing replication setup..."
-        if self.verbose:
+        if self.verbosity > 0:
             print "# Creating a test database on master named %s..." % db
         res = self.master.exec_query("CREATE DATABASE %s" % db,
                                      self.query_options)
@@ -679,7 +722,7 @@ class Replication(object):
                     i = num_tries
                     break
             i += 1
-            if i < num_tries and self.verbose:
+            if i < num_tries and self.verbosity > 0:
                 print "# Waiting for slave to synchronize with master"
         if i == num_tries:
             print "ERROR: Unable to complete testing."

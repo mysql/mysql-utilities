@@ -149,6 +149,31 @@ class test(replicate.test):
 
         self.server1.exec_query("SET GLOBAL server_id = %s" % slave_serverid)
 
+        comment = "Test case 10 - --master-log-pos but no log file"
+        cmd_opts = "--master-log-pos=96 "
+        res = mutlib.System_test.run_test_case(self, 2, cmd+cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 11 - --master-log-file and --start-from-beginning"
+        cmd_opts = "--master-log-file='mysql_bin.00005' --start-from-beginning"
+        res = mutlib.System_test.run_test_case(self, 2, cmd+cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 12 - --master-log-pos and --start-from-beginning"
+        cmd_opts = "--master-log-pos=96 --start-from-beginning"
+        res = mutlib.System_test.run_test_case(self, 2, cmd+cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 13 - --master-log-file+pos and --start-from-beginning"
+        cmd_opts = "--master-log-pos=96 --start-from-beginning "
+        cmd_opts += "--master-log-file='mysql_bin.00005'"
+        res = mutlib.System_test.run_test_case(self, 2, cmd+cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_result("ERROR: Query failed. 1227: Access denied;",

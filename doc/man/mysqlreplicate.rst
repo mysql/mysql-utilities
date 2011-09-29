@@ -13,7 +13,8 @@ SYNOPSIS
                  --slave=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[--help | --version] | --quiet |
                  --verbose | --testdb=<test database> | --pedantic
-                 --rpl_user=<uid:passwd>]
+                 --rpl_user=<uid:passwd> | --master-log-file=<log_file> |
+                 --master-log-pos=<pos> | --start-from-beginning]
 
 DESCRIPTION
 -----------
@@ -36,6 +37,32 @@ Furthermore, the utility will also report a warning if the InnoDB storage
 engine differs from the master and slave. Similarly, :option:`--pedantic`
 requires the InnoDB storage engine to the be the same on the master and slave.
 
+The utility will setup replication to start from the current binary log file
+and position of the master. However, you can instruct the utility to start from
+the beginning of recorded events by using the :option:`--start-from-beginning`
+option. You can also provide a binary log file from the master with the
+:option:`--master-log-file` option which will start replication from the first
+event in that binary log file. Or you can start replication from a specific
+binary log file and position with the :option:`--master-log-file` and
+:option:`--master-log-pos` options. In summary, replication can be started
+using one of the following strategies.
+
+Start from current position (default)
+  Start replication from last known binary log file and position from the
+  master. The *SHOW MASTER STATUS* command is used to retrieve this
+  information.
+
+Start from the beginning
+  Start replication from the first event recorded in the binary logging of the
+  master.
+  
+Start from a binary log file
+  Start replication at the first event in a specific binary log file.
+  
+Start from a specific event
+  Start replication from a specific position (event) in a specific binary log
+  file.
+  
 The :option:`-vv` option will also display any discrepancies among the storage
 engines and InnoDB values with or without the :option:`--pedantic` option.
 
@@ -69,6 +96,19 @@ OPTIONS
 
    database name to use in testing replication setup (optional)
 
+.. option:: --master-log-file=<MASTER_LOG_FILE>
+
+   use this master log file to initiate the slave.
+
+.. option:: --master-log-pos=<MASTER_LOG_POS>
+
+   use this position in the master log file to initiate the slave
+
+.. option:: --start-from-beginning, -b
+
+   start replication at the beginning of logged events. Not valid with
+   --master-log-file or --master-log-pos
+
 .. option:: --verbose, -v
 
    control how much information is displayed. For example, -v =
@@ -98,7 +138,7 @@ To setup replication between a MySQL instance on two different hosts using
 the default settings, use this command::
 
     $ mysqlreplicate --master=root@localhost:3306 \\
-        --slave=root@localhost:3307 --rpl-user=rpl:rpl
+      --slave=root@localhost:3307 --rpl-user=rpl:rpl
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
     # Checking for binary logging on master...
@@ -127,6 +167,53 @@ servers have the same storage engines with the same default specified.::
     # error: 0:
     # Unlocking tables on master...
     # ...done.
+
+The following command starts replication from the current position of the
+master (default).::
+
+   $ mysqlreplicate --master=root@localhost:3306 \\
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # ...done.
+
+The following command tarts replication from the beginning of recorded events.::
+
+   $ mysqlreplicate --master=root@localhost:3306 \\
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+        --start-from-beginning
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # ...done.
+
+The following starts replication from the beginning of a specific binary log
+file.::
+
+   $ mysqlreplicate --master=root@localhost:3306 \\
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+        --master-log-file=my_log.000003 
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # ...done.
+
+The following starts replication from an arbitrary binary log file and
+position.::
+
+   $ mysqlreplicate --master=root@localhost:3306 \\
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+        --master-log-file=my_log.000001 --master-log-pos=96
+    # master on localhost: ... connected.
+    # slave on localhost: ... connected.
+    # Checking for binary logging on master...
+    # Setting up replication...
+    # ...done.
+
 
 RECOMMENDATIONS
 ---------------

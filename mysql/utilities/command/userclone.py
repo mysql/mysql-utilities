@@ -124,10 +124,10 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         destination = servers[0]
 
     # Create an instance of the user class for source.
-    user_source = User(source, base_user, verbosity >= 1)
+    user_source = User(source, base_user, verbosity)
 
     # Create an instance of the user class for destination.
-    user_dest = User(destination, base_user, verbosity >= 1)
+    user_dest = User(destination, base_user, verbosity)
 
     # Check to ensure base user exists.
     if not user_source.exists(base_user):
