@@ -274,10 +274,10 @@ def _show_running_servers(start=3306, end=3333):
     start[in]         starting port for Windows servers
     end[in]           ending port for Windows servers
     """
-    from mysql.utilities.common.server import find_running_servers
+    from mysql.utilities.common.server import get_local_servers
 
     sys.stdout.write("# \n")
-    processes = find_running_servers(True, start, end)
+    processes = get_local_servers(True, start, end)
     if len(processes) > 0:
         sys.stdout.write("# The following MySQL servers are active "
                          "on this host:\n")

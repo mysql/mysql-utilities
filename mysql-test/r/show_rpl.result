@@ -1,0 +1,100 @@
+Test case 1 - show topology of master with no slaves
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 2 - show topology
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3312
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3313
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+   |
+   +--- localhost:3312 - (SLAVE + MASTER)
+       |
+       +--- localhost:3313 - (SLAVE)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
+| localhost:3311  | localhost:3312  |
+| localhost:3312  | localhost:3313  |
++-----------------+-----------------+
+Test case 3 - show topology with --max-depth
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+   |
+   +--- localhost:3312 - (SLAVE)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
+| localhost:3311  | localhost:3312  |
++-----------------+-----------------+
+Test case 4 - show topology with circular replication
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3312
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3313
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+   |
+   +--- localhost:3312 - (SLAVE + MASTER)
+       |
+       +--- localhost:3313 - (SLAVE + MASTER)
+           |
+           +--- localhost:3311 <--> (SLAVE + MASTER)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
+| localhost:3311  | localhost:3312  |
+| localhost:3312  | localhost:3313  |
+| localhost:3313  | localhost:3311  |
++-----------------+-----------------+
+Test case 5 - show topology with master:master replication
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3314
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3315
+
+# Replication Topology Graph
+localhost:3314 (MASTER)
+   |
+   +--- localhost:3315 - (SLAVE + MASTER)
+       |
+       +--- localhost:3314 <--> (SLAVE + MASTER)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3314  | localhost:3315  |
+| localhost:3315  | localhost:3314  |
++-----------------+-----------------+

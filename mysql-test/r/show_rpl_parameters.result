@@ -1,0 +1,132 @@
+Test case 1 - show topology - without list
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
+Test case 2 - show topology - with list
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
++-----------------+-----------------+
+Test case 3 - show topology - with list and quiet
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
++-----------------+-----------------+
+Test case 4 - show topology - with format and without list
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
+Test case 5 - show topology - help
+Usage: mysqlrplshow.py --master=root@localhost:3306 
+
+mysqlrplshow - show slaves attached to a master
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --master=MASTER       connection information for master server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  -l, --show-list       Print a list of the topology.
+  -f FORMAT, --format=FORMAT
+                        display the list in either GRID (default), TAB, CSV,
+                        or VERTICAL format
+  -r, --recurse         Traverse the list of slaves to find additional
+                        master/slave connections. User this option to map a
+                        replication topology.
+  --max-depth=MAX_DEPTH
+                        Limit the traversal to this depth. Valid only with the
+                        --recurse option. Valid values are non-negative
+                        integers.
+  -p, --prompt          Prompt for slave user and password if different from
+                        master login.
+  -n NUM_RETRIES, --num-retries=NUM_RETRIES
+                        Number of retries allowed for failed slave login
+                        attempt. Valid with --prompt only.
+  -q, --quiet           Turn off all messages for quiet execution.
+Test Case 6 : Testing show topology with CSV format 
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
+Master,Slave
+localhost:3311,localhost:3310
+Test Case 7 : Testing show topology with TAB format 
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
+Master	Slave
+localhost:3311	localhost:3310
+Test Case 8 : Testing show topology with GRID format 
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:3311  | localhost:3310  |
++-----------------+-----------------+
+Test Case 9 : Testing show topology with VERTICAL format 
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3311
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:3310
+
+# Replication Topology Graph
+localhost:3311 (MASTER)
+   |
+   +--- localhost:3310 - (SLAVE)
+
+*************************       1. row *************************
+ Master: localhost:3311
+  Slave: localhost:3310
+1 rows.

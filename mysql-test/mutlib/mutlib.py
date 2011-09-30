@@ -650,6 +650,21 @@ class System_test(object):
             self.results.pop(linenums[linenum])
 
     
+    def replace_substring(self, target, replacement):
+        """Replace a target substring in the entire result file.
+        
+        target[in]         target string to replace
+        replacement[in]    string to replace
+        """
+        linenum = 0
+        for line in self.results:
+            if line.find(target):
+                self.results.pop(linenum)
+                replace_line = line.replace(target, replacement)
+                self.results.insert(linenum, replace_line)
+            linenum += 1
+
+ 
     def mask_result(self, prefix, target, mask):
         """Mask out a portion of a string for the results.
 

@@ -28,7 +28,7 @@ import os
 import re
 import sys
 import time
-from mysql.utilities.common.server import Server, find_running_servers
+from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.exception import MUTLibError
@@ -458,7 +458,7 @@ else:
 # Check for running servers
 processes = []
 if server_list.num_servers():
-    processes = find_running_servers(False, opt.start_port, 3333, os.getcwd())
+    processes = get_local_servers(False, opt.start_port, 3333, os.getcwd())
 
 # Kill any servers running from the test directory
 if len(processes) > 0:

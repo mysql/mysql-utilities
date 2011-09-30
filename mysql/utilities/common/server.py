@@ -75,7 +75,7 @@ def _print_connection(prefix, conn_info):
     print "# %s on %s: ..." % (prefix, conn_val["host"]),
 
 
-def find_running_servers(all=False, start=3306, end=3333, datadir_prefix=None):
+def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     """Check to see if there are any servers running on the local host.
 
     This method attempts to locate all running servers. If provided, it will

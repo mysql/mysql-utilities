@@ -157,7 +157,7 @@ def format_vertical_list(file, columns, rows):
         file.write("%d rows.\n" % int(row_num))
 
 
-def print_list(file, format, columns, rows, no_headers=False):
+def print_list(file, format, columns, rows, no_headers=False, sort=False):
     """Print a list based on format.
     
     Prints a list of rows in the format chosen. Default is GRID.
@@ -167,8 +167,11 @@ def print_list(file, format, columns, rows, no_headers=False):
     columns[in]       Column headings
     rows[in]          Rows to print
     no_headers[in]    If True, do not print headings (column names)
+    sort[in]          If True, sort list before printing
     """
 
+    if sort:
+        rows.sort()
     list_options = {
         'print_header' : not no_headers
     }
