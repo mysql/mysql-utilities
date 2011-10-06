@@ -123,6 +123,19 @@ for use in running the tests. By default, the command above will execute all
 tests. You can specify one or more tests as arguments to the command. See the
 manual for more information about the MySQL Utilities Testing utility (mut).
 
+If you need to test a version of mysql.connector together with
+mysql.utilities without installing it first, special care have to be
+taken.  Since both packages live in the 'mysql' package, they are
+expected to be found in the same directory.  For that reason, you
+first have to install both mysql.connector and mysql.utilities in a
+temporary directory and add this to PYTHONPATH.
+
+  # cd repository for mysql.connector
+  python setup.py build -b /temp/something
+  # cd to repository for mysql.utilities
+  python setup.py build -b /temp/something
+  cd mysql-test
+  PYTHONPATH=/temp/something/lib.* python mut.pu --server=<as above>
 
 Operating System Notes
 ----------------------
