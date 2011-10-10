@@ -1,3 +1,14 @@
+
+Release 1.0.3 (Released October 10, 2011)
+----------------------------------------------
+
+- BUG#12757358: mysqldbcopy - duplicate % symbols inserted for SQL statements
+- BUG#12871032: Server.connect_servers forces source and dest to be same type
+- BUG#12885004: mysqldbcopy, mysqldbexport - add --all option
+- BUG#12887948: mysqlreplicate - Remove FLUSH TABLES WITH READ LOCK
+- WL#5958: mysqlrplshow - show replication slaves
+- WL#5983: mysqlreplicate - allow user to specify binary log file and position
+
 Release 1.0.2 (Released August 12, 2011)
 -----------------------------------------
 
