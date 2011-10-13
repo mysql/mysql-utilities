@@ -25,10 +25,7 @@ class test(export_parameters_def.test):
 
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
-        try:
-            self.server1.exec_query("CREATE DATABASE util_test_mt")
-        except:
-            raise MUTLibError("Cannot create database for test case 1.")
+        self.server1.exec_query("CREATE DATABASE IF NOT EXISTS util_test_mt")
 
         cmd_str = "mysqldbexport.py %s util_test_mt --export=definitions " \
                   "--file-per-table" % from_conn
