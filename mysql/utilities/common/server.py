@@ -843,7 +843,7 @@ class Server(object):
         res = self.show_server_variable("sql_log_bin")
         if not res:
             raise UtilDBError("Cannot retrieve status of sql_log_bin variable.")
-        if res[0][1] == "OFF" or res[0][1] == "0":
+        if res[0][1] in ("OFF", "0"):
             return False
         return True
 

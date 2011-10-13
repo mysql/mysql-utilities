@@ -217,9 +217,9 @@ def _export_row(data_rows, cur_table, col_metadata,
     db_name = cur_table.db_name
     full_name = "%s.%s" % (db_name, tbl_name)
     list_options = {}
-    if format != "SQL" and format != "S" and outfile is None:
+    if format not in ("SQL", "S") and outfile is None:
         outfile = sys.stdout # default file handle
-    if format == "SQL" or format == "S":
+    if format in ('SQL', 'S'):
         if single:
             if single:
                 data = data_rows
@@ -394,7 +394,7 @@ def export_data(src_val, db_list, options):
 
             # switch for writing to files
             if file_per_table:
-                if format == "SQL" or format == "S":
+                if format in ('SQL', 'S'):
                     file_name = tbl_name + ".sql"
                 else:
                     file_name = tbl_name + ".%s" % format.lower()

@@ -184,7 +184,7 @@ elif opt.export == "B":
 if opt.skip_blobs and not opt.export == "DATA":
     print "# WARNING: --skip-blobs option ignored for metadata export."
 
-if opt.file_per_tbl and (opt.export == "DEFINITIONS" or opt.export == "BOTH"):
+if opt.file_per_tbl and opt.export in ("DEFINITIONS", "BOTH"):
     print "# WARNING: --file-per-table option ignored for metadata export."
 
 if "DATA" in skips and opt.export == "DATA":
@@ -232,9 +232,9 @@ try:
     # record start time
     if opt.verbosity >= 3:
         start_test = time.time()
-    if opt.export == "DEFINITIONS" or opt.export == "BOTH":
+    if opt.export in ("DEFINITIONS", "BOTH"):
         dbexport.export_metadata(server_values, db_list, options)
-    if opt.export == "DATA" or opt.export == "BOTH":
+    if opt.export in ("DATA", "BOTH"):
         if opt.display != "BRIEF":
             print "# NOTE : --display is ignored for data export."
         dbexport.export_data(server_values, db_list, options)

@@ -34,6 +34,8 @@ _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
 _IMPORT_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT,
                 _GRANT, _DATA_DECORATE]
 _DEFINITION_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT]
+_BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP"]
+_DATA_COMMANDS = ["INSERT", "UPDATE"]
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
@@ -188,6 +190,7 @@ def read_next(file, format, no_headers=False):
     if format == "SQL":
         sql_cmd = ""
         for row in _read_row(file, "SQL", True):
+            first_word = row[0:row.find(' ')].upper() # find first word
             # Skip these nonsense rows
             if len(row) == 0 or row[0] == "#"or row[0:2] == "||":
                 continue
@@ -205,17 +208,13 @@ def read_next(file, format, no_headers=False):
                     sql_cmd = ""
                 cmd_type = "SQL"
                 multiline = True
-            elif row[0:len("CREATE")].upper() == "CREATE" or \
-                 row[0:len("USE")].upper() == "USE" or \
-                 row[0:len("GRANT")].upper() == "GRANT" or \
-                 row[0:len("DROP")].upper() == "DROP":
+            elif first_word in _BASIC_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
                     yield (cmd_type, sql_cmd)
                 cmd_type = "SQL"
                 sql_cmd = row
-            elif row[0:len("INSERT")].upper() == "INSERT" or \
-                 row[0:len("UPDATE")].upper() == "UPDATE":
+            elif first_word in _DATA_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
                     yield (cmd_type, sql_cmd)
@@ -457,7 +456,7 @@ def _build_create_objects(obj_type, db, definitions):
                           (defn[col_ref.get("ACTION_ORIENTATION",5)],
                            defn[col_ref.get("ACTION_STATEMENT",7)])
             create_strings.append(create_str)
-        elif obj_type == "PROCEDURE" or obj_type == "FUNCTION":
+        elif obj_type in ("PROCEDURE", "FUNCTION"):
             create_str = "CREATE DEFINER=%s" % defn[col_ref.get("DEFINER",5)]
             create_str += " %s `%s`.`%s`(%s)" % \
                           (obj_type, db,
@@ -848,7 +847,7 @@ def import_file(dest_val, file_name, options):
                 raise UtilError("Cannot read an import file generated with "
                                 "--display=NAMES")
 
-            if import_type == "DEFINITIONS" or import_type == "BOTH":
+            if import_type in ("DEFINITIONS", "BOTH"):
                 if format == "SQL":
                     statements.append(row[1])
                 else:
@@ -868,7 +867,7 @@ def import_file(dest_val, file_name, options):
                 _process_definitions(statements, table_col_list, db_name)
                 definitions = []
 
-            if import_type == "DATA" or import_type == "BOTH":
+            if import_type in ("DATA", "BOTH"):
                 if _skip_object("DATA", options):
                     continue  # skip data
                 elif format == "SQL":

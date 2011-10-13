@@ -131,7 +131,7 @@ def _get_db_dir_size(folder):
         return None
     for item in os.listdir(folder):
         name, ext = os.path.splitext(item)
-        if ext.upper() != ".MYD" and ext.upper() != ".MYI" and \
+        if ext.upper() not in (".MYD", ".MYI") and \
            name.upper() not in ('SLOW_LOG', 'GENERAL_LOG'):
             itemfolder = os.path.join(folder, item)
             if os.path.isfile(itemfolder):
@@ -721,8 +721,7 @@ def show_innodb_usage(server, datadir, options):
 
     # Check to see if we have innodb
     res = server.show_server_variable('have_innodb')
-    if res != [] and \
-       (res[0][1].upper() == "NO" or res[0][1] == "DISABLED"):
+    if res != [] and res[0][1].upper() in ("NO", "DISABLED"):
         print "# InnoDB is disabled on this server."
         return True
 

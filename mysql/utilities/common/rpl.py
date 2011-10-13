@@ -333,7 +333,7 @@ class Replication(object):
         if not res:
             return (["Cannot retrieve status of log_bin variable."])
         log_bin = res[0][1]
-        if log_bin == "OFF" or log_bin == "0":
+        if log_bin in ("OFF", "0"):
             errors.append("Master must have binary logging turned on.")
 
         return errors
