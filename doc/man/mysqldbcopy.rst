@@ -70,30 +70,30 @@ The following command line options are accepted by **mysqldbcopy**:
 
    show the help page
 
-.. option:: --source <source>
+.. option:: --source=<source>
 
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
-.. option:: --destination <destination>
+.. option:: --destination=<destination>
 
    connection information for destination server in the form:
    <user>:<password>@<host>:<port>:<socket> Where <password> is
    optional and either <port> or <socket> must be provided.
 
-.. option:: --copy-dir <copy directory>
+.. option:: --copy-dir=<copy_directory>
 
    a path to use when copying data (stores temporary files) - default
    = current directory
 
-.. option:: --skip <objects>
+.. option:: --skip=<objects>
 
    specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
-.. option:: --exclude=EXCLUDE, -x EXCLUDE
+.. option:: --exclude=<exclude>, -x<exclude>
 
    exclude one or more objects from the operation using either a specific name
    such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
@@ -116,12 +116,12 @@ The following command line options are accepted by **mysqldbcopy**:
 
     use multiple threads for cross-server copy (default = 1)
 
-.. option:: --new-storage-engine=NEW_ENGINE
+.. option:: --new-storage-engine=<new_engine>
 
    Change all tables to use this storage engine if storage engine exists on the
    destination.
 
-.. option:: --default-storage-engine=DEF_ENGINE
+.. option:: --default-storage-engine=<def_engine>
 
    Change all tables to use this storage engine if the original storage engine
    does not exist on the destination.

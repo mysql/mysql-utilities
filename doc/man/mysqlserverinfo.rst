@@ -86,13 +86,13 @@ OPTIONS
 
     show the program's help and usage
 
-.. option:: --server <server>
+.. option:: --server=<server>
 
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket> specify this option multiple times
    for seeing the information from additional servers.
 
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format
 

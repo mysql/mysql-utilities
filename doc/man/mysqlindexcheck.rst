@@ -90,7 +90,7 @@ OPTIONS
 
    show the help page
 
-.. option:: --server <source>
+.. option:: --server=<source>
 
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
@@ -112,7 +112,7 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --format <index-format>
+.. option:: --format=<index_format>
 
    Display the list of indexes per table in either **SQL**, **TABLE**
    (default), **TAB**, **CSV**, or **VERTICAL** format
@@ -121,11 +121,11 @@ OPTIONS
 
     show index performance statistics
 
-.. option:: --best <num>
+.. option:: --best=<num>
 
     limit index statistics to the best N indexes
 
-.. option:: --worst <num>
+.. option:: --worst=<num>
 
    limit index statistics to the worst N indexes
 

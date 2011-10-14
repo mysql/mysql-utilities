@@ -52,30 +52,30 @@ OPTIONS
 
    Show this help message and exit
 
-.. option:: --server <server>
+.. option:: --server=<server>
 
    Server given by *server* will be used in the tests. The format of
    *server* is given in :ref:`connspec`. List option multiple times
    for multiple servers to use
 
-.. option:: --do-test <prefix>
+.. option:: --do-test=<prefix>
 
     Execute all tests that begin with *prefix*.
 
-.. option:: --suite <suite>
+.. option:: --suite=<suite>
 
    test suite to execute - list option multiple times for multiple
    suites
 
-.. option:: --skip-test <test>
+.. option:: --skip-test=<test>
 
    exclude *test* - list option multiple times for multiple tests
 
-.. option:: --skip-tests <tests>
+.. option:: --skip-tests=<tests>
 
    exclude *tests* that begin with this string
 
-.. option:: --start-test <prefix>
+.. option:: --start-test=<prefix>
 
    start executing tests that begin with *prefix*
 
@@ -84,11 +84,11 @@ OPTIONS
    exclude tests that require greater resources or take a long time to
    run
 
-.. option:: --testdir <path>
+.. option:: --testdir=<path>
 
    Path to test directory
 
-.. option:: --start-port <port>
+.. option:: --start-port=<port>
 
    starting port for spawned servers
 
@@ -101,11 +101,11 @@ OPTIONS
 
    execute tests sorted by suite.name (default = True)
 
-.. option:: --utildir <path>
+.. option:: --utildir=<path>
 
    location of utilities
 
-.. option:: --width <number>
+.. option:: --width=<number>
 
    Display width
 

@@ -151,12 +151,12 @@ OPTIONS
 
    show the help page
 
-.. option:: --server1 <source>
+.. option:: --server1=<source>
 
    connection information for the first server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --server2 <source>
+.. option:: --server2=<source>
 
    connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
@@ -166,12 +166,12 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --difftype=DIFFTYPE, -d <DIFFTYPE>
+.. option:: --difftype=<difftype>, -d<difftype>
 
    display differences in context format either unified,
    context, or differ (default: unified).
    
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display missing rows in either GRID (default), CSV, TAB, or VERTICAL format
    

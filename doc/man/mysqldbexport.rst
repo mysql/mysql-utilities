@@ -109,23 +109,23 @@ OPTIONS
 
 .. option:: --help
 
-.. option:: --server <server>
+.. option:: --server=<server>
 
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
    or VERTICAL|V format
 
-.. option:: --display <display>, -d <display>
+.. option:: --display=<display>, -d<display>
 
    control the number of columns shown: BRIEF = minimal columns for
    object creation (default), FULL = all columns, NAMES = only object
    names (not valid for --format=SQL)
 
-.. option:: --export <export>, -e <export>
+.. option:: --export=<export>, -e<export>
 
    control the export of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = export only the
@@ -157,13 +157,13 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --skip <skip-objects>
+.. option:: --skip=<skip-objects>
 
    specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
 
-.. option:: -x EXCLUDE --exclude=EXCLUDE
+.. option:: --exclude=<exclude>, -x<exclude> 
 
    exclude one or more objects from the operation using either a specific name
    such as db1.t1 or a REGEXP search pattern. Repeat option for multiple

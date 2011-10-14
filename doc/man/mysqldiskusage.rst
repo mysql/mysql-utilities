@@ -63,12 +63,12 @@ OPTIONS
 
    show the program's help page
 
-.. option:: --server=SERVER
+.. option:: --server=<server>
 
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --format=FORMAT, -f FORMAT
+.. option:: --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV,
    or VERTICAL format

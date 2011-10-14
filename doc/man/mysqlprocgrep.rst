@@ -48,31 +48,31 @@ Options
 
    Print help
 
-.. option:: --match-user <pattern>
+.. option:: --match-user=<pattern>
 
    Match all rows where the **User** field matches pattern
 
-.. option:: --match-host <pattern>
+.. option:: --match-host=<pattern>
 
    Match all rows where the **Host** field matches pattern
 
-.. option:: --match-db <pattern>
+.. option:: --match-db=<pattern>
 
    Match all rows where the **Db** field matches pattern
 
-.. option:: --match-time <pattern>
+.. option:: --match-time=<pattern>
 
    Match all rows where the **Time** field matches pattern
 
-.. option:: --match-command <pattern>
+.. option:: --match-command=<pattern>
 
    Match all rows where the **Command** field matches pattern
 
-.. option:: --match-state <pattern>
+.. option:: --match-state=<pattern>
 
    Match all rows where the **State** field matches pattern.
 
-.. option:: --match-info <pattern>
+.. option:: --match-info=<pattern>
 
    Match all rows where the **Info** field matches pattern.
 
@@ -143,7 +143,7 @@ Options
      END;
      CLOSE kill_cursor;
 
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format
 
