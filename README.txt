@@ -86,7 +86,7 @@ commands can be used::
     python setup.py build_sphinx -b man
     python setup.py build_man
 
-Building Unix manual pages require Sphinx version 1.0 or later and
+NOTE: Building Unix manual pages require Sphinx version 1.0 or later and
 docutils 0.6 or later.
 
 Manual pages are currently not pre-generated, so you have to build
