@@ -129,6 +129,16 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
+.. option:: --help, -h
+
+   Print help.
+
+.. option:: --server=<source>
+
+   connection information for the servers to search in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   The option may be repeated to form a list of servers to search.
+
 .. option:: --search-objects=<type>, ...
             --object-types=<type>, ...
 
