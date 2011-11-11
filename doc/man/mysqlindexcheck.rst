@@ -107,7 +107,7 @@ OPTIONS
 
    skip tables that do not exist
 
-.. option:: --verbose, -v
+.. option::  --verbose, -v
 
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug

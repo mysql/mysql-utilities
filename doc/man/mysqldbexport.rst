@@ -144,7 +144,7 @@ OPTIONS
    db1, t1 and t2, results in files named db1.t1.csv and db1.t2.csv. If
    definitions are included, they are written to stdout as normal.
 
-.. option:: --no-headers, -h
+.. option::  --no-headers, -h
 
    do not display the column headers - ignored for GRID format
 

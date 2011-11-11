@@ -148,7 +148,7 @@ OPTIONS
    Perform the match using the **REGEXP** operator. Default is to use
    **LIKE** for matching.
 
-.. option:: --sql, --print-sql, -p
+.. option::  --sql, --print-sql, -p
 
    Print the SQL code that will be executed to find all matching
    objects. This can be useful if you want to safe the statement for

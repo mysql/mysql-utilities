@@ -122,7 +122,7 @@ OPTIONS
 
    Use bulk insert statements for data (default:False)
 
-.. option:: --no-headers, -h
+.. option::  --no-headers, -h
 
    do not display the column headers - ignored for GRID format
 

@@ -78,7 +78,7 @@ OPTIONS
    connection information for the slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --verbose, -v
+.. option::  --verbose, -v
 
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
