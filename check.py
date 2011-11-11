@@ -10,6 +10,6 @@ if __name__ == '__main__':
         name = '.'.join(base.split('/'))
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(name))
     result = unittest.TextTestRunner().run(suite)
-    if len(result.errors) > 0:
+    if not result.wasSuccessful():
         sys.exit(1)             # Results are printed above
 
