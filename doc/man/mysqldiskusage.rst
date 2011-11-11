@@ -73,7 +73,7 @@ OPTIONS
    display the output in either GRID (default), TAB, CSV,
    or VERTICAL format
 
-.. option:: --no-headers, -h
+.. option::  --no-headers, -h
 
    do not display the column headers - ignored for grid format
 

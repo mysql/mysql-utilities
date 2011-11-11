@@ -116,7 +116,7 @@ The following command line options are accepted by **mysqldbcopy**:
 
     use multiple threads for cross-server copy (default = 1)
 
-.. option:: --new-storage-engine=<new_engine>
+.. option::  --new-storage-engine=<new_engine>
 
    Change all tables to use this storage engine if storage engine exists on the
    destination.

@@ -143,7 +143,7 @@ Options
      END;
      CLOSE kill_cursor;
 
-.. option:: --format=<format>, -f<format>
+.. option::  --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format
 
