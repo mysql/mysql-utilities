@@ -27,11 +27,24 @@ class TestParseConnection(unittest.TestCase):
         ('mats:foo@localhost', 'mats:foo@localhost:3306'),
         ('mats:foo@localhost:3308', 'mats:foo@localhost:3308'),
         ('mats@localhost:3308:/usr/var/mysqld.sock', 'mats@localhost:3308:/usr/var/mysqld.sock'),
+        ('mats:@localhost', 'mats@localhost:3306'),
+        # IPv6 strings
+        ("cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf", "cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf:3306"),
+        ("cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329:3306"),
+        ("cbell@fe80:0:0:0:202:b3ff:fe1e:8329", "cbell@fe80:0:0:0:202:b3ff:fe1e:8329:3306"),
+        ("cbell@'fe80::202:b3ff:fe1e:8329'", "cbell@fe80::202:b3ff:fe1e:8329:3306"),
+        ("cbell@'fe80::0202:b3ff:fe1e:8329'", "cbell@fe80::0202:b3ff:fe1e:8329:3306"),
+        ('cbell@"FE80::0202:B3FF:FE1E:8329"', "cbell@FE80::0202:B3FF:FE1E:8329:3306"),
+        ('cbell@1:2:3:4:5:6:7:8', 'cbell@1:2:3:4:5:6:7:8:3306'),
+        ("cbell@'E3D7::51F4:9BC8:192.168.100.32'", 'cbell@E3D7::51F4:9BC8:192.168.100.32:3306'),
+        ("cbell@'E3D7::51F4:9BC8'", 'cbell@E3D7::51F4:9BC8:3306'),
         ]
 
     # These specifiers are invalid and should generate a FormatError.
     invalid_specificers = [
-        'mats', 'mats@', '@localhost', 'mats:@localhost',
+        'mats', 'mats@', '@localhost', 'cbell@what:is::::this?',
+        'cbell@1:2:3:4:5:6:192.168.1.110',
+        'cbell@E3D7::51F4:9BC8:192.168.100.32',
         ]
     
     def test_valid(self):
@@ -49,7 +62,14 @@ class TestParseConnection(unittest.TestCase):
         If the connection string is invalid, a FormatError should be thrown.
         """
         for spec in self.invalid_specificers:
-            self.assertRaises(FormatError, parse_connection, spec)
+            try:
+                parse_connection(spec)
+            except FormatError:
+                pass
+            except:
+                self.fail("Unexpected exception thrown.")
+            else:
+                self.fail("Exception not thrown for: '%s'." % spec)
  
 if __name__ == '__main__':
     unittest.main()
