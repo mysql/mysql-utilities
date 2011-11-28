@@ -1,0 +1,15 @@
+Test case 1 - error: no --new-data option
+Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/data2 --new-port=3310 --new-id=12 --root-password=root
+
+mysqlserverclone.py: error: No new database path. Use --help for available options.
+Test case 2 - error: no login
+# WARNING: Root password for new instance has not been set.
+ERROR: Cannot connect to the source server.
+Error ####: Can't connect to MySQL server on 'nothere:####'
+Test case 3 - error: cannot connect
+ERROR: Cannot connect to the source server.
+Error ####: Can't connect to MySQL server on 'nothere:####'
+Test case 4 - cannot create directory
+# Cloning the MySQL server running on localhost.
+# Creating new data directory...
+ERROR: Unable to create directory '/not/there/yes'
