@@ -290,10 +290,12 @@ class Table(object):
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
+        self.text_columns = []
+        self.blob_columns = []
+        self.column_format = None
+        self.column_names = []
         if options.get('get_cols', False):
-            self.col_metadata = self.get_column_metadata()
-        else:
-            self.col_metadata = None
+            self.get_column_metadata()
         self.dest_vals = None
 
         # Get max allowed packet
@@ -338,67 +340,56 @@ class Table(object):
 
     def get_column_metadata(self, columns=None):
         """Get information about the table for the bulk insert operation.
+        
+        This method builds lists that describe the metadata of the table. This
+        includes lists for:
+        
+          column names
+          column format for building VALUES clause
+          blob fields - for use in generating INSERT/UPDATE for blobs
+          text fields - for use in checking for single quotes
 
         columns[in]        if None, use EXPLAIN else use column list.
-
-        Returns column metadata list
         """
-
-        rows = None
-
-        # Get field masks for blob and quoted fields
-        # Build an array of dictionaries describing the fields
-        special_cols = []
+        
         if columns is None:
-            rows = self.server.exec_query("explain %s" % self.table)
-        else:
-            rows = columns
-        if rows is not None:
-            for row in rows:
-                if len(row) > 1:
-                    has_char = (row[1].lower().find("char") >= 0)
-                    has_enum = (row[1].lower().find("enum") >= 0)
-                    has_set = (row[1].lower().find("set") >= 0)
-                    has_date = (row[1].lower().find("date") >= 0)
-                    has_time = (row[1].lower().find("time") >= 0)
-                    col_data = {
-                        "has_blob" : (row[1].lower().find("blob") >= 0) \
-                                     or (row[1].lower().find("text") >= 0),
-                        "is_text"  : has_char or has_enum or has_set,
-                        "is_time"  : has_date or has_time,
-                        "name"     : row[0]
-                    }
-                else: # No column information - make all text
-                    col_data = {
-                        "has_blob" : False,
-                        "is_text"  : True,
-                        "is_time"  : False,
-                        "name"     : row[0]
-                    }
-                special_cols.append(col_data)
-        return special_cols
+            columns = self.server.exec_query("explain %s" % self.table)
+        stop = len(columns)
+        self.column_names = []
+        col_format_values = [''] * stop
+        if columns is not None:
+            for col in range(0,stop):
+                self.column_names.append(columns[col][0])
+                col_type_prefix = columns[col][1][0:4].lower()
+                if col_type_prefix in ("char", "enum", "set("):
+                    self.text_columns.append(col)
+                    col_format_values[col] = "'%s'"
+                elif col_type_prefix in ("blob", "text"):
+                    self.blob_columns.append(col)
+                    col_format_values[col] = "%s"
+                elif col_type_prefix in ("date", "time"):
+                    col_format_values[col] = "'%s'"
+                else:
+                    col_format_values[col] = "%s"
+        self.column_format = "%s%s%s" % \
+                             (" (", ', '.join(col_format_values), ")")
 
 
-    def get_col_names(self, col_metadata=None):
+    def get_col_names(self):
         """Get column names for the export operation.
-
-        col_metadata[in]   If provided, get column names from metadata
 
         Return (list) column names
         """
 
-        cols = []
-        if col_metadata is None:
+        if self.column_format is None:
+            self.column_names = []
             rows = self.server.exec_query("explain %s" % self.table)
             for row in rows:
-                cols.append(row[0])
-        else:
-            for col in col_metadata:
-                cols.append(col.get("name"))
-        return cols
+                self.column_names.append(row[0])
+        return self.column_names
 
 
-    def _build_update_blob(self, row, new_db, name, special_cols, blob_col):
+    def _build_update_blob(self, row, new_db, name, blob_col):
         """Build an UPDATE statement to update blob fields.
 
         row[in]            a row to process
@@ -406,73 +397,65 @@ class Table(object):
         name[in]           name of the table
         conn_val[in]       connection information for the destination server
         query[in]          the INSERT string for executemany()
-        special_cols[in]   list of columns for special string handling
         blob_col[in]       number of the column containing the blob
 
         Returns tuple (UPDATE string, blob data)
         """
+        
+        if self.column_format is None:
+            self.get_column_metadata()
 
         blob_insert = "UPDATE %s.%s SET `" % (new_db, name)
         where_clause = "WHERE "
         data_clause = None
         stop = len(row)
         for col in range(0,stop):
-            if col == blob_col:
-                blob_insert += special_cols[col]["name"] + "` = %s "
+            col_name = self.column_names[col]
+            if col in self.blob_columns:
+                blob_insert += col_name + "` = %s "
                 data = row[col]
             else:
                 if col > 0 and col < stop:
                     where_clause += " AND "
-                where_clause += "`%s` = '%s' " % (special_cols[col]["name"],
-                                                  row[col])
+                where_clause += "`%s` = '%s' " % (col_name, row[col])
         return (blob_insert + where_clause, data)
 
 
-    def get_column_string(self, row, new_db, col_metadata=None):
+    def get_column_string(self, row, new_db):
         """Return a formatted list of column data.
 
         row[in]            a row to process
         new_db[in]         new database name
-        col_metadata[in]   list of columns for special string handling
 
         Returns (string) column list
         """
-        # Must call get_col_metata() first!
-        assert col_metadata, \
-               "You must call get_column_metadata before get_column_string()."
+        
+        if self.column_format is None:
+            self.get_column_metadata()
 
         blob_inserts = []
-        val_str = " ("
-        stop = len(row)
-        for col in range(0,stop):
-            if row[col] == None:
-                val_str += "NULL"
-            else:
-                # Save blob updates for later...
-                if col_metadata[col]["has_blob"]: # It is a blob field!
-                    str = self._build_update_blob(row, new_db,
-                                                  self.tbl_name,
-                                                  col_metadata, col)
-                    blob_inserts.append(str)
-                    val_str += "NULL"
-                # We must ensure to escape ' marks.
-                elif col_metadata[col]["is_text"]: # No, text field
-                    if row[col].find("'"):
-                        val_str += "'%s'" % re.sub("'", "''", row[col])
-                    else:
-                        val_str += "'%s'" % row[col]
-                elif col_metadata[col]["is_time"]:
-                    val_str += "'%s'" % row[col]
-                else: # Ah, ok, so it is some other field...
-                    val_str += "%s" % row[col]
-            if (col + 1) < stop:
-                val_str += ", "
-        val_str += ")"
+        values = list(row)
 
+        # Find blobs
+        for col in self.blob_columns:
+            # Save blob updates for later...
+            str = self._build_update_blob(row, new_db, self.tbl_name, col)
+            blob_inserts.append(str)
+            values[col] = "NULL"
+
+        # Fix text fields
+        [values[col].replace("'", "''") for col in self.text_columns]
+        
+        # Build string
+        val_str = self.column_format % tuple(values)
+
+        # Fix NULLs
+        val_str.replace(", None,", ", NULL,")
+        
         return (val_str, blob_inserts)
 
 
-    def make_bulk_insert(self, rows, new_db, col_metadata=None):
+    def make_bulk_insert(self, rows, new_db):
         """Create bulk insert statements for the data
 
         Reads data from a table (rows) and builds group INSERT statements for
@@ -482,15 +465,12 @@ class Table(object):
 
         rows[in]           a list of rows to process
         new_db[in]         new database name
-        col_metadata[in]   the column metadata - call get_column_metadata() to
-                           generate on first call to bulk_insert
 
         Returns (tuple) - (bulk insert statements, blob data inserts)
         """
 
-        # Must call get_col_metata() first!
-        assert col_metadata, \
-               "You must call get_column_metadata before make_bulk_insert()."
+        if self.column_format is None:
+            self.get_column_metadata()
 
         data_inserts = []
         blob_inserts = []
@@ -505,7 +485,7 @@ class Table(object):
                     insert_str += val_str
                 data_size = len(insert_str)
 
-            col_data = self.get_column_string(row, new_db, col_metadata)
+            col_data = self.get_column_string(row, new_db)
             val_str = col_data[0]
 
             if len(col_data[1]) > 0:
@@ -604,10 +584,10 @@ class Table(object):
         # First, turn off foreign keys if turned on
         fkey_on = dest.toggle_fkeys(False)
 
-        if self.col_metadata is None:
-            self.col_metadata = self.get_column_metadata()
+        if self.column_format is None:
+            self.get_column_metadata()
 
-        data_lists = self.make_bulk_insert(rows, new_db, self.col_metadata)
+        data_lists = self.make_bulk_insert(rows, new_db)
         insert_data = data_lists[0]
         blob_data = data_lists[1]
 
@@ -656,8 +636,8 @@ class Table(object):
                 If spawn == False, None
         """
 
-        if self.col_metadata is None:
-            self.col_metadata = self.get_column_metadata()
+        if self.column_format is None:
+            self.get_column_metadata()
 
         if self.dest_vals is None:
             self.dest_vals = self.get_dest_values(destination)

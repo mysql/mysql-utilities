@@ -190,8 +190,7 @@ def export_metadata(src_val, db_list, options):
     return True
 
 
-def _export_row(data_rows, cur_table, col_metadata,
-                format, single, skip_blobs, first=False,
+def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
                 no_headers=False, outfile=None):
     """Export a row
 
@@ -200,7 +199,6 @@ def _export_row(data_rows, cur_table, col_metadata,
 
     datarows[in]       one or more rows for exporting
     cur_table[in]      Table class instance
-    col_metadata[in]   metadata about the columns including types and widths
     format[in]         desired output format
     skip_blobs[in]     if True, skip blob data
     single[in]         if True, generate single INSERT statements (valid
@@ -217,7 +215,8 @@ def _export_row(data_rows, cur_table, col_metadata,
     db_name = cur_table.db_name
     full_name = "%s.%s" % (db_name, tbl_name)
     list_options = {}
-    if format not in ("SQL", "S") and outfile is None:
+    # if outfile is not set, use stdout.
+    if outfile is None:
         outfile = sys.stdout # default file handle
     if format in ('SQL', 'S'):
         if single:
@@ -227,28 +226,20 @@ def _export_row(data_rows, cur_table, col_metadata,
                 data = data_rows[1]
             blob_rows = []
             for row in data:
-                columns = cur_table.get_column_string(row, full_name,
-                                                      col_metadata)
+                columns = cur_table.get_column_string(row, full_name)
                 if len(columns[1]) > 0:
                     blob_rows.extend(columns[1])
                 row_str = "INSERT INTO %s VALUES%s;" % (full_name, columns[0])
-                if outfile is not None:
-                    outfile.write(row_str + "\n")
-                else:
-                    print row_str
+                outfile.write(row_str + "\n")
         else:
             # Generate bulk insert statements
-            data_lists = cur_table.make_bulk_insert(data_rows, db_name,
-                                                    col_metadata)
+            data_lists = cur_table.make_bulk_insert(data_rows, db_name)
             rows = data_lists[0]
             blob_rows = data_lists[1]
 
             if len(rows) > 0:
                 for row in rows:
-                    if outfile is not None:
-                        outfile.write("%s;\n" % row)
-                    else:
-                        print "%s;" % row
+                    outfile.write("%s;\n" % row)
             else:
                 print "# Table %s has no data." % tbl_name
 
@@ -261,29 +252,27 @@ def _export_row(data_rows, cur_table, col_metadata,
                 print "# Blob data for table %s:" % tbl_name
                 for blob_row in blob_rows:
                     row_str = blob_row[0] % blob_row[1] + ";"
-                    if outfile is not None:
-                        outfile.write(row_str + "\n")
-                    else:
-                        print row_str
+                    outfile.write(row_str + "\n")
+
     # Cannot use print_list here becasue we must manipulate
     # the behavior of format_tabular_list
     elif format == "VERTICAL":
-        format_vertical_list(outfile, cur_table.get_col_names(col_metadata),
+        format_vertical_list(outfile, cur_table.get_col_names(),
                              data_rows)
     elif format == "TAB":
         list_options['print_header'] = first
         list_options['separator'] = '\t'
         list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(),
                             data_rows, list_options)
     elif format == "CSV":
         list_options['print_header'] = first
         list_options['separator'] = ','
         list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(),
                             data_rows, list_options)
     else:  # default to table format - header is always printed
-        format_tabular_list(outfile, cur_table.get_col_names(col_metadata),
+        format_tabular_list(outfile, cur_table.get_col_names(),
                             data_rows)
 
 
@@ -382,7 +371,6 @@ def export_data(src_val, db_list, options):
                 'quiet'    : quiet
             }
             cur_table = Table(source, tbl_name, tbl_options)
-            col_metadata = cur_table.get_column_metadata()
             if single and format not in ("SQL", "GRID", "VERTICAL"):
                 retrieval_mode = -1
                 first = True
@@ -405,7 +393,7 @@ def export_data(src_val, db_list, options):
                 print message
 
             for data_rows in cur_table.retrieve_rows(retrieval_mode):
-                _export_row(data_rows, cur_table, col_metadata,
+                _export_row(data_rows, cur_table, 
                             format, single, skip_blobs, first, no_headers,
                             outfile)
                 if first:

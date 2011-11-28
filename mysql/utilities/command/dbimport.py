@@ -693,8 +693,9 @@ def _get_column_metadata(tbl_class, table_col_list):
 
     for tbl_col_def in table_col_list:
         if tbl_col_def[0] == tbl_class.tbl_name:
-            return tbl_class.get_column_metadata(tbl_col_def[1])
-    return None
+            tbl_class.get_column_metadata(tbl_col_def[1])
+            return True
+    return False
 
 
 def import_file(dest_val, file_name, options):
@@ -748,17 +749,18 @@ def import_file(dest_val, file_name, options):
         tbl = Table(destination, tbl_name)
         # Need to check to see if table exists!
         if tbl.exists():
-            col_meta = tbl.get_column_metadata()
+            tbl.get_column_metadata()
+            col_meta = True
         elif len(table_col_list) > 0:
             col_meta = _get_column_metadata(tbl, table_col_list)
         else:
             fix_cols = []
             fix_cols.append((tbl.tbl_name, columns))
             col_meta = _get_column_metadata(tbl, fix_cols)
-        if col_meta is None:
+        if not col_meta:
             raise UtilError("Cannot build bulk insert statements without "
                                  "the table definition.")
-        ins_strs = tbl.make_bulk_insert(table_rows, tbl.db_name, col_meta)
+        ins_strs = tbl.make_bulk_insert(table_rows, tbl.db_name)
         if len(ins_strs[0]) > 0:
             statements.extend(ins_strs[0])
         if len(ins_strs[1]) > 0 and not skip_blobs:
