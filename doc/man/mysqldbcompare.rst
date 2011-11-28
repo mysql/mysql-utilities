@@ -14,7 +14,8 @@ SYNOPSIS
               --help | --version | --verbose | --run-all-tests | --quiet |
               --format=<format> | --width=<width> |
               [--difftype=[--unified|--context|--differ]]
-              [<db1:db2> | <db> [<db1:db2>* | db*] 
+              [<db1:db2> | <db> [<db1:db2>* | db*] [--skip-object-compare |
+              --skip-row-count | --skip-diff | --skip-data-check]
 
 DESCRIPTION
 -----------
@@ -87,13 +88,16 @@ A test may complete with one of the following states:
 **-**
   the test is not applicable to this object
 
-Several of the tests may be skipped with a :option:`--skip` option. For
-example, the user can skip the object compare step if there are known missing
-objects among the databases, skip the definition comparison if there are known
-differences in the definitions, skip the row count step, and skip the data
-check step. A user may want to use these options to run only one of the tests.
-This may be helpful when working to bring two databases into synchronization to
-avoid running all of the tests repeatedly during the process.
+Several of the tests may be skipped with a --skip-% option. For example, the
+user can skip the object compare step if there are known missing objects among
+the databases by using the :option:`--skip-object-compare` option, skip the
+definition comparison if there are known differences in the definitions by
+using the :option:`--skip-diff` option, skip the row count step using the
+:option:`--skip-row-count` option, and skip the data check step using the
+:option:`--skip-data-check` options. A user may want to use these options to
+run only one of the tests. This may be helpful when working to bring two
+databases into synchronization to avoid running all of the tests repeatedly
+during the process.
 
 The user may specify the databases to compare using the notation db1:db2.
 Additionally, the check may be run against either a single server for comparing
@@ -151,12 +155,12 @@ OPTIONS
 
    show the help page
 
-.. option:: --server1 <source>
+.. option:: --server1=<source>
 
    connection information for the first server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --server2 <source>
+.. option:: --server2=<source>
 
    connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
@@ -166,12 +170,12 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --difftype=DIFFTYPE, -d <DIFFTYPE>
+.. option:: --difftype=<difftype>, -d<difftype>
 
    display differences in context format either unified,
    context, or differ (default: unified).
    
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display missing rows in either GRID (default), CSV, TAB, or VERTICAL format
    

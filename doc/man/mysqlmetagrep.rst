@@ -129,8 +129,18 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
-.. option:: --search-objects <type>, ...
-            --object-types <type>, ...
+.. option:: --help, -h
+
+   Print help.
+
+.. option:: --server=<source>
+
+   connection information for the servers to search in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   The option may be repeated to form a list of servers to search.
+
+.. option:: --search-objects=<type>, ...
+            --object-types=<type>, ...
 
    Only search for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
@@ -148,13 +158,13 @@ OPTIONS
    Perform the match using the **REGEXP** operator. Default is to use
    **LIKE** for matching.
 
-.. option:: --sql, --print-sql, -p
+.. option::  --sql, --print-sql, -p
 
    Print the SQL code that will be executed to find all matching
    objects. This can be useful if you want to safe the statement for
    later execution, or pipe it into other tools.
 
-.. option:: --pattern <pattern>, -e <pattern>
+.. option:: --pattern=<pattern>, -e=<pattern>
 
    Pattern to use when matching. This is required when the pattern
    looks like a connection specification.
@@ -162,11 +172,11 @@ OPTIONS
    If a pattern option is given, the first argument is not treated as
    a pattern but as a connection specifier.
 
-.. option:: --database <pattern>
+.. option:: --database=<pattern>
 
    Only look in databases matching this pattern.
 
-.. option:: --format <format>, -f <format>
+.. option:: --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format
 

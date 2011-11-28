@@ -77,30 +77,30 @@ OPTIONS
 
    show help page
 
-.. option:: --master <master>
+.. option:: --master=<master>
 
    connection information for master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --slave <slave>
+.. option:: --slave=<slave>
 
    connection information for slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --rpl-user <replication-user>
+.. option:: --rpl-user=<replication_user>
 
    the user and password for the replication user requirement -
    For example, rpl:passwd - default = rpl:rpl
 
-.. option:: --test-db <test database>
+.. option:: --test-db=<test_database>
 
    database name to use in testing replication setup (optional)
 
-.. option:: --master-log-file=<MASTER_LOG_FILE>
+.. option:: --master-log-file=<master_log_file>
 
    use this master log file to initiate the slave.
 
-.. option:: --master-log-pos=<MASTER_LOG_POS>
+.. option:: --master-log-pos=<master_log_pos>
 
    use this position in the master log file to initiate the slave
 

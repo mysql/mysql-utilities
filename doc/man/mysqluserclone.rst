@@ -45,19 +45,19 @@ OPTIONS
 
    show the help page
 
-.. option:: --source <source>
+.. option:: --source=<source>
 
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
-.. option:: --destination <destinatio>
+.. option:: --destination=<destination>
 
    connection information for destination server in the form:
    <user>:<password>@<host>:<port>:<socket> Where <password> is
    optional and either <port> or <socket> must be provided.
 
-.. option:: --copy-dir <directory>
+.. option:: --copy-dir=<directory>
 
    Path to use when copying data (stores temporary files) - default =
    current directory
@@ -87,7 +87,7 @@ OPTIONS
 
    list all users on the source - does not require a destination
 
-.. option::  --format=LIST_FORMAT
+.. option::  --format=<list_format>
 
    display the list of users in either GRID (default), TAB, CSV, or VERTICAL
    format - valid only for :option:`--list` option

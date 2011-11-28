@@ -68,17 +68,17 @@ OPTIONS
 
    show the help page
 
-.. option:: --master <source>
+.. option:: --master=<source>
 
    connection information for the master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --slave <source>
+.. option:: --slave=<source>
 
    connection information for the slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --verbose, -v
+.. option::  --verbose, -v
 
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
@@ -92,7 +92,7 @@ OPTIONS
 
    suppress warning messages
 
-.. option:: --master-info-file <file>
+.. option:: --master-info-file=<file>
 
    the name of the master information file on the slave.default = 'master.info'
    read from the data directory. Note: this option requires that the utility

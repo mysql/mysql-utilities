@@ -33,7 +33,7 @@ OPTIONS
 
    show the help page
 
-.. option:: --server <source>
+.. option:: --server=<source>
 
    connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
@@ -47,24 +47,24 @@ OPTIONS
 
    turn off all messages for quiet execution
 
-.. option:: --new-data <path to new datadir>
+.. option:: --new-data=<path_to_new_datadir>
 
    the full path to the location of the data directory for the new
    instance
 
-.. option:: --new-port <port>
+.. option:: --new-port=<port>
 
    the new port for the new instance - default=3307
 
-.. option:: --new-id <server_id>
+.. option:: --new-id=<server_id>
 
    the server_id for the new instance - default=2
 
-.. option:: --root-password <password>
+.. option:: --root-password=<password>
 
    password for the root user
 
-.. option:: --mysqld <options>
+.. option:: --mysqld=<options>
 
    additional options for mysqld
 

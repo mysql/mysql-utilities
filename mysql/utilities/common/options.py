@@ -347,6 +347,9 @@ def parse_connection(connection_values):
     # Get user, password    
     user, passwd = _match(_CONN_USERPASS, userpass)
 
+    if len(hostportsock) <= 0:
+        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+
     if hostportsock[0] in ['"', "'"]:
         # need to strip the quotes
         host, port, socket = _match(_CONN_QUOTEDHOST, hostportsock)

@@ -92,17 +92,17 @@ OPTIONS
 
 .. option:: --help
 
-.. option:: --server=SERVER
+.. option:: --server=<SERVER>
 
    connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --format=FORMAT, -f FORMAT
+.. option:: --format=<format>, -f<format>
 
    display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
    or VERTICAL|V format
 
-.. option:: --import=import, -i import
+.. option:: --import=<import_type>, -i<import_type>
 
    control the import of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = import only the
@@ -122,7 +122,7 @@ OPTIONS
 
    Use bulk insert statements for data (default:False)
 
-.. option:: --no-headers, -h
+.. option::  --no-headers, -h
 
    do not display the column headers - ignored for GRID format
 
@@ -135,7 +135,7 @@ OPTIONS
    control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --skip <skip-objects>
+.. option:: --skip=<skip_objects>
 
    specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
@@ -145,12 +145,12 @@ OPTIONS
 
    Do not import blob data.
    
-.. option:: --new-storage-engine=NEW_ENGINE
+.. option:: --new-storage-engine=<new_engine>
 
    Change all tables to use this storage engine if storage engine exists on the
    destination.
 
-.. option:: --default-storage-engine=DEF_ENGINE
+.. option:: --default-storage-engine=<def_engine>
 
    Change all tables to use this storage engine if the original storage engine
    does not exist on the destination.

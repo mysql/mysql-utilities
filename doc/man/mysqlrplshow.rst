@@ -97,7 +97,7 @@ OPTIONS
 
    show the help page
 
-.. option:: --master <source>
+.. option:: --master=<source>
 
    connection information for the master server in the form:
    <user>:<password>@<host>:<port>:<socket>
@@ -115,12 +115,12 @@ OPTIONS
 
    prompt for slave user and password if different from master login.
    
-.. option:: --num-retries=NUM_RETRIES, -n NUM_RETRIES
+.. option:: --num-retries=<num_retries>, -n<num_retries>
 
    number of retries allowed for failed slave login attempt. Valid with
    --prompt only.
 
-.. option:: --format=FORMAT, -f FORMAT
+.. option:: --format=<format>, -f<format>
 
    display the output in either GRID (default), TAB, CSV,
    or VERTICAL format
