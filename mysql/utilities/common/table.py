@@ -32,6 +32,14 @@ _MAXTHREADS_INSERT = 6
 _MAXROWS_PER_THREAD = 100000
 _MAXAVERAGE_CALC = 100
 
+_FOREIGN_KEY_QUERY = """
+  SELECT CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
+         REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME 
+  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND 
+        REFERENCED_TABLE_SCHEMA IS NOT NULL
+"""
+
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
 
@@ -787,6 +795,16 @@ class Table(object):
         Returns result set
         """
         res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)
+        return res
+    
+    
+    def get_tbl_foreign_keys(self):
+        """Return a result set containing all foreign keys for the table
+        
+        Returns result set
+        """
+        res = self.server.exec_query(_FOREIGN_KEY_QUERY % (self.db_name,
+                                                           self.tbl_name))
         return res
 
 

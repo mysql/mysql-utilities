@@ -296,7 +296,8 @@ def connect_servers(src_val, dest_val, options={}):
             raise UtilError("The %s version is incompatible. Utility "
                             "requires version %s or higher." %
                             (destination.name, version))
-    elif not quiet and dest_dict is not None:
+    elif not quiet and dest_dict is not None and \
+         not isinstance(dest_val, Server):
         _print_connection(dest_name, src_dict)
         print "connected."
     return (source, destination)

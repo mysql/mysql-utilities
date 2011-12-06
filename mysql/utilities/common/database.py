@@ -58,6 +58,26 @@ _OBJTYPE_QUERY = """
     )
 """
 
+_DEFINITION_QUERY = """
+  SELECT %(columns)s
+  FROM INFORMATION_SCHEMA.%(table_name)s WHERE %(conditions)s
+"""
+
+_PARTITION_QUERY = """
+  SELECT PARTITION_NAME, SUBPARTITION_NAME, PARTITION_ORDINAL_POSITION,
+         SUBPARTITION_ORDINAL_POSITION, PARTITION_METHOD, SUBPARTITION_METHOD,
+         PARTITION_EXPRESSION, SUBPARTITION_EXPRESSION, PARTITION_DESCRIPTION
+  FROM INFORMATION_SCHEMA.PARTITIONS
+  WHERE TABLE_SCHEMA = '%(db)s' AND TABLE_NAME = '%(name)s'
+"""
+
+_COLUMN_QUERY = """
+  SELECT ORDINAL_POSITION, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE,
+         COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT, COLUMN_KEY       
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = '%(db)s' AND TABLE_NAME = '%(name)s'
+"""
+
 class Database(object):
     """
     The Database class encapsulates a database. The class has the following
@@ -559,6 +579,100 @@ class Database(object):
                 create_statement = row[0][2]
         return create_statement
 
+
+    def get_object_definition(self, db, name, obj_type):
+        """Return a list of the object's creation metadata.
+        
+        This method queries the INFORMATION_SCHEMA or MYSQL database for the
+        row-based (list) description of the object. This is similar to the
+        output EXPLAIN <object>.
+
+        db[in]             Database name
+        name[in]           Name of the object
+        obj_type[in]       Object type (string) e.g. DATABASE
+                           Note: this is used to form the correct SHOW command
+
+        Returns list - object definition, None if db.object does not exist
+        """
+        definition = []
+        from_name = None
+        condition = None
+        
+        if obj_type == _DATABASE:
+            columns = 'SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, ' + \
+                      'DEFAULT_COLLATION_NAME, SQL_PATH'
+            from_name = 'SCHEMATA'
+            condition = "SCHEMA_NAME = '%s'" % name
+        elif obj_type == _TABLE:
+            columns = 'TABLE_SCHEMA, TABLE_NAME, ENGINE, AUTO_INCREMENT, ' + \
+                      'AVG_ROW_LENGTH, CHECKSUM, TABLE_COLLATION, ' + \
+                      'TABLE_COMMENT, ROW_FORMAT, CREATE_OPTIONS'
+            from_name = 'TABLES'
+            condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
+                         (db, name) 
+        elif obj_type == _VIEW:
+            columns = 'TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, ' + \
+                      'CHECK_OPTION, DEFINER, SECURITY_TYPE'
+            from_name = 'VIEWS'
+            condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
+                         (db, name)
+        elif obj_type == _TRIG:
+            columns = 'TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ' + \
+                      'EVENT_OBJECT_TABLE, ACTION_STATEMENT, ' + \
+                      'ACTION_TIMING, DEFINER'
+            from_name = 'TRIGGERS'
+            condition = "TRIGGER_SCHEMA = '%s' AND TRIGGER_NAME = '%s'" % \
+                         (db, name)
+        elif obj_type == _PROC or obj_type == _FUNC:
+            columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
+                      'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
+                      'ROUTINE_COMMENT, ROUTINES.DEFINER, param_list, ' + \
+                      'DTD_IDENTIFIER, ROUTINES.IS_DETERMINISTIC'
+            from_name = 'ROUTINES JOIN mysql.proc ON ' + \
+                        'ROUTINES.ROUTINE_SCHEMA = proc.db AND ' + \
+                        'ROUTINES.ROUTINE_NAME = proc.name AND ' + \
+                        'ROUTINES.ROUTINE_TYPE = proc.type '
+            condition = "ROUTINE_SCHEMA = '%s' AND ROUTINE_NAME = '%s'" % \
+                         (db, name)
+            if obj_type == _PROC:
+                type = 'PROCEDURE'
+            else:
+                type = 'FUNCTION'
+            condition += " AND ROUTINE_TYPE = '%s'" % type
+        elif obj_type == _EVENT:
+            columns = 'EVENT_SCHEMA, EVENT_NAME, DEFINER, EVENT_DEFINITION, ' + \
+                      'EVENT_TYPE, INTERVAL_FIELD, INTERVAL_VALUE, STATUS, '+ \
+                      'ON_COMPLETION, STARTS, ENDS'
+            from_name = 'EVENTS'
+            condition = "EVENT_SCHEMA = '%s' AND EVENT_NAME = '%s'" % \
+                         (db, name)            
+
+        if from_name is None:
+            raise UtilError('Attempting to get definition from unknown object '
+                            'type = %s.' % obj_type)
+
+        values = {
+            'columns'    : columns,
+            'table_name' : from_name,
+            'conditions' : condition,
+        }
+        rows = self.source.exec_query(_DEFINITION_QUERY % values)
+        if rows != []:
+            # If this is a table, we need three types of information:
+            # basic info, column info, and partitions info
+            if obj_type == _TABLE:
+                values['name'] = name
+                values['db'] = db
+                basic_def = rows[0]
+                col_def = self.source.exec_query(_COLUMN_QUERY % values)
+                part_def = self.source.exec_query(_PARTITION_QUERY % \
+                                                  values)
+                definition.append((basic_def, col_def, part_def))
+            else:
+                definition.append(rows[0])
+            
+        return definition
+    
 
     def get_next_object(self):
         """Retrieve the next object in the database list.

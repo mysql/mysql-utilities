@@ -89,6 +89,13 @@ class test(diff.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        test_num += 1
+        cmd_opts = " " 
+        comment = "Test case %d - no objects specified." % test_num
+        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
 
     def get_result(self):

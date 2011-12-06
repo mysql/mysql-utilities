@@ -95,11 +95,11 @@ def _get_objects(server, database, options):
 def get_create_object(server, object_name, options):
     """Get the object's create statement.
     
+    This method retrieves the object create statement from the database.
+    
     server[in]        server connection
     object_name[in]   name of object in the form db.objectname
     options[in]       options: verbosity, quiet
-    
-    This method retrieves the object create statement from the database.
     
     Returns string : create statement or raise error if object or db not exist
     """
@@ -195,7 +195,7 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     return (server1, server2)
 
 
-def _get_common_lists(list1, list2):
+def get_common_lists(list1, list2):
     """Compare the items in two lists
     
     This method compares the items in two lists returning those items that
@@ -237,8 +237,8 @@ def get_common_objects(server1, server2, db1, db2,
     db1_objects = _get_objects(server1, db1, options)
     db2_objects = _get_objects(server2, db2, options)
         
-    in_both, in_db1_not_db2, in_db2_not_db1 = _get_common_lists(db1_objects,
-                                                                db2_objects)
+    in_both, in_db1_not_db2, in_db2_not_db1 = get_common_lists(db1_objects,
+                                                               db2_objects)
     if print_list:
         print_missing_list(in_db1_not_db2,
                            "server1:"+db1, "server2:"+db2) 
@@ -258,24 +258,26 @@ def _get_diff(list1, list2, object1, object2, difftype):
     list2[in]         The list used for compare
     object1[in]       The 'from' or source
     object2[in]       The 'to' or difference destination
+    difftype[in]      Difference type
     
     Returns list - differences or []
     """
     import difflib
     
     diff_str = []
-    if difftype == 'unified':
+    # Generate unified is SQL is specified for use in reporting errors
+    if difftype in ['unified', 'sql']:
         for line in difflib.unified_diff(list1, list2,
                                          fromfile=object1, tofile=object2):
-            diff_str.append(line.strip('\n'))
+            diff_str.append(line.strip('\n').rstrip(' '))
     elif difftype == 'context':
         for line in difflib.context_diff(list1, list2,
                                          fromfile=object1, tofile=object2):
-            diff_str.append(line.strip('\n'))
+            diff_str.append(line.strip('\n').rstrip(' '))
     else:
         has_diff = False
         for line in difflib.ndiff(list1, list2):
-            diff_str.append(line.strip('\n'))
+            diff_str.append(line.strip('\n').rstrip(' '))
             if line[0] in ['-', '+', '?']:
                 has_diff = True
                 
@@ -285,11 +287,126 @@ def _get_diff(list1, list2, object1, object2, difftype):
     return diff_str
 
 
+def _get_transform(server1, server2, object1, object2, options):
+    """Get the transformation SQL statements
+    
+    This method generates the SQL statements to transform the destination
+    object based on direction of the compare.
+    
+    server1[in]        first server connection
+    server2[in]        second server connection
+    object1            the first object in the compare in the form: (db.name)
+    object2            the second object in the compare in the form: (db.name)
+    options[in]        a dictionary containing the options for the operation:
+                       (quiet, etc.)
+
+    Returns tuple - (bool - same db name?, list of transformation statements)
+    """
+    from mysql.utilities.common.database import Database
+    from mysql.utilities.common.sql_transform import SQLTransformer
+
+    obj_type = None
+    direction = options.get("changes-for", "server1")
+
+    # If there is no dot, we do not have the format 'db_name.obj_name' for
+    # object1 and therefore must treat it as a database name.
+    if object1.find('.') == -1:
+        obj_type = "DATABASE"
+        
+        # We are working with databases so db and name need to be set
+        # to the database name to tell the get_object_definition() method
+        # to retrieve the database information.
+        db1 = object1
+        db2 = object2
+        name1 = object1
+        name2 = object2
+    else:
+        try:
+            db1, name1 = object1.split('.')
+            db2, name2 = object2.split('.')
+        except:
+            raise UtilError("Invalid object name arguments for _get_transform"
+                            "(): %s, %s." % (object1, object2))
+            
+    db_1 = Database(server1, db1, options)
+    db_2 = Database(server2, db2, options)
+    
+    if obj_type is None:
+        obj_type = db_1.get_object_type(name1)
+
+    transform_str = []
+    obj1 = db_1.get_object_definition(db1, name1, obj_type)
+    obj2 = db_2.get_object_definition(db2, name2, obj_type)
+    
+    # Get the transformation based on direction.
+    transform_str = []
+    same_db_name = True
+    xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], obj_type,
+                           options.get('verbosity', 0))
+
+    differences = xform.transform_definition()
+    if differences is not None and len(differences) > 0:
+        transform_str.extend(differences)
+
+    return transform_str
+
+
+def _build_diff_list(diff1, diff2, transform1, transform2,
+                     first, second, options):
+    """Build the list of differences
+    
+    Returns list = list of differences or transformations
+    """
+    # Don't build the list if there were no differences.
+    if len(diff1) == 0:
+        return []
+        
+    reverse = options.get('reverse', False)
+    diff_list = []    
+    if options.get('difftype') == 'sql':
+        if len(transform1) == 0:
+            diff_list.append("\n# WARNING: Cannot generate SQL statements "
+                             "for these objects.")
+            diff_list.append("# Check the difference output for other "
+                             "discrepencies.")
+            diff_list.extend(diff1)
+        else:
+            diff_list.append("# Transformation for --changes-for=%s:\n#\n" %
+                             first)
+            diff_list.extend(transform1)
+            diff_list.append("")
+            if reverse and len(transform2) > 0:
+                diff_list.append("#\n# Transformation for reverse changes "
+                                 "(--changes-for=%s):\n#" % second)
+                for row in transform2:
+                    sub_rows = row.split('\n')
+                    for sub_row in sub_rows:
+                        diff_list.append("# %s" % sub_row)
+                diff_list.append("#\n")
+    else:
+        diff_list.append("# Object definitions differ. "
+                         "(--changes-for=%s)\n#\n" % first)
+        diff_list.extend(diff1)
+        if reverse and len(diff2) > 0:
+            diff_list.append("")
+            diff_list.append("#\n# Definition diff for reverse changes "
+                             "(--changes-for=%s):\n#" % second)
+            for row in diff2:
+                diff_list.append("# %s" % row)
+            diff_list.append("#\n")
+
+    return diff_list
+
+
 def diff_objects(server1, server2, object1, object2, options):
-    """diff the definition of two objects
+    """diff the definition (CREATE statement) of two objects
     
     Produce a diff in the form unified, context, or ndiff of two objects.
     Note: objects must exist else exception is thrown.
+    
+    With the transform option, the method will generate the transformation
+    SQL statements in addition to the differences found in the CREATE
+    statements.
     
     server1[in]        first server connection
     server2[in]        second server connection
@@ -306,26 +423,85 @@ def diff_objects(server1, server2, object1, object2, options):
     verbosity = options.get("verbosity", 0)
     difftype = options.get("difftype", "unified")
     width = options.get("width", 75)
+    direction = options.get("changes-for", "server1")
+    reverse = options.get("reverse", False)
 
     object1_create = get_create_object(server1, object1, options)
     object2_create = get_create_object(server2, object2, options)
-
+    
     if not quiet:
         msg = "# Comparing {0} to {1} ".format(object1, object2)
         print msg,
         linelen = width - (len(msg) + 10)
         print ' ' * linelen,
 
-    diff_str = _get_diff(object1_create.split('\n'),
-                         object2_create.split('\n'),
-                         object1, object2, difftype)
+    object1_create_list = object1_create.split('\n')
+    object2_create_list = object2_create.split('\n')
 
-    if len(diff_str) > 0:
+    diff_list = []    
+    diff_server1 = []
+    diff_server2 = []
+    transform_server1 = []
+    transform_server2 = []
+
+    # Get the difference based on direction.
+    if direction == 'server1' or reverse:
+        diff_server1 = _get_diff(object1_create_list,
+                                 object2_create_list,
+                                 object1, object2, difftype)
+        # If there is a difference. Check for SQL output
+        if difftype == 'sql' and len(diff_server1) > 0:
+            transform_server1 = _get_transform(server1, server2,
+                                               object1, object2, options)
+
+    if direction == 'server2' or reverse:
+        diff_server2 = _get_diff(object2_create_list,
+                                 object1_create_list,
+                                 object2, object1, difftype)
+        # If there is a difference. Check for SQL output
+        if difftype == 'sql' and len(diff_server2) > 0:
+            transform_server2 = _get_transform(server2, server1,
+                                               object2, object1, options)
+
+
+    # Build diff list
+    if direction == 'server1':
+        diff_list = _build_diff_list(diff_server1, diff_server2,
+                                     transform_server1, transform_server2,
+                                     'server1', 'server2', options)
+    else:
+        diff_list = _build_diff_list(diff_server2, diff_server1,
+                                     transform_server2, transform_server1,
+                                     'server2', 'server1', options)
+    
+    # Check for failure to generate SQL statements
+    if (difftype == 'sql') and \
+       ((direction == 'server1' and transform_server1 == [] \
+         and diff_server1 != []) or \
+        (direction == 'server2' and transform_server2 == [] \
+         and diff_server2 != [])):
+
+        # Here we found no transformations. So either the change is nothing
+        # more than the database name or we missed something. Send a
+        # warning to the user.
+
         if not quiet:
-            print "[FAIL]\n# Object definitions are not the same:"
-            for line in diff_str:
+            print "[FAIL]"
+
+        for line in diff_list:
+            print line
+        
+        return diff_list
+
+    if len(diff_list) > 0:
+        if not quiet:
+            print "[FAIL]"
+
+        if difftype == 'sql' or not quiet:
+            for line in diff_list:
                 print line
-        return diff_str
+
+        return diff_list
     
     if not quiet:
         print "[PASS]"
@@ -605,7 +781,7 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
     tbl2_hash = _make_sum_rows(table2, pri_idx_str2)
 
     # Compare results
-    in_both, in1_not2, in2_not1 = _get_common_lists(tbl1_hash, tbl2_hash)
+    in_both, in1_not2, in2_not1 = get_common_lists(tbl1_hash, tbl2_hash)
     
     # If mismatch found, go back to compare table and retrieve grouping.
     if len(in1_not2) != 0 or len(in2_not1) != 0:
@@ -622,8 +798,8 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
             table2_diffs.append(row[0])
             
         # Find changed and missing rows
-        changed_rows, extra1, extra2 = _get_common_lists(table1_diffs,
-                                                         table2_diffs)
+        changed_rows, extra1, extra2 = get_common_lists(table1_diffs,
+                                                        table2_diffs)
         
         if len(changed_rows) > 0:
             data_diffs.append("Data differences found among rows:")

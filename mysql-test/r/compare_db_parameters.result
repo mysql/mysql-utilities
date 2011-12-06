@@ -29,8 +29,9 @@ Options:
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           Turn off all messages for quiet execution.
   -d DIFFTYPE, --difftype=DIFFTYPE
-                        display differences in context format either unified,
-                        context, or differ (default: unified).
+                        display differences in context format in one of the
+                        following formats: [unified|context|differ] (default:
+                        unified).
 Test case 2 - Use  -a --difftype=unified --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -301,7 +302,7 @@ Data differences found among rows:
 -         cost: 9.99
 +         cost: 10.00
           type: other
-         notes: 
+         notes:
       supplier: 1
 @@ -10,7 +10,7 @@
   stock_number: 11186
@@ -310,7 +311,7 @@ Data differences found among rows:
 -         cost: 9.99
 +         cost: 10.00
           type: polishing
-         notes: 
+         notes:
       supplier: 1
 @@ -18,7 +18,7 @@
   stock_number: 11146
@@ -319,7 +320,7 @@ Data differences found among rows:
 -         cost: 9.99
 +         cost: 10.00
           type: repair
-         notes: 
+         notes:
       supplier: 1
 
 Rows in inventory.supplies not in inventory.supplies
@@ -695,7 +696,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 9.99
            type: other
-          notes: 
+          notes:
        supplier: 1
 --- 2,8 ----
    stock_number: 11040
@@ -703,7 +704,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 10.00
            type: other
-          notes: 
+          notes:
        supplier: 1
 ***************
 *** 10,16 ****
@@ -712,7 +713,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 9.99
            type: polishing
-          notes: 
+          notes:
        supplier: 1
 --- 10,16 ----
    stock_number: 11186
@@ -720,7 +721,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 10.00
            type: polishing
-          notes: 
+          notes:
        supplier: 1
 ***************
 *** 18,24 ****
@@ -729,7 +730,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 9.99
            type: repair
-          notes: 
+          notes:
        supplier: 1
 --- 18,24 ----
    stock_number: 11146
@@ -737,7 +738,7 @@ Data differences found among rows:
             qty: 1
 !          cost: 10.00
            type: repair
-          notes: 
+          notes:
        supplier: 1
 
 Rows in inventory.supplies not in inventory.supplies
@@ -1097,7 +1098,7 @@ Data differences found among rows:
 +          cost: 10.00
 ?                ^^ ^^
            type: other
-          notes: 
+          notes:
        supplier: 1
   *************************       2. row *************************
    stock_number: 11186
@@ -1108,7 +1109,7 @@ Data differences found among rows:
 +          cost: 10.00
 ?                ^^ ^^
            type: polishing
-          notes: 
+          notes:
        supplier: 1
   *************************       3. row *************************
    stock_number: 11146
@@ -1119,7 +1120,7 @@ Data differences found among rows:
 +          cost: 10.00
 ?                ^^ ^^
            type: repair
-          notes: 
+          notes:
        supplier: 1
   3 rows.
 

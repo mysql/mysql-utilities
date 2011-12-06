@@ -29,6 +29,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -71,8 +72,14 @@ parser.add_option("--force", action="store_true", dest="force",
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
-# Add difftype option
-add_difftype(parser)
+# Add difftype option with SQL option
+add_difftype(parser, True)
+
+# Add the direction (changes-for)
+add_changes_for(parser)
+
+# Add show reverse option
+add_reverse(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -86,7 +93,9 @@ options = {
     "verbosity"        : opt.verbosity,
     "difftype"         : opt.difftype,
     "force"            : opt.force,
-    "width"            : opt.width
+    "width"            : opt.width,
+    "changes-for"      : opt.changes_for,
+    "reverse"          : opt.reverse,
 }
 
 # Parse server connection values
@@ -101,6 +110,10 @@ if opt.server2 is not None:
         parser.error("Server2 connection values invalid or cannot be parsed.")
 else:
     server2_values = None
+    
+# Check for arguments
+if len(args) == 0:
+    parser.error("No objects specified to compare.")
 
 # run the diff
 diff_failed = False
@@ -140,7 +153,7 @@ for argument in args:
 
 if diff_failed:
     if not opt.quiet:
-        print "Diff failed. One or more differences found."
+        print "Compare failed. One or more differences found."
     exit(1)            
 
 if not opt.quiet:

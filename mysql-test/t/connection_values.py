@@ -75,7 +75,7 @@ class test(mutlib.System_test):
                 if self.results[i][1] == '':
                     errors = (msg)
                 else:
-                    errors = (msg, "Exception: %s." % self.results[i][1])
+                    errors = (msg, "\nException: %s." % self.results[i][1])
                 return (False, errors)
         
         return (True, None)

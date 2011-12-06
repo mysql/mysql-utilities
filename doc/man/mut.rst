@@ -126,6 +126,10 @@ NOTES
 The information specified for the server must be a valid login
 account.
 
+Any test named ???_template.py shall be skipped. This permits the developer
+to create a base class to import for a collection of tests based on a common
+code base.
+
 EXAMPLES
 --------
 

@@ -76,6 +76,9 @@ stock_number,description,qty,cost,type,notes,supplier
 
 VIEW      tools                                     FAIL    -       -       
 
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- inventory.tools
 +++ inventory.tools
 @@ -1,1 +1,1 @@

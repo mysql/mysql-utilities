@@ -618,6 +618,27 @@ class System_test(object):
         return res == exp_result
 
     
+    def run_test_case_result(self, command, comments, debug=False):
+        """Execute a test case and save the results returning actual result.
+
+        Call this method to run a test case and save the results to the
+        results list.
+        
+        command[in]        Execution command (e.g. ./mysqlclonedb.py --help)
+        comments[in]       Comments to put in result list
+        debug[in]          Print debug information during execution
+              
+        Returns int - actual result
+        """
+        if self.debug or debug:
+            print "\n%s" % comments
+        res = self.exec_util(command, self.res_fname)
+        if comments:
+            self.results.append(comments + "\n")
+        self.record_results(self.res_fname)
+        return res
+
+
     def replace_result(self, prefix, str):
         """Replace a string in the results with a new, deterministic string.
 

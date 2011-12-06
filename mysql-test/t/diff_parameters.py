@@ -5,6 +5,7 @@ import diff
 from mysql.utilities.exception import MUTLibError
 
 _FORMATS = ['unified','context','differ']
+_DIRECTIONS = ['server1', 'server2']
 
 class test(diff.test):
     """check parameters for diff
@@ -78,6 +79,22 @@ class test(diff.test):
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Test --changes-for and reverse
+        for dir in _DIRECTIONS:
+            test_num += 1
+            cmd_opts = " --changes-for=%s " % dir 
+            comment = "Test case %d - Use%s " % (test_num, cmd_opts)
+            res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+            if not res:
+                raise MUTLibError("%s: failed" % comment)
+            # now with reverse
+            test_num += 1
+            cmd_opts = " --changes-for=%s --show-reverse" % dir 
+            comment = "Test case %d - Use%s " % (test_num, cmd_opts)
+            res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+            if not res:
+                raise MUTLibError("%s: failed" % comment)
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
