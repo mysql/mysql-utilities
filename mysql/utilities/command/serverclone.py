@@ -27,15 +27,14 @@ import sys
 import time
 import shutil
 
-def clone_server(conn_val, new_data, new_port, new_id, rootpass,
-                 mysqld_options=None, verbose=False, quiet=False):
+def clone_server(conn_val, options):
     """Clone an existing server
 
     This method creates a new instance of a running server using a datadir
     set to the new_data parametr, with a port set to new_port, server_id
-    set to new_id and a root password of rootpass. You can also specify
+    set to new_id and a root password of root_pass. You can also specify
     additional parameters for the mysqld command line as well as turn on
-    verbose mode to display more diagnostic information during the clone
+    verbosity mode to display more diagnostic information during the clone
     process.
 
     The method will build a new base database installation from the .sql
@@ -45,22 +44,34 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     dest_val[in]        a dictionary containing connection information
                         including:
                         (user, password, host, port, socket)
-    new_data[in]        An existing path to create the new database and use
-                        as datadir for new instance
-    new_port[in]        Port number for new instance
-    new_id[in]          Server_id for new instance
-    rootpass[in]        Password for root user on new instance (optional)
-    mysqld_options[in]  Additional command line options for mysqld
-    verbose[in]         Print additional information during operation
-                        (default is False)
-    quiet[in]           If True, do not print messages.
-                        (default is False)
+    options[in]         dictionary of options:
+      new_data[in]        An existing path to create the new database and use
+                          as datadir for new instance
+                          (default = None)
+      new_port[in]        Port number for new instance
+                          (default = 3307)
+      new_id[in]          Server_id for new instance
+                          (default = 2)
+      root_pass[in]       Password for root user on new instance (optional)
+      mysqld_options[in]  Additional command line options for mysqld
+      verbosity[in]       Print additional information during operation
+                          (default is 0)
+      quiet[in]           If True, do not print messages.
+                          (default is False)
+      cmd_file[in]        file name to write startup command
     """
 
     from mysql.utilities.common.server import Server
     from mysql.utilities.exception import UtilError
     from mysql.utilities.common.tools import get_tool_path
-
+    
+    new_data = options.get('new_data', None)
+    new_port = options.get('new_port', '3307')
+    root_pass = options.get('root_pass', None)
+    verbosity = options.get('verbosity', 0)
+    quiet = options.get('quiet', False)
+    cmd_file = options.get('cmd_file', None)
+    
     # Try to connect to the MySQL database server.
     server1_options = {
         'conn_info' : conn_val,
@@ -111,14 +122,21 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
                                         "mysql_test_data_timezone.sql", False)
     help_data = get_tool_path(basedir, "fill_help_tables.sql", False)
 
-    if verbose and not quiet:
-        print "Location of files:"
-        print "                      mysqld: %s" % mysqld_path
-        print "                  mysqladmin: %s" % mysqladmin_path
-        print "     mysql_system_tables.sql: %s" % system_tables
-        print "mysql_system_tables_data.sql: %s" % system_tables_data
-        print "mysql_test_data_timezone.sql: %s" % test_data_timezone
-        print "        fill_help_tables.sql: %s" % help_data
+    if verbosity >= 3 and not quiet:
+        print "# Location of files:"
+        locations = [
+            ("mysqld", mysqld_path),
+            ("mysqladmin", mysqladmin_path),
+            ("mysql_system_tables.sql", system_tables),
+            ("mysql_system_tables_data.sql", system_tables_data),
+            ("mysql_test_data_timezone.sql", test_data_timezone),
+            ("fill_help_tables.sql", help_data),
+        ]
+        if cmd_file is not None:
+            locations.append(("write startup command to", cmd_file))
+        
+        for location in locations:
+            print "# % 28s: %s" % location
 
     # Create the new mysql data with mysql_import_db-like process
     if not quiet:
@@ -140,7 +158,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
             " --datadir=%s --basedir=%s " % (new_data, mysql_basedir) + \
             " < bootstrap.sql"
     proc = None
-    if verbose and not quiet:
+    if verbosity >= 1 and not quiet:
         proc = subprocess.Popen(cmd, shell=True)
     else:
         proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
@@ -156,16 +174,30 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     if not quiet:
         print "# Starting new instance of the server..."
     cmd = mysqld_path + " --no-defaults "
-    if mysqld_options:
-        cmd += mysqld_options + " --user=root "
+    if options.get('mysqld_options', None):
+        cmd += options.get('mysqld_options') + " --user=root "
     cmd += "--datadir=%s " % (new_data)
     cmd += "--tmpdir=%s " % (new_data)
     cmd += "--pid-file=%s " % os.path.join(new_data, "clone.pid")
     cmd += "--port=%s " % (new_port)
-    cmd += "--server-id=%s " % (new_id)
+    cmd += "--server-id=%s " % (options.get('new_id', 2))
     cmd += "--basedir=%s " % (mysql_basedir)
     cmd += "--socket=%s/mysql.sock " % (new_data)
-    if verbose and not quiet:
+
+    # Write startup command if specified
+    if cmd_file is not None:
+        if verbosity >= 0 and not quiet:
+            print "# Writing startup command to file."
+        cfile = open(cmd_file, 'w') 
+        if os.name == 'posix' and cmd_file.endswith('.sh'):
+            cfile.write("#!/bin/sh\n")
+        cfile.write("# Startup command generated by mysqlserverclone.\n")
+        cfile.write("%s\n" % cmd)
+        cfile.close()
+        
+    if verbosity >= 1 and not quiet:
+        if verbosity >= 2:
+            print "# Startup command for new server:\n%s" % cmd
         proc = subprocess.Popen(cmd, shell=True)
     else:
         proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
@@ -203,7 +235,7 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         except:
             pass
         finally:
-            if verbose and not quiet:
+            if verbosity >= 1 and not quiet:
                 print "# trying again..."
 
     if i == stop:
@@ -212,16 +244,16 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
         print "# Success!"
 
     # Set the root password
-    if rootpass:
+    if root_pass:
         if not quiet:
             print "# Setting the root password..."
         if os.name == "posix":
             cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
-                  "--socket=%s password %s " % (new_sock, rootpass)
+                  "--socket=%s password %s " % (new_sock, root_pass)
         else:
             cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
-                  "password %s --port=%s" % (rootpass, int(new_port))
-        if verbose and not quiet:
+                  "password %s --port=%s" % (root_pass, int(new_port))
+        if verbosity > 0 and not quiet:
             proc = subprocess.Popen(cmd, shell=True)
         else:
             proc = subprocess.Popen(cmd, shell=True,
@@ -233,8 +265,8 @@ def clone_server(conn_val, new_data, new_port, new_id, rootpass,
     if not quiet:
         conn_str = "# Connection Information:\n"
         conn_str += "#  -uroot"
-        if rootpass:
-            conn_str += " -p%s" % rootpass
+        if root_pass:
+            conn_str += " -p%s" % root_pass
         if os.name == "posix":
             conn_str += " --socket=%s" % new_sock
         else:

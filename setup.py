@@ -60,7 +60,6 @@ class install_scripts(_install_scripts):
 
     def run(self):
         from distutils import log, dir_util
-        _install_scripts.run(self)
         # We should probably use distutils.dist.execute here to allow
         # --dry-run to work properly.
         if not self.skip_profile:
@@ -77,6 +76,7 @@ class install_scripts(_install_scripts):
             else:
                 log.info("Not adding %s%s", self.profile_file,
                          " (skipped)" if self.skip_profile else "")
+        _install_scripts.run(self)
 
     def get_outputs(self):
         outputs = _install_scripts.get_outputs(self)

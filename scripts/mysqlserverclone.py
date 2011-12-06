@@ -58,12 +58,17 @@ parser.add_option("--new-id", action="store", dest="new_id",
                          "the new instance - default=%default")
 
 # Root password for the new instance
-parser.add_option("--root-password", action="store", dest="rootpass",
-                  type="string", help="password for the root user")
+parser.add_option("--root-password", action="store", dest="root_pass",
+                  type="string", help="Password for the root user")
 
 # Optional additional command-line options
 parser.add_option("--mysqld", action="store", dest="mysqld",
                   type="string", help="Additional options for mysqld")
+
+# Option to write command to file
+parser.add_option("--write-command", "-w", action="store", dest='cmd_file',
+                  default=None, type="string", help="Path to file for writing"
+                  " startup command. For example: start_server1.sh")
 
 # Add verbosity and quiet mode
 add_verbosity(parser, True)
@@ -76,8 +81,20 @@ if opt.new_data is None:
     parser.error("No new database path. Use --help for available options.")
 
 # Warn if root-password is left off.
-if opt.rootpass is None or opt.rootpass == '':
+if opt.root_pass is None or opt.root_pass == '':
     print "# WARNING: Root password for new instance has not been set."
+
+# Build options
+options = {
+    'new_data'       : opt.new_data,
+    'new_port'       : opt.new_port,
+    'new_id'         : opt.new_id,
+    'root_pass'      : opt.root_pass,
+    'mysqld_options' : opt.mysqld,
+    'verbosity'      : opt.verbosity,
+    'quiet'          : opt.quiet,
+    'cmd_file'       : opt.cmd_file,
+}
 
 # Parse source connection values
 try:
@@ -86,9 +103,7 @@ except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 try:
-    res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
-                                    opt.new_id, opt.rootpass, opt.mysqld,
-                                    opt.verbosity >= 1, opt.quiet)
+    res = serverclone.clone_server(conn, options)
 except exception.UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
