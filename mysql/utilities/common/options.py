@@ -160,18 +160,52 @@ def check_verbosity(options):
         options.verbosity = None
 
 
-def add_difftype(parser, default="unified"):
+def add_changes_for(parser):
+    """Add the changes_for option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("--changes-for", action="store", dest="changes_for",
+                      type="choice", default="server1", help="Specify the "
+                      "server to show transformations to match the other "
+                      "server. For example, to see the transformation for "
+                      "transforming server1 to match server2, use "
+                      "--changes-for=server1. Valid values are 'server1' or "
+                      "'server2'. The default is 'server1'.",
+                      choices=['server1', 'server2'])
+
+
+def add_reverse(parser):
+    """Add the show-reverse option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("--show-reverse", action="store_true", dest="reverse",
+                      default=False, help="produce a transformation report "
+                      "containing the SQL statements to conform the object "
+                      "definitions specified in reverse. For example if "
+                      "--changes-for is set to server1, also generate the "
+                      "transformation for server2. Note: the reverse changes "
+                      "are annotated and marked as comments.")
+
+
+def add_difftype(parser, allow_sql=False, default="unified"):
     """Add the difftype option.
     
     parser[in]        the parser instance
+    allow_sql[in]     if True, allow sql as a valid option
+                      (default is False)
     default[in]       the default option
                       (default is unified)
     """
+    choice_list = ['unified', 'context', 'differ']
+    if allow_sql:
+        choice_list.append('sql')
     parser.add_option("-d", "--difftype", action="store", dest="difftype",
-                      type="choice", default="unified",
-                      choices=['unified', 'context', 'differ'],
-                      help="display differences in context format either "
-                      "unified, context, or differ (default: unified).", )
+                      type="choice", default="unified", choices=choice_list,
+                      help="display differences in context format in one of "
+                      "the following formats: [%s] (default: unified)." %
+                      '|'.join(choice_list))
 
 
 def add_engines(parser):

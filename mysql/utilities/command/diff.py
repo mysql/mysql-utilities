@@ -45,8 +45,7 @@ def object_diff(server1_val, server2_val, object1, object2, options):
 
     server1, server2 = server_connect(server1_val, server2_val,
                                       object1, object2, options)
-    result = diff_objects(server1, server2,
-                          object1, object2, options)
+    result = diff_objects(server1, server2, object1, object2, options)
     
     return result
 
@@ -87,6 +86,13 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     in_both.sort()
     if (len(in_db1) > 0 or len(in_db2) > 0) and not force:
         return False
+    
+    # Do the diff for the databases themselves
+    result = object_diff(server1, server2, db1, db2, options)
+    if result is not None:
+        success = False
+        if not force:
+            return False
 
     # For each that match, do object diff
     success = True

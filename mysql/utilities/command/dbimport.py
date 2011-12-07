@@ -543,17 +543,6 @@ def _build_col_metadata(obj_type, definitions):
     return table_col_list
 
 
-def _to_sql(obj):
-    """Convert a value to a suitable SQL value placing quotes where needed.
-
-    obj[in]           object (value) to convert
-
-    Returns (string) converted value
-    """
-    from mysql.connector.conversion import MySQLConverter
-    return MySQLConverter().quote(obj)
-
-
 def _build_insert_data(col_names, tbl_name, data):
     """Build simple INSERT statements for data.
 
@@ -563,8 +552,10 @@ def _build_insert_data(col_names, tbl_name, data):
 
     Returns (string) the INSERT statement.
     """
+    from mysql.utilities.common.sql_transform import to_sql
+    
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
-           ") VALUES (" + ','.join(imap(_to_sql, data))  + ");"
+           ") VALUES (" + ','.join(imap(to_sql, data))  + ");"
 
 
 def _skip_sql(sql, options):

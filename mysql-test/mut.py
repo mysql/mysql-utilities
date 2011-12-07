@@ -206,6 +206,10 @@ def find_tests(path):
                 
             # Get file and extension
             fname, ext = os.path.splitext(f)
+            
+            # Skip template tests
+            if fname.endswith('_template'):
+                continue
     
             # Check for suite.test as well as simply test
             if args and fname not in args and directory + "." + fname not in args:

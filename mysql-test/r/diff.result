@@ -1,10 +1,13 @@
 Test case 1 - diff a sample database
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
+# Comparing util_test to util_test                                 [PASS]
 # Comparing util_test.f1 to util_test.f1                           [PASS]
 # Comparing util_test.p1 to util_test.p1                           [PASS]
 # Comparing util_test.t1 to util_test.t1                           [FAIL]
-# Object definitions are not the same:
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- util_test.t1
 +++ util_test.t1
 @@ -1,3 +1,4 @@
@@ -13,12 +16,14 @@ Test case 1 - diff a sample database
 +  `a` char(30) DEFAULT NULL,
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Diff failed. One or more differences found.
+Compare failed. One or more differences found.
 Test case 2 - diff a single object - not same
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t2 to util_test.t2                           [FAIL]
-# Object definitions are not the same:
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- util_test.t2
 +++ util_test.t2
 @@ -1,3 +1,3 @@
@@ -26,7 +31,7 @@ Test case 2 - diff a single object - not same
    `a` char(30) DEFAULT NULL
 -) ENGINE=MyISAM DEFAULT CHARSET=latin1
 +) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Diff failed. One or more differences found.
+Compare failed. One or more differences found.
 Test case 3 - diff a single object - is same
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -49,10 +54,13 @@ Test case 5 - diff multiple objects + database - some same
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
+# Comparing util_test to util_test                                 [PASS]
 # Comparing util_test.f1 to util_test.f1                           [PASS]
 # Comparing util_test.p1 to util_test.p1                           [PASS]
 # Comparing util_test.t1 to util_test.t1                           [FAIL]
-# Object definitions are not the same:
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- util_test.t1
 +++ util_test.t1
 @@ -1,3 +1,4 @@
@@ -62,7 +70,9 @@ Test case 5 - diff multiple objects + database - some same
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 # Comparing util_test.t2 to util_test.t2                           [FAIL]
-# Object definitions are not the same:
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- util_test.t2
 +++ util_test.t2
 @@ -1,3 +1,3 @@
@@ -74,4 +84,4 @@ Test case 5 - diff multiple objects + database - some same
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 # Comparing util_test.trg to util_test.trg                         [PASS]
 # Comparing util_test.v1 to util_test.v1                           [PASS]
-Diff failed. One or more differences found.
+Compare failed. One or more differences found.

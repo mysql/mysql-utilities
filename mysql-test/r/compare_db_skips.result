@@ -55,6 +55,9 @@ stock_number,description,qty,cost,type,notes,supplier
 
 VIEW      tools                                     FAIL    -       -       
 
+# Object definitions differ. (--changes-for=server1)
+#
+
 --- inventory.tools
 +++ inventory.tools
 @@ -1,1 +1,1 @@
@@ -121,6 +124,9 @@ stock_number,description,qty,cost,type,notes,supplier
 10665,Glass polish pad,3,10.00,polishing,,1
 
 VIEW      tools                                     FAIL    -       -       
+
+# Object definitions differ. (--changes-for=server1)
+#
 
 --- inventory.tools
 +++ inventory.tools
@@ -219,6 +225,9 @@ Row counts are not the same among inventory.supplies and inventory.supplies.
 
 
 VIEW      tools                                     FAIL    -       -       
+
+# Object definitions differ. (--changes-for=server1)
+#
 
 --- inventory.tools
 +++ inventory.tools
