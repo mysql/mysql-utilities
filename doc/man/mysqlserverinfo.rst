@@ -119,6 +119,17 @@ OPTIONS
    Applies to Windows only and is ignored if :option:`--show-servers` is not
    specified. Default is 3306:3333
 
+.. option:: --start, -s
+
+   start server in read only mode if offline
+
+.. option:: --basedir=<basedir>
+
+   the base directory for the server
+  
+.. option:: --datadir=<datadir>
+
+   the data directory for the server
 
 .. _mysqlserverinfo-notes:
 

@@ -153,6 +153,11 @@ Options
 
    display the output in either GRID (default), TAB, CSV, or VERTICAL format
 
+.. option:: --age=<time>
+
+   Only show processes that have been in the current state more than a given
+   time
+
 
 Specifying time
 ~~~~~~~~~~~~~~~
