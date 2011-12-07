@@ -21,7 +21,7 @@ This utility is used to show the slaves for a master. It will print a graph of
 the master and its slaves labeling each with the hostname and port.
 
 You can choose to explore the slaves for each client with the
-`:option:--recurse` option. This will permit the utility to connect to
+:option:`--recurse` option. This will permit the utility to connect to
 each slave found and attempt to find if it has any slaves. If slaves are found,
 the process continues until the slave is found in the list of servers serving
 as masters (a circular topology). The graph displays the topology with
@@ -50,7 +50,7 @@ localhost:3311 (MASTER)
            |
            +--- localhost:3311 <--> (SLAVE)
 
-You can specify the `:option:--show-list` option to produce a column list of
+You can specify the :option:`--show-list` option to produce a column list of
 the graph. You also have the choice to view the output in one of the following
 formats using the :option:`--format` option.
 
@@ -70,21 +70,20 @@ formats using the :option:`--format` option.
 
 You must provide valid login information for the master as shown above.
 
-If you elect to use the `:option:--recurse` option, the utility will
+If you elect to use the :option:`--recurse` option, the utility will
 attempt to connect to the slaves using the user name and password provided for
 the master. If these credentials do not work (the connection fails), the
 utility will thrown an error and stop. This behavior can be changed using the
-`:option:--prompt` option which will permit the utility to prompt for the user
+:option:`--prompt` option which will permit the utility to prompt for the user
 name and password for each slave that fails to connect. You can also use the
-`:option:--num-retries=n` option to reattempt a failed connection 'n' times
+:option:`--num-retries=n` option to reattempt a failed connection 'n' times
 before the utility fails.
 
 The utility reports slaves by use of the *SHOW SLAVE HOSTS* command whereby the
-slaves should be started with the `:option:--report-host` and
-`:option:--report-port` options specified. If you want to use the
-:option:--recurse` option, the values for these options must be set to the
-actual port and host of the slaves else the utility may not be able to connect
-to the slaves to find their slaves.
+slaves should be started with the --report-host and --report-port options
+specified. If you want to use the :option:--recurse` option, the values for
+these options must be set to the actual port and host of the slaves else the
+utility may not be able to connect to the slaves to find their slaves.
 
 OPTIONS
 -------
@@ -138,8 +137,8 @@ privileges to successfully execute this utility. Specifically, the login user
 must have appropriate permissions to execute *SHOW SLAVE STATUS*, *SHOW MASTER
 STATUS*, and *SHOW SLAVE HOSTS*.
 
-When using the `:option:--prompt` option, the utility sets the
-`:option:--num-retries` option to 1 if not set explicitly. This ensures at
+When using the :option:`--prompt` option, the utility sets the
+:option:`--num-retries` option to 1 if not set explicitly. This ensures at
 least one attempt to retry and prompt for the user name and password should a
 connection fail.
 
