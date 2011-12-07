@@ -231,7 +231,7 @@ Host2:
 CREATE TABLE dbx.table3 (num int, notes char(30), misc char(55));
 
 To generate a set of SQL statements to transform the definition of db1.table1 to
-dbx.table3, use this command:
+dbx.table3, use this command::
 
     $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
           --changes-for=server1 --difftype=sql
@@ -247,7 +247,7 @@ dbx.table3, use this command:
     Compare failed. One or more differences found.
 
 To generate a set of SQL statements to transform the definition of dbx.table3 to
-db1.table1, use this command:
+db1.table1, use this command::
 
     $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
           --changes-for=server2 --difftype=sql
@@ -263,7 +263,7 @@ db1.table1, use this command:
     Compare failed. One or more differences found.
 
 To generate a set of SQL statements to transform the definitions of dbx.table3
-and db1.table1 in both directions, use this command:
+and db1.table1 in both directions, use this command::
 
     $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
           --show-reverse --difftype=sql
