@@ -184,10 +184,6 @@ OPTIONS
 
    Print the version and exit.
 
-.. option:: --help, -h
-
-   Print help.
-
 
 EXAMPLES
 --------
