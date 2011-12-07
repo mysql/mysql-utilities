@@ -5,7 +5,7 @@ import import_basic
 from mysql.utilities.exception import MUTLibError, UtilDBError
 
 class test(import_basic.test):
-    """check parameters for impport utility
+    """check parameters for import utility
     This test executes a basic check of parameters for mysqldbimport.
     It uses the import_basic test as a parent for setup and teardown methods.
     """

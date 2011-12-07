@@ -32,6 +32,14 @@ _MAXTHREADS_INSERT = 6
 _MAXROWS_PER_THREAD = 100000
 _MAXAVERAGE_CALC = 100
 
+_FOREIGN_KEY_QUERY = """
+  SELECT CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
+         REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME 
+  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND 
+        REFERENCED_TABLE_SCHEMA IS NOT NULL
+"""
+
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
 
@@ -400,25 +408,32 @@ class Table(object):
         blob_col[in]       number of the column containing the blob
 
         Returns tuple (UPDATE string, blob data)
-        """
-        
+        """        
+        from mysql.connector.conversion import MySQLConverter
+
         if self.column_format is None:
             self.get_column_metadata()
 
-        blob_insert = "UPDATE %s.%s SET `" % (new_db, name)
-        where_clause = "WHERE "
-        data_clause = None
+        blob_insert = "UPDATE %s.%s SET " % (new_db, name)
+        where_values = []
+        do_commas = False
+        has_data = False
         stop = len(row)
         for col in range(0,stop):
             col_name = self.column_names[col]
             if col in self.blob_columns:
-                blob_insert += col_name + "` = %s "
-                data = row[col]
+                if row[col] is not None and len(row[col]) > 0:
+                    if do_commas:
+                        blob_insert += ", "
+                    blob_insert += "`%s` = " % col_name + "%s" % \
+                                   MySQLConverter().quote(row[col])
+                    has_data = True
+                    do_commas = True
             else:
-                if col > 0 and col < stop:
-                    where_clause += " AND "
-                where_clause += "`%s` = '%s' " % (col_name, row[col])
-        return (blob_insert + where_clause, data)
+                where_values.append("`%s` = '%s' " % (col_name, row[col]))
+        if has_data:
+            return blob_insert + " WHERE " + " AND ".join(where_values) + ";"
+        return None
 
 
     def get_column_string(self, row, new_db):
@@ -439,18 +454,23 @@ class Table(object):
         # Find blobs
         for col in self.blob_columns:
             # Save blob updates for later...
-            str = self._build_update_blob(row, new_db, self.tbl_name, col)
-            blob_inserts.append(str)
+            blob = self._build_update_blob(row, new_db, self.tbl_name, col)
+            if blob is not None:
+                blob_inserts.append(blob)
             values[col] = "NULL"
 
-        # Fix text fields
+        # Replace single quotes located in the value for a text field with
+        # a double single quote. This fixes SQL errors related to using
+        # single quotes in a string value that is single quoted. For example,
+        # we change 'this' is it' to 'this'' is it'
         [values[col].replace("'", "''") for col in self.text_columns]
         
         # Build string
         val_str = self.column_format % tuple(values)
 
-        # Fix NULLs
-        val_str.replace(", None,", ", NULL,")
+        # Change 'None' occurrences with "NULL"
+        val_str.replace(", None", ", NULL")
+        val_str.replace("(None", "(NULL")
         
         return (val_str, blob_inserts)
 
@@ -767,6 +787,16 @@ class Table(object):
         Returns result set
         """
         res = self.server.exec_query("SHOW INDEXES FROM %s" % self.table)
+        return res
+    
+    
+    def get_tbl_foreign_keys(self):
+        """Return a result set containing all foreign keys for the table
+        
+        Returns result set
+        """
+        res = self.server.exec_query(_FOREIGN_KEY_QUERY % (self.db_name,
+                                                           self.tbl_name))
         return res
 
 

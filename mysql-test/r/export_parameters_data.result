@@ -15,9 +15,9 @@ INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
@@ -34,9 +34,9 @@ INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test 
 # Data for table util_test.t2: 
 INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example', NULL),  ('12 Test Basic database example', NULL),  ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2 SET `x_blob` = This is a blob. WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2 SET `x_blob` = This is a blob. WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2 SET `x_blob` = This is a blob. WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
 # Data for table util_test.t4: 
@@ -83,9 +83,9 @@ INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
@@ -247,9 +247,9 @@ INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
@@ -411,9 +411,9 @@ INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
 INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = This is a blob. WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
 # Data for table util_test.t3: 
 INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
 INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
@@ -976,4 +976,34 @@ Test case 30 - VERTICAL format with NAMES display
  c: 3
  d: 2
 1 rows.
+#...done.
+Test case 31 - multiple blobs
+# Source on localhost: ... connected.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL, NULL);
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL, NULL);
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL, NULL);
+# Blob data for table t2:
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
+UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.

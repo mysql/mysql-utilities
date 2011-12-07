@@ -232,9 +232,9 @@ GRANT UPDATE ON util_test.* TO 'joe'@'user'
 INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
 INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
 INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' 
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' 
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' 
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' ;
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' ;
+UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' ;
 INSERT INTO util_test.t4 VALUES  (3, 2)
 #...done.
 Test case 19 - no data

@@ -765,7 +765,7 @@ def import_file(dest_val, file_name, options):
             statements.extend(ins_strs[0])
         if len(ins_strs[1]) > 0 and not skip_blobs:
             for update in ins_strs[1]:
-                statements.append(update[0] % "'%s'" % update[1])
+                statements.append(update)
 
     # Gather options
     format = options.get("format", "SQL").upper()

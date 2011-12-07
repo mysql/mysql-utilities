@@ -251,8 +251,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
             else:
                 print "# Blob data for table %s:" % tbl_name
                 for blob_row in blob_rows:
-                    row_str = blob_row[0] % blob_row[1] + ";"
-                    outfile.write(row_str + "\n")
+                    outfile.write(blob_row + "\n")
 
     # Cannot use print_list here becasue we must manipulate
     # the behavior of format_tabular_list

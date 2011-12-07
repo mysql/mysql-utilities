@@ -63,6 +63,16 @@ class test(export_parameters_def.test):
         func = export_parameters_def.test.test_format_and_display_values
         func(self, "%s util_test --export=data --format=" % cmd_str, 4)
 
+        self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
+                                 " y_blob blob")
+        self.server1.exec_query("UPDATE util_test.t2 SET y_blob = "
+                                "'This is yet another blob.' ")
+
+        comment = "Test case 31 - multiple blobs"
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
   
     def get_result(self):
