@@ -28,12 +28,12 @@ import sys
 import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbexport
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_format_option
-from mysql.utilities.common.options import add_all, check_all
+from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -102,8 +102,10 @@ parser.add_option("--file-per-table", action="store_true", dest="file_per_tbl",
 parser.add_option("-x", "--exclude", action="append", dest="exclude",
                   type="string", default=None, help="Exclude one or more "
                   "objects from the operation using either a specific name "
-                  "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
-                  "for multiple exclusions.")
+                  "(e.g. db1.t1), a LIKE pattern (e.g. db1.t% or db%.%) or a "
+                  "REGEXP search pattern. To use a REGEXP search pattern for "
+                  "all exclusions, you must also specify the --regexp option. "
+                  "Repeat the --exclude option for multiple exclusions.")
 
 # Add the all database options
 add_all(parser, "databases")
@@ -114,26 +116,17 @@ add_skip_options(parser)
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
+# Add regexp
+add_regexp(parser)
+
+# Add locking
+add_locking(parser)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
-
-# Build exclusion lists
-exclude_objects = []
-exclude_object_names = []
-if opt.exclude is not None:
-    try:
-        for item in opt.exclude:
-            if item.find(".") > 0:
-                db, name = item.split(".")
-                exclude_object_names.append((db, name))
-            else:
-                exclude_objects.append(item)
-    except:
-        print "WARNING: Cannot parse exclude list. " + \
-              "Proceeding without exclusions."
 
 try:
     skips = check_skip_options(opt.skip_objects)
@@ -212,9 +205,10 @@ options = {
     "verbosity"        : opt.verbosity,
     "debug"            : opt.verbosity >= 3,
     "file_per_tbl"     : opt.file_per_tbl,
-    "exclude_names"    : exclude_object_names,
-    "exclude_patterns" : exclude_objects,
+    "exclude_patterns" : opt.exclude,
     "all"              : opt.all,
+    "use_regexp"       : opt.use_regexp,
+    "locking"          : opt.locking,
 }
 
 # Parse server connection values

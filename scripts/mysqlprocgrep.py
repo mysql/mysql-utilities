@@ -8,7 +8,7 @@ import sys
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.proc import *
 from mysql.utilities.exception import FormatError, EmptyResultError
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import check_format_option
@@ -26,10 +26,9 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               "mysqlprocgrep - search process information",
                               "%prog --server=user:pass@host:port:socket "
                               "[options]", True)
-parser.add_option(
-    "-G", "--basic-regexp", "--regexp",
-    dest="use_regexp", action="store_true", default=False,
-    help="Use 'REGEXP' operator to match pattern. Default is to use 'LIKE'.")
+# Add regexp
+add_regexp(parser)
+
 parser.add_option(
     "-Q", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,

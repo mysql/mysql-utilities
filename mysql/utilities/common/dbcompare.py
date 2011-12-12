@@ -26,10 +26,6 @@ from mysql.utilities.exception import UtilError, UtilDBError
 # The following are the queries needed to perform table data consistency
 # checking.
 
-_LOCK_TABLE = """
-    LOCK TABLE {db}.{table} READ, {db}.compare_{table} WRITE
-"""
-
 _COMPARE_TABLE = """
     CREATE TEMPORARY TABLE {db}.compare_{table} (
         compare_sign char(32) NOT NULL PRIMARY KEY,
@@ -597,11 +593,16 @@ def _make_sum_rows(table, idx_str):
     
     Returns result from 
     """
+    from mysql.utilities.common.lock import Lock
+
     col_str = ", ".join(table.get_col_names())
         
     # Lock table first
-    table.server.exec_query(_LOCK_TABLE.format(db=table.db_name,
-                                               table=table.tbl_name))
+    tbl_lock_list = [
+        (table.table, 'READ'),
+        ("%s.compare_%s" % (table.db_name, table.tbl_name), 'WRITE')
+    ]
+    my_lock = Lock(table.server, tbl_lock_list)
 
     table.server.exec_query(
         _COMPARE_INSERT.format(db=table.db_name, table=table.tbl_name,
@@ -612,7 +613,7 @@ def _make_sum_rows(table, idx_str):
         _COMPARE_SUM.format(db=table.db_name, table=table.tbl_name))
 
     # Unlock table
-    table.server.exec_query("UNLOCK TABLES")
+    my_lock.unlock()
 
     return res
 

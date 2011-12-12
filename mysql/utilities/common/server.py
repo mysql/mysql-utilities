@@ -28,6 +28,8 @@ import mysql.connector
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.options import parse_connection
 
+_FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
+
 def get_connection_dictionary(conn_info):
     """Get the connection dictionary.
 
@@ -384,6 +386,9 @@ class Server(object):
         except KeyError:
             raise UtilError("Dictionary format not recognized.")
         self.connect_error = None
+        # Set to TRUE when foreign key checks are ON. Check with
+        # foreign_key_checks_enabled.
+        self.fkeys = None  
 
 
     def get_connection_values(self):
@@ -467,28 +472,6 @@ class Server(object):
                     if int(t_rel) > int(rel):
                         return False
         return True
-
-
-    def toggle_fkeys(self, turn_on=True):
-        """Turn foreign key checks on or off
-
-        turn_on[in]        if True, turns on fkey check
-                           if False, turns off fkey check
-
-        Returns original value = True == ON, False == OFF
-        """
-
-        query_options = {
-            'fetch' : False
-        }
-        fkey_query = "SET foreign_key_checks = %s"
-        res = self.show_server_variable("foreign_key_checks")
-        fkey = (res[0][1] == "ON")
-        if not fkey and turn_on:
-            res = self.exec_query(fkey_query % "ON", query_options)
-        elif fkey and not turn_on:
-            res = self.exec_query(fkey_query % "OFF", query_options)
-        return fkey
 
 
     def exec_query(self, query_str, options={}):
@@ -863,4 +846,33 @@ class Server(object):
             self.exec_query("SET SQL_LOG_BIN=0")
         elif action.lower() == 'enable':
             self.exec_query("SET SQL_LOG_BIN=1")
+
+   
+    def foreign_key_checks_enabled(self):
+        """Check foreign key status for the connection.
+        
+        Returns bool - True - foreign keys are enabled
+        """
+        if self.fkeys is None:
+            res = self.show_server_variable("foreign_key_checks")
+            self.fkeys = (res is not None) and (res[0][1] == "ON")
+        return self.fkeys
+
+
+    def disable_foreign_key_checks(self, disable=True):
+        """Enable or disable foreign key checks for the connection.
+        
+        disable[in]        if True, turn off foreign key checks
+                           elif False turn foreign key checks on
+        """
+        value = None
+        if self.fkeys is None:
+            self.foreign_key_checks_enabled()
+        if disable and self.fkeys:
+            value = "OFF"
+        elif not self.fkeys:
+            value = "ON"
+        if value is not None:
+            res = self.exec_query(_FOREIGN_KEY_SET % value, {'fetch':'false'})
+
 

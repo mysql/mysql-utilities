@@ -1920,6 +1920,4 @@ INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
 INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
-USE wesaysocorp;
-# Exporting data from wesaysocorp
 #...done.

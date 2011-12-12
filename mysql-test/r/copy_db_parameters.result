@@ -3,19 +3,19 @@ Test case 1 - normal run
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
-# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 #...done.
 Test case 2 - operation fails - need overwrite
 # Source on localhost: ... connected.
@@ -41,8 +41,11 @@ Options:
   --threads=THREADS     use multiple threads (connections) for insert
   -x EXCLUDE, --exclude=EXCLUDE
                         Exclude one or more objects from the operation using
-                        either a specific name (e.g. db1.t1) or a REGEXP
-                        search pattern. Repeat option for multiple exclusions.
+                        either a specific name (e.g. db1.t1), a LIKE pattern
+                        (e.g. db1.t% or db%.%) or a REGEXP search pattern. To
+                        use a REGEXP search pattern for all exclusions, you
+                        must also specify the --regexp option. Repeat the
+                        --exclude option for multiple exclusions.
   -a, --all             include all databases
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
@@ -58,6 +61,13 @@ Options:
                         Change all tables to use this storage engine if the
                         original storage engine does not exist on the
                         destination.
+  --locking=LOCKING     Choose the lock type for the operation: no-locks = do
+                        not use any table locks, lock-all = use table locks
+                        but no transaction and no consistent read, snaphot
+                        (default): consistent read using a single transaction.
+  -G, --basic-regexp, --regexp
+                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
@@ -67,11 +77,11 @@ Test case 4 - no data
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
-# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 #...done.
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 5 - quiet copy
@@ -85,10 +95,10 @@ Test case 6 - copy all databases - but only the utils
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
-# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
 # Copying database wesaysocorp 
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 #...done.

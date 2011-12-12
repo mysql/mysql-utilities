@@ -287,6 +287,40 @@ def check_all(parser, options, args, objects):
     if options.all and len(args) > 0:
         parser.error("You cannot use the --all option with a list of "
                      "%s." % objects)
+        
+        
+def add_locking(parser):
+    """Add the --locking option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("--locking", action="store", dest="locking",
+                      type="choice", default="snapshot", 
+                      choices=['no-locks', 'lock-all', 'snapshot'],
+                      help="Choose the lock type for the operation: no-locks "
+                      "= do not use any table locks, lock-all = use table "
+                      "locks but no transaction and no consistent read, "
+                      "snaphot (default): consistent read using a single "
+                      "transaction.")
+
+    
+def add_regexp(parser):
+    """Add the --regexp option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("-G", "--basic-regexp", "--regexp", dest="use_regexp",
+                      action="store_true", default=False, help="Use 'REGEXP' "
+                      "operator to match pattern. Default is to use 'LIKE'.")
+
+
+def obj2sql(obj):
+    """Convert a Python object to an SQL object.
+
+    This function convert Python objects to SQL values using the
+    conversion functions in the database connector package."""
+    from mysql.connector.conversion import MySQLConverter
+    return MySQLConverter().quote(obj)
 
 
 _CONN_USERPASS = re.compile(

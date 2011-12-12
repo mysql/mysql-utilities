@@ -37,7 +37,7 @@ class test(clone_db.test):
         clone_db.test.drop_db(self, self.server1, 'util_db_clone')
 
         comment = "Test case 2 - exclude by regex"
-        cmd_opts = "--exclude=^e --exclude=4$"
+        cmd_opts = "--exclude=^e --exclude=4$ --regex "
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -45,7 +45,7 @@ class test(clone_db.test):
         clone_db.test.drop_db(self, self.server1, 'util_db_clone')
 
         comment = "Test case 3 - exclude by name and regex"
-        cmd_opts = "--exclude=^e --exclude=4$ " + \
+        cmd_opts = "--exclude=^e --exclude=4$ --regex " + \
                    "--exclude=v1 --exclude=util_test.trg"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:

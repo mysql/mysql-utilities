@@ -295,7 +295,9 @@ def export_data(src_val, db_list, options):
     Returns bool True = success, False = error
     """
 
+    from mysql.utilities.command.dbcopy import get_copy_lock
     from mysql.utilities.common.database import Database
+    from mysql.utilities.common.lock import Lock
     from mysql.utilities.common.table import Table
     from mysql.utilities.common.server import connect_servers
 
@@ -311,6 +313,8 @@ def export_data(src_val, db_list, options):
     skip_funcs = options.get("skip_funcs", False)
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
+    locking = options.get("locking", "snapshot")
+    my_lock = None
 
     conn_options = {
         'quiet'     : quiet,
@@ -323,9 +327,12 @@ def export_data(src_val, db_list, options):
     if options.get("all", False):
         rows = source.get_all_databases()
         for row in rows:
-            db_list.append(row[0])
+            if row[0] not in db_list:
+                db_list.append(row[0])
 
-    # Check user permissions on source for all databases
+    # Check if database exists and user permissions on source for all databases
+    table_lock_list = []
+    table_list = []
     for db_name in db_list:
         source_db = Database(source, db_name)
 
@@ -338,69 +345,74 @@ def export_data(src_val, db_list, options):
             'skip_events' : skip_events,
         }
 
-        source_db.check_read_access(src_val["user"], src_val["host"],
-                                    access_options)
-
-    for db_name in db_list:
-
-        # Get a Database class instance
-        db = Database(source, db_name, options)
-
         # Error is source database does not exist
-        if not db.exists():
+        if not source_db.exists():
             raise UtilDBError("Source database does not exist - %s" % db_name,
                               -1, db_name)
+            
+        source_db.check_read_access(src_val["user"], src_val["host"],
+                                    access_options)
+        
+        # Build table list
+        # if this is a lock-all type, find all tables for locking
+        tables = source_db.get_db_objects("TABLE")
+        for table in tables:
+            table_list.append((db_name, table[0]))
+            if locking == 'lock-all':
+                table_lock_list.append(("%s.%s" % (db_name, table[0]),
+                                        'READ'))
 
-        if not quiet:
+    my_lock = get_copy_lock(source, table_lock_list, options, True)        
+        
+    old_db = ""
+    for table in table_list:
+        db_name = table[0]
+        tbl_name = "%s.%s" % (db_name, table[1])
+        if not quiet and old_db != db_name:
+            old_db = db_name
             if format == "SQL":
-                print "USE %s;" % db_name
+               print "USE %s;" % db_name
             print "# Exporting data from %s" % db_name
             if file_per_table:
                 print "# Writing table data to files."
 
-        # Perform the extraction
-        tables = db.get_db_objects("TABLE")
-        if len(tables) < 1:
-            break
-        for table in tables:
-            tbl_name = "%s.%s" % (db_name, table[0])
-            tbl_options = {
-                'verbose'  : False,
-                'get_cols' : True,
-                'quiet'    : quiet
-            }
-            cur_table = Table(source, tbl_name, tbl_options)
-            if single and format not in ("SQL", "GRID", "VERTICAL"):
-                retrieval_mode = -1
-                first = True
+        tbl_options = {
+            'verbose'  : False,
+            'get_cols' : True,
+            'quiet'    : quiet
+        }
+        cur_table = Table(source, tbl_name, tbl_options)
+        if single and format not in ("SQL", "GRID", "VERTICAL"):
+            retrieval_mode = -1
+            first = True
+        else:
+            retrieval_mode = 1
+            first = False
+
+        message = "# Data for table %s: " % tbl_name
+
+        # switch for writing to files
+        if file_per_table:
+            if format in ('SQL', 'S'):
+               file_name = tbl_name + ".sql"
             else:
-                retrieval_mode = 1
-                first = False
+                file_name = tbl_name + ".%s" % format.lower()
+            outfile = open(file_name, "w")
+            outfile.write(message + "\n")
+        else:
+            outfile = None
+            print message
 
-            message = "# Data for table %s: " % tbl_name
-
-            # switch for writing to files
-            if file_per_table:
-                if format in ('SQL', 'S'):
-                    file_name = tbl_name + ".sql"
-                else:
-                    file_name = tbl_name + ".%s" % format.lower()
-                outfile = open(file_name, "w")
-                outfile.write(message + "\n")
-            else:
-                outfile = None
-                print message
-
-            for data_rows in cur_table.retrieve_rows(retrieval_mode):
-                _export_row(data_rows, cur_table, 
-                            format, single, skip_blobs, first, no_headers,
-                            outfile)
-                if first:
-                    first = False
-
-            if file_per_table:
-                outfile.close()
-
+        for data_rows in cur_table.retrieve_rows(retrieval_mode):
+            _export_row(data_rows, cur_table, format, single,
+                        skip_blobs, first, no_headers, outfile)
+            if first:
+               first = False
+ 
+        if file_per_table:
+            outfile.close()
+  
+    my_lock.unlock()
 
     if not quiet:
         print "#...done."

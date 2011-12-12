@@ -24,7 +24,7 @@ import sys
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import check_format_option
 from mysql.utilities.exception import UtilError
@@ -49,10 +49,10 @@ parser.add_option(
     dest="object_types", default=','.join(OBJECT_TYPES),
     help="The object type to search in: a comma-separated list"
     " of one or more of: " + ', '.join(map(quote, OBJECT_TYPES)))
-parser.add_option(
-    "-G", "--basic-regexp", "--regexp",
-    dest="use_regexp", action="store_true", default=False,
-    help="Use 'REGEXP' operator to match pattern. Default is to use 'LIKE'.")
+
+# Add regexp
+add_regexp(parser)
+
 parser.add_option(
     "-p", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,

@@ -24,6 +24,81 @@ is exactly the same among two servers.
 import sys
 from mysql.utilities.exception import UtilError
 
+def get_copy_lock(server, table_lock_list, options, include_mysql=False):
+    """Get an instance of the Lock class with a standard copy (read) lock
+    
+    This method creates an instance of the Lock class using the lock type
+    specified in the options. It is used to initiate the locks for the copy
+    and related operations.
+    
+    server[in]             Server instance for locking calls
+    table_lock_list[in]    List of tables in form (db.name, type)
+                           Example = [('db1.t1', 'READ')]
+    options[in]            option dictionary
+                           Must include the skip_* options for copy and export
+    include_mysql[in]      if True, include the mysql tables for copy operation
+    
+    Returns Lock - Lock class instance
+    """
+    from mysql.utilities.common.lock import Lock
+
+    # if this is a lock-all type, find all tables and lock them
+    if options.get('locking', 'snapshot') == 'lock-all':
+        # Now add mysql tables
+        if include_mysql:
+            # Don't lock proc tables if no procs of funcs are being read
+            if not options.get('skip_procs', False) and \
+               not options.get('skip_funcs', False):
+                table_lock_list.append(("mysql.proc", 'READ'))
+                table_lock_list.append(("mysql.procs_priv", 'READ'))
+            # Don't lock event table if events are skipped
+            if not options.get('skip_events', False):
+                table_lock_list.append(("mysql.event", 'READ'))
+        lock = Lock(server, table_lock_list, options)
+    else:
+        lock = Lock(server, [], options)
+
+    return lock
+
+
+def _copy_objects(source, destination, db_list, options,
+                  show_message=True, do_create=True):
+    """Copy objects for a list of databases
+    
+    This method loops through a list of databases copying the objects as
+    controlled by the skip options.
+    
+    source[in]             Server class instance for source
+    destination[in]        Server class instance for destination
+    options[in]            copy options
+    show_message[in]       if True, display copy message
+                           Default = True
+    do_create[in]          if True, execute create statement for database
+                           Default = True
+    """
+    
+    from mysql.utilities.common.database import Database
+
+    # Copy objects
+    for db_name in db_list:
+        
+        if show_message:
+            # Display copy message
+            if not options.get('quiet', False):
+                msg = "# Copying database %s " % db_name[0]
+                if db_name[1]:
+                    msg += "renamed as %s" % (db_name[1])
+                print msg
+
+        # Get a Database class instance
+        db = Database(source, db_name[0], options)
+
+        # Perform the copy
+        db.init()
+        db.copy_objects(db_name[1], options, destination,
+                        options.get("threads", False), do_create)
+
+
 def copy_db(src_val, dest_val, db_list, options):
     """Copy a database
 
@@ -56,6 +131,7 @@ def copy_db(src_val, dest_val, db_list, options):
     """
 
     from mysql.utilities.common.database import Database
+    from mysql.utilities.common.options import check_engine_options
     from mysql.utilities.common.server import connect_servers
 
     quiet = options.get("quiet", False)
@@ -64,6 +140,9 @@ def copy_db(src_val, dest_val, db_list, options):
     skip_funcs = options.get("skip_funcs", False)
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
+    skip_data = options.get("skip_data", False)
+    skip_triggers = options.get("skip_triggers", False)
+    skip_tables = options.get("skip_tables", False)
 
     conn_options = {
         'quiet'     : quiet,
@@ -89,7 +168,12 @@ def copy_db(src_val, dest_val, db_list, options):
         else:
             raise UtilError("Cannot copy all databases on the same server.")
 
-    # Check user permissions on source and destination for all databases
+    # Do error checking and preliminary work:
+    #  - Check user permissions on source and destination for all databases
+    #  - Check to see if executing on same server but same db name (error)
+    #  - Build list of tables to lock for copying data (if no skipping data)
+    #  - Check storage engine compatibility
+    table_lock_list = []
     for db_name in db_list:
         source_db = Database(source, db_name[0])
         if destination is None:
@@ -115,7 +199,18 @@ def copy_db(src_val, dest_val, db_list, options):
         dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                    access_options)
 
-    for db_name in db_list:
+        # Build table list
+        if not skip_data and options.get('locking', 'snapshot') == 'lock-all':
+            tables = source_db.get_db_objects("TABLE")
+            for table in tables:
+                table_lock_list.append(("%s.%s" % (db_name[0], table[0]),
+                                        'READ'))
+                # Cloning requires issuing WRITE locks because we use same conn.
+                # Non-cloning will issue WRITE lock on a new destination conn.
+                if cloning:
+                    # For cloning, we use the same connection so we need to
+                    # lock the destination tables with WRITE.
+                    table_lock_list.append(("%s.%s" % (db, table[0]), 'WRITE'))
 
         # Error is source db and destination db are the same and we're cloning
         if destination == source and db_name[0] == db_name[1]:
@@ -123,25 +218,66 @@ def copy_db(src_val, dest_val, db_list, options):
                                  "source - source = %s, destination = %s" %
                                  (db_name[0], db_name[1]))
 
-        # Display copy message
-        if not quiet:
-            msg = "# Copying database %s " % db_name[0]
-            if db_name[1]:
-                msg += "renamed as %s" % (db_name[1])
-            print msg
-
-        # Get a Database class instance
-        db = Database(source, db_name[0], options)
-
         # Error is source database does not exist
-        if not db.exists():
-            raise UtilError("Source database does not exist - %s" %
-                                 db_name[0])
+        if not source_db.exists():
+            raise UtilError("Source database does not exist - %s" % db_name[0])
+        
+        # Check storage engines
+        check_engine_options(destination,
+                             options.get("new_engine", None),
+                             options.get("def_engine", None),
+                             False, options.get("quiet", False))
 
-        # Perform the copy
-        db.init()
-        db.copy(db_name[1], None, options, destination,
-                options.get("threads", False))
+
+    # Copy objects
+    # We need to delay trigger and events to after data is loaded
+    new_opts = options.copy()
+    new_opts['skip_triggers'] = True
+    new_opts['skip_events'] = True
+    _copy_objects(source, destination, db_list, new_opts)
+
+    # Copy data
+    if not skip_data and not skip_tables:
+        my_lock = get_copy_lock(source, table_lock_list, options, True)
+    
+        # Copy tables
+        for db_name in db_list:
+    
+            # Get a Database class instance
+            db = Database(source, db_name[0], options)
+    
+            # Perform the copy
+            db.init()
+            db.copy_data(db_name[1], options, destination,
+                         options.get("threads", False))
+            
+        my_lock.unlock()
+
+    # TODO: Refactor with sub methods!
+      
+    # Create triggers for all databases
+    if not skip_triggers:
+        new_opts = options.copy()
+        new_opts['skip_tables'] = True
+        new_opts['skip_views'] = True
+        new_opts['skip_procs'] = True
+        new_opts['skip_funcs'] = True
+        new_opts['skip_events'] = True
+        new_opts['skip_grants'] = True
+        new_opts['skip_create'] = True
+        _copy_objects(source, destination, db_list, new_opts, False, False)
+
+    # Create events for all databases
+    if not skip_events:
+        new_opts = options.copy()
+        new_opts['skip_tables'] = True
+        new_opts['skip_views'] = True
+        new_opts['skip_procs'] = True
+        new_opts['skip_funcs'] = True
+        new_opts['skip_triggers'] = True
+        new_opts['skip_grants'] = True
+        new_opts['skip_create'] = True
+        _copy_objects(source, destination, db_list, new_opts, False, False)
 
     if not quiet:
         print "#...done."

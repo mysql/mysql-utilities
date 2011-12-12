@@ -53,6 +53,13 @@ If the option :option:`--default-storage-engine` or
 does not exist, a warning shall be issued and the default storage engine
 setting on the server shall be used instead.
 
+The operation uses a consistent snapshot by default to read from the
+database(s) selected. You can change the locking mode by using the
+:option:`--locking` option. You can turn off locking altogether ('no-locks') or
+use only table locks ('lock-all'). The default value is 'snapshot'.
+Additionaly, WRITE locks are used to lock the destination tables during the
+copy.
+
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
 See :ref:`mysqldb-notes` below for more details.
@@ -125,6 +132,18 @@ The following command line options are accepted by **mysqldbcopy**:
 
    Change all tables to use this storage engine if the original storage engine
    does not exist on the destination.
+   
+.. option:: --locking=<locking>
+
+   Choose the lock type for the operation: no-locks = do not use any table
+   locks, lock-all = use table locks but no transaction and no consistent read,
+   snaphot (default): consistent read using a single transaction.
+
+.. option:: --basic-regexp, --regexp, -G
+
+   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
+   'LIKE'.
+
 
 .. _mysqldbcopy-notes:
 
@@ -164,7 +183,7 @@ EXAMPLES
 The following example demonstrates how to use the utility to copy a database
 named 'util_test' to a new name 'util_test_copy' on the same server.::
 
-    $ mysqldbcopy.py \\
+    $ mysqldbcopy \\
       --source=root:pass@localhost:3310:/test123/mysql.sock \\
       --destination=root:pass@localhost:3310:/test123/mysql.sock \\
       util_test:util_test_copy
@@ -186,6 +205,34 @@ named 'util_test' to a new name 'util_test_copy' on the same server.::
     # Copying EVENT util_test.e1
     # Copying GRANTS from util_test
     #...done.
+    
+If the database you are copying does not contain only InnoDB tables and you
+want to ensure data integrity of the copy by locking the tables during the read
+step, issue this command:::
+
+    $ mysqldbcopy \\
+      --source=root:pass@localhost:3310:/test123/mysql.sock \\
+      --destination=root:pass@localhost:3310:/test123/mysql.sock \\
+      util_test:util_test_copy --locking=lock-all
+    # Source on localhost: ... connected.
+    # Destination on localhost: ... connected.
+    # Copying database util_test renamed as util_test_copy
+    # Copying TABLE util_test.t1
+    # Copying table data.
+    # Copying TABLE util_test.t2
+    # Copying table data.
+    # Copying TABLE util_test.t3
+    # Copying table data.
+    # Copying TABLE util_test.t4
+    # Copying table data.
+    # Copying VIEW util_test.v1
+    # Copying TRIGGER util_test.trg
+    # Copying PROCEDURE util_test.p1
+    # Copying FUNCTION util_test.f1
+    # Copying EVENT util_test.e1
+    # Copying GRANTS from util_test
+    #...done.
+    
 
 COPYRIGHT
 ---------

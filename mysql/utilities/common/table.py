@@ -359,7 +359,7 @@ class Table(object):
 
         columns[in]        if None, use EXPLAIN else use column list.
         """
-        
+
         if columns is None:
             columns = self.server.exec_query("explain %s" % self.table)
         stop = len(columns)
@@ -588,6 +588,7 @@ class Table(object):
         destination[in]    the destination server
         """
 
+        from mysql.utilities.common.lock import Lock
         from mysql.utilities.common.server import Server
 
         if self.dest_vals is None:
@@ -601,8 +602,12 @@ class Table(object):
         dest = Server(server_options)
         dest.connect()
 
+        # Issue the write lock
+        lock_list = [("%s.%s" % (new_db, self.tbl_name), 'WRITE')]
+        my_lock = Lock(dest, lock_list, {'locking':'lock-all',})
+                    
         # First, turn off foreign keys if turned on
-        fkey_on = dest.toggle_fkeys(False)
+        dest.disable_foreign_key_checks(True)
 
         if self.column_format is None:
             self.get_column_metadata()
@@ -630,8 +635,8 @@ class Table(object):
                                      "Error = %s" % e.errmsg)
 
         # Now, turn on foreign keys if they were on at the start
-        if fkey_on:
-            fkey_on = dest.toggle_fkeys(True)
+        dest.disable_foreign_key_checks(False)
+        my_lock.unlock()
         del dest
 
 
@@ -672,7 +677,22 @@ class Table(object):
         return proc
 
 
-    def copy_data(self, destination, new_db=None, connections=1):
+    def _clone_data(self, new_db):
+        """Clone table data.
+
+        This method will copy all of the data for a table
+        from the old database to the new database on the same server.
+
+        new_db[in]         New database name for the table
+        """
+        query_str = "INSERT INTO %s.%s SELECT * FROM %s.%s" % \
+                    (new_db, self.tbl_name, self.db_name, self.tbl_name)
+        if self.verbose and not self.vquiet:
+            print query_str
+        self.server.exec_query(query_str)
+
+
+    def copy_data(self, destination, cloning=False, new_db=None, connections=1):
         """Retrieve data from a table and copy to another server and database.
 
         Reads data from a table and inserts the correct INSERT statements into
@@ -681,30 +701,34 @@ class Table(object):
         Note: if connections < 1 - retrieve the data one row at-a-time
 
         destination[in]    Destination server
+        cloning[in]        If True, we are copying on the same server
         new_db[in]         Rename the db to this name
         connections[in]    Number of threads(connections) to use for insert
         """
 
         if new_db is None:
             new_db = self.db_name
-
+            
         num_conn = int(connections)
 
-        # Read and copy the data
-        pthreads = []
-        for rows in self.retrieve_rows(num_conn):
-            p = self.insert_rows(rows, new_db, destination, num_conn > 1)
-            if p is not None:
-                p.start()
-                pthreads.append(p)
-
-        if num_conn > 1:
-            # Wait for all to finish
-            num_complete = 0
-            while num_complete < len(pthreads):
-                for p in pthreads:
-                    if not p.is_alive():
-                        num_complete += 1
+        if cloning:
+            self._clone_data(new_db)
+        else:
+            # Read and copy the data
+            pthreads = []
+            for rows in self.retrieve_rows(num_conn):
+                p = self.insert_rows(rows, new_db, destination, num_conn > 1)
+                if p is not None:
+                    p.start()
+                    pthreads.append(p)
+    
+            if num_conn > 1:
+                # Wait for all to finish
+                num_complete = 0
+                while num_complete < len(pthreads):
+                    for p in pthreads:
+                        if not p.is_alive():
+                            num_complete += 1
 
 
     def retrieve_rows(self, num_conn=1):

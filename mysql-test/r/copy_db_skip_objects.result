@@ -3,17 +3,17 @@ Test case 1 - no grants
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
@@ -22,17 +22,17 @@ Test case 2 - no events
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
 Test case 3 - no functions
@@ -40,16 +40,16 @@ Test case 3 - no functions
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
 Test case 4 - no procedures
@@ -57,14 +57,14 @@ Test case 4 - no procedures
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
 # Copying TRIGGER util_test.trg
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
@@ -73,14 +73,14 @@ Test case 5 - no triggers
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 6 - no views
@@ -88,12 +88,12 @@ Test case 6 - no views
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 #...done.
 OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -108,19 +108,19 @@ Test case 8 - skip create db
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
-# Copying data for TABLE util_test.t1
 # Copying TABLE util_test.t2
-# Copying data for TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying data for TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying data for TABLE util_test.t4
 # Copying VIEW util_test.v1
-# Copying TRIGGER util_test.trg
 # Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
-# Copying EVENT util_test.e1
 # Copying GRANTS from util_test
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
 Test case 9 - skip tables only - will fail

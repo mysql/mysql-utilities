@@ -31,8 +31,11 @@ Options:
                         --export=data or --export=both.
   -x EXCLUDE, --exclude=EXCLUDE
                         Exclude one or more objects from the operation using
-                        either a specific name (e.g. db1.t1) or a REGEXP
-                        search pattern. Repeat option for multiple exclusions.
+                        either a specific name (e.g. db1.t1), a LIKE pattern
+                        (e.g. db1.t% or db%.%) or a REGEXP search pattern. To
+                        use a REGEXP search pattern for all exclusions, you
+                        must also specify the --regexp option. Repeat the
+                        --exclude option for multiple exclusions.
   -a, --all             include all databases
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
@@ -41,6 +44,13 @@ Options:
   -v, --verbose         Control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           Turn off all messages for quiet execution.
+  -G, --basic-regexp, --regexp
+                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
+  --locking=LOCKING     Choose the lock type for the operation: no-locks = do
+                        not use any table locks, lock-all = use table locks
+                        but no transaction and no consistent read, snaphot
+                        (default): consistent read using a single transaction.
 Test case 2 - no grants
 # Source on localhost: ... connected.
 # Exporting metadata from util_test

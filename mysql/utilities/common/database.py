@@ -113,8 +113,8 @@ class Database(object):
         self.skip_grants = options.get("skip_grants", False)
         self.skip_create = options.get("skip_create", False)
         self.skip_data = options.get("skip_data", False)
-        self.exclude_names = options.get("exclude_names", None)
         self.exclude_patterns = options.get("exclude_patterns", None)
+        self.use_regexp = options.get("use_regexp", False)
         self.new_db = None
         self.init_called = False
         self.destination = None # Used for copy mode
@@ -386,32 +386,12 @@ class Database(object):
             raise UtilDBError("Cannot operate on %s object. Error: %s" %
                               (obj_type, e.errmsg), -1, self.db_name)
 
-    def __copy_table_data(self, name, quiet=False):
-        """Clone table data.
 
-        This method will copy all of the data for a table
-        from the old database to the new database.
+    def copy_objects(self, new_db, options, new_server=None,
+                     connections=1, check_exists=True):
+        """Copy the database objects.
 
-        name[in]           Name of the object
-        quiet[in]          do not print informational messages
-
-        Note: will handle exception and print error if query fails
-        """
-
-        if not quiet:
-            print "# Copying table data."
-        query_str = "INSERT INTO %s.%s SELECT * FROM %s.%s" % \
-                    (self.new_db, name, self.db_name, name)
-        if self.verbose and not quiet:
-            print query_str
-        self.source.exec_query(query_str)
-
-
-    def copy(self, new_db, input_file, options,
-             new_server=None, connections=1):
-        """Copy a database.
-
-        This method will copy a database and all of its objecs and data
+        This method will copy a database and all of its objects and data
         to another, new database. Options set at instantiation will determine
         if there are objects that are excluded from the copy. Likewise,
         the method will also skip data if that option was set and process
@@ -422,72 +402,49 @@ class Database(object):
         name by setting new_db = old_db or as a new database.
         
         new_db[in]         Name of the new database
-        input_file[in]     Full path of input file (or None)
         options[in]        Options for copy e.g. force, copy_dir, etc.
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
+        check_exists[in]   If True, check for database existance before copy
+                           Default is True
         """
 
         from mysql.utilities.common.table import Table
-        from mysql.utilities.common.options import check_engine_options
 
         # Must call init() first!
         # Guard for init() prerequisite
-        assert self.init_called, "You must call db.init() before db.copy()."
+        assert self.init_called, "You must call db.init() before " + \
+                                 "db.copy_objects()."
 
         grant_msg_displayed = False
         self.new_db = new_db
-        copy_file = None
         self.destination = new_server
 
         # We know we're cloning if there is no new connection.
         self.cloning = (new_server == self.source)
 
-        # Turn off input file if we aren't cloning
-        if not self.cloning:
-            copy_file = input_file
-            input_file = None
-            self.destination = new_server
-            copy_file = "copy_data_%s" % \
-                        (datetime.datetime.now().strftime("%Y.%m.%d"))
-            if options.get("copy_dir", False):
-               copy_file = options["copy_dir"] + copy_file
-        else:
+        if self.cloning:
             self.destination = self.source
 
-        # Check storage engines
-        check_engine_options(self.destination,
-                             options.get("new_engine", None),
-                             options.get("def_engine", None),
-                             False, options.get("quiet", False))
-
-        res = self.destination.show_server_variable("foreign_key_checks")
-        fkey = (res is not None) and (res[0][1] == "ON")
-
-        fkey_query = "SET foreign_key_checks = %s"
-
-        # First, turn off foreign keys if turned on
-        if fkey:
-            res = self.destination.exec_query(fkey_query % "OFF",
-                                              self.query_options)
 
         # Check to see if database exists
-        exists = False
-        drop_server = None
-        if self.cloning:
-            exists = self.exists(self.source, new_db)
-            drop_server = self.source
-        else:
-            exists = self.exists(self.destination, new_db)
-            drop_server = self.destination
-        if exists:
-            if options.get("force", False):
-                self.drop(drop_server, True, new_db)
-            elif not self.skip_create:
-                raise UtilDBError("destination database exists. Use "
-                                  "--force to overwrite existing "
-                                  "database.", -1, new_db)
+        if check_exists:
+            exists = False
+            drop_server = None
+            if self.cloning:
+                exists = self.exists(self.source, new_db)
+                drop_server = self.source
+            else:
+                exists = self.exists(self.destination, new_db)
+                drop_server = self.destination
+            if exists:
+                if options.get("force", False):
+                    self.drop(drop_server, True, new_db)
+                elif not self.skip_create:
+                    raise UtilDBError("destination database exists. Use "
+                                      "--force to overwrite existing "
+                                      "database.", -1, new_db)
 
         # Create new database first
         if not self.skip_create:
@@ -513,40 +470,64 @@ class Database(object):
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
 
-            # Now copy the data if enabled
-            if not self.skip_data:
-                if obj[0] == _TABLE:
-                    tblname = obj[1][0]
-                    if self.cloning:
-                        self.__copy_table_data(tblname, options.get("quiet",
-                                                                    False))
-                    else:
-                        if not options.get("quiet", False):
-                            print "# Copying data for TABLE %s.%s" % \
-                                   (self.db_name, tblname)
-                        tbl_options = {
-                            'verbose'  : self.verbose,
-                            'get_cols' : True,
-                            'quiet'    : options.get('quiet', False)
-                        }
-                        tbl = Table(self.source,
-                                    "%s.%s" % (self.db_name, tblname),
-                                    tbl_options)
-                        if tbl is None:
-                            raise UtilDBError("Cannot create table object "
-                                              "before copy.", -1, self.db_name)
 
-                        tbl.copy_data(self.destination, new_db, connections)
+    def copy_data(self, new_db, options, new_server=None, connections=1):
+        """Copy the data for the tables.
 
-        # Cleanup
-        if copy_file:
-            if os.access(copy_file, os.F_OK):
-                os.remove(copy_file)
+        This method will copy the data for all of the tables to another, new
+        database. The method will process an input file with INSERT statements
+        if the option was selected by the caller.
+
+        new_db[in]         Name of the new database
+        options[in]        Options for copy e.g. force, copy_dir, etc.
+        new_server[in]     Connection to another server for copying the db
+                           Default is None (copy to same server - clone)
+        connections[in]    Number of threads(connections) to use for insert
+        """
+
+        from mysql.utilities.common.table import Table
+
+        # Must call init() first!
+        # Guard for init() prerequisite
+        assert self.init_called, "You must call db.init() before "+ \
+                                 "db.copy_data()."
+
+        if self.skip_data:
+            return
+        
+        self.destination = new_server
+
+        # We know we're cloning if there is no new connection.
+        self.cloning = (new_server == self.source)
+
+        if self.cloning:
+            self.destination = self.source
+
+        quiet = options.get("quiet", False)
+        
+        tbl_options = {
+            'verbose'  : self.verbose,
+            'get_cols' : True,
+            'quiet'    : quiet
+        }
+
+        # Turn off foreign keys if they were on at the start
+        self.destination.disable_foreign_key_checks(True)
+
+        table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
+        for tblname in table_names:
+            if not quiet:
+                print "# Copying data for TABLE %s.%s" % (self.db_name, tblname)
+            tbl = Table(self.source, "%s.%s" % (self.db_name, tblname),
+                        tbl_options)
+            if tbl is None:
+                raise UtilDBError("Cannot create table object before copy.",
+                                  -1, self.db_name)
+                
+            tbl.copy_data(self.destination, self.cloning, new_db, connections)
 
         # Now, turn on foreign keys if they were on at the start
-        if fkey:
-            res = self.destination.exec_query(fkey_query % "ON",
-                                              self.query_options)
+        self.destination.disable_foreign_key_checks(False)
 
 
     def get_create_statement(self, db, name, obj_type):
@@ -691,41 +672,35 @@ class Database(object):
             yield obj
 
 
-    def __build_exclude_names(self, exclude_param):
-        """Return a string to add to where clause to exclude objects by
-        name.
-
-        This method will skip any db.name combinations that do not match
-        the current database.
-
-        exclude_param[in]  Name of column to check.
-
-        Returns (string) String to add to where clause or ""
-        """
-        str = ""
-        for obj_name in self.exclude_names:
-            db = obj_name[0]
-            name = obj_name[1]
-            if db == self.db_name:
-                str += " AND %s != '%s'" % (exclude_param, name.strip("'"))
-
-        return str
-
-
     def __build_exclude_patterns(self, exclude_param):
-        """Return a string to add to where clause to exclude objects by
-        REGEXP.
+        """Return a string to add to where clause to exclude objects.
+
+        This method will add the conditions to exclude objects based on
+        name if there is a dot notation or by a search pattern as specified
+        by the options.
 
         exclude_param[in]  Name of column to check.
 
         Returns (string) String to add to where clause or ""
         """
+        from mysql.utilities.common.options import obj2sql
+        
+        oper = 'NOT REGEXP' if self.use_regexp else 'NOT LIKE'
         str = ""
         for pattern in self.exclude_patterns:
-            str += " AND %s NOT REGEXP '%s'" % (exclude_param,
-                                                pattern.strip("'"))
+            value = None
+            if pattern.find(".") > 0:
+                db, name = pattern.split(".")
+                if db == self.db_name:
+                    value = name
+            else:
+                value = pattern
+            if value is not None:
+                str += " AND {0} {1} {2}".format(exclude_param, oper,
+                                                 obj2sql(value))
+
         return str
-    
+
 
     def get_object_type(self, object_name):
         """Return the object type of an object
@@ -953,8 +928,6 @@ class Database(object):
                 prefix = _MINIMAL
             # Form exclusion string
             exclude_str = ""
-            if self.exclude_names is not None:
-                exclude_str += self.__build_exclude_names(exclude_param)
             if self.exclude_patterns is not None:
                 exclude_str += self.__build_exclude_patterns(exclude_param)
             query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)

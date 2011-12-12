@@ -32,7 +32,8 @@ from mysql.utilities.command import dbcopy
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
-from mysql.utilities.common.options import add_all, check_all
+from mysql.utilities.common.options import add_all, check_all, add_locking
+from mysql.utilities.common.options import add_regexp
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -94,8 +95,10 @@ parser.add_option("--threads", action="store", dest="threads",
 parser.add_option("-x", "--exclude", action="append", dest="exclude",
                   type="string", default=None, help="Exclude one or more "
                   "objects from the operation using either a specific name "
-                  "(e.g. db1.t1) or a REGEXP search pattern. Repeat option "
-                  "for multiple exclusions.")
+                  "(e.g. db1.t1), a LIKE pattern (e.g. db1.t% or db%.%) or a "
+                  "REGEXP search pattern. To use a REGEXP search pattern for "
+                  "all exclusions, you must also specify the --regexp option. "
+                  "Repeat the --exclude option for multiple exclusions.")
 
 # Add the all database options
 add_all(parser, "databases")
@@ -108,6 +111,12 @@ add_verbosity(parser, True)
 
 # Add engine options
 add_engines(parser)
+
+# Add locking options
+add_locking(parser)
+
+# Add regexp
+add_regexp(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -133,21 +142,6 @@ check_all(parser, opt, args, "databases")
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
 
-# Build exclusion lists
-exclude_objects = []
-exclude_object_names = []
-if opt.exclude is not None:
-    try:
-        for item in opt.exclude:
-            if item.find(".") > 0:
-                db, name = item.split(".")
-                exclude_object_names.append((db, name))
-            else:
-                exclude_objects.append(item)
-    except:
-        print "WARNING: Cannot parse exclude list. " + \
-              "Proceeding without exclusions."
-
 # Set options for database operations.
 options = {
     "skip_tables"      : "TABLES" in skips,
@@ -165,11 +159,12 @@ options = {
     "quiet"            : opt.quiet,
     "threads"          : opt.threads,
     "debug"            : opt.verbosity == 3,
-    "exclude_names"    : exclude_object_names,
-    "exclude_patterns" : exclude_objects,
+    "exclude_patterns" : opt.exclude,
     "new_engine"       : opt.new_engine,
     "def_engine"       : opt.def_engine,
     "all"              : opt.all,
+    "locking"          : opt.locking,
+    "use_regexp"       : opt.use_regexp,
 }
 
 # Parse source connection values

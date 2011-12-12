@@ -140,19 +140,13 @@ _SELECT_TYPE_FRM = """
     {condition}
 """
 
-def _obj2sql(obj):
-    """Convert a Python object to an SQL object.
-
-    This function convert Python objects to SQL values using the
-    conversion functions in the database connector package."""
-    from mysql.connector.conversion import MySQLConverter
-    return MySQLConverter().quote(obj)
-
 def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     """Generate a SELECT statement for finding an object.
     """
+    from mysql.utilities.common.options import obj2sql
+
     options = {
-        'pattern': _obj2sql(pattern),
+        'pattern': obj2sql(pattern),
         'regex': 'REGEXP' if use_regexp else 'LIKE',
         'select_option': '',
         'field_type': "'" + objtype.upper() + "'",
@@ -164,7 +158,7 @@ def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     if check_body and "body_field" in options:
         condition += " OR {body_field} {regex} {pattern}".format(**options)
     if database_pattern:
-        options['database_pattern'] = _obj2sql(database_pattern)
+        options['database_pattern'] = obj2sql(database_pattern)
         condition = "({0}) AND {schema_field} {regex} {database_pattern}".format(condition, **options)
     options['condition'] = condition
 

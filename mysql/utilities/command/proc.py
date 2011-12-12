@@ -43,14 +43,6 @@ def _spec(info):
         result += ":" + info["unix_socket"]
     return result
 
-def _obj2sql(obj):
-    """Convert a Python object to an SQL object.
-
-    This function convert Python objects to SQL values using the
-    conversion functions in the database connector package."""
-    from mysql.connector.conversion import MySQLConverter
-    return MySQLConverter().quote(obj)
-
 _SELECT_PROC_FRM = """
 SELECT
   Id, User, Host, Db, Command, Time, State, Info
@@ -60,9 +52,11 @@ FROM
 def _make_select(matches, use_regexp, conditions):
     """Generate a SELECT statement for matching the processes.
     """
+    from mysql.utilities.common.options import obj2sql
+
     oper = 'REGEXP' if use_regexp else 'LIKE'
     for field, pattern in matches:
-        conditions.append("    {0} {1} {2}".format(field, oper, _obj2sql(pattern)))
+        conditions.append("    {0} {1} {2}".format(field, oper, obj2sql(pattern)))
     if len(conditions) > 0:
         condition = "\nWHERE\n" + "\n  AND\n".join(conditions)
     else:

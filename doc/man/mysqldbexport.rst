@@ -96,6 +96,11 @@ permits you to export your data in the format most suitable to an external
 tool, another MySQL server, or a yet another use without the need to
 reformat the data.
 
+The operation uses a consistent snapshot by default to read from the
+database(s) selected. You can change the locking mode by using the
+:option:`--locking` option. You can turn off locking altogether ('no-locks') or
+use only table locks ('lock-all'). The default value is 'snapshot'.
+
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
 See :ref:`mysqldbexport-notes` below for more details.
@@ -172,6 +177,17 @@ OPTIONS
 .. option:: --skip-blobs
 
    Do not export blob data.
+
+.. option:: --locking=<locking>
+
+   Choose the lock type for the operation: no-locks = do not use any table
+   locks, lock-all = use table locks but no transaction and no consistent read,
+   snaphot (default): consistent read using a single transaction.
+
+.. option:: --basic-regexp, --regexp, -G
+
+   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
+   'LIKE'.
 
 
 .. _mysqldbexport-notes:
@@ -263,6 +279,36 @@ insert statements, use this command::
     # Data for table util_test.t4:
     INSERT INTO util_test.t4 VALUES  (3, 2);
     #...done.
+    
+If the database you are exporting does not contain only InnoDB tables and you
+want to ensure data integrity of the exported data by locking the tables during
+the read step, issue this command:::
+
+    $ mysqldbexport --server=root:pass@localhost \\
+      --export=DATA --bulk-insert util_test --locking=lock-all
+    # Source on localhost: ... connected.
+    USE util_test;
+    # Exporting data from util_test
+    # Data for table util_test.t1:
+    INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),
+      ('02 Test Basic database example'),
+      ('03 Test Basic database example'),
+      ('04 Test Basic database example'),
+      ('05 Test Basic database example'),
+      ('06 Test Basic database example'),
+      ('07 Test Basic database example');
+    # Data for table util_test.t2:
+    INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),
+      ('12 Test Basic database example'),
+      ('13 Test Basic database example');
+    # Data for table util_test.t3:
+    INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),
+      (2, '15 test fkeys'),
+      (3, '16 test fkeys');
+    # Data for table util_test.t4:
+    INSERT INTO util_test.t4 VALUES  (3, 2);
+    #...done.
+
 
 COPYRIGHT
 ---------

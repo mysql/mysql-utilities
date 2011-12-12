@@ -32,20 +32,20 @@ class test(export_parameters_def.test):
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - exclude by regex"
-        cmd_opts = "-x ^f -x 4$"
+        cmd_opts = "-x ^f -x 4$ --regexp"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - exclude by name and regex"
         cmd_opts = "--exclude=^f --exclude=4$ -x ^p " + \
-                   "--exclude=v1 --exclude=util_test.trg"
+                   "--exclude=v1 --exclude=util_test.trg --regexp"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - exclude everything by regex"
-        cmd_opts = "-x 1 -x t --exclude=util_test.trg"
+        cmd_opts = "-x 1 -x t --exclude=util_test.trg --regexp"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
