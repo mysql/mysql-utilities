@@ -15,7 +15,7 @@ three different ways:
 - As a :ref:`connection specification` string, which is a string
   containing the connection parameters.
 
-- As a :ref:Server instance.
+- As a :ref:`Server instance`.
 
 When providing the connection parameters as a dictionary, the
 parameters are passed unchanged to the connectors ``connect``

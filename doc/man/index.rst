@@ -16,6 +16,7 @@ Command-line Utilities
    mysqlprocgrep
    mysqlreplicate
    mysqlrplcheck
+   mysqlrplshow
    mysqlserverclone
    mysqlserverinfo
    mysqluserclone

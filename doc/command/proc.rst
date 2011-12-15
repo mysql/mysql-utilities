@@ -96,5 +96,5 @@ Classes
 
 .. References
 .. ----------
-.. _`INFORMATION_SCHEMA.PROCESSLIST`: http://dev.mysql.com/doc/refman/5.1/en/processlist-table.html
-.. _`SELECT`: http://dev.mysql.com/doc/refman/5.1/en/select.html
+.. _`INFORMATION_SCHEMA.PROCESSLIST`: http://dev.mysql.com/doc/refman/5.5/en/processlist-table.html
+.. _`SELECT`: http://dev.mysql.com/doc/refman/5.5/en/select.html

@@ -28,27 +28,29 @@ as masters (a circular topology). The graph displays the topology with
 successive indents. A notation is made for circular topologies.
 
 An example of the graph for a typical topology with relay slaves is shown
-below.
+below.::
 
-# Replication Topology Graph
-localhost:3311 (MASTER)
-   |
-   +--- localhost:3310 - (SLAVE)
-   |
-   +--- localhost:3312 - (SLAVE + MASTER)
-       |
-       +--- localhost:3313 - (SLAVE)
+  # Replication Topology Graph::
 
-A circular replication topology would be shown like the following.
+  localhost:3311 (MASTER)
+     |
+     +--- localhost:3310 - (SLAVE)
+     |
+     +--- localhost:3312 - (SLAVE + MASTER)
+         |
+         +--- localhost:3313 - (SLAVE)
 
-# Replication Topology Graph
-localhost:3311 (MASTER)
-   |
-   +--- localhost:3312 - (SLAVE + MASTER)
-       |
-       +--- localhost:3313 - (SLAVE + MASTER)
-           |
-           +--- localhost:3311 <--> (SLAVE)
+A circular replication topology would be shown like the following.::
+
+  # Replication Topology Graph
+
+  localhost:3311 (MASTER)
+     |
+     +--- localhost:3312 - (SLAVE + MASTER)
+         |
+         +--- localhost:3313 - (SLAVE + MASTER)
+             |
+             +--- localhost:3311 <--> (SLAVE)
 
 You can specify the :option:`--show-list` option to produce a column list of
 the graph. You also have the choice to view the output in one of the following
