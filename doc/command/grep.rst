@@ -60,4 +60,4 @@ Classes
 
 .. References
 .. ----------
-.. _`SELECT`: http://dev.mysql.com/doc/refman/5.1/en/select.html
+.. _`SELECT`: http://dev.mysql.com/doc/mysql/en/select.html

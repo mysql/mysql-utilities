@@ -123,7 +123,7 @@ This is but a brief set of examples of regular expressions. The full
 syntax is described in the `MySQL manual`_, but can often be found in
 :manpage:`regex(7)`.
 
-.. _`MySQL manual`: http://dev.mysql.com/doc/refman/5.5/en/regexp.html
+.. _`MySQL manual`: http://dev.mysql.com/doc/mysql/en/regexp.html
 
 
 OPTIONS
