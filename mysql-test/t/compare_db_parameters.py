@@ -57,7 +57,7 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts += " --quiet"
+        cmd_opts += " --quiet -a"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:

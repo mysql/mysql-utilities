@@ -13,7 +13,8 @@ SYNOPSIS
             [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --run-all-tests | --quiet |
               --format=<format> | --width=<width> |
-              [--difftype=[--unified|--context|--differ]]
+              --changes-for = [server1|server2] | 
+              [--difftype=[unified|context|differ|sql]]
               [<db1:db2> | <db> [<db1:db2>* | db*] [--skip-object-compare |
               --skip-row-count | --skip-diff | --skip-data-check]
 
@@ -136,6 +137,31 @@ the following formats:
   displays the output in a single column similar to the ``\G`` option
   for the mysql monitor commands.
 
+The :option:`--changes-for` option can be used to control the direction of the
+difference (by specifying the object to be transformed) in either the
+difference report (default) or the transformation report (designated with the
+:option:`--difftype=sql` option). For example, consider the following command.::
+
+  mysqldbcompare --server1=root@host1 --server2@host2 db1.table1:dbx.table3
+    --difftype=sql
+
+In this example, db1 exists on host1 and dbx exists on host2 as defined by
+position where the database and object to the left of the colon are located on
+--server1 and the database and object on the right is located on --server2.
+
+  * --changes-for=server1 - The object definition on server1 is the object to be
+    transformed and is used to produce the difference or transformation
+    compared to the definition on server2. The output therefore will be the
+    transformation needed to make the object on server1 like the object on
+    server2.
+  * --changes-for=server2 - The object definition on server2 is the object to be
+    transformed and is used to produce the difference or transformation
+    compared to the definition on server1. The output therefore will be the
+    transformation needed to make the object on server2 like the object on
+    server1.
+
+The default direction is server1. 
+
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
 
@@ -147,14 +173,40 @@ option and will be re-enabled on exit.
 OPTIONS
 -------
 
-.. option:: --version
-
-   show version number and exit
-
 .. option:: --help
 
    show the help page
 
+.. option:: --changes-for=DIRECTION
+
+   specify the server to show transformations to match the other server. For
+   example, to see the transformation for transforming server1 to match
+   server2, use --changes-for=server1. Valid values are 'server1' or
+   'server2'. The default is 'server1' 
+
+.. option:: --difftype=<difftype>, -d<difftype>
+
+   display differences in context format either unified,
+   context, differ, or sql (default: unified).
+   
+.. option:: --disable-binary-logging
+
+   Turn binary logging off during operation if enabled (SQL_LOG_BIN=1).
+   Prevents compare operations from being written to the binary log. Note: may
+   require SUPER privilege.
+
+.. option:: --format=<format>, -f<format>
+
+   display missing rows in either GRID (default), CSV, TAB, or VERTICAL format
+   
+.. option:: --quiet
+
+   Do not print anything. Return only success or fail as exit code.
+
+.. option:: --run-all-tests, -a
+
+   Do not halt at the first difference found. Process all objects.
+   
 .. option:: --server1=<source>
 
    connection information for the first server in the form:
@@ -165,23 +217,20 @@ OPTIONS
    connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --verbose, -v
+.. option:: --show-reverse
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   produce a transformation report containing the SQL statements to conform the
+   object definitions specified in reverse. For example if --changes-for is set
+   to server1, also generate the transformation for server2. Note: the reverse
+   changes are annotated and marked as comments
 
-.. option:: --difftype=<difftype>, -d<difftype>
+.. option:: --skip-data-check
 
-   display differences in context format either unified,
-   context, or differ (default: unified).
-   
-.. option:: --format=<format>, -f<format>
+   skip data consistency check
 
-   display missing rows in either GRID (default), CSV, TAB, or VERTICAL format
-   
-.. option:: --width
+.. option:: --skip-diff
 
-   change the display width of the test report
+   skip the object diff step
 
 .. option:: --skip-object-compare
 
@@ -191,27 +240,19 @@ OPTIONS
 
    skip row count step
 
-.. option:: --skip-diff
+.. option:: --verbose, -v
 
-   skip the object diff step
+   control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug
 
-.. option:: --skip-data-check
+.. option:: --version
 
-   skip data consistency check
+   show version number and exit
 
-.. option:: --run-all-tests, -a
+.. option:: --width
 
-   Do not halt at the first difference found. Process all objects.
-   
-.. option:: --quiet
+   change the display width of the test report
 
-   Do not print anything. Return only success or fail as exit code.
-
-.. option:: --disable-binary-logging
-
-   Turn binary logging off during operation if enabled (SQL_LOG_BIN=1).
-   Prevents compare operations from being written to the binary log. Note: may
-   require SUPER privilege.
 
 NOTES
 -----
@@ -223,6 +264,7 @@ This utility currently compares the full CREATE statement for the objects.
 Future versions will have additional features to produce more detailed
 comparisons that can generate appropriate ALTER statements and have the
 capability to ignore naming differences.
+
 
 EXAMPLES
 --------
@@ -274,6 +316,119 @@ use this command::
     Database consistency check failed.
     
     # ...done
+
+    Given : two databases with the same table layout. Data for each table
+            contains:
+  
+          mysql> select * from db1.t1;
+          +---+---------------+
+          | a | b             |
+          +---+---------------+
+          | 1 | Test 789      |
+          | 2 | Test 456      |
+          | 3 | Test 123      |
+          | 4 | New row - db1 |
+          +---+---------------+
+          4 rows in set (0.00 sec)
+          
+          mysql> select * from db2.t1;
+          +---+---------------+
+          | a | b             |
+          +---+---------------+
+          | 1 | Test 123      |
+          | 2 | Test 456      |
+          | 3 | Test 789      |
+          | 5 | New row - db2 |
+          +---+---------------+
+          4 rows in set (0.00 sec)
+  
+    To generate the SQL commands for data transformations to make db1.t1 the
+    same as db2.t1, use the --changes-for=server1 options. We must also include
+    the -a option to ensure the data consistency test is run. The following
+    command illustrates the options used and an excerpt from the results
+    generated. 
+  
+    $ mysqldbcompare --server1=root:root@localhost \
+        --server2=root:root@localhost db1:db2 --changes-for=server1 -a \
+        --difftype=sql
+        
+    [...]
+  
+    #                                                   Defn    Row     Data   
+    # Type      Object Name                             Diff    Count   Check  
+    # ------------------------------------------------------------------------- 
+    # TABLE     t1                                      pass    pass    FAIL    
+    #
+    # Data transformations for direction = server1:
+    
+    # Data differences found among rows:
+    UPDATE db1.t1 SET b = 'Test 123' WHERE a = '1';
+    UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3';
+    DELETE FROM db1.t1 WHERE a = '4';
+    INSERT INTO db1.t1 (a, b) VALUES('5', 'New row - db2');
+    
+    
+    # Database consistency check failed.
+    #
+    # ...done
+  
+    Similarly, when the same command is run with --changes-for=server2 and
+    --difftype=sql, the following report is generated.
+  
+    $ mysqldbcompare --server1=root:root@localhost \
+        --server2=root:root@localhost db1:db2 --changes-for=server2 -a \
+        --difftype=sql
+        
+    [...]
+  
+    #                                                   Defn    Row     Data   
+    # Type      Object Name                             Diff    Count   Check  
+    # ------------------------------------------------------------------------- 
+    # TABLE     t1                                      pass    pass    FAIL    
+    #
+    # Data transformations for direction = server2:
+    
+    # Data differences found among rows:
+    UPDATE db2.t1 SET b = 'Test 789' WHERE a = '1';
+    UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3';
+    DELETE FROM db2.t1 WHERE a = '5';
+    INSERT INTO db2.t1 (a, b) VALUES('4', 'New row - db1');
+  
+    When the --changes-for=both option is set with the --difftype=sql SQL
+    generation option set, the following shows an excerpt of the results.
+    
+    $ mysqldbcompare --server1=root:root@localhost \
+        --server2=root:root@localhost db1:db2 --changes-for=both -a \
+        --difftype=sql
+        
+    [...]
+  
+    #                                                   Defn    Row     Data   
+    # Type      Object Name                             Diff    Count   Check  
+    # ------------------------------------------------------------------------- 
+    # TABLE     t1                                      pass    pass    FAIL    
+    #
+    # Data transformations for direction = server1:
+    
+    # Data differences found among rows:
+    UPDATE db1.t1 SET b = 'Test 123' WHERE a = '1';
+    UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3';
+    DELETE FROM db1.t1 WHERE a = '4';
+    INSERT INTO db1.t1 (a, b) VALUES('5', 'New row - db2');
+  
+    # Data transformations for direction = server2:
+    
+    # Data differences found among rows:
+    UPDATE db2.t1 SET b = 'Test 789' WHERE a = '1';
+    UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3';
+    DELETE FROM db2.t1 WHERE a = '5';
+    INSERT INTO db2.t1 (a, b) VALUES('4', 'New row - db1');
+    
+    
+    # Database consistency check failed.
+    #
+    # ...done
+
 
 COPYRIGHT
 ---------

@@ -85,13 +85,35 @@ class test(mutlib.System_test):
             
         self.alter_data()
 
-        comment = "Test case 2 - check database with known differences"
+        comment = "Test case 2 - check database with known differences " + \
+                  "direction = server1 (default)"
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
             
-        self.do_replacements()
+        comment = "Test case 3 - check database with known differences " + \
+                  "direction = server2"
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+                                 "--format=CSV --changes-for=server2", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 4 - check database with known differences " + \
+                  "direction = server1 and reverse"
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+                                 "--format=CSV --changes-for=server1 "
+                                 "--show-reverse", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 5 - check database with known differences " + \
+                  "direction = server2 and reverse"
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+                                 "--format=CSV --changes-for=server2 "
+                                 "--show-reverse", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
 
         return True
           

@@ -25,13 +25,14 @@ import sys
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.exception import UtilError, UtilDBError
 
-_ROW_FORMAT = "{0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
+_PRINT_WIDTH = 75
+_ROW_FORMAT = "# {0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
 _RPT_FORMAT = "{0:{1}} {2:{3}}"
 
 _ERROR_DB_DIFF = "The object definitions do not match."
 _ERROR_DB_MISSING = "The database {0} does not exist."
 _ERROR_OBJECT_LIST = "The list of objects differs among database {0} and {1}."
-_ERROR_ROW_COUNT = "Row counts are not the same among {0} and {1}.\n"
+_ERROR_ROW_COUNT = "Row counts are not the same among {0} and {1}.\n#"
 
 _DEFAULT_OPTIONS = {
     "quiet"           : False,
@@ -43,25 +44,33 @@ _DEFAULT_OPTIONS = {
     "no_diff"         : False,
     "no_row_count"    : False,
     "no_data"         : False,
+    "transform"       : False,
 }
 
 class _CompareDBReport:
     """Print compare database report
     """
     
-    def __init__(self, width):
+    def __init__(self, options):
         """Constructor
         
-        width[in]      Width of report
+        options[in]    options for class
+            width[in]      Width of report
+            quiet[in]      If true, do not print commentary
+                           (default = False)
         """
-        self.width = width
+        self.width = options.get('width', _PRINT_WIDTH) - 2 # for '# '
+        self.quiet = options.get('quiet', False)
         self.type_width = 9
         self.oper_width = 7
-        self.desc_width = width - self.type_width - (3 * self.oper_width) - 4
+        self.desc_width = self.width - self.type_width - (3 * self.oper_width) - 4
 
     def print_heading(self):
         """Print heading for database consistency
         """
+        # Skip if quiet
+        if self.quiet:
+            return
         # Set the variable width global parameters here
         print _ROW_FORMAT.format(' ', self.type_width,
                                  ' ', self.desc_width,
@@ -73,7 +82,7 @@ class _CompareDBReport:
                                  "Diff", self.oper_width,
                                  "Count", self.oper_width,
                                  "Check", self.oper_width)
-        print '-' * self.width,
+        print "# %s" % ('-' * self.width),
 
     
     def report_object(self, obj_type, description):
@@ -82,8 +91,11 @@ class _CompareDBReport:
         obj_type[in]      type of the object(s) described
         description[in]   description of object(s)
         """
-        print "\n", _RPT_FORMAT.format(obj_type, self.type_width,
-                                       description, self.desc_width),
+        # Skip if quiet
+        if self.quiet:
+            return
+        print "\n#", _RPT_FORMAT.format(obj_type, self.type_width,
+                                        description, self.desc_width),
     
     
     def report_state(self, state):
@@ -91,6 +103,9 @@ class _CompareDBReport:
         
         state[in]         state of the test
         """
+        # Skip if quiet
+        if self.quiet:
+            return
         print "{0:<{1}}".format(state, self.oper_width),
 
 
@@ -100,7 +115,7 @@ class _CompareDBReport:
         errors[in]        list of strings to print
         """
         if len(errors) > 0:
-            print "\n"
+            print "\n#"
         for line in errors:
             print line
 
@@ -123,7 +138,8 @@ def _check_databases(server1, server2, db1, db2, options):
         # temporarily make the diff quiet to retrieve errors
         new_opt = {}
         new_opt.update(options)
-        new_opt['quiet'] = True
+        new_opt['quiet'] = True          # do not print messages
+        new_opt['suppress_sql'] = True   # do not print SQL statements either
         res = diff_objects(server1, server2, db1, db2, new_opt)
         if res is not None:
             for row in res:
@@ -160,16 +176,16 @@ def _check_objects(server1, server2, db1, db2,
                 if len(in_db1) > 0:
                     print_missing_list(in_db1,
                                        "server1:"+db1, "server2:"+db2)
-                    print
+                    print "#"
                 if len(in_db2) > 0:
                     print_missing_list(in_db2,
                                        "server2:"+db2, "server1:"+db1)
-                    print
+                    print "#"
             else:
                 raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
 
     # If in verbose mode, show count of object types.
-    if options['verbosity'] > 0:
+    if options['verbosity'] > 1:
         objects = {
                 'TABLE' : 0,
                  'VIEW' : 0,
@@ -210,7 +226,8 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options):
         # temporarily make the diff quiet to retrieve errors
         new_opt = {}
         new_opt.update(options)
-        new_opt['quiet'] = True
+        new_opt['quiet'] = True          # do not print messages
+        new_opt['suppress_sql'] = True   # do not print SQL statements either
         res = diff_objects(server1, server2, obj1, obj2, new_opt)
         if res is not None:
             reporter.report_state('FAIL')
@@ -247,7 +264,7 @@ def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
             if not options['run_all_tests']:
                 raise UtilError(msg)
             else:
-                errors.append(msg)
+                errors.append("# %s" % msg)
         else:
             reporter.report_state('pass')
     else:
@@ -268,19 +285,53 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     
     Returns list of errors
     """
-    from mysql.utilities.common.dbcompare import check_consistency
+    from mysql.utilities.common.dbcompare import check_consistency, \
+                                                 build_diff_list
 
-    errors = []   
+    direction = options.get('changes-for', 'server1')
+    difftype = options.get('difftype', 'unified')
+    reverse = options.get('reverse', False)
+    
+    errors = []
+    diff_server1 = []
+    diff_server2 = []
+    diff_list = []
     # For each table, do row data consistency check
     if not options['no_data']:
         try:
-            res = check_consistency(server1, server2,
-                                    obj1, obj2, options)
-            if res is not None:
-                reporter.report_state('FAIL')
-                errors.extend(res)
-            else:
+            # Do the comparison based on direction
+            if direction == 'server1' or reverse:
+                diff_server1 = check_consistency(server1, server2,
+                                                 obj1, obj2, options)
+            if direction == 'server2' or reverse:
+                diff_server2 = check_consistency(server2, server1,
+                                                 obj2, obj1, options)
+                
+            # if no differences, return
+            if (diff_server1 is None and diff_server2 is None) or \
+               (not reverse and direction == 'server1' and \
+                diff_server1 is None) or \
+               (not reverse and direction == 'server2' and \
+                diff_server2 is None):
                 reporter.report_state('pass')
+                return errors
+                    
+            # Build diff list
+            new_opts = options.copy()
+            new_opts['data_diff'] = True
+            if direction == 'server1':
+                diff_list = build_diff_list(diff_server1, diff_server2,
+                                            diff_server1, diff_server2,
+                                            'server1', 'server2', new_opts)
+            else:
+                diff_list = build_diff_list(diff_server2, diff_server1,
+                                            diff_server2, diff_server1,
+                                            'server2', 'server1', new_opts)
+            if len(diff_list) == 0:
+                reporter.report_state('pass')
+            else:
+                reporter.report_state('FAIL')
+                errors = diff_list
         except UtilError, e:
             if e.errmsg == "No primary key found.":
                 reporter.report_state('SKIP')
@@ -368,7 +419,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     if not db2_conn.exists():
         raise UtilDBError(_ERROR_DB_MISSING.format(db2))
 
-    message = "# Checking databases {0} on server1 and {1} on server2\n"
+    message = "# Checking databases {0} on server1 and {1} on server2\n#"
     print message.format(db1, db2)
     
     # Check for database existance and CREATE differences
@@ -378,7 +429,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     in_both = _check_objects(server1, server2, db1, db2,
                              db1_conn, db2_conn, options)
 
-    reporter = _CompareDBReport(options['width'])
+    reporter = _CompareDBReport(options)
     reporter.print_heading()
     
     # Remaining operations can occur in a loop one for each object.        
@@ -422,8 +473,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
             object1_create = get_create_object(server1, obj1, options)
             object2_create = get_create_object(server2, obj2, options)
           
-        if not options['quiet']:
-            reporter.report_errors(error_list)
+        reporter.report_errors(error_list)
         
     return success
 

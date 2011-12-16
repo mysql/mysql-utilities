@@ -30,28 +30,40 @@ Options:
   -q, --quiet           Turn off all messages for quiet execution.
   -d DIFFTYPE, --difftype=DIFFTYPE
                         display differences in context format in one of the
-                        following formats: [unified|context|differ] (default:
-                        unified).
+                        following formats: [unified|context|differ|sql]
+                        (default: unified).
+  --changes-for=CHANGES_FOR
+                        Specify the server to show transformations to match
+                        the other server. For example, to see the
+                        transformation for transforming server1 to match
+                        server2, use --changes-for=server1. Valid values are
+                        'server1' or 'server2'. The default is 'server1'.
+  --show-reverse        produce a transformation report containing the SQL
+                        statements to conform the object definitions specified
+                        in reverse. For example if --changes-for is set to
+                        server1, also generate the transformation for server2.
+                        Note: the reverse changes are annotated and marked as
+                        comments.
 Test case 2 - Use  -a --difftype=unified --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,5 +1,5 @@
@@ -66,18 +78,18 @@ Data differences found among rows:
 +| 2     | Wesayso Corporation  |
 ++-------+----------------------+
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,7 +1,7 @@
@@ -96,7 +108,7 @@ Data differences found among rows:
 +| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ++---------------+-----------------+------+--------+------------+--------+-----------+
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
@@ -108,7 +120,7 @@ Rows in inventory.supplies not in inventory.supplies
 | 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
@@ -118,29 +130,29 @@ Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 3 - Use  -a --difftype=unified --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -148,15 +160,15 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -168,7 +180,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -177,36 +189,36 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 4 - Use  -a --difftype=unified --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -214,15 +226,15 @@ Data differences found among rows:
 -2	Never Enough Inc.
 +2	Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code	name
 3	Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -234,7 +246,7 @@ Data differences found among rows:
 +11186	Plastic polish	1	10.00	polishing		1
 +11146	Speed shine	1	10.00	repair		1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11104	Interior cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
@@ -243,36 +255,36 @@ stock_number	description	qty	cost	type	notes	supplier
 11106	Wheel cleaner	1	9.99	cleaning		1
 11270	Carpet cleaner	1	9.99	cleaning		1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
 11116	Microfiber wax removal towel	3	16.99	waxing		1
 10665	Glass polish pad	3	10.00	polishing		1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 5 - Use  -a --difftype=unified --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,4 +1,4 @@
@@ -282,17 +294,17 @@ Data differences found among rows:
 + name: Wesayso Corporation
  1 rows.
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
 1 rows.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -2,7 +2,7 @@
@@ -323,7 +335,7 @@ Data differences found among rows:
          notes:
       supplier: 1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11104
   description: Interior cleaner
@@ -374,7 +386,7 @@ Rows in inventory.supplies not in inventory.supplies
      supplier: 1
 6 rows.
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
@@ -402,29 +414,29 @@ Rows in inventory.supplies not in inventory.supplies
 3 rows.
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 6 - Use  -a --difftype=context --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 *** inventory.supplier
 --- inventory.supplier
 ***************
@@ -441,18 +453,18 @@ Data differences found among rows:
 ! | 2     | Wesayso Corporation  |
 ! +-------+----------------------+
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 *** inventory.supplies
 --- inventory.supplies
 ***************
@@ -473,7 +485,7 @@ Data differences found among rows:
 ! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ! +---------------+-----------------+------+--------+------------+--------+-----------+
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
@@ -485,7 +497,7 @@ Rows in inventory.supplies not in inventory.supplies
 | 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
@@ -495,29 +507,29 @@ Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 7 - Use  -a --difftype=context --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 *** inventory.supplier
 --- inventory.supplier
 ***************
@@ -528,15 +540,15 @@ Data differences found among rows:
   code,name
 ! 2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 *** inventory.supplies
 --- inventory.supplies
 ***************
@@ -551,7 +563,7 @@ Data differences found among rows:
 ! 11186,Plastic polish,1,10.00,polishing,,1
 ! 11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -560,36 +572,36 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 8 - Use  -a --difftype=context --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 *** inventory.supplier
 --- inventory.supplier
 ***************
@@ -600,15 +612,15 @@ Data differences found among rows:
   code	name
 ! 2	Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code	name
 3	Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 *** inventory.supplies
 --- inventory.supplies
 ***************
@@ -623,7 +635,7 @@ Data differences found among rows:
 ! 11186	Plastic polish	1	10.00	polishing		1
 ! 11146	Speed shine	1	10.00	repair		1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11104	Interior cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
@@ -632,36 +644,36 @@ stock_number	description	qty	cost	type	notes	supplier
 11106	Wheel cleaner	1	9.99	cleaning		1
 11270	Carpet cleaner	1	9.99	cleaning		1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
 11116	Microfiber wax removal towel	3	16.99	waxing		1
 10665	Glass polish pad	3	10.00	polishing		1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 9 - Use  -a --difftype=context --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 *** inventory.supplier
 --- inventory.supplier
 ***************
@@ -676,17 +688,17 @@ Data differences found among rows:
 !  name: Wesayso Corporation
   1 rows.
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
 1 rows.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 *** inventory.supplies
 --- inventory.supplies
 ***************
@@ -741,7 +753,7 @@ Data differences found among rows:
           notes:
        supplier: 1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11104
   description: Interior cleaner
@@ -792,7 +804,7 @@ Rows in inventory.supplies not in inventory.supplies
      supplier: 1
 6 rows.
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
@@ -820,29 +832,29 @@ Rows in inventory.supplies not in inventory.supplies
 3 rows.
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 10 - Use  -a --difftype=differ --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 - +-------+--------------------+
 + +-------+----------------------+
 ?                              ++
@@ -858,18 +870,18 @@ Data differences found among rows:
 + +-------+----------------------+
 ?                              ++
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 - +---------------+-----------------+------+-------+------------+--------+-----------+
 + +---------------+-----------------+------+--------+------------+--------+-----------+
 ?                                                  +
@@ -895,7 +907,7 @@ Data differences found among rows:
 + +---------------+-----------------+------+--------+------------+--------+-----------+
 ?                                                  +
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
@@ -907,7 +919,7 @@ Rows in inventory.supplies not in inventory.supplies
 | 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
@@ -917,42 +929,42 @@ Rows in inventory.supplies not in inventory.supplies
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 11 - Use  -a --difftype=differ --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
   code,name
 - 2,Never Enough Inc.
 + 2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
   stock_number,description,qty,cost,type,notes,supplier
 - 11040,Leather care,1,9.99,other,,1
 ?                      ^ ^^
@@ -967,7 +979,7 @@ Data differences found among rows:
 + 11146,Speed shine,1,10.00,repair,,1
 ?                     ^^ ^^
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -976,49 +988,49 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 12 - Use  -a --difftype=differ --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
   code	name
 - 2	Never Enough Inc.
 + 2	Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code	name
 3	Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
   stock_number	description	qty	cost	type	notes	supplier
 - 11040	Leather care	1	9.99	other		1
 ?                      ^ ^^
@@ -1033,7 +1045,7 @@ Data differences found among rows:
 + 11146	Speed shine	1	10.00	repair		1
 ?                     ^^ ^^
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11104	Interior cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
@@ -1042,53 +1054,53 @@ stock_number	description	qty	cost	type	notes	supplier
 11106	Wheel cleaner	1	9.99	cleaning		1
 11270	Carpet cleaner	1	9.99	cleaning		1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number	description	qty	cost	type	notes	supplier
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
 11116	Microfiber wax removal towel	3	16.99	waxing		1
 10665	Glass polish pad	3	10.00	polishing		1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 13 - Use  -a --difftype=differ --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
   *************************       1. row *************************
    code: 2
 -  name: Never Enough Inc.
 +  name: Wesayso Corporation
   1 rows.
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
 1 rows.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
   *************************       1. row *************************
    stock_number: 11040
     description: Leather care
@@ -1124,7 +1136,7 @@ Data differences found among rows:
        supplier: 1
   3 rows.
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11104
   description: Interior cleaner
@@ -1175,7 +1187,7 @@ Rows in inventory.supplies not in inventory.supplies
      supplier: 1
 6 rows.
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 *************************       1. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
@@ -1203,43 +1215,95 @@ Rows in inventory.supplies not in inventory.supplies
 3 rows.
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 14 - without force 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
+#
 ERROR: The list of objects differs among database inventory and inventory.
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
-Test case 15 -  -d differ --format=csv --quiet
+Test case 15 -  -d differ --format=csv --quiet -a
 # Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
 
-ERROR: The list of objects differs among database inventory and inventory.
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
+  code,name
+- 2,Never Enough Inc.
++ 2,Wesayso Corporation
+
+# Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
+  stock_number,description,qty,cost,type,notes,supplier
+- 11040,Leather care,1,9.99,other,,1
+?                      ^ ^^
++ 11040,Leather care,1,10.00,other,,1
+?                      ^^ ^^
+- 11186,Plastic polish,1,9.99,polishing,,1
+?                        ^ ^^
++ 11186,Plastic polish,1,10.00,polishing,,1
+?                        ^^ ^^
+- 11146,Speed shine,1,9.99,repair,,1
+?                     ^ ^^
++ 11146,Speed shine,1,10.00,repair,,1
+?                     ^^ ^^
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
 Test case 16 -  --format=csv -a --width=65
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                          Defn    Row     Data   
-Type      Object Name                     Diff    Count   Check  
------------------------------------------------------------------ 
-TABLE     supplier                        pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                                         Defn    Row     Data   
+# Type      Object Name                   Diff    Count   Check  
+# --------------------------------------------------------------- 
+# TABLE     supplier                      pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -1247,15 +1311,15 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                        pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                      pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -1267,7 +1331,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -1276,36 +1340,36 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 17 -  --format=csv -a --width=55
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
-                                Defn    Row     Data   
-Type      Object Name           Diff    Count   Check  
-------------------------------------------------------- 
-TABLE     supplier              pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
+#                               Defn    Row     Data   
+# Type      Object Name         Diff    Count   Check  
+# ----------------------------------------------------- 
+# TABLE     supplier            pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -1313,15 +1377,15 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies              pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies            pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -1333,7 +1397,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -1342,28 +1406,28 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 18 -  --format=csv -vvv -a
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
      FUNCTION : 0
@@ -1372,10 +1436,10 @@ Object types found common to both databases:
         EVENT : 0
     PROCEDURE : 0
          VIEW : 0
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL   
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL   
 
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
@@ -1391,10 +1455,10 @@ CREATE TABLE `supplier` (
   PRIMARY KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -1402,11 +1466,11 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL   
+# TABLE     supplies                                pass    FAIL    FAIL   
 
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
@@ -1432,10 +1496,10 @@ CREATE TABLE `supplies` (
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -1447,7 +1511,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -1456,28 +1520,28 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
 Test case 19 -  --format=csv -vvv -a --disable-binary-logging
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-WARNING: Objects in server2:inventory but not in server1:inventory:
-        VIEW: tools
-
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+# WARNING: Objects in server2:inventory but not in server1:inventory:
+#         VIEW: tools
+#
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
      FUNCTION : 0
@@ -1486,10 +1550,10 @@ Object types found common to both databases:
         EVENT : 0
     PROCEDURE : 0
          VIEW : 0
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL   
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL   
 
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
@@ -1505,10 +1569,10 @@ CREATE TABLE `supplier` (
   PRIMARY KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -1516,11 +1580,11 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL   
+# TABLE     supplies                                pass    FAIL    FAIL   
 
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
@@ -1546,10 +1610,10 @@ CREATE TABLE `supplies` (
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -1561,7 +1625,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -1570,13 +1634,13 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done

@@ -83,6 +83,114 @@ def to_sql(obj):
     return MySQLConverter().quote(obj)
 
 
+def build_pkey_where_clause(table, row):
+    """Build the WHERE clause based on the primary keys
+    
+    table[in]              instance of Table class for table
+    row[in]                row of data
+    
+    Returns string - WHERE clause or "" if no keys
+    """
+    where_str = ""
+    pkeys = table.get_primary_index()
+    if len(pkeys) > 0:
+        col_names = table.get_col_names()
+        where_str += "WHERE "
+        for pkey in pkeys:
+            key_col = pkey[0]                         # get the column name
+            col_data = row[col_names.index(key_col)]  # get column value
+            where_str += "%s = %s" % (key_col, to_sql(col_data))
+    
+    return where_str
+
+
+def build_set_clauses(table, table_cols, dest_row, src_row):
+    """Build the SET clauses for an UPDATE statement
+   
+    table[in]              instance of Table class for table
+    dest_row[in]           row of data for destination (to be changed)
+    src_row[in]            row of data for source (to be changed to)
+    
+    Returns string - WHERE clause or "" if no keys
+    """
+    col_metadata = table.get_column_metadata()
+    # do SETs
+    set_str = ""
+    do_comma = False
+    for col_idx in range(0,len(table_cols)):
+        if dest_row[col_idx] != src_row[col_idx]:
+            # do comma
+            if do_comma:
+                set_str += ", "
+            else:
+                set_str = "SET "
+                do_comma = True
+            # Check for NULL for non-text fields that have no value in new row
+            if len(src_row[col_idx]) == 0 \
+               and not col_metadata[col_idx]['is_text']:
+                set_str += "%s = %s" % (table_cols[col_idx], "NULL")
+            else:
+                set_str += "%s = %s" % (table_cols[col_idx],
+                                       to_sql(src_row[col_idx]))
+
+    return set_str
+
+
+def transform_data(destination, source, operation, rows):
+    """Transform data for tables.
+    
+    This method will generate INSERT, UPDATE, and DELETE statements for
+    transforming data found to differ among tables.
+    
+    destination[in]    Table class instance of the destination
+    source[in]         Table class instance of the source
+    operation[in]      specify if INSERT, UPDATE, or DELETE
+    rows[in]           rows for transformation as follows:
+                       UPDATE - tuple (old, new)
+                       DELETE - list to delete
+                       INSERT - list to insert
+    
+    Returns list - SQL statement(s) for transforming the data or a warning
+                   if the columns differ between the tables
+    """
+    statements = []
+    dest_cols = destination.get_col_names()
+    src_cols = source.get_col_names()
+    
+    # We cannot do the data changes if the columns are different in the
+    # destination and source!
+    if dest_cols != src_cols:
+        return ["WARNING: Cannot generate SQL UPDATE commands for " \
+                "tables whose definitions are different. Check the " \
+                "table definitions for changes."]
+    data_op = operation.upper()
+    if data_op == "INSERT":
+        for row in rows:
+            formatted_row = []
+            for col in row:
+                formatted_row.append(to_sql(col))
+            statements.append("INSERT INTO %s (%s) VALUES(%s);" %
+                              (destination.table, ', '.join(dest_cols),
+                               ', '.join(formatted_row)))
+    elif data_op == "UPDATE":
+        for i in range(0,len(rows[0])):
+            row1 = rows[0][i]
+            row2 = rows[1][i]
+            sql_str = "UPDATE %s" % destination.table
+            sql_str += " %s" % build_set_clauses(source, src_cols, row1, row2)
+            sql_str += " %s" % build_pkey_where_clause(source, row2)
+            statements.append("%s;" % sql_str)                
+    elif data_op == "DELETE":
+        for row in rows:
+            sql_str = "DELETE FROM %s " % destination.table
+            sql_str += build_pkey_where_clause(source, row)
+            statements.append("%s;" % sql_str)
+    else:
+        raise UtilError("Unknown data transformation option: %s." % data_op)
+    
+    return statements
+
+
 class SQLTransformer(object):
     """
     The SQLTransformer class provides a mechanism for generating SQL statments

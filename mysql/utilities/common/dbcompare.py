@@ -26,6 +26,10 @@ from mysql.utilities.exception import UtilError, UtilDBError
 # The following are the queries needed to perform table data consistency
 # checking.
 
+_COMPARE_TABLE_DROP = """
+    DROP TABLE {db}.compare_{table};
+"""
+
 _COMPARE_TABLE = """
     CREATE TEMPORARY TABLE {db}.compare_{table} (
         compare_sign char(32) NOT NULL PRIMARY KEY,
@@ -143,9 +147,9 @@ def print_missing_list(item_list, first, second):
     """
     if len(item_list) == 0:
         return False
-    print "WARNING: Objects in {0} but not in {1}:".format(first, second)
+    print "# WARNING: Objects in {0} but not in {1}:".format(first, second)
     for item in item_list:
-        print "{0:>12}: {1}".format(item[0], item[1][0])
+        print "# {0:>12}: {1}".format(item[0], item[1][0])
     return True
 
 
@@ -250,6 +254,9 @@ def _get_diff(list1, list2, object1, object2, difftype):
     This method finds the difference of two lists using either unified,
     context, or differ-style output.
     
+    Note: We must strip not only \n but also trailing blanks due to change in
+          Python 2.7.1 handling of difflib methods.
+    
     list1[in]         The base list
     list2[in]         The list used for compare
     object1[in]       The 'from' or source
@@ -347,9 +354,24 @@ def _get_transform(server1, server2, object1, object2, options):
     return transform_str
 
 
-def _build_diff_list(diff1, diff2, transform1, transform2,
+def build_diff_list(diff1, diff2, transform1, transform2,
                      first, second, options):
     """Build the list of differences
+    
+    This method builds a list of difference statements based on whether
+    the lists are the result of an SQL statement generation, object definition
+    differences, or data differences.
+    
+    Note: to specify a non-SQL difference for data, set
+          options['data_diff'] = True
+    
+    diff1[in]              definitiion diff for first server
+    diff2[in]              definition diff for second server
+    transform1[in]         transformation for first server
+    transform2[in]         transformation for second server
+    first[in]              name of first server (e.g. server1)
+    second[in]             name of second server (e.g. server2)
+    options[in]            options for building the list
     
     Returns list = list of differences or transformations
     """
@@ -380,13 +402,16 @@ def _build_diff_list(diff1, diff2, transform1, transform2,
                         diff_list.append("# %s" % sub_row)
                 diff_list.append("#\n")
     else:
-        diff_list.append("# Object definitions differ. "
-                         "(--changes-for=%s)\n#\n" % first)
+        # Don't print messages for a data difference (non-SQL)
+        if not options.get('data_diff', False):
+           diff_list.append("# Object definitions differ. "
+                            "(--changes-for=%s)\n#\n" % first)
         diff_list.extend(diff1)
         if reverse and len(diff2) > 0:
             diff_list.append("")
-            diff_list.append("#\n# Definition diff for reverse changes "
-                             "(--changes-for=%s):\n#" % second)
+            if not options.get('data_diff', False):
+                diff_list.append("#\n# Definition diff for reverse changes "
+                                 "(--changes-for=%s):\n#" % second)
             for row in diff2:
                 diff_list.append("# %s" % row)
             diff_list.append("#\n")
@@ -404,12 +429,15 @@ def diff_objects(server1, server2, object1, object2, options):
     SQL statements in addition to the differences found in the CREATE
     statements.
     
+    When the --difftype == 'sql', the method will print the sql statements
+    to stdout. To suppress this, use options: quiet=True, suppress_sql=True.
+    
     server1[in]        first server connection
     server2[in]        second server connection
     object1            the first object in the compare in the form: (db.name)
     object2            the second object in the compare in the form: (db.name)
     options[in]        a dictionary containing the options for the operation:
-                       (quiet, verbosity, difftype, width)
+                       (quiet, verbosity, difftype, width, suppress_sql)
 
     Returns None = objects are the same, diff[] = objects differ
     """
@@ -462,13 +490,13 @@ def diff_objects(server1, server2, object1, object2, options):
 
     # Build diff list
     if direction == 'server1':
-        diff_list = _build_diff_list(diff_server1, diff_server2,
-                                     transform_server1, transform_server2,
-                                     'server1', 'server2', options)
+        diff_list = build_diff_list(diff_server1, diff_server2,
+                                    transform_server1, transform_server2,
+                                    'server1', 'server2', options)
     else:
-        diff_list = _build_diff_list(diff_server2, diff_server1,
-                                     transform_server2, transform_server1,
-                                     'server2', 'server1', options)
+        diff_list = build_diff_list(diff_server2, diff_server1,
+                                    transform_server2, transform_server1,
+                                    'server2', 'server1', options)
     
     # Check for failure to generate SQL statements
     if (difftype == 'sql') and \
@@ -492,8 +520,9 @@ def diff_objects(server1, server2, object1, object2, options):
     if len(diff_list) > 0:
         if not quiet:
             print "[FAIL]"
-
-        if difftype == 'sql' or not quiet:
+            
+        if not quiet or \
+           (not options.get("suppress_sql", False) and difftype == 'sql'):
             for line in diff_list:
                 print line
 
@@ -503,6 +532,20 @@ def diff_objects(server1, server2, object1, object2, options):
         print "[PASS]"
 
     return None
+
+
+def _drop_compare_object(server, db_name, tbl_name):
+    """Drop the compare object table
+    
+    server[in]             Server instance
+    db_name[in]            database name
+    tbl_name[in]           table name
+    """
+    try:
+        server.exec_query(_COMPARE_TABLE_DROP.format(db=db_name,
+                                                     table=tbl_name))
+    except:
+        pass
 
 
 def _get_compare_objects(index_cols, table1):
@@ -548,8 +591,6 @@ def _setup_compare(table1, table2):
     the keys are the same (have the same columns). An error is raised if
     neither of these are met.
     
-    Note: This method will clock
-    
     table1[in]        table1 Table instance
     table2[in]        table2 Table instance
 
@@ -566,6 +607,10 @@ def _setup_compare(table1, table2):
         raise UtilError("Indexes are not the same.")
     elif table1_idx == [] or table2_idx == []:
         raise UtilError("No primary key found.")
+
+    # drop the temporary tables
+    _drop_compare_object(server1, table1.db_name, table1.tbl_name)
+    _drop_compare_object(server2, table2.db_name, table2.tbl_name)
 
     # Build the primary key hash if needed
     tbl1_table, pri_idx1 = _get_compare_objects(table1_idx, table1)
@@ -753,6 +798,7 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
     Returns None = data is consistent
             list of differences - data is not consistent
     """
+    from mysql.utilities.common.sql_transform import transform_data
     from mysql.utilities.common.table import Table
         
     format = options.get('format', 'GRID')
@@ -789,7 +835,7 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
         table1_diffs = []
         table2_diffs = []
         data_diffs = []
-
+        
         # Get keys for diffs on table1
         for row in in1_not2:
             table1_diffs.append(row[0])
@@ -803,30 +849,42 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
                                                         table2_diffs)
         
         if len(changed_rows) > 0:
-            data_diffs.append("Data differences found among rows:")
-            rows = _get_rows_span(table1, changed_rows)
-            rows1 = _get_formatted_rows(rows, table1, format)
-            rows = _get_rows_span(table2, changed_rows)
-            rows2 = _get_formatted_rows(rows, table2, format)            
-            diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
-                                 difftype)
-            if len(diff_str) > 0:
-                data_diffs.extend(diff_str)
+            data_diffs.append("# Data differences found among rows:")
+            tbl1_rows = _get_rows_span(table1, changed_rows)
+            tbl2_rows = _get_rows_span(table2, changed_rows)
+            if difftype == 'sql':
+                data_diffs.extend(transform_data(table1, table2, "UPDATE",
+                                                 (tbl1_rows, tbl2_rows)))
+            else:
+                rows1 = _get_formatted_rows(tbl1_rows, table1, format)
+                rows2 = _get_formatted_rows(tbl2_rows, table2, format)            
+                diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
+                                     difftype)
+                if len(diff_str) > 0:
+                    data_diffs.extend(diff_str)
         
         if len(extra1) > 0:
             rows = _get_rows_span(table1, extra1)
-            data_diffs.append("\nRows in {0} not in {1}".format(table1_name,
+            if difftype == 'sql':
+                data_diffs.extend(transform_data(table1, table2,
+                                                 "DELETE", rows))
+            else:
+                data_diffs.append("\n# Rows in {0} not in {1}".format(table1_name,
                                                                 table2_name))
-            res = _get_formatted_rows(rows, table1, format)
-            data_diffs.extend(res)
+                res = _get_formatted_rows(rows, table1, format)
+                data_diffs.extend(res)
             
 
         if len(extra2) > 0:
             rows = _get_rows_span(table2, extra2)
-            data_diffs.append("\nRows in {0} not in {1}".format(table2_name,
-                                                                table1_name))
-            res = _get_formatted_rows(rows, table2, format)
-            data_diffs.extend(res)
+            if difftype == 'sql':
+                data_diffs.extend(transform_data(table1, table2,
+                                                 "INSERT", rows))
+            else:
+                data_diffs.append("\n# Rows in {0} not in {1}".format(table2_name,
+                                                                    table1_name))
+                res = _get_formatted_rows(rows, table2, format)
+                data_diffs.extend(res)
             
     if binlog_server1:
         server1.toggle_binlog("ENABLE")

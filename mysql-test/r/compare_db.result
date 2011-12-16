@@ -2,36 +2,36 @@ Test case 1 - check a sample database
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    pass    pass    
-TABLE     supplies                                  pass    pass    pass    
-VIEW      cleaning                                  pass    -       -       
-VIEW      finishing_up                              pass    -       -       
-VIEW      tools                                     pass    -       -      
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    pass    pass    
+# TABLE     supplies                                pass    pass    pass    
+# VIEW      cleaning                                pass    -       -       
+# VIEW      finishing_up                            pass    -       -       
+# VIEW      tools                                   pass    -       -      
 
 Databases are consistent.
-
+#
 # ...done
-Test case 2 - check database with known differences
+Test case 2 - check database with known differences direction = server1 (default)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
-
-WARNING: Objects in server1:inventory but not in server2:inventory:
-        VIEW: finishing_up
-        VIEW: cleaning
-
-                                                    Defn    Row     Data   
-Type      Object Name                               Diff    Count   Check  
---------------------------------------------------------------------------- 
-TABLE     supplier                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplier and inventory.supplier.
-
-Data differences found among rows:
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
 --- inventory.supplier
 +++ inventory.supplier
 @@ -1,2 +1,2 @@
@@ -39,15 +39,15 @@ Data differences found among rows:
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-Rows in inventory.supplier not in inventory.supplier
+# Rows in inventory.supplier not in inventory.supplier
 code,name
 3,Never Enough Inc.
 
-TABLE     supplies                                  pass    FAIL    FAIL    
-
-Row counts are not the same among inventory.supplies and inventory.supplies.
-
-Data differences found among rows:
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
 --- inventory.supplies
 +++ inventory.supplies
 @@ -1,4 +1,4 @@
@@ -59,7 +59,7 @@ Data differences found among rows:
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -68,14 +68,14 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-Rows in inventory.supplies not in inventory.supplies
+# Rows in inventory.supplies not in inventory.supplies
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
-VIEW      tools                                     FAIL    -       -       
-
+# VIEW      tools                                   FAIL    -       -       
+#
 # Object definitions differ. (--changes-for=server1)
 #
 
@@ -86,6 +86,336 @@ VIEW      tools                                     FAIL    -       -
 +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
 
 
-Database consistency check failed.
+# Database consistency check failed.
+#
+# ...done
+Test case 3 - check database with known differences direction = server2
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Wesayso Corporation
++2,Never Enough Inc.
 
+# Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,10.00,other,,1
+-11186,Plastic polish,1,10.00,polishing,,1
+-11146,Speed shine,1,10.00,repair,,1
++11040,Leather care,1,9.99,other,,1
++11186,Plastic polish,1,9.99,polishing,,1
++11146,Speed shine,1,9.99,repair,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+# VIEW      tools                                   FAIL    -       -       
+#
+# Object definitions differ. (--changes-for=server2)
+#
+
+--- inventory.tools
++++ inventory.tools
+@@ -1,1 +1,1 @@
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 4 - check database with known differences direction = server1 and reverse
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+# Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+# # Data differences found among rows:
+# --- inventory.supplier
+# +++ inventory.supplier
+# @@ -1,2 +1,2 @@
+#  code,name
+# -2,Wesayso Corporation
+# +2,Never Enough Inc.
+# 
+# Rows in inventory.supplier not in inventory.supplier
+# code,name
+# 3,Never Enough Inc.
+#
+
+
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11146,Speed shine,1,9.99,repair,,1
++11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11146,Speed shine,1,10.00,repair,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+# # Data differences found among rows:
+# --- inventory.supplies
+# +++ inventory.supplies
+# @@ -1,4 +1,4 @@
+#  stock_number,description,qty,cost,type,notes,supplier
+# -11040,Leather care,1,10.00,other,,1
+# -11186,Plastic polish,1,10.00,polishing,,1
+# -11146,Speed shine,1,10.00,repair,,1
+# +11040,Leather care,1,9.99,other,,1
+# +11186,Plastic polish,1,9.99,polishing,,1
+# +11146,Speed shine,1,9.99,repair,,1
+# 
+# Rows in inventory.supplies not in inventory.supplies
+# stock_number,description,qty,cost,type,notes,supplier
+# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+# 11116,Microfiber wax removal towel,3,16.99,waxing,,1
+# 10665,Glass polish pad,3,10.00,polishing,,1
+# 
+# Rows in inventory.supplies not in inventory.supplies
+# stock_number,description,qty,cost,type,notes,supplier
+# 11104,Interior cleaner,1,9.99,cleaning,,1
+# 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+# 11136,Rubber cleaner,1,9.99,cleaning,,1
+# 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+# 11106,Wheel cleaner,1,9.99,cleaning,,1
+# 11270,Carpet cleaner,1,9.99,cleaning,,1
+#
+
+
+# VIEW      tools                                   FAIL    -       -       
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- inventory.tools
++++ inventory.tools
+@@ -1,1 +1,1 @@
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+
+#
+# Definition diff for reverse changes (--changes-for=server2):
+#
+# --- inventory.tools
+# +++ inventory.tools
+# @@ -1,1 +1,1 @@
+# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+#
+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 5 - check database with known differences direction = server2 and reverse
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server1:inventory but not in server2:inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplier and inventory.supplier.
+#
+# Data differences found among rows:
+--- inventory.supplier
++++ inventory.supplier
+@@ -1,2 +1,2 @@
+ code,name
+-2,Wesayso Corporation
++2,Never Enough Inc.
+
+# Rows in inventory.supplier not in inventory.supplier
+code,name
+3,Never Enough Inc.
+
+# # Data differences found among rows:
+# --- inventory.supplier
+# +++ inventory.supplier
+# @@ -1,2 +1,2 @@
+#  code,name
+# -2,Never Enough Inc.
+# +2,Wesayso Corporation
+# 
+# Rows in inventory.supplier not in inventory.supplier
+# code,name
+# 3,Never Enough Inc.
+#
+
+
+# TABLE     supplies                                pass    FAIL    FAIL    
+#
+# Row counts are not the same among inventory.supplies and inventory.supplies.
+#
+# Data differences found among rows:
+--- inventory.supplies
++++ inventory.supplies
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11040,Leather care,1,10.00,other,,1
+-11186,Plastic polish,1,10.00,polishing,,1
+-11146,Speed shine,1,10.00,repair,,1
++11040,Leather care,1,9.99,other,,1
++11186,Plastic polish,1,9.99,polishing,,1
++11146,Speed shine,1,9.99,repair,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+
+# Rows in inventory.supplies not in inventory.supplies
+stock_number,description,qty,cost,type,notes,supplier
+11104,Interior cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
+
+# # Data differences found among rows:
+# --- inventory.supplies
+# +++ inventory.supplies
+# @@ -1,4 +1,4 @@
+#  stock_number,description,qty,cost,type,notes,supplier
+# -11040,Leather care,1,9.99,other,,1
+# -11186,Plastic polish,1,9.99,polishing,,1
+# -11146,Speed shine,1,9.99,repair,,1
+# +11040,Leather care,1,10.00,other,,1
+# +11186,Plastic polish,1,10.00,polishing,,1
+# +11146,Speed shine,1,10.00,repair,,1
+# 
+# Rows in inventory.supplies not in inventory.supplies
+# stock_number,description,qty,cost,type,notes,supplier
+# 11104,Interior cleaner,1,9.99,cleaning,,1
+# 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+# 11136,Rubber cleaner,1,9.99,cleaning,,1
+# 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+# 11106,Wheel cleaner,1,9.99,cleaning,,1
+# 11270,Carpet cleaner,1,9.99,cleaning,,1
+# 
+# Rows in inventory.supplies not in inventory.supplies
+# stock_number,description,qty,cost,type,notes,supplier
+# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+# 11116,Microfiber wax removal towel,3,16.99,waxing,,1
+# 10665,Glass polish pad,3,10.00,polishing,,1
+#
+
+
+# VIEW      tools                                   FAIL    -       -       
+#
+# Object definitions differ. (--changes-for=server2)
+#
+
+--- inventory.tools
++++ inventory.tools
+@@ -1,1 +1,1 @@
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+
+#
+# Definition diff for reverse changes (--changes-for=server1):
+#
+# --- inventory.tools
+# +++ inventory.tools
+# @@ -1,1 +1,1 @@
+# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+#
+
+
+
+# Database consistency check failed.
+#
 # ...done

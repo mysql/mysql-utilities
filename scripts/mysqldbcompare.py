@@ -28,12 +28,12 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import check_format_option
 from mysql.utilities.exception import UtilError, FormatError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcompare "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mysqldbcompare - compare databases for consistency"
 USAGE = "%prog --server1=user:pass@host:port:socket " + \
         "--server2=user:pass@host:port:socket db1:db2"
@@ -103,7 +103,13 @@ parser.add_option("--disable-binary-logging", action="store_true",
 add_verbosity(parser, True)
 
 # Add difftype option
-add_difftype(parser)
+add_difftype(parser, True)
+
+# Add the direction (changes-for)
+add_changes_for(parser)
+
+# Add show reverse option
+add_reverse(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -130,6 +136,8 @@ options = {
     "no_data"          : opt.no_data,
     "format"           : opt.format,
     "toggle_binlog"    : opt.toggle_binlog,
+    "changes-for"      : opt.changes_for,
+    "reverse"          : opt.reverse,
 }
 
 # Parse server connection values
@@ -175,14 +183,14 @@ for db in args:
 if not opt.quiet:
     print
     if check_failed:
-        print "Database consistency check failed."
+        print "# Database consistency check failed."
     else:
         sys.stdout.write("Databases are consistent")
         if opt.no_object_check or opt.no_diff or \
            opt.no_row_count or opt.no_data:
             sys.stdout.write(" given skip options specified")
         print "."
-    print "\n# ...done"
+    print "#\n# ...done"
 
 if check_failed:
     exit(1)

@@ -11,6 +11,6 @@ Test case 3 - malformed argument inventory.inventory
 # server2 on localhost: ... connected.
 ERROR: The database inventory.inventory does not exist.
 
-Database consistency check failed.
-
+# Database consistency check failed.
+#
 # ...done
