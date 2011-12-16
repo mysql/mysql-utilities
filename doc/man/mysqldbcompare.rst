@@ -13,7 +13,7 @@ SYNOPSIS
             [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --run-all-tests | --quiet |
               --format=<format> | --width=<width> |
-              --changes-for = [server1|server2] | 
+              --changes-for=[server1|server2] | 
               [--difftype=[unified|context|differ|sql]]
               [<db1:db2> | <db> [<db1:db2>* | db*] [--skip-object-compare |
               --skip-row-count | --skip-diff | --skip-data-check]

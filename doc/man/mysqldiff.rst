@@ -12,7 +12,7 @@ SYNOPSIS
   mysqldiff --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
             [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
-              --changes-for = [server1|server2] --quiet |
+              --changes-for=[server1|server2] --quiet |
               [--difftype=[--unified|--context|--differ|sql]]
               [<db1:db2> [<db1:db2>*] | --show-reverse |
                <db1.obj1:db2.obj2> [<db1.obj1:db2.obj2>*]]
