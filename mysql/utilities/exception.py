@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2011, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,4 +94,6 @@ class MUTLibError(Exception):
         self.errmsg = message
         self.options = options
     
-
+class LogParserError(UtilError):
+    def __init__(self, message=''):
+        super(LogParserError,self).__init__(message)

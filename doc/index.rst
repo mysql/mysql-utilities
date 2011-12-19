@@ -20,6 +20,7 @@ Contents:
 
    intro/index
    command/index
+   parser/index
    man/index
    changes
 

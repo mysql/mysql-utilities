@@ -1,0 +1,15 @@
+/usr/sbin/mysqld, Version: 5.1.54-1ubuntu4-log ((Ubuntu)). started with:
+Tcp port: 3309  Unix socket: /var/run/mysqld/mysqld3.sock
+Time                 Id Command    Argument
+111102 12:48:46	    3 Connect	root@localhost on 
+		    3 Query	select @@version_comment limit 1
+111102 12:48:50	    3 Query	show databases
+111102 12:48:54	    3 Query	SELECT DATABASE()
+		    3 Init DB	test
+		    3 Query	show databases
+		    3 Query	show tables
+		    3 Field List	t1 
+111102 12:48:57	    3 Query	show tables
+111102 12:48:59	    3 Query	select * from t1
+111102 12:49:02	    3 Query	insert into t1 values (3),(4)
+111102 12:49:04	    3 Quit	

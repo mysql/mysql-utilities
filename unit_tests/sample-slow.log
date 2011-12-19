@@ -1,0 +1,59 @@
+/usr/sbin/mysqld, Version: 5.1.54-1ubuntu4-log ((Ubuntu)). started with:
+Tcp port: 3309  Unix socket: /var/run/mysqld/mysqld3.sock
+Time                 Id Command    Argument
+# Time: 111102 12:48:46
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000333  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
+SET timestamp=1320234526;
+select @@version_comment limit 1;
+# Time: 111102 12:48:50
+# User@Host: root[root] @ localhost []
+# Query_time: 0.001015  Lock_time: 0.000294 Rows_sent: 3  Rows_examined: 3
+SET timestamp=1320234530;
+show databases;
+# Time: 111102 12:48:54
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000236  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
+SET timestamp=1320234534;
+SELECT DATABASE();
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000073  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
+use test;
+SET timestamp=1320234534;
+# administrator command: Init DB;
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000686  Lock_time: 0.000100 Rows_sent: 3  Rows_examined: 3
+SET timestamp=1320234534;
+show databases;
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000274  Lock_time: 0.000074 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1320234534;
+show tables;
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000300  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0
+SET timestamp=1320234534;
+;
+# Time: 111102 12:48:57
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000451  Lock_time: 0.000193 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1320234537;
+show tables;
+# Time: 111102 12:48:59
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000370  Lock_time: 0.000178 Rows_sent: 4  Rows_examined: 4
+SET timestamp=1320234539;
+select * from t1;
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000372  Lock_time: 0.000180 Rows_sent: 4  Rows_examined: 4
+SET timestamp=1320234539;
+select * from t2;
+# Time: 111102 12:49:02
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000404  Lock_time: 0.000194 Rows_sent: 0  Rows_examined: 0
+SET timestamp=1320234542;
+insert into t1 values (3),(4);
+# Time: 111102 12:49:04
+# User@Host: root[root] @ localhost []
+# Query_time: 0.000087  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0
+SET timestamp=1320234544;
+# administrator command: Quit;
