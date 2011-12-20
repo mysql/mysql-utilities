@@ -131,7 +131,7 @@ OPTIONS
 
 .. option:: --help, -h
 
-   Print help.
+   Display a help message and exit.
 
 .. option:: --server=<source>
 
@@ -182,7 +182,7 @@ OPTIONS
 
 .. option:: --version
 
-   Print the version and exit.
+   Display version information and exit.
 
 
 EXAMPLES

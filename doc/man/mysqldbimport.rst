@@ -88,9 +88,11 @@ OPTIONS
 
 .. option:: --version
 
-   show program's version number and exit
+   Display version information and exit.
 
 .. option:: --help
+
+   Display a help message and exit.
 
 .. option:: --server=<SERVER>
 

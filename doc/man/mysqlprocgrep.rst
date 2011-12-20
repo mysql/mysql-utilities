@@ -46,7 +46,7 @@ Options
 
 .. option:: --help, -h
 
-   Print help
+   Display a help message and exit.
 
 .. option:: --server=<source>
 
@@ -157,6 +157,10 @@ Options
 
    Only show processes that have been in the current state more than a given
    time
+
+.. option:: --version
+
+   Display version information and exit.
 
 
 Specifying time

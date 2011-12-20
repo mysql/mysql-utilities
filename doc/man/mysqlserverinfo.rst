@@ -80,11 +80,11 @@ OPTIONS
 
 .. option:: --version
 
-   show program's version number and exit
+   Display version information and exit.
 
 .. option:: --help
 
-    show the program's help and usage
+   Display a help message and exit.
 
 .. option:: --server=<server>
 

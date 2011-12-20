@@ -92,11 +92,11 @@ OPTIONS
 
 .. option:: --version
 
-   show version number and exit
+   Display version information and exit.
 
 .. option:: --help
 
-   show the help page
+   Display a help message and exit.
 
 .. option:: --master=<source>
 

@@ -71,11 +71,11 @@ OPTIONS
 
 .. option:: --version
 
-   show version number and exit
+   Display version information and exit.
 
 .. option:: --help
 
-   show help page
+   Display a help message and exit.
 
 .. option:: --master=<master>
 

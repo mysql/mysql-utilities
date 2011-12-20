@@ -71,11 +71,11 @@ The following command line options are accepted by **mysqldbcopy**:
 
 .. option:: --version
 
-   show version number and exit
+   Display version information and exit.
 
 .. option:: --help
 
-   show the help page
+   Display a help message and exit.
 
 .. option:: --source=<source>
 
