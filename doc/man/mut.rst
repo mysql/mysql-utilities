@@ -64,61 +64,61 @@ OPTIONS
 
 .. option:: --suite=<suite>
 
-   test suite to execute - list option multiple times for multiple
-   suites
+   Test suite to execute - list option multiple times for multiple
+   suites.
 
 .. option:: --skip-test=<test>
 
-   exclude *test* - list option multiple times for multiple tests
+   Exclude *test* - list option multiple times for multiple tests.
 
 .. option:: --skip-tests=<tests>
 
-   exclude *tests* that begin with this string
+   Exclude *tests* that begin with this string.
 
 .. option:: --start-test=<prefix>
 
-   start executing tests that begin with *prefix*
+   Start executing tests that begin with *prefix*.
 
 .. option:: --skip-long
 
-   exclude tests that require greater resources or take a long time to
-   run
+   Exclude tests that require greater resources or take a long time to
+   run.
 
 .. option:: --testdir=<path>
 
-   Path to test directory
+   Path to test directory.
 
 .. option:: --start-port=<port>
 
-   starting port for spawned servers
+   Starting port for spawned servers.
 
 .. option:: --record
 
-   record output of specified test if successful - works with only one
-   test selected
+   Record output of specified test if successful - works with only one
+   test selected.
 
 .. option:: --sorted
 
-   execute tests sorted by suite.name (default = True)
+   Execute tests sorted by suite.name (default = True).
 
 .. option:: --utildir=<path>
 
-   location of utilities
+   Location of utilities.
 
 .. option:: --width=<number>
 
-   Display width
+   Display width.
 
 .. option:: --force, -f
 
-   Do not abort when a test fails
+   Do not abort when a test fails.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
+   Control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug. Use -vvv to display actual
    results of test cases to the screen and ignore result processing - used to
-   diagnose test execution problems
+   diagnose test execution problems.
 
 NOTES
 -----

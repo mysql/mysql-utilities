@@ -179,14 +179,14 @@ OPTIONS
 
 .. option:: --changes-for=DIRECTION
 
-   specify the server to show transformations to match the other server. For
+   Specify the server to show transformations to match the other server. For
    example, to see the transformation for transforming server1 to match
    server2, use --changes-for=server1. Valid values are 'server1' or
-   'server2'. The default is 'server1' 
+   'server2'. The default is 'server1'.
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
-   display differences in context format either unified,
+   Display differences in context format either unified,
    context, differ, or sql (default: unified).
    
 .. option:: --disable-binary-logging
@@ -197,7 +197,7 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   display missing rows in either GRID (default), CSV, TAB, or VERTICAL format
+   Display missing rows in either GRID (default), CSV, TAB, or VERTICAL format.
    
 .. option:: --quiet
 
@@ -209,41 +209,41 @@ OPTIONS
    
 .. option:: --server1=<source>
 
-   connection information for the first server in the form:
+   Connection information for the first server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --server2=<source>
 
-   connection information for the second server in the form:
+   Connection information for the second server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --show-reverse
 
-   produce a transformation report containing the SQL statements to conform the
+   Produce a transformation report containing the SQL statements to conform the
    object definitions specified in reverse. For example if --changes-for is set
    to server1, also generate the transformation for server2. Note: the reverse
-   changes are annotated and marked as comments
+   changes are annotated and marked as comments.
 
 .. option:: --skip-data-check
 
-   skip data consistency check
+   Skip data consistency check.
 
 .. option:: --skip-diff
 
-   skip the object diff step
+   Skip the object diff step.
 
 .. option:: --skip-object-compare
 
-   skip object comparison step
+   Skip object comparison step.
 
 .. option:: --skip-row-count
 
-   skip row count step
+   Skip row count step.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
 
@@ -251,7 +251,7 @@ OPTIONS
 
 .. option:: --width
 
-   change the display width of the test report
+   Change the display width of the test report.
 
 
 NOTES

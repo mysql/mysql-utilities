@@ -70,37 +70,37 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   connection information for the master server in the form:
+   Connection information for the master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --slave=<source>
 
-   connection information for the slave server in the form:
+   Connection information for the slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option::  --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution. Note: errors and warnings are
+   Turn off all messages for quiet execution. Note: errors and warnings are
    not suppressed.
    
 .. option:: --suppress
 
-   suppress warning messages
+   Suppress warning messages.
 
 .. option:: --master-info-file=<file>
 
-   the name of the master information file on the slave.default = 'master.info'
+   The name of the master information file on the slave.default = 'master.info'
    read from the data directory. Note: this option requires that the utility
    run on the slave with appropriate file read access to the data directory.
    
 .. option:: --show-slave-status, -s
 
-   display the values from SHOW SLAVE STATUS
+   Display the values from SHOW SLAVE STATUS.
 
 NOTES
 -----

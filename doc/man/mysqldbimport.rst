@@ -96,20 +96,20 @@ OPTIONS
 
 .. option:: --server=<SERVER>
 
-   connection information for the server in the form:
+   Connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
-   or VERTICAL|V format
+   Display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
+   or VERTICAL|V format.
 
 .. option:: --import=<import_type>, -i<import_type>
 
-   control the import of either DATA|D = only the table data for the
+   Control the import of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = import only the
    definitions for the objects in the database list, or BOTH|B =
-   import the metadata followed by the data (default: import metadata)
+   import the metadata followed by the data (default: import metadata).
 
 .. option:: --drop-first, -d
 
@@ -117,31 +117,31 @@ OPTIONS
 
 .. option:: --dryrun
 
-   import the files and generate the statements but do not execute
-   them - useful for testing file validity
+   Import the files and generate the statements but do not execute
+   them - useful for testing file validity.
 
 .. option:: --bulk-insert, -b
 
-   Use bulk insert statements for data (default:False)
+   Use bulk insert statements for data (default:False).
 
 .. option::  --no-headers, -h
 
-   do not display the column headers - ignored for GRID format
+   Do not display the column headers - ignored for GRID format.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution
+   Turn off all messages for quiet execution.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --skip=<skip_objects>
 
-   specify objects to skip in the operation in the form of a
+   Specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
+   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
 
 .. option:: --skip-blobs
 

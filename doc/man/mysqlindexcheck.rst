@@ -92,42 +92,42 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   connection information for source server in the form:
+   Connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --show-drops, -d
 
-   display DROP statements for dropping indexes
+   Display DROP statements for dropping indexes.
 
 .. option:: --show-indexes, -i
 
-   display indexes for each table
+   Display indexes for each table.
 
 .. option:: --skip, -s
 
-   skip tables that do not exist
+   Skip tables that do not exist.
 
 .. option::  --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --format=<index_format>
 
    Display the list of indexes per table in either **SQL**, **TABLE**
-   (default), **TAB**, **CSV**, or **VERTICAL** format
+   (default), **TAB**, **CSV**, or **VERTICAL** format.
 
 .. option:: --stats
 
-    show index performance statistics
+    Show index performance statistics.
 
 .. option:: --best=<num>
 
-    limit index statistics to the best N indexes
+    Limit index statistics to the best N indexes.
 
 .. option:: --worst=<num>
 
-   limit index statistics to the worst N indexes
+   Limit index statistics to the worst N indexes.
 
 
 NOTES

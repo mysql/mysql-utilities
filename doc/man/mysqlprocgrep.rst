@@ -50,29 +50,29 @@ Options
 
 .. option:: --server=<source>
 
-   connection information for the servers to search in the form:
+   Connection information for the servers to search in the form:
    <user>:<password>@<host>:<port>:<socket>
    The option may be repeated to form a list of servers to search.
 
 .. option:: --match-user=<pattern>
 
-   Match all rows where the **User** field matches pattern
+   Match all rows where the **User** field matches pattern.
 
 .. option:: --match-host=<pattern>
 
-   Match all rows where the **Host** field matches pattern
+   Match all rows where the **Host** field matches pattern.
 
 .. option:: --match-db=<pattern>
 
-   Match all rows where the **Db** field matches pattern
+   Match all rows where the **Db** field matches pattern.
 
 .. option:: --match-time=<pattern>
 
-   Match all rows where the **Time** field matches pattern
+   Match all rows where the **Time** field matches pattern.
 
 .. option:: --match-command=<pattern>
 
-   Match all rows where the **Command** field matches pattern
+   Match all rows where the **Command** field matches pattern.
 
 .. option:: --match-state=<pattern>
 
@@ -101,7 +101,7 @@ Options
 
    Be more verbose and print messages about execution. Can be given
    multiple times, in which case the verbosity level increases.
-   For example, -v = verbose, -vv = more verbose, -vvv = debug
+   For example, -v = verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --regexp, --basic-regexp, -G
 

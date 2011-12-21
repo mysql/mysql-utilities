@@ -79,44 +79,44 @@ OPTIONS
 
 .. option:: --master=<master>
 
-   connection information for master server in the form:
+   Connection information for master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --slave=<slave>
 
-   connection information for slave server in the form:
+   Connection information for slave server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --rpl-user=<replication_user>
 
-   the user and password for the replication user requirement -
-   For example, rpl:passwd - default = rpl:rpl
+   The user and password for the replication user requirement -
+   For example, rpl:passwd - default = rpl:rpl.
 
 .. option:: --test-db=<test_database>
 
-   database name to use in testing replication setup (optional)
+   Database name to use in testing replication setup (optional).
 
 .. option:: --master-log-file=<master_log_file>
 
-   use this master log file to initiate the slave.
+   Use this master log file to initiate the slave.
 
 .. option:: --master-log-pos=<master_log_pos>
 
-   use this position in the master log file to initiate the slave
+   Use this position in the master log file to initiate the slave.
 
 .. option:: --start-from-beginning, -b
 
-   start replication at the beginning of logged events. Not valid with
-   --master-log-file or --master-log-pos
+   Start replication at the beginning of logged events. Not valid with
+   --master-log-file or --master-log-pos.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --pedantic, -p
 
-   fail if storage engines differ among master and slave (optional)
+   Fail if storage engines differ among master and slave (optional).
 
 
 NOTES

@@ -35,38 +35,38 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   connection information for source server in the form:
+   Connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution
+   Turn off all messages for quiet execution.
 
 .. option:: --new-data=<path_to_new_datadir>
 
-   the full path to the location of the data directory for the new
-   instance
+   The full path to the location of the data directory for the new
+   instance.
 
 .. option:: --new-port=<port>
 
-   the new port for the new instance - default=3307
+   The new port for the new instance - default=3307.
 
 .. option:: --new-id=<server_id>
 
-   the server_id for the new instance - default=2
+   The server_id for the new instance - default=2.
 
 .. option:: --root-password=<password>
 
-   password for the root user
+   Password for the root user.
 
 .. option:: --mysqld=<options>
 
-   additional options for mysqld
+   Additional options for mysqld.
 
 NOTES
 -----

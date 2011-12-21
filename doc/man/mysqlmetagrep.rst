@@ -135,7 +135,7 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   connection information for the servers to search in the form:
+   Connection information for the servers to search in the form:
    <user>:<password>@<host>:<port>:<socket>
    The option may be repeated to form a list of servers to search.
 
@@ -178,7 +178,7 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either GRID (default), TAB, CSV, or VERTICAL format
+   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
 
 .. option:: --version
 

@@ -79,49 +79,49 @@ The following command line options are accepted by **mysqldbcopy**:
 
 .. option:: --source=<source>
 
-   connection information for source server in the form:
+   Connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --destination=<destination>
 
-   connection information for destination server in the form:
+   Connection information for destination server in the form:
    <user>:<password>@<host>:<port>:<socket> Where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --copy-dir=<copy_directory>
 
-   a path to use when copying data (stores temporary files) - default
-   = current directory
+   Path to use when copying data (stores temporary files) - default
+   = current directory.
 
 .. option:: --skip=<objects>
 
-   specify objects to skip in the operation in the form of a
+   Specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
+   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
 
 .. option:: --exclude=<exclude>, -x<exclude>
 
-   exclude one or more objects from the operation using either a specific name
+   Exclude one or more objects from the operation using either a specific name
    such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
    exclusions.
 
 .. option:: --force, -f
 
-   drop the new database or object if it exists
+   Drop the new database or object if it exists.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution
+   Turn off all messages for quiet execution.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --threads
 
-    use multiple threads for cross-server copy (default = 1)
+    Use multiple threads for cross-server copy (default = 1).
 
 .. option::  --new-storage-engine=<new_engine>
 

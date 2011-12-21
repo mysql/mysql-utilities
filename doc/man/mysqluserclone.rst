@@ -47,50 +47,50 @@ OPTIONS
 
 .. option:: --source=<source>
 
-   connection information for source server in the form:
+   Connection information for source server in the form:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --destination=<destination>
 
-   connection information for destination server in the form:
-   <user>:<password>@<host>:<port>:<socket> Where <password> is
+   Connection information for destination server in the form:
+   <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --copy-dir=<directory>
 
    Path to use when copying data (stores temporary files) - default =
-   current directory
+   current directory.
 
 .. option:: --dump, -d 
 
-   dump GRANT statements for user
+   Dump GRANT statements for user.
 
 .. option:: --force, -f
 
-   drop the new user if it exists
+   Drop the new user if it exists.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution
+   Turn off all messages for quiet execution.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --include-global-privileges
 
-   include privileges that match ``base_user@%`` as well as ``base_user@host``
+   Include privileges that match ``base_user@%`` as well as ``base_user@host``.
 
 .. option:: --list
 
-   list all users on the source - does not require a destination
+   List all users on the source - does not require a destination.
 
 .. option::  --format=<list_format>
 
-   display the list of users in either GRID (default), TAB, CSV, or VERTICAL
-   format - valid only for :option:`--list` option
+   Display the list of users in either GRID (default), TAB, CSV, or VERTICAL
+   format - valid only for :option:`--list` option.
 
 
 NOTES

@@ -118,30 +118,30 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   connection information for the server in the form:
+   Connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
-   or VERTICAL|V format
+   Display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
+   or VERTICAL|V format.
 
 .. option:: --display=<display>, -d<display>
 
-   control the number of columns shown: BRIEF = minimal columns for
+   Control the number of columns shown: BRIEF = minimal columns for
    object creation (default), FULL = all columns, NAMES = only object
-   names (not valid for --format=SQL)
+   names (not valid for --format=SQL).
 
 .. option:: --export=<export>, -e<export>
 
-   control the export of either DATA|D = only the table data for the
+   Control the export of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = export only the
    definitions for the objects in the database list, or BOTH|B =
-   export the metadata followed by the data (default: export metadata)
+   export the metadata followed by the data (default: export metadata).
 
 .. option:: --bulk-insert, -b
 
-   Use bulk insert statements for data (default:False)
+   Use bulk insert statements for data (default:False).
 
 .. option:: --file-per-table
 
@@ -153,26 +153,26 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   do not display the column headers - ignored for GRID format
+   Do not display the column headers - ignored for GRID format.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution
+   Turn off all messages for quiet execution.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --skip=<skip-objects>
 
-   specify objects to skip in the operation in the form of a
+   Specify objects to skip in the operation in the form of a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB
+   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
 
 .. option:: --exclude=<exclude>, -x<exclude> 
 
-   exclude one or more objects from the operation using either a specific name
+   Exclude one or more objects from the operation using either a specific name
    such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
    exclusions.
 

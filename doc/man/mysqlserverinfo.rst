@@ -88,48 +88,48 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   connection information for the server in the form:
-   <user>:<password>@<host>:<port>:<socket> specify this option multiple times
+   Connection information for the server in the form:
+   <user>:<password>@<host>:<port>:<socket> Specify this option multiple times
    for seeing the information from additional servers.
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either GRID (default), TAB, CSV, or VERTICAL format
+   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
 
 .. option:: --no-headers, -h
 
-   do not display the column headers - ignored for GRID format
+   Do not display the column headers - ignored for GRID format.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --show-defaults
 
-   display default settings for mysqld from the local configuration file
+   Display default settings for mysqld from the local configuration file.
    
 .. option:: --show-servers
 
-   display running servers on the local host
+   Display running servers on the local host.
    
 .. option:: --port-range
 
-   the port range to use for finding running servers in the form start:end.
+   The port range to use for finding running servers in the form start:end.
    Applies to Windows only and is ignored if :option:`--show-servers` is not
-   specified. Default is 3306:3333
+   specified. Default is 3306:3333.
 
 .. option:: --start, -s
 
-   start server in read only mode if offline
+   Start server in read only mode if offline.
 
 .. option:: --basedir=<basedir>
 
-   the base directory for the server
+   The base directory for the server.
   
 .. option:: --datadir=<datadir>
 
-   the data directory for the server
+   The data directory for the server.
 
 .. _mysqlserverinfo-notes:
 

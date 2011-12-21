@@ -100,35 +100,35 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   connection information for the master server in the form:
+   Connection information for the master server in the form:
    <user>:<password>@<host>:<port>:<socket>
    
 .. option:: --show-list, -l
 
-   print a list of the topology
+   Print a list of the topology.
    
 .. option:: --recurse, -r
 
-   traverse the list of slaves to find additional master/slave connections.
+   Traverse the list of slaves to find additional master/slave connections.
    User this option to map a replication topology.
    
 .. option:: --prompt, -p
 
-   prompt for slave user and password if different from master login.
+   Prompt for slave user and password if different from master login.
    
 .. option:: --num-retries=<num_retries>, -n<num_retries>
 
-   number of retries allowed for failed slave login attempt. Valid with
+   Number of retries allowed for failed slave login attempt. Valid with
    --prompt only.
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either GRID (default), TAB, CSV,
-   or VERTICAL format
+   Display the output in either GRID (default), TAB, CSV,
+   or VERTICAL format.
 
 .. option:: --quiet, -q
 
-   turn off all messages for quiet execution. Note: errors and warnings are
+   Turn off all messages for quiet execution. Note: errors and warnings are
    not suppressed.
 
 NOTES

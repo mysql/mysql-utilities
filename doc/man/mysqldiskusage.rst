@@ -65,50 +65,50 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   connection information for the server in the form:
+   Connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --format=<format>, -f<format>
 
-   display the output in either GRID (default), TAB, CSV,
-   or VERTICAL format
+   Display the output in either GRID (default), TAB, CSV,
+   or VERTICAL format.
 
 .. option::  --no-headers, -h
 
-   do not display the column headers - ignored for grid format
+   Do not display the column headers - ignored for grid format.
 
 .. option:: --verbose, -v
 
-   control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option::  --binlog, -b
 
-    include binary log usage
+    Include binary log usage.
 
 .. option::  --relaylog, -r
 
-    include relay log usage
+    Include relay log usage.
 
 .. option::  --logs, -l
 
-    include general, error, and slow log usage
+    Include general, error, and slow log usage.
     
 .. option::  --InnoDB, -i
 
-    include InnoDB tablespace usage
+    Include InnoDB tablespace usage.
 
 .. option::  --empty, -m
 
-    include empty databases
+    Include empty databases.
 
 .. option::  --all, -a
 
-    show all usage including empty databases
+    Show all usage including empty databases.
     
 .. option:: --quiet
 
-    suppress informational messages
+    Suppress informational messages.
 
 .. _`mysqldiskusage-notes`:
 
