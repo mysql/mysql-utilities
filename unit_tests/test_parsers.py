@@ -243,7 +243,7 @@ SLOW_LOG_ENTRIES_EXP = [
       'rows_sent': 1,
       'database': None,
       'lock_time': decimal.Decimal('0.000000'),
-      'datetime': datetime.datetime(2011, 11, 2, 12, 48, 46),
+      'datetime': datetime.datetime.fromtimestamp(1320234526),
       'host': 'localhost',
       'user': 'root',
       'query': 'SET timestamp=1320234526;\nselect @@version_comment limit 1;'},
@@ -252,7 +252,7 @@ SLOW_LOG_ENTRIES_EXP = [
       'rows_sent': 44345,
       'database': None,
       'lock_time': decimal.Decimal('34.000000'),
-      'datetime': datetime.datetime(2011, 11, 25, 11, 56, 45),
+      'datetime': datetime.datetime.fromtimestamp(1322218605),
       'host': 'localhost',
       'user': 'root',
       'query': ('SET timestamp=1322218605;\n'
@@ -262,7 +262,7 @@ SLOW_LOG_ENTRIES_EXP = [
       'rows_sent': 44342,
       'database': None,
       'lock_time': decimal.Decimal('2.000000'),
-      'datetime': datetime.datetime(2011, 11, 25, 11, 56, 45),
+      'datetime': datetime.datetime.fromtimestamp(1322218605),
       'host': 'localhost',
       'user': 'root',
       'query': ('SET timestamp=1322218605;\n'
@@ -709,7 +709,7 @@ class TestSlowQueryLog(BaseParserTestCase):
             (   ('SET timestamp=1320234526;',
                  'select @@version_comment limit 1;'),
                 dict(database=None,
-                     datetime=datetime.datetime(2011, 11, 2, 12, 48, 46),
+                     datetime=datetime.datetime.fromtimestamp(1320234526),
                      query='SET timestamp=1320234526;\n'\
                         'select @@version_comment limit 1;')),
             
@@ -718,7 +718,7 @@ class TestSlowQueryLog(BaseParserTestCase):
                  'from t1',
                  'where c1 like "%a%";'),
                 dict(database=None,
-                     datetime=datetime.datetime(2011, 11, 2, 12, 48, 46),
+                     datetime=datetime.datetime.fromtimestamp(1320234526),
                      query='SET timestamp=1320234526;\n'\
                            'select c1\nfrom t1\nwhere c1 like "%a%";')),
             
@@ -727,7 +727,7 @@ class TestSlowQueryLog(BaseParserTestCase):
                  'SET timestamp=1320234526;',
                  'select @@version_comment limit 1;'),
                 dict(database='test',
-                     datetime=datetime.datetime(2011, 11, 2, 12, 48, 46),
+                     datetime=datetime.datetime.fromtimestamp(1320234526),
                      query='use test\nSET timestamp=1320234526;\n'\
                            'select @@version_comment limit 1;')),
         ]
@@ -745,7 +745,7 @@ class TestSlowQueryLog(BaseParserTestCase):
         self._fakelog_writelines(tests[0][0], empty=True)
         result = dict(database=None, query=None)
         exp = dict(database='test',
-                   datetime=datetime.datetime(2011, 11, 2, 12, 48, 46),
+                   datetime=datetime.datetime.fromtimestamp(1320234526),
                    query='SET timestamp=1320234526;\n'\
                          'select @@version_comment limit 1;')
         try:
