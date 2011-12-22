@@ -43,19 +43,19 @@ names similar to the script. A command module will include classes and methods
 from one or more common modules where the abstract objects and method groups
 are kept. The common modules reside in the /mysql/utilities/common folder of
 the source tree. The following illustrates this arrangement using the
-mysqlserverinfo utility.
+mysqlserverinfo utility.::
 
-/scripts/mysqlserverinfo.py
-    |
-    +--- /mysql/utilities/command/serverinfo.py
-            |
-            +--- /mysql/utilities/common/options.py
-            |
-            +--- /mysql/utilities/common/server.py
-            |
-            +--- /mysql/utilities/common/tools.py
-            |
-            +--- /mysql/utilities/common/format.py
+  /scripts/mysqlserverinfo.py
+      |
+      +--- /mysql/utilities/command/serverinfo.py
+              |
+              +--- /mysql/utilities/common/options.py
+              |
+              +--- /mysql/utilities/common/server.py
+              |
+              +--- /mysql/utilities/common/tools.py
+              |
+              +--- /mysql/utilities/common/format.py
 
 The utility scripts are designed to process the user input and option settings
 and pass them on to the command module. Thus, the script contains only such
