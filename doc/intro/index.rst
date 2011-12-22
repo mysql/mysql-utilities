@@ -80,55 +80,55 @@ The MySQL Utilities Library
 ---------------------------
 
 While the library is growing, the following lists the current common modules
-and the major classes and methods as of the 1.0.1 release.
+and the major classes and methods as of the 1.0.1 release.::
 
-Module     Class/Method              Description
----------- ------------------------- ------------------------------------------
-database   Database                  perform database-level operations
-dbcompare  get_create_object         retrieve object's create statement 
-           diff_objects              diff the definition of two objects
-           check_consistency         check the data consistency of two tables
-format     format_tabular_list       format a list in either GRID or delimited
-                                     format to a file
-           format_vertical_list      format a list in a vertical format to file
-           print_list                print a list based on format (CSV, GRID,
-                                     TAB, or VERTICAL)
-options    setup_common_options      setup option parser and options common to
-                                     all MySQL Utilities
-           add_skip_options          add the common --skip options
-           check_skip_options        check skip options for validity
-           check_format_option       check format option for validity
-           add_verbosity             add the verbosity and quiet options
-           check_verbosity           check to see if both verbosity and quiet 
-                                     are being used
-           add_difftype              add the difftype option
-           add_engines               add the engine and default-storage-engine
-                                     options
-           check_engine_options      check to see if storage engines specified 
-                                     in options exist
-           parse_connection          parse connection values
-rpl        Replication               used to establish a replication connection
-                                     between a master and a slave
-           get_replication_tests     return list of replication test function
-                                     pointers
-server     get_connection_dictionary get the connection dictionary
-           find_running_servers      check to see if there are any servers
-                                     running on the local host
-           connect_servers           connect to a source and destination server
-           Server                    used to connect to a running MySQL server
-                                     and perform server-level operations
-table      Index                     encapsulates an index for a given table as
-                                     defined by the output of SHOW INDEXES FROM
-           Table                     encapsulates a table for a given database
-                                     to perform table-level operations
-tools      get_tool_path             search for a MySQL tool and return the
-                                     full path
-           delete_directory          remove a directory (folder) and contents
-user       parse_user_host           parse user, passwd, host, port from
-                                     user:passwd@host
-           User                      used to clone the user and its grants to
-                                     another user and perform user-level
-                                     operations
+  Module     Class/Method              Description
+  ---------- ------------------------- ----------------------------------------
+  database   Database                  perform database-level operations
+  dbcompare  get_create_object         retrieve object's create statement 
+             diff_objects              diff the definition of two objects
+             check_consistency         check the data consistency of two tables
+  format     format_tabular_list       format a list in either GRID or 
+                                       delimited format to a file
+             format_vertical_list      format a list in a vertical format to 
+             print_list                file print a list based on format (CSV, 
+                                       GRID, TAB, or VERTICAL)
+  options    setup_common_options      setup option parser and options common 
+                                       to all MySQL Utilities
+             add_skip_options          add the common --skip options
+             check_skip_options        check skip options for validity
+             check_format_option       check format option for validity
+             add_verbosity             add the verbosity and quiet options
+             check_verbosity           check to see if both verbosity and quiet 
+                                       are being used
+             add_difftype              add the difftype option
+             add_engines               add the engine, default-storage-engine
+                                       options
+             check_engine_options      check to see if storage engines listed 
+                                       in options exist
+             parse_connection          parse connection values
+  rpl        Replication               used to establish a replication
+                                       connection between a master and a slave
+             get_replication_tests     return list of replication test function
+                                       pointers
+  server     get_connection_dictionary get the connection dictionary
+             find_running_servers      check to see if there are any servers
+                                       running on the local host
+             connect_servers           connect to source and destination server
+             Server                    used to connect to running MySQL server
+                                       and perform server-level operations
+  table      Index                     encapsulates an index for a given table 
+                                       as defined by SHOW INDEXES FROM
+             Table                     encapsulates a table for given database
+                                       to perform table-level operations
+  tools      get_tool_path             search for a MySQL tool and return the
+                                       full path
+             delete_directory          remove a directory (folder) and contents
+  user       parse_user_host           parse user, passwd, host, port from
+                                       user:passwd@host
+             User                      used to clone the user and its grants to
+                                       another user and perform user-level
+                                       operations
 
 General Interface Specifications and Code Practices
 ---------------------------------------------------
@@ -143,25 +143,25 @@ that resort to platform specific native code are also not used.
 
 The class method and function signatures are designed to make use of a small
 number of required parameters and all optional parameters as a single
-dictionary. Consider the following method. 
+dictionary. Consider the following method.::
 
-def do_something_wonderful(position, obj1, obj2, options={}):
-    """Does something wonderful
-    
-    A fictional method that does something to object 2 based on the
-    location of something in object 1.
-    
-    position[in]   Position in obj1
-    obj1[in]       First object to manipulate
-    obj2[in]       Second object to manipulate
-    options[in]    Option dictionary
-      width        width of printout (default 75)
-      iter         max iterations (default 2)
-      ok_to_fail   if True, do not throw exception
-                   (default True)
+  def do_something_wonderful(position, obj1, obj2, options={}):
+      """Does something wonderful
       
-    Returns bool - True = success, Fail = failed
-    """
+      A fictional method that does something to object 2 based on the
+      location of something in object 1.
+      
+      position[in]   Position in obj1
+      obj1[in]       First object to manipulate
+      obj2[in]       Second object to manipulate
+      options[in]    Option dictionary
+        width        width of printout (default 75)
+        iter         max iterations (default 2)
+        ok_to_fail   if True, do not throw exception
+                     (default True)
+        
+      Returns bool - True = success, Fail = failed
+      """
 
 This example is typical of the methods and classes in the library. Notice this
 method has three required parameters and a dictionary of options that may exist.
@@ -173,7 +173,7 @@ the example above where the dictionary contains three keys and the
 documentation lists their defaults.
 
 To call this method and pass different values for one or more of the options,
-the code may look similar to the following.
+the code may look similar to the following.::
 
   opt_dictionary = {
     'width'      : 100,
