@@ -1,7 +1,7 @@
 .. _`mysqlserverinfo`:
 
 #########################################################################
-``mysqlserverinfo`` - Display common diagnostic information from a server
+``mysqlserverinfo`` - Display Common Diagnostic Information from a Server
 #########################################################################
 
 SYNOPSIS

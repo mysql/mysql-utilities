@@ -1,8 +1,8 @@
 .. `mysqlindexcheck`:
 
-#######################################################################
-``mysqlindexcheck`` - Identify potentially redundant indexes in a table
-#######################################################################
+##################################################################
+``mysqlindexcheck`` - Identify Potentially Redundant Table Indexes
+##################################################################
 
 SYNOPSIS
 --------

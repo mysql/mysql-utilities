@@ -1,7 +1,7 @@
 .. _`mysqldbimport`:
 
 #####################################################################
-``mysqldbimport`` - Import object definitions or data into a database
+``mysqldbimport`` - Import Object Definitions or Data into a Database
 #####################################################################
 
 SYNOPSIS

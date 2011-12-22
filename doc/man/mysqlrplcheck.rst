@@ -1,7 +1,7 @@
 .. `mysqlrplcheck`:
 
 ########################################################
-``mysqlrplcheck`` - Check prerequisities for replication
+``mysqlrplcheck`` - Check Prerequisities for Replication
 ########################################################
 
 SYNOPSIS

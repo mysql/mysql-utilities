@@ -1,5 +1,5 @@
 #############################################################
-:mod:`mysql.utilities.command.grep` --- Searching for Objects
+:mod:`mysql.utilities.command.grep` --- Search for Objects
 #############################################################
 
 .. module:: mysql.utilities.command.grep

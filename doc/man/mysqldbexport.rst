@@ -1,7 +1,7 @@
 .. _`mysqldbexport`:
 
 #####################################################################
-``mysqldbexport`` - Export object definitions or data from a database
+``mysqldbexport`` - Export Object Definitions or Data from a Database
 #####################################################################
 
 SYNOPSIS

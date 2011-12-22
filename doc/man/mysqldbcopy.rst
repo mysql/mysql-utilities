@@ -1,7 +1,7 @@
 .. _`mysqldbcopy`:
 
 #######################################################
-``mysqldbcopy`` - Copy database objects between servers
+``mysqldbcopy`` - Copy Database Objects Between Servers
 #######################################################
 
 SYNOPSIS

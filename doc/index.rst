@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-MySQL Utilities's documentation
+MySQL Utilities Documentation
 ===============================
 
 MySQL Utilities is both a set of command-line utilities as well as a

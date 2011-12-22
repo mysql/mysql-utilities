@@ -1,7 +1,7 @@
 .. _ `mysqlmetagrep`:
 
 #############################################
-``mysqlmetagrep`` - Search object definitions
+``mysqlmetagrep`` - Search Object Definitions
 #############################################
 
 SYNOPSIS

@@ -1,6 +1,6 @@
 
 ######################
-Command-line Utilities
+Command-Line Utilities
 ######################
 
 .. toctree::

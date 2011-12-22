@@ -1,5 +1,5 @@
 #############################################################
-:mod:`mysql.utilities.parser` --- Parsing MySQL Log Files
+:mod:`mysql.utilities.parser` --- Parse MySQL Log Files
 #############################################################
 
 .. module:: mysql.utilities.parser

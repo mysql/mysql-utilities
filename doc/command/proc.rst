@@ -1,5 +1,5 @@
 ###################################################################
-:mod:`mysql.utilities.command.proc` --- Search processes on servers
+:mod:`mysql.utilities.command.proc` --- Search Processes on Servers
 ###################################################################
 
 .. module:: mysql.utilities.command.proc
