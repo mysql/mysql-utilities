@@ -8,7 +8,6 @@ Release 1.0.4 (Released December 22, 2011)
 - BUG#13082780: mysqldbexport - improve performance of _export_row() 
 - BUG#13115052: corrected order of /etc/profile.d/mysql-utilities.sh access
 - BUG#13418634: mysqldbcopy - Crashes when data contains apostrophe
-- WL#55635: General and Slow log parsers 
 - WL#5635: Parsers for General and Slow Query Log
 - WL#5977: MySQL Utilities: Add generate SQL to mysqldiff output
 - WL#5978: MySQL Utilities: Add generate SQL to mysqldbcompare
