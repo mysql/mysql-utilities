@@ -93,40 +93,40 @@ and the major classes and methods as of the 1.0.1 release::
              format_vertical_list      format a list in a vertical format to 
              print_list                file print a list based on format (CSV, 
                                        GRID, TAB, or VERTICAL)
-  options    setup_common_options      setup option parser and options common 
+  options    setup_common_options      set up option parser and options common 
                                        to all MySQL Utilities
              add_skip_options          add the common --skip options
              check_skip_options        check skip options for validity
              check_format_option       check format option for validity
              add_verbosity             add the verbosity and quiet options
              check_verbosity           check whether both verbosity and quiet 
-                                       are being used
+                                       options are being used
              add_difftype              add the difftype option
              add_engines               add the engine, default-storage-engine
                                        options
              check_engine_options      check whether storage engines listed 
                                        in options exist
              parse_connection          parse connection values
-  rpl        Replication               used to establish a replication
-                                       connection between a master and a slave
+  rpl        Replication               establish a replication connection
+                                       between a master and a slave
              get_replication_tests     return list of replication test function
                                        pointers
   server     get_connection_dictionary get the connection dictionary
-             find_running_servers      check whether there are any servers
+             find_running_servers      check whether any servers are
                                        running on the local host
              connect_servers           connect to source and destination server
-             Server                    used to connect to running MySQL server
+             Server                    connect to running MySQL server
                                        and perform server-level operations
-  table      Index                     encapsulates an index for a given table 
+  table      Index                     encapsulate an index for a given table 
                                        as defined by SHOW INDEXES FROM
-             Table                     encapsulates a table for given database
+             Table                     encapsulate a table for given database
                                        to perform table-level operations
-  tools      get_tool_path             search for a MySQL tool and return the
+  tools      get_tool_path             search for a MySQL tool and return its
                                        full path
              delete_directory          remove a directory (folder) and contents
   user       parse_user_host           parse user, passwd, host, port from
                                        user:passwd@host
-             User                      used to clone the user and its grants to
+             User                      clone a user and its grants to
                                        another user and perform user-level
                                        operations
 
@@ -163,8 +163,9 @@ dictionary. Consider the following method::
       Returns bool - True = success, Fail = failed
       """
 
-This example is typical of the methods and classes in the library. Notice this
-method has three required parameters and a dictionary of options that may exist.
+This example is typical of the methods and classes in the library.
+Notice that this method has three required parameters and a dictionary
+of options that may exist.
 
 Each method and function that uses this mechanism defines its own default
 values for the items in the dictionary. A quick look at the method
