@@ -21,29 +21,29 @@ MySQL Utilities are designed as a collection of easy to use Python scripts that
 can be combined into more powerful features. The scripts internally make use of
 the :ref:`mysql.utilities` module library to perform its various tasks. Since
 a library of common functions is available, it is easy for a database
-administrator to create her own scripts for common tasks. These utilities are
+administrator to create scripts for common tasks. These utilities are
 located in the scripts folder of the installation or source tree.
 
-If, on the other hand, you have a task that is not met by these utilities or
-one that can be met if you combined one or more of the utilities or even parts
-of the utilities, you can easily form your own custom solution. In the
-following sections, we present an example of a custom utility. First, we
-examine the anatomy of a utility and then what the mysql.utilities module
+If you have a task that is not met by these utilities or
+one that can be met by combining one or more of the utilities or even parts
+of the utilities, you can easily form your own custom solution. The
+following sections present an example of a custom utility, discussing first
+the anatomy of a utility and then what the mysql.utilities module
 library has available.
 
 Anatomy of a MySQL Utility
 ---------------------------
 
-MySQL Utilities are built using a three-tier module organization. At the top is
-the command script and resides in the /scripts folder of the installation or
+MySQL Utilities use a three-tier module organization. At the top is
+the command script, which resides in the /scripts folder of the installation or
 source tree. Included in the script is a command module designed to encapsulate
-and isolate the bulk of the work for the utility. The command module resides in
+and isolate the bulk of the work performed by the utility. The command module resides in
 the /mysql/utilities/command folder of the source tree. Command modules have
-names similar to the script. A command module will include classes and methods
+names similar to the script. A command module includes classes and methods
 from one or more common modules where the abstract objects and method groups
 are kept. The common modules reside in the /mysql/utilities/common folder of
 the source tree. The following illustrates this arrangement using the
-mysqlserverinfo utility.::
+**mysqlserverinfo** utility::
 
   /scripts/mysqlserverinfo.py
       |
@@ -74,18 +74,18 @@ that performs both operations.
 Common modules are the heart of the MySQL Utilities library. These modules
 contain classes that abstract MySQL objects, devices, and mechanisms. For
 example, there is a server class that contains operations to be performed on
-servers like connecting (logging in) and running queries.
+servers, such as connecting (logging in) and running queries.
 
 The MySQL Utilities Library
 ---------------------------
 
 While the library is growing, the following lists the current common modules
-and the major classes and methods as of the 1.0.1 release.::
+and the major classes and methods as of the 1.0.1 release::
 
   Module     Class/Method              Description
   ---------- ------------------------- ----------------------------------------
   database   Database                  perform database-level operations
-  dbcompare  get_create_object         retrieve object's create statement 
+  dbcompare  get_create_object         retrieve object create statement 
              diff_objects              diff the definition of two objects
              check_consistency         check the data consistency of two tables
   format     format_tabular_list       format a list in either GRID or 
@@ -99,12 +99,12 @@ and the major classes and methods as of the 1.0.1 release.::
              check_skip_options        check skip options for validity
              check_format_option       check format option for validity
              add_verbosity             add the verbosity and quiet options
-             check_verbosity           check to see if both verbosity and quiet 
+             check_verbosity           check whether both verbosity and quiet 
                                        are being used
              add_difftype              add the difftype option
              add_engines               add the engine, default-storage-engine
                                        options
-             check_engine_options      check to see if storage engines listed 
+             check_engine_options      check whether storage engines listed 
                                        in options exist
              parse_connection          parse connection values
   rpl        Replication               used to establish a replication
@@ -112,7 +112,7 @@ and the major classes and methods as of the 1.0.1 release.::
              get_replication_tests     return list of replication test function
                                        pointers
   server     get_connection_dictionary get the connection dictionary
-             find_running_servers      check to see if there are any servers
+             find_running_servers      check whether there are any servers
                                        running on the local host
              connect_servers           connect to source and destination server
              Server                    used to connect to running MySQL server
@@ -139,11 +139,11 @@ to the most widely accepted specifications and techniques. This includes
 limiting the choice of libraries used to the default libraries found in the
 Python distributions. This ensures easier installation, enhanced portability,
 and fewer problems with missing libraries. Similarly, external libraries
-that resort to platform specific native code are also not used.
+that resort to platform-specific native code are also not used.
 
 The class method and function signatures are designed to make use of a small
 number of required parameters and all optional parameters as a single
-dictionary. Consider the following method.::
+dictionary. Consider the following method::
 
   def do_something_wonderful(position, obj1, obj2, options={}):
       """Does something wonderful
@@ -168,12 +168,12 @@ method has three required parameters and a dictionary of options that may exist.
 
 Each method and function that uses this mechanism defines its own default
 values for the items in the dictionary. A quick look at the method
-documentation will list the key names for the dictionary. This can be seen in
-the example above where the dictionary contains three keys and the
+documentation shows the key names for the dictionary. This can be seen in
+the preceding example where the dictionary contains three keys and the
 documentation lists their defaults.
 
 To call this method and pass different values for one or more of the options,
-the code may look similar to the following.::
+the code may look like this::
 
   opt_dictionary = {
     'width'      : 100,
@@ -182,8 +182,8 @@ the code may look similar to the following.::
   }
   result = do_something_wonderful(1, obj_1, obj_2, opt_dictionary)
 
-The documentation block for the above method is the style used throughout the
-library. 
+The documentation block for the preceding method is the style used
+throughout the library.
 
 Example
 -------
@@ -192,44 +192,45 @@ Now that you are familiar with the MySQL utilities and the supporting library
 modules, let us take a look at an example of combining some of these modules to
 solve a problem.
 
-Suppose you want to develop a new database solution and need to use real world
-data and user accounts for testing. The MySQL utility, mysqlserverclone, looks
-like a possibility but it only makes an instance of a running server - it does
-not copy data. However, mysqldbcopy makes a copy of the data and mysqluserclone
-makes clones of the users. You could run each of these utilities in sequence,
-and that would work, but we are lazy at heart so we want something that will not
-only copy everything but also find it for us - we want a one command solution.
+Suppose you want to develop a new database solution and need to use real
+world data and user accounts for testing. The MySQL utility,
+**mysqlserverclone**, looks like a possibility but it makes only an instance
+of a running server. It does not copy data. However, **mysqldbcopy** makes a
+copy of the data and **mysqluserclone** clones the users. You could run each
+of these utilities in sequence, and that would work, but we are lazy at
+heart and want something that not only copies everything but also finds it
+for us. That is, we want a one-command solution.
 
-The good news here is this is indeed possible and very easy to do. Let us start
+The good news is that this is indeed possible and very easy to do. Let us start
 with breaking the problem down into its smaller components. In a nutshell, we
-need to do the following tasks:
+must perform these tasks:
 
-* connect to the original server
-* find all of the databases
-* find all of the users
-* make a clone of the original server
-* copy all of the databases
-* copy all of the users
+* Connect to the original server
+* Find all of the databases
+* Find all of the users
+* Make a clone of the original server
+* Copy all of the databases
+* Copy all of the users
 
-If you look at the utilities and the modules listed above, you will see we have
-solutions and primitives for each of these operations. So you don't even have
-to call the MySQL utilities directly (but you could). Now let us dive into
+If you look at the utilities and the modules just listed, you see that we have
+solutions and primitives for each of these operations. So you need not even
+call the MySQL utilities directly (although you could). Now let us dive into
 the code for this example.
 
-The first thing we need is to connect to the original server. We use the same
+The first task is to connect to the original server. We use the same
 connection mechanism as the other MySQL utilities by specifying a --server
-option like this:::
+option like this::
 
     parser.add_option("--server", action="store", dest="server",
                       type="string", default="root@localhost:3306",
                       help="connection information for original server in " + \
                       "the form: <user>:<password>@<host>:<port>:<socket>")
 
-Once we process the options and arguments, connecting to the server is easy and
-can be done like the following. Here we use the parse_connection method to take
+Once we process the options and arguments, connecting to the server is easy:
+Use the parse_connection method to take
 the server option values and get a dictionary with the connection values. All
 of the heavy diagnosis and error handling is done for us so we just need to
-check for exceptions.::
+check for exceptions::
 
     from mysql.utilities.common.options import parse_connection
 
@@ -240,7 +241,7 @@ check for exceptions.::
 
 Now that we have the connection parameters, we create a class instance of the
 server using the Server class from the server module and then connect. Once
-again, we check for exceptions.::
+again, we check for exceptions::
 
     from mysql.utilities.common.server import Server
 
@@ -255,7 +256,7 @@ again, we check for exceptions.::
         print "ERROR:", e.errmsg
 
 The next item is to get a list of all of the databases on the server. We use
-the new server class instance to retrieve all of the databases on the server.::
+the new server class instance to retrieve all of the databases on the server::
 
     db_list = []
     for db in server1.get_all_databases():
@@ -264,7 +265,7 @@ the new server class instance to retrieve all of the databases on the server.::
 If you wanted to supply your own list of databases, you could use an option
 like the following. You could also add an else clause which would allow you to
 either get all of the databases by omitting the --databases option or supply
-your own list of databases (e.g. --databases=db1,db2,db3).::
+your own list of databases (e.g. --databases=db1,db2,db3)::
 
     parser.add_option("-d", "--databases", action="store", dest="dbs_to_copy",
                       type="string", help="comma-separated list of databases "
@@ -280,7 +281,7 @@ your own list of databases (e.g. --databases=db1,db2,db3).::
 
 Notice we are creating a list of tuples. This is because the dbcopy module
 uses a list of tuples in the form (old_db, new_db) to allow you to copy a
-database to a new name. For our purposes, we don't want a rename so we leave
+database to a new name. For our purposes, we do not want a rename so we leave
 the new name value set to None.
 
 Next, we want a list of all of the users. Once again, you could construct the
@@ -291,7 +292,7 @@ In this case, we do not have a primitive for getting all users created on a
 server. But we do have the ability to run a query and process the results.
 Fortunately, there is a simple SQL statement that can retrieve all of the users
 on a server. For our purposes, we get all of the users except the root user
-and the anonymous user(s). We then add each to a list for processing later.::
+and the anonymous user(s). We then add each to a list for processing later::
 
     users = server1.exec_query("SELECT user, host "
                                "FROM mysql.user "
@@ -300,15 +301,15 @@ and the anonymous user(s). We then add each to a list for processing later.::
         user_list.append(user[0]+'@'+user[1])
 
 Now we must clone the original server and create a viable running instance.
-When you examine the mysqlserverclone utility code, you will see it calls
+When you examine the **mysqlserverclone** utility code, you see that it calls
 another module located in the mysql.utilities.command sub folder. These modules
-are where all of the work of the utilities take place. This allows you to
+are where all of the work done by the utilities take place. This allows you to
 create new combinations of the utilities by calling the actual operations
 directly. Let's do that now to clone the server.
 
 The first thing you notice in examining the serverclone module is that it takes
-a number of parameters for the new server instance. We will supply those in a
-similar way as options.::
+a number of parameters for the new server instance. We supply those in a
+similar way as options::
 
     parser.add_option("--new-data", action="store", dest="new_data",
                       type="string", help="the full path to the location "
@@ -333,14 +334,14 @@ As you can see, the operation is very simple. We just added a few options we
 needed like --new-data, --new-port, and --new-id (much like mysqlserverclone)
 and supplied some default values for the other parameters.
 
-Next, we need to start copying the databases. Once again, we will use the
+Next, we need to start copying the databases. Once again, we use the
 command module for mysqldbcopy to do all of the work for us. First, we need the
-connection parameters to the new instance. This is provided in the form of a
+connection parameters for the new instance. This is provided in the form of a
 dictionary. We know the instance is a clone so some of the values are going to
 be the same and we use a default root password so that is also known. Likewise,
 we specified the data directory and, since we are running on a Linux machine,
-we know what the socket path is. Note: for Windows machines, you can leave the
-socket value None. We will pass this dictionary to the copy method.::
+we know what the socket path is. (For Windows machines, you can leave the
+socket value None.) We pass this dictionary to the copy method::
 
     dest_values = {
         "user"   : conn.get("user"),
@@ -350,14 +351,14 @@ socket value None. We will pass this dictionary to the copy method.::
         "unix_socket" : os.path.join(opt.new_data, "mysql.sock")
     }
 
-In this case, there are also a number options needed to control how the copy
-works (i.e. if any objects are skipped). For our purposes, we want all objects
-to be copied so we will supply only the minimal settings and let the library
+In this case, a number of options are needed to control how the copy
+works (for example, if any objects are skipped). For our purposes, we want all objects
+to be copied so we supply only the minimal settings and let the library
 use the defaults. This example shows how you can 'fine tune' the scripts to
 meet your specific needs without having to specify a lot of additional options
-in your script. We will set the quiet option on so we won't clutter the screen
-with messages and tell the copy to skip databases that don't exist (in case we
-supply the --databases option and provide a database that doesn't exist).::
+in your script. We enable the quiet option on so as not to clutter the screen
+with messages, and tell the copy to skip databases that do not exist (in case we
+supply the --databases option and provide a database that does not exist)::
 
     options = {
         "quiet" : True,
@@ -365,7 +366,7 @@ supply the --databases option and provide a database that doesn't exist).::
     }
 
 The actual copy of the databases is easy. Just call the method and supply the
-list of databases.::
+list of databases::
 
     from mysql.utilities.command import dbcopy
 
@@ -375,10 +376,10 @@ list of databases.::
         print "ERROR:", e.errmsg
         exit(1)
 
-Lastly, we copy the user accounts. Once again, we need to provide a dictionary
-of options and we will call the command module directly. Note however, the
+Lastly, we copy the user accounts. Once again, we must provide a dictionary
+of options and call the command module directly. In this case, the
 userclone module provides a method that clones one user to one or more users so
-we will have to loop through the users and clone them one at a time.::
+we must loop through the users and clone them one at a time::
 
     from mysql.utilities.command import userclone
 
@@ -396,7 +397,7 @@ we will have to loop through the users and clone them one at a time.::
             print "ERROR:", e.errmsg
             exit(1)
 
-We're done. As you can see, constructing new solutions from the MySQL utility
+We are done. As you can see, constructing new solutions from the MySQL utility
 command and common modules is easy and is limited only by your imagination.
 
 Enhancing the Example
@@ -405,23 +406,23 @@ Enhancing the Example
 A complete solution for the example named copy_server.py is located in the
 /docs/intro/examples folder. It is complete in so far as this document explains,
 but it can be enhanced in a number of ways. The following briefly lists some
-of the things you may want to consider adding to make this example a more
+of the things to consider adding to make this example a more
 robust utility.
 
-* table locking : currently, the databases are not locked when copied. To
+* Table locking: Currently, the databases are not locked when copied. To
   achieve a consistent copy of the data on an active server, you may want to
-  add table locking or use transactions (e.g. if you are using InnoDB) for a
-  more consistent copy.
-* skip users not associated with the databases being copied
-* do not copy users with only global privileges
-* start replication after all of the users are copied (makes this example a
-  clone and replicate scale out solution)
-* stopping new client connections to the server during the copy
+  add table locking or use transactions (for example, if you are using InnoDB)
+  for a more consistent copy.
+* Skip users not associated with the databases being copied.
+* Do not copy users with only global privileges.
+* Start replication after all of the users are copied (makes this example a
+  clone and replicate scale out solution).
+* Stop new client connections to the server during the copy.
 
 Conclusion
 ----------
 
 If you find some primitives missing or would like to see more specific
 functionality in the library or scripts, please contact us with your ideas or
-better still - write them yourselves! We welcome all suggestions in code or
+better still, write them yourselves! We welcome all suggestions in code or
 text.
