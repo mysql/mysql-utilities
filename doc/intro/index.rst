@@ -19,7 +19,7 @@ What are the MySQL Utilities?
 
 MySQL Utilities are designed as a collection of easy to use Python scripts that
 can be combined into more powerful features. The scripts internally make use of
-the :ref:`mysql.utilities` module library to perform it's various tasks. Since
+the :ref:`mysql.utilities` module library to perform its various tasks. Since
 a library of common functions is available, it is easy for a database
 administrator to create her own scripts for common tasks. These utilities are
 located in the scripts folder of the installation or source tree.
