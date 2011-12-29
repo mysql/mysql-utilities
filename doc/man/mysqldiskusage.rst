@@ -55,60 +55,60 @@ See :ref:`mysqldiskusage-notes` below for more details.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
+
+.. option::  --all, -a
+
+    Show all usage including empty databases.
+
+.. option::  --binlog, -b
+
+    Include binary log usage.
+
+.. option::  --empty, -m
+
+    Include empty databases.
+
+.. option:: --format=<format>, -f<format>
+
+   Display the output in either GRID (default), TAB, CSV,
+   or VERTICAL format.
+    
+.. option::  --InnoDB, -i
+
+    Include InnoDB tablespace usage.
+
+.. option::  --logs, -l
+
+    Include general, error, and slow log usage.
+
+.. option::  --no-headers, -h
+
+   Do not display the column headers - ignored for grid format.
+    
+.. option:: --quiet
+
+    Suppress informational messages.
+
+.. option::  --relaylog, -r
+
+    Include relay log usage.
 
 .. option:: --server=<server>
 
    Connection information for the server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --format=<format>, -f<format>
-
-   Display the output in either GRID (default), TAB, CSV,
-   or VERTICAL format.
-
-.. option::  --no-headers, -h
-
-   Do not display the column headers - ignored for grid format.
-
 .. option:: --verbose, -v
 
    Control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
-.. option::  --binlog, -b
+.. option:: --version
 
-    Include binary log usage.
-
-.. option::  --relaylog, -r
-
-    Include relay log usage.
-
-.. option::  --logs, -l
-
-    Include general, error, and slow log usage.
-    
-.. option::  --InnoDB, -i
-
-    Include InnoDB tablespace usage.
-
-.. option::  --empty, -m
-
-    Include empty databases.
-
-.. option::  --all, -a
-
-    Show all usage including empty databases.
-    
-.. option:: --quiet
-
-    Suppress informational messages.
+   Display version information and exit.
 
 .. _`mysqldiskusage-notes`:
 

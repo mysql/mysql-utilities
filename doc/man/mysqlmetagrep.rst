@@ -133,11 +133,31 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --server=<source>
+.. option:: --body, -b
 
-   Connection information for the servers to search in the form:
-   <user>:<password>@<host>:<port>:<socket>
-   The option may be repeated to form a list of servers to search.
+   Search the body of procedures, functions, triggers, and
+   events. Default is to only match the name.
+
+.. option:: --database=<pattern>
+
+   Only look in databases matching this pattern.
+
+.. option:: --format=<format>, -f<format>
+
+   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
+
+.. option:: --pattern=<pattern>, -e=<pattern>
+
+   Pattern to use when matching. This is required when the pattern
+   looks like a connection specification.
+
+   If a pattern option is given, the first argument is not treated as
+   a pattern but as a connection specifier.
+
+.. option:: --regexp, --basic-regexp, -G
+
+   Perform the match using the **REGEXP** operator. Default is to use
+   **LIKE** for matching.
 
 .. option:: --search-objects=<type>, ...
             --object-types=<type>, ...
@@ -148,37 +168,17 @@ OPTIONS
 
    Default is to search in objects of all kinds of types.
 
-.. option:: --body, -b
+.. option:: --server=<source>
 
-   Search the body of procedures, functions, triggers, and
-   events. Default is to only match the name.
-
-.. option:: --regexp, --basic-regexp, -G
-
-   Perform the match using the **REGEXP** operator. Default is to use
-   **LIKE** for matching.
+   Connection information for the servers to search in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   The option may be repeated to form a list of servers to search.
 
 .. option::  --sql, --print-sql, -p
 
    Print the SQL code that will be executed to find all matching
    objects. This can be useful if you want to safe the statement for
    later execution, or pipe it into other tools.
-
-.. option:: --pattern=<pattern>, -e=<pattern>
-
-   Pattern to use when matching. This is required when the pattern
-   looks like a connection specification.
-
-   If a pattern option is given, the first argument is not treated as
-   a pattern but as a connection specifier.
-
-.. option:: --database=<pattern>
-
-   Only look in databases matching this pattern.
-
-.. option:: --format=<format>, -f<format>
-
-   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
 
 .. option:: --version
 

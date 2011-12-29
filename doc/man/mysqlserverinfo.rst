@@ -78,50 +78,9 @@ shown).
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
-
-.. option:: --server=<server>
-
-   Connection information for the server in the form:
-   <user>:<password>@<host>:<port>:<socket> Specify this option multiple times
-   for seeing the information from additional servers.
-
-.. option:: --format=<format>, -f<format>
-
-   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
-
-.. option:: --no-headers, -h
-
-   Do not display the column headers - ignored for GRID format.
-
-.. option:: --verbose, -v
-
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
-
-.. option:: --show-defaults
-
-   Display default settings for mysqld from the local configuration file.
-   
-.. option:: --show-servers
-
-   Display running servers on the local host.
-   
-.. option:: --port-range
-
-   The port range to use for finding running servers in the form start:end.
-   Applies to Windows only and is ignored if :option:`--show-servers` is not
-   specified. Default is 3306:3333.
-
-.. option:: --start, -s
-
-   Start server in read only mode if offline.
 
 .. option:: --basedir=<basedir>
 
@@ -130,6 +89,47 @@ OPTIONS
 .. option:: --datadir=<datadir>
 
    The data directory for the server.
+
+.. option:: --format=<format>, -f<format>
+
+   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
+
+.. option:: --no-headers, -h
+
+   Do not display the column headers - ignored for GRID format.
+   
+.. option:: --port-range
+
+   The port range to use for finding running servers in the form start:end.
+   Applies to Windows only and is ignored if :option:`--show-servers` is not
+   specified. Default is 3306:3333.
+
+.. option:: --server=<server>
+
+   Connection information for the server in the form:
+   <user>:<password>@<host>:<port>:<socket> Specify this option multiple times
+   for seeing the information from additional servers.
+
+.. option:: --show-defaults
+
+   Display default settings for mysqld from the local configuration file.
+   
+.. option:: --show-servers
+
+   Display running servers on the local host.
+
+.. option:: --start, -s
+
+   Start server in read only mode if offline.
+
+.. option:: --verbose, -v
+
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
+
+.. option:: --version
+
+   Display version information and exit.
 
 .. _mysqlserverinfo-notes:
 

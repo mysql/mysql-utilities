@@ -69,36 +69,25 @@ OPTIONS
 
 The following command line options are accepted by **mysqldbcopy**:
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
-
-.. option:: --source=<source>
-
-   Connection information for source server in the form:
-   <user>:<password>@<host>:<port>:<socket> where <password> is
-   optional and either <port> or <socket> must be provided.
-
-.. option:: --destination=<destination>
-
-   Connection information for destination server in the form:
-   <user>:<password>@<host>:<port>:<socket> Where <password> is
-   optional and either <port> or <socket> must be provided.
 
 .. option:: --copy-dir=<copy_directory>
 
    Path to use when copying data (stores temporary files) - default
    = current directory.
 
-.. option:: --skip=<objects>
+.. option:: --default-storage-engine=<def_engine>
 
-   Specify objects to skip in the operation in the form of a
-   comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
+   Change all tables to use this storage engine if the original storage engine
+   does not exist on the destination.
+
+.. option:: --destination=<destination>
+
+   Connection information for destination server in the form:
+   <user>:<password>@<host>:<port>:<socket> Where <password> is
+   optional and either <port> or <socket> must be provided.
 
 .. option:: --exclude=<exclude>, -x<exclude>
 
@@ -109,29 +98,6 @@ The following command line options are accepted by **mysqldbcopy**:
 .. option:: --force, -f
 
    Drop the new database or object if it exists.
-
-.. option:: --quiet, -q
-
-   Turn off all messages for quiet execution.
-
-.. option:: --verbose, -v
-
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
-
-.. option:: --threads
-
-    Use multiple threads for cross-server copy (default = 1).
-
-.. option::  --new-storage-engine=<new_engine>
-
-   Change all tables to use this storage engine if storage engine exists on the
-   destination.
-
-.. option:: --default-storage-engine=<def_engine>
-
-   Change all tables to use this storage engine if the original storage engine
-   does not exist on the destination.
    
 .. option:: --locking=<locking>
 
@@ -139,10 +105,44 @@ The following command line options are accepted by **mysqldbcopy**:
    locks, lock-all = use table locks but no transaction and no consistent read,
    snaphot (default): consistent read using a single transaction.
 
-.. option:: --basic-regexp, --regexp, -G
+.. option::  --new-storage-engine=<new_engine>
+
+   Change all tables to use this storage engine if storage engine exists on the
+   destination.
+
+.. option:: --quiet, -q
+
+   Turn off all messages for quiet execution.
+
+.. option:: --regexp, --basic-regexp, -G
 
    Use 'REGEXP' operator to match pattern for exclusion. Default is to use
    'LIKE'.
+
+.. option:: --skip=<objects>
+
+   Specify objects to skip in the operation in the form of a
+   comma-separated list (no spaces). Valid values = TABLES, VIEWS,
+   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
+
+.. option:: --source=<source>
+
+   Connection information for source server in the form:
+   <user>:<password>@<host>:<port>:<socket> where <password> is
+   optional and either <port> or <socket> must be provided.
+
+.. option:: --threads
+
+    Use multiple threads for cross-server copy (default = 1).
+
+.. option:: --verbose, -v
+
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
+
+.. option:: --version
+
+   Display version information and exit.
 
 
 .. _mysqldbcopy-notes:

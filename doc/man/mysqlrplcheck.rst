@@ -60,10 +60,6 @@ shown above.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
@@ -73,34 +69,38 @@ OPTIONS
    Connection information for the master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --slave=<source>
+.. option:: --master-info-file=<file>
 
-   Connection information for the slave server in the form:
-   <user>:<password>@<host>:<port>:<socket>
-
-.. option::  --verbose, -v
-
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   The name of the master information file on the slave.default = 'master.info'
+   read from the data directory. Note: this option requires that the utility
+   run on the slave with appropriate file read access to the data directory.
 
 .. option:: --quiet, -q
 
    Turn off all messages for quiet execution. Note: errors and warnings are
    not suppressed.
    
+.. option:: --show-slave-status, -s
+
+   Display the values from SHOW SLAVE STATUS.
+
+.. option:: --slave=<source>
+
+   Connection information for the slave server in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   
 .. option:: --suppress
 
    Suppress warning messages.
 
-.. option:: --master-info-file=<file>
+.. option::  --verbose, -v
 
-   The name of the master information file on the slave.default = 'master.info'
-   read from the data directory. Note: this option requires that the utility
-   run on the slave with appropriate file read access to the data directory.
-   
-.. option:: --show-slave-status, -s
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
-   Display the values from SHOW SLAVE STATUS.
+.. option:: --version
+
+   Display version information and exit.
 
 NOTES
 -----

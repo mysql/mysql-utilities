@@ -25,13 +25,34 @@ password for the login user account on the new instance.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help, -h
 
    Display a help message and exit.
+
+.. option:: --mysqld=<options>
+
+   Additional options for mysqld.
+
+.. option:: --new-data=<path_to_new_datadir>
+
+   The full path to the location of the data directory for the new
+   instance.
+
+.. option:: --new-id=<server_id>
+
+   The server_id for the new instance - default=2.
+
+.. option:: --new-port=<port>
+
+   The new port for the new instance - default=3307.
+
+.. option:: --quiet, -q
+
+   Turn off all messages for quiet execution.
+
+.. option:: --root-password=<password>
+
+   Password for the root user.
 
 .. option:: --server=<source>
 
@@ -43,30 +64,9 @@ OPTIONS
    Control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
-.. option:: --quiet, -q
+.. option:: --version
 
-   Turn off all messages for quiet execution.
-
-.. option:: --new-data=<path_to_new_datadir>
-
-   The full path to the location of the data directory for the new
-   instance.
-
-.. option:: --new-port=<port>
-
-   The new port for the new instance - default=3307.
-
-.. option:: --new-id=<server_id>
-
-   The server_id for the new instance - default=2.
-
-.. option:: --root-password=<password>
-
-   Password for the root user.
-
-.. option:: --mysqld=<options>
-
-   Additional options for mysqld.
+   Display version information and exit.
 
 NOTES
 -----

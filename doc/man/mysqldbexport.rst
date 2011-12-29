@@ -108,23 +108,13 @@ See :ref:`mysqldbexport-notes` below for more details.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --server=<server>
+.. option:: --bulk-insert, -b
 
-   Connection information for the server in the form:
-   <user>:<password>@<host>:<port>:<socket>
-
-.. option:: --format=<format>, -f<format>
-
-   Display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
-   or VERTICAL|V format.
+   Use bulk insert statements for data (default:False).
 
 .. option:: --display=<display>, -d<display>
 
@@ -132,16 +122,18 @@ OPTIONS
    object creation (default), FULL = all columns, NAMES = only object
    names (not valid for --format=SQL).
 
+.. option:: --exclude=<exclude>, -x<exclude> 
+
+   Exclude one or more objects from the operation using either a specific name
+   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
+   exclusions.
+
 .. option:: --export=<export>, -e<export>
 
    Control the export of either DATA|D = only the table data for the
    tables in the database list, DEFINITIONS|F = export only the
    definitions for the objects in the database list, or BOTH|B =
    export the metadata followed by the data (default: export metadata).
-
-.. option:: --bulk-insert, -b
-
-   Use bulk insert statements for data (default:False).
 
 .. option:: --file-per-table
 
@@ -151,6 +143,17 @@ OPTIONS
    db1, t1 and t2, results in files named db1.t1.csv and db1.t2.csv. If
    definitions are included, they are written to stdout as normal.
 
+.. option:: --format=<format>, -f<format>
+
+   Display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
+   or VERTICAL|V format.
+
+.. option:: --locking=<locking>
+
+   Choose the lock type for the operation: no-locks = do not use any table
+   locks, lock-all = use table locks but no transaction and no consistent read,
+   snaphot (default): consistent read using a single transaction.
+
 .. option::  --no-headers, -h
 
    Do not display the column headers - ignored for GRID format.
@@ -159,10 +162,15 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
-.. option:: --verbose, -v
+.. option:: --regexp, --basic-regexp, -G
 
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
+   'LIKE'.
+
+.. option:: --server=<server>
+
+   Connection information for the server in the form:
+   <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --skip=<skip-objects>
 
@@ -170,26 +178,18 @@ OPTIONS
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
 
-.. option:: --exclude=<exclude>, -x<exclude> 
-
-   Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
-   exclusions.
-
 .. option:: --skip-blobs
 
    Do not export blob data.
 
-.. option:: --locking=<locking>
+.. option:: --verbose, -v
 
-   Choose the lock type for the operation: no-locks = do not use any table
-   locks, lock-all = use table locks but no transaction and no consistent read,
-   snaphot (default): consistent read using a single transaction.
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
-.. option:: --basic-regexp, --regexp, -G
+.. option:: --version
 
-   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
-   'LIKE'.
+   Display version information and exit.
 
 
 .. _mysqldbexport-notes:

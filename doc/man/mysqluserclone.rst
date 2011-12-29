@@ -37,19 +37,14 @@ needed). You can also control the output of the list using the
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --source=<source>
+.. option:: --copy-dir=<directory>
 
-   Connection information for source server in the form:
-   <user>:<password>@<host>:<port>:<socket> where <password> is
-   optional and either <port> or <socket> must be provided.
+   Path to use when copying data (stores temporary files) - default =
+   current directory.
 
 .. option:: --destination=<destination>
 
@@ -57,27 +52,18 @@ OPTIONS
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
-.. option:: --copy-dir=<directory>
-
-   Path to use when copying data (stores temporary files) - default =
-   current directory.
-
 .. option:: --dump, -d 
 
    Dump GRANT statements for user.
 
+.. option::  --format=<list_format>
+
+   Display the list of users in either GRID (default), TAB, CSV, or VERTICAL
+   format - valid only for :option:`--list` option.
+
 .. option:: --force, -f
 
    Drop the new user if it exists.
-
-.. option:: --quiet, -q
-
-   Turn off all messages for quiet execution.
-
-.. option:: --verbose, -v
-
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --include-global-privileges
 
@@ -87,10 +73,24 @@ OPTIONS
 
    List all users on the source - does not require a destination.
 
-.. option::  --format=<list_format>
+.. option:: --quiet, -q
 
-   Display the list of users in either GRID (default), TAB, CSV, or VERTICAL
-   format - valid only for :option:`--list` option.
+   Turn off all messages for quiet execution.
+
+.. option:: --source=<source>
+
+   Connection information for source server in the form:
+   <user>:<password>@<host>:<port>:<socket> where <password> is
+   optional and either <port> or <socket> must be provided.
+
+.. option:: --verbose, -v
+
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
+
+.. option:: --version
+
+   Display version information and exit.
 
 
 NOTES

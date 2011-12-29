@@ -90,46 +90,46 @@ utility may not be able to connect to the slaves to find their slaves.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
-
-.. option:: --master=<source>
-
-   Connection information for the master server in the form:
-   <user>:<password>@<host>:<port>:<socket>
-   
-.. option:: --show-list, -l
-
-   Print a list of the topology.
-   
-.. option:: --recurse, -r
-
-   Traverse the list of slaves to find additional master/slave connections.
-   User this option to map a replication topology.
-   
-.. option:: --prompt, -p
-
-   Prompt for slave user and password if different from master login.
-   
-.. option:: --num-retries=<num_retries>, -n<num_retries>
-
-   Number of retries allowed for failed slave login attempt. Valid with
-   --prompt only.
 
 .. option:: --format=<format>, -f<format>
 
    Display the output in either GRID (default), TAB, CSV,
    or VERTICAL format.
 
+.. option:: --master=<source>
+
+   Connection information for the master server in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   
+.. option:: --num-retries=<num_retries>, -n<num_retries>
+
+   Number of retries allowed for failed slave login attempt. Valid with
+   --prompt only.
+   
+.. option:: --prompt, -p
+
+   Prompt for slave user and password if different from master login.
+
 .. option:: --quiet, -q
 
    Turn off all messages for quiet execution. Note: errors and warnings are
    not suppressed.
+   
+.. option:: --recurse, -r
+
+   Traverse the list of slaves to find additional master/slave connections.
+   User this option to map a replication topology.
+   
+.. option:: --show-list, -l
+
+   Print a list of the topology.
+
+.. option:: --version
+
+   Display version information and exit.
 
 NOTES
 -----

@@ -44,13 +44,22 @@ specified with the :option:`--suite=` option to execute the performance tests.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
+
+.. option:: --do-test=<prefix>
+
+    Execute all tests that begin with *prefix*.
+
+.. option:: --force, -f
+
+   Do not abort when a test fails.
+
+.. option:: --record
+
+   Record output of specified test if successful - works with only one
+   test selected.
 
 .. option:: --server=<server>
 
@@ -58,14 +67,10 @@ OPTIONS
    *server* is given in :ref:`connspec`. List option multiple times
    for multiple servers to use
 
-.. option:: --do-test=<prefix>
+.. option:: --skip-long
 
-    Execute all tests that begin with *prefix*.
-
-.. option:: --suite=<suite>
-
-   Test suite to execute - list option multiple times for multiple
-   suites.
+   Exclude tests that require greater resources or take a long time to
+   run.
 
 .. option:: --skip-test=<test>
 
@@ -75,43 +80,30 @@ OPTIONS
 
    Exclude *tests* that begin with this string.
 
-.. option:: --start-test=<prefix>
+.. option:: --sorted
 
-   Start executing tests that begin with *prefix*.
-
-.. option:: --skip-long
-
-   Exclude tests that require greater resources or take a long time to
-   run.
-
-.. option:: --testdir=<path>
-
-   Path to test directory.
+   Execute tests sorted by suite.name (default = True).
 
 .. option:: --start-port=<port>
 
    Starting port for spawned servers.
 
-.. option:: --record
+.. option:: --start-test=<prefix>
 
-   Record output of specified test if successful - works with only one
-   test selected.
+   Start executing tests that begin with *prefix*.
 
-.. option:: --sorted
+.. option:: --suite=<suite>
 
-   Execute tests sorted by suite.name (default = True).
+   Test suite to execute - list option multiple times for multiple
+   suites.
+
+.. option:: --testdir=<path>
+
+   Path to test directory.
 
 .. option:: --utildir=<path>
 
    Location of utilities.
-
-.. option:: --width=<number>
-
-   Display width.
-
-.. option:: --force, -f
-
-   Do not abort when a test fails.
 
 .. option:: --verbose, -v
 
@@ -119,6 +111,14 @@ OPTIONS
    verbose, -vv = more verbose, -vvv = debug. Use -vvv to display actual
    results of test cases to the screen and ignore result processing - used to
    diagnose test execution problems.
+
+.. option:: --version
+
+   Display version information and exit.
+
+.. option:: --width=<number>
+
+   Display width.
 
 NOTES
 -----

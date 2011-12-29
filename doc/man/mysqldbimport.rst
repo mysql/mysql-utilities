@@ -86,18 +86,27 @@ See :ref:`mysqldbimport-notes` below for more details.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --server=<SERVER>
+.. option:: --bulk-insert, -b
 
-   Connection information for the server in the form:
-   <user>:<password>@<host>:<port>:<socket>
+   Use bulk insert statements for data (default:False).
+
+.. option:: --default-storage-engine=<def_engine>
+
+   Change all tables to use this storage engine if the original storage engine
+   does not exist on the destination.
+
+.. option:: --drop-first, -d
+
+   Drop database before importing.
+
+.. option:: --dryrun
+
+   Import the files and generate the statements but do not execute
+   them - useful for testing file validity.
 
 .. option:: --format=<format>, -f<format>
 
@@ -110,19 +119,11 @@ OPTIONS
    tables in the database list, DEFINITIONS|F = import only the
    definitions for the objects in the database list, or BOTH|B =
    import the metadata followed by the data (default: import metadata).
+   
+.. option:: --new-storage-engine=<new_engine>
 
-.. option:: --drop-first, -d
-
-   Drop database before importing.
-
-.. option:: --dryrun
-
-   Import the files and generate the statements but do not execute
-   them - useful for testing file validity.
-
-.. option:: --bulk-insert, -b
-
-   Use bulk insert statements for data (default:False).
+   Change all tables to use this storage engine if storage engine exists on the
+   destination.
 
 .. option::  --no-headers, -h
 
@@ -132,10 +133,10 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
-.. option:: --verbose, -v
+.. option:: --server=<SERVER>
 
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   Connection information for the server in the form:
+   <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --skip=<skip_objects>
 
@@ -146,16 +147,15 @@ OPTIONS
 .. option:: --skip-blobs
 
    Do not import blob data.
-   
-.. option:: --new-storage-engine=<new_engine>
 
-   Change all tables to use this storage engine if storage engine exists on the
-   destination.
+.. option:: --verbose, -v
 
-.. option:: --default-storage-engine=<def_engine>
+   Control how much information is displayed. For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
-   Change all tables to use this storage engine if the original storage engine
-   does not exist on the destination.
+.. option:: --version
+
+   Display version information and exit.
 
 .. _`mysqldbimport-notes`:
 

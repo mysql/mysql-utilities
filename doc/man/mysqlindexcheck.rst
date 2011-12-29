@@ -82,13 +82,18 @@ See :ref:`mysqlindexcheck-notes` below for more details.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
+
+.. option:: --best=<num>
+
+    Limit index statistics to the best N indexes.
+
+.. option:: --format=<index_format>
+
+   Display the list of indexes per table in either **SQL**, **TABLE**
+   (default), **TAB**, **CSV**, or **VERTICAL** format.
 
 .. option:: --server=<source>
 
@@ -107,23 +112,18 @@ OPTIONS
 
    Skip tables that do not exist.
 
+.. option:: --stats
+
+    Show index performance statistics.
+
 .. option::  --verbose, -v
 
    Control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
-.. option:: --format=<index_format>
+.. option:: --version
 
-   Display the list of indexes per table in either **SQL**, **TABLE**
-   (default), **TAB**, **CSV**, or **VERTICAL** format.
-
-.. option:: --stats
-
-    Show index performance statistics.
-
-.. option:: --best=<num>
-
-    Limit index statistics to the best N indexes.
+   Display version information and exit.
 
 .. option:: --worst=<num>
 

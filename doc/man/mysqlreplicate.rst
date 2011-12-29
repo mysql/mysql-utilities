@@ -69,10 +69,6 @@ engines and InnoDB values with or without the :option:`--pedantic` option.
 OPTIONS
 -------
 
-.. option:: --version
-
-   Display version information and exit.
-
 .. option:: --help
 
    Display a help message and exit.
@@ -82,20 +78,6 @@ OPTIONS
    Connection information for master server in the form:
    <user>:<password>@<host>:<port>:<socket>
 
-.. option:: --slave=<slave>
-
-   Connection information for slave server in the form:
-   <user>:<password>@<host>:<port>:<socket>
-
-.. option:: --rpl-user=<replication_user>
-
-   The user and password for the replication user requirement -
-   For example, rpl:passwd - default = rpl:rpl.
-
-.. option:: --test-db=<test_database>
-
-   Database name to use in testing replication setup (optional).
-
 .. option:: --master-log-file=<master_log_file>
 
    Use this master log file to initiate the slave.
@@ -104,19 +86,37 @@ OPTIONS
 
    Use this position in the master log file to initiate the slave.
 
+.. option:: --pedantic, -p
+
+   Fail if storage engines differ among master and slave (optional).
+
+.. option:: --rpl-user=<replication_user>
+
+   The user and password for the replication user requirement -
+   For example, rpl:passwd - default = rpl:rpl.
+
+.. option:: --slave=<slave>
+
+   Connection information for slave server in the form:
+   <user>:<password>@<host>:<port>:<socket>
+
 .. option:: --start-from-beginning, -b
 
    Start replication at the beginning of logged events. Not valid with
    --master-log-file or --master-log-pos.
+
+.. option:: --test-db=<test_database>
+
+   Database name to use in testing replication setup (optional).
 
 .. option:: --verbose, -v
 
    Control how much information is displayed. For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
-.. option:: --pedantic, -p
+.. option:: --version
 
-   Fail if storage engines differ among master and slave (optional).
+   Display version information and exit.
 
 
 NOTES

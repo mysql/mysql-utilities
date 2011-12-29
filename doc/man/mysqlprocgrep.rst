@@ -48,39 +48,14 @@ Options
 
    Display a help message and exit.
 
-.. option:: --server=<source>
+.. option:: --age=<time>
 
-   Connection information for the servers to search in the form:
-   <user>:<password>@<host>:<port>:<socket>
-   The option may be repeated to form a list of servers to search.
+   Only show processes that have been in the current state more than a given
+   time
 
-.. option:: --match-user=<pattern>
+.. option::  --format=<format>, -f<format>
 
-   Match all rows where the **User** field matches pattern.
-
-.. option:: --match-host=<pattern>
-
-   Match all rows where the **Host** field matches pattern.
-
-.. option:: --match-db=<pattern>
-
-   Match all rows where the **Db** field matches pattern.
-
-.. option:: --match-time=<pattern>
-
-   Match all rows where the **Time** field matches pattern.
-
-.. option:: --match-command=<pattern>
-
-   Match all rows where the **Command** field matches pattern.
-
-.. option:: --match-state=<pattern>
-
-   Match all rows where the **State** field matches pattern.
-
-.. option:: --match-info=<pattern>
-
-   Match all rows where the **Info** field matches pattern.
+   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
 
 .. option:: --kill-connection
 
@@ -90,6 +65,34 @@ Options
 
    Kill the query for all matching processes.
 
+.. option:: --match-command=<pattern>
+
+   Match all rows where the **Command** field matches pattern.
+
+.. option:: --match-db=<pattern>
+
+   Match all rows where the **Db** field matches pattern.
+
+.. option:: --match-host=<pattern>
+
+   Match all rows where the **Host** field matches pattern.
+
+.. option:: --match-info=<pattern>
+
+   Match all rows where the **Info** field matches pattern.
+
+.. option:: --match-state=<pattern>
+
+   Match all rows where the **State** field matches pattern.
+
+.. option:: --match-time=<pattern>
+
+   Match all rows where the **Time** field matches pattern.
+
+.. option:: --match-user=<pattern>
+
+   Match all rows where the **User** field matches pattern.
+
 .. option:: --print
 
    Print information about the matching processes. This is the default
@@ -97,15 +100,15 @@ Options
    is given. If a kill option is given, this option will print
    information about the processes before killing them.
 
-.. option:: --verbose, -v
-
-   Be more verbose and print messages about execution. Can be given
-   multiple times, in which case the verbosity level increases.
-   For example, -v = verbose, -vv = more verbose, -vvv = debug.
-
 .. option:: --regexp, --basic-regexp, -G
 
    Use **REGEXP** operator to match patterns instead of **LIKE**.
+
+.. option:: --server=<source>
+
+   Connection information for the servers to search in the form:
+   <user>:<password>@<host>:<port>:<socket>
+   The option may be repeated to form a list of servers to search.
 
 .. option:: --sql, --print-sql, -Q
 
@@ -149,14 +152,11 @@ Options
      END;
      CLOSE kill_cursor;
 
-.. option::  --format=<format>, -f<format>
+.. option:: --verbose, -v
 
-   display the output in either GRID (default), TAB, CSV, or VERTICAL format
-
-.. option:: --age=<time>
-
-   Only show processes that have been in the current state more than a given
-   time
+   Be more verbose and print messages about execution. Can be given
+   multiple times, in which case the verbosity level increases.
+   For example, -v = verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
 
