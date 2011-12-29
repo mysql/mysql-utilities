@@ -57,11 +57,10 @@ with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-You can turn off the headers when using formats CSV and TAB by
-specifying the :option:`--no-headers` option.
+To turn off the headers when using CSV or TAB display format, specify
+the :option:`--no-headers` option.
 
-You can turn off all feedback information by specifying the
-:option:`--quiet` option.
+To turn off all feedback information, specify the :option:`--quiet` option.
 
 To change the storage engine for all tables on the destination, specify the
 new engine with the :option:`--new-storage-engine` option. If the new engine
@@ -85,6 +84,8 @@ See :ref:`mysqldbimport-notes` below for more details.
 
 OPTIONS
 -------
+
+**mysqldbimport** accepts the following command-line options:
 
 .. option:: --help
 

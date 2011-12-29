@@ -60,6 +60,8 @@ shown above.
 OPTIONS
 -------
 
+**mysqlrplcheck** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

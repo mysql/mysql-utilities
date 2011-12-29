@@ -96,6 +96,8 @@ user that has the appropriate rights to access all objects in the operation.
 OPTIONS
 -------
 
+**mysqldiff** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

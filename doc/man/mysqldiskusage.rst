@@ -45,8 +45,8 @@ with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-You can turn off the headers when using formats CSV and TAB by
-specifying the :option:`--no-headers` option.
+To turn off the headers when using CSV or TAB display format, specify
+the :option:`--no-headers` option.
 
 You must provide login information such as user, host, password, etc. for a
 user that has the appropriate rights to access all objects in the operation.
@@ -54,6 +54,8 @@ See :ref:`mysqldiskusage-notes` below for more details.
 
 OPTIONS
 -------
+
+**mysqldiskusage** accepts the following command-line options:
 
 .. option:: --help
 

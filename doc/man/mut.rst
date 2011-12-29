@@ -44,6 +44,8 @@ specified with the :option:`--suite=` option to execute the performance tests.
 OPTIONS
 -------
 
+**mut** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

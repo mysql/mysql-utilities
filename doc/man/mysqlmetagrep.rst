@@ -129,6 +129,8 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
+**mysqlmetagrep** accepts the following command-line options:
+
 .. option:: --help, -h
 
    Display a help message and exit.

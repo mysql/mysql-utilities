@@ -69,6 +69,8 @@ engines and InnoDB values with or without the :option:`--pedantic` option.
 OPTIONS
 -------
 
+**mysqlreplicate** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

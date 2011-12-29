@@ -173,6 +173,8 @@ option and will be re-enabled on exit.
 OPTIONS
 -------
 
+**mysqldbcompare** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

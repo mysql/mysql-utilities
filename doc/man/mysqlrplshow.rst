@@ -90,6 +90,8 @@ utility may not be able to connect to the slaves to find their slaves.
 OPTIONS
 -------
 
+**mysqlrplshow** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

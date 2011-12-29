@@ -82,6 +82,8 @@ See :ref:`mysqlindexcheck-notes` below for more details.
 OPTIONS
 -------
 
+**mysqlindexcheck** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.

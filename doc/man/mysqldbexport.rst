@@ -54,8 +54,8 @@ with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-  To specify how much data to display, use one of the following values
-  with the :option:`--display` option:
+To specify how much data to display, use one of the following values
+with the :option:`--display` option:
 
 **BRIEF**
   Display only the minimal columns for recreating the objects.
@@ -69,11 +69,10 @@ with the :option:`--format` option:
 Note: When combining :option:`--format` and :option:`--display`, the
 :option:`--display` option is ignored for SQL generation.
 
-You can turn off the headers when using formats CSV and TAB by
-specifying the :option:`--no-headers` option.
+To turn off the headers when using CSV or TAB display format, specify
+the :option:`--no-headers` option.
 
-You can turn off all feedback information by specifying the
-:option:`--quiet` option.
+To turn off all feedback information, specify the :option:`--quiet` option.
 
 You can also have the utility write the data for the tables to separate files
 by using the :option:`--file-per-table` option. This would create files with a
@@ -107,6 +106,8 @@ See :ref:`mysqldbexport-notes` below for more details.
 
 OPTIONS
 -------
+
+**mysqldbexport** accepts the following command-line options:
 
 .. option:: --help
 

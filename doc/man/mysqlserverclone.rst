@@ -25,6 +25,8 @@ password for the login user account on the new instance.
 OPTIONS
 -------
 
+**mysqlserverclone** accepts the following command-line options:
+
 .. option:: --help, -h
 
    Display a help message and exit.

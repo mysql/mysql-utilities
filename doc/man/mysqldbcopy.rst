@@ -67,7 +67,7 @@ See :ref:`mysqldb-notes` below for more details.
 OPTIONS
 -------
 
-The following command line options are accepted by **mysqldbcopy**:
+**mysqldbcopy** accepts the following command-line options:
 
 .. option:: --help
 

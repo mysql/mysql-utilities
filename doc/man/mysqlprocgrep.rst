@@ -44,6 +44,8 @@ with the :option:`--format` option:
 Options
 -------
 
+**mysqlprocgrep** accepts the following command-line options:
+
 .. option:: --help, -h
 
    Display a help message and exit.

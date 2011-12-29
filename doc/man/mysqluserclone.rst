@@ -37,6 +37,8 @@ needed). You can also control the output of the list using the
 OPTIONS
 -------
 
+**mysqluserclone** accepts the following command-line options:
+
 .. option:: --help
 
    Display a help message and exit.
