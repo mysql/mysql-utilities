@@ -31,40 +31,40 @@ particular set of objects, say, for exporting only events (by
 excluding all other types). Similarly, you can skip creating blob
 UPDATE commands by specifying the :option:`--skip-blobs` option.
 
-You also have the choice to view the output in one of the following
-formats using the :option:`--format` option.
+To specify how to display output, use one of the following values
+with the :option:`--format` option:
 
-**SQL**
-  Displays the output using SQL statements. For definitions, this is
+**SQL** (default)
+  Display output using SQL statements. For definitions, this is
   the appropriate **CREATE** and **GRANT** statements. For data, this
   is an **INSERT** statement (or bulk insert if the
-  :option:`--bulk-insert` options is specified).
+  :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Displays output formatted like that of the mysql monitor in a grid
+  Display output formatted like that of the mysql monitor in a grid
   or table layout.
 
 **CSV**
-  Displays the output in a comma-separated list.
+  Display output in comma-separated values format.
 
 **TAB**
-  Displays the output in a tab-separated list.
+  Display output in tab-separated format.
 
 **VERTICAL**
-  Displays the output in a single column similar to the ``\G`` option
-  for the mysql monitor commands.
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
-  You also have the option to specify how much data to display in one
-  of the following displays using the :option:`--display` option.
+  To specify how much data to display, use one of the following values
+  with the :option:`--display` option:
 
 **BRIEF**
-  Show only the minimal columns for recreating the objects.
+  Display only the minimal columns for recreating the objects.
 
 **FULL**
-  Show the complete column list for recreating the objects.
+  Display the complete column list for recreating the objects.
 
 **NAMES**
-  Show only the names of the objects.
+  Display only the object names.
 
 Note: When combining :option:`--format` and :option:`--display`, the
 :option:`--display` option is ignored for SQL generation.

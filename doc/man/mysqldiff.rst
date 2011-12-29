@@ -45,17 +45,17 @@ for the object pairs specified. If a transformation cannot be formed, the
 utility reports the diff of the object along with a warning statement. See
 important limitations below in the NOTES section.
 
-You can change the display format of the diff output using one of the
-following formats:
+To specify how to display diff-style output, use one of the following
+values with the :option:`--difftype` option:
 
 **unified** (default)
-  print unified format output
+  Print unified format output.
 
 **context**
-  print context format output
+  Print context format output.
 
 **differ**
-  print differ-style format output
+  Print differ-style format output.
 
 The :option:`--changes-for` option can be used to control the direction of the
 difference (by specifying the object to be transformed) in either the

@@ -41,22 +41,22 @@ server is not started accidentally. Note: be sure to consider ramifications of
 starting a server on the error and similar logs. It is best to save this
 information prior to running this utility on an offline server.
 
-You also have the choice to view the output in one of the following
-formats using the :option:`--format` option.
+To specify how to display output, use one of the following values
+with the :option:`--format` option:
 
-**GRID**
-  Displays output formatted like that of the mysql monitor in a grid
+**GRID** (default)
+  Display output formatted like that of the mysql monitor in a grid
   or table layout.
 
 **CSV**
-  Displays the output in a comma-separated list.
+  Display output in comma-separated values format.
 
 **TAB**
-  Displays the output in a tab-separated list.
+  Display output in tab-separated format.
 
 **VERTICAL**
-  Displays the output in a single column similar to the ``\G`` option
-  for the mysql monitor commands.
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
 You can turn off the headers when using formats CSV and TAB by
 specifying the :option:`--no-headers` option.

@@ -34,28 +34,28 @@ particular set of objects, say, for importing only events (by
 excluding all other types). Similarly, you can skip creating blob
 UPDATE commands by specifying the :option:`--skip-blobs` option.
 
-You also have the choice to view the output in one of the following formats
-using the :option:`--format` option.
+To specify how to display output, use one of the following values
+with the :option:`--format` option:
 
-**SQL**
-  Displays the output using SQL statements. For definitions, this is
-  the appropriate CREATE and GRANT statements. For data, this is an
-  INSERT statement (or bulk insert if the :option:`--bulk-insert` options is
-  specified).
+**SQL** (default)
+  Display output using SQL statements. For definitions, this is
+  the appropriate **CREATE** and **GRANT** statements. For data, this
+  is an **INSERT** statement (or bulk insert if the
+  :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Displays output formatted like that of the mysql monitor in a grid
+  Display output formatted like that of the mysql monitor in a grid
   or table layout.
 
 **CSV**
-  Displays the output in a comma-separated list.
+  Display output in comma-separated values format.
 
 **TAB**
-  Displays the output in a tab-separated list.
+  Display output in tab-separated format.
 
 **VERTICAL**
-  Displays the output in a single column similar to the \G option for
-  the mysql monitor commands.
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
 You can turn off the headers when using formats CSV and TAB by
 specifying the :option:`--no-headers` option.

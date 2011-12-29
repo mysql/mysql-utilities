@@ -56,19 +56,19 @@ You can specify the :option:`--show-list` option to produce a column list of
 the graph. You also have the choice to view the output in one of the following
 formats using the :option:`--format` option.
 
-**GRID**
-  Displays output formatted like that of the mysql monitor in a grid
-  or table layout. This is the default format.
+**GRID** (default)
+  Display output formatted like that of the mysql monitor in a grid
+  or table layout.
 
 **CSV**
-  Displays the output in a comma-separated list.
+  Display output in comma-separated values format.
 
 **TAB**
-  Displays the output in a tab-separated list.
+  Display output in tab-separated format.
 
 **VERTICAL**
-  Displays the output in a single column similar to the \G option for
-  the mysql monitor commands.
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
 You must provide valid login information for the master as shown above.
 

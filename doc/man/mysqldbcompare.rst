@@ -108,34 +108,34 @@ specifying the :option:`--server2` option. In this case, the database or
 database object pair align such that database1 (or database1.object1) are taken
 from server1 and database2 (or database2.object2) are taken from server2.
 
-You can change the display format of the diff-style output using one of the
-following formats:
+To specify how to display diff-style output, use one of the following
+values with the :option:`--difftype` option:
 
 **unified** (default)
-  print unified format output
+  Print unified format output.
 
 **context**
-  print context format output
+  Print context format output.
 
 **differ**
-  print differ-style format output
+  Print differ-style format output.
 
-You can change the display format of changed or missing row output using one of
-the following formats:
+To specify how to display changed or missing row output, use one of
+the following values with the :option:`--format` option:
 
-**GRID**
-  displays output formatted like that of the mysql monitor in a grid
+**GRID** (default)
+  Display output formatted like that of the mysql monitor in a grid
   or table layout.
 
 **CSV**
-  displays the output in a comma-separated list.
+  Display output in comma-separated values format.
 
 **TAB**
-  displays the output in a tab-separated list.
+  Display output in tab-separated format.
 
 **VERTICAL**
-  displays the output in a single column similar to the ``\G`` option
-  for the mysql monitor commands.
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
 The :option:`--changes-for` option can be used to control the direction of the
 difference (by specifying the object to be transformed) in either the
