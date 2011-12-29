@@ -28,7 +28,7 @@ as masters (a circular topology). The graph displays the topology with
 successive indents. A notation is made for circular topologies.
 
 An example of the graph for a typical topology with relay slaves is shown
-below.::
+below::
 
   # Replication Topology Graph::
 
@@ -40,7 +40,7 @@ below.::
          |
          +--- localhost:3313 - (SLAVE)
 
-A circular replication topology would be shown like the following.::
+A circular replication topology would be shown like the following::
 
   # Replication Topology Graph
 
@@ -150,7 +150,7 @@ EXAMPLES
 --------
 
 To show the slaves for a master running on the local host, use the following
-command.::
+command::
 
     $ mysqlrplshow  --master=root@localhost:3311 
     # master on localhost: ... connected.
@@ -164,7 +164,7 @@ command.::
        +--- localhost:3312 - (SLAVE)
 
 To show the full replication topology of a master running on the local host,
-use the following command.::
+use the following command::
 
     $ mysqlrplshow  --master=root@localhost:3311 
                     --recurse
@@ -182,7 +182,7 @@ use the following command.::
 
 To show the full replication topology of a master runnin on the local host,
 prompting for the user name and password for slaves that do not have the same
-user name and password credentials as the master, use the following command.::
+user name and password credentials as the master, use the following command::
 
     $ mysqlrplshow --recurse --prompt --num-retries=1
       --master=root@localhost:3331

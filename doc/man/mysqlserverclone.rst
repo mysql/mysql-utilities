@@ -80,7 +80,7 @@ EXAMPLES
 --------
 
 The following demonstrates how to create a new instance of a running server
-and setting the root password and turning binary logging on.::
+and setting the root password and turning binary logging on::
 
     $ mkdir /source/test123
     $ mysqlserverclone --server=root:pass@localhost \

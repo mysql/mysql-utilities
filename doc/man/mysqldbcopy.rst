@@ -181,7 +181,7 @@ EXAMPLES
 --------
 
 The following example demonstrates how to use the utility to copy a database
-named 'util_test' to a new name 'util_test_copy' on the same server.::
+named 'util_test' to a new name 'util_test_copy' on the same server::
 
     $ mysqldbcopy \\
       --source=root:pass@localhost:3310:/test123/mysql.sock \\

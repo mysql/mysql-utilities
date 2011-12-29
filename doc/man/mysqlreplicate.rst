@@ -149,7 +149,7 @@ the default settings, use this command::
 
 The following command ensures the replication between the master and slave is
 successful if and only if the InnoDB storage engines are the same and both
-servers have the same storage engines with the same default specified.::
+servers have the same storage engines with the same default specified::
 
     $ mysqlreplicate --master=root@localhost:3306 \\
       --slave=root@localhost:3307 --rpl-user=rpl:rpl -vv --pedantic
@@ -171,7 +171,7 @@ servers have the same storage engines with the same default specified.::
     # ...done.
 
 The following command starts replication from the current position of the
-master (default).::
+master (default)::
 
    $ mysqlreplicate --master=root@localhost:3306 \\
         --slave=root@localhost:3307 --rpl-user=rpl:rpl
@@ -181,7 +181,7 @@ master (default).::
     # Setting up replication...
     # ...done.
 
-The following command tarts replication from the beginning of recorded events.::
+The following command starts replication from the beginning of recorded events::
 
    $ mysqlreplicate --master=root@localhost:3306 \\
         --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
@@ -193,7 +193,7 @@ The following command tarts replication from the beginning of recorded events.::
     # ...done.
 
 The following starts replication from the beginning of a specific binary log
-file.::
+file::
 
    $ mysqlreplicate --master=root@localhost:3306 \\
         --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
@@ -205,7 +205,7 @@ file.::
     # ...done.
 
 The following starts replication from an arbitrary binary log file and
-position.::
+position::
 
    $ mysqlreplicate --master=root@localhost:3306 \\
         --slave=root@localhost:3307 --rpl-user=rpl:rpl \\

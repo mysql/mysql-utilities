@@ -19,7 +19,7 @@ DESCRIPTION
 
 This utility is used to check the prerequisites for replication on a master and
 a slave. These checks (called tests) are designed to ensure a healthy
-replication setup. Each of these tests are described in more detail below.::
+replication setup. Each of these tests are described in more detail below::
 
  Test# Description
  ----- ----------------------------------------------------------------------
@@ -114,7 +114,7 @@ EXAMPLES
 --------
 
 To check the prerequisites of a master and slave actively performing
-replication, use the following command.::
+replication, use the following command::
 
     $ mysqlrplcheck --master=root@host1:3310 --slave=root@host2:3311
     # master on host1: ... connected.
@@ -135,7 +135,7 @@ replication, use the following command.::
     
 To perform the same command but also display the contents of the master
 information file on the slave and the values of SHOW SLAVE STATUS as well as
-additional details, use this command.::
+additional details, use this command::
 
     $ mysqlrplcheck --master=root@host1:3310 --slave=root@host2:3311 \
       --show-slave-status -vv

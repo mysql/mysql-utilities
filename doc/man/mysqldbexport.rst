@@ -78,7 +78,7 @@ You can also have the utility write the data for the tables to separate files
 by using the :option:`--file-per-table` option. This would create files with a
 file name composed of the database and table name followed by the format of the
 file. For example, the following command produces files named db1.<table
-name>.csv.::
+name>.csv::
 
   mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
 

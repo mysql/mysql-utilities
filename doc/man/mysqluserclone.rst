@@ -121,7 +121,7 @@ the local machine, use this command::
     # ...done.
 
 The following shows all of the users on the localhost server in the most
-verbose output in a CSV format.::
+verbose output in CSV format::
 
     $ mysqluserclone --source=root@localhost --list --format=CSV -vvv
     # Source on localhost: ... connected.

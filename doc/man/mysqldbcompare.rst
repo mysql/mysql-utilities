@@ -140,7 +140,7 @@ the following values with the :option:`--format` option:
 The :option:`--changes-for` option can be used to control the direction of the
 difference (by specifying the object to be transformed) in either the
 difference report (default) or the transformation report (designated with the
-:option:`--difftype=sql` option). For example, consider the following command.::
+:option:`--difftype=sql` option). For example, consider the following command::
 
   mysqldbcompare --server1=root@host1 --server2@host2 db1.table1:dbx.table3
     --difftype=sql
