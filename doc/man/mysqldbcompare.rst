@@ -266,9 +266,6 @@ The login user must have the appropriate permissions to read all databases
 and tables listed.
 
 This utility currently compares the full CREATE statement for the objects.
-Future versions will have additional features to produce more detailed
-comparisons that can generate appropriate ALTER statements and have the
-capability to ignore naming differences.
 
 
 EXAMPLES
