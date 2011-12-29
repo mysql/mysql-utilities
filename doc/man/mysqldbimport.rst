@@ -78,9 +78,10 @@ If the option :option:`--default-storage-engine` or
 does not exist, a warning shall be issued and the default storage engine
 setting on the server shall be used instead.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
-See :ref:`mysqldbimport-notes` below for more details.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
+See :ref:`mysqldbimport-notes` for more details.
 
 OPTIONS
 -------
@@ -136,7 +137,7 @@ OPTIONS
 
 .. option:: --server=<SERVER>
 
-   Connection information for the server in the form:
+   Connection information for the server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --skip=<skip_objects>
@@ -151,7 +152,8 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

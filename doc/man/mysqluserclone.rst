@@ -25,9 +25,10 @@ account on one server as a template, clone a MySQL user such that one
 or more new user accounts are created on another (or the same) server
 with the same privileges as the original user.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
-See :ref:`mysqluserclone-notes` below for more details.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
+See :ref:`mysqluserclone-notes` for more details.
 
 You can also use the utility to list users for a server by specifying the
 --list option. This prints a list of the users on the source (no destination is
@@ -50,7 +51,7 @@ OPTIONS
 
 .. option:: --destination=<destination>
 
-   Connection information for destination server in the form:
+   Connection information for the destination server in the format:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
@@ -81,27 +82,29 @@ OPTIONS
 
 .. option:: --source=<source>
 
-   Connection information for source server in the form:
+   Connection information for the source server in the format:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
 
    Display version information and exit.
 
+.. _mysqluserclone-notes:
 
 NOTES
 -----
 
 The login user must have the appropriate permissions to create new
 users, access (read) the mysql database, and grant privileges. At a
-minimum, this requires the login user to have read on the mysql
-database, the **WITH GRANT OPTION** for all databases listed in the
+minimum, this requires the login user to have read privileges on the mysql
+database, the **GRANT OPTION** privilege for all databases listed in the
 **GRANT** statements found, and the ability to create a user account.
 
 EXAMPLES

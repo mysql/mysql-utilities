@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
   mysqldbcompare --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
-            [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+              [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --run-all-tests | --quiet |
               --format=<format> | --width=<width> |
               --changes-for=[server1|server2] | 
@@ -21,11 +21,12 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility is used to compare the objects and data from two databases to
-ensure they are the same. It will identify objects whose definitions differ
-presenting them in a diff-style format of choice. Differences in the data are
-shown using a similar diff-style format. Changed or missing rows are shown in a
-standard format of either GRID, CSV, TAB, or VERTICAL.
+This utility compares the objects and data from two databases to
+find differences. It identifies objects having different definitions
+in the two databases and presents them in a diff-style format of
+choice. Differences in the data are shown using a similar diff-style
+format. Changed or missing rows are shown in a standard format of
+either GRID, CSV, TAB, or VERTICAL.
 
 Those objects considered in the database include tables, views, triggers,
 procedures, functions, and events. A count of each object type can be shown
@@ -33,61 +34,62 @@ with the :option:`-vv` option.
 
 The check is performed using a series of steps called tests. The utility is
 designed to stop on the first failed test but the user may specify the
-:option:`--run-all-tests` option which will run-all-tests the utility to run
+:option:`--run-all-tests` option which causes the utility to run
 all tests regardless of their end state.
 
-Note: using :option:`--run-all-tests` may produce expected cascade failures.
+Note: Using :option:`--run-all-tests` may produce expected cascade failures.
 For example, if the row counts differ among two tables being compared, the data
 consistency will also fail.
 
 The tests include the following:
 
-1) check database definitions
-2) check existance of objects in both databases
-3) compare the definitions of objects
-4) check row count for tables
-5) check data consistency for tables
+1) Check database definitions
+2) Check existance of objects in both databases
+3) Compare the definitions of objects
+4) Check row count for tables
+5) Check data consistency for tables
 
-(1) A database existance precondition check will ensure both databases exist.
+(1) A database existance precondition check ensures that both databases exist.
 If they do not, no further processing is possible and the
 :option:`--run-all-tests` option is ignored.
 
-(2) The test for objects in both databases will identify those objects missing
-from one or another database. The following tests (3)-(5) apply only those
+(2) The test for objects in both databases identifies those objects missing
+from one or another database. The following tests (3)-(5) apply only to those
 objects that appear in both databases.
 
 (3) The definitions (the CREATE statements) are compared and differences are
-presented. In the case of name differences only, this test will fail (since the
+presented. In the case of name differences only, this test fails (since the
 statements are not the same) but the user may elect that this is normal and
 therefore may want to run the utility again with the :option:`--skip-diff`
 option to skip this test.
 
-(4) The row count test ensure both tables have the same number of rows. Note
-that this does not ensure the table data is consistent - it is merely a cursory
-check to indicate possible missing rows in one or the other table being
-compared. The data consistency check (5) will identify the missing rows.
+(4) The row count check ensures that both tables have the same
+number of rows. Note that this does not ensure the table data is
+consistent. It is merely a cursory check to indicate possible missing
+rows in one or the other table being compared. The data consistency
+check (5) identifies the missing rows.
 
-(5) The test for data consistency will identify both changed rows as well as
+(5) The data consistency check identifies both changed rows as well as
 missing rows from one or another of the tables in the databases. Changed rows
 are displayed as a diff-style report with the format chosen (default is GRID)
 and missing rows are also displayed using the format chosen.
 
-A test may complete with one of the following states:
+Each test completes with one of the following states:
 
 **pass**
-  the test succeeded
+  The test succeeded.
 
 **FAIL**
-  the test failed - errors are displayed following the test state line
+  The test failed. Errors are displayed following the test state line.
 
 **SKIP**
-  the test was skipped due to a missing prerequisite or a skip option
+  The test was skipped due to a missing prerequisite or a skip option.
 
 **WARN**
-  the test encountered an unusual but not fatal error
+  The test encountered an unusual but not fatal error.
 
 **-**
-  the test is not applicable to this object
+  The test is not applicable to this object.
 
 Several of the tests may be skipped with a --skip-% option. For example, the
 user can skip the object compare step if there are known missing objects among
@@ -100,7 +102,7 @@ run only one of the tests. This may be helpful when working to bring two
 databases into synchronization to avoid running all of the tests repeatedly
 during the process.
 
-The user may specify the databases to compare using the notation db1:db2.
+To specify the databases to compare, use the notation db1:db2.
 Additionally, the check may be run against either a single server for comparing
 two databases of different names on the same server by specifying only the
 :option:`--server1` option. The user can also connect to another server by
@@ -140,7 +142,7 @@ the following values with the :option:`--format` option:
 The :option:`--changes-for` option can be used to control the direction of the
 difference (by specifying the object to be transformed) in either the
 difference report (default) or the transformation report (designated with the
-:option:`--difftype=sql` option). For example, consider the following command::
+:option:`--difftype=sql` option). Consider the following command::
 
   mysqldbcompare --server1=root@host1 --server2@host2 db1.table1:dbx.table3
     --difftype=sql
@@ -151,24 +153,24 @@ position where the database and object to the left of the colon are located on
 
   * --changes-for=server1 - The object definition on server1 is the object to be
     transformed and is used to produce the difference or transformation
-    compared to the definition on server2. The output therefore will be the
+    compared to the definition on server2. The output therefore is the
     transformation needed to make the object on server1 like the object on
     server2.
   * --changes-for=server2 - The object definition on server2 is the object to be
     transformed and is used to produce the difference or transformation
-    compared to the definition on server1. The output therefore will be the
+    compared to the definition on server1. The output therefore is the
     transformation needed to make the object on server2 like the object on
     server1.
 
 The default direction is server1. 
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
 
-If the utility is to be run on a server that has binary logging enabled, and
-you do not want the compare steps logged, you can disable the binary logging
-(if turned on) of the compare by using the :option:`--disable-binary-logging`
-option and will be re-enabled on exit.
+If the utility is to be run on a server that has binary logging
+enabled, and you do not want the comparison steps logged, use the
+:option:`--disable-binary-logging` option.
 
 OPTIONS
 -------
@@ -194,8 +196,8 @@ OPTIONS
 .. option:: --disable-binary-logging
 
    Turn binary logging off during operation if enabled (SQL_LOG_BIN=1).
-   Prevents compare operations from being written to the binary log. Note: may
-   require SUPER privilege.
+   Prevents comparison operations from being written to the binary log. Note:
+   Requires the SUPER privilege.
 
 .. option:: --format=<format>, -f<format>
 
@@ -203,7 +205,7 @@ OPTIONS
    
 .. option:: --quiet
 
-   Do not print anything. Return only success or fail as exit code.
+   Do not print anything. Return only an exit code of success or failure.
 
 .. option:: --run-all-tests, -a
 
@@ -211,40 +213,41 @@ OPTIONS
    
 .. option:: --server1=<source>
 
-   Connection information for the first server in the form:
+   Connection information for the first server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --server2=<source>
 
-   Connection information for the second server in the form:
+   Connection information for the second server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --show-reverse
 
    Produce a transformation report containing the SQL statements to conform the
-   object definitions specified in reverse. For example if --changes-for is set
-   to server1, also generate the transformation for server2. Note: the reverse
+   object definitions specified in reverse. For example, if --changes-for is set
+   to server1, also generate the transformation for server2. Note: The reverse
    changes are annotated and marked as comments.
 
 .. option:: --skip-data-check
 
-   Skip data consistency check.
+   Skip the data consistency check.
 
 .. option:: --skip-diff
 
-   Skip the object diff step.
+   Skip the object diff check.
 
 .. option:: --skip-object-compare
 
-   Skip object comparison step.
+   Skip the object comparison check.
 
 .. option:: --skip-row-count
 
-   Skip row count step.
+   Skip the row count check.
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

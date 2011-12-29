@@ -9,10 +9,10 @@ SYNOPSIS
 
 ::
 
- mysqlserverclone  [[ --help | --version] | --quiet |
-                   --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                   [ --new-data=<datadir> | --new-port=<port> |
-                     --new-id=<server_id> ] | --root-password=<passwd> ]
+ mysqlserverclone [[ --help | --version] | --quiet |
+                  --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+                  [ --new-data=<datadir> | --new-port=<port> |
+                  --new-id=<server_id> ] | --root-password=<passwd> ]
 
 DESCRIPTION
 -----------
@@ -58,12 +58,13 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   Connection information for source server in the form:
+   Connection information for the source server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

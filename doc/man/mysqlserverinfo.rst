@@ -22,24 +22,25 @@ This utility permits a database administrator to view critical information
 about a server for use in diagnosing problems. The information displayed
 includes the following:
 
-    * server connection information
-    * version number of the server
-    * data directory path
-    * base directory path
-    * plugin directory path
-    * configuration file location and name
-    * current binary log file
-    * current binary log position
-    * current relay log file
-    * current relay log position
+    * Server connection information
+    * Version number of the server
+    * Data directory path
+    * Base directory path
+    * Plugin directory path
+    * Configuration file location and name
+    * Current binary log file
+    * Current binary log position
+    * Current relay log file
+    * Current relay log position
 
-If you want to see information about an offline server, this utility can be
-used to see the same information. It works by starting the server in a read
-only mode. You must specify the :option:`--basedir`, :option:`--datadir`, and
-:option:`--start` options to enable this feature. This is so that an offline
-server is not started accidentally. Note: be sure to consider ramifications of
-starting a server on the error and similar logs. It is best to save this
-information prior to running this utility on an offline server.
+If you want to see information about an offline server, this utility
+can be used to see the same information. It works by starting the
+server in a read-only mode. You must specify the :option:`--basedir`,
+:option:`--datadir`, and :option:`--start` options to enable this
+feature. This is so that an offline server is not started accidentally.
+Note: be sure to consider ramifications of starting a server on the
+error and similar logs. It is best to save this information prior
+to running this utility on an offline server.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -103,14 +104,14 @@ OPTIONS
 .. option:: --port-range
 
    The port range to use for finding running servers in the form start:end.
-   Applies to Windows only and is ignored if :option:`--show-servers` is not
+   Applies only to Windows and is ignored if :option:`--show-servers` is not
    specified. Default is 3306:3333.
 
 .. option:: --server=<server>
 
-   Connection information for the server in the form:
-   <user>:<password>@<host>:<port>:<socket> Specify this option multiple times
-   for seeing the information from additional servers.
+   Connection information for the server in the format:
+   <user>:<password>@<host>:<port>:<socket> Use this option multiple times
+   to see information for multiple servers.
 
 .. option:: --show-defaults
 
@@ -122,11 +123,12 @@ OPTIONS
 
 .. option:: --start, -s
 
-   Start server in read only mode if offline.
+   Start server in read-only mode if offline.
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

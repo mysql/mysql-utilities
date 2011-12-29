@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
   mysqldiff --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
-            [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+              [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
               --changes-for=[server1|server2] --quiet |
               [--difftype=[--unified|--context|--differ|sql]]
@@ -43,7 +43,7 @@ Use the 'sql' value for the :option:`--difftype` option to produce a listing
 that contains the appropriate ALTER commands to conform the object definitions
 for the object pairs specified. If a transformation cannot be formed, the
 utility reports the diff of the object along with a warning statement. See
-important limitations below in the NOTES section.
+important limitations in the NOTES section.
 
 To specify how to display diff-style output, use one of the following
 values with the :option:`--difftype` option:
@@ -90,8 +90,9 @@ object does not match. The user can override this behavior by specifying the
 :option:`--force` option will will attempt to compare all objects listed as
 arguments.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
 
 OPTIONS
 -------
@@ -120,16 +121,16 @@ OPTIONS
    
 .. option:: --quiet
 
-   Do not print anything. Return only success or fail as exit code.
+   Do not print anything. Return only an exit code of success or failure.
 
 .. option:: --server1=<source>
 
-   Connection information for the first server in the form:
+   Connection information for the first server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --server2=<source>
 
-   Connection information for the second server in the form:
+   Connection information for the second server in the format:
    <user>:<password>@<host>:<port>:<socket>
    
 .. option:: --show-reverse
@@ -141,7 +142,8 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

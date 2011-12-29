@@ -52,7 +52,7 @@ Options
 
 .. option:: --age=<time>
 
-   Only show processes that have been in the current state more than a given
+   Display only processes that have been in the current state more than a given
    time
 
 .. option::  --format=<format>, -f<format>
@@ -108,7 +108,7 @@ Options
 
 .. option:: --server=<source>
 
-   Connection information for the servers to search in the form:
+   Connection information for the servers to search in the format:
    <user>:<password>@<host>:<port>:<socket>
    The option may be repeated to form a list of servers to search.
 
@@ -156,9 +156,9 @@ Options
 
 .. option:: --verbose, -v
 
-   Be more verbose and print messages about execution. Can be given
-   multiple times, in which case the verbosity level increases.
-   For example, -v = verbose, -vv = more verbose, -vvv = debug.
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
+   verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
 

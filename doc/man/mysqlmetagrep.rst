@@ -138,11 +138,11 @@ OPTIONS
 .. option:: --body, -b
 
    Search the body of procedures, functions, triggers, and
-   events. Default is to only match the name.
+   events. The default is to match only the name.
 
 .. option:: --database=<pattern>
 
-   Only look in databases matching this pattern.
+   Look only in databases matching this pattern.
 
 .. option:: --format=<format>, -f<format>
 
@@ -164,7 +164,7 @@ OPTIONS
 .. option:: --search-objects=<type>, ...
             --object-types=<type>, ...
 
-   Only search for/in objects of type <type>, where <type> can be:
+   Search only for/in objects of type <type>, where <type> can be:
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
 
@@ -172,7 +172,7 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   Connection information for the servers to search in the form:
+   Connection information for the servers to search in the format:
    <user>:<password>@<host>:<port>:<socket>
    The option may be repeated to form a list of servers to search.
 

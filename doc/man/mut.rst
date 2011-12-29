@@ -25,7 +25,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility is designed to execute predefined tests to test the MySQL
+This utility executes predefined tests to test the MySQL
 Utilities. The tests are divided into suites (stored as folders). By default,
 all tests located in the /test folder are considered the 'main' suite.
 
@@ -33,13 +33,14 @@ You can select any number of tests to run, select one or more suites to
 restrict the tests, exclude suites and tests, and specify the location of
 the utilities and tests.
 
-The utility requires the existance of at least one server with which to use to
+The utility requires the existance of at least one server to
 clone for testing purposes. You must specify at least one server, but you may
 specify multiple servers for tests designed to use additional servers.
 
-The utility has a special test suite named 'performance' where performance
-related tests are placed. This suite is not included by default and must be
-specified with the :option:`--suite=` option to execute the performance tests.
+The utility has a special test suite named 'performance' where
+performance-related tests are placed. This suite is not included
+by default and must be specified with the :option:`--suite=` option
+to execute the performance tests.
 
 OPTIONS
 -------
@@ -52,7 +53,7 @@ OPTIONS
 
 .. option:: --do-test=<prefix>
 
-    Execute all tests that begin with *prefix*.
+   Execute all tests that begin with *prefix*.
 
 .. option:: --force, -f
 
@@ -60,14 +61,14 @@ OPTIONS
 
 .. option:: --record
 
-   Record output of specified test if successful - works with only one
+   Record the output of the specified test if successful. Works with only one
    test selected.
 
 .. option:: --server=<server>
 
-   Server given by *server* will be used in the tests. The format of
-   *server* is given in :ref:`connspec`. List option multiple times
-   for multiple servers to use
+   Use the server given by *server* in the tests. The format of
+   *server* is given in :ref:`connspec`. Use this option multiple times
+   to specify multiple servers.
 
 .. option:: --skip-long
 
@@ -76,7 +77,7 @@ OPTIONS
 
 .. option:: --skip-test=<test>
 
-   Exclude *test* - list option multiple times for multiple tests.
+   Exclude *test*.  Use this option multiple times to specify multiple tests.
 
 .. option:: --skip-tests=<tests>
 
@@ -88,7 +89,7 @@ OPTIONS
 
 .. option:: --start-port=<port>
 
-   Starting port for spawned servers.
+   The starting port for spawned servers.
 
 .. option:: --start-test=<prefix>
 
@@ -96,23 +97,24 @@ OPTIONS
 
 .. option:: --suite=<suite>
 
-   Test suite to execute - list option multiple times for multiple
-   suites.
+   The test suite to execute.  Use this option multiple times to specify
+   multiple suites.
 
 .. option:: --testdir=<path>
 
-   Path to test directory.
+   Path to the test directory.
 
 .. option:: --utildir=<path>
 
-   Location of utilities.
+   Location of the utilities.
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
-   verbose, -vv = more verbose, -vvv = debug. Use -vvv to display actual
-   results of test cases to the screen and ignore result processing - used to
-   diagnose test execution problems.
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
+   verbose, -vv = more verbose, -vvv = debug. To diagnose test execution
+   problems, use -vvv to display the actual results of test cases and ignore
+   result processing.
 
 .. option:: --version
 
@@ -120,13 +122,13 @@ OPTIONS
 
 .. option:: --width=<number>
 
-   Display width.
+   Specify the display width.
 
 NOTES
 -----
 
-The information specified for the server must be a valid login
-account.
+The information specified for the server must be a valid account for that
+server.
 
 Any test named ???_template.py shall be skipped. This permits the developer
 to create a base class to import for a collection of tests based on a common
@@ -135,8 +137,10 @@ code base.
 EXAMPLES
 --------
 
-The following example demonstrates how to use mut to execute a subset of the
-tests using an existing server which is cloned::
+The following example demonstrates how to invoke **mut** to execute
+a subset of the tests using an existing server which is cloned.
+Notice in the example that the test name, status, and relative time
+are displayed::
 
     $ python mut --server=root@localhost --do-tests=clone_user --width=70
 
@@ -164,9 +168,6 @@ tests using an existing server which is cloned::
     Testing completed: Friday 03 December 2010 09:50:06
 
     All 3 tests passed.
-
-Notice in the example above the test name, status, and relative time is
-displayed.
 
 COPYRIGHT
 ---------

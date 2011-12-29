@@ -100,9 +100,10 @@ database(s) selected. You can change the locking mode by using the
 :option:`--locking` option. You can turn off locking altogether ('no-locks') or
 use only table locks ('lock-all'). The default value is 'snapshot'.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
-See :ref:`mysqldbexport-notes` below for more details.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
+See :ref:`mysqldbexport-notes` for more details.
 
 OPTIONS
 -------
@@ -126,8 +127,8 @@ OPTIONS
 .. option:: --exclude=<exclude>, -x<exclude> 
 
    Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
-   exclusions.
+   such as db1.t1 or a REGEXP search pattern.  Use this option multiple times
+   to specify multiple exclusions.
 
 .. option:: --export=<export>, -e<export>
 
@@ -170,7 +171,7 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in the form:
+   Connection information for the server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --skip=<skip-objects>
@@ -185,7 +186,8 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version

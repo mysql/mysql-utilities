@@ -77,7 +77,7 @@ OPTIONS
 
 .. option:: --master=<master>
 
-   Connection information for master server in the form:
+   Connection information for the master server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --master-log-file=<master_log_file>
@@ -99,7 +99,7 @@ OPTIONS
 
 .. option:: --slave=<slave>
 
-   Connection information for slave server in the form:
+   Connection information for the slave server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --start-from-beginning, -b
@@ -113,7 +113,8 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
@@ -220,9 +221,9 @@ position::
 RECOMMENDATIONS
 ---------------
 
-You should use read_only = True in the my.cnf file for the slave to ensure no
-accidental data changes such as INSERT, DELETE, UPDATE, etc. are permitted
-on the slave.
+You should use read_only = True in the my.cnf file for the slave
+to ensure no accidental data changes such as INSERT, DELETE, UPDATE,
+and so forth, are permitted on the slave.
 
 Use the :option:`--pedantic` and :option:`-vv` options for setting up
 replication on production servers to avoid possible problems with differing

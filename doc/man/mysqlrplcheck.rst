@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
   mysqlrplcheck --master=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                --slave=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+              --slave=<user>[<passwd>]@<host>:[<port>][:<socket>] |
               --help | --version | --verbose | --show-slave-status |
               --master-info-file=<file> | --quiet | --suppress
 
@@ -19,7 +19,7 @@ DESCRIPTION
 
 This utility is used to check the prerequisites for replication on a master and
 a slave. These checks (called tests) are designed to ensure a healthy
-replication setup. Each of these tests are described in more detail below::
+replication setup. Each of these tests are described in more detail here::
 
  Test# Description
  ----- ----------------------------------------------------------------------
@@ -54,9 +54,6 @@ information file on the slave.
 You can also use the :option:`--show-slave-status` option to see the values
 from the SHOW SLAVE STATUS command.
 
-You must provide valid login information for both the master and the slave as
-shown above.
-
 OPTIONS
 -------
 
@@ -68,7 +65,7 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   Connection information for the master server in the form:
+   Connection information for the master server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --master-info-file=<file>
@@ -88,7 +85,7 @@ OPTIONS
 
 .. option:: --slave=<source>
 
-   Connection information for the slave server in the form:
+   Connection information for the slave server in the format:
    <user>:<password>@<host>:<port>:<socket>
    
 .. option:: --suppress
@@ -97,7 +94,8 @@ OPTIONS
 
 .. option::  --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
@@ -132,6 +130,9 @@ replication, use the following command::
     Checking lower_case_table_names settings                          [pass]
     Checking slave delay (seconds behind master                       [pass]
     # ...done.
+
+As shown in the example, you must provide valid login information
+for both the master and the slave.
     
 To perform the same command but also display the contents of the master
 information file on the slave and the values of SHOW SLAVE STATUS as well as

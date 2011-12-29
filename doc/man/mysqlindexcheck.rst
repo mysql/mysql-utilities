@@ -12,8 +12,8 @@ SYNOPSIS
   mysqlcheckindex --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                   --quiet | --index-format=[GRID|SQL|TAB|CSV] |
-                   --stats [--best=<num_rows> | --worst=<num rows> ]]
+                 --quiet | --index-format=[GRID|SQL|TAB|CSV] |
+                 --stats [--best=<num_rows> | --worst=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
@@ -33,7 +33,7 @@ rules are applied during the operation.
 
 **SPATIAL**
   idx_a and idx_b are duplicates iff they contain the same
-  column (only 1 column is permitted)
+  column (only one column is permitted)
 
 **FULLTEXT**
   idx_b is redundant to idx_a iff all columns in idx_b are
@@ -46,10 +46,10 @@ can specify a list of tables (in the form *db.tablename*) which will
 limit the scan to only those tables in the databases listed and those
 tables listed.
 
-If you want to see the example DROP statements to drop the redundant indexes,
-you can specify the :option:`--show-drops` option (see below). You can also
-examine the existing indexes using the :option:`--verbose` option which prints
-the equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
+To see the example DROP statements to drop the redundant indexes,
+specify the :option:`--show-drops` option. to examine the existing
+indexes, use the :option:`--verbose` option, which prints the
+equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
 You can also display the best and worst non-primary key indexes for
 each table with the :option:`--best` and :option:`--worst`
@@ -75,9 +75,10 @@ one of the following formats:
 Note: the :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
-See :ref:`mysqlindexcheck-notes` below for more details.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
+See :ref:`mysqlindexcheck-notes` for more details.
 
 OPTIONS
 -------
@@ -99,7 +100,7 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   Connection information for source server in the form:
+   Connection information for the source server in the format:
    <user>:<password>@<host>:<port>:<socket>
 
 .. option:: --show-drops, -d
@@ -120,7 +121,8 @@ OPTIONS
 
 .. option::  --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
@@ -131,6 +133,7 @@ OPTIONS
 
    Limit index statistics to the worst N indexes.
 
+.. _mysqlindexcheck-notes:
 
 NOTES
 -----

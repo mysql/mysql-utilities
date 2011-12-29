@@ -57,12 +57,13 @@ The operation uses a consistent snapshot by default to read from the
 database(s) selected. You can change the locking mode by using the
 :option:`--locking` option. You can turn off locking altogether ('no-locks') or
 use only table locks ('lock-all'). The default value is 'snapshot'.
-Additionaly, WRITE locks are used to lock the destination tables during the
+Additionally, WRITE locks are used to lock the destination tables during the
 copy.
 
-You must provide login information such as user, host, password, etc. for a
-user that has the appropriate rights to access all objects in the operation.
-See :ref:`mysqldb-notes` below for more details.
+You must provide connection parameters such as user, host, password,
+and so forth, for a user that has the appropriate rights to access
+all objects in the operation.
+See :ref:`mysqldbcopy-notes` for more details.
 
 OPTIONS
 -------
@@ -75,7 +76,7 @@ OPTIONS
 
 .. option:: --copy-dir=<copy_directory>
 
-   Path to use when copying data (stores temporary files) - default
+   Path to use when copying data (stores temporary files). Default
    = current directory.
 
 .. option:: --default-storage-engine=<def_engine>
@@ -85,15 +86,15 @@ OPTIONS
 
 .. option:: --destination=<destination>
 
-   Connection information for destination server in the form:
+   Connection information for the destination server in the format:
    <user>:<password>@<host>:<port>:<socket> Where <password> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --exclude=<exclude>, -x<exclude>
 
    Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a REGEXP search pattern. Repeat option for multiple
-   exclusions.
+   such as db1.t1 or a REGEXP search pattern.  Use this option multiple times
+   to specify multiple exclusions.
 
 .. option:: --force, -f
 
@@ -121,13 +122,13 @@ OPTIONS
 
 .. option:: --skip=<objects>
 
-   Specify objects to skip in the operation in the form of a
+   Specify objects to skip in the operation as a
    comma-separated list (no spaces). Valid values = TABLES, VIEWS,
    TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
 
 .. option:: --source=<source>
 
-   Connection information for source server in the form:
+   Connection information for the source server in the format:
    <user>:<password>@<host>:<port>:<socket> where <password> is
    optional and either <port> or <socket> must be provided.
 
@@ -137,7 +138,8 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. For example, -v =
+   Control how much information is displayed. This option can be used
+   multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 
 .. option:: --version
@@ -154,24 +156,24 @@ The login user must have the appropriate permissions to create new
 objects, read the old database, access (read) the mysql database, and
 grant privileges.
 
-To copy all objects from a source, the user must have **SELECT** and
-**SHOW VIEW** privileges on the database as well as **SELECT** on the
-mysql database.
+To copy all objects from a source, the user must have the **SELECT** and
+**SHOW VIEW** privileges on the database as well as the **SELECT** privilege
+on the mysql database.
 
-To copy all objects to a destination, the user must have **CREATE**
-for the database as well as **SUPER** for procedures and functions
-(when binary logging is enabled) and **WITH GRANT OPTION** to copy
+To copy all objects to a destination, the user must have these privileges:
+**CREATE** for the database, **SUPER** for procedures and functions
+(when binary logging is enabled), and **GRANT OPTION** to copy
 grants.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
 contains certain objects such as views or events and whether binary
-logging is turned on (hence the need for **SUPER**).
+logging is turned on (hence the need for the **SUPER** privilege).
 
-The --new-storage-engine and --default-storage-engine options apply to all
-tables in the operation.
+The :option:`--new-storage-engine` and :option:`--default-storage-engine`
+options apply to all tables in the operation.
 
-Some combinations of the options may result in errors during the
+Some option combinations may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is copied.
 

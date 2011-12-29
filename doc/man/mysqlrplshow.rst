@@ -28,7 +28,7 @@ as masters (a circular topology). The graph displays the topology with
 successive indents. A notation is made for circular topologies.
 
 An example of the graph for a typical topology with relay slaves is shown
-below::
+here::
 
   # Replication Topology Graph::
 
@@ -70,7 +70,6 @@ formats using the :option:`--format` option.
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-You must provide valid login information for the master as shown above.
 
 If you elect to use the :option:`--recurse` option, the utility will
 attempt to connect to the slaves using the user name and password provided for
@@ -83,7 +82,7 @@ before the utility fails.
 
 The utility reports slaves by use of the *SHOW SLAVE HOSTS* command whereby the
 slaves should be started with the --report-host and --report-port options
-specified. If you want to use the :option:--recurse` option, the values for
+specified. If you want to use the :option:`--recurse` option, the values for
 these options must be set to the actual port and host of the slaves else the
 utility may not be able to connect to the slaves to find their slaves.
 
@@ -103,13 +102,13 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   Connection information for the master server in the form:
+   Connection information for the master server in the format:
    <user>:<password>@<host>:<port>:<socket>
    
 .. option:: --num-retries=<num_retries>, -n<num_retries>
 
-   Number of retries allowed for failed slave login attempt. Valid with
-   --prompt only.
+   Number of retries allowed for failed slave login attempt. Valid only with
+   :option:`--prompt`.
    
 .. option:: --prompt, -p
 
@@ -162,6 +161,9 @@ command::
        +--- localhost:3310 - (SLAVE)
        |
        +--- localhost:3312 - (SLAVE)
+
+As shown in the example, you must provide valid login information
+for the master.
 
 To show the full replication topology of a master running on the local host,
 use the following command::
