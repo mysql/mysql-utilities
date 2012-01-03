@@ -59,7 +59,8 @@ Options
 
 .. option::  --format=<format>, -f<format>
 
-   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
+   Specify the display format. Permitted format values are
+   GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --kill-connection
 

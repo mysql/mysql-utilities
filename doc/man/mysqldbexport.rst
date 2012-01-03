@@ -135,9 +135,10 @@ OPTIONS
 
 .. option:: --export=<export>, -e<export>
 
-   Control the export of either DATA|D = only the table data for the
+   Specify the export format. Permitted format values are
+   DATA|D = export only the table data for the
    tables in the database list, DEFINITIONS|F = export only the
-   definitions for the objects in the database list, or BOTH|B =
+   definitions for the objects in the database list, and BOTH|B =
    export the metadata followed by the data (default: export metadata).
 
 .. option:: --file-per-table

@@ -26,7 +26,7 @@ find differences. It identifies objects having different definitions
 in the two databases and presents them in a diff-style format of
 choice. Differences in the data are shown using a similar diff-style
 format. Changed or missing rows are shown in a standard format of
-either GRID, CSV, TAB, or VERTICAL.
+GRID, CSV, TAB, or VERTICAL.
 
 Those objects considered in the database include tables, views, triggers,
 procedures, functions, and events. A count of each object type can be shown
@@ -206,7 +206,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Display missing rows in either GRID (default), CSV, TAB, or VERTICAL format.
+   Specify the missing-row display format. Permitted format values are
+   GRID, CSV, TAB, and VERTICAL. The default is GRID.
    
 .. option:: --quiet
 

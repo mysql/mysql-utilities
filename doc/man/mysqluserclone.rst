@@ -62,8 +62,9 @@ OPTIONS
 
 .. option::  --format=<list_format>
 
-   Display the list of users in either GRID (default), TAB, CSV, or VERTICAL
-   format - valid only for :option:`--list` option.
+   Specify the user display format. Permitted format values are
+   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   This option is valid only if :option:`--list` is given.
 
 .. option:: --force, -f
 

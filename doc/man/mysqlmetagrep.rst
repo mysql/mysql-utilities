@@ -98,7 +98,7 @@ characters, optionally containing characters with special meaning:
 **$**
    Matches the end of a string.
 **[axy]**
-   Matches either **a**, **x**, or **y**.
+   Matches **a**, **x**, or **y**.
 **[a-f]**
    Matches any character in the range **a** to
    **f** (that is, **a**, **b**, **c**, **d**,
@@ -113,7 +113,7 @@ characters, optionally containing characters with special meaning:
 **a?**
    Matches zero or one **a**.
 **ab|cd**
-   Matches either **ab** or **cd**.
+   Matches **ab** or **cd**.
 **a{5}**
    Matches 5 instances of **a**.
 **a{2,5}**
@@ -148,7 +148,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Display the output in either GRID (default), TAB, CSV, or VERTICAL format.
+   Specify the display format. Permitted format values are
+   GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --pattern=<pattern>, -e=<pattern>
 

@@ -95,8 +95,8 @@ OPTIONS
 
 .. option:: --format=<index_format>
 
-   Display the list of indexes per table in either **SQL**, **TABLE**
-   (default), **TAB**, **CSV**, or **VERTICAL** format.
+   Specify the index list display format. Permitted format values are
+   TABLE, TAB, CSV, SQL, or VERTICAL. The default is TABLE.
 
 .. option:: --server=<source>
 

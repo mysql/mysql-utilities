@@ -20,7 +20,7 @@ DESCRIPTION
 -----------
 
 This utility permits a database administrator to see the disk space usage
-for one or more databases in either CSV, TAB, GRID, or VERTICAL format.
+for one or more databases in CSV, TAB, GRID, or VERTICAL format.
 The utility also enables the user to examine the disk usage for the
 binary logs, slow, error, and general log, and InnoDB tablespace usage. The
 default is to show only the database disk space usage.
@@ -76,8 +76,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Display the output in either GRID (default), TAB, CSV,
-   or VERTICAL format.
+   Specify the display format. Permitted format values are
+   GRID, CSV, TAB, and VERTICAL. The default is GRID.
     
 .. option::  --InnoDB, -i
 
