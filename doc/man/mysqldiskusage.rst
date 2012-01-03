@@ -51,7 +51,7 @@ the :option:`--no-headers` option.
 You must provide connection parameters (user, host, password, and
 so forth), for an account that has the appropriate privileges to
 access all objects in the operation.
-See :ref:`mysqldiskusage-notes` for more details.
+For details, see :ref:`mysqldiskusage-notes`.
 
 OPTIONS
 -------

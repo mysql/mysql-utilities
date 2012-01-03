@@ -49,13 +49,13 @@ To specify how to display diff-style output, use one of the following
 values with the :option:`--difftype` option:
 
 **unified** (default)
-  Print unified format output.
+  Display unified format output.
 
 **context**
-  Print context format output.
+  Display context format output.
 
 **differ**
-  Print differ-style format output.
+  Display differ-style format output.
 
 The :option:`--changes-for` option can be used to control the direction of the
 difference (by specifying the object to be transformed) in either the

@@ -22,9 +22,10 @@ DESCRIPTION
 -----------
 
 This utility exports the metadata
-(object definitions, hence definitions) or data or both from one or more
+(object definitions) or data or both from one or more
 databases. By default, the utility exports only definitions.
 
+You can also skip objects by type using the :option:`--skip` option
 To skip objects by type, use the :option:`--skip` option
 with a list of the objects to skip. This enables you to extract a
 particular set of objects, say, for exporting only events (by
@@ -103,7 +104,7 @@ respectively. The default value is 'snapshot'.
 You must provide connection parameters (user, host, password, and
 so forth), for an account that has the appropriate privileges to
 access all objects in the operation.
-See :ref:`mysqldbexport-notes` for more details.
+For details, see :ref:`mysqldbexport-notes`.
 
 OPTIONS
 -------

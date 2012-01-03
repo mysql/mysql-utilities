@@ -28,7 +28,7 @@ with the same privileges as the original user.
 You must provide connection parameters (user, host, password, and
 so forth), for an account that has the appropriate privileges to
 access all objects in the operation.
-See :ref:`mysqluserclone-notes` for more details.
+For details, see :ref:`mysqluserclone-notes`.
 
 You can also use the utility to list users for a server by specifying the
 --list option. This prints a list of the users on the source (no destination is

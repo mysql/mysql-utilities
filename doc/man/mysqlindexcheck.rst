@@ -78,7 +78,7 @@ printed as SQL statements.
 You must provide connection parameters (user, host, password, and
 so forth), for an account that has the appropriate privileges to
 access all objects in the operation.
-See :ref:`mysqlindexcheck-notes` for more details.
+For details, see :ref:`mysqlindexcheck-notes`.
 
 OPTIONS
 -------
