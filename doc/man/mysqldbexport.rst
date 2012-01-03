@@ -206,8 +206,8 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to create new
-objects, read the old database, access (read) the mysql database, and
+The login user must have the appropriate permissions to
+read the old database, access (read) the mysql database, and
 grant privileges.
 
 To export all objects from a source database, the user must have **SELECT** and

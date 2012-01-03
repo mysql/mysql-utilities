@@ -59,7 +59,7 @@ values with the :option:`--difftype` option:
   Display differ-style format output.
 
 **sql**
-  Display SQL format output.
+  Display SQL transformation statement output.
 
 The :option:`--changes-for` option controls the direction of the
 difference (by specifying the object to be transformed) in either the

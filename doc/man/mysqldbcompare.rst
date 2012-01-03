@@ -123,7 +123,7 @@ values with the :option:`--difftype` option:
   Display differ-style format output.
 
 **sql**
-  Display SQL format output.
+  Display SQL transformation statement output.
 
 To specify how to display changed or missing row output, use one of
 the following values with the :option:`--format` option:
