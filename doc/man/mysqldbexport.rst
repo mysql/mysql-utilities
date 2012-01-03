@@ -122,7 +122,7 @@ OPTIONS
 .. option:: --display=<display>, -d<display>
 
    Control the number of columns shown. Permitted display values are BRIEF
-   = minimal columns for object creation (default), FULL = all columns,
+   = minimal columns for object creation (default), FULL = all columns, and
    NAMES = only object names (not valid for --format=SQL).
 
 .. option:: --exclude=<exclude>, -x<exclude> 
@@ -152,14 +152,14 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the output format. Permitted format values are
-   SQL|S, GRID|G, TAB|T, CSV|C, or VERTICAL|V. The default is SQL.
+   SQL|S, GRID|G, TAB|T, CSV|C, and VERTICAL|V. The default is SQL.
 
 .. option:: --locking=<locking>
 
    Choose the lock type for the operation. Permitted lock values are no-locks
    = do not use any table locks, lock-all = use table locks but no transaction
-   and no consistent read, snaphot: consistent read using a single transaction.
-   The default is snapshot.
+   and no consistent read, and snaphot = consistent read using a single
+   transaction. The default is snapshot.
 
 .. option::  --no-headers, -h
 
@@ -184,7 +184,7 @@ OPTIONS
 
    Specify objects to skip in the operation as a comma-separated list
    (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, VIEWS.
+   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
 
 .. option:: --skip-blobs
 

@@ -38,7 +38,7 @@ can be used to see the same information. It works by starting the
 server in a read-only mode. You must specify the :option:`--basedir`,
 :option:`--datadir`, and :option:`--start` options to enable this
 feature. This is so that an offline server is not started accidentally.
-Note: be sure to consider ramifications of starting a server on the
+Note: Be sure to consider the ramifications of starting a server on the
 error and similar logs. It is best to save this information prior
 to running this utility on an offline server.
 

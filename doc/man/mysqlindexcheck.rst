@@ -72,7 +72,7 @@ one of the following formats:
 **SQL**
   print SQL statements rather than a list.
 
-Note: the :option:`--best` and :option:`--worst` lists cannot be
+Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
 You must provide connection parameters (user, host, password, and

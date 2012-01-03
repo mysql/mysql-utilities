@@ -124,7 +124,7 @@ OPTIONS
 
    Specify objects to skip in the operation as a comma-separated list
    (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, VIEWS.
+   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
 
 .. option:: --source=<source>
 

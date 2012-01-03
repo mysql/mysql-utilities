@@ -115,7 +115,7 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the input format. Permitted format values are
-   SQL|S, GRID|G, TAB|T, CSV|C, or VERTICAL|V. The default is SQL.
+   SQL|S, GRID|G, TAB|T, CSV|C, and VERTICAL|V. The default is SQL.
 
 .. option:: --import=<import_type>, -i<import_type>
 
@@ -147,7 +147,7 @@ OPTIONS
 
    Specify objects to skip in the operation as a comma-separated list
    (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, VIEWS.
+   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
 
 .. option:: --skip-blobs
 
@@ -169,8 +169,10 @@ NOTES
 -----
 
 The login user must have the appropriate permissions to create new
-objects, read the old database, access (read) the mysql database, and
-grant privileges.
+objects, access (read) the mysql database, and grant privileges.
+If a database to be imported already exists, the user must have read
+permission for it, which is needed to check the existence of objects in the
+database.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database

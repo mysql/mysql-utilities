@@ -122,6 +122,9 @@ values with the :option:`--difftype` option:
 **differ**
   Display differ-style format output.
 
+**sql**
+  Display SQL format output.
+
 To specify how to display changed or missing row output, use one of
 the following values with the :option:`--format` option:
 
@@ -139,7 +142,7 @@ the following values with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-The :option:`--changes-for` option can be used to control the direction of the
+The :option:`--changes-for` option controls the direction of the
 difference (by specifying the object to be transformed) in either the
 difference report (default) or the transformation report (designated with the
 :option:`--difftype=sql` option). Consider the following command::
@@ -147,16 +150,18 @@ difference report (default) or the transformation report (designated with the
   mysqldbcompare --server1=root@host1 --server2@host2 db1.table1:dbx.table3
     --difftype=sql
 
-In this example, db1 exists on host1 and dbx exists on host2 as defined by
-position where the database and object to the left of the colon are located on
---server1 and the database and object on the right is located on --server2.
+In this example, db1 exists on host1 and dbx exists on host2 as
+defined by position where the database and object to the left of
+the colon are located on the server designated by :option:`--server1`
+and the database and object on the right is located on the server
+designated by :option:`--server2`.
 
-  * --changes-for=server1 - The object definition on server1 is the object to be
+  * :option:`--changes-for=server1`: The object definition on server1 is the object to be
     transformed and is used to produce the difference or transformation
     compared to the definition on server2. The output therefore is the
     transformation needed to make the object on server1 like the object on
     server2.
-  * --changes-for=server2 - The object definition on server2 is the object to be
+  * :option:`--changes-for=server2`: The object definition on server2 is the object to be
     transformed and is used to produce the difference or transformation
     compared to the definition on server1. The output therefore is the
     transformation needed to make the object on server2 like the object on
@@ -190,8 +195,8 @@ OPTIONS
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
-   Display differences in context format either unified,
-   context, differ, or sql (default: unified).
+   Specify the difference display format. Permitted format values are unified,
+   context, differ, and sql. The default is unified.
    
 .. option:: --disable-binary-logging
 
@@ -264,8 +269,6 @@ NOTES
 
 The login user must have the appropriate permissions to read all databases
 and tables listed.
-
-This utility currently compares the full CREATE statement for the objects.
 
 
 EXAMPLES

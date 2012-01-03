@@ -71,12 +71,12 @@ OPTIONS
 .. option:: --master-info-file=<file>
 
    The name of the master information file on the slave.default = 'master.info'
-   read from the data directory. Note: this option requires that the utility
+   read from the data directory. Note: This option requires that the utility
    run on the slave with appropriate file read access to the data directory.
 
 .. option:: --quiet, -q
 
-   Turn off all messages for quiet execution. Note: errors and warnings are
+   Turn off all messages for quiet execution. Note: Errors and warnings are
    not suppressed.
    
 .. option:: --show-slave-status, -s

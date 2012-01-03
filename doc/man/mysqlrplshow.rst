@@ -116,7 +116,7 @@ OPTIONS
 
 .. option:: --quiet, -q
 
-   Turn off all messages for quiet execution. Note: errors and warnings are
+   Turn off all messages for quiet execution. Note: Errors and warnings are
    not suppressed.
    
 .. option:: --recurse, -r
