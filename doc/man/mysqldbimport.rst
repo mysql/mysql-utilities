@@ -22,11 +22,13 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to import the metadata
-(objects) or data for one or more databases from one or more files in
-either SQL, CSV, TAB, GRID, or VERTICAL formats. These formats are the
-output of the mysqldbexport utility. The utility enables you to import
-either the object definitions, the data, or both for a list of databases.
+This utility imports the metadata (object definitions) or data for one or
+more databases from one or more files in
+any of SQL, CSV, TAB, GRID, or VERTICAL formats. These formats are the
+output of the **mysqldbexport** utility.
+For a list of databases,
+the **mysqldbimport** utility enables you to import
+the object definitions, the data, or both.
 
 You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This enables you to extract a
@@ -34,27 +36,27 @@ particular set of objects, say, for importing only events (by
 excluding all other types). Similarly, you can skip creating blob
 UPDATE commands by specifying the :option:`--skip-blobs` option.
 
-To specify how to display output, use one of the following values
+To specify the input format, use one of the following values
 with the :option:`--format` option:
 
 **SQL** (default)
-  Display output using SQL statements. For definitions, this consists of
+  Input consists of SQL statements. For definitions, this consists of
   the appropriate **CREATE** and **GRANT** statements. For data, this
   is an **INSERT** statement (or bulk insert if the
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Display output formatted like that of the mysql monitor in a grid
+  Input is formatted like that of the mysql monitor in a grid
   or table layout.
 
 **CSV**
-  Display output in comma-separated values format.
+  Input is formatted in comma-separated values format.
 
 **TAB**
-  Display output in tab-separated format.
+  Input is formatted in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
+  Input is formatted in a single column similar to the ``\G`` command
   for the mysql monitor.
 
 To turn off the headers when using CSV or TAB display format, specify
@@ -112,8 +114,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Display the output in either SQL|S (default), GRID|G, TAB|T, CSV|C,
-   or VERTICAL|V format.
+   Specify the input format. Permitted format values are
+   SQL|S, GRID|G, TAB|T, CSV|C, or VERTICAL|V. The default is SQL.
 
 .. option:: --import=<import_type>, -i<import_type>
 
