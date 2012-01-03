@@ -27,25 +27,25 @@ as a different name (clone).
 
 The operation copies all objects (tables, views, triggers, events, procedures,
 functions, and database-level grants) to the destination server. The utility
-will also copy all data. There are options to turn off copying any or all of
+also copies all data. There are options to turn off copying any or all of
 the objects as well as not copying the data.
 
 You can exclude specific objects by name using the :option:`--exclude` option
 whereby you specify a name in the form of <db>.<object> or you can supply a
-regex search pattern. For example, :option:`--exclude=db1.trig1` will exclude
-the single trigger and :option:`--exclude=trig_` will exclude all objects from
+regex search pattern. For example, :option:`--exclude=db1.trig1` excludes
+the single trigger and :option:`--exclude=trig_` excludes all objects from
 all databases whose name begins with trig and has a following character or
 digit.
 
 To change the storage engine for all tables on the destination, specify the
 new engine with the :option:`--new-storage-engine` option. If the new engine
-specified is available on the destination, all tables will be changed to use
+specified is available on the destination, all tables are changed to use
 the engine.
 
 Similarly, you can specify a different default storage engine with the
 :option:`--default-storage-engine` option. If the engine specified is
 available on the destination, any table that specifies a storage engine that
-is not on the destination will use the new default engine. Note that this
+is not on the destination uses the new default engine. Note that this
 overrides the default storage engine mechanism on the server.
 
 If the option :option:`--default-storage-engine` or
@@ -208,9 +208,9 @@ named 'util_test' to a new name 'util_test_copy' on the same server::
     # Copying GRANTS from util_test
     #...done.
     
-If the database you are copying does not contain only InnoDB tables and you
-want to ensure data integrity of the copy by locking the tables during the read
-step, issue this command:::
+If the database to be copied does not contain only InnoDB tables and you
+want to ensure data integrity of the copy by locking the tables during the
+read step, add a :option:`--locking=lock-all` option to the command::
 
     $ mysqldbcopy \
       --source=root:pass@localhost:3310:/test123/mysql.sock \
