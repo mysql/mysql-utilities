@@ -51,7 +51,7 @@ _`unix_socket`
 .. _`connection specification`:
 
 Providing the connection parameters as a string requires the string to
-have the format ``user:password@host:port:socket``, where some values
+have the format ``user[:passwd]@host[:port][:socket]``, where some values
 are optional. If a connection specification string is provided, it
 will be parsed using the :ref:`options.parse_connection` function.
 
