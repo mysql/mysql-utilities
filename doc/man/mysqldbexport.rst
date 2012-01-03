@@ -29,7 +29,7 @@ You can also skip objects by type using the :option:`--skip` option
 and list the objects you want to skip. This enables you to extract a
 particular set of objects, say, for exporting only events (by
 excluding all other types). Similarly, you can skip creating blob
-UPDATE commands by specifying the :option:`--skip-blobs` option.
+*UPDATE* statements by specifying the :option:`--skip-blobs` option.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:

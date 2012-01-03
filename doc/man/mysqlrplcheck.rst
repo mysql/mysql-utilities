@@ -52,7 +52,7 @@ as server-id's, lower-case-table-name settings, and the contents of the master
 information file on the slave.
 
 You can also use the :option:`--show-slave-status` option to see the values
-from the SHOW SLAVE STATUS command.
+from the *SHOW SLAVE STATUS* statement.
 
 OPTIONS
 -------
@@ -135,7 +135,7 @@ As shown in the example, you must provide valid login information
 for both the master and the slave.
     
 To perform the same command but also display the contents of the master
-information file on the slave and the values of SHOW SLAVE STATUS as well as
+information file on the slave and the values of *SHOW SLAVE STATUS* as well as
 additional details, use this command::
 
     $ mysqlrplcheck --master=root@host1:3310 --slave=root@host2:3311 \
