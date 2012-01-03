@@ -12,7 +12,7 @@ SYNOPSIS
   mysqlmetagrep [ --version | --help ] | --format=<format> |
                 --body | --types<object types> | --regexp | --sql |
                 --database=<pattern> | --pattern=<pattern>
-                --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+                --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 DESCRIPTION
 -----------

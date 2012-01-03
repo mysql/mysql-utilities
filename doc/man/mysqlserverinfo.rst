@@ -9,8 +9,8 @@ SYNOPSIS
 
 ::
 
- mysqlserverinfo [ --server=<user>[<passwd>]@<host>:[<port>][:<socket>] |
-                   [, --server=<user>[<passwd>]@<host>:[<port>][:<socket>] ] |
+ mysqlserverinfo [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
+                   [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
                    --format=[|GRID|TAB|CSV|VERTICAL] ] | --no-headers |
                    --show-defaults | [--start --basedir=<base directory> 
                    --datadir=<data directory>] --verbose

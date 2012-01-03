@@ -9,8 +9,8 @@ SYNOPSIS
 
 ::
 
-  mysqlreplicate --master=<user>[<passwd>]@<host>:[<port>][:<socket>]
-                 --slave=<user>[<passwd>]@<host>:[<port>][:<socket>]
+  mysqlreplicate --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+                 --slave=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[--help | --version] | --quiet |
                  --verbose | --testdb=<test database> | --pedantic
                  --rpl_user=<uid:passwd> | --master-log-file=<log_file> |

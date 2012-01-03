@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqldbimport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldbimport --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              [--quiet | --help | --no-headers | --dryrun |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --verbose |

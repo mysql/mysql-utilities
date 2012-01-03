@@ -10,7 +10,7 @@ SYNOPSIS
 
 ::
 
- mysqldiskusage --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldiskusage --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
              --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]

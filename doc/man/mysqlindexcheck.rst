@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlcheckindex --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+  mysqlcheckindex --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
                  --quiet | --index-format=[GRID|SQL|TAB|CSV] |

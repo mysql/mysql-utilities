@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
  mysqlserverclone [[ --help | --version] | --quiet |
-                  --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+                  --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                   [ --new-data=<datadir> | --new-port=<port> |
                   --new-id=<server_id> ] | --root-password=<passwd> ]
 

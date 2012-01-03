@@ -9,8 +9,8 @@ SYNOPSIS
 
 ::
 
-  mysqldbcompare --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
-              [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+  mysqldbcompare --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+              [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
               --help | --version | --verbose | --run-all-tests | --quiet |
               --format=<format> | --width=<width> |
               --changes-for=[server1|server2] | 

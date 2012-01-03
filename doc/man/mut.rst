@@ -13,8 +13,8 @@ SYNOPSIS
  mut [[--help | --version ] | --verbose | --sorted | --record |
             --utildir=<path> | --width=<num> | --start-port=<num> |
             --testdir=<path> | --do-test=<prefix> | --force |
-            [ --server=<user>[<passwd>]@<host>:[<port>][:<socket>] |
-            [, --server=<user>[<passwd>]@<host>:[<port>][:<socket>] ] |
+            [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
+            [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
             [ --suite=<suite> | [, --suite=<suite> ]] |
             [ --skip-suite=<suite> | [, --skip-suite=<suite> ]] |
               --skip-tests=<test_prefix> | --skip-long |

@@ -9,8 +9,8 @@ SYNOPSIS
 
 ::
 
- mysqldbcopy --source=<user>[<passwd>]@<host>:[<port>][:<socket>]
-             --destination=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldbcopy --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+             --destination=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              (<db_name>[:<new_name>])+ [--verbose | --quiet |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --help | --version |

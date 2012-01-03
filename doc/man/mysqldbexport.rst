@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqldbexport --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+ mysqldbexport --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              (<db_name>[, <db_name>])+ [--quiet | --help | --no-headers |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |

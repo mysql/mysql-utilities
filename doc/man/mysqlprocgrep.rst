@@ -14,7 +14,7 @@ SYNOPSIS
                 --print | --verbose | --match-user=<pattern> |
                 --match-host=<pattern> | --match-command=<pattern> |
                 --match-info=<pattern> | --match-state=<pattern> |
-                --server=<user>[<passwd>]@<host>:[<port>][:<socket>]
+                --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 DESCRIPTION
 -----------

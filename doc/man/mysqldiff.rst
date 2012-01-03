@@ -9,8 +9,8 @@ SYNOPSIS
 
 ::
 
-  mysqldiff --server1=<user>[<passwd>]@<host>:[<port>][:<socket>]
-              [ --server2=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+  mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+              [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
               --changes-for=[server1|server2] --quiet |
               [--difftype=[unified|context|differ|sql]]
