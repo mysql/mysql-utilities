@@ -219,12 +219,12 @@ OPTIONS
 .. option:: --server1=<source>
 
    Connection information for the first server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --server2=<source>
 
    Connection information for the second server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --show-reverse
 

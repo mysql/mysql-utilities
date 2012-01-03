@@ -101,7 +101,7 @@ OPTIONS
 .. option:: --server=<source>
 
    Connection information for the source server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --show-drops, -d
 

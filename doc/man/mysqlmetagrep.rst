@@ -175,7 +175,7 @@ OPTIONS
 .. option:: --server=<source>
 
    Connection information for the servers to search in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
    The option may be repeated to form a list of servers to search.
 
 .. option::  --sql, --print-sql, -p

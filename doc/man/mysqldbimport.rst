@@ -141,7 +141,7 @@ OPTIONS
 .. option:: --server=<SERVER>
 
    Connection information for the server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --skip=<skip_objects>
 

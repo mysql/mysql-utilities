@@ -87,7 +87,8 @@ OPTIONS
 .. option:: --destination=<destination>
 
    Connection information for the destination server in the format:
-   <user>:<password>@<host>:<port>:<socket> Where <password> is
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   where <passwd> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --exclude=<exclude>, -x<exclude>
@@ -129,7 +130,8 @@ OPTIONS
 .. option:: --source=<source>
 
    Connection information for the source server in the format:
-   <user>:<password>@<host>:<port>:<socket> where <password> is
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   where <passwd> is
    optional and either <port> or <socket> must be provided.
 
 .. option:: --threads

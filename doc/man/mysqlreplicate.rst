@@ -78,7 +78,7 @@ OPTIONS
 .. option:: --master=<master>
 
    Connection information for the master server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --master-log-file=<master_log_file>
 
@@ -100,7 +100,7 @@ OPTIONS
 .. option:: --slave=<slave>
 
    Connection information for the slave server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --start-from-beginning, -b
 

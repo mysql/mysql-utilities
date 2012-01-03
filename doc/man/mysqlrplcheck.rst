@@ -66,7 +66,7 @@ OPTIONS
 .. option:: --master=<source>
 
    Connection information for the master server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --master-info-file=<file>
 
@@ -86,7 +86,7 @@ OPTIONS
 .. option:: --slave=<source>
 
    Connection information for the slave server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
    
 .. option:: --suppress
 

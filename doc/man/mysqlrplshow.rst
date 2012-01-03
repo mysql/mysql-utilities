@@ -103,7 +103,7 @@ OPTIONS
 .. option:: --master=<source>
 
    Connection information for the master server in the format:
-   <user>:<password>@<host>:<port>:<socket>
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
    
 .. option:: --num-retries=<num_retries>, -n<num_retries>
 

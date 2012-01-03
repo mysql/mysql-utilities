@@ -111,7 +111,8 @@ OPTIONS
 .. option:: --server=<server>
 
    Connection information for the server in the format:
-   <user>:<password>@<host>:<port>:<socket> Use this option multiple times
+   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Use this option multiple times
    to see information for multiple servers.
 
 .. option:: --show-defaults
