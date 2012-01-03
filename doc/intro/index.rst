@@ -266,7 +266,7 @@ the new server class instance to retrieve all of the databases on the server::
 If you wanted to supply your own list of databases, you could use an option
 like the following. You could also add an else clause which would allow you to
 either get all of the databases by omitting the --databases option or supply
-your own list of databases (e.g. --databases=db1,db2,db3)::
+your own list of databases (for example, --databases=db1,db2,db3)::
 
     parser.add_option("-d", "--databases", action="store", dest="dbs_to_copy",
                       type="string", help="comma-separated list of databases "
@@ -304,7 +304,7 @@ and the anonymous user(s). We then add each to a list for processing later::
 Now we must clone the original server and create a viable running instance.
 When you examine the **mysqlserverclone** utility code, you see that it calls
 another module located in the mysql.utilities.command sub folder. These modules
-are where all of the work done by the utilities take place. This allows you to
+are where all of the work done by the utilities take place. This enables you to
 create new combinations of the utilities by calling the actual operations
 directly. Let's do that now to clone the server.
 

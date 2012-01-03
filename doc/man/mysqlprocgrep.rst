@@ -7,6 +7,8 @@
 SYNOPSIS
 --------
 
+::
+
   mysqlprocgrep [ --version | --help ] | --format=<format> |
                 --kill-connection | --kill-query | --regexp | --sql-body |
                 --print | --verbose | --match-user=<pattern> |

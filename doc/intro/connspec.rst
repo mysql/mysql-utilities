@@ -35,7 +35,7 @@ _`host`
   The domain name of the host or the IP address. If no hostname is provided,
   'localhost' will be used. This field accepts hostnames, IPv4, and IPv6
   addresses. It also accepts quoted values which are not validated and passed
-  directly to the calling methods. This allows users to specify host names and
+  directly to the calling methods. This enables users to specify host names and
   IP addresses that are outside of the supported validation mechanisms.
  
 

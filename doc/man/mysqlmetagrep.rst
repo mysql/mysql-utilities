@@ -7,6 +7,8 @@
 SYNOPSIS
 --------
 
+::
+
   mysqlmetagrep [ --version | --help ] | --format=<format> |
                 --body | --types<object types> | --regexp | --sql |
                 --database=<pattern> | --pattern=<pattern>

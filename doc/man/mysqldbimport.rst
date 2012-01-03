@@ -25,7 +25,7 @@ DESCRIPTION
 This utility permits a database administrator to import the metadata
 (objects) or data for one or more databases from one or more files in
 either SQL, CSV, TAB, GRID, or VERTICAL formats. These formats are the
-output of the mysqldbexport utility. The utility allows you to import
+output of the mysqldbexport utility. The utility enables you to import
 either the object definitions, the data, or both for a list of databases.
 
 You can also skip objects by type using the :option:`--skip` option
