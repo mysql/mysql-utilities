@@ -147,8 +147,8 @@ difference (by specifying the object to be transformed) in either the
 difference report (default) or the transformation report (designated with the
 :option:`--difftype=sql` option). Consider the following command::
 
-  mysqldbcompare --server1=root@host1 --server2@host2 db1.table1:dbx.table3
-    --difftype=sql
+  mysqldbcompare --server1=root@host1 --server2=root@host2 --difftype=sql \
+    db1.table1:dbx.table3
 
 In this example, db1 exists on host1 and dbx exists on host2 as
 defined by position where the database and object to the left of

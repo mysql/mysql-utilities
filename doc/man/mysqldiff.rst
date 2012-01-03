@@ -66,8 +66,8 @@ difference (by specifying the object to be transformed) in either the
 difference report (default) or the transformation report (designated with the
 :option:`--difftype=sql` option). Consider the following command::
 
-  mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
-    --difftype=sql
+  mysqldiff --server1=root@host1 --server2=root@host2 --difftype=sql \
+    db1.table1:dbx.table3
 
 In this example, db1 exists on host1 and dbx exists on host2 as
 defined by position where the database and object to the left of
@@ -239,8 +239,9 @@ CREATE TABLE dbx.table3 (num int, notes char(30), misc char(55));
 To generate a set of SQL statements to transform the definition of db1.table1 to
 dbx.table3, use this command::
 
-    $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
-          --changes-for=server1 --difftype=sql
+    $ mysqldiff --server1=root@host1 --server2=root@host2 \
+          --changes-for=server1 --difftype=sql \
+          db1.table1:dbx.table3
     # server1 on host1: ... connected.
     # server2 on host2: ... connected.
     # Comparing db1.table1 to dbx.table3                               [FAIL]
@@ -255,8 +256,9 @@ dbx.table3, use this command::
 To generate a set of SQL statements to transform the definition of dbx.table3 to
 db1.table1, use this command::
 
-    $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
-          --changes-for=server2 --difftype=sql
+    $ mysqldiff --server1=root@host1 --server2=root@host2 \
+          --changes-for=server2 --difftype=sql \
+          db1.table1:dbx.table3
     # server1 on host1: ... connected.
     # server2 on host2: ... connected.
     # Comparing db1.table1 to dbx.table3                               [FAIL]
@@ -271,8 +273,9 @@ db1.table1, use this command::
 To generate a set of SQL statements to transform the definitions of dbx.table3
 and db1.table1 in both directions, use this command::
 
-    $ mysqldiff --server1=root@host1 --server2@host2 db1.table1:dbx.table3 \
-          --show-reverse --difftype=sql
+    $ mysqldiff --server1=root@host1 --server2=root@host2 \
+          --show-reverse --difftype=sql \
+          db1.table1:dbx.table3
     # server1 on host1: ... connected.
     # server2 on host2: ... connected.
     # Comparing db1.table1 to dbx.table3                               [FAIL]
