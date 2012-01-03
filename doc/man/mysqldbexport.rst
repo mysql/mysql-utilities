@@ -26,7 +26,7 @@ This utility permits a database administrator to export the metadata
 databases. By default, the utility will export only definitions.
 
 You can also skip objects by type using the :option:`--skip` option
-and list the objects you want to skip. This can allow you to extract a
+and list the objects you want to skip. This enables you to extract a
 particular set of objects, say, for exporting only events (by
 excluding all other types). Similarly, you can skip creating blob
 UPDATE commands by specifying the :option:`--skip-blobs` option.

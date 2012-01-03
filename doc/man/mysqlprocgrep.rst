@@ -174,7 +174,7 @@ Time for the :option:`--age` option can be specified in two formats:
 either using the ``hh:mm:ss`` format, with hours and minutes optional,
 or as a sequence of numbers with a suffix giving the period size.
 
-The allowable suffixes are **s** (second), **m** (minute), **h**
+The permitted suffixes are **s** (second), **m** (minute), **h**
 (hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
 15 minutes.
 

@@ -264,7 +264,7 @@ the new server class instance to retrieve all of the databases on the server::
         db_list.append((db[0], None))
 
 If you wanted to supply your own list of databases, you could use an option
-like the following. You could also add an else clause which would allow you to
+like the following. You could also add an else clause which would enable you to
 either get all of the databases by omitting the --databases option or supply
 your own list of databases (for example, --databases=db1,db2,db3)::
 
@@ -281,12 +281,12 @@ your own list of databases (for example, --databases=db1,db2,db3)::
             db_list.append((db, None))
 
 Notice we are creating a list of tuples. This is because the dbcopy module
-uses a list of tuples in the form (old_db, new_db) to allow you to copy a
+uses a list of tuples in the form (old_db, new_db) to enable you to copy a
 database to a new name. For our purposes, we do not want a rename so we leave
 the new name value set to None.
 
 Next, we want a list of all of the users. Once again, you could construct the
-new solution to be flexible by allowing the user to specify the users she wants
+new solution to be flexible by permitting the user to specify the users
 to copy. We leave this as an exercise.
 
 In this case, we do not have a primitive for getting all users created on a

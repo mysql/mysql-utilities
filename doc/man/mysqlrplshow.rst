@@ -107,7 +107,7 @@ OPTIONS
    
 .. option:: --num-retries=<num_retries>, -n<num_retries>
 
-   Number of retries allowed for failed slave login attempt. Valid only with
+   Number of retries permitted for failed slave login attempts. Valid only with
    :option:`--prompt`.
    
 .. option:: --prompt, -p

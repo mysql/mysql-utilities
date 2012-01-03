@@ -19,7 +19,7 @@ three different ways:
 
 When providing the connection parameters as a dictionary, the
 parameters are passed unchanged to the connectors ``connect``
-function. This allow you to pass on parameters not supported through
+function. This enables you to pass on parameters not supported through
 the other interfaces, but at least these parameters are supported:
 
 _`user`
