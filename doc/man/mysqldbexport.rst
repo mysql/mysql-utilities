@@ -13,7 +13,7 @@ SYNOPSIS
              (<db_name>[, <db_name>])+ [--quiet | --help | --no-headers |
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
-             --veerbose | --version | --bulk-insert | --file-per-table |
+             --verbose | --version | --bulk-insert | --file-per-table |
              --export=[DEFINITIONS|DATA|BOTH] |
              --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] ] |
              --exclude=<name>[|,--exclude=<name>]
