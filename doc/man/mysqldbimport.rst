@@ -195,7 +195,7 @@ using a file in CSV format, use this command::
     #...done.
 
 Similarly, to import the data of the database 'util_test' to server1 on port
-3306 producing bulk insert statements, use this command::
+3306, importing the data using bulk insert statements, use this command::
 
     $ mysqldbimport --import=data --bulk-insert \
       --server=root@localhost --format=csv data.csv
@@ -204,8 +204,8 @@ Similarly, to import the data of the database 'util_test' to server1 on port
     #...done.
 
 Also, to import both the data and definitions of the database 'util_test' to
-server1 on port 3306 producing bulk insert statements from a file that contains
-SQL statements, use this command::
+server1 on port 3306, importing the data using bulk insert statements from a
+file that contains SQL statements, use this command::
 
     $ mysqldbimport --import=both --bulk-insert \
       --server=root@localhost --format=sql data.sql
