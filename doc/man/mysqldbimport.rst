@@ -187,7 +187,7 @@ EXAMPLES
 To import the metadata of the database 'util_test' to server1 on port 3306
 using a file in CSV format, use this command::
 
-    $ mysqldbimport --import=definitions --server=root@localhost \\
+    $ mysqldbimport --import=definitions --server=root@localhost \
       --format=csv data.csv
     # Source on localhost: ... connected.
     # Importing definitions from data.csv.
@@ -196,7 +196,7 @@ using a file in CSV format, use this command::
 Similarly, to import the data of the database 'util_test' to server1 on port
 3306 producing bulk insert statements, use this command::
 
-    $ mysqldbimport --import=data --bulk-insert \\
+    $ mysqldbimport --import=data --bulk-insert \
       --server=root@localhost --format=csv data.csv
     # Source on localhost: ... connected.
     # Importing data from data.csv.
@@ -206,7 +206,7 @@ Also, to import both the data and definitions of the database 'util_test' to
 server1 on port 3306 producing bulk insert statements from a file that contains
 SQL statements, use this command::
 
-    $ mysqldbimport --import=both --bulk-insert \\
+    $ mysqldbimport --import=both --bulk-insert \
       --server=root@localhost --format=sql data.sql
     # Source on localhost: ... connected.
     # Importing definitions and data from data.sql.

@@ -185,9 +185,9 @@ EXAMPLES
 The following example demonstrates how to use the utility to copy a database
 named 'util_test' to a new name 'util_test_copy' on the same server::
 
-    $ mysqldbcopy \\
-      --source=root:pass@localhost:3310:/test123/mysql.sock \\
-      --destination=root:pass@localhost:3310:/test123/mysql.sock \\
+    $ mysqldbcopy \
+      --source=root:pass@localhost:3310:/test123/mysql.sock \
+      --destination=root:pass@localhost:3310:/test123/mysql.sock \
       util_test:util_test_copy
     # Source on localhost: ... connected.
     # Destination on localhost: ... connected.
@@ -212,9 +212,9 @@ If the database you are copying does not contain only InnoDB tables and you
 want to ensure data integrity of the copy by locking the tables during the read
 step, issue this command:::
 
-    $ mysqldbcopy \\
-      --source=root:pass@localhost:3310:/test123/mysql.sock \\
-      --destination=root:pass@localhost:3310:/test123/mysql.sock \\
+    $ mysqldbcopy \
+      --source=root:pass@localhost:3310:/test123/mysql.sock \
+      --destination=root:pass@localhost:3310:/test123/mysql.sock \
       util_test:util_test_copy --locking=lock-all
     # Source on localhost: ... connected.
     # Destination on localhost: ... connected.

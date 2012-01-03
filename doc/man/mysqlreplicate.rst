@@ -140,7 +140,7 @@ EXAMPLES
 To setup replication between a MySQL instance on two different hosts using
 the default settings, use this command::
 
-    $ mysqlreplicate --master=root@localhost:3306 \\
+    $ mysqlreplicate --master=root@localhost:3306 \
       --slave=root@localhost:3307 --rpl-user=rpl:rpl
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
@@ -152,7 +152,7 @@ The following command ensures the replication between the master and slave is
 successful if and only if the InnoDB storage engines are the same and both
 servers have the same storage engines with the same default specified::
 
-    $ mysqlreplicate --master=root@localhost:3306 \\
+    $ mysqlreplicate --master=root@localhost:3306 \
       --slave=root@localhost:3307 --rpl-user=rpl:rpl -vv --pedantic
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
@@ -174,7 +174,7 @@ servers have the same storage engines with the same default specified::
 The following command starts replication from the current position of the
 master (default)::
 
-   $ mysqlreplicate --master=root@localhost:3306 \\
+   $ mysqlreplicate --master=root@localhost:3306 \
         --slave=root@localhost:3307 --rpl-user=rpl:rpl
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
@@ -184,8 +184,8 @@ master (default)::
 
 The following command starts replication from the beginning of recorded events::
 
-   $ mysqlreplicate --master=root@localhost:3306 \\
-        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+   $ mysqlreplicate --master=root@localhost:3306 \
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \
         --start-from-beginning
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
@@ -196,8 +196,8 @@ The following command starts replication from the beginning of recorded events::
 The following starts replication from the beginning of a specific binary log
 file::
 
-   $ mysqlreplicate --master=root@localhost:3306 \\
-        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+   $ mysqlreplicate --master=root@localhost:3306 \
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \
         --master-log-file=my_log.000003 
     # master on localhost: ... connected.
     # slave on localhost: ... connected.
@@ -208,8 +208,8 @@ file::
 The following starts replication from an arbitrary binary log file and
 position::
 
-   $ mysqlreplicate --master=root@localhost:3306 \\
-        --slave=root@localhost:3307 --rpl-user=rpl:rpl \\
+   $ mysqlreplicate --master=root@localhost:3306 \
+        --slave=root@localhost:3307 --rpl-user=rpl:rpl \
         --master-log-file=my_log.000001 --master-log-pos=96
     # master on localhost: ... connected.
     # slave on localhost: ... connected.

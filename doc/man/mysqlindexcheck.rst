@@ -150,25 +150,25 @@ use this command::
 
     $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.
-    # The following indexes are duplicates or redundant \\
+    # The following indexes are duplicates or redundant \
       for table employees.dept_emp:
     #
     CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
     #     may be redundant or duplicate of:
     ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
-    # The following indexes are duplicates or redundant \\
+    # The following indexes are duplicates or redundant \
       for table employees.dept_manager:
     #
     CREATE INDEX emp_no ON employees.dept_manager (emp_no) USING BTREE
     #     may be redundant or duplicate of:
     ALTER TABLE employees.dept_manager ADD PRIMARY KEY (emp_no, dept_no)
-    # The following indexes are duplicates or redundant \\
+    # The following indexes are duplicates or redundant \
       for table employees.salaries:
     #
     CREATE INDEX emp_no ON employees.salaries (emp_no) USING BTREE
     #     may be redundant or duplicate of:
     ALTER TABLE employees.salaries ADD PRIMARY KEY (emp_no, from_date)
-    # The following indexes are duplicates or redundant \\
+    # The following indexes are duplicates or redundant \
       for table employees.titles:
     #
     CREATE INDEX emp_no ON employees.titles (emp_no) USING BTREE

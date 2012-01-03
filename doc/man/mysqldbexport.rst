@@ -225,7 +225,7 @@ EXAMPLES
 To export the definitions of the database 'dev' from a MySQL server on
 localhast via port 3306 producing **CREATE** statements, use this command::
 
-    $ mysqldbexport --server=root:pass@localhost \\
+    $ mysqldbexport --server=root:pass@localhost \
       --skip=GRANTS --export=DEFINITIONS util_test
     # Source on localhost: ... connected.
     # Exporting metadata from util_test
@@ -260,7 +260,7 @@ localhast via port 3306 producing **CREATE** statements, use this command::
 Similarly, to export the data of the database 'util_test' producing bulk
 insert statements, use this command::
 
-    $ mysqldbexport --server=root:pass@localhost \\
+    $ mysqldbexport --server=root:pass@localhost \
       --export=DATA --bulk-insert util_test
     # Source on localhost: ... connected.
     USE util_test;
@@ -289,7 +289,7 @@ If the database you are exporting does not contain only InnoDB tables and you
 want to ensure data integrity of the exported data by locking the tables during
 the read step, issue this command:::
 
-    $ mysqldbexport --server=root:pass@localhost \\
+    $ mysqldbexport --server=root:pass@localhost \
       --export=DATA --bulk-insert util_test --locking=lock-all
     # Source on localhost: ... connected.
     USE util_test;

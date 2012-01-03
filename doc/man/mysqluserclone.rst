@@ -113,8 +113,8 @@ EXAMPLES
 To clone 'joe' as 'sam' and 'sally' with passwords and logging in as root on
 the local machine, use this command::
 
-    $ mysqluserclone --source=root@localhost \\
-      --destination=root@localhost \\
+    $ mysqluserclone --source=root@localhost \
+      --destination=root@localhost \
       joe@localhost sam:secret1@localhost sally:secret2@localhost
     # Source on localhost: ... connected.
     # Destination on localhost: ... connected.
