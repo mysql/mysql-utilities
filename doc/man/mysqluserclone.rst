@@ -25,9 +25,9 @@ account on one server as a template, clone a MySQL user such that one
 or more new user accounts are created on another (or the same) server
 with the same privileges as the original user.
 
-You must provide connection parameters such as user, host, password,
-and so forth, for a user that has the appropriate rights to access
-all objects in the operation.
+You must provide connection parameters (user, host, password, and
+so forth), for an account that has the appropriate privileges to
+access all objects in the operation.
 See :ref:`mysqluserclone-notes` for more details.
 
 You can also use the utility to list users for a server by specifying the
@@ -88,7 +88,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

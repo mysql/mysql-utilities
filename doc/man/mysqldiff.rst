@@ -90,9 +90,9 @@ object does not match. The user can override this behavior by specifying the
 :option:`--force` option will will attempt to compare all objects listed as
 arguments.
 
-You must provide connection parameters such as user, host, password,
-and so forth, for a user that has the appropriate rights to access
-all objects in the operation.
+You must provide connection parameters (user, host, password, and
+so forth), for an account that has the appropriate privileges to
+access all objects in the operation.
 
 OPTIONS
 -------
@@ -142,7 +142,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

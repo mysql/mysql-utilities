@@ -38,7 +38,7 @@ To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **SQL** (default)
-  Display output using SQL statements. For definitions, this is
+  Display output using SQL statements. For definitions, this consists of
   the appropriate **CREATE** and **GRANT** statements. For data, this
   is an **INSERT** statement (or bulk insert if the
   :option:`--bulk-insert` option is specified).
@@ -78,9 +78,9 @@ If the option :option:`--default-storage-engine` or
 does not exist, a warning shall be issued and the default storage engine
 setting on the server shall be used instead.
 
-You must provide connection parameters such as user, host, password,
-and so forth, for a user that has the appropriate rights to access
-all objects in the operation.
+You must provide connection parameters (user, host, password, and
+so forth), for an account that has the appropriate privileges to
+access all objects in the operation.
 See :ref:`mysqldbimport-notes` for more details.
 
 OPTIONS
@@ -129,7 +129,8 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display the column headers - ignored for GRID format.
+   Do not display the column headers. This option is ignored for GRID-format
+   output.
 
 .. option:: --quiet, -q
 
@@ -142,17 +143,17 @@ OPTIONS
 
 .. option:: --skip=<skip_objects>
 
-   Specify objects to skip in the operation in the form of a
-   comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
+   Specify objects to skip in the operation as a comma-separated list
+   (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
+   GRANTS, PROCEDURES, TABLES, TRIGGERS, VIEWS.
 
 .. option:: --skip-blobs
 
-   Do not import blob data.
+   Do not import BLOB data.
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

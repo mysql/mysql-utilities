@@ -49,7 +49,7 @@ using one of the following strategies.
 
 Start from current position (default)
   Start replication from last known binary log file and position from the
-  master. The *SHOW MASTER STATUS* statement is used to retrieve this
+  master. The **SHOW MASTER STATUS** statement is used to retrieve this
   information.
 
 Start from the beginning
@@ -113,7 +113,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

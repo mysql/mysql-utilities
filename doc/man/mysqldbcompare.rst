@@ -164,9 +164,9 @@ position where the database and object to the left of the colon are located on
 
 The default direction is server1. 
 
-You must provide connection parameters such as user, host, password,
-and so forth, for a user that has the appropriate rights to access
-all objects in the operation.
+You must provide connection parameters (user, host, password, and
+so forth), for an account that has the appropriate privileges to
+access all objects in the operation.
 
 If the utility is to be run on a server that has binary logging
 enabled, and you do not want the comparison steps logged, use the
@@ -246,7 +246,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

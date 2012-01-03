@@ -60,9 +60,9 @@ use only table locks ('lock-all'). The default value is 'snapshot'.
 Additionally, WRITE locks are used to lock the destination tables during the
 copy.
 
-You must provide connection parameters such as user, host, password,
-and so forth, for a user that has the appropriate rights to access
-all objects in the operation.
+You must provide connection parameters (user, host, password, and
+so forth), for an account that has the appropriate privileges to
+access all objects in the operation.
 See :ref:`mysqldbcopy-notes` for more details.
 
 OPTIONS
@@ -122,9 +122,9 @@ OPTIONS
 
 .. option:: --skip=<objects>
 
-   Specify objects to skip in the operation as a
-   comma-separated list (no spaces). Valid values = TABLES, VIEWS,
-   TRIGGERS, PROCEDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB.
+   Specify objects to skip in the operation as a comma-separated list
+   (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
+   GRANTS, PROCEDURES, TABLES, TRIGGERS, VIEWS.
 
 .. option:: --source=<source>
 
@@ -138,7 +138,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

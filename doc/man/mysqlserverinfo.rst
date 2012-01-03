@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlserverinfo - [ --server=<user>[<passwd>]@<host>:[<port>][:<socket>] |
+ mysqlserverinfo [ --server=<user>[<passwd>]@<host>:[<port>][:<socket>] |
                    [, --server=<user>[<passwd>]@<host>:[<port>][:<socket>] ] |
                    --format=[|GRID|TAB|CSV|VERTICAL] ] | --no-headers |
                    --show-defaults | [--start --basedir=<base directory> 
@@ -99,7 +99,8 @@ OPTIONS
 
 .. option:: --no-headers, -h
 
-   Do not display the column headers - ignored for GRID format.
+   Do not display the column headers. This option is ignored for GRID-format
+   output.
    
 .. option:: --port-range
 
@@ -127,7 +128,7 @@ OPTIONS
 
 .. option:: --verbose, -v
 
-   Control how much information is displayed. This option can be used
+   Specify how much information to display. Use this option
    multiple times to increase the amount of information.  For example, -v =
    verbose, -vv = more verbose, -vvv = debug.
 

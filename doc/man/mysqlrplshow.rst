@@ -80,7 +80,7 @@ name and password for each slave that fails to connect. You can also use the
 :option:`--num-retries=n` option to reattempt a failed connection 'n' times
 before the utility fails.
 
-The utility reports slaves by use of the *SHOW SLAVE HOSTS* statement whereby the
+The utility reports slaves by use of the **SHOW SLAVE HOSTS** statement whereby the
 slaves should be started with the --report-host and --report-port options
 specified. If you want to use the :option:`--recurse` option, the values for
 these options must be set to the actual port and host of the slaves else the
@@ -135,10 +135,10 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the *REPLICATE SLAVE* and *REPLICATE CLIENT*
+The login user must have the **REPLICATE SLAVE** and **REPLICATE CLIENT**
 privileges to successfully execute this utility. Specifically, the login user
-must have appropriate permissions to execute *SHOW SLAVE STATUS*, *SHOW MASTER
-STATUS*, and *SHOW SLAVE HOSTS*.
+must have appropriate permissions to execute **SHOW SLAVE STATUS**, **SHOW MASTER
+STATUS**, and **SHOW SLAVE HOSTS**.
 
 When using the :option:`--prompt` option, the utility sets the
 :option:`--num-retries` option to 1 if not set explicitly. This ensures at
