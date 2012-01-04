@@ -12,72 +12,76 @@ SYNOPSIS
   mysqlcheckindex --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                 --quiet | --index-format=[GRID|SQL|TAB|CSV] |
+                 --quiet | --format=[GRID|SQL|TAB|CSV] |
                  --stats [--best=<num_rows> | --worst=<num rows> ]]
                  <db> | [ ,<db> | ,<db.table> | , <db.table>]]
 
 DESCRIPTION
 -----------
 
-This utility is used to read the indexes for one or more tables and
-identify duplicate and potentially redundant indexes. The following
-rules are applied during the operation.
+This utility read the indexes for one or more tables and identifies
+duplicate and potentially redundant indexes. Depending on the index
+type, the utility applies the following rules to compare indexes
+(designated as idx_a and idx_b):
 
 **BTREE**
-  idx_b is redundant to idx_a iff the first n columns in idx_b
+  idx_b is redundant to idx_a if and only if the first n columns in idx_b
   also appear in idx_a. Order and uniqueness count.
 
 **HASH**
-  idx_a and idx_b are duplicates iff they contain the same
-  columns in the same order and uniqueness counts.
+  idx_a and idx_b are duplicates if and only if they contain the same
+  columns in the same order. Uniqueness counts.
 
 **SPATIAL**
-  idx_a and idx_b are duplicates iff they contain the same
-  column (only one column is permitted)
+  idx_a and idx_b are duplicates if and only if they contain the same
+  column (only one column is permitted).
 
 **FULLTEXT**
-  idx_b is redundant to idx_a iff all columns in idx_b are
-  included in idx_a (order is not important)
+  idx_b is redundant to idx_a if and only if all columns in idx_b are
+  included in idx_a. Order counts.
 
-You can specify scanning all of the tables for any database (except
-the internal databases **mysql**, **INFORMATION_SCHEMA**,
-**PERFORMANCE_SCHEMA**) by specifying only the database name or you
-can specify a list of tables (in the form *db.tablename*) which will
-limit the scan to only those tables in the databases listed and those
-tables listed.
+To scan all tables in a database, specify only the database name. To scan
+a specific table, name the table in *db*.table* format.
 
-To see the example DROP statements to drop the redundant indexes,
-specify the :option:`--show-drops` option. to examine the existing
+You can scan tables in any database except the internal databases
+**mysql**, **INFORMATION_SCHEMA**, and **performance_schema**.
+
+To see **DROP** statements to drop redundant indexes,
+specify the :option:`--show-drops` option. To examine the existing
 indexes, use the :option:`--verbose` option, which prints the
 equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
-You can also display the best and worst non-primary key indexes for
-each table with the :option:`--best` and :option:`--worst`
-options. The data will show the top 5 indexes from tables with 10 or
-more rows.
+To display the best or worst non-primary key indexes for each table,
+use the :option:`--best` or :option:`--worst` option. The data will
+show the top 5 indexes from tables with 10 or more rows.
 
-You can change the display format of the index lists for
-:option:`--show-indexes`, :option:`--best`, and :option:`--worst` in
-one of the following formats:
+To change the format of the index lists displayed for the
+:option:`--show-indexes`, :option:`--best`, and :option:`--worst` options,
+use one of the following values with the :option:`--format` option:
 
-**TABLE** (default)
-  print a mysql-like table output
-
-**TAB**
-  print using tabs for separation
+**GRID** (default)
+  Display output formatted like that of the mysql monitor in a grid
+  or table layout.
 
 **CSV**
-  print using commas for separation
+  Display output in comma-separated values format.
+
+**TAB**
+  Display output in tab-separated format.
 
 **SQL**
   print SQL statements rather than a list.
+
+**VERTICAL**
+  Display output in a single column similar to the ``\G`` command
+  for the mysql monitor.
 
 Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to
-access all objects in the operation.
+read all objects accessed during the operation.
 For details, see :ref:`mysqlindexcheck-notes`.
 
 OPTIONS
@@ -95,8 +99,9 @@ OPTIONS
 
 .. option:: --format=<index_format>
 
-   Specify the index list display format. Permitted format values are
-   TABLE, TAB, CSV, SQL, or VERTICAL. The default is TABLE.
+   Specify the index list display format. Permitted format values are GRID,
+   CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T, S
+   and V.  The default is GRID.
 
 .. option:: --server=<source>
 
@@ -105,7 +110,7 @@ OPTIONS
 
 .. option:: --show-drops, -d
 
-   Display DROP statements for dropping indexes.
+   Display **DROP** statements for dropping indexes.
 
 .. option:: --show-indexes, -i
 
@@ -144,9 +149,9 @@ and tables listed.
 EXAMPLES
 --------
 
-To scan all of the tables in the employees database to see the possible
-redundant and duplicate indexes as well as the DROP statements for the indexes,
-use this command::
+To scan all tables in the employees database to see the
+possible redundant and duplicate indexes, as well as the **DROP**
+statements for the indexes, use this command::
 
     $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.
