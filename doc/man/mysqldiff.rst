@@ -171,12 +171,14 @@ be compared.
 The SQL transformation feature has the following known limitations:
 
 * When tables with partition differences are encountered, the utility
-  generates the **ALTER TABLE** statements for all other changes but
-  prints a warning and the partition differences are omitted.
+  generates the **ALTER TABLE** statement for all other changes but
+  prints a warning and omits the partition differences.
   
 * If the transformation detects table options in the source table (specified
   with the :option:`--changes-for` option) that are not changed or do not exist
-  in the target table, a warning is issued.
+  in the target table, the utility generates the **ALTER TABLE** statement for
+  all other changes but prints a warning and omits the table option
+  differences.
   
 * Rename for events is not supported. This is because **mysqldiff** compares
   objects by name. In this case, depending on the direction of the diff, the
