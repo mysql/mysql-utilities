@@ -219,7 +219,7 @@ routines, triggers, and events)::
 
 This is the same as the previous example, but using the **REGEXP** operator.
 Note that in the pattern it is not necessary to add wildcards before or
-after t2.
+after t3::
 
     $ mysqlmetagrep -Gb --pattern="t2" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
