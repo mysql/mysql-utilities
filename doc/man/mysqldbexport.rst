@@ -122,24 +122,25 @@ OPTIONS
 .. option:: --display=<display>, -d<display>
 
    Control the number of columns shown. Permitted display values are BRIEF
-   = minimal columns for object creation (default), FULL = all columns, and
-   NAMES = only object names (not valid for --format=SQL).
+   = minimal columns for object creation, FULL = all columns, and NAMES =
+   only object names (not valid for --format=SQL). The default is BRIEF.
 
 .. option:: --exclude=<exclude>, -x<exclude> 
 
    Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a REGEXP search pattern.  Use this option multiple times
-   to specify multiple exclusions.
+   such as db1.t1 or a search pattern.  Use this option multiple times
+   to specify multiple exclusions. By default, patterns use LIKE matching.
+   With the :option:`--regexp` option, patterns use REGEXP matching.
 
    This option does not apply to grants.
 
 .. option:: --export=<export>, -e<export>
 
-   Specify the export format. Permitted format values are
-   DATA|D = export only the table data for the
-   tables in the database list, DEFINITIONS|F = export only the
-   definitions for the objects in the database list, and BOTH|B =
-   export the metadata followed by the data (default: export metadata).
+   Specify the export format. Permitted format values are DEFINITIONS (or F) =
+   export only the definitions (metadata) for the objects in the database list,
+   DATA (or D) = export only the table data for the tables in the database list,
+   and BOTH (or B) = export the definitions followed by the data. The default is
+   DEFINITIONS.
 
 .. option:: --file-per-table
 
@@ -173,8 +174,8 @@ OPTIONS
 
 .. option:: --regexp, --basic-regexp, -G
 
-   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
-   'LIKE'.
+   Use the 'REGEXP' operator to match patterns for exclusion. The default
+   is to use 'LIKE'.
 
 .. option:: --server=<server>
 

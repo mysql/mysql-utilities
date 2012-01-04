@@ -39,7 +39,7 @@ specify multiple servers for tests designed to use additional servers.
 
 The utility has a special test suite named 'performance' where
 performance-related tests are placed. This suite is not included
-by default and must be specified with the :option:`--suite=` option
+by default and must be specified with the :option:`--suite` option
 to execute the performance tests.
 
 OPTIONS
@@ -61,8 +61,8 @@ OPTIONS
 
 .. option:: --record
 
-   Record the output of the specified test if successful. Works with only one
-   test selected.
+   Record the output of the specified test if successful. With this option,
+   you must specify exactly one test to run.
 
 .. option:: --server=<server>
 
@@ -79,13 +79,13 @@ OPTIONS
 
    Exclude *test*.  Use this option multiple times to specify multiple tests.
 
-.. option:: --skip-tests=<tests>
+.. option:: --skip-tests=<prefix>
 
-   Exclude *tests* that begin with this string.
+   Exclude all tests that begin with *prefix*.
 
 .. option:: --sorted
 
-   Execute tests sorted by suite.name (default = True).
+   Execute tests sorted by suite.testname (default = True).
 
 .. option:: --start-port=<port>
 

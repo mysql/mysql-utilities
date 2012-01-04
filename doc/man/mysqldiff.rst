@@ -170,10 +170,9 @@ be compared.
 
 The SQL transformation feature has the following known limitations:
 
-* Does not support tables with partition settings that change. When a table
-  with partition changes is encountered, the utility generates the **ALTER
-  TABLE** statements for all other changes but prints a warning when
-  partition changes are detected.
+* When tables with partition differences are encountered, the utility
+  generates the **ALTER TABLE** statements for all other changes but
+  prints a warning and the partition differences are omitted.
   
 * If the transformation detects table options in the source table (specified
   with the :option:`--changes-for` option) that are not changed or do not exist

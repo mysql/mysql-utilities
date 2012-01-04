@@ -94,8 +94,9 @@ OPTIONS
 .. option:: --exclude=<exclude>, -x<exclude>
 
    Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a REGEXP search pattern.  Use this option multiple times
-   to specify multiple exclusions.
+   such as db1.t1 or a search pattern.  Use this option multiple times
+   to specify multiple exclusions. By default, patterns use LIKE matching.
+   With the :option:`--regexp` option, patterns use REGEXP matching.
 
 .. option:: --force, -f
 
@@ -118,8 +119,8 @@ OPTIONS
 
 .. option:: --regexp, --basic-regexp, -G
 
-   Use 'REGEXP' operator to match pattern for exclusion. Default is to use
-   'LIKE'.
+   Use the 'REGEXP' operator to match patterns for exclusion. The default
+   is to use 'LIKE'.
 
 .. option:: --skip=<objects>
 

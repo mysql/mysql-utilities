@@ -119,11 +119,11 @@ OPTIONS
 
 .. option:: --import=<import_type>, -i<import_type>
 
-   Specify the import format. Permitted format values are
-   DATA|D = only the table data for the
-   tables in the database list, DEFINITIONS|F = import only the
-   definitions for the objects in the database list, and BOTH|B =
-   import the metadata followed by the data (default: import metadata).
+   Specify the import format. Permitted format values are DEFINITIONS (or F) =
+   import only the definitions (metadata) for the objects in the database list,
+   DATA (or D) = import only the table data for the tables in the database list,
+   and BOTH (or B) = import the definitions and the data. The default is
+   DEFINITIONS.
    
 .. option:: --new-storage-engine=<new_engine>
 
