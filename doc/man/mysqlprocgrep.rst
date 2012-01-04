@@ -19,11 +19,11 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility scan the process lists for all the servers provided via repeated
-occurrences of the :option:`--server` option and will either print the result
-(the default) or execute certain actions on it. The match conditions are given
-as options to the tool and in order for a row to match, all the conditions
-given have to match.
+This utility scans the process lists for all the servers specified
+using instances of the :option:`--server` option and either prints
+the result (the default) or executes certain actions on it. The
+process-matching conditions are specified as command options. For
+a process to match, all conditions must match.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -72,37 +72,37 @@ Options
 
 .. option:: --match-command=<pattern>
 
-   Match all rows where the **Command** field matches pattern.
+   Match all processes where the **Command** field matches the pattern.
 
 .. option:: --match-db=<pattern>
 
-   Match all rows where the **Db** field matches pattern.
+   Match all processes where the **Db** field matches the pattern.
 
 .. option:: --match-host=<pattern>
 
-   Match all rows where the **Host** field matches pattern.
+   Match all processes where the **Host** field matches the pattern.
 
 .. option:: --match-info=<pattern>
 
-   Match all rows where the **Info** field matches pattern.
+   Match all processes where the **Info** field matches the pattern.
 
 .. option:: --match-state=<pattern>
 
-   Match all rows where the **State** field matches pattern.
+   Match all processes where the **State** field matches the pattern.
 
 .. option:: --match-time=<pattern>
 
-   Match all rows where the **Time** field matches pattern.
+   Match all processes where the **Time** field matches the pattern.
 
 .. option:: --match-user=<pattern>
 
-   Match all rows where the **User** field matches pattern.
+   Match all processes where the **User** field matches the pattern.
 
 .. option:: --print
 
    Print information about the matching processes. This is the default
    if no :option:`--kill-connection` or :option:`--kill-query` option
-   is given. If a kill option is given, this option will print
+   is given. If a kill option is given, :option:`--print` prints
    information about the processes before killing them.
 
 .. option:: --regexp, --basic-regexp, -G
@@ -130,7 +130,7 @@ Options
    scheduler.
 
    When used with a kill option, code for killing the matching queries
-   are generated. Note that it is not possible to execute the emitted
+   is generated. Note that it is not possible to execute the emitted
    code unless it is put in a stored routine, event, or trigger. For
    example, the following code could be generated to kill all
    connections for user **www-data** that is idle::
