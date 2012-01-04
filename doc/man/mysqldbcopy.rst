@@ -119,8 +119,8 @@ OPTIONS
 
 .. option:: --regexp, --basic-regexp, -G
 
-   Use the 'REGEXP' operator to match patterns for exclusion. The default
-   is to use 'LIKE'.
+   Perform pattern matches using the **REGEXP** operator. The default is
+   to use **LIKE** for matching.
 
 .. option:: --skip=<objects>
 

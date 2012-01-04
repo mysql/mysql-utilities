@@ -51,7 +51,7 @@ specify the :option:`--show-drops` option. To examine the existing
 indexes, use the :option:`--verbose` option, which prints the
 equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
-To display the best or worst non-primary key indexes for each table,
+To display the best or worst nonprimary key indexes for each table,
 use the :option:`--best` or :option:`--worst` option. The data will
 show the top 5 indexes from tables with 10 or more rows.
 

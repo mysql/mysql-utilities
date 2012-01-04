@@ -17,16 +17,16 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility searches for objects on all the servers provided via
-repeated occurrences of the :option:`--server` option matching a given
-pattern and show a table of the objects that match. The first
-non-option argument it taken to be the pattern unless the
-:option:`--pattern` option is used, in which case all non-option
+This utility searches for objects matching a given pattern on all the
+servers specified using instances of the :option:`--server` option. It
+produces output that displays the objects that match.  By default, the first
+nonoption argument is taken to be the pattern unless the :option:`--pattern`
+option is given. If the :option:`--pattern` option is given, all nonoption
 arguments are treated as connection specifications.
 
-Internally, the utility creates an SQL statement for searching the
+Internally, the utility generates an SQL statement for searching the
 necessary tables in the **INFORMATION_SCHEMA** database on the
-provided servers and executes it in turn before collecting the result
+designated servers and executes it in turn before collecting the result
 and printing it as a table. If you do not want to send the statement
 to the servers and instead have the utility emit the statement, you
 can use the :option:`--sql` option. This can be useful if you want to
@@ -37,10 +37,11 @@ The MySQL server uses two forms of patterns when matching strings:
 :ref:`simple_pattern` and :ref:`posix_regexp`.
 
 Normally, the **LIKE** operator is used to match the name (and
-optionally, the body) but this can be changed to use the **REGEXP**
-operator instead by using the :option:`--regexp` option.
+optionally, the body) of objects, but this can be changed to use
+the **REGEXP** operator instead by using the :option:`--regexp`
+option.
 
-Note that since the **REGEXP** operator does a substring searching, it
+Note that since the **REGEXP** operator does substring searching, it
 is necessary to anchor the expression to the beginning of the string
 if you want to match the beginning of the string.
 
@@ -67,7 +68,7 @@ with the :option:`--format` option:
 SQL Simple Patterns
 ^^^^^^^^^^^^^^^^^^^
 
-The simple patterns defined by SQL standard consist of a string of
+The simple patterns defined by the SQL standard consist of a string of
 characters with two characters that have special meaning: **%**
 (percent) matches zero or more characters and **_** (underscore)
 matches exactly one character.
@@ -77,7 +78,7 @@ For example:
 ``'mats%'``
   Matches any string that starts with 'mats'.
 ``'%kindahl%'``
-  Matches any string consisting containing the word 'kindahl'.
+  Matches any string containing the word 'kindahl'.
 ``'%_'``
   Matches any string consisting of one or more characters.
 
@@ -117,7 +118,7 @@ characters, optionally containing characters with special meaning:
 **a{5}**
    Matches 5 instances of **a**.
 **a{2,5}**
-   Matches between 2 and 5 instances of **a**.
+   Matches from 2 to 5 instances of **a**.
 **(abc)+**
    Matches one or more repetitions of **abc**.
 
@@ -161,13 +162,13 @@ OPTIONS
 
 .. option:: --regexp, --basic-regexp, -G
 
-   Perform the match using the **REGEXP** operator. Default is to use
-   **LIKE** for matching.
+   Perform pattern matches using the **REGEXP** operator. The default is
+   to use **LIKE** for matching.
 
 .. option:: --search-objects=<type>, ...
             --object-types=<type>, ...
 
-   Search only for/in objects of type <type>, where <type> can be:
+   Search only for/in objects of type <type>, where <type> can be
    **procedure**, **function**, **event**, **trigger**, **table**, or
    **database**.
 
@@ -181,9 +182,9 @@ OPTIONS
 
 .. option::  --sql, --print-sql, -p
 
-   Print the SQL code that will be executed to find all matching
-   objects. This can be useful if you want to safe the statement for
-   later execution, or pipe it into other tools.
+   Print rather than executing the SQL code that would be executed to find
+   all matching objects. This can be useful if you want to save the statement
+   for later execution, or use it as input for other programs.
 
 .. option:: --version
 
@@ -193,7 +194,8 @@ OPTIONS
 EXAMPLES
 --------
 
-Find all objects where the name match the pattern ``'t\_'``::
+Find all objects with a name that matches the pattern ``'t_'`` (the letter t
+followed by any single character)::
 
     $ mysqlmetagrep --pattern="t_" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
@@ -215,8 +217,9 @@ routines, triggers, and events)::
     | root:*@localhost:3306  | TABLE        | t2           | test      |
     +------------------------+--------------+--------------+-----------+
 
-Same thing, but using the **REGEXP** operator. Note that it is not
-necessary to add wildcards before the pattern::
+This is the same as the previous example, but using the **REGEXP** operator.
+Note that in the pattern it is not necessary to add wildcards before or
+after t2.
 
     $ mysqlmetagrep -Gb --pattern="t2" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+

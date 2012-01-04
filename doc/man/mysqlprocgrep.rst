@@ -107,7 +107,8 @@ Options
 
 .. option:: --regexp, --basic-regexp, -G
 
-   Use **REGEXP** operator to match patterns instead of **LIKE**.
+   Perform pattern matches using the **REGEXP** operator. The default is
+   to use **LIKE** for matching.
 
 .. option:: --server=<source>
 
