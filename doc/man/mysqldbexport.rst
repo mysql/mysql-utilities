@@ -69,7 +69,7 @@ with the :option:`--display` option:
 
 Note: For SQL-format output, the :option:`--display` option is ignored.
 
-To turn off the headers when using CSV or TAB display format, specify
+To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
@@ -102,7 +102,7 @@ only table locks, use an option value of 'no-locks' or 'lock-all',
 respectively. The default value is 'snapshot'.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqldbexport-notes`.
 
@@ -165,7 +165,7 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display the column headers. This option is ignored for GRID-format
+   Do not display column headers. This option is ignored for GRID-format
    output.
 
 .. option:: --quiet, -q

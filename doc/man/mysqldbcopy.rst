@@ -61,7 +61,7 @@ Additionally, WRITE locks are used to lock the destination tables during the
 copy.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqldbcopy-notes`.
 

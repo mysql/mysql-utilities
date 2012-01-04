@@ -59,7 +59,7 @@ with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-To turn off the headers when using CSV or TAB display format, specify
+To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
 You can also see the common default settings read from the machine's local
@@ -100,7 +100,7 @@ OPTIONS
 
 .. option:: --no-headers, -h
 
-   Do not display the column headers. This option is ignored for GRID-format
+   Do not display column headers. This option is ignored for GRID-format
    output.
    
 .. option:: --port-range

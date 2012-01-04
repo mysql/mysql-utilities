@@ -26,7 +26,7 @@ or more new user accounts are created on another (or the same) server
 with the same privileges as the original user.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqluserclone-notes`.
 

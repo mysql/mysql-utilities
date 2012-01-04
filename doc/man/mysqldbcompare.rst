@@ -170,7 +170,7 @@ designated by :option:`--server2`.
 The default direction is server1. 
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 
 If the utility is to be run on a server that has binary logging

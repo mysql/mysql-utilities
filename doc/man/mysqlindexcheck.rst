@@ -76,7 +76,7 @@ Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqlindexcheck-notes`.
 

@@ -59,7 +59,7 @@ with the :option:`--format` option:
   Input is formatted in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-To turn off the headers when using CSV or TAB display format, specify
+To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
@@ -81,7 +81,7 @@ specified storage engine, a warning is issued and the default storage
 engine setting on the server is used instead.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqldbimport-notes`.
 
@@ -132,7 +132,7 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display the column headers. This option is ignored for GRID-format
+   Do not display column headers. This option is ignored for GRID-format
    output.
 
 .. option:: --quiet, -q

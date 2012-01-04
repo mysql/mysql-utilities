@@ -97,7 +97,7 @@ object does not match. To override this behavior, specify the
 all objects listed as arguments.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
+so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 
 OPTIONS
