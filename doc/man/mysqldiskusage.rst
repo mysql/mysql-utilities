@@ -14,19 +14,18 @@ SYNOPSIS
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
              --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
-             [| <db>]
+             [<db> ...]
 
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to see the disk space usage
-for one or more databases in CSV, TAB, GRID, or VERTICAL format.
-The utility also enables the user to examine the disk usage for the
-binary logs, slow, error, and general log, and InnoDB tablespace usage. The
-default is to show only the database disk space usage.
+This utility displays disk space usage for one or more databases in GRID,
+CSV, TAB, or VERTICAL format.  The utility optionally display disk usage for
+the binary log, slow query log, error log, general query log, relay log, and
+InnoDB tablespaces. The default is to show only database disk usage.
 
-If no databases are listed, the utility shows the disk space usage for all
-databases.
+If the command line lists no no databases, the utility shows the
+disk space usage for all databases.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -45,12 +44,12 @@ with the :option:`--format` option:
   Display output in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-To turn off the headers when using CSV or TAB display format, specify
+To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
 You must provide connection parameters (user, host, password, and
-so forth), for an account that has the appropriate privileges to
-access all objects in the operation.
+so forth) for an account that has the appropriate privileges for
+all objects accessed during the operation.
 For details, see :ref:`mysqldiskusage-notes`.
 
 OPTIONS
@@ -64,11 +63,11 @@ OPTIONS
 
 .. option::  --all, -a
 
-    Show all usage including empty databases.
+    Display all disk usage, including empty databases.
 
 .. option::  --binlog, -b
 
-    Include binary log usage.
+    Display binary log usage.
 
 .. option::  --empty, -m
 
@@ -81,15 +80,16 @@ OPTIONS
     
 .. option::  --InnoDB, -i
 
-    Include InnoDB tablespace usage.
+    Display InnoDB tablespace usage.
 
 .. option::  --logs, -l
 
-    Include general, error, and slow log usage.
+    Display general query log, error log, and slow query log usage.
 
 .. option::  --no-headers, -h
 
-   Do not display the column headers - ignored for grid format.
+   Do not display column headers. This option is ignored for GRID-format
+   output.
     
 .. option:: --quiet
 
@@ -97,7 +97,7 @@ OPTIONS
 
 .. option::  --relaylog, -r
 
-    Include relay log usage.
+    Display relay log usage.
 
 .. option:: --server=<server>
 
@@ -123,21 +123,23 @@ The login user must have the appropriate permissions to create new
 objects, read the old database, access (read) the mysql database, and
 grant privileges.
 
-The user may also require read access to the data directory and InnoDB home
-directory. If the user does not have access to these areas, the data displayed
-will be limited to information from the system tables and therefore should be
-considered an estimate. This is because the utility will not be able to include
+Depending on the options used, the user may also require file system
+read access to the data directory and InnoDB home directory. If the
+user does not have access to these areas, the data displayed is
+limited to information from the system tables and therefore should
+be considered an estimate. This is because the utility cannot include
 .frm and related miscellaneous files in the calculations.
 
-If the user has read access to the data directory, disk space usage shown will
-include the sum of all storage engine specific files such as the .MYI and
-.MYD files for MyISAM and similarly include the tablespace files for InnoDB.
+If the user has read access to the data directory, disk space usage
+shown includes the sum of all storage engine specific files such
+as the .MYI and .MYD files for MyISAM and similarly includes the
+tablespace files for InnoDB.
 
 EXAMPLES
 --------
 
 To show only the disk space usage for the employees and test databases in
-ggrid format, use this command::
+grid format (the default), use this command::
 
     $ mysqldiskusage --server=root@localhost db1 db2 db3
     # Source on localhost: ... connected.
