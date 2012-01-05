@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
   mysqlmetagrep [ --version | --help ] | --format=<format> |
-                --body | --types<object types> | --regexp | --sql |
+                --body | --search-objects=<types> | --regexp | --sql |
                 --database=<pattern> | --pattern=<pattern>
                 --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
 
@@ -30,8 +30,8 @@ designated servers and executes it in turn before collecting the result
 and printing it as a table. If you do not want to send the statement
 to the servers and instead have the utility emit the statement, you
 can use the :option:`--sql` option. This can be useful if you want to
-feed the output of the statement to other utilities such as
-:manpage:`mysqlevent(1)`.
+feed the output of the statement to another application such as the **mysql**
+monitor.
 
 The MySQL server uses two forms of patterns when matching strings:
 :ref:`simple_pattern` and :ref:`posix_regexp`.
@@ -149,7 +149,7 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the outpu display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --pattern=<pattern>, -e=<pattern>
@@ -163,16 +163,16 @@ OPTIONS
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching.
+   to use **LIKE** for matching. This affects the :option:`--database`
+   and :option:`--pattern` options.
 
-.. option:: --search-objects=<type>, ...
-            --object-types=<type>, ...
+.. option:: --search-objects=<types>, --object-types=<types>
 
-   Search only for/in objects of type <type>, where <type> can be
-   **procedure**, **function**, **event**, **trigger**, **table**, or
-   **database**.
+   Search only for/in objects named in <types>, which is a comma-separated
+   list of one or more of the values **procedure**, **function**, **event**,
+   **trigger**, **table**, and **database**.
 
-   Default is to search in objects of all kinds of types.
+   The default is to search in objects of all types.
 
 .. option:: --server=<source>
 
@@ -219,7 +219,7 @@ routines, triggers, and events)::
 
 This is the same as the previous example, but using the **REGEXP** operator.
 Note that in the pattern it is not necessary to add wildcards before or
-after t3::
+after t2::
 
     $ mysqlmetagrep -Gb --pattern="t2" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+

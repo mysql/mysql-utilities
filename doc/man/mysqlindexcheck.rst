@@ -13,8 +13,8 @@ SYNOPSIS
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
                  --quiet | --format=[GRID|SQL|TAB|CSV] |
-                 --stats [--best=<num_rows> | --worst=<num rows> ]]
-                 <db> | [ ,<db> | ,<db.table> | , <db.table>]]
+                 --stats [--best[=<N>] | --worst[=<N>] ]]
+                 <db>[.<table>] ... ]
 
 DESCRIPTION
 -----------
@@ -41,7 +41,8 @@ type, the utility applies the following rules to compare indexes
   included in idx_a. Order counts.
 
 To scan all tables in a database, specify only the database name. To scan
-a specific table, name the table in *db*.table* format.
+a specific table, name the table in *db*.*table* format. It is possible
+to mix database and table names.
 
 You can scan tables in any database except the internal databases
 **mysql**, **INFORMATION_SCHEMA**, and **performance_schema**.
@@ -52,8 +53,10 @@ indexes, use the :option:`--verbose` option, which prints the
 equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
 To display the best or worst nonprimary key indexes for each table,
-use the :option:`--best` or :option:`--worst` option. The data will
-show the top 5 indexes from tables with 10 or more rows.
+use the :option:`--best` or :option:`--worst` option. This causes the
+output to show the best or worst indexes from tables with 10 or more rows.
+By default, each option shows five indexes. To override that, provide
+an integer value for the option.
 
 To change the format of the index lists displayed for the
 :option:`--show-indexes`, :option:`--best`, and :option:`--worst` options,
@@ -93,15 +96,18 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --best=<num>
+.. option:: --best[=<N>]
 
-    Limit index statistics to the best N indexes.
+   If :option:`--stats` is given,
+   limit index statistics to the best N indexes. The default value of N is
+   5 if omitted.
 
 .. option:: --format=<index_format>
 
-   Specify the index list display format. Permitted format values are GRID,
-   CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T, S
-   and V.  The default is GRID.
+   Specify the index list display format for output produced by
+   :option:`--stats`. Permitted format values are
+   GRID, CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T,
+   S, and V.  The default is GRID.
 
 .. option:: --server=<source>
 
@@ -134,9 +140,11 @@ OPTIONS
 
    Display version information and exit.
 
-.. option:: --worst=<num>
+.. option:: --worst[=<N>]
 
-   Limit index statistics to the worst N indexes.
+   If :option:`--stats` is given,
+   limit index statistics to the worst N indexes. The default value of N is
+   5 if omitted.
 
 .. _mysqlindexcheck-notes:
 

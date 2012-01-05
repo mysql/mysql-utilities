@@ -11,7 +11,7 @@ SYNOPSIS
 
  mysqlserverinfo [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
                    [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
-                   --format=[|GRID|TAB|CSV|VERTICAL] ] | --no-headers |
+                   --format=[|GRID|CSV|TAB|VERTICAL] ] | --no-headers |
                    --show-defaults | [--start --basedir=<base directory> 
                    --datadir=<data directory>] --verbose
 
@@ -95,12 +95,12 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
    
 .. option:: --port-range

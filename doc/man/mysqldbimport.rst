@@ -29,6 +29,9 @@ TAB, GRID, or VERTICAL formats. These formats are the output of the
 utility enables you to import the object definitions, the data, or
 both.
 
+If an object exists on the destination server with the same name as an
+imported object, it is dropped first before importing the new object.
+
 You can also skip objects by type using the :option:`--skip` option
 with a list of the objects to skip. This enables you to extract a
 and listing the objects to skip. This enables you to extract a
@@ -59,26 +62,28 @@ with the :option:`--format` option:
   Input is formatted in a single column similar to the ``\G`` command
   for the mysql monitor.
 
-To turn off the headers for CSV or TAB display format, specify
-the :option:`--no-headers` option.
+To indicate that input in CSV or TAB format does not contain column headers,
+specify the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
 
-To change the storage engine for all tables on the destination, specify the
-new engine with the :option:`--new-storage-engine` option. If the destination
-server supports the new engine, all tables will use that engine.
+By default, each table is created on the destination server using the same
+storage engine as the original table.  To override this and specify the
+storage engine to be used for all tables created on the destination server,
+use the :option:`--new-storage-engine` option. If the destination server
+supports the new engine, all tables will use that engine.
 
-Similarly, you can specify a different default storage engine with
-the :option:`--default-storage-engine` option. If the destination
-server supports the engine, any table that specifies a storage
-engine that the server does not support will use the new default
-engine. Note that this overrides the default storage engine mechanism
-on the server.
+To specify the storage engine to use for tables for which the destination
+server does not support the original storage engine on the source server,
+use the :option:`--default-storage-engine` option.
 
-If the :option:`--default-storage-engine` or :option:`--new-storage-engine`
+The :option:`--new-storage-engine` option takes precedence over
+:option:`--default-storage-engine` if both are given.
+
+If the :option:`--new-storage-engine` or :option:`--default-storage-engine`
 option is given and the destination server does not support the
-specified storage engine, a warning is issued and the default storage
-engine setting on the server is used instead.
+specified storage engine, a warning is issued and the server's default storage
+engine setting is used instead.
 
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to
@@ -100,8 +105,8 @@ OPTIONS
 
 .. option:: --default-storage-engine=<def_engine>
 
-   Change all tables to use this storage engine if the destination server
-   does not support the original storage engine.
+   The engine to use for tables if the destination server does not support
+   the original storage engine on the source server.
 
 .. option:: --drop-first, -d
 
@@ -114,8 +119,9 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the input format. Permitted format values are
-   SQL|S, GRID|G, TAB|T, CSV|C, and VERTICAL|V. The default is SQL.
+   Specify the input format. Permitted format values are SQL,
+   GRID, CSV, TAB, and VERTICAL, or the corresponding shortcuts S, G,
+   C, T, and V.  The default is SQL.
 
 .. option:: --import=<import_type>, -i<import_type>
 
@@ -127,13 +133,12 @@ OPTIONS
    
 .. option:: --new-storage-engine=<new_engine>
 
-   Change all tables to use this storage engine if the destiation server
-   supports the storage engine.
+   The engine to use for all tables created on the destination server.
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
-   output.
+   Input does not contain column headers. This option applies only for
+   CSV and TAB input.
 
 .. option:: --quiet, -q
 

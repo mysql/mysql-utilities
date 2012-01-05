@@ -97,7 +97,7 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --master=<source>

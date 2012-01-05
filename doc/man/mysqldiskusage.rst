@@ -13,7 +13,7 @@ SYNOPSIS
  mysqldiskusage --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
+             --format=[GRID|G|CSV|C|TAB|T|VERTICAL|V]
              [<db> ...]
 
 DESCRIPTION
@@ -63,7 +63,8 @@ OPTIONS
 
 .. option::  --all, -a
 
-    Display all disk usage, including empty databases.
+    Display all disk usage. This includes usage for databases, logs, and
+    InnoDB tablespaces.
 
 .. option::  --binlog, -b
 
@@ -75,12 +76,15 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   Specify the display format. Permitted format values are GRID,
+   CSV, TAB, and VERTICAL, or the corresponding shortcuts G, C, T,
+   and V.  The default is GRID.
     
 .. option::  --InnoDB, -i
 
-    Display InnoDB tablespace usage.
+    Display InnoDB tablespace usage. This includes information about the
+    shared InnoDB tablespace as well as .idb files for InnoDB tables with
+    their own tablespace.
 
 .. option::  --logs, -l
 
@@ -88,7 +92,7 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
     
 .. option:: --quiet
@@ -119,9 +123,8 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to create new
-objects, read the old database, access (read) the mysql database, and
-grant privileges.
+The login user must have the appropriate permissions to
+read any objects accessed during the operation.
 
 Depending on the options used, the user may also require file system
 read access to the data directory and InnoDB home directory. If the
@@ -141,7 +144,7 @@ EXAMPLES
 To show only the disk space usage for the employees and test databases in
 grid format (the default), use this command::
 
-    $ mysqldiskusage --server=root@localhost db1 db2 db3
+    $ mysqldiskusage --server=root@localhost employees test
     # Source on localhost: ... connected.
     # Database totals:
     +------------+--------------+

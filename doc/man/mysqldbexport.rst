@@ -153,8 +153,9 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output format. Permitted format values are
-   SQL|S, GRID|G, TAB|T, CSV|C, and VERTICAL|V. The default is SQL.
+   Specify the output display format. Permitted format values are SQL,
+   GRID, CSV, TAB, and VERTICAL, or the corresponding shortcuts S, G,
+   C, T, and V.  The default is SQL.
 
 .. option:: --locking=<locking>
 
@@ -165,7 +166,7 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
 
 .. option:: --quiet, -q

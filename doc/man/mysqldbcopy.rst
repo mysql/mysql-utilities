@@ -37,21 +37,23 @@ the single trigger and :option:`--exclude=trig_` excludes all objects from
 all databases whose name begins with trig and has a following character or
 digit.
 
-To change the storage engine for all tables on the destination, specify the
-new engine with the :option:`--new-storage-engine` option. If the destination
-server supports the new engine, all tables will use that engine.
+By default, each table is created on the destination server using the same
+storage engine as the original table.  To override this and specify the
+storage engine to be used for all tables created on the destination server,
+use the :option:`--new-storage-engine` option. If the destination server
+supports the new engine, all tables will use that engine.
 
-Similarly, you can specify a different default storage engine with
-the :option:`--default-storage-engine` option. If the destination
-server supports the engine, any table that specifies a storage
-engine that the server does not support will use the new default
-engine. Note that this overrides the default storage engine mechanism
-on the server.
+To specify the storage engine to use for tables for which the destination
+server does not support the original storage engine on the source server,
+use the :option:`--default-storage-engine` option.
 
-If the :option:`--default-storage-engine` or :option:`--new-storage-engine`
+The :option:`--new-storage-engine` option takes precedence over
+:option:`--default-storage-engine` if both are given.
+
+If the :option:`--new-storage-engine` or :option:`--default-storage-engine`
 option is given and the destination server does not support the
-specified storage engine, a warning is issued and the default storage
-engine setting on the server is used instead.
+specified storage engine, a warning is issued and the server's default storage
+engine setting is used instead.
 
 The operation uses a consistent snapshot by default to read from the
 database(s) selected. You can change the locking mode by using the
@@ -81,8 +83,8 @@ OPTIONS
 
 .. option:: --default-storage-engine=<def_engine>
 
-   Change all tables to use this storage engine if the destination server
-   does not support the original storage engine.
+   The engine to use for tables if the destination server does not support
+   the original storage engine on the source server.
 
 .. option:: --destination=<destination>
 
@@ -110,8 +112,7 @@ OPTIONS
 
 .. option::  --new-storage-engine=<new_engine>
 
-   Change all tables to use this storage engine if the destiation server
-   supports the storage engine.
+   The engine to use for all tables created on the destination server.
 
 .. option:: --quiet, -q
 
