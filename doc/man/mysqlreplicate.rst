@@ -13,35 +13,38 @@ SYNOPSIS
                  --slave=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[--help | --version] | --quiet |
                  --verbose | --testdb=<test database> | --pedantic
-                 --rpl_user=<uid:passwd> | --master-log-file=<log_file> |
+                 --rpl-user=<uid:passwd> | --master-log-file=<log_file> |
                  --master-log-pos=<pos> | --start-from-beginning]
 
 DESCRIPTION
 -----------
 
-This utility permits an administrator to start replication among two
-servers. The user provides login information to the slave and provides
+This utility permits an administrator to start replication from one server
+(the master) to another (the slave).
+The user provides login information for the slave and
 connection information for connecting to the master.
 
 You can also specify a database to be used to test replication as well as
-a unix socket file for connecting to a master running on a local host.
+a Unix socket file for connecting to a master running on a local host.
 
-The utility will report conditions where the storage engines on the master
-and the slave differ. Warnings are issued by default or you can use the
---pedantic option to require the storage engines to be the same on both
-the master and slave. This would include not only that both servers have
-the same storage engines enabled but also that the default storage engine
-is the same.
+The utility report conditions where the storage engines on the master and
+the slave differ. Warnings are issued by default or you can use the
+:option:`--pedantic` option to require storage engines to be the same on the
+master and slave. This means that both servers have the same storage engines
+enabled and the same default storage engine.
 
-Furthermore, the utility will also report a warning if the InnoDB storage
-engine differs from the master and slave. Similarly, :option:`--pedantic`
-requires the InnoDB storage engine to the be the same on the master and slave.
+Furthermore, the utility reports a warning if the InnoDB storage engine
+differs from the master and slave. Similarly, :option:`--pedantic` requires
+the InnoDB storage engine to the be the same on the master and slave.
+  
+The :option:`-vv` option displays any discrepancies between the storage
+engines and InnoDB values, with or without the :option:`--pedantic` option.
 
-The utility will setup replication to start from the current binary log file
-and position of the master. However, you can instruct the utility to start from
+The utility sets up replication to start from the current binary log file
+and position of the master. However, you can start from
 the beginning of recorded events by using the :option:`--start-from-beginning`
 option. You can also provide a binary log file from the master with the
-:option:`--master-log-file` option which will start replication from the first
+:option:`--master-log-file` option, which will start replication from the first
 event in that binary log file. Or you can start replication from a specific
 binary log file and position with the :option:`--master-log-file` and
 :option:`--master-log-pos` options. In summary, replication can be started
@@ -53,18 +56,14 @@ Start from current position (default)
   information.
 
 Start from the beginning
-  Start replication from the first event recorded in the binary logging of the
-  master.
+  Start replication from the first event recorded in the master binary log.
   
 Start from a binary log file
   Start replication at the first event in a specific binary log file.
   
 Start from a specific event
-  Start replication from a specific position (event) in a specific binary log
-  file.
-  
-The :option:`-vv` option will also display any discrepancies among the storage
-engines and InnoDB values with or without the :option:`--pedantic` option.
+  Start replication from specific event coordinates (specific binary log file
+  and position).
 
 OPTIONS
 -------
@@ -82,11 +81,11 @@ OPTIONS
 
 .. option:: --master-log-file=<master_log_file>
 
-   Use this master log file to initiate the slave.
+   Begin replication from this master log file.
 
 .. option:: --master-log-pos=<master_log_pos>
 
-   Use this position in the master log file to initiate the slave.
+   Begin replication from this position in the master log file.
 
 .. option:: --pedantic, -p
 
@@ -94,8 +93,8 @@ OPTIONS
 
 .. option:: --rpl-user=<replication_user>
 
-   The user and password for the replication user requirement -
-   For example, rpl:passwd - default = rpl:rpl.
+   The user and password for the replication user, in name:passwd format.
+   The default is rpl:rpl.
 
 .. option:: --slave=<slave>
 
@@ -104,12 +103,13 @@ OPTIONS
 
 .. option:: --start-from-beginning, -b
 
-   Start replication at the beginning of logged events. Not valid with
-   --master-log-file or --master-log-pos.
+   Start replication at the beginning of logged events. This option is not
+   valid if :option:`--master-log-file` or :option:`--master-log-pos` are
+   given.
 
 .. option:: --test-db=<test_database>
 
-   Database name to use in testing replication setup (optional).
+   The database name to use for testing the replication setup (optional).
 
 .. option:: --verbose, -v
 
@@ -130,14 +130,15 @@ databases and the ability to create a user account. For example, the user
 account used to connect to the master must have the WITH GRANT OPTION
 privilege.
 
-The server ID on the master and slave must be unique. The utility will
-report an error if the server ID is 0 or is the same on the master and
-slave. Set these values before starting this utility.
+The server IDs on the master and slave must be unique. The utility
+reports an error if the server ID is 0 on either host or the same
+on the master and slave. Set these values before starting this
+utility.
 
 EXAMPLES
 --------
 
-To setup replication between a MySQL instance on two different hosts using
+To set up replication between a MySQL instance on two different hosts using
 the default settings, use this command::
 
     $ mysqlreplicate --master=root@localhost:3306 \
@@ -148,9 +149,10 @@ the default settings, use this command::
     # Setting up replication...
     # ...done.
 
-The following command ensures the replication between the master and slave is
-successful if and only if the InnoDB storage engines are the same and both
-servers have the same storage engines with the same default specified::
+The following command uses :option:`--pedantic` to ensure that
+replication between the master and slave is successful if and only
+if both servers have the same storage engines available, the same
+default storage engine, and the same InnoDB storage engine::
 
     $ mysqlreplicate --master=root@localhost:3306 \
       --slave=root@localhost:3307 --rpl-user=rpl:rpl -vv --pedantic
@@ -193,8 +195,8 @@ The following command starts replication from the beginning of recorded events::
     # Setting up replication...
     # ...done.
 
-The following starts replication from the beginning of a specific binary log
-file::
+The following command starts replication from the beginning of a
+specific binary log file::
 
    $ mysqlreplicate --master=root@localhost:3306 \
         --slave=root@localhost:3307 --rpl-user=rpl:rpl \
@@ -205,8 +207,8 @@ file::
     # Setting up replication...
     # ...done.
 
-The following starts replication from an arbitrary binary log file and
-position::
+The following command starts replication from specific log coordinates
+(specific binary log file and position)::
 
    $ mysqlreplicate --master=root@localhost:3306 \
         --slave=root@localhost:3307 --rpl-user=rpl:rpl \
@@ -221,9 +223,9 @@ position::
 RECOMMENDATIONS
 ---------------
 
-You should use read_only = True in the my.cnf file for the slave
-to ensure no accidental data changes such as INSERT, DELETE, UPDATE,
-and so forth, are permitted on the slave.
+You should use read_only = 1 in the my.cnf file for the slave to
+ensure no accidental data changes, such as **INSERT**, **DELETE**,
+**UPDATE**, and so forth, are permitted on the slave.
 
 Use the :option:`--pedantic` and :option:`-vv` options for setting up
 replication on production servers to avoid possible problems with differing
