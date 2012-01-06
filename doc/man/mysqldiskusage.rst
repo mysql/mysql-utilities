@@ -75,7 +75,7 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are GRID,
+   Specify the output display format. Permitted format values are GRID,
    CSV, TAB, and VERTICAL, or the corresponding shortcuts G, C, T,
    and V.  The default is GRID.
     

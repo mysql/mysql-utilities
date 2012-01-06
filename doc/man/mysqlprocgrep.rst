@@ -19,11 +19,12 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility scans the process lists for all the servers specified
-using instances of the :option:`--server` option and either prints
-the result (the default) or executes certain actions on it. The
-process-matching conditions are specified as command options. For
-a process to match, all conditions must match.
+This utility scans the process lists for the servers specified using
+instances of the :option:`--server` option and selects those that match the
+conditions specified using the :option:`--age` and --match-xxx options. For
+a process to match, all conditions given must match.  The utility then
+either prints the selected processes (the default) or executes certain
+actions on them.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -53,12 +54,22 @@ Options
 
 .. option:: --age=<time>
 
-   Display only processes that have been in the current state more than a given
-   time
+   Select only processes that have been in the current state more than
+   a given time. The time value can be specified in two formats:
+   either using the ``hh:mm:ss`` format, with hours and minutes optional,
+   or as a sequence of numbers with a suffix giving the period size.
+
+   The permitted suffixes are **s** (second), **m** (minute), **h**
+   (hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
+   15 minutes.
+
+   For both formats, the specification can optionally be preceeded by 
+   ``+`` or ``-``, where ``+`` means older than the given time, and
+   ``-`` means younger than the given time.
 
 .. option::  --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --kill-connection
@@ -107,11 +118,11 @@ Options
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching.
+   to use **LIKE** for matching.  This affects the --match-xxx options.
 
 .. option:: --server=<source>
 
-   Connection information for the servers to search in the format:
+   Connection information for the server to search in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
    The option may be repeated to form a list of servers to search.
 
@@ -132,7 +143,7 @@ Options
    is generated. Note that it is not possible to execute the emitted
    code unless it is put in a stored routine, event, or trigger. For
    example, the following code could be generated to kill all
-   connections for user **www-data** that is idle::
+   connections for user **www-data** that are idle::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -168,21 +179,6 @@ Options
    Display version information and exit.
 
 
-Specifying time
-~~~~~~~~~~~~~~~
-
-Time for the :option:`--age` option can be specified in two formats:
-either using the ``hh:mm:ss`` format, with hours and minutes optional,
-or as a sequence of numbers with a suffix giving the period size.
-
-The permitted suffixes are **s** (second), **m** (minute), **h**
-(hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
-15 minutes.
-
-For both formats, the specification can optionally be preceeded by a
-``+`` or a ``-``, where a ``+`` means older than the given time, and
-``-`` means younger than the given age.
-
 EXAMPLES
 --------
 
@@ -190,14 +186,16 @@ For all the examples, we assume that the **root** user on
 **localhost** has sufficient privileges to kill queries and
 connections.
 
-To kill all connections created by user "mats" that are younger than 1
+To kill all queries created by user "mats" that are younger than 1
 minute::
 
-  mysqlprocgrep --server=root@localhost --match-user=mats --age=1m --kill-query
+  mysqlprocgrep --server=root@localhost \
+    --match-user=mats --age=-1m --kill-query
 
-To kill all queries that has been idle for more than 1 hour::
+To kill all connections that has been idle for more than 1 hour::
 
-  mysqlprocgrep --server=root@localhost --match-command=sleep --age=1h --kill
+  mysqlprocgrep --server=root@localhost \
+    --match-command=sleep --age=1h --kill-connection
 
 COPYRIGHT
 ---------
