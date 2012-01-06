@@ -32,8 +32,21 @@ For details, see :ref:`mysqluserclone-notes`.
 
 You can also use the utility to list users for a server by specifying the
 --list option. This prints a list of the users on the source (no destination is
-needed). You can also control the output of the list using the
-:option:`--format` option.
+needed). To control how to display list output, use one of the following
+values with the :option:`--format` option:
+
+**GRID** (default)
+  Display output in grid or table format like that of the **mysql** monitor.
+
+**CSV**
+  Display output in comma-separated values format.
+
+**TAB**
+  Display output in tab-separated format.
+
+**VERTICAL**
+  Display output in single-column format like that of the ``\G`` command
+  for the **mysql** monitor.
 
 OPTIONS
 -------

@@ -46,8 +46,7 @@ To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the **mysql** monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -56,8 +55,8 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the **mysql** monitor.
 
 To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.

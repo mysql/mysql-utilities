@@ -18,7 +18,7 @@ DESCRIPTION
 -----------
 
 This utility is used to show the slaves for a master. It will print a graph of
-the master and its slaves labeling each with the hostname and port.
+the master and its slaves labeling each with the host name and port number.
 
 You can choose to explore the slaves for each client with the
 :option:`--recurse` option. This will permit the utility to connect to
@@ -57,8 +57,7 @@ the graph. You also have the choice to view the output in one of the following
 formats using the :option:`--format` option.
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the **mysql** monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -67,8 +66,8 @@ formats using the :option:`--format` option.
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the **mysql** monitor.
 
 
 If you elect to use the :option:`--recurse` option, the utility will

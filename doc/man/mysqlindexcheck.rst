@@ -63,8 +63,7 @@ To change the format of the index lists displayed for the
 use one of the following values with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the **mysql** monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -76,8 +75,8 @@ use one of the following values with the :option:`--format` option:
   print SQL statements rather than a list.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the **mysql** monitor.
 
 Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.

@@ -49,8 +49,7 @@ with the :option:`--format` option:
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Input is formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the **mysql** monitor.
 
 **CSV**
   Input is formatted in comma-separated values format.
@@ -59,8 +58,8 @@ with the :option:`--format` option:
   Input is formatted in tab-separated format.
 
 **VERTICAL**
-  Input is formatted in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the **mysql** monitor.
 
 To indicate that input in CSV or TAB format does not contain column headers,
 specify the :option:`--no-headers` option.
