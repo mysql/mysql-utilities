@@ -21,7 +21,7 @@ DESCRIPTION
 
 This utility scans the process lists for the servers specified using
 instances of the :option:`--server` option and selects those that match the
-conditions specified using the :option:`--age` and --match-xxx options. For
+conditions specified using the :option:`--age` and ``--match-xxx`` options. For
 a process to match, all conditions given must match.  The utility then
 either prints the selected processes (the default) or executes certain
 actions on them.
