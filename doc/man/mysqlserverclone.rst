@@ -33,7 +33,7 @@ OPTIONS
 
 .. option:: --mysqld=<options>
 
-   Additional options for :commmand:`mysqld`.
+   Additional options for :command:`mysqld`.
 
 .. option:: --new-data=<path_to_new_datadir>
 
