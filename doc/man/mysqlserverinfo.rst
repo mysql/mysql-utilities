@@ -18,29 +18,27 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to view critical information
-about a server for use in diagnosing problems. The information displayed
-includes the following:
+This utility displays critical information about a server for use
+in diagnosing problems. The information displayed includes the
+following:
 
-    * Server connection information
-    * Version number of the server
-    * Data directory path
-    * Base directory path
-    * Plugin directory path
-    * Configuration file location and name
-    * Current binary log file
-    * Current binary log position
-    * Current relay log file
-    * Current relay log position
+* Server connection information
+* Version number of the server
+* Data directory path name
+* Base directory path name
+* Plugin directory path name
+* Configuration file location and name
+* Current binary log coordinates (file name and position)
+* Current relay log coordinates (file name and position)
 
-If you want to see information about an offline server, this utility
-can be used to see the same information. It works by starting the
-server in a read-only mode. You must specify the :option:`--basedir`,
-:option:`--datadir`, and :option:`--start` options to enable this
-feature. This is so that an offline server is not started accidentally.
+This utility can be used to see the diagnostic information for servers that
+are running or offline.  If you want to see information about an offline
+server, the utility starts server in read-only mode. In this case, you must
+specify the :option:`--basedir`, :option:`--datadir`, and :option:`--start`
+options to prevent the utility from starting an offline server accidentally.
 Note: Be sure to consider the ramifications of starting a server on the
-error and similar logs. It is best to save this information prior
-to running this utility on an offline server.
+error and similar logs. It is best to save this information prior to running
+this utility on an offline server.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -61,19 +59,19 @@ with the :option:`--format` option:
 To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
-You can also see the common default settings read from the machine's local
+You can also see the common default settings for the local server's
 configuration file. This option reads the configuration file on the machine
-that the utility is run from, not the servers to which the :option:`--server`
-option specifies.
+where the utility is run, not the machine for the host that the
+:option:`--server` option specifies.
 
-You can also run the utility against several servers by specifying the
-:option:`--server` option multiple times. In this case, the utility will
-attempt to connect to each server and read the information.
+To run the utility against several servers, specify the
+:option:`--server` option multiple times. In this case, the utility 
+attempts to connect to each server and read the information.
 
-You can also see the MySQL servers running on the local machine by using the
-:option:`--show-servers` option. This will show all of the servers with their
-process id and data directory (on Windows, only the process id and port is
-shown).
+To see the MySQL servers running on the local machine, use the
+:option:`--show-servers` option. This shows all the servers with
+their process ID and data directory. On Windows, the utility shows
+only the process ID and port.
 
 OPTIONS
 -------
@@ -102,11 +100,11 @@ OPTIONS
    Do not display column headers. This option applies only for CSV and TAB
    output.
    
-.. option:: --port-range=start:end
+.. option:: --port-range=<start:end>
 
    The port range to check for finding running servers. This option applies
-   only to Windows and only if :option:`--show-servers` is given. The default
-   range is 3306:3333.
+   only to Windows and is ignored unless :option:`--show-servers` is given.
+   The default range is 3306:3333.
 
 .. option:: --server=<server>
 
@@ -117,12 +115,13 @@ OPTIONS
 
 .. option:: --show-defaults
 
-   Display default settings for mysqld from the local configuration file.
+   Display default settings for :command:`mysqld` from the local configuration
+   file.
    
 .. option:: --show-servers
 
-   Display running servers on the local host. The utility examines the host
-   process list to determine which servers are running.
+   Display information about servers running on the local host. The utility
+   examines the host process list to determine which servers are running.
 
 .. option:: --start, -s
 
@@ -140,19 +139,13 @@ OPTIONS
 
 .. _mysqlserverinfo-notes:
 
-NOTES
------
-
-The :option:`--show-defaults` option, it applies to the machine the utility is
-run from.
-
 
 EXAMPLES
 --------
 
 To display the server information for the local server and the settings for
-mysqld in the configuration file with the output in a vertical list, use this
-command::
+:command:`mysqld` in the configuration file with the output in a vertical
+list, use this command::
 
     $ mysqlserverinfo --server=root:pass@localhost -d --format=vertical
     # Source on localhost: ... connected.
