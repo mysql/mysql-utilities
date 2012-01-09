@@ -24,8 +24,7 @@ This utility permits an administrator to start replication from one server
 The user provides login information for the slave and
 connection information for connecting to the master.
 
-You can also specify a database to be used to test replication as well as
-a Unix socket file for connecting to a master running on a local host.
+You can also specify a database to be used to test replication.
 
 The utility report conditions where the storage engines on the master and
 the slave differ. Warnings are issued by default or you can use the
@@ -36,6 +35,9 @@ enabled and the same default storage engine.
 Furthermore, the utility reports a warning if the InnoDB storage engine
 differs from the master and slave. Similarly, :option:`--pedantic` requires
 the InnoDB storage engine to the be the same on the master and slave.
+Both servers must be running the same "type" of InnoDB (built-in or the InnoDB
+Plugin), and InnoDB on both servers must have the same major and minor version
+numbers and enabled state.
   
 The :option:`-vv` option displays any discrepancies between the storage
 engines and InnoDB values, with or without the :option:`--pedantic` option.
@@ -109,7 +111,8 @@ OPTIONS
 
 .. option:: --test-db=<test_database>
 
-   The database name to use for testing the replication setup (optional).
+   The database name to use for testing the replication setup. If this option
+   is not given, no testing is done, only error checking.
 
 .. option:: --verbose, -v
 
@@ -125,10 +128,10 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to grant access to all
-databases and the ability to create a user account. For example, the user
-account used to connect to the master must have the WITH GRANT OPTION
-privilege.
+The login user for the master server must have the appropriate permissions
+to grant access to all databases and the ability to create a user account.
+For example, the user account used to connect to the master must have the
+WITH GRANT OPTION privilege.
 
 The server IDs on the master and slave must be unique. The utility
 reports an error if the server ID is 0 on either host or the same
@@ -138,8 +141,8 @@ utility.
 EXAMPLES
 --------
 
-To set up replication between a MySQL instance on two different hosts using
-the default settings, use this command::
+To set up replication between two MySQL instances running on different ports
+of the same host using the default settings, use this command::
 
     $ mysqlreplicate --master=root@localhost:3306 \
       --slave=root@localhost:3307 --rpl-user=rpl:rpl
@@ -224,8 +227,9 @@ RECOMMENDATIONS
 ---------------
 
 You should use read_only = 1 in the my.cnf file for the slave to
-ensure no accidental data changes, such as **INSERT**, **DELETE**,
-**UPDATE**, and so forth, are permitted on the slave.
+ensure that no accidental data changes, such as **INSERT**, **DELETE**,
+**UPDATE**, and so forth, are permitted on the slave other than from
+events read from the master.
 
 Use the :option:`--pedantic` and :option:`-vv` options for setting up
 replication on production servers to avoid possible problems with differing

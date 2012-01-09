@@ -29,6 +29,10 @@ actions on them.
 If no :option:`--age` or ``--match-xxx`` options are given, the utility
 selects all processes.
 
+The ``--match-xxx`` options correspond to the columns in the
+INFORMATION_SCHEMA.PROCESSLIST table. For example, :option:`--match-command`
+specifies a matching condition for **PROCESSLIST.COMMAND** column values.
+
 Processes that can be seen and killed are subject to whether the
 account used to connect to the server has the **PROCESS** and
 **SUPER** privileges.  Without **PROCESS**, the account cannot see

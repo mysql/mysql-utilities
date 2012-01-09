@@ -102,11 +102,11 @@ OPTIONS
    Do not display column headers. This option applies only for CSV and TAB
    output.
    
-.. option:: --port-range
+.. option:: --port-range=start:end
 
-   The port range to use for finding running servers in the form start:end.
-   Applies only to Windows and is ignored if :option:`--show-servers` is not
-   specified. Default is 3306:3333.
+   The port range to check for finding running servers. This option applies
+   only to Windows and only if :option:`--show-servers` is given. The default
+   range is 3306:3333.
 
 .. option:: --server=<server>
 
@@ -121,7 +121,8 @@ OPTIONS
    
 .. option:: --show-servers
 
-   Display running servers on the local host.
+   Display running servers on the local host. The utility examines the host
+   process list to determine which servers are running.
 
 .. option:: --start, -s
 

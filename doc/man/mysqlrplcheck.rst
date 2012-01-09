@@ -24,10 +24,12 @@ replication setup. Each of these tests are described in more detail here::
  Test# Description
  ----- ----------------------------------------------------------------------
    1   Is binary log enabled on the master?
-   2   Are there binary logging exceptions? If so, display them.
+   2   Are there binary logging exceptions (such as *_do_db or *_ignore_db
+       settings)? If so, display them.
    3   Does the rpl user exist on the master with the correct privileges?
    4   Are there server-id conflicts?
-   5   Is the slave connected to this master? If not, display host and port.
+   5   Is the slave connected to this master? If not, display the master
+       host and port.
    6   Are there conflicts between the master.info file on the slave and
        the values shown in SHOW SLAVE STATUS on the master?
    7   Are the InnoDB configurations compatible (plugin vs. native)?

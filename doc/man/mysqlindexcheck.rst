@@ -157,8 +157,7 @@ EXAMPLES
 --------
 
 To scan all tables in the employees database to see the
-possible redundant and duplicate indexes, as well as the **DROP**
-statements for the indexes, use this command::
+possible redundant and duplicate indexes, use this command::
 
     $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.

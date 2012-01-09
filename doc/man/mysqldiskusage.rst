@@ -27,6 +27,8 @@ InnoDB tablespaces. The default is to show only database disk usage.
 If the command line lists no no databases, the utility shows the
 disk space usage for all databases.
 
+Size values displayed without a unit indicator such as MB are in bytes.
+
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 

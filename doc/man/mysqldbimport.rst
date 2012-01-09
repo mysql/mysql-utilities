@@ -109,7 +109,7 @@ OPTIONS
 
 .. option:: --drop-first, -d
 
-   Drop database before importing.
+   Drop each database if it exists before importing it.
 
 .. option:: --dryrun
 
