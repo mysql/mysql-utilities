@@ -25,7 +25,7 @@ DESCRIPTION
 This utility imports the metadata (object definitions) or data for
 one or more databases from one or more files in any of SQL, CSV,
 TAB, GRID, or VERTICAL formats. These formats are the output of the
-**mysqldbexport** utility.  For a list of databases, the **mysqldbimport**
+:command:`mysqldbexport` utility.  For a list of databases, the :command:`mysqldbimport`
 utility enables you to import the object definitions, the data, or
 both.
 
@@ -49,7 +49,7 @@ with the :option:`--format` option:
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Display output in grid or table format like that of the **mysql** monitor.
+  Display output in grid or table format like that of the :command:`mysql` monitor.
 
 **CSV**
   Input is formatted in comma-separated values format.
@@ -59,7 +59,7 @@ with the :option:`--format` option:
 
 **VERTICAL**
   Display output in single-column format like that of the ``\G`` command
-  for the **mysql** monitor.
+  for the :command:`mysql` monitor.
 
 To indicate that input in CSV or TAB format does not contain column headers,
 specify the :option:`--no-headers` option.
@@ -92,7 +92,7 @@ For details, see :ref:`mysqldbimport-notes`.
 OPTIONS
 -------
 
-**mysqldbimport** accepts the following command-line options:
+:command:`mysqldbimport` accepts the following command-line options:
 
 .. option:: --help
 

@@ -36,7 +36,7 @@ needed). To control how to display list output, use one of the following
 values with the :option:`--format` option:
 
 **GRID** (default)
-  Display output in grid or table format like that of the **mysql** monitor.
+  Display output in grid or table format like that of the :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -46,12 +46,12 @@ values with the :option:`--format` option:
 
 **VERTICAL**
   Display output in single-column format like that of the ``\G`` command
-  for the **mysql** monitor.
+  for the :command:`mysql` monitor.
 
 OPTIONS
 -------
 
-**mysqluserclone** accepts the following command-line options:
+:command:`mysqluserclone` accepts the following command-line options:
 
 .. option:: --help
 

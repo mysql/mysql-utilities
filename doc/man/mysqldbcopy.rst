@@ -70,7 +70,7 @@ For details, see :ref:`mysqldbcopy-notes`.
 OPTIONS
 -------
 
-**mysqldbcopy** accepts the following command-line options:
+:command:`mysqldbcopy` accepts the following command-line options:
 
 .. option:: --help
 

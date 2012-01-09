@@ -30,7 +30,7 @@ designated servers and executes it in turn before collecting the result
 and printing it as a table. If you do not want to send the statement
 to the servers and instead have the utility emit the statement, you
 can use the :option:`--sql` option. This can be useful if you want to
-feed the output of the statement to another application such as the **mysql**
+feed the output of the statement to another application such as the :command:`mysql`
 monitor.
 
 The MySQL server uses two forms of patterns when matching strings:
@@ -49,7 +49,7 @@ To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output in grid or table format like that of the **mysql** monitor.
+  Display output in grid or table format like that of the :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -59,7 +59,7 @@ with the :option:`--format` option:
 
 **VERTICAL**
   Display output in single-column format like that of the ``\G`` command
-  for the **mysql** monitor.
+  for the :command:`mysql` monitor.
 
 
 .. _simple_pattern:
@@ -131,7 +131,7 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
-**mysqlmetagrep** accepts the following command-line options:
+:command:`mysqlmetagrep` accepts the following command-line options:
 
 .. option:: --help, -h
 

@@ -103,7 +103,7 @@ access all objects in the operation.
 OPTIONS
 -------
 
-**mysqldiff** accepts the following command-line options:
+:command:`mysqldiff` accepts the following command-line options:
 
 .. option:: --help
 
@@ -180,7 +180,7 @@ The SQL transformation feature has the following known limitations:
   all other changes but prints a warning and omits the table option
   differences.
   
-* Rename for events is not supported. This is because **mysqldiff** compares
+* Rename for events is not supported. This is because :command:`mysqldiff` compares
   objects by name. In this case, depending on the direction of the diff, the
   event is identified as needing to be added or a **DROP EVENT** statement
   is generated.

@@ -42,7 +42,7 @@ with the :option:`--format` option:
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Display output in grid or table format like that of the **mysql** monitor.
+  Display output in grid or table format like that of the :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -52,7 +52,7 @@ with the :option:`--format` option:
 
 **VERTICAL**
   Display output in single-column format like that of the ``\G`` command
-  for the **mysql** monitor.
+  for the :command:`mysql` monitor.
 
 To specify how much data to display, use one of the following values
 with the :option:`--display` option:
@@ -88,7 +88,7 @@ the single named trigger and :option:`--exclude=trig_` excludes all objects
 from all databases whose name begins with trig and has a following character
 or digit.
 
-**mysqldbexport** differs from **mysqldump** in that it can produce output in a
+:command:`mysqldbexport` differs from :command:`mysqldump` in that it can produce output in a
 variety of formats to make your data extraction/transport much easier. It
 permits you to export your data in the format most suitable to an external
 tool, another MySQL server, or a yet another use without the need to
@@ -108,7 +108,7 @@ For details, see :ref:`mysqldbexport-notes`.
 OPTIONS
 -------
 
-**mysqldbexport** accepts the following command-line options:
+:command:`mysqldbexport` accepts the following command-line options:
 
 .. option:: --help
 

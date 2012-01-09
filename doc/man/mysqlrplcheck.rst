@@ -56,7 +56,7 @@ To see the values from the **SHOW SLAVE STATUS** statement, use the
 OPTIONS
 -------
 
-**mysqlrplcheck** accepts the following command-line options:
+:command:`mysqlrplcheck` accepts the following command-line options:
 
 .. option:: --help
 

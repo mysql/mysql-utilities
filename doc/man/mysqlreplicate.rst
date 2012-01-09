@@ -68,7 +68,7 @@ Start from a specific event
 OPTIONS
 -------
 
-**mysqlreplicate** accepts the following command-line options:
+:command:`mysqlreplicate` accepts the following command-line options:
 
 .. option:: --help
 
