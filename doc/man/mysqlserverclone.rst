@@ -18,8 +18,8 @@ DESCRIPTION
 -----------
 
 This utility permits an administrator to start a new instance of a
-running server.  The utility will create a new datadir (--new-data),
-and start the server with a socket file. You can optionally add a
+running server.  The utility creates a new datadir (:option:`--new-data`),
+and starts the server with a socket file. You can optionally add a
 password for the login user account on the new instance.
 
 OPTIONS
@@ -33,20 +33,20 @@ OPTIONS
 
 .. option:: --mysqld=<options>
 
-   Additional options for mysqld.
+   Additional options for :commmand:`mysqld`.
 
 .. option:: --new-data=<path_to_new_datadir>
 
-   The full path to the location of the data directory for the new
-   instance.
+   The full path name of the location of the data directory for the new
+   server instance.
 
 .. option:: --new-id=<server_id>
 
-   The server_id for the new instance - default=2.
+   The ``server_id`` value for the new server instance. The default 2.
 
 .. option:: --new-port=<port>
 
-   The new port for the new instance - default=3307.
+   The port number for the new server instance. The default is 3307.
 
 .. option:: --quiet, -q
 
@@ -54,11 +54,11 @@ OPTIONS
 
 .. option:: --root-password=<password>
 
-   Password for the root user.
+   The password for the root user.
 
 .. option:: --server=<source>
 
-   Connection information for the source server in the format:
+   Connection information for the server to be cloned in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --verbose, -v
@@ -80,8 +80,8 @@ to all databases and the ability to create a user account.
 EXAMPLES
 --------
 
-The following demonstrates how to create a new instance of a running server
-and setting the root password and turning binary logging on::
+The following demonstrates how to create a new instance of a running server,
+set the root password and enable binary logging::
 
     $ mkdir /source/test123
     $ mysqlserverclone --server=root:pass@localhost \
