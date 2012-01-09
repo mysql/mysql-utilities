@@ -12,7 +12,7 @@ SYNOPSIS
   mysqlrplshow --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               --help | --version | --show-list | --quiet |
               --recurse | --prompt | --num-retries |
-              --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
+              --format=[GRID|G|TAB|T|CSV|C|VERTICAL|V]
 
 DESCRIPTION
 -----------
@@ -55,9 +55,9 @@ circularity::
              |
              +--- localhost:3311 <--> (SLAVE)
 
-To produce a column list of the graph, specify the :option:`--show-list`
-option.  You also have the choice to view the output in one of the following
-formats using the :option:`--format` option.
+To produce a column list in addition to the graph, specify the
+:option:`--show-list` option.  In this case, to specify how to display the
+list, use one of the following values with the :option:`--format` option:
 
 **GRID** (default)
   Display output in grid or table format like that of the :command:`mysql` monitor.
@@ -99,8 +99,9 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   Specify the display format for column list output . Permitted format values
+   are GRID, CSV, TAB, and VERTICAL. The default is GRID. This option applies
+   only if :option:`--show-list` is given.
 
 .. option:: --master=<source>
 
@@ -133,7 +134,7 @@ OPTIONS
    
 .. option:: --show-list, -l
 
-   Print a list of the topology.
+   Display a column list of the topology.
 
 .. option:: --version
 
