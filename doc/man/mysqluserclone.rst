@@ -20,20 +20,20 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to use an existing user
-account on one server as a template, clone a MySQL user such that one
-or more new user accounts are created on another (or the same) server
-with the same privileges as the original user.
+This utility uses an existing MySQL user account on one server as a
+template, and clones it to create one or more new user accounts with the
+same privileges as the original user.  The new users can be created on the
+original server or a different server.
 
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqluserclone-notes`.
 
-You can also use the utility to list users for a server by specifying the
---list option. This prints a list of the users on the source (no destination is
-needed). To control how to display list output, use one of the following
-values with the :option:`--format` option:
+To list users for a server, specify the :option:`--list` option.  This
+prints a list of the users on the source (no destination is needed). To
+control how to display list output, use one of the following values with the
+:option:`--format` option:
 
 **GRID** (default)
   Display output in grid or table format like that of the :command:`mysql` monitor.
@@ -59,19 +59,17 @@ OPTIONS
 
 .. option:: --copy-dir=<directory>
 
-   Path to use when copying data (stores temporary files) - default =
-   current directory.
+   The path to use when copying data (stores temporary files). The default is
+   the current directory.
 
 .. option:: --destination=<destination>
 
    Connection information for the destination server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
 
 .. option:: --dump, -d 
 
-   Dump GRANT statements for user.
+   Dump **GRANT** statements for user.
 
 .. option::  --format=<list_format>
 
@@ -89,7 +87,8 @@ OPTIONS
 
 .. option:: --list
 
-   List all users on the source - does not require a destination.
+   List all users on the source server. With this option, a destination server
+   need not be specified.
 
 .. option:: --quiet, -q
 
@@ -99,8 +98,6 @@ OPTIONS
 
    Connection information for the source server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
 
 .. option:: --verbose, -v
 
