@@ -59,10 +59,10 @@ with the :option:`--format` option:
 To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
-You can also see the common default settings for the local server's
-configuration file. This option reads the configuration file on the machine
-where the utility is run, not the machine for the host that the
-:option:`--server` option specifies.
+To see the common default settings for the local server's configuration
+file, use the :option:`--show-defaults` option. This option reads the
+configuration file on the machine where the utility is run, not the machine
+for the host that the :option:`--server` option specifies.
 
 To run the utility against several servers, specify the
 :option:`--server` option multiple times. In this case, the utility 
@@ -116,7 +116,7 @@ OPTIONS
 .. option:: --show-defaults
 
    Display default settings for :command:`mysqld` from the local configuration
-   file.
+   file. It uses :command:`my_print_defaults` to obtain the options.
    
 .. option:: --show-servers
 

@@ -34,7 +34,10 @@ OPTIONS
 
 .. option:: --mysqld=<options>
 
-   Additional options for :command:`mysqld`.
+   Additional options for :command:`mysqld`. To specify multiple options,
+   separate them by spaces. Use appropriate quoting as necessary. For example,
+   to specify ``--log-bin=binlog`` and ``--general-log-file="my log file"``,
+   use :option:`--mysqld="--log-bin=binlog --general-log-file='my log file'"`.
 
 .. option:: --new-data=<path_to_new_datadir>
 
