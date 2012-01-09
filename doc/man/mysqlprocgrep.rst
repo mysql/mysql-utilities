@@ -32,6 +32,8 @@ selects all processes.
 The ``--match-xxx`` options correspond to the columns in the
 INFORMATION_SCHEMA.PROCESSLIST table. For example, :option:`--match-command`
 specifies a matching condition for **PROCESSLIST.COMMAND** column values.
+There is no ``--match-time`` option, however. To specify a condition based on
+process time, use :option:`--age`.
 
 Processes that can be seen and killed are subject to whether the
 account used to connect to the server has the **PROCESS** and
@@ -112,10 +114,6 @@ Options
 .. option:: --match-state=<pattern>
 
    Match all processes where the **State** field matches the pattern.
-
-.. option:: --match-time=<pattern>
-
-   Match all processes where the **Time** field matches the pattern.
 
 .. option:: --match-user=<pattern>
 

@@ -170,7 +170,7 @@ OPTIONS
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching. This affects the :option:`--databases`
+   to use **LIKE** for matching. This affects the :option:`--database`
    and :option:`--pattern` options.
 
 .. option:: --server=<source>

@@ -17,8 +17,9 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits an administrator to start a new instance of a
-running server.  The utility creates a new datadir (:option:`--new-data`),
+This utility permits an administrator to clone an existing MySQL server
+instance to start a new server instance
+on the same host.  The utility creates a new datadir (:option:`--new-data`),
 and starts the server with a socket file. You can optionally add a
 password for the login user account on the new instance.
 
@@ -38,7 +39,8 @@ OPTIONS
 .. option:: --new-data=<path_to_new_datadir>
 
    The full path name of the location of the data directory for the new
-   server instance.
+   server instance. If the directory does not exist, the utility will create
+   it.
 
 .. option:: --new-id=<server_id>
 
@@ -54,7 +56,7 @@ OPTIONS
 
 .. option:: --root-password=<password>
 
-   The password for the root user.
+   The password for the root user of the new server instance.
 
 .. option:: --server=<source>
 
@@ -71,11 +73,6 @@ OPTIONS
 
    Display version information and exit.
 
-NOTES
------
-
-The login user must have the appropriate permissions to grant access
-to all databases and the ability to create a user account.
 
 EXAMPLES
 --------
