@@ -4,7 +4,7 @@
 
 .. module:: mysql.utilities.parser
 
-This module provides classes which can be used for parsing MySQL log files.
+This module provides classes for parsing MySQL log files.
 Currently, *Slow Query Log* and *General Query Log* are supported.
 
 Classes
@@ -15,7 +15,7 @@ Classes
     Parse the MySQL General Query Log.
     
     This class is used to parse the MySQL General Query Log. Instances
-    are iterable, but does not provide multiple independent iterators.
+    are iterable, but the class does not provide multiple independent iterators.
     
     For example, to go through the log and print the entries:
     
@@ -25,37 +25,37 @@ Classes
     ...     print entry
     
     :type stream: file type
-    :param stream: a valid file type, for example the result of
+    :param stream: a valid file type; for example, the result of
                    the built-in Python function `open()`_
     
     .. attribute:: version
     
-    :returns: Version of the MySQL server, which produced the log.
+    :returns: Version of the MySQL server that produced the log
     :rtype: tuple
     
     .. attribute:: program
     
-    :returns: Full path of the MySQL server executable.
+    :returns: Full path of the MySQL server executable
     :rtype: str
     
     .. attribute:: port
     
-    :returns: TCP/IP port on which the MySQL server was listening.
+    :returns: TCP/IP port on which the MySQL server was listening
     :rtype: int
     
     .. attribute:: socket
     
-    :returns: Full path of the MySQL server Unix socket.
+    :returns: Full path of the MySQL server Unix socket
     :rtype: str
     
-    ..attribute:: start_datetime
+    .. attribute:: start_datetime
     
-    :returns: Date and time of the first read log entry.
+    :returns: Date and time of the first read log entry
     :rtype: datetime.datetime
     
-    ..attribute:: lastseen_datetime
+    .. attribute:: lastseen_datetime
     
-    :returns: Date and time of the last read log entry.
+    :returns: Date and time of the last read log entry
     :rtype: datetime.datetime
 
 .. class:: SlowQueryLog(stream)
@@ -63,7 +63,7 @@ Classes
     Parse the MySQL Slow Query Log.
     
     This class is used to parse the MySQL Slow Query Log. Instances
-    are iterable, but does not provide multiple independent iterators.
+    are iterable, but the class does not provide multiple independent iterators.
     
     For example, to go through the log and print the entries:
 
@@ -73,37 +73,37 @@ Classes
     ...     print entry
 
     :type stream: file type
-    :param stream: a valid file type, for example the result of
+    :param stream: a valid file type; for example, the result of
                    the built-in Python function `open()`_
 
     .. attribute:: version
 
-    :returns: Version of the MySQL server, which produced the log.
+    :returns: Version of the MySQL server that produced the log
     :rtype: tuple
 
     .. attribute:: program
 
-    :returns: Full path of the MySQL server executable.
+    :returns: Full path of the MySQL server executable
     :rtype: str
 
     .. attribute:: port
 
-    :returns: TCP/IP port on which the MySQL server was listening.
+    :returns: TCP/IP port on which the MySQL server was listening
     :rtype: int
 
     .. attribute:: socket
 
-    :returns: Full path of the MySQL server Unix socket.
+    :returns: Full path of the MySQL server Unix socket
     :rtype: str
 
-    ..attribute:: start_datetime
+    .. attribute:: start_datetime
 
-    :returns: Date and time of the first read log entry.
+    :returns: Date and time of the first read log entry
     :rtype: datetime.datetime
 
-    ..attribute:: lastseen_datetime
+    .. attribute:: lastseen_datetime
 
-    :returns: Date and time of the last read log entry.
+    :returns: Date and time of the last read log entry
     :rtype: datetime.datetime
 
 .. References
