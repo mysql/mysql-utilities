@@ -26,6 +26,15 @@ a process to match, all conditions given must match.  The utility then
 either prints the selected processes (the default) or executes certain
 actions on them.
 
+If no :option:`--age` or ``--match-xxx`` options are given, the utility
+selects all processes.
+
+Processes that can be seen and killed are subject to whether the
+account used to connect to the server has the **PROCESS** and
+**SUPER** privileges.  Without **PROCESS**, the account cannot see
+processes belonging to other accounts Without **SUPER**, the account
+cannot kill processes belonging to other accounts
+
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
@@ -118,7 +127,7 @@ Options
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching.  This affects the --match-xxx options.
+   to use **LIKE** for matching.  This affects the ``--match-xxx`` options.
 
 .. option:: --server=<source>
 

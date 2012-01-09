@@ -139,8 +139,8 @@ OPTIONS
 
 .. option:: --body, -b
 
-   Search the body of procedures, functions, triggers, and
-   events. The default is to match only the name.
+   Search the body of stored programs (procedures, functions, triggers, and
+   events). The default is to match only the name.
 
 .. option:: --database=<pattern>
 
@@ -151,27 +151,27 @@ OPTIONS
    Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
-.. option:: --pattern=<pattern>, -e=<pattern>
-
-   Pattern to use when matching. This is required when the pattern
-   looks like a connection specification.
-
-   If a pattern option is given, the first argument is not treated as
-   a pattern but as a connection specifier.
-
-.. option:: --regexp, --basic-regexp, -G
-
-   Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching. This affects the :option:`--database`
-   and :option:`--pattern` options.
-
-.. option:: --search-objects=<types>, --object-types=<types>
+.. option:: --object-types=<types>, --search-objects=<types>
 
    Search only for/in objects named in <types>, which is a comma-separated
    list of one or more of the values **procedure**, **function**, **event**,
    **trigger**, **table**, and **database**.
 
    The default is to search in objects of all types.
+
+.. option:: --pattern=<pattern>, -e=<pattern>
+
+   The pattern to use when matching. This is required when the first nonoption
+   argument looks like a connection specification rather than a pattern.
+
+   If the :option:`--pattern` option is given, the first nonoption argument
+   is not treated as a pattern but as a connection specifier.
+
+.. option:: --regexp, --basic-regexp, -G
+
+   Perform pattern matches using the **REGEXP** operator. The default is
+   to use **LIKE** for matching. This affects the
+   :option:`--pattern` option.
 
 .. option:: --server=<source>
 
