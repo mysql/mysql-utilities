@@ -89,9 +89,9 @@ Classes
       be supplied as keyword arguments and that all other arguments
       are treated as connection specifiers.
 
-      :type connection: A :ref:`connection specificers`
+      :type connection: A :ref:`connection specifiers`
       :param output: File object for printing output to
-      :param connector: Connector to use.
+      :param connector: Connector to use
 
 
 .. References

@@ -45,7 +45,7 @@ a specific table, name the table in *db*.*table* format. It is possible
 to mix database and table names.
 
 You can scan tables in any database except the internal databases
-:command:`mysql`, **INFORMATION_SCHEMA**, and **performance_schema**.
+**mysql**, **INFORMATION_SCHEMA**, and **performance_schema**.
 
 To see **DROP** statements to drop redundant indexes,
 specify the :option:`--show-drops` option. To examine the existing
@@ -63,7 +63,8 @@ To change the format of the index lists displayed for the
 use one of the following values with the :option:`--format` option:
 
 **GRID** (default)
-  Display output in grid or table format like that of the :command:`mysql` monitor.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.

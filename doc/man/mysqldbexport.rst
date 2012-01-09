@@ -42,7 +42,8 @@ with the :option:`--format` option:
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Display output in grid or table format like that of the :command:`mysql` monitor.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.

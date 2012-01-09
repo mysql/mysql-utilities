@@ -75,16 +75,16 @@ the colon are located on the server designated by :option:`--server1`
 and the database and object on the right is located on the server
 designated by :option:`--server2`.
 
-  * :option:`--changes-for=server1`: The object definition on server1 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server2. The output therefore is the
-    transformation needed to make the object on server1 like the object on
-    server2.
-  * :option:`--changes-for=server2`: The object definition on server2 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server1. The output therefore is the
-    transformation needed to make the object on server2 like the object on
-    server1.
+* :option:`--changes-for=server1`: The object definition on server1 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server2. The output therefore is the
+  transformation needed to make the object on server1 like the object on
+  server2.
+* :option:`--changes-for=server2`: The object definition on server2 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server1. The output therefore is the
+  transformation needed to make the object on server2 like the object on
+  server1.
 
 The default direction is server1. 
 

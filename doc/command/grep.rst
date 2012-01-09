@@ -53,9 +53,9 @@ Classes
       Execute the search on each of the connections in turn and print an
       aggregate of the result as a grid table.
 
-      :param connections: Sequence of :ref:`connection specifiers` to send the query to.
-      :param output: Output stream where the result will be written.
-      :param connector: Connector to use when connecting to the servers.
+      :param connections: Sequence of :ref:`connection specifiers` to send the query to
+      :param output: Output stream where the result will be written
+      :param connector: Connector to use when connecting to the servers
 
 
 .. References
