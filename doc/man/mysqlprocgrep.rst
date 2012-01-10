@@ -90,11 +90,13 @@ Options
 
 .. option:: --kill-connection
 
-   Kill the connection for all matching processes.
+   Kill the connection for all matching processes (like the **KILL
+   CONNECTION** statement).
 
 .. option:: --kill-query
 
-   Kill the query for all matching processes.
+   Kill the query for all matching processes (like the **KILL QUERY**
+   statement).
 
 .. option:: --match-command=<pattern>
 
@@ -140,16 +142,18 @@ Options
 
 .. option:: --sql, --print-sql, -Q
 
-   Emit the SQL for matching or killing the queries. If the
+   Instead of displaying the selected processes, emit the **SELECT**
+   statement that retrieves information about them. If the
    :option:`--kill-connection` or :option:`--kill-query` option is
-   given, a routine for killing the queries are generated.
+   given, a stored procedure named ``kill_processes()`` for killing the
+   queries is generated rather than a **SELECT** statement.
 
 .. option:: --sql-body
 
-   Emit SQL statements for performing the search or kill of the
-   **INFORMATION_SCHEMA.PROCESSLIST** table.  This is useful together
-   with :manpage:`mysqlmkevent(1)` to generate an event for the server
-   scheduler.
+   Like :option:`--sql`, but produces the output as the body of a stored
+   procedure without the **CREATE PROCEDURE** part of the definition.
+   This could be used, for example, to generate an event for the server
+   Event Manager.
 
    When used with a kill option, code for killing the matching queries
    is generated. Note that it is not possible to execute the emitted
