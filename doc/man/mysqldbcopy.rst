@@ -102,7 +102,9 @@ OPTIONS
 
 .. option:: --force, -f
 
-   Drop the new database or object if it exists.
+   Drop each database to be copied if exists before copying anything into
+   it. Without this option, an error occurs if you attempt to copy objects
+   into an existing database.
    
 .. option:: --locking=<locking>
 

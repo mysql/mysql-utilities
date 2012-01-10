@@ -110,7 +110,8 @@ OPTIONS
 
 .. option:: --drop-first, -d
 
-   Drop each database if it exists before importing it.
+   Drop each database to be imported if exists before importing anything into
+   it.
 
 .. option:: --dryrun
 
@@ -130,6 +131,11 @@ OPTIONS
    DATA (or D) = import only the table data for the tables in the database list,
    and BOTH (or B) = import the definitions and the data. The default is
    DEFINITIONS.
+
+   If you attempt to import objects into an existing database, the result
+   depends on the import format. If the format is DEFINITIONS or BOTH, an
+   error occurs unless :option:`--drop-first` is given. If the format is
+   DATA, imported table data is added to existing table data.
    
 .. option:: --new-storage-engine=<new_engine>
 
