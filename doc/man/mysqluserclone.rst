@@ -119,7 +119,7 @@ read the **mysql** database.
 
 The account used to connect to the destination server must have privileges to
 execute **CREATE USER** (and **DROP USER** if the :option:`--force` option is
-given), and privileges to execute **GRANT* for all privileges to be granted to
+given), and privileges to execute **GRANT** for all privileges to be granted to
 the new accounts.
 
 EXAMPLES
