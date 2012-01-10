@@ -75,7 +75,9 @@ OPTIONS
 
 .. option:: --force, -f
 
-   Drop the new user if it exists.
+   Drop the new user account if it exists before creating the new account.
+   Without this option, it is an error to try to create an account that
+   already exists.
 
 .. option:: --include-global-privileges
 
@@ -110,11 +112,13 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to create new
-users, access (read) the mysql database, and grant privileges. At a
-minimum, this requires the login user to have read privileges on the mysql
-database, the **GRANT OPTION** privilege for all databases listed in the
-**GRANT** statements found, and the ability to create a user account.
+The account used to connect to the source server must have privileges to
+read the **mysql** database.
+
+The account used to connect to the destination server must have privileges to
+execute **CREATE USER** (and **DROP USER** if the :option:`--force` option is
+given), and privileges to execute **GRANT* for all privileges to be granted to
+the new accounts.
 
 EXAMPLES
 --------
