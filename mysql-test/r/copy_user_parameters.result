@@ -16,8 +16,6 @@ Options:
   --destination=DESTINATION
                         connection information for destination server in the
                         form: <user>:<password>@<host>:<port>:<socket>
-  --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
-                        files) - default = current directory
   -d, --dump            dump GRANT statements for user - does not require a
                         destination
   -f, --force           drop the new user if it exists

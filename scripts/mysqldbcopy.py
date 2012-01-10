@@ -75,12 +75,6 @@ parser.add_option("--destination", action="store", dest="destination",
                   help="connection information for destination server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Copy directory
-parser.add_option("--copy-dir", action="store", dest="copy_dir",
-                  type = "string", default=None, help="a path to use when "
-                         "copying data (stores temporary files) - "
-                         "default = current directory")
-
 # Overwrite mode
 parser.add_option("-f", "--force", action="store_true", dest="force",
                   help="drop the new database or object if it exists",
@@ -153,7 +147,6 @@ options = {
     "skip_grants"      : "GRANTS" in skips,
     "skip_create"      : "CREATE_DB" in skips,
     "skip_data"        : "DATA" in skips,
-    "copy_dir"         :  opt.copy_dir,
     "force"            : opt.force,
     "verbose"          : opt.verbosity >= 1,
     "quiet"            : opt.quiet,

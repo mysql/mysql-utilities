@@ -402,7 +402,7 @@ class Database(object):
         name by setting new_db = old_db or as a new database.
         
         new_db[in]         Name of the new database
-        options[in]        Options for copy e.g. force, copy_dir, etc.
+        options[in]        Options for copy e.g. force, etc.
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
@@ -479,7 +479,7 @@ class Database(object):
         if the option was selected by the caller.
 
         new_db[in]         Name of the new database
-        options[in]        Options for copy e.g. force, copy_dir, etc.
+        options[in]        Options for copy e.g. force, etc.
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert

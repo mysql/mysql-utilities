@@ -62,12 +62,6 @@ parser.add_option("--destination", action="store", dest="destination",
                   help="connection information for destination server in " + \
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
-# Copy directory
-parser.add_option("--copy-dir", action="store", dest="copy_dir",
-                  type = "string", default="", help="a path to use when "
-                         "copying data (stores temporary files) - "
-                         "default = current directory")
-
 # Dump mode
 parser.add_option("-d", "--dump", action="store_true",
                   dest="dump", help="dump GRANT statements for user - does "
@@ -149,7 +143,6 @@ else:
     # Build dictionary of options
     options = {
         "dump"         : opt.dump,
-        "copy_dir"     : opt.copy_dir,
         "overwrite"    : opt.overwrite,
         "quiet"        : opt.quiet,
         "verbosity"    : opt.verbosity,

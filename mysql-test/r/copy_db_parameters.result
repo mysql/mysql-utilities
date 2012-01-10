@@ -35,8 +35,6 @@ Options:
   --destination=DESTINATION
                         connection information for destination server in the
                         form: <user>:<password>@<host>:<port>:<socket>
-  --copy-dir=COPY_DIR   a path to use when copying data (stores temporary
-                        files) - default = current directory
   -f, --force           drop the new database or object if it exists
   --threads=THREADS     use multiple threads (connections) for insert
   -x EXCLUDE, --exclude=EXCLUDE

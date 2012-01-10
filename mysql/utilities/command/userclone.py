@@ -102,7 +102,6 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     from mysql.utilities.common.user import User
 
     dump_sql = options.get("dump", False)
-    copy_dir = options.get("copy_dir", False)
     overwrite = options.get("overwrite", False)
     verbosity = options.get("verbosity", False)
     quiet = options.get("quiet", False)
