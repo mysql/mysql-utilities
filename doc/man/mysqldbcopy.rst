@@ -76,11 +76,6 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --copy-dir=<copy_directory>
-
-   Path to use when copying data (stores temporary files). Default
-   = current directory.
-
 .. option:: --default-storage-engine=<def_engine>
 
    The engine to use for tables if the destination server does not support
