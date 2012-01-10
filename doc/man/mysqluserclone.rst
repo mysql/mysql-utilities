@@ -65,7 +65,9 @@ OPTIONS
 
 .. option:: --dump, -d 
 
-   Dump **GRANT** statements for user.
+   Display the **GRANT** statements to create the account rather than
+   executing them. In this case, the utility does not connect to the
+   destination server and no :option:`--destination` option is needed.
 
 .. option::  --format=<list_format>
 

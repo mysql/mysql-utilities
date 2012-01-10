@@ -19,15 +19,36 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility displays disk space usage for one or more databases in GRID,
-CSV, TAB, or VERTICAL format.  The utility optionally display disk usage for
-the binary log, slow query log, error log, general query log, relay log, and
-InnoDB tablespaces. The default is to show only database disk usage.
+This utility displays disk space usage for one or more databases.
+The utility optionally displays disk usage for the binary log, slow
+query log, error log, general query log, relay log, and InnoDB
+tablespaces. The default is to show only database disk usage.
 
 If the command line lists no no databases, the utility shows the
 disk space usage for all databases.
 
 Size values displayed without a unit indicator such as MB are in bytes.
+
+The utility determines the the location of the data directory by requesting
+it from the server. For a local server, the utility obtains size information
+directly from files in the data directory and InnoDB home directory. In this
+case, you must have file system access to read those directories.  Disk
+space usage shown includes the sum of all storage engine specific files such
+as the .MYI and .MYD files for MyISAM and similarly includes the tablespace
+files for InnoDB.
+
+If that fails, or if the server is not local, the utility is limited to
+information that can be obtained from the system tables and therefore should
+be considered an estimate. This is because the utility cannot include
+.frm and related miscellaneous files in the calculations.
+For information read from the server, the account used to connect to the
+server must have the appropriate permissions to read any objects accessed
+during the operation.
+
+If information requested requires file system access but is not available
+that way, the utility prints a message that the information is not
+accessible.  This occurs, for example, if you request log usage but the
+server is not local and the log files cannot be examined directly.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -121,24 +142,6 @@ OPTIONS
    Display version information and exit.
 
 .. _`mysqldiskusage-notes`:
-
-NOTES
------
-
-The login user must have the appropriate permissions to
-read any objects accessed during the operation.
-
-Depending on the options used, the user may also require file system
-read access to the data directory and InnoDB home directory. If the
-user does not have access to these areas, the data displayed is
-limited to information from the system tables and therefore should
-be considered an estimate. This is because the utility cannot include
-.frm and related miscellaneous files in the calculations.
-
-If the user has read access to the data directory, disk space usage
-shown includes the sum of all storage engine specific files such
-as the .MYI and .MYD files for MyISAM and similarly includes the
-tablespace files for InnoDB.
 
 EXAMPLES
 --------
