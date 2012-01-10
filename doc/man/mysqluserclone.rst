@@ -58,11 +58,6 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --copy-dir=<directory>
-
-   The path to use when copying data (stores temporary files). The default is
-   the current directory.
-
 .. option:: --destination=<destination>
 
    Connection information for the destination server in the format:
