@@ -95,7 +95,7 @@ OPTIONS
    to specify multiple exclusions. By default, patterns use LIKE matching.
    With the :option:`--regexp` option, patterns use REGEXP matching.
 
-.. option:: --force, -f
+.. option:: --force
 
    Drop each database to be copied if exists before copying anything into
    it. Without this option, an error occurs if you attempt to copy objects

@@ -118,7 +118,7 @@ OPTIONS
    Do not display column headers. This option applies only for CSV and TAB
    output.
     
-.. option:: --quiet
+.. option:: --quiet, -q
 
     Suppress informational messages.
 

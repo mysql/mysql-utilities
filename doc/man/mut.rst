@@ -55,7 +55,7 @@ OPTIONS
 
    Execute all tests that begin with *prefix*.
 
-.. option:: --force, -f
+.. option:: --force
 
    Do not abort when a test fails.
 

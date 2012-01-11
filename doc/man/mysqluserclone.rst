@@ -69,13 +69,13 @@ OPTIONS
    executing them. In this case, the utility does not connect to the
    destination server and no :option:`--destination` option is needed.
 
-.. option::  --format=<list_format>
+.. option::  --format=<list_format>, -f<list_format>
 
    Specify the user display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
    This option is valid only if :option:`--list` is given.
 
-.. option:: --force, -f
+.. option:: --force
 
    Drop the new user account if it exists before creating the new account.
    Without this option, it is an error to try to create an account that

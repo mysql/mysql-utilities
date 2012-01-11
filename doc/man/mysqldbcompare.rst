@@ -209,7 +209,7 @@ OPTIONS
    Specify the missing-row display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
    
-.. option:: --quiet
+.. option:: --quiet, -q
 
    Do not print anything. Return only an exit code of success or failure.
 

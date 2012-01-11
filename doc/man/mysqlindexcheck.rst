@@ -9,10 +9,10 @@ SYNOPSIS
 
 ::
 
-  mysqlcheckindex --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+  mysqlindexcheck --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                 --quiet | --format=[GRID|SQL|TAB|CSV] |
+                 --format=[GRID|SQL|TAB|CSV] |
                  --stats [--best[=<N>] | --worst[=<N>] ]]
                  <db>[.<table>] ... ]
 
@@ -102,7 +102,7 @@ OPTIONS
    limit index statistics to the best N indexes. The default value of N is
    5 if omitted.
 
-.. option:: --format=<index_format>
+.. option:: --format=<index_format>, -f<index_format>
 
    Specify the index list display format for output produced by
    :option:`--stats`. Permitted format values are
