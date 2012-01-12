@@ -40,13 +40,13 @@ Classes
 
    Search for objects on a MySQL server by name or content.
 
-   This command class is used to search one or more MySQL server
-   instances for objects where the name (or the contents of routines,
-   triggers, or events) match a given pattern.
+   This command class searchs one or more MySQL server
+   instances for objects where the name (or content) of routines,
+   triggers, or events) matches a given pattern.
 
    .. method:: sql() -> string
 
-      This will return SQL code for executing the search in the form of a
+      Return the SQL code for executing the search in the form of a
       `SELECT`_ statement.
 
    .. method:: execute(connections[, output=sys.output, connector=mysql.connector])

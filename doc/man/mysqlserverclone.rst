@@ -76,6 +76,11 @@ OPTIONS
 
    Display version information and exit.
 
+.. option:: --write-command=<file_name>, -w<file_name>
+
+   Path name of file in which to write the command used to launch the new
+   server instance.
+
 
 EXAMPLES
 --------
