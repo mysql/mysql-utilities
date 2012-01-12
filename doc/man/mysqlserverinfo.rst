@@ -11,43 +11,41 @@ SYNOPSIS
 
  mysqlserverinfo [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
                    [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
-                   --format=[|GRID|TAB|CSV|VERTICAL] ] | --no-headers |
+                   --format=[|GRID|CSV|TAB|VERTICAL] ] | --no-headers |
                    --show-defaults | [--start --basedir=<base directory> 
                    --datadir=<data directory>] --verbose
 
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to view critical information
-about a server for use in diagnosing problems. The information displayed
-includes the following:
+This utility displays critical information about a server for use
+in diagnosing problems. The information displayed includes the
+following:
 
-    * Server connection information
-    * Version number of the server
-    * Data directory path
-    * Base directory path
-    * Plugin directory path
-    * Configuration file location and name
-    * Current binary log file
-    * Current binary log position
-    * Current relay log file
-    * Current relay log position
+* Server connection information
+* Version number of the server
+* Data directory path name
+* Base directory path name
+* Plugin directory path name
+* Configuration file location and name
+* Current binary log coordinates (file name and position)
+* Current relay log coordinates (file name and position)
 
-If you want to see information about an offline server, this utility
-can be used to see the same information. It works by starting the
-server in a read-only mode. You must specify the :option:`--basedir`,
-:option:`--datadir`, and :option:`--start` options to enable this
-feature. This is so that an offline server is not started accidentally.
+This utility can be used to see the diagnostic information for servers that
+are running or offline.  If you want to see information about an offline
+server, the utility starts server in read-only mode. In this case, you must
+specify the :option:`--basedir`, :option:`--datadir`, and :option:`--start`
+options to prevent the utility from starting an offline server accidentally.
 Note: Be sure to consider the ramifications of starting a server on the
-error and similar logs. It is best to save this information prior
-to running this utility on an offline server.
+error and similar logs. It is best to save this information prior to running
+this utility on an offline server.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -56,30 +54,30 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
 
-You can also see the common default settings read from the machine's local
-configuration file. This option reads the configuration file on the machine
-that the utility is run from, not the servers to which the :option:`--server`
-option specifies.
+To see the common default settings for the local server's configuration
+file, use the :option:`--show-defaults` option. This option reads the
+configuration file on the machine where the utility is run, not the machine
+for the host that the :option:`--server` option specifies.
 
-You can also run the utility against several servers by specifying the
-:option:`--server` option multiple times. In this case, the utility will
-attempt to connect to each server and read the information.
+To run the utility against several servers, specify the
+:option:`--server` option multiple times. In this case, the utility 
+attempts to connect to each server and read the information.
 
-You can also see the MySQL servers running on the local machine by using the
-:option:`--show-servers` option. This will show all of the servers with their
-process id and data directory (on Windows, only the process id and port is
-shown).
+To see the MySQL servers running on the local machine, use the
+:option:`--show-servers` option. This shows all the servers with
+their process ID and data directory. On Windows, the utility shows
+only the process ID and port.
 
 OPTIONS
 -------
 
-**mysqlserverinfo** accepts the following command-line options:
+:command:`mysqlserverinfo` accepts the following command-line options:
 
 .. option:: --help
 
@@ -95,19 +93,19 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
    
-.. option:: --port-range
+.. option:: --port-range=<start:end>
 
-   The port range to use for finding running servers in the form start:end.
-   Applies only to Windows and is ignored if :option:`--show-servers` is not
-   specified. Default is 3306:3333.
+   The port range to check for finding running servers. This option applies
+   only to Windows and is ignored unless :option:`--show-servers` is given.
+   The default range is 3306:3333.
 
 .. option:: --server=<server>
 
@@ -118,11 +116,13 @@ OPTIONS
 
 .. option:: --show-defaults
 
-   Display default settings for mysqld from the local configuration file.
+   Display default settings for :command:`mysqld` from the local configuration
+   file. It uses :command:`my_print_defaults` to obtain the options.
    
 .. option:: --show-servers
 
-   Display running servers on the local host.
+   Display information about servers running on the local host. The utility
+   examines the host process list to determine which servers are running.
 
 .. option:: --start, -s
 
@@ -140,19 +140,13 @@ OPTIONS
 
 .. _mysqlserverinfo-notes:
 
-NOTES
------
-
-The :option:`--show-defaults` option, it applies to the machine the utility is
-run from.
-
 
 EXAMPLES
 --------
 
 To display the server information for the local server and the settings for
-mysqld in the configuration file with the output in a vertical list, use this
-command::
+:command:`mysqld` in the configuration file with the output in a vertical
+list, use this command::
 
     $ mysqlserverinfo --server=root:pass@localhost -d --format=vertical
     # Source on localhost: ... connected.
@@ -183,7 +177,7 @@ command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

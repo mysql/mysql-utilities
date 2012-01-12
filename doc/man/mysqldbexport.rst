@@ -42,8 +42,8 @@ with the :option:`--format` option:
   :option:`--bulk-insert` option is specified).
 
 **GRID**
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -52,8 +52,8 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 To specify how much data to display, use one of the following values
 with the :option:`--display` option:
@@ -89,7 +89,7 @@ the single named trigger and :option:`--exclude=trig_` excludes all objects
 from all databases whose name begins with trig and has a following character
 or digit.
 
-**mysqldbexport** differs from **mysqldump** in that it can produce output in a
+:command:`mysqldbexport` differs from :command:`mysqldump` in that it can produce output in a
 variety of formats to make your data extraction/transport much easier. It
 permits you to export your data in the format most suitable to an external
 tool, another MySQL server, or a yet another use without the need to
@@ -109,7 +109,7 @@ For details, see :ref:`mysqldbexport-notes`.
 OPTIONS
 -------
 
-**mysqldbexport** accepts the following command-line options:
+:command:`mysqldbexport` accepts the following command-line options:
 
 .. option:: --help
 
@@ -153,8 +153,9 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output format. Permitted format values are
-   SQL|S, GRID|G, TAB|T, CSV|C, and VERTICAL|V. The default is SQL.
+   Specify the output display format. Permitted format values are SQL,
+   GRID, CSV, TAB, and VERTICAL, or the corresponding shortcuts S, G,
+   C, T, and V.  The default is SQL.
 
 .. option:: --locking=<locking>
 
@@ -165,7 +166,7 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
 
 .. option:: --quiet, -q
@@ -326,7 +327,7 @@ during the read step, add a :option:`--locking=lock-all` option to the command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

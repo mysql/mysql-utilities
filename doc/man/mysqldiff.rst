@@ -75,16 +75,16 @@ the colon are located on the server designated by :option:`--server1`
 and the database and object on the right is located on the server
 designated by :option:`--server2`.
 
-  * :option:`--changes-for=server1`: The object definition on server1 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server2. The output therefore is the
-    transformation needed to make the object on server1 like the object on
-    server2.
-  * :option:`--changes-for=server2`: The object definition on server2 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server1. The output therefore is the
-    transformation needed to make the object on server2 like the object on
-    server1.
+* :option:`--changes-for=server1`: The object definition on server1 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server2. The output therefore is the
+  transformation needed to make the object on server1 like the object on
+  server2.
+* :option:`--changes-for=server2`: The object definition on server2 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server1. The output therefore is the
+  transformation needed to make the object on server2 like the object on
+  server1.
 
 The default direction is server1. 
 
@@ -103,13 +103,13 @@ access all objects in the operation.
 OPTIONS
 -------
 
-**mysqldiff** accepts the following command-line options:
+:command:`mysqldiff` accepts the following command-line options:
 
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --changes-for=DIRECTION
+.. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
    example, to see the transformation for transforming server1 to match
@@ -118,14 +118,15 @@ OPTIONS
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
-   Specify the difference display format. Permitted format values are unified,
-   context, differ, and sql. The default is unified.
+   Specify the difference display format. Permitted format values are
+   **unified**, **context**, **differ**, and **sql**. The default is
+   **unified**.
    
 .. option:: --force
 
    Do not halt at the first difference found. Process all objects.
    
-.. option:: --quiet
+.. option:: --quiet, -q
 
    Do not print anything. Return only an exit code of success or failure.
 
@@ -157,9 +158,10 @@ OPTIONS
 
    Display version information and exit.
 
-.. option:: --width
+.. option:: --width=<number>
 
    Change the display width of the test report.
+   The default is 75 characters.
 
 
 NOTES
@@ -180,7 +182,7 @@ The SQL transformation feature has the following known limitations:
   all other changes but prints a warning and omits the table option
   differences.
   
-* Rename for events is not supported. This is because **mysqldiff** compares
+* Rename for events is not supported. This is because :command:`mysqldiff` compares
   objects by name. In this case, depending on the direction of the diff, the
   event is identified as needing to be added or a **DROP EVENT** statement
   is generated.
@@ -298,7 +300,7 @@ and db1.table1 in both directions, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

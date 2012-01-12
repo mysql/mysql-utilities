@@ -13,26 +13,49 @@ SYNOPSIS
  mysqldiskusage --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V]
+             --format=[GRID|G|CSV|C|TAB|T|VERTICAL|V]
              [<db> ...]
 
 DESCRIPTION
 -----------
 
-This utility displays disk space usage for one or more databases in GRID,
-CSV, TAB, or VERTICAL format.  The utility optionally display disk usage for
-the binary log, slow query log, error log, general query log, relay log, and
-InnoDB tablespaces. The default is to show only database disk usage.
+This utility displays disk space usage for one or more databases.
+The utility optionally displays disk usage for the binary log, slow
+query log, error log, general query log, relay log, and InnoDB
+tablespaces. The default is to show only database disk usage.
 
 If the command line lists no no databases, the utility shows the
 disk space usage for all databases.
+
+Size values displayed without a unit indicator such as MB are in bytes.
+
+The utility determines the the location of the data directory by requesting
+it from the server. For a local server, the utility obtains size information
+directly from files in the data directory and InnoDB home directory. In this
+case, you must have file system access to read those directories.  Disk
+space usage shown includes the sum of all storage engine specific files such
+as the .MYI and .MYD files for MyISAM and similarly includes the tablespace
+files for InnoDB.
+
+If that fails, or if the server is not local, the utility is limited to
+information that can be obtained from the system tables and therefore should
+be considered an estimate. This is because the utility cannot include
+.frm and related miscellaneous files in the calculations.
+For information read from the server, the account used to connect to the
+server must have the appropriate permissions to read any objects accessed
+during the operation.
+
+If information requested requires file system access but is not available
+that way, the utility prints a message that the information is not
+accessible.  This occurs, for example, if you request log usage but the
+server is not local and the log files cannot be examined directly.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -41,8 +64,8 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 To turn off the headers for CSV or TAB display format, specify
 the :option:`--no-headers` option.
@@ -55,7 +78,7 @@ For details, see :ref:`mysqldiskusage-notes`.
 OPTIONS
 -------
 
-**mysqldiskusage** accepts the following command-line options:
+:command:`mysqldiskusage` accepts the following command-line options:
 
 .. option:: --help
 
@@ -63,7 +86,8 @@ OPTIONS
 
 .. option::  --all, -a
 
-    Display all disk usage, including empty databases.
+    Display all disk usage. This includes usage for databases, logs, and
+    InnoDB tablespaces.
 
 .. option::  --binlog, -b
 
@@ -75,12 +99,15 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   Specify the output display format. Permitted format values are GRID,
+   CSV, TAB, and VERTICAL, or the corresponding shortcuts G, C, T,
+   and V.  The default is GRID.
     
 .. option::  --InnoDB, -i
 
-    Display InnoDB tablespace usage.
+    Display InnoDB tablespace usage. This includes information about the
+    shared InnoDB tablespace as well as .idb files for InnoDB tables with
+    their own tablespace.
 
 .. option::  --logs, -l
 
@@ -88,10 +115,10 @@ OPTIONS
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option is ignored for GRID-format
+   Do not display column headers. This option applies only for CSV and TAB
    output.
     
-.. option:: --quiet
+.. option:: --quiet, -q
 
     Suppress informational messages.
 
@@ -116,32 +143,13 @@ OPTIONS
 
 .. _`mysqldiskusage-notes`:
 
-NOTES
------
-
-The login user must have the appropriate permissions to create new
-objects, read the old database, access (read) the mysql database, and
-grant privileges.
-
-Depending on the options used, the user may also require file system
-read access to the data directory and InnoDB home directory. If the
-user does not have access to these areas, the data displayed is
-limited to information from the system tables and therefore should
-be considered an estimate. This is because the utility cannot include
-.frm and related miscellaneous files in the calculations.
-
-If the user has read access to the data directory, disk space usage
-shown includes the sum of all storage engine specific files such
-as the .MYI and .MYD files for MyISAM and similarly includes the
-tablespace files for InnoDB.
-
 EXAMPLES
 --------
 
 To show only the disk space usage for the employees and test databases in
 grid format (the default), use this command::
 
-    $ mysqldiskusage --server=root@localhost db1 db2 db3
+    $ mysqldiskusage --server=root@localhost employees test
     # Source on localhost: ... connected.
     # Database totals:
     +------------+--------------+
@@ -212,7 +220,7 @@ To see all disk usage for the server in CSV format, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

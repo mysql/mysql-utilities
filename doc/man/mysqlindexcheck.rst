@@ -9,12 +9,12 @@ SYNOPSIS
 
 ::
 
-  mysqlcheckindex --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+  mysqlindexcheck --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                 --quiet | --format=[GRID|SQL|TAB|CSV] |
-                 --stats [--best=<num_rows> | --worst=<num rows> ]]
-                 <db> | [ ,<db> | ,<db.table> | , <db.table>]]
+                 --format=[GRID|SQL|TAB|CSV] |
+                 --stats [--best[=<N>] | --worst[=<N>] ]]
+                 <db>[.<table>] ... ]
 
 DESCRIPTION
 -----------
@@ -41,7 +41,8 @@ type, the utility applies the following rules to compare indexes
   included in idx_a. Order counts.
 
 To scan all tables in a database, specify only the database name. To scan
-a specific table, name the table in *db*.table* format.
+a specific table, name the table in *db*.*table* format. It is possible
+to mix database and table names.
 
 You can scan tables in any database except the internal databases
 **mysql**, **INFORMATION_SCHEMA**, and **performance_schema**.
@@ -52,16 +53,18 @@ indexes, use the :option:`--verbose` option, which prints the
 equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
 
 To display the best or worst nonprimary key indexes for each table,
-use the :option:`--best` or :option:`--worst` option. The data will
-show the top 5 indexes from tables with 10 or more rows.
+use the :option:`--best` or :option:`--worst` option. This causes the
+output to show the best or worst indexes from tables with 10 or more rows.
+By default, each option shows five indexes. To override that, provide
+an integer value for the option.
 
 To change the format of the index lists displayed for the
 :option:`--show-indexes`, :option:`--best`, and :option:`--worst` options,
 use one of the following values with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -73,8 +76,8 @@ use one of the following values with the :option:`--format` option:
   print SQL statements rather than a list.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
@@ -87,21 +90,24 @@ For details, see :ref:`mysqlindexcheck-notes`.
 OPTIONS
 -------
 
-**mysqlindexcheck** accepts the following command-line options:
+:command:`mysqlindexcheck` accepts the following command-line options:
 
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --best=<num>
+.. option:: --best[=<N>]
 
-    Limit index statistics to the best N indexes.
+   If :option:`--stats` is given,
+   limit index statistics to the best N indexes. The default value of N is
+   5 if omitted.
 
-.. option:: --format=<index_format>
+.. option:: --format=<index_format>, -f<index_format>
 
-   Specify the index list display format. Permitted format values are GRID,
-   CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T, S
-   and V.  The default is GRID.
+   Specify the index list display format for output produced by
+   :option:`--stats`. Permitted format values are
+   GRID, CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T,
+   S, and V.  The default is GRID.
 
 .. option:: --server=<source>
 
@@ -134,9 +140,11 @@ OPTIONS
 
    Display version information and exit.
 
-.. option:: --worst=<num>
+.. option:: --worst[=<N>]
 
-   Limit index statistics to the worst N indexes.
+   If :option:`--stats` is given,
+   limit index statistics to the worst N indexes. The default value of N is
+   5 if omitted.
 
 .. _mysqlindexcheck-notes:
 
@@ -150,8 +158,7 @@ EXAMPLES
 --------
 
 To scan all tables in the employees database to see the
-possible redundant and duplicate indexes, as well as the **DROP**
-statements for the indexes, use this command::
+possible redundant and duplicate indexes, use this command::
 
     $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.
@@ -183,7 +190,7 @@ statements for the indexes, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -4,33 +4,34 @@
 
 .. module:: mysql.utilities.command.grep
 
-This module provide utilities to search objects on server. The module
-define a set of *object types* that can be searched by searching the
-*fields* of each object. The notion of a field of an object is in this
-case very loosly defined and basically means any names occuring as
-part of the definition of an object. For example, the fields of a
-table include the table name, the column names, and the partition
-names (if it is a partition table).
+This module provide utilities to search for objects on a server. The module
+defines a set of *object types* that can be searched by searching the
+*fields* of each object. The notion of a field of an object is in this case
+very loosly defined and basically means any names occurring as part of the
+object definition. For example, the fields of a table include the table
+name, the column names, and the partition names (if it is a partitioned
+table).
 
 
 Constants
 ---------
 
-.. data:: ROUTINE
-.. data:: EVENT
-.. data:: TRIGGER
-.. data:: TABLE
-.. data:: DATABASE
-.. data:: VIEW
-.. data:: USER
+The following constants denote the different object types that can be
+searched.
 
-   Constants that can be used to denote the different object types.
+.. data:: ROUTINE
+          EVENT
+          TRIGGER
+          TABLE
+          DATABASE
+          VIEW
+          USER
+
+The following constant is a sequence of all the object types that are
+available. It can be used to generate a version-independent list of object
+types that can be searched in; for example, options and help texts.
 
 .. data:: OBJECT_TYPES
-
-   This is a sequence of all the object types that are available. It
-   can be used to generate a version-independent list of object types
-   that can be searched in, for example, options and help texts.
 
 Classes
 -------
@@ -39,13 +40,13 @@ Classes
 
    Search for objects on a MySQL server by name or content.
 
-   This command class is used to search one or more MySQL server
-   instances for objects where the name (or the contents of routines,
-   triggers, or events) match a given pattern.
+   This command class searches one or more MySQL server
+   instances for objects where the name (or content) of routines,
+   triggers, or events) matches a given pattern.
 
    .. method:: sql() -> string
 
-      This will return SQL code for executing the search in the form of a
+      Return the SQL code for executing the search in the form of a
       `SELECT`_ statement.
 
    .. method:: execute(connections[, output=sys.output, connector=mysql.connector])
@@ -53,9 +54,9 @@ Classes
       Execute the search on each of the connections in turn and print an
       aggregate of the result as a grid table.
 
-      :param connections: Sequence of :ref:`connection specifiers` to send the query to.
-      :param output: Output stream where the result will be written.
-      :param connector: Connector to use when connecting to the servers.
+      :param connections: Sequence of :ref:`connection specifiers` to send the query to
+      :param output: Output stream where the result will be written
+      :param connector: Connector to use when connecting to the servers
 
 
 .. References

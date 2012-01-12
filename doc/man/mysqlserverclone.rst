@@ -17,36 +17,41 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits an administrator to start a new instance of a
-running server.  The utility will create a new datadir (--new-data),
-and start the server with a socket file. You can optionally add a
+This utility permits an administrator to clone an existing MySQL server
+instance to start a new server instance
+on the same host.  The utility creates a new datadir (:option:`--new-data`),
+and starts the server with a socket file. You can optionally add a
 password for the login user account on the new instance.
 
 OPTIONS
 -------
 
-**mysqlserverclone** accepts the following command-line options:
+:command:`mysqlserverclone` accepts the following command-line options:
 
-.. option:: --help, -h
+.. option:: --help
 
    Display a help message and exit.
 
 .. option:: --mysqld=<options>
 
-   Additional options for mysqld.
+   Additional options for :command:`mysqld`. To specify multiple options,
+   separate them by spaces. Use appropriate quoting as necessary. For example,
+   to specify ``--log-bin=binlog`` and ``--general-log-file="my log file"``,
+   use :option:`--mysqld="--log-bin=binlog --general-log-file='my log file'"`.
 
 .. option:: --new-data=<path_to_new_datadir>
 
-   The full path to the location of the data directory for the new
-   instance.
+   The full path name of the location of the data directory for the new
+   server instance. If the directory does not exist, the utility will create
+   it.
 
 .. option:: --new-id=<server_id>
 
-   The server_id for the new instance - default=2.
+   The ``server_id`` value for the new server instance. The default 2.
 
 .. option:: --new-port=<port>
 
-   The new port for the new instance - default=3307.
+   The port number for the new server instance. The default is 3307.
 
 .. option:: --quiet, -q
 
@@ -54,11 +59,11 @@ OPTIONS
 
 .. option:: --root-password=<password>
 
-   Password for the root user.
+   The password for the root user of the new server instance.
 
 .. option:: --server=<source>
 
-   Connection information for the source server in the format:
+   Connection information for the server to be cloned in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
 
 .. option:: --verbose, -v
@@ -71,17 +76,17 @@ OPTIONS
 
    Display version information and exit.
 
-NOTES
------
+.. option:: --write-command=<file_name>, -w<file_name>
 
-The login user must have the appropriate permissions to grant access
-to all databases and the ability to create a user account.
+   Path name of file in which to write the command used to launch the new
+   server instance.
+
 
 EXAMPLES
 --------
 
-The following demonstrates how to create a new instance of a running server
-and setting the root password and turning binary logging on::
+The following demonstrates how to create a new instance of a running server,
+set the root password and enable binary logging::
 
     $ mkdir /source/test123
     $ mysqlserverclone --server=root:pass@localhost \
@@ -101,7 +106,7 @@ and setting the root password and turning binary logging on::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

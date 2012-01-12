@@ -1,8 +1,8 @@
 .. `mysqldbcompare`:
 
-#################################################################
-``mysqldbcompare`` - Check Two Databases and Identify Differences
-#################################################################
+###################################################################
+``mysqldbcompare`` - Compare Two Databases and Identify Differences
+###################################################################
 
 SYNOPSIS
 --------
@@ -27,6 +27,17 @@ in the two databases and presents them in a diff-style format of
 choice. Differences in the data are shown using a similar diff-style
 format. Changed or missing rows are shown in a standard format of
 GRID, CSV, TAB, or VERTICAL.
+
+To specify the databases to compare, use the notation db1:db2 or db.
+In the latter case, the databases to compare have the same name; this
+is a convenience notation for comparing databases on two servers.
+
+The comparison may be run against two databases of different names on a
+single server by specifying only the :option:`--server1` option. The user
+can also connect to another server by specifying the :option:`--server2`
+option. In this case, the database or database object pair align such that
+db1 (or db1.obj1) are taken from server1 and db2 (or db2.obj2) are taken
+from server2.
 
 Those objects considered in the database include tables, views, triggers,
 procedures, functions, and events. A count of each object type can be shown
@@ -57,7 +68,7 @@ If they do not, no further processing is possible and the
 from one or another database. The following tests (3)-(5) apply only to those
 objects that appear in both databases.
 
-(3) The definitions (the CREATE statements) are compared and differences are
+(3) The definitions (the **CREATE** statements) are compared and differences are
 presented. In the case of name differences only, this test fails (since the
 statements are not the same) but the user may elect that this is normal and
 therefore may want to run the utility again with the :option:`--skip-diff`
@@ -91,7 +102,7 @@ Each test completes with one of the following states:
 **-**
   The test is not applicable to this object.
 
-Several of the tests may be skipped with a --skip-% option. For example, the
+Several of the tests may be skipped with a ``--skip-xxx`` option. For example, the
 user can skip the object compare step if there are known missing objects among
 the databases by using the :option:`--skip-object-compare` option, skip the
 definition comparison if there are known differences in the definitions by
@@ -101,14 +112,6 @@ using the :option:`--skip-diff` option, skip the row count step using the
 run only one of the tests. This may be helpful when working to bring two
 databases into synchronization to avoid running all of the tests repeatedly
 during the process.
-
-To specify the databases to compare, use the notation db1:db2.
-Additionally, the check may be run against either a single server for comparing
-two databases of different names on the same server by specifying only the
-:option:`--server1` option. The user can also connect to another server by
-specifying the :option:`--server2` option. In this case, the database or
-database object pair align such that database1 (or database1.object1) are taken
-from server1 and database2 (or database2.object2) are taken from server2.
 
 To specify how to display diff-style output, use one of the following
 values with the :option:`--difftype` option:
@@ -129,8 +132,8 @@ To specify how to display changed or missing row output, use one of
 the following values with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -139,8 +142,8 @@ the following values with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 The :option:`--changes-for` option controls the direction of the
 difference (by specifying the object to be transformed) in either the
@@ -156,16 +159,16 @@ the colon are located on the server designated by :option:`--server1`
 and the database and object on the right is located on the server
 designated by :option:`--server2`.
 
-  * :option:`--changes-for=server1`: The object definition on server1 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server2. The output therefore is the
-    transformation needed to make the object on server1 like the object on
-    server2.
-  * :option:`--changes-for=server2`: The object definition on server2 is the object to be
-    transformed and is used to produce the difference or transformation
-    compared to the definition on server1. The output therefore is the
-    transformation needed to make the object on server2 like the object on
-    server1.
+* :option:`--changes-for=server1`: The object definition on server1 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server2. The output therefore is the
+  transformation needed to make the object on server1 like the object on
+  server2.
+* :option:`--changes-for=server2`: The object definition on server2 is the object to be
+  transformed and is used to produce the difference or transformation
+  compared to the definition on server1. The output therefore is the
+  transformation needed to make the object on server2 like the object on
+  server1.
 
 The default direction is server1. 
 
@@ -180,13 +183,13 @@ enabled, and you do not want the comparison steps logged, use the
 OPTIONS
 -------
 
-**mysqldbcompare** accepts the following command-line options:
+:command:`mysqldbcompare` accepts the following command-line options:
 
 .. option:: --help
 
    Display a help message and exit.
 
-.. option:: --changes-for=DIRECTION
+.. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
    example, to see the transformation for transforming server1 to match
@@ -195,8 +198,9 @@ OPTIONS
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
-   Specify the difference display format. Permitted format values are unified,
-   context, differ, and sql. The default is unified.
+   Specify the difference display format. Permitted format values are
+   **unified**, **context**, **differ**, and **sql**. The default is
+   **unified**.
    
 .. option:: --disable-binary-logging
 
@@ -209,7 +213,7 @@ OPTIONS
    Specify the missing-row display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
    
-.. option:: --quiet
+.. option:: --quiet, -q
 
    Do not print anything. Return only an exit code of success or failure.
 
@@ -260,9 +264,10 @@ OPTIONS
 
    Display version information and exit.
 
-.. option:: --width
+.. option:: --width=<number>
 
    Change the display width of the test report.
+   The default is 75 characters.
 
 
 NOTES
@@ -439,7 +444,7 @@ use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,8 +1,8 @@
 .. `mysqlrplcheck`:
 
-########################################################
-``mysqlrplcheck`` - Check Prerequisities for Replication
-########################################################
+####################################################
+``mysqlrplcheck`` - Check Replication Prerequisities
+####################################################
 
 SYNOPSIS
 --------
@@ -17,28 +17,29 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility is used to check the prerequisites for replication on a master and
+This utility checks the prerequisites for replication between a master and
 a slave. These checks (called tests) are designed to ensure a healthy
 replication setup. Each of these tests are described in more detail here::
 
  Test# Description
  ----- ----------------------------------------------------------------------
-   1   Is binary log turned on for the master?
-   2   Are there binary logging exceptions? If so, display them.
-   3   Does the rpl user exist on the master and does she have the correct
-       privileges?
+   1   Is binary log enabled on the master?
+   2   Are there binary logging exceptions (such as *_do_db or *_ignore_db
+       settings)? If so, display them.
+   3   Does the rpl user exist on the master with the correct privileges?
    4   Are there server-id conflicts?
-   5   Is the slave connected to this master? If not, display host and port.
-   6   Are there conflicts between the master.info file and the values shown
-       in SHOW SLAVE STATUS?
+   5   Is the slave connected to this master? If not, display the master
+       host and port.
+   6   Are there conflicts between the master.info file on the slave and
+       the values shown in SHOW SLAVE STATUS on the master?
    7   Are the InnoDB configurations compatible (plugin vs. native)?
    8   Are the storage engines compatible (have same on slave as master)?
    9   Are the lower-case-tables-names settings compatible? Warn if there are
-       settings of lower/upper case table names that can cause problems.
+       settings for lowercase/uppercase table names that can cause problems.
        See BUG#59240.
   10   Is the slave behind the master?
 
-The utility will run each of the tests in turn unless there is a fatal error
+The utility runs each of the tests in turn unless there is a fatal error
 preventing further testing, such as a loss of connection to the servers.
 
 Each test can complete with one of the following states: (pass, fail, warn)
@@ -47,17 +48,17 @@ met but one or more errors occurred or there are exceptions to consider, and
 warn means the test found some unusual settings that should be examined
 further but may not be in error.
 
-You can use the :option:`--verbose` option to see additional information such
-as server-id's, lower-case-table-name settings, and the contents of the master
+Use the :option:`--verbose` option to see additional information such
+as server IDs, lower-case-table-name settings, and the contents of the master
 information file on the slave.
 
-You can also use the :option:`--show-slave-status` option to see the values
-from the **SHOW SLAVE STATUS** statement.
+To see the values from the **SHOW SLAVE STATUS** statement, use the
+:option:`--show-slave-status` option.
 
 OPTIONS
 -------
 
-**mysqlrplcheck** accepts the following command-line options:
+:command:`mysqlrplcheck` accepts the following command-line options:
 
 .. option:: --help
 
@@ -70,9 +71,10 @@ OPTIONS
 
 .. option:: --master-info-file=<file>
 
-   The name of the master information file on the slave.default = 'master.info'
-   read from the data directory. Note: This option requires that the utility
-   run on the slave with appropriate file read access to the data directory.
+   The name of the master information file on the slave. The default is
+   'master.info' read from the data directory. Note: This option requires that
+   you run the utility on the slave and that you have appropriate file read
+   access to the data directory.
 
 .. option:: --quiet, -q
 
@@ -81,7 +83,7 @@ OPTIONS
    
 .. option:: --show-slave-status, -s
 
-   Display the values from **SHOW SLAVE STATUS**.
+   Display the values from **SHOW SLAVE STATUS** on the master.
 
 .. option:: --slave=<source>
 
@@ -111,8 +113,8 @@ STATUS**, **SHOW MASTER STATUS**, and **SHOW VARIABLES**.
 EXAMPLES
 --------
 
-To check the prerequisites of a master and slave actively performing
-replication, use the following command::
+To check the prerequisites of a master and slave that currently are actively
+performing replication, use the following command::
 
     $ mysqlrplcheck --master=root@host1:3310 --slave=root@host2:3311
     # master on host1: ... connected.
@@ -229,7 +231,7 @@ additional details, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

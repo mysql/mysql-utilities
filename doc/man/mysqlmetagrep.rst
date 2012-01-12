@@ -10,7 +10,7 @@ SYNOPSIS
 ::
 
   mysqlmetagrep [ --version | --help ] | --format=<format> |
-                --body | --types<object types> | --regexp | --sql |
+                --body | --search-objects=<types> | --regexp | --sql |
                 --database=<pattern> | --pattern=<pattern>
                 --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
 
@@ -30,8 +30,8 @@ designated servers and executes it in turn before collecting the result
 and printing it as a table. If you do not want to send the statement
 to the servers and instead have the utility emit the statement, you
 can use the :option:`--sql` option. This can be useful if you want to
-feed the output of the statement to other utilities such as
-:manpage:`mysqlevent(1)`.
+feed the output of the statement to another application such as the :command:`mysql`
+monitor.
 
 The MySQL server uses two forms of patterns when matching strings:
 :ref:`simple_pattern` and :ref:`posix_regexp`.
@@ -49,8 +49,8 @@ To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -59,8 +59,8 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 
 .. _simple_pattern:
@@ -132,16 +132,16 @@ syntax is described in the `MySQL manual`_, but can often be found in
 OPTIONS
 -------
 
-**mysqlmetagrep** accepts the following command-line options:
+:command:`mysqlmetagrep` accepts the following command-line options:
 
-.. option:: --help, -h
+.. option:: --help
 
    Display a help message and exit.
 
 .. option:: --body, -b
 
-   Search the body of procedures, functions, triggers, and
-   events. The default is to match only the name.
+   Search the body of stored programs (procedures, functions, triggers, and
+   events). The default is to match only the name.
 
 .. option:: --database=<pattern>
 
@@ -149,30 +149,30 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
+
+.. option:: --object-types=<types>, --search-objects=<types>
+
+   Search only for/in objects named in <types>, which is a comma-separated
+   list of one or more of the values **procedure**, **function**, **event**,
+   **trigger**, **table**, and **database**.
+
+   The default is to search in objects of all types.
 
 .. option:: --pattern=<pattern>, -e=<pattern>
 
-   Pattern to use when matching. This is required when the pattern
-   looks like a connection specification.
+   The pattern to use when matching. This is required when the first nonoption
+   argument looks like a connection specification rather than a pattern.
 
-   If a pattern option is given, the first argument is not treated as
-   a pattern but as a connection specifier.
+   If the :option:`--pattern` option is given, the first nonoption argument
+   is not treated as a pattern but as a connection specifier.
 
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching.
-
-.. option:: --search-objects=<type>, ...
-            --object-types=<type>, ...
-
-   Search only for/in objects of type <type>, where <type> can be
-   **procedure**, **function**, **event**, **trigger**, **table**, or
-   **database**.
-
-   Default is to search in objects of all kinds of types.
+   to use **LIKE** for matching. This affects the :option:`--database`
+   and :option:`--pattern` options.
 
 .. option:: --server=<source>
 
@@ -219,7 +219,7 @@ routines, triggers, and events)::
 
 This is the same as the previous example, but using the **REGEXP** operator.
 Note that in the pattern it is not necessary to add wildcards before or
-after t3::
+after t2::
 
     $ mysqlmetagrep -Gb --pattern="t2" --server=mats@localhost
     +------------------------+--------------+--------------+-----------+
@@ -233,7 +233,7 @@ after t3::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

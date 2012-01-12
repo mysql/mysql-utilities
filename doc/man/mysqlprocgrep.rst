@@ -19,18 +19,34 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility scans the process lists for all the servers specified
-using instances of the :option:`--server` option and either prints
-the result (the default) or executes certain actions on it. The
-process-matching conditions are specified as command options. For
-a process to match, all conditions must match.
+This utility scans the process lists for the servers specified using
+instances of the :option:`--server` option and selects those that match the
+conditions specified using the :option:`--age` and ``--match-xxx`` options. For
+a process to match, all conditions given must match.  The utility then
+either prints the selected processes (the default) or executes certain
+actions on them.
+
+If no :option:`--age` or ``--match-xxx`` options are given, the utility
+selects all processes.
+
+The ``--match-xxx`` options correspond to the columns in the
+INFORMATION_SCHEMA.PROCESSLIST table. For example, :option:`--match-command`
+specifies a matching condition for **PROCESSLIST.COMMAND** column values.
+There is no ``--match-time`` option, however. To specify a condition based on
+process time, use :option:`--age`.
+
+Processes that can be seen and killed are subject to whether the
+account used to connect to the server has the **PROCESS** and
+**SUPER** privileges.  Without **PROCESS**, the account cannot see
+processes belonging to other accounts Without **SUPER**, the account
+cannot kill processes belonging to other accounts
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
 **GRID** (default)
-  Display output formatted like that of the mysql monitor in a grid
-  or table layout.
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
 
 **CSV**
   Display output in comma-separated values format.
@@ -39,36 +55,48 @@ with the :option:`--format` option:
   Display output in tab-separated format.
 
 **VERTICAL**
-  Display output in a single column similar to the ``\G`` command
-  for the mysql monitor.
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 
 Options
 -------
 
-**mysqlprocgrep** accepts the following command-line options:
+:command:`mysqlprocgrep` accepts the following command-line options:
 
-.. option:: --help, -h
+.. option:: --help
 
    Display a help message and exit.
 
 .. option:: --age=<time>
 
-   Display only processes that have been in the current state more than a given
-   time
+   Select only processes that have been in the current state more than
+   a given time. The time value can be specified in two formats:
+   either using the ``hh:mm:ss`` format, with hours and minutes optional,
+   or as a sequence of numbers with a suffix giving the period size.
+
+   The permitted suffixes are **s** (second), **m** (minute), **h**
+   (hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
+   15 minutes.
+
+   For both formats, the specification can optionally be preceeded by 
+   ``+`` or ``-``, where ``+`` means older than the given time, and
+   ``-`` means younger than the given time.
 
 .. option::  --format=<format>, -f<format>
 
-   Specify the display format. Permitted format values are
+   Specify the output display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
 
 .. option:: --kill-connection
 
-   Kill the connection for all matching processes.
+   Kill the connection for all matching processes (like the **KILL
+   CONNECTION** statement).
 
 .. option:: --kill-query
 
-   Kill the query for all matching processes.
+   Kill the query for all matching processes (like the **KILL QUERY**
+   statement).
 
 .. option:: --match-command=<pattern>
 
@@ -90,10 +118,6 @@ Options
 
    Match all processes where the **State** field matches the pattern.
 
-.. option:: --match-time=<pattern>
-
-   Match all processes where the **Time** field matches the pattern.
-
 .. option:: --match-user=<pattern>
 
    Match all processes where the **User** field matches the pattern.
@@ -108,32 +132,34 @@ Options
 .. option:: --regexp, --basic-regexp, -G
 
    Perform pattern matches using the **REGEXP** operator. The default is
-   to use **LIKE** for matching.
+   to use **LIKE** for matching.  This affects the ``--match-xxx`` options.
 
 .. option:: --server=<source>
 
-   Connection information for the servers to search in the format:
+   Connection information for the server to search in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
    The option may be repeated to form a list of servers to search.
 
 .. option:: --sql, --print-sql, -Q
 
-   Emit the SQL for matching or killing the queries. If the
+   Instead of displaying the selected processes, emit the **SELECT**
+   statement that retrieves information about them. If the
    :option:`--kill-connection` or :option:`--kill-query` option is
-   given, a routine for killing the queries are generated.
+   given, a stored procedure named ``kill_processes()`` for killing the
+   queries is generated rather than a **SELECT** statement.
 
 .. option:: --sql-body
 
-   Emit SQL statements for performing the search or kill of the
-   **INFORMATION_SCHEMA.PROCESSLIST** table.  This is useful together
-   with :manpage:`mysqlmkevent(1)` to generate an event for the server
-   scheduler.
+   Like :option:`--sql`, but produces the output as the body of a stored
+   procedure without the **CREATE PROCEDURE** part of the definition.
+   This could be used, for example, to generate an event for the server
+   Event Manager.
 
    When used with a kill option, code for killing the matching queries
    is generated. Note that it is not possible to execute the emitted
    code unless it is put in a stored routine, event, or trigger. For
    example, the following code could be generated to kill all
-   connections for user **www-data** that is idle::
+   connections for user **www-data** that are idle::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -169,21 +195,6 @@ Options
    Display version information and exit.
 
 
-Specifying time
-~~~~~~~~~~~~~~~
-
-Time for the :option:`--age` option can be specified in two formats:
-either using the ``hh:mm:ss`` format, with hours and minutes optional,
-or as a sequence of numbers with a suffix giving the period size.
-
-The permitted suffixes are **s** (second), **m** (minute), **h**
-(hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
-15 minutes.
-
-For both formats, the specification can optionally be preceeded by a
-``+`` or a ``-``, where a ``+`` means older than the given time, and
-``-`` means younger than the given age.
-
 EXAMPLES
 --------
 
@@ -191,19 +202,21 @@ For all the examples, we assume that the **root** user on
 **localhost** has sufficient privileges to kill queries and
 connections.
 
-To kill all connections created by user "mats" that are younger than 1
+To kill all queries created by user "mats" that are younger than 1
 minute::
 
-  mysqlprocgrep --server=root@localhost --match-user=mats --age=1m --kill-query
+  mysqlprocgrep --server=root@localhost \
+    --match-user=mats --age=-1m --kill-query
 
-To kill all queries that has been idle for more than 1 hour::
+To kill all connections that has been idle for more than 1 hour::
 
-  mysqlprocgrep --server=root@localhost --match-command=sleep --age=1h --kill
+  mysqlprocgrep --server=root@localhost \
+    --match-command=sleep --age=1h --kill-connection
 
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

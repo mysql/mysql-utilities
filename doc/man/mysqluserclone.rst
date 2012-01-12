@@ -1,8 +1,8 @@
 .. _`mysqluserclone`:
 
-#####################################################################
-``mysqluserclone`` - Create New Users Using Existing User as Template
-#####################################################################
+###########################################################
+``mysqluserclone`` - Clone Existing User to Create New User
+###########################################################
 
 
 SYNOPSIS
@@ -20,25 +20,39 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-This utility permits a database administrator to use an existing user
-account on one server as a template, clone a MySQL user such that one
-or more new user accounts are created on another (or the same) server
-with the same privileges as the original user.
+This utility uses an existing MySQL user account on one server as a
+template, and clones it to create one or more new user accounts with the
+same privileges as the original user.  The new users can be created on the
+original server or a different server.
 
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to
 access all objects in the operation.
 For details, see :ref:`mysqluserclone-notes`.
 
-You can also use the utility to list users for a server by specifying the
---list option. This prints a list of the users on the source (no destination is
-needed). You can also control the output of the list using the
-:option:`--format` option.
+To list users for a server, specify the :option:`--list` option.  This
+prints a list of the users on the source (no destination is needed). To
+control how to display list output, use one of the following values with the
+:option:`--format` option:
+
+**GRID** (default)
+  Display output in grid or table format like that of the
+  :command:`mysql` monitor.
+
+**CSV**
+  Display output in comma-separated values format.
+
+**TAB**
+  Display output in tab-separated format.
+
+**VERTICAL**
+  Display output in single-column format like that of the ``\G`` command
+  for the :command:`mysql` monitor.
 
 OPTIONS
 -------
 
-**mysqluserclone** accepts the following command-line options:
+:command:`mysqluserclone` accepts the following command-line options:
 
 .. option:: --help
 
@@ -48,22 +62,24 @@ OPTIONS
 
    Connection information for the destination server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
 
 .. option:: --dump, -d 
 
-   Dump GRANT statements for user.
+   Display the **GRANT** statements to create the account rather than
+   executing them. In this case, the utility does not connect to the
+   destination server and no :option:`--destination` option is needed.
 
-.. option::  --format=<list_format>
+.. option::  --format=<list_format>, -f<list_format>
 
    Specify the user display format. Permitted format values are
    GRID, CSV, TAB, and VERTICAL. The default is GRID.
    This option is valid only if :option:`--list` is given.
 
-.. option:: --force, -f
+.. option:: --force
 
-   Drop the new user if it exists.
+   Drop the new user account if it exists before creating the new account.
+   Without this option, it is an error to try to create an account that
+   already exists.
 
 .. option:: --include-global-privileges
 
@@ -71,7 +87,8 @@ OPTIONS
 
 .. option:: --list
 
-   List all users on the source - does not require a destination.
+   List all users on the source server. With this option, a destination server
+   need not be specified.
 
 .. option:: --quiet, -q
 
@@ -81,8 +98,6 @@ OPTIONS
 
    Connection information for the source server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
 
 .. option:: --verbose, -v
 
@@ -99,11 +114,13 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to create new
-users, access (read) the mysql database, and grant privileges. At a
-minimum, this requires the login user to have read privileges on the mysql
-database, the **GRANT OPTION** privilege for all databases listed in the
-**GRANT** statements found, and the ability to create a user account.
+The account used to connect to the source server must have privileges to
+read the **mysql** database.
+
+The account used to connect to the destination server must have privileges to
+execute **CREATE USER** (and **DROP USER** if the :option:`--force` option is
+given), and privileges to execute **GRANT** for all privileges to be granted to
+the new accounts.
 
 EXAMPLES
 --------
@@ -136,7 +153,7 @@ verbose output in CSV format::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
