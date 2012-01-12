@@ -4,13 +4,13 @@
 
 .. module:: mysql.utilities.command.grep
 
-This module provide utilities to search objects on server. The module
-define a set of *object types* that can be searched by searching the
-*fields* of each object. The notion of a field of an object is in this
-case very loosly defined and basically means any names occuring as
-part of the definition of an object. For example, the fields of a
-table include the table name, the column names, and the partition
-names (if it is a partition table).
+This module provide utilities to search for objects on a server. The module
+defines a set of *object types* that can be searched by searching the
+*fields* of each object. The notion of a field of an object is in this case
+very loosly defined and basically means any names occurring as part of the
+object definition. For example, the fields of a table include the table
+name, the column names, and the partition names (if it is a partitioned
+table).
 
 
 Constants
@@ -40,7 +40,7 @@ Classes
 
    Search for objects on a MySQL server by name or content.
 
-   This command class searchs one or more MySQL server
+   This command class searches one or more MySQL server
    instances for objects where the name (or content) of routines,
    triggers, or events) matches a given pattern.
 

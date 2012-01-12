@@ -4,7 +4,7 @@
 
 .. module:: mysql.utilities.command.proc
 
-Module for searching processes on a server and optionally kill either
+Module for searching processes on a server and optionally killing either
 the query or the connection for all matching processes.
 
 The processes are searched by matching the fields in the
@@ -39,7 +39,7 @@ the search conditions.
 
 .. data:: KILL_QUERY
 
-   Kill the process current query
+   Kill the process query
 
 .. data:: KILL_CONNECTION
 
@@ -66,11 +66,12 @@ Classes
    >>> grep = ProcessGrep(matches=[(USER, "mats")], actions=[KILL_QUERY])
    >>> grep.execute("root@server-1.example.com", "root@server-2.example.com")
 
-   :param matches: Sequence of fields to compare. All fields have to
+   :param matches: Sequence of field comparison conditions. In each
+                   condition, *var* is one of the constants listed earlier
+                   and *pat* is a pattern. All field conditions must
                    match for the process to match.
 
-   :type matches: List of *(var, pat)* pairs, where *var* is one of the
-                  constants listed earlier and *pat* is a pattern.
+   :type matches: List of *(var, pat)* pairs
 
    .. method:: sql([only_body=False])
 

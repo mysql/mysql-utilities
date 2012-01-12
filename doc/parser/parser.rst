@@ -14,10 +14,10 @@ Classes
 
     Parse the MySQL General Query Log.
     
-    This class is used to parse the MySQL General Query Log. Instances
-    are iterable, but the class does not provide multiple independent iterators.
+    This class parses the MySQL General Query Log. Instances are iterable,
+    but the class does not provide multiple independent iterators.
     
-    For example, to go through the log and print the entries:
+    For example, to read the log and print the entries:
     
     >>> general_log = open("/var/lib/mysql/mysql.log")
     >>> log = GeneralQueryLog(general_log)
@@ -62,10 +62,10 @@ Classes
 
     Parse the MySQL Slow Query Log.
     
-    This class is used to parse the MySQL Slow Query Log. Instances
-    are iterable, but the class does not provide multiple independent iterators.
+    This class parses the MySQL Slow Query Log. Instances are iterable,
+    but the class does not provide multiple independent iterators.
     
-    For example, to go through the log and print the entries:
+    For example, to read the log and print the entries:
 
     >>> slow_log = open("/var/lib/mysql/mysql-slow.log")
     >>> log = SlowQueryLog(slow_log)
