@@ -109,7 +109,7 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --changes-for=DIRECTION
+.. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
    example, to see the transformation for transforming server1 to match
@@ -118,8 +118,9 @@ OPTIONS
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
-   Specify the difference display format. Permitted format values are unified,
-   context, differ, and sql. The default is unified.
+   Specify the difference display format. Permitted format values are
+   **unified**, **context**, **differ**, and **sql**. The default is
+   **unified**.
    
 .. option:: --force
 
@@ -157,9 +158,10 @@ OPTIONS
 
    Display version information and exit.
 
-.. option:: --width
+.. option:: --width=<number>
 
    Change the display width of the test report.
+   The default is 75 characters.
 
 
 NOTES

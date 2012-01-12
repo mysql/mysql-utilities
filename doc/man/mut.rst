@@ -51,7 +51,7 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --do-test=<prefix>
+.. option:: --do-tests=<prefix>
 
    Execute all tests that begin with *prefix*.
 
@@ -75,9 +75,15 @@ OPTIONS
    Exclude tests that require greater resources or take a long time to
    run.
 
-.. option:: --skip-test=<test>
+.. option:: --skip-suite=<name>
 
-   Exclude *test*.  Use this option multiple times to specify multiple tests.
+   Exclude the named test suite.  Use this option multiple times
+   to specify multiple suites.
+
+.. option:: --skip-test=<name>
+
+   Exclude the named test.  Use this option multiple times to specify
+   multiple tests.
 
 .. option:: --skip-tests=<prefix>
 
@@ -95,9 +101,9 @@ OPTIONS
 
    Start executing tests that begin with *prefix*.
 
-.. option:: --suite=<suite>
+.. option:: --suite=<name>
 
-   The test suite to execute.  Use this option multiple times to specify
+   Execute the named test suite.  Use this option multiple times to specify
    multiple suites.
 
 .. option:: --testdir=<path>
@@ -122,7 +128,7 @@ OPTIONS
 
 .. option:: --width=<number>
 
-   Specify the display width.
+   Specify the display width. The default is 75 characters.
 
 NOTES
 -----
