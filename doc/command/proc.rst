@@ -21,11 +21,9 @@ queries further.
 Constants
 ---------
 
-.. data:: KILL_QUERY
-          KILL_CONNECTION
-          PRINT_PROCESS
-
-   Constants for the different actions that can be done on processes.
+The following constants correspond to columns in the
+`INFORMATION_SCHEMA.PROCESSLIST`_ table. They indicate which columns to
+examine when searching for processes matching the search conditions.
 
 .. data:: ID
           USER
@@ -36,7 +34,20 @@ Constants
           STATE
           INFO
 
-   Constants for the columns available in the processlist table.
+The following constants indicate actions to perform on processes that match
+the search conditions.
+
+.. data:: KILL_QUERY
+
+   Kill the process current query
+
+.. data:: KILL_CONNECTION
+
+   Kill the process connection
+
+.. data:: PRINT_PROCESS
+
+   Print the processes
 
 
 Classes

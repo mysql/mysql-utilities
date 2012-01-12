@@ -16,21 +16,22 @@ names (if it is a partition table).
 Constants
 ---------
 
-.. data:: ROUTINE
-.. data:: EVENT
-.. data:: TRIGGER
-.. data:: TABLE
-.. data:: DATABASE
-.. data:: VIEW
-.. data:: USER
+The following constants denote the different object types that can be
+searched.
 
-   Constants that can be used to denote the different object types.
+.. data:: ROUTINE
+          EVENT
+          TRIGGER
+          TABLE
+          DATABASE
+          VIEW
+          USER
+
+The following constant is a sequence of all the object types that are
+available. It can be used to generate a version-independent list of object
+types that can be searched in; for example, options and help texts.
 
 .. data:: OBJECT_TYPES
-
-   This is a sequence of all the object types that are available. It
-   can be used to generate a version-independent list of object types
-   that can be searched in, for example, options and help texts.
 
 Classes
 -------
