@@ -226,11 +226,11 @@ view is imported on another server.
 
 The :option:`--exclude` option does not apply to grants.
 
-The permitted values for the :option:`--format`, :option:`--export`, and
-:option:`--display` options are case insensitive. The option also permits the
-user to specify a prefix for a valid value. For example, --format=g will
-specify the grid format. An error will be generated if a prefix matches more
-than one valid value.
+For the :option:`--format`, :option:`--export`, and :option:`--display`
+options, the permitted values are not case sensitive. In addition, values
+may be specified as any unambiguous prefix of a valid value.  For example,
+:option:`--format=g` specifies the grid format. An error is generated if a
+prefix matches more than one valid value.
 
 EXAMPLES
 --------

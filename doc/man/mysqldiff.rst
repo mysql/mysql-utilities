@@ -191,10 +191,10 @@ The SQL transformation feature has the following known limitations:
 
 * MySQL Cluster-specific SQL extensions are not supported.
 
-The permitted values for the :option:`--difftype` option is case insensitive.
-The option also permits the user to specify a prefix for a valid value. For
-example, --difftype=d will specify the differ type. An error will be generated
-if a prefix matches more than one valid value.
+For the :option:`--difftype` option, the permitted values are not case
+sensitive. In addition, values may be specified as any unambiguous prefix of
+a valid value. For example, :option:`--difftype=d` specifies the differ
+type. An error is generated if a prefix matches more than one valid value.
 
 EXAMPLES
 --------

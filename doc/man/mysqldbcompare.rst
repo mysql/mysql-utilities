@@ -276,10 +276,10 @@ NOTES
 The login user must have the appropriate permissions to read all databases
 and tables listed.
 
-The permitted values for the :option:`--difftype` option are case insensitive.
-The option also permits the user to specify a prefix for a valid value. For
-example, --difftype=d will specify the differ type. An error will be generated if
-a prefix matches more than one valid value.
+For the :option:`--difftype` option, the permitted values are not case
+sensitive. In addition, values may be specified as any unambiguous prefix of
+a valid value. For example, :option:`--difftype=d` specifies the differ
+type. An error is generated if a prefix matches more than one valid value.
 
 
 EXAMPLES
@@ -333,117 +333,110 @@ use this command::
     
     # ...done
 
-    Given : two databases with the same table layout. Data for each table
-            contains:
+Given : two databases with the same table layout. Data for each table
+contains::
   
-          mysql> select * from db1.t1;
-          +---+---------------+
-          | a | b             |
-          +---+---------------+
-          | 1 | Test 789      |
-          | 2 | Test 456      |
-          | 3 | Test 123      |
-          | 4 | New row - db1 |
-          +---+---------------+
-          4 rows in set (0.00 sec)
-          
-          mysql> select * from db2.t1;
-          +---+---------------+
-          | a | b             |
-          +---+---------------+
-          | 1 | Test 123      |
-          | 2 | Test 456      |
-          | 3 | Test 789      |
-          | 5 | New row - db2 |
-          +---+---------------+
-          4 rows in set (0.00 sec)
+    mysql> select * from db1.t1;
+    +---+---------------+
+    | a | b             |
+    +---+---------------+
+    | 1 | Test 789      |
+    | 2 | Test 456      |
+    | 3 | Test 123      |
+    | 4 | New row - db1 |
+    +---+---------------+
+    4 rows in set (0.00 sec)
+    
+    mysql> select * from db2.t1;
+    +---+---------------+
+    | a | b             |
+    +---+---------------+
+    | 1 | Test 123      |
+    | 2 | Test 456      |
+    | 3 | Test 789      |
+    | 5 | New row - db2 |
+    +---+---------------+
+    4 rows in set (0.00 sec)
   
-    To generate the SQL commands for data transformations to make db1.t1 the
-    same as db2.t1, use the --changes-for=server1 options. We must also include
-    the -a option to ensure the data consistency test is run. The following
-    command illustrates the options used and an excerpt from the results
-    generated. 
-  
+To generate the SQL statements for data transformations to make db1.t1 the
+same as db2.t1, use the :option:`--changes-for=server1` option. We must also
+include the :option:`-a` option to ensure the data consistency test is run.
+The following command illustrates the options used and an excerpt from the
+results generated::
+
     $ mysqldbcompare --server1=root:root@localhost \
-        --server2=root:root@localhost db1:db2 --changes-for=server1 -a \
-        --difftype=sql
-        
+	--server2=root:root@localhost db1:db2 --changes-for=server1 -a \
+	--difftype=sql
+
     [...]
-  
-    #                                                   Defn    Row     Data   
-    # Type      Object Name                             Diff    Count   Check  
-    # ------------------------------------------------------------------------- 
-    # TABLE     t1                                      pass    pass    FAIL    
-    #
-    # Data transformations for direction = server1:
-    
-    # Data differences found among rows:
-    UPDATE db1.t1 SET b = 'Test 123' WHERE a = '1';
-    UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3';
-    DELETE FROM db1.t1 WHERE a = '4';
-    INSERT INTO db1.t1 (a, b) VALUES('5', 'New row - db2');
-    
-    
-    # Database consistency check failed.
-    #
-    # ...done
-  
-    Similarly, when the same command is run with --changes-for=server2 and
-    --difftype=sql, the following report is generated.
-  
+
+    #                                                   Defn    Row     Data
+    # Type      Object Name                             Diff    Count
+    Check #
+    -------------------------------------------------------------------------
+    # TABLE     t1                                      pass    pass    FAIL
+    # # Data transformations for direction = server1:
+
+    # Data differences found among rows: UPDATE db1.t1 SET b = 'Test 123'
+    WHERE a = '1'; UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3'; DELETE
+    FROM db1.t1 WHERE a = '4'; INSERT INTO db1.t1 (a, b) VALUES('5', 'New
+    row - db2');
+
+
+    # Database consistency check failed.  # # ...done
+
+Similarly, when the same command is run with --changes-for=server2 and
+--difftype=sql, the following report is generated::
+
     $ mysqldbcompare --server1=root:root@localhost \
-        --server2=root:root@localhost db1:db2 --changes-for=server2 -a \
-        --difftype=sql
-        
+	--server2=root:root@localhost db1:db2 --changes-for=server2 -a \
+	--difftype=sql
+
     [...]
-  
-    #                                                   Defn    Row     Data   
-    # Type      Object Name                             Diff    Count   Check  
-    # ------------------------------------------------------------------------- 
-    # TABLE     t1                                      pass    pass    FAIL    
-    #
+
+    #                                                   Defn    Row     Data
+    # Type      Object Name                             Diff    Count
+    Check #
+    -------------------------------------------------------------------------
+    # TABLE     t1                                      pass    pass    FAIL
+    # # Data transformations for direction = server2:
+
+    # Data differences found among rows: UPDATE db2.t1 SET b = 'Test 789'
+    WHERE a = '1'; UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3'; DELETE
+    FROM db2.t1 WHERE a = '5'; INSERT INTO db2.t1 (a, b) VALUES('4', 'New
+    row - db1');
+
+When the :option:`--changes-for=both` option is set with the
+:option:`--difftype=sql` SQL generation option set, the following shows an
+excerpt of the results::
+
+    $ mysqldbcompare --server1=root:root@localhost \
+	--server2=root:root@localhost db1:db2 --changes-for=both -a \
+	--difftype=sql
+
+    [...]
+
+    #                                                   Defn    Row     Data
+    # Type      Object Name                             Diff    Count
+    Check #
+    -------------------------------------------------------------------------
+    # TABLE     t1                                      pass    pass    FAIL
+    # # Data transformations for direction = server1:
+
+    # Data differences found among rows: UPDATE db1.t1 SET b = 'Test 123'
+    WHERE a = '1'; UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3'; DELETE
+    FROM db1.t1 WHERE a = '4'; INSERT INTO db1.t1 (a, b) VALUES('5', 'New
+    row - db2');
+
     # Data transformations for direction = server2:
-    
-    # Data differences found among rows:
-    UPDATE db2.t1 SET b = 'Test 789' WHERE a = '1';
-    UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3';
-    DELETE FROM db2.t1 WHERE a = '5';
-    INSERT INTO db2.t1 (a, b) VALUES('4', 'New row - db1');
-  
-    When the --changes-for=both option is set with the --difftype=sql SQL
-    generation option set, the following shows an excerpt of the results.
-    
-    $ mysqldbcompare --server1=root:root@localhost \
-        --server2=root:root@localhost db1:db2 --changes-for=both -a \
-        --difftype=sql
-        
-    [...]
-  
-    #                                                   Defn    Row     Data   
-    # Type      Object Name                             Diff    Count   Check  
-    # ------------------------------------------------------------------------- 
-    # TABLE     t1                                      pass    pass    FAIL    
-    #
-    # Data transformations for direction = server1:
-    
-    # Data differences found among rows:
-    UPDATE db1.t1 SET b = 'Test 123' WHERE a = '1';
-    UPDATE db1.t1 SET b = 'Test 789' WHERE a = '3';
-    DELETE FROM db1.t1 WHERE a = '4';
-    INSERT INTO db1.t1 (a, b) VALUES('5', 'New row - db2');
-  
-    # Data transformations for direction = server2:
-    
-    # Data differences found among rows:
-    UPDATE db2.t1 SET b = 'Test 789' WHERE a = '1';
-    UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3';
-    DELETE FROM db2.t1 WHERE a = '5';
-    INSERT INTO db2.t1 (a, b) VALUES('4', 'New row - db1');
-    
-    
-    # Database consistency check failed.
-    #
-    # ...done
+
+    # Data differences found among rows: UPDATE db2.t1 SET b = 'Test 789'
+    WHERE a = '1'; UPDATE db2.t1 SET b = 'Test 123' WHERE a = '3'; DELETE
+    FROM db2.t1 WHERE a = '5'; INSERT INTO db2.t1 (a, b) VALUES('4', 'New
+    row - db1');
+
+
+    # Database consistency check failed.  # # ...done
 
 
 COPYRIGHT

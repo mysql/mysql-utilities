@@ -197,10 +197,11 @@ in an error when the view is imported on another server.
 The :option:`--new-storage-engine` and :option:`--default-storage-engine`
 options apply to all tables in the operation.
 
-The permitted values for the :option:`--format` and :option:`--import` options
-are case insensitive. The option also permits the user to specify a prefix for
-a valid value. For example, --format=g will specify the grid format. An error
-will be generated if a prefix matches more than one valid value.
+For the :option:`--format` and :option:`--import` options, the permitted
+values are not case sensitive. In addition, values may be specified as any
+unambiguous prefix of a valid value.  For example, :option:`--format=g`
+specifies the grid format. An error is generated if a prefix matches more
+than one valid value.
 
 EXAMPLES
 --------

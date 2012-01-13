@@ -10,17 +10,7 @@ SYNOPSIS
 
 ::
 
- mut [[--help | --version ] | --verbose | --sorted | --record |
-            --utildir=<path> | --width=<num> | --start-port=<num> |
-            --testdir=<path> | --do-test=<prefix> | --force |
-            [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
-            [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
-            [ --suite=<suite> | [, --suite=<suite> ]] |
-            [ --skip-suite=<suite> | [, --skip-suite=<suite> ]] |
-              --skip-tests=<test_prefix> | --skip-long |
-            [ --skip-test=<testname> | [, --skip-test=<testname> ]] |
-            [ <testname> | <suite>.<testname> |
-            [, <testname> | <suite>.<testname> ]]
+ mut [options] [suitename.]testname ...
 
 DESCRIPTION
 -----------
@@ -45,7 +35,7 @@ to execute the performance tests.
 OPTIONS
 -------
 
-**mut** accepts the following command-line options:
+:command:`mut` accepts the following command-line options:
 
 .. option:: --help
 
@@ -108,11 +98,11 @@ OPTIONS
 
 .. option:: --testdir=<path>
 
-   Path to the test directory.
+   The path to the test directory.
 
 .. option:: --utildir=<path>
 
-   Location of the utilities.
+   The location of the utilities.
 
 .. option:: --verbose, -v
 
@@ -133,20 +123,18 @@ OPTIONS
 NOTES
 -----
 
-The information specified for the server must be a valid account for that
-server.
+The connection specifier must name a valid account for the server.
 
-Any test named ???_template.py shall be skipped. This permits the developer
+Any test named ???_template.py is skipped. This enables the developer
 to create a base class to import for a collection of tests based on a common
 code base.
 
 EXAMPLES
 --------
 
-The following example demonstrates how to invoke **mut** to execute
+The following example demonstrates how to invoke :command:`mut` to execute
 a subset of the tests using an existing server which is cloned.
-Notice in the example that the test name, status, and relative time
-are displayed::
+The example displays the test name, status, and relative time::
 
     $ python mut --server=root@localhost --do-tests=clone_user --width=70
 
