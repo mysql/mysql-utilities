@@ -50,9 +50,9 @@ def export_metadata(src_val, db_list, options):
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
 
-    format = options.get("format", "SQL")
+    format = options.get("format", "sql")
     no_headers = options.get("no_headers", False)
-    column_type = options.get("display", "BRIEF")
+    column_type = options.get("display", "brief")
     skip_create = options.get("skip_create", False)
     quiet = options.get("quiet", False)
     skip_tables = options.get("skip_tables", False)
@@ -105,7 +105,7 @@ def export_metadata(src_val, db_list, options):
             print "# Exporting metadata from %s" % db_name
 
         # Perform the extraction
-        if format == "SQL":
+        if format == "sql":
             db.init()
             if not skip_create:
                 print "DROP DATABASE IF EXISTS %s;" % db_name
@@ -169,14 +169,14 @@ def export_metadata(src_val, db_list, options):
                     # Cannot use print_list here becasue we must manipulate
                     # the behavior of format_tabular_list
                     list_options = {}
-                    if format == "VERTICAL":
+                    if format == "vertical":
                         format_vertical_list(sys.stdout, rows[0], rows[1])
-                    elif format == "TAB":
+                    elif format == "tab":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = '\t'
                         format_tabular_list(sys.stdout, rows[0], rows[1],
                                             list_options)
-                    elif format == "CSV":
+                    elif format == "csv":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = ','
                         format_tabular_list(sys.stdout, rows[0], rows[1],
@@ -218,7 +218,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
     # if outfile is not set, use stdout.
     if outfile is None:
         outfile = sys.stdout # default file handle
-    if format in ('SQL', 'S'):
+    if format == 'sql':
         if single:
             if single:
                 data = data_rows
@@ -255,16 +255,16 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
 
     # Cannot use print_list here becasue we must manipulate
     # the behavior of format_tabular_list
-    elif format == "VERTICAL":
+    elif format == "vertical":
         format_vertical_list(outfile, cur_table.get_col_names(),
                              data_rows)
-    elif format == "TAB":
+    elif format == "tab":
         list_options['print_header'] = first
         list_options['separator'] = '\t'
         list_options['quiet'] = not no_headers
         format_tabular_list(outfile, cur_table.get_col_names(),
                             data_rows, list_options)
-    elif format == "CSV":
+    elif format == "csv":
         list_options['print_header'] = first
         list_options['separator'] = ','
         list_options['quiet'] = not no_headers
@@ -301,9 +301,9 @@ def export_data(src_val, db_list, options):
     from mysql.utilities.common.table import Table
     from mysql.utilities.common.server import connect_servers
 
-    format = options.get("format", "SQL")
+    format = options.get("format", "sql")
     no_headers = options.get("no_headers", True)
-    column_type = options.get("display", "BRIEF")
+    column_type = options.get("display", "brief")
     single = options.get("single", False)
     skip_blobs = options.get("skip_blobs", False)
     quiet = options.get("quiet", False)
@@ -370,7 +370,7 @@ def export_data(src_val, db_list, options):
         tbl_name = "%s.%s" % (db_name, table[1])
         if not quiet and old_db != db_name:
             old_db = db_name
-            if format == "SQL":
+            if format == "sql":
                print "USE %s;" % db_name
             print "# Exporting data from %s" % db_name
             if file_per_table:
@@ -382,7 +382,7 @@ def export_data(src_val, db_list, options):
             'quiet'    : quiet
         }
         cur_table = Table(source, tbl_name, tbl_options)
-        if single and format not in ("SQL", "GRID", "VERTICAL"):
+        if single and format not in ("sql", "grid", "vertical"):
             retrieval_mode = -1
             first = True
         else:
@@ -393,7 +393,7 @@ def export_data(src_val, db_list, options):
 
         # switch for writing to files
         if file_per_table:
-            if format in ('SQL', 'S'):
+            if format == 'sql':
                file_name = tbl_name + ".sql"
             else:
                 file_name = tbl_name + ".%s" % format.lower()

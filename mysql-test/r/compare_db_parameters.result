@@ -5,14 +5,16 @@ mysqldbcompare - compare databases for consistency
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
   --server1=SERVER1     connection information for first server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --server2=SERVER2     connection information for second server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        display the output in either GRID (default), TAB, CSV,
-                        or VERTICAL format
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
   --skip-object-compare
                         skip object comparison step
   --skip-row-count      skip row count step
@@ -21,19 +23,19 @@ Options:
   --width=WIDTH         display width
   -a, --run-all-tests   do not abort when a diff test fails
   --disable-binary-logging
-                        Turn binary logging off during operation if enabled
+                        turn binary logging off during operation if enabled
                         (SQL_LOG_BIN=1). Note: may require SUPER privilege.
                         Prevents compare operations from being written to the
                         binary log.
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
   -d DIFFTYPE, --difftype=DIFFTYPE
                         display differences in context format in one of the
                         following formats: [unified|context|differ|sql]
                         (default: unified).
   --changes-for=CHANGES_FOR
-                        Specify the server to show transformations to match
+                        specify the server to show transformations to match
                         the other server. For example, to see the
                         transformation for transforming server1 to match
                         server2, use --changes-for=server1. Valid values are

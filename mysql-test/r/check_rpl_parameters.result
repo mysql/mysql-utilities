@@ -5,24 +5,24 @@ mysqlrplcheck - check replication
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --master=MASTER       connection information for master server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --slave=SLAVE         connection information for slave server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --master-info-file=MASTER_INFO
-                        The name of the master information file on the
+                        the name of the master information file on the
                         slave.default = 'master.info' read from the data
                         directory. Note: this option requires that the utility
                         run on the slave with appropriate file read access to
                         the data directory.
   -s, --show-slave-status
-                        Show slave status
+                        show slave status
   --width=WIDTH         display width
-  --suppress            Suppress warning messages
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  --suppress            suppress warning messages
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
 Test case 2 - master_info
 # master on localhost: ... connected.
 # slave on localhost: ... connected.

@@ -33,7 +33,7 @@ class test(server_info.test):
             raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
 
-        test_num = 1
+        test_num += 1
         cmd_opts = " --server=xewkjsdd:21"
         comment = "Test case %d - bad server" % test_num
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -46,7 +46,7 @@ class test(server_info.test):
         test_num += 1
         cmd_opts = " --format=ASDASDASD"
         comment = "Test case %d - bad format" % test_num
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")

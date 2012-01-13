@@ -35,17 +35,17 @@ prints a list of the users on the source (no destination is needed). To
 control how to display list output, use one of the following values with the
 :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -72,7 +72,7 @@ OPTIONS
 .. option::  --format=<list_format>, -f<list_format>
 
    Specify the user display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   grid, csv, tab, and vertical. The default is grid.
    This option is valid only if :option:`--list` is given.
 
 .. option:: --force
@@ -122,6 +122,11 @@ execute **CREATE USER** (and **DROP USER** if the :option:`--force` option is
 given), and privileges to execute **GRANT** for all privileges to be granted to
 the new accounts.
 
+The permitted values for the :option:`--format` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --format=g will specify the grid format. An error will be generated if
+a prefix matches more than one valid value.
+
 EXAMPLES
 --------
 
@@ -141,7 +146,7 @@ the local machine, use this command::
 The following shows all of the users on the localhost server in the most
 verbose output in CSV format::
 
-    $ mysqluserclone --source=root@localhost --list --format=CSV -vvv
+    $ mysqluserclone --source=root@localhost --list --format=csv -vvv
     # Source on localhost: ... connected.
     user,host,database
     joe,localhost,util_test

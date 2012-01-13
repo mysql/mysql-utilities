@@ -5,12 +5,12 @@ mysqldiskusage - show disk usage for databases
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        display the output in either GRID (default), TAB, CSV,
-                        or VERTICAL format
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
   -h, --no-headers      do not show column headers
   -b, --binlog          include binary log usage
   -r, --relaylog        include relay log usage
@@ -18,9 +18,9 @@ Options:
   -i, --innodb          include InnoDB tablespace usage
   -m, --empty           include empty databases
   -a, --all             show all usage including empty databases
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
 
 Test Case 2 : No headers 
 # Source on localhost: ... connected.

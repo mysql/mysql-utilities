@@ -106,8 +106,8 @@ class test(export_basic.test):
                                        full_format=True, no_headers=True,
                                        abbrev=True, displays=True):
         
-        _FORMATS = ("SQL", "CSV", "TAB", "GRID", "VERTICAL")
-        _FORMATS_ABBREV = ("S", "C", "T", "G", "V")
+        _FORMATS = ("sql", "csv", "tab", "GRID", "VERTICAL")
+        _FORMATS_ABBREV = ("SQ", "CS", "ta", "g", "v")
 
         # First, with headers
         if full_format:

@@ -131,17 +131,17 @@ values with the :option:`--difftype` option:
 To specify how to display changed or missing row output, use one of
 the following values with the :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -211,7 +211,7 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the missing-row display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   grid, csv, tab, and vertical. The default is grid.
    
 .. option:: --quiet, -q
 
@@ -275,6 +275,11 @@ NOTES
 
 The login user must have the appropriate permissions to read all databases
 and tables listed.
+
+The permitted values for the :option:`--difftype` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --difftype=d will specify the differ type. An error will be generated if
+a prefix matches more than one valid value.
 
 
 EXAMPLES

@@ -11,7 +11,7 @@ SYNOPSIS
 
  mysqlserverinfo [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
                    [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
-                   --format=[|GRID|CSV|TAB|VERTICAL] ] | --no-headers |
+                   --format=[grid|tab|csv|vertical] ] | --no-headers |
                    --show-defaults | [--start --basedir=<base directory> 
                    --datadir=<data directory>] --verbose
 
@@ -43,17 +43,17 @@ this utility on an offline server.
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -94,7 +94,7 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the output display format. Permitted format values are
-   GRID, CSV, TAB, and VERTICAL. The default is GRID.
+   grid, csv, tab, and vertical. The default is grid.
 
 .. option:: --no-headers, -h
 
@@ -140,6 +140,10 @@ OPTIONS
 
 .. _mysqlserverinfo-notes:
 
+The permitted values for the :option:`--format` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --format=g will specify the grid format. An error will be generated if
+a prefix matches more than one valid value.
 
 EXAMPLES
 --------

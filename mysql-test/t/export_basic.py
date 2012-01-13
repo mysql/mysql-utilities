@@ -37,7 +37,7 @@ class test(copy_db_parameters.test):
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - export data only - bulk insert"
-        cmd_str = cmd + " --export=data --format=SQL --bulk-insert"
+        cmd_str = cmd + " --export=DATA --format=SQL --bulk-insert"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

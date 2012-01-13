@@ -192,7 +192,7 @@ class ProcessGrep(object):
 
         output = kwrds.get('output', sys.stdout)
         connector = kwrds.get('connector', mysql.connector)
-        format = kwrds.get('format', "GRID")
+        format = kwrds.get('format', "grid")
 
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")

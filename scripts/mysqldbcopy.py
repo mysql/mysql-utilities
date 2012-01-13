@@ -29,6 +29,7 @@ import time
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbcopy
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
@@ -54,12 +55,8 @@ def print_elapsed_time(start_test):
     print("Time: %6d\n" % display_time)
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, True, False)
 
 # Setup utility-specific options:
 
@@ -87,7 +84,7 @@ parser.add_option("--threads", action="store", dest="threads",
 
 # Add the exclude database option
 parser.add_option("-x", "--exclude", action="append", dest="exclude",
-                  type="string", default=None, help="Exclude one or more "
+                  type="string", default=None, help="exclude one or more "
                   "objects from the operation using either a specific name "
                   "(e.g. db1.t1), a LIKE pattern (e.g. db1.t% or db%.%) or a "
                   "REGEXP search pattern. To use a REGEXP search pattern for "
@@ -138,15 +135,15 @@ check_verbosity(opt)
 
 # Set options for database operations.
 options = {
-    "skip_tables"      : "TABLES" in skips,
-    "skip_views"       : "VIEWS" in skips,
-    "skip_triggers"    : "TRIGGERS" in skips,
-    "skip_procs"       : "PROCEDURES" in skips,
-    "skip_funcs"       : "FUNCTIONS" in skips,
-    "skip_events"      : "EVENTS" in skips,
-    "skip_grants"      : "GRANTS" in skips,
-    "skip_create"      : "CREATE_DB" in skips,
-    "skip_data"        : "DATA" in skips,
+    "skip_tables"      : "tables" in skips,
+    "skip_views"       : "views" in skips,
+    "skip_triggers"    : "triggers" in skips,
+    "skip_procs"       : "procedures" in skips,
+    "skip_funcs"       : "functions" in skips,
+    "skip_events"      : "events" in skips,
+    "skip_grants"      : "grants" in skips,
+    "skip_create"      : "create_db" in skips,
+    "skip_data"        : "data" in skips,
     "force"            : opt.force,
     "verbose"          : opt.verbosity >= 1,
     "quiet"            : opt.quiet,

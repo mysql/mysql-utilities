@@ -495,7 +495,7 @@ def show_database_usage(server, datadir, dblist, options):
     
     from mysql.utilities.common.format import print_list
 
-    format = options.get("format", "GRID")
+    format = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)
@@ -526,7 +526,7 @@ def show_database_usage(server, datadir, dblist, options):
 
     # Get list of databases with sizes and formatted when necessary
     columns, rows, db_total = _build_db_list(server, res, dblist, datadir,
-                                             format == "GRID",
+                                             format == "grid",
                                              have_read, verbosity,
                                              include_empty or do_all)
 
@@ -553,7 +553,7 @@ def show_logfile_usage(server, options):
     """
     from mysql.utilities.common.format import print_list
 
-    format = options.get("format", "GRID")
+    format = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)
@@ -577,7 +577,7 @@ def show_logfile_usage(server, options):
     fmt_logs = []
     columns = ['log_name', 'size']
     if len(logs) > 0:
-        if format == 'GRID':
+        if format == 'grid':
             max_col = _get_formatted_max_width(logs, columns, 1)
             if max_col < len('size'):
                 max_col = len('size')
@@ -617,7 +617,7 @@ def show_log_usage(server, datadir, options):
     """
     from mysql.utilities.common.format import print_list
 
-    format = options.get("format", "GRID")
+    format = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)
@@ -713,7 +713,7 @@ def show_innodb_usage(server, datadir, options):
     """
     from mysql.utilities.common.format import print_list
 
-    format = options.get("format", "GRID")
+    format = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)

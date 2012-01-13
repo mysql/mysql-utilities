@@ -5,19 +5,19 @@ mysqlindexcheck - check for duplicate or redundant indexes
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -d, --show-drops      display DROP statements for dropping indexes
   -i, --show-indexes    display indexes for each table
   -s, --skip            skip tables that do not exist
-  --format=INDEX_FORMAT
-                        display the list of indexes per table in either SQL,
-                        GRID (default), TAB, CSV, or VERTICAL format
+  -f FORMAT, --format=FORMAT
+                        display the list of indexes per table in either sql,
+                        grid (default), tab, csv, or vertical format
   --stats               show index performance statistics
   --best=BEST           limit index statistics to the best N indexes
   --worst=WORST         limit index statistics to the worst N indexes
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
 Test case 2 - show drops for a table with dupe indexes
 # Source on localhost: ... connected.

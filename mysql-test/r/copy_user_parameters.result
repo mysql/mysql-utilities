@@ -10,7 +10,7 @@ mysqluserclone - clone a MySQL user account to one or more new users
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --source=SOURCE       connection information for source server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --destination=DESTINATION
@@ -18,16 +18,17 @@ Options:
                         form: <user>:<password>@<host>:<port>:<socket>
   -d, --dump            dump GRANT statements for user - does not require a
                         destination
-  -f, --force           drop the new user if it exists
+  --force               drop the new user if it exists
   --include-global-privileges
                         include privileges that match base_user@% as well as
                         base_user@host
   --list                list all users on the source - does not require a
                         destination
-  --format=LIST_FORMAT  display the list of users in either GRID (default),
-                        TAB, CSV, or VERTICAL format - valid only for --list
+  -f FORMAT, --format=FORMAT
+                        display the list of users in either grid (default),
+                        tab, csv, or vertical format - valid only for --list
                         option
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the quiet parameter

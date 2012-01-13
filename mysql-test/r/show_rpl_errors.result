@@ -10,7 +10,7 @@ Error 1045: Access denied for user 'wanda'@'localhost' (using password: YES)
 Test case 3 - show topology - bad format
 Usage: mysqlrplshow.py --master=root@localhost:3306 
 
-mysqlrplshow.py: error: XXXXXX is not a valid format option.
+mysqlrplshow.py: error: option --format: invalid choice: 'XXXXXX' (choose from 'grid', 'tab', 'csv', 'vertical')
 Test case 4a - show topology - not enough permissions
 # master on localhost: ... connected.
 ERROR: Not enough permissions. The user must have the REPLICATION SLAVE privilege.

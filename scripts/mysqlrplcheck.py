@@ -26,6 +26,7 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.command import rpl
@@ -40,12 +41,8 @@ USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 "
 PRINT_WIDTH = 75
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, True, False)
 
 # Setup utility-specific options:
 
@@ -64,7 +61,7 @@ parser.add_option("--slave", action="store", dest="slave",
 # Add --master-info-file
 parser.add_option("--master-info-file", action="store", dest="master_info",
                   type="string", default="master.info",
-                  help="The name of the master information file on the slave."
+                  help="the name of the master information file on the slave."
                        "default = 'master.info' read from the data directory."
                        " Note: this option requires that the utility run on "
                        "the slave with appropriate file read access to the "
@@ -72,7 +69,7 @@ parser.add_option("--master-info-file", action="store", dest="master_info",
 
 # Add --show-slave-status
 parser.add_option("--show-slave-status", "-s", action="store_true",
-                  dest="slave_status", default=False, help="Show slave status")
+                  dest="slave_status", default=False, help="show slave status")
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
@@ -81,7 +78,7 @@ parser.add_option("--width", action="store", dest="width",
 
 # Add suppress to suppress warning messages
 parser.add_option("--suppress", action="store_true", dest="suppress",
-                  default=False, help="Suppress warning messages")
+                  default=False, help="suppress warning messages")
 
 # Add verbosity
 add_verbosity(parser, True)

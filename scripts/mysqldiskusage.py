@@ -31,7 +31,7 @@ from mysql.utilities.command import diskusage
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -50,16 +50,15 @@ def print_elapsed_time(start_test):
         display_time = 1
     print("Time: %6d\n" % display_time)
 
-# Setup the command parser and setup server, helpe
+# Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
                               DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
 
 # Output format
-parser.add_option("-f", "--format", action="store", dest="format",
-                  help="display the output in either GRID (default), "
-                       "TAB, CSV, or VERTICAL format", default="GRID")
+add_format_option(parser, "display the output in either grid (default), "
+                  "tab, csv, or vertical format", "grid")     
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
@@ -96,12 +95,6 @@ add_verbosity(parser, True)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
-
-# Fail if format specified is invalid
-try:
-    opt.format = check_format_option(opt.format).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
 
 from mysql.utilities.common.server import connect_servers
 

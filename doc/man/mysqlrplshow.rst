@@ -12,7 +12,7 @@ SYNOPSIS
   mysqlrplshow --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               --help | --version | --show-list | --quiet |
               --recurse | --prompt | --num-retries |
-              --format=[GRID|G|TAB|T|CSV|C|VERTICAL|V]
+              --format=[sql|grid|tab|csv|vertical]
 
 DESCRIPTION
 -----------
@@ -59,17 +59,17 @@ To produce a column list in addition to the graph, specify the
 :option:`--show-list` option.  In this case, to specify how to display the
 list, use one of the following values with the :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -101,7 +101,7 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the display format for column list output . Permitted format values
-   are GRID, CSV, TAB, and VERTICAL. The default is GRID. This option applies
+   are grid, csv, tab, and verticaL. The default is grid. This option applies
    only if :option:`--show-list` is given.
 
 .. option:: --master=<source>
@@ -148,6 +148,11 @@ The login user must have the **REPLICATE SLAVE** and **REPLICATE CLIENT**
 privileges to successfully execute this utility. Specifically, the login
 user must have appropriate permissions to execute **SHOW SLAVE STATUS**,
 **SHOW MASTER STATUS**, and **SHOW SLAVE HOSTS**.
+
+The permitted values for the :option:`--format` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --format=g will specify the grid format. An error will be generated if
+a prefix matches more than one valid value.
 
 EXAMPLES
 --------

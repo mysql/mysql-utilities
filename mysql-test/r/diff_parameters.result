@@ -6,22 +6,22 @@ how db1.obj1 differs from db2.obj2
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server1=SERVER1     connection information for first server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --server2=SERVER2     connection information for second server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --width=WIDTH         display width
   --force               do not abort when a diff test fails
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
   -d DIFFTYPE, --difftype=DIFFTYPE
                         display differences in context format in one of the
                         following formats: [unified|context|differ|sql]
                         (default: unified).
   --changes-for=CHANGES_FOR
-                        Specify the server to show transformations to match
+                        specify the server to show transformations to match
                         the other server. For example, to see the
                         transformation for transforming server1 to match
                         server2, use --changes-for=server1. Valid values are

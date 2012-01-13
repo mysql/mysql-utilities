@@ -45,7 +45,7 @@ class test(import_basic.test):
         from_conn = "--server=" + self.build_connection_string(self.server1)
         to_conn = "--server=" + self.build_connection_string(self.server2)
 
-        _FORMAT_DISPLAY = ("SQL","GRID","CSV","TAB","VERTICAL")
+        _FORMAT_DISPLAY = ("sql","grid","csv","tab","vertical")
 
         exp_cmd_str = "mysqldbexport.py util_test --export=data " \
                       "--file-per-table %s --quiet --format=" % from_conn

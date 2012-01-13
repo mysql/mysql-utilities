@@ -727,7 +727,7 @@ class Database(object):
         return object_type
 
 
-    def get_db_objects(self, obj_type, columns='NAMES', get_columns=False):
+    def get_db_objects(self, obj_type, columns='names', get_columns=False):
         """Return a result set containing a list of objects for a given
         database based on type.
 
@@ -737,7 +737,7 @@ class Database(object):
         also provide the list of column names if desired.
 
         obj_type[in]       Type of object to retrieve
-        columns[in]        Column mode - NAMES (default), BRIEF, or FULL
+        columns[in]        Column mode - names (default), brief, or full
                            Note: not valid for GRANT objects.
         get_columns[in]    If True, return column names as first element
                            and result set as second element. If False,
@@ -920,9 +920,9 @@ class Database(object):
                                      self.db_name, self.db_name)
             return self.source.exec_query(query, col_options)
         else:
-            if columns == "NAMES":
+            if columns == "names":
                 prefix = _NAMES
-            elif columns == "FULL":
+            elif columns == "full":
                 prefix = _FULL
             else:
                 prefix = _MINIMAL

@@ -32,13 +32,15 @@ from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options, add_engines
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbimport "
 DESCRIPTION = "mysqldbimport - import metadata and data from files"
 USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
+
+_PERMITTED_IMPORTS = ["data", "definitions", "both"]
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -58,26 +60,26 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Setup utility-specific options:
 
 # Input format
-parser.add_option("-f", "--format", action="store", dest="format", default="SQL",
-                  help="the input file format in either SQL|S (default), "
-                       "GRID|G, TAB|T, CSV|C, or VERTICAL|V format")
+add_format_option(parser, "the input file format in either sql (default), "
+                  "grid, tab, csv, or vertical format", "sql", True)     
 
 # Import mode
 parser.add_option("-i", "--import", action="store", dest="import_type",
                   default="definitions", help="control the import of either "
-                  "DATA|D = only the table data for the tables in the database "
-                  "list, DEFINITIONS|F = import only the definitions for "
-                  "the objects in the database list, or BOTH|B = import "
+                  "'data' = only the table data for the tables in the database "
+                  "list, 'definitions' = import only the definitions for "
+                  "the objects in the database list, or 'both' = import "
                   "the metadata followed by the data "
-                  "(default: import definitions)")
+                  "(default: import definitions)", type="choice",
+                  choices=_PERMITTED_IMPORTS)
 
 # Drop mode
 parser.add_option("-d", "--drop-first", action="store_true", default=False,
-                  help="Drop database before importing.", dest="do_drop")
+                  help="drop database before importing.", dest="do_drop")
 
 # Single insert mode
 parser.add_option("-b", "--bulk-insert", action="store_true",
-                  dest="bulk_insert", default=False, help="Use bulk insert "
+                  dest="bulk_insert", default=False, help="use bulk insert "
                   "statements for data (default:False)")
 
 # Header row
@@ -92,7 +94,7 @@ parser.add_option("--dryrun", action="store_true", dest="dryrun",
 
 # Skip blobs for import
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
-                  default=False, help="Do not import blob data.")
+                  default=False, help="do not import blob data.")
 
 # Add the skip common options
 add_skip_options(parser)
@@ -119,52 +121,29 @@ except UtilError, e:
 if len(args) == 0:
     parser.error("You must specify at least one file to import.")
 
-# Fail if format specified is invalid
-try:
-    opt.format = check_format_option(opt.format, True, True).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
-
-_PERMITTED_EXPORTS = ("DATA", "DEFINITIONS", "BOTH", "D", "F", "B")
-
-if opt.import_type.upper() not in _PERMITTED_EXPORTS:
-    print "# WARNING : '%s' is not a valid import mode. Using default." % \
-          opt.import_type
-    opt.import_type = "DEFINITIONS"
-else:
-    opt.import_type = opt.import_type.upper()
-
-# Convert to full word for easier coding in command module
-if opt.import_type == "D":
-    opt.import_type = "DATA"
-elif opt.import_type == "F":
-    opt.import_type = "DEFINITIONS"
-elif opt.import_type == "B":
-    opt.import_type = "BOTH"
-
-if opt.skip_blobs and not opt.import_type == "DATA":
+if opt.skip_blobs and not opt.import_type == "data":
     print "# WARNING: --skip-blobs option ignored for metadata import."
 
-if "DATA" in skips and opt.import_type == "DATA":
+if "data" in skips and opt.import_type == "data":
     print "ERROR: You cannot use --import=data and --skip-data when " \
           "importing table data."
     exit(1)
 
-if "CREATE_DB" in skips and opt.do_drop:
+if "create_db" in skips and opt.do_drop:
     print "ERROR: You cannot combine --drop-first and --skip=create_db."
     exit (1)
 
 # Set options for database operations.
 options = {
-    "skip_tables"   : "TABLES" in skips,
-    "skip_views"    : "VIEWS" in skips,
-    "skip_triggers" : "TRIGGERS" in skips,
-    "skip_procs"    : "PROCEDURES" in skips,
-    "skip_funcs"    : "FUNCTIONS" in skips,
-    "skip_events"   : "EVENTS" in skips,
-    "skip_grants"   : "GRANTS" in skips,
-    "skip_create"   : "CREATE_DB" in skips,
-    "skip_data"     : "DATA" in skips,
+    "skip_tables"   : "tables" in skips,
+    "skip_views"    : "views" in skips,
+    "skip_triggers" : "triggers" in skips,
+    "skip_procs"    : "procedures" in skips,
+    "skip_funcs"    : "functions" in skips,
+    "skip_events"   : "events" in skips,
+    "skip_grants"   : "grants" in skips,
+    "skip_create"   : "create_db" in skips,
+    "skip_data"     : "data" in skips,
     "skip_blobs"    : opt.skip_blobs,
     "format"        : opt.format,
     "no_headers"    : opt.no_headers,

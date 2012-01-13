@@ -5,32 +5,32 @@ mysqldbexport - export metadata and data from databases
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        display the output in either SQL|S (default), GRID|G,
-                        TAB|T, CSV|C, or VERTICAL|V format
+                        display the output in either sql (default), grid, tab,
+                        csv, or vertical format
   -d DISPLAY, --display=DISPLAY
-                        control the number of columns shown: BRIEF = minimal
-                        columns for object creation (default), FULL = all
-                        columns, NAMES = only object names (not valid for
-                        --format=SQL)
+                        control the number of columns shown: 'brief' = minimal
+                        columns for object creation (default), 'full' = all
+                        columns, 'names' = only object names (not valid for
+                        --format=sql)
   -e EXPORT, --export=EXPORT
-                        control the export of either DATA|D = only the table
+                        control the export of either 'data' = only the table
                         data for the tables in the database list,
-                        DEFINITIONS|F = export only the definitions for the
-                        objects in the database list, or BOTH|B = export the
+                        'definitions' = export only the definitions for the
+                        objects in the database list, or 'both' = export the
                         metadata followed by the data (default: export
                         definitions)
-  -b, --bulk-insert     Use bulk insert statements for data (default:False)
-  -h, --no-headers      do not display the column headers - ignored for GRID
+  -b, --bulk-insert     use bulk insert statements for data (default:False)
+  -h, --no-headers      do not display the column headers - ignored for grid
                         format
-  --skip-blobs          Do not export blob data.
-  --file-per-table      Write table data to separate files. Valid only for
+  --skip-blobs          do not export blob data.
+  --file-per-table      write table data to separate files. Valid only for
                         --export=data or --export=both.
   -x EXCLUDE, --exclude=EXCLUDE
-                        Exclude one or more objects from the operation using
+                        exclude one or more objects from the operation using
                         either a specific name (e.g. db1.t1), a LIKE pattern
                         (e.g. db1.t% or db%.%) or a REGEXP search pattern. To
                         use a REGEXP search pattern for all exclusions, you
@@ -39,15 +39,15 @@ Options:
   -a, --all             include all databases
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
-                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
-                        EVENTS, GRANTS, DATA, CREATE_DB
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        tables, views, triggers, procedures, functions,
+                        events, grants, data, create_db
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
   -G, --basic-regexp, --regexp
-                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
-  --locking=LOCKING     Choose the lock type for the operation: no-locks = do
+  --locking=LOCKING     choose the lock type for the operation: no-locks = do
                         not use any table locks, lock-all = use table locks
                         but no transaction and no consistent read, snaphot
                         (default): consistent read using a single transaction.
@@ -481,7 +481,7 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-Test case 13 - SQL format
+Test case 13 - sql format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS util_test;
@@ -570,7 +570,7 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-Test case 14 - CSV format
+Test case 14 - csv format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -617,7 +617,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
 #...done.
-Test case 15 - TAB format
+Test case 15 - tab format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1070,7 +1070,7 @@ Test case 17 - VERTICAL format
    ROUTINE_NAME: None
 18 rows.
 #...done.
-Test case 18 - SQL format no headers
+Test case 18 - sql format no headers
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS util_test;
@@ -1159,7 +1159,7 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-Test case 19 - CSV format no headers
+Test case 19 - csv format no headers
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1199,7 +1199,7 @@ e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XX
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
 #...done.
-Test case 20 - TAB format no headers
+Test case 20 - tab format no headers
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1645,7 +1645,7 @@ Test case 22 - VERTICAL format no headers
    ROUTINE_NAME: None
 18 rows.
 #...done.
-Test case 23 - S format
+Test case 23 - SQ format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS util_test;
@@ -1734,7 +1734,7 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-Test case 24 - C format
+Test case 24 - CS format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1781,7 +1781,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
 #...done.
-Test case 25 - T format
+Test case 25 - ta format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1828,7 +1828,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
 #...done.
-Test case 26 - G format
+Test case 26 - g format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
@@ -1896,7 +1896,7 @@ Test case 26 - G format
 | 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
-Test case 27 - V format
+Test case 27 - v format
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:

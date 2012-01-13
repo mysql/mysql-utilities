@@ -59,15 +59,15 @@ parser.add_option("--new-id", action="store", dest="new_id",
 
 # Root password for the new instance
 parser.add_option("--root-password", action="store", dest="root_pass",
-                  type="string", help="Password for the root user")
+                  type="string", help="password for the root user")
 
 # Optional additional command-line options
 parser.add_option("--mysqld", action="store", dest="mysqld",
-                  type="string", help="Additional options for mysqld")
+                  type="string", help="additional options for mysqld")
 
 # Option to write command to file
 parser.add_option("--write-command", "-w", action="store", dest='cmd_file',
-                  default=None, type="string", help="Path to file for writing"
+                  default=None, type="string", help="path to file for writing"
                   " startup command. For example: start_server1.sh")
 
 # Add verbosity and quiet mode

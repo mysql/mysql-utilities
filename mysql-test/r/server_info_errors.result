@@ -1,20 +1,15 @@
 Test case 1 - no server
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket -f GRID
+Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo.py: error: You must specify at least one server.
 
-Test case 1 - bad server
+Test case 2 - bad server
 ERROR: Connection 'xewkjsdd:21' cannot be parsed as a connection
 
-Test case 2 - bad format
-# WARNING : 'ASDASDASD' is not a valid output format. Using default.
-# Source on localhost: ... connected.
-+---------+
-| XXXX ...|
-+---------+
-| XXXX ...|
-+---------+
-#...done.
+Test case 3 - bad format
+Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
 
-Test case 3 - offline server
+mysqlserverinfo.py: error: option --format: invalid choice: 'ASDASDASD' (choose from 'grid', 'tab', 'csv', 'vertical')
+
+Test case 4 - offline server
 ERROR: Server is offline. To connection, you must provide basedir, datadir, and the start option

@@ -66,7 +66,7 @@ INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
-Test case 4 - SQL format
+Test case 4 - sql format
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
@@ -93,7 +93,7 @@ INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
-Test case 5 - CSV format
+Test case 5 - csv format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -119,7 +119,7 @@ a,b
 c,d
 3,2
 #...done.
-Test case 6 - TAB format
+Test case 6 - tab format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -230,7 +230,7 @@ Test case 8 - VERTICAL format
  d: 2
 1 rows.
 #...done.
-Test case 9 - SQL format no headers
+Test case 9 - sql format no headers
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
@@ -257,7 +257,7 @@ INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
-Test case 10 - CSV format no headers
+Test case 10 - csv format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -283,7 +283,7 @@ a,b
 c,d
 3,2
 #...done.
-Test case 11 - TAB format no headers
+Test case 11 - tab format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -394,7 +394,7 @@ Test case 13 - VERTICAL format no headers
  d: 2
 1 rows.
 #...done.
-Test case 14 - S format
+Test case 14 - SQ format
 # Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
@@ -421,7 +421,7 @@ INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
 # Data for table util_test.t4: 
 INSERT INTO util_test.t4 VALUES (3, 2);
 #...done.
-Test case 15 - C format
+Test case 15 - CS format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -447,7 +447,7 @@ a,b
 c,d
 3,2
 #...done.
-Test case 16 - T format
+Test case 16 - ta format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -473,7 +473,7 @@ a	b
 c	d
 3	2
 #...done.
-Test case 17 - G format
+Test case 17 - g format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -511,7 +511,7 @@ Test case 17 - G format
 | 3  | 2  |
 +----+----+
 #...done.
-Test case 18 - V format
+Test case 18 - v format
 # Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 

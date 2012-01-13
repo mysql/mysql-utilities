@@ -50,12 +50,12 @@ def _read_row(file, format, skip_comments=False):
     Returns (tuple) - one row of data
     """
 
-    if format == "SQL":
+    if format == "sql":
         # Easiest - just read a row and return it.
         for row in file.readlines():
             if row[0] != '#':
                 yield row.strip('\n')
-    elif format == "VERTICAL":
+    elif format == "vertical":
         # This format is a bit trickier. We need to read a set of rows that
         # encompass the data row. They will appear in this format:
         #   ****** <header> ******
@@ -123,15 +123,15 @@ def _read_row(file, format, skip_comments=False):
     else:
         separator = ","
         # Use CSV reader to read the row
-        if format == "CSV":
+        if format == "csv":
             separator = ","
-        elif format == "TAB":
+        elif format == "tab":
             separator = "\t"
-        elif format == "GRID":
+        elif format == "grid":
             separator = "|"
         csv_reader = csv.reader(file, delimiter=separator)
         for row in csv_reader:
-            if format == "GRID":
+            if format == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
                         continue
@@ -187,9 +187,9 @@ def read_next(file, format, no_headers=False):
     """
     cmd_type = ""
     multiline = False
-    if format == "SQL":
+    if format == "sql":
         sql_cmd = ""
-        for row in _read_row(file, "SQL", True):
+        for row in _read_row(file, "sql", True):
             first_word = row[0:row.find(' ')].upper() # find first word
             # Skip these nonsense rows
             if len(row) == 0 or row[0] == "#"or row[0:2] == "||":
@@ -206,13 +206,13 @@ def read_next(file, format, no_headers=False):
                     #yield goes here
                     yield (cmd_type, sql_cmd)
                     sql_cmd = ""
-                cmd_type = "SQL"
+                cmd_type = "sql"
                 multiline = True
             elif first_word in _BASIC_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
                     yield (cmd_type, sql_cmd)
-                cmd_type = "SQL"
+                cmd_type = "sql"
                 sql_cmd = row
             elif first_word in _DATA_COMMANDS:
                 if len(sql_cmd) > 0:
@@ -265,8 +265,8 @@ def _get_db(row):
     Returns (string) database name or None if not found
     """
     db_name = None
-    if (row[0] in _DEFINITION_LIST or row[0] == "SQL"):
-        if row[0] == "SQL":
+    if (row[0] in _DEFINITION_LIST or row[0] == "sql"):
+        if row[0] == "sql":
             # Need crude parse here for database statement.
             parts = ()
             parts = row[1].split(" ")
@@ -665,7 +665,7 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
         try:
             if dryrun:
                 print statement
-            elif format != "SQL" or not _skip_sql(statement, options):
+            elif format != "sql" or not _skip_sql(statement, options):
                 destination.exec_query(statement)
         # Here we capture any exception and raise UtilError to communicate to
         # the script/user. Since all util errors (exceptions) derive from
@@ -759,10 +759,10 @@ def import_file(dest_val, file_name, options):
                 statements.append(update)
 
     # Gather options
-    format = options.get("format", "SQL").upper()
+    format = options.get("format", "sql")
     no_headers = options.get("no_headers", False)
     quiet = options.get("quiet", False)
-    import_type = options.get("import_type", "DEFINITIONS").upper()
+    import_type = options.get("import_type", "definitions")
     single = options.get("single", True)
     dryrun = options.get("dryrun", False)
     do_drop = options.get("do_drop", False)
@@ -784,15 +784,15 @@ def import_file(dest_val, file_name, options):
                          False, options.get("quiet", False))
 
     if not quiet:
-        if import_type == "BOTH":
+        if import_type == "both":
             str = "definitions and data"
         else:
-            str = import_type.lower()
+            str = import_type
         print "# Importing %s from %s." % (str, file_name)
 
     # Setup variables we will need
     skip_header = not no_headers
-    if format == "SQL":
+    if format == "sql":
         skip_header = False
     get_db = True
     check_privileges = False
@@ -808,7 +808,7 @@ def import_file(dest_val, file_name, options):
     tbl_name = ""
 
     # Read the file one object/definition group at a time
-    for row in read_next(file, format.upper()):
+    for row in read_next(file, format):
         # If this is the first pass, get the database name from the file
         if get_db:
             if skip_header:
@@ -816,10 +816,10 @@ def import_file(dest_val, file_name, options):
             else:
                 db_name = _get_db(row)
                 get_db = False
-                if do_drop and import_type != "DATA":
+                if do_drop and import_type != "data":
                     statements.append("DROP DATABASE IF EXISTS `%s`;" % \
                                       db_name)
-                if import_type != "DATA":
+                if import_type != "data":
                     if not _skip_object("CREATE_DB", options):
                         statements.append("CREATE DATABASE `%s`;" % db_name)
 
@@ -835,13 +835,13 @@ def import_file(dest_val, file_name, options):
                                        access_options)
 
         # Now check to see if we want definitions, data, or both:
-        if row[0] == "SQL" or row[0] in _DEFINITION_LIST:
-            if format != "SQL" and len(row[1]) == 1:
+        if row[0] == "sql" or row[0] in _DEFINITION_LIST:
+            if format != "sql" and len(row[1]) == 1:
                 raise UtilError("Cannot read an import file generated with "
                                 "--display=NAMES")
 
-            if import_type in ("DEFINITIONS", "BOTH"):
-                if format == "SQL":
+            if import_type in ("definitions", "both"):
+                if format == "sql":
                     statements.append(row[1])
                 else:
                     if obj_type == "":
@@ -860,10 +860,10 @@ def import_file(dest_val, file_name, options):
                 _process_definitions(statements, table_col_list, db_name)
                 definitions = []
 
-            if import_type in ("DATA", "BOTH"):
+            if import_type in ("data", "both"):
                 if _skip_object("DATA", options):
                     continue  # skip data
-                elif format == "SQL":
+                elif format == "sql":
                     statements.append(row[1])
                 else:
                     if row[0] == "BEGIN_DATA":

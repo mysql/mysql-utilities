@@ -29,17 +29,17 @@ class test(check_index_parameters.test):
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 2 - show indexes using SQL format"
-        res = self.run_test_case(0, cmd_str + "--format=SQL", comment)
+        res = self.run_test_case(0, cmd_str + "--format=sQl", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 3 - show indexes using GRID format"
-        res = self.run_test_case(0, cmd_str + "--format=GRID", comment)
+        res = self.run_test_case(0, cmd_str + "--format=gRId", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         comment = "Test case 4 - show indexes using TAB format"
-        res = self.run_test_case(0, cmd_str + "--format=TAB", comment)
+        res = self.run_test_case(0, cmd_str + "--format=tab", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 

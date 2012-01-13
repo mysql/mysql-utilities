@@ -11,7 +11,7 @@ from mysql.utilities.exception import FormatError, EmptyResultError
 from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import UtilError
 
 def add_pattern(option, opt, value, parser, field):
@@ -32,33 +32,30 @@ add_regexp(parser)
 parser.add_option(
     "-Q", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,
-    help="Print the statement instead of sending it to the server. If a kill option is submitted, a procedure will be generated containing the code for executing the kill.")
+    help="print the statement instead of sending it to the server. If a kill option is submitted, a procedure will be generated containing the code for executing the kill.")
 parser.add_option(
     "--sql-body",
     dest="sql_body", action="store_true", default=False,
-    help="Only print the body of the procedure.")
+    help="only print the body of the procedure.")
 parser.add_option(
     "--kill-connection",
     action="append_const", const=KILL_CONNECTION,
     dest="actions", default=[],
-    help="Kill all matching connections.")
+    help="kill all matching connections.")
 parser.add_option(
     "--kill-query",
     action="append_const", const=KILL_QUERY,
     dest="actions", default=[],
-    help="Kill query for all matching processes.")
+    help="kill query for all matching processes.")
 parser.add_option(
     "--print",
     action="append_const", const=PRINT_PROCESS,
     dest="actions", default=[],
-    help="Print all matching processes.")
+    help="print all matching processes.")
 
 # Output format
-parser.add_option(
-    "-f", "--format", 
-    action="store", dest="format", default="GRID",
-    help="display the output in either GRID (default), "
-    "TAB, CSV, or VERTICAL format")
+add_format_option(parser, "display the output in either grid (default), "
+                  "tab, csv, or vertical format", "grid")     
 
 # Add verbosity mode
 add_verbosity(parser, False)
@@ -69,20 +66,15 @@ for col in USER, HOST, DB, COMMAND, INFO, STATE:
         "--match-" + col.lower(),
         action="callback", callback=add_pattern, callback_args=(col,),
         dest="matches", type="string", metavar="PATTERN", default=[],
-        help="Match the '{0}' column of the PROCESSLIST table".format(col))
+        help="match the '{0}' column of the PROCESSLIST table".format(col))
 
 parser.add_option(
     "--age",
     dest="age", default=None,
-    help="Only show processes that been in the current state more than a given time")
+    help="show only processes that have been in the current state more than "
+         "a given time")
 
 (options, args) = parser.parse_args()
-
-# Fail if format specified is invalid
-try:
-    options.format = check_format_option(options.format).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
 
 # Print SQL if only --sql-body is given
 if options.sql_body:

@@ -29,7 +29,7 @@ mysqldbcopy - copy databases from one server to another
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --source=SOURCE       connection information for source server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --destination=DESTINATION
@@ -38,7 +38,7 @@ Options:
   -f, --force           drop the new database or object if it exists
   --threads=THREADS     use multiple threads (connections) for insert
   -x EXCLUDE, --exclude=EXCLUDE
-                        Exclude one or more objects from the operation using
+                        exclude one or more objects from the operation using
                         either a specific name (e.g. db1.t1), a LIKE pattern
                         (e.g. db1.t% or db%.%) or a REGEXP search pattern. To
                         use a REGEXP search pattern for all exclusions, you
@@ -47,24 +47,24 @@ Options:
   -a, --all             include all databases
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
-                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
-                        EVENTS, GRANTS, DATA, CREATE_DB
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        tables, views, triggers, procedures, functions,
+                        events, grants, data, create_db
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
   --new-storage-engine=NEW_ENGINE
-                        Change all tables to use this storage engine if
+                        change all tables to use this storage engine if
                         storage engine exists on the destination.
   --default-storage-engine=DEF_ENGINE
-                        Change all tables to use this storage engine if the
+                        change all tables to use this storage engine if the
                         original storage engine does not exist on the
                         destination.
-  --locking=LOCKING     Choose the lock type for the operation: no-locks = do
+  --locking=LOCKING     choose the lock type for the operation: no-locks = do
                         not use any table locks, lock-all = use table locks
                         but no transaction and no consistent read, snaphot
                         (default): consistent read using a single transaction.
   -G, --basic-regexp, --regexp
-                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
 Test case 4 - no data
 # Source on localhost: ... connected.

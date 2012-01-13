@@ -28,13 +28,15 @@ import time
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.serverinfo import show_server_info
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import add_verbosity
+
 from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqlserverinfo "
 DESCRIPTION = "mysqlserverinfo - show server information"
-USAGE = "%prog --server=user:pass@host:port:socket -f GRID"
+USAGE = "%prog --server=user:pass@host:port:socket --format=grid"
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -43,9 +45,8 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Setup utility-specific options:
 
 # Input format
-parser.add_option("-f", "--format", action="store", dest="format",
-                  help="display the output in either GRID (default), "
-                       "TAB, CSV, or VERTICAL format", default="GRID")
+add_format_option(parser, "display the output in either grid (default), "
+                  "tab, csv, or vertical format", "grid")     
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
@@ -84,15 +85,6 @@ add_verbosity(parser, False)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-_PERMITTED_FORMATS = ("GRID", "TAB", "CSV", "VERTICAL")
-
-if opt.format.upper() not in _PERMITTED_FORMATS:
-    print "# WARNING : '%s' is not a valid output format. Using default." % \
-          opt.format
-    opt.format = "GRID"
-else:
-    opt.format = opt.format.upper()
-    
 # Check port range
 if os.name == 'nt':
     parts = opt.ports.split(":")

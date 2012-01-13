@@ -5,37 +5,37 @@ mysqldbimport - import metadata and data from files
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        the input file format in either SQL|S (default),
-                        GRID|G, TAB|T, CSV|C, or VERTICAL|V format
+                        the input file format in either sql (default), grid,
+                        tab, csv, or vertical format
   -i IMPORT_TYPE, --import=IMPORT_TYPE
-                        control the import of either DATA|D = only the table
+                        control the import of either 'data' = only the table
                         data for the tables in the database list,
-                        DEFINITIONS|F = import only the definitions for the
-                        objects in the database list, or BOTH|B = import the
+                        'definitions' = import only the definitions for the
+                        objects in the database list, or 'both' = import the
                         metadata followed by the data (default: import
                         definitions)
-  -d, --drop-first      Drop database before importing.
-  -b, --bulk-insert     Use bulk insert statements for data (default:False)
+  -d, --drop-first      drop database before importing.
+  -b, --bulk-insert     use bulk insert statements for data (default:False)
   -h, --no-headers      files do not contain column headers
   --dryrun              import the files and generate the statements but do
                         not execute them - useful for testing file validity
-  --skip-blobs          Do not import blob data.
+  --skip-blobs          do not import blob data.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
-                        TABLES, VIEWS, TRIGGERS, PROCEDURES, FUNCTIONS,
-                        EVENTS, GRANTS, DATA, CREATE_DB
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        tables, views, triggers, procedures, functions,
+                        events, grants, data, create_db
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
   --new-storage-engine=NEW_ENGINE
-                        Change all tables to use this storage engine if
+                        change all tables to use this storage engine if
                         storage engine exists on the destination.
   --default-storage-engine=DEF_ENGINE
-                        Change all tables to use this storage engine if the
+                        change all tables to use this storage engine if the
                         original storage engine does not exist on the
                         destination.
 Generating import file

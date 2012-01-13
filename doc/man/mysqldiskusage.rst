@@ -13,7 +13,7 @@ SYNOPSIS
  mysqldiskusage --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
              [--help | --no-headers | --version | --verbose |
              --binlog | --relaylog | --logs | --empty | --all 
-             --format=[GRID|G|CSV|C|TAB|T|VERTICAL|V]
+             --format=[grid|tab|csv|vertical]
              [<db> ...]
 
 DESCRIPTION
@@ -53,17 +53,17 @@ server is not local and the log files cannot be examined directly.
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -99,9 +99,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are GRID,
-   CSV, TAB, and VERTICAL, or the corresponding shortcuts G, C, T,
-   and V.  The default is GRID.
+   Specify the output display format. Permitted format values are
+   grid, csv, tab, and vertical. The default is grid.
     
 .. option::  --InnoDB, -i
 
@@ -142,6 +141,11 @@ OPTIONS
    Display version information and exit.
 
 .. _`mysqldiskusage-notes`:
+
+The permitted values for the :option:`--format` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --format=g will specify the grid format. An error will be generated if
+a prefix matches more than one valid value.
 
 EXAMPLES
 --------

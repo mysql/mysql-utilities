@@ -42,4 +42,4 @@ Total database disk usage = XXXXXXX
 Test Case 5 : Testing disk space with NOT_THERE format 
 Usage: mysqldiskusage.py --server=user:pass@host:port:socket db1 --all
 
-mysqldiskusage.py: error: NOT_THERE is not a valid format option.
+mysqldiskusage.py: error: option --format: invalid choice: 'NOT_THERE' (choose from 'grid', 'tab', 'csv', 'vertical')

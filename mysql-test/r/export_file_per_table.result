@@ -6,35 +6,35 @@ DROP DATABASE IF EXISTS util_test_mt;
 CREATE DATABASE util_test_mt;
 USE util_test_mt;
 #...done.
-Test case 2 - SQL format with --file-per-table
+Test case 2 - sql format with --file-per-table
 # Checking for file-per-table creation:
 #       util_test.t1.sql ................. [PASS]
 #       util_test.t2.sql ................. [PASS]
 #       util_test.t3.sql ................. [PASS]
 #       util_test.t4.sql ................. [PASS]
 
-Test case 3 - GRID format with --file-per-table
+Test case 3 - grid format with --file-per-table
 # Checking for file-per-table creation:
 #      util_test.t1.grid ................. [PASS]
 #      util_test.t2.grid ................. [PASS]
 #      util_test.t3.grid ................. [PASS]
 #      util_test.t4.grid ................. [PASS]
 
-Test case 4 - CSV format with --file-per-table
+Test case 4 - csv format with --file-per-table
 # Checking for file-per-table creation:
 #       util_test.t1.csv ................. [PASS]
 #       util_test.t2.csv ................. [PASS]
 #       util_test.t3.csv ................. [PASS]
 #       util_test.t4.csv ................. [PASS]
 
-Test case 5 - TAB format with --file-per-table
+Test case 5 - tab format with --file-per-table
 # Checking for file-per-table creation:
 #       util_test.t1.tab ................. [PASS]
 #       util_test.t2.tab ................. [PASS]
 #       util_test.t3.tab ................. [PASS]
 #       util_test.t4.tab ................. [PASS]
 
-Test case 6 - VERTICAL format with --file-per-table
+Test case 6 - vertical format with --file-per-table
 # Checking for file-per-table creation:
 #  util_test.t1.vertical ................. [PASS]
 #  util_test.t2.vertical ................. [PASS]

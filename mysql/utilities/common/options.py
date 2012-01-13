@@ -24,16 +24,66 @@ Methods:
   parse_connection()         Parse connection parameters
 """
 
+import copy
 import optparse
 import re
 
 from .. import VERSION_FRM
 from mysql.utilities.exception import UtilError
+from optparse import Option as CustomOption, OptionValueError as ValueError
 
-_PERMITTED_FORMATS = ["GRID", "TAB", "CSV", "VERTICAL"]
+_PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
 
-def setup_common_options(program_name, desc_str, usage_str, append=False):
+def prefix_check_choice(option, opt, value):
+    """Check option values using case insensitive prefix compare
+    
+    This method checks to see if the value specified is a prefix of one of the
+    choices. It converts the string provided by the user (value) to lower case
+    to permit case insensitive comparison of the user input. If multiple
+    choices are found for a prefix, an error is thrown. If the value being
+    compared does not match the list of choices, an error is thrown.
+    
+    option[in]             Option class instance
+    opt[in]                option name
+    value[in]              the value provided by the user
+    
+    Returns string - valid option chosen
+    """
+    choices = ", ".join(map(repr, option.choices)) # String of choices
+
+    # Get matches for prefix given
+    alts = [alt for alt in option.choices if alt.startswith(value.lower())]
+    if len(alts) == 1:   # only 1 match 
+       return alts[0]
+    elif len(alts) > 1:  # multiple matches
+        raise ValueError(("option %s: there are multiple prefixes matching: "
+                          "%r (choose from %s)") % (opt, value, choices))
+        
+    # Doesn't match. Show user possible choices.
+    raise ValueError(("option %s: invalid choice: %r (choose from %s)")
+                     % (opt, value, choices))
+
+
+class CaseInsensitiveChoicesOption(CustomOption):
+    """Case insensitive choices option class
+    
+    This is an extension of the Option class. It replaces the check_choice
+    method with the prefix_check_choice() method above to provide
+    shortcut aware choice selection. It also ensures the choice compare is
+    done with a case insensitve test.
+    """
+    TYPE_CHECKER = copy.copy(CustomOption.TYPE_CHECKER)
+    TYPE_CHECKER["choice"] = prefix_check_choice
+
+    def __init__(self, *opts, **attrs):
+        if 'choices' in attrs:
+            attrs['choices'] = [ attr.lower() for attr in attrs['choices'] ]
+        CustomOption.__init__(self, *opts, **attrs)
+
+
+def setup_common_options(program_name, desc_str, usage_str,
+                         append=False, server=True):
     """Setup option parser and options common to all MySQL Utilities.
 
     This method creates an option parser and adds options for user
@@ -45,6 +95,8 @@ def setup_common_options(program_name, desc_str, usage_str, append=False):
     usage_str[in]      A brief usage example
     append[in]         If True, allow --server to be specified multiple times
                        (default = False)
+    server[in]         If True, add the --server option
+                       (default = True)
 
     Returns parser object
     """
@@ -53,27 +105,32 @@ def setup_common_options(program_name, desc_str, usage_str, append=False):
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,
-        add_help_option=False)
-    parser.add_option("--help", action="help")
+        add_help_option=False,
+        option_class=CaseInsensitiveChoicesOption)
+    parser.add_option("--help", action="help", help="display a help message "
+                      "and exit")
 
-    # Connection information for the first server
-    if append:
-        parser.add_option("--server", action="append", dest="server",
-                          help="connection information for the server in " + \
-                          "the form: <user>:<password>@<host>:<port>:<socket>")
-    else:
-        parser.add_option("--server", action="store", dest="server",
-                          type = "string", default="root@localhost:3306",
-                          help="connection information for the server in " + \
-                          "the form: <user>:<password>@<host>:<port>:<socket>")
+    if server:
+        # Connection information for the first server
+        if append:
+            parser.add_option("--server", action="append", dest="server",
+                              help="connection information for the server in "
+                              "the form: <user>:<password>@<host>:<port>:"
+                              "<socket>")
+        else:
+            parser.add_option("--server", action="store", dest="server",
+                              type = "string", default="root@localhost:3306",
+                              help="connection information for the server in "
+                              "the form: <user>:<password>@<host>:<port>:"
+                              "<socket>")
 
     return parser
 
 
 _SKIP_VALUES = (
-    "TABLES","VIEWS","TRIGGERS","PROCEDURES",
-    "FUNCTIONS","EVENTS","GRANTS","DATA",
-    "CREATE_DB"
+    "tables","views","triggers","procedures",
+    "functions","events","grants","data",
+    "create_db"
 )
 
 def add_skip_options(parser):
@@ -84,8 +141,8 @@ def add_skip_options(parser):
     parser.add_option("--skip", action="store", dest="skip_objects",
                       default=None, help="specify objects to skip in the "
                       "operation in the form of a comma-separated list (no "
-                      "spaces). Valid values = TABLES, VIEWS, TRIGGERS, PROC"
-                      "EDURES, FUNCTIONS, EVENTS, GRANTS, DATA, CREATE_DB")
+                      "spaces). Valid values = tables, views, triggers, proc"
+                      "edures, functions, events, grants, data, create_db")
 
 
 def check_skip_options(skip_list):
@@ -102,36 +159,32 @@ def check_skip_options(skip_list):
     if skip_list is not None:
         items = skip_list.split(",")
         for object in items:
-            if object.upper() in _SKIP_VALUES:
-                new_skip_list.append(object.upper())
+            obj = object.lower()
+            if obj in _SKIP_VALUES:
+                new_skip_list.append(obj)
             else:
                 raise UtilError("The value %s is not a valid value for "
-                                     "--skip." % object)
+                                "--skip." % object)
     return new_skip_list
 
 
-def check_format_option(option, sql=False, initials=False):
-    """Check format option for validity.
+def add_format_option(parser, help_text, default_val, sql=False):
+    """Add the format option.
     
-    option[in]        value specified
-    sql[in]           if True, add 'SQL' format
-                      default=False
-    initials[in]      if True, add initial caps for compares
+    parser[in]        the parser instance
+    help_text[in]     help text
+    default_val[in]   default value
+    sql[in]           if True, add 'sql' format
                       default=False
     
     Returns corrected format value
     """
     formats = _PERMITTED_FORMATS
     if sql:
-        formats.append('SQL')
-    candidates = [ f for f in formats if f.startswith(option.upper()) ]
-    if len(candidates) > 1:
-        message = ''.join([value, "is ambigous. Alternatives:"] + candidates)
-        raise UtilError(message)
-    if len(candidates) == 0:
-        raise UtilError(option + " is not a valid format option.")
-
-    return candidates[0]
+        formats.append('sql')
+    parser.add_option("-f", "--format", action="store", dest="format",
+                      default=default_val, help=help_text, type="choice",
+                      choices=formats)
 
 
 def add_verbosity(parser, quiet=True):
@@ -143,11 +196,11 @@ def add_verbosity(parser, quiet=True):
 
     """
     parser.add_option("-v", "--verbose", action="count", dest="verbosity",
-                      help="Control how much information is displayed. "
+                      help="control how much information is displayed. "
                       "e.g., -v = verbose, -vv = more verbose, -vvv = debug")
     if quiet:
         parser.add_option("-q", "--quiet", action="store_true", dest="quiet",
-                          help="Turn off all messages for quiet execution.")
+                          help="turn off all messages for quiet execution.")
 
 
 def check_verbosity(options):
@@ -166,7 +219,7 @@ def add_changes_for(parser):
     parser[in]        the parser instance
     """
     parser.add_option("--changes-for", action="store", dest="changes_for",
-                      type="choice", default="server1", help="Specify the "
+                      type="choice", default="server1", help="specify the "
                       "server to show transformations to match the other "
                       "server. For example, to see the transformation for "
                       "transforming server1 to match server2, use "
@@ -215,11 +268,11 @@ def add_engines(parser):
     """
     # Add engine
     parser.add_option("--new-storage-engine", action="store", dest="new_engine",
-                      default=None, help="Change all tables to use this "\
+                      default=None, help="change all tables to use this "\
                       "storage engine if storage engine exists on the destination.")
     # Add default storage engine
     parser.add_option("--default-storage-engine", action="store",
-                      dest="def_engine", default=None, help="Change all "
+                      dest="def_engine", default=None, help="change all "
                       "tables to use this storage engine if the original "
                       "storage engine does not exist on the destination.")
 
@@ -297,7 +350,7 @@ def add_locking(parser):
     parser.add_option("--locking", action="store", dest="locking",
                       type="choice", default="snapshot", 
                       choices=['no-locks', 'lock-all', 'snapshot'],
-                      help="Choose the lock type for the operation: no-locks "
+                      help="choose the lock type for the operation: no-locks "
                       "= do not use any table locks, lock-all = use table "
                       "locks but no transaction and no consistent read, "
                       "snaphot (default): consistent read using a single "
@@ -310,7 +363,7 @@ def add_regexp(parser):
     parser[in]        the parser instance
     """
     parser.add_option("-G", "--basic-regexp", "--regexp", dest="use_regexp",
-                      action="store_true", default=False, help="Use 'REGEXP' "
+                      action="store_true", default=False, help="use 'REGEXP' "
                       "operator to match pattern. Default is to use 'LIKE'.")
 
 

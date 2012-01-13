@@ -14,8 +14,8 @@ SYNOPSIS
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --verbose |
              --version | --bulk-insert | --drop-first ]
-             --import=[DEFINITIIONS|DATA|BOTH] |
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] |
+             --import=[definitiions|data|both] |
+             --format=[sql|grid|tab|csv|vertical] |
              --new-storage-engine=<engine> | --default-storage-engine=<engine>
              <file> [|,<file>]
 
@@ -42,23 +42,23 @@ UPDATE commands by specifying the :option:`--skip-blobs` option.
 To specify the input format, use one of the following values
 with the :option:`--format` option:
 
-**SQL** (default)
+**sql** (default)
   Input consists of SQL statements. For definitions, this consists of
   the appropriate **CREATE** and **GRANT** statements. For data, this
   is an **INSERT** statement (or bulk insert if the
   :option:`--bulk-insert` option is specified).
 
-**GRID**
+**grid**
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Input is formatted in comma-separated values format.
 
-**TAB**
+**tab**
   Input is formatted in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -120,22 +120,21 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the input format. Permitted format values are SQL,
-   GRID, CSV, TAB, and VERTICAL, or the corresponding shortcuts S, G,
-   C, T, and V.  The default is SQL.
-
+   Specify the input format. Permitted format values are
+   sql, grid, tab, csv, and vertical. The default is sql.
+   
 .. option:: --import=<import_type>, -i<import_type>
 
-   Specify the import format. Permitted format values are DEFINITIONS (or F) =
+   Specify the import format. Permitted format values are definitions =
    import only the definitions (metadata) for the objects in the database list,
-   DATA (or D) = import only the table data for the tables in the database list,
-   and BOTH (or B) = import the definitions and the data. The default is
-   DEFINITIONS.
+   data = import only the table data for the tables in the database list,
+   and both = import the definitions and the data. The default is
+   definitions.
 
    If you attempt to import objects into an existing database, the result
-   depends on the import format. If the format is DEFINITIONS or BOTH, an
+   depends on the import format. If the format is definitions or both, an
    error occurs unless :option:`--drop-first` is given. If the format is
-   DATA, imported table data is added to existing table data.
+   data, imported table data is added to existing table data.
    
 .. option:: --new-storage-engine=<new_engine>
 
@@ -197,6 +196,11 @@ in an error when the view is imported on another server.
 
 The :option:`--new-storage-engine` and :option:`--default-storage-engine`
 options apply to all tables in the operation.
+
+The permitted values for the :option:`--format` and :option:`--import` options
+are case insensitive. The option also permits the user to specify a prefix for
+a valid value. For example, --format=g will specify the grid format. An error
+will be generated if a prefix matches more than one valid value.
 
 EXAMPLES
 --------

@@ -116,9 +116,8 @@ class test(mutlib.System_test):
 
 
         from_conn = "--source=" + self.build_connection_string(self.server1)
-        cmd_str = "mysqluserclone.py %s -f " % from_conn
+        cmd_str = "mysqluserclone.py %s --force " % from_conn
 
-        # Test case 1 - clone a user to a single user
         comment = "Test case 8 - clone a single user joe_pass@user to " + \
                   "a single user: jill@user with only source specified"
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",

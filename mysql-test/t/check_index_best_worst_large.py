@@ -34,7 +34,7 @@ class test(mutlib.System_test):
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s employees.dept_emp " % from_conn
-        cmd_str += " --format=CSV "
+        cmd_str += " --format=csv "
         
         comment = "Test case 1 - show best indexes"
         res = self.run_test_case(0, cmd_str + "--stats -vv --best=5", comment)

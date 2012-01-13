@@ -204,6 +204,6 @@ def show_topology(master_vals, options={}):
         
         # make a list from the topology
         topology_list = topo.get_topology_list()
-        print_list(sys.stdout, options.get("format", "GRID"),
+        print_list(sys.stdout, options.get("format", "grid"),
                    ["Master", "Slave"], topology_list, False, True)
 

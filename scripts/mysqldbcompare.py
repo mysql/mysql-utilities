@@ -29,7 +29,8 @@ from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import UtilError, FormatError
 
 # Constants
@@ -40,12 +41,8 @@ USAGE = "%prog --server1=user:pass@host:port:socket " + \
 PRINT_WIDTH = 75
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE)
 
 # Connection information for the source server
 parser.add_option("--server1", action="store", dest="server1",
@@ -60,9 +57,8 @@ parser.add_option("--server2", action="store", dest="server2",
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
 # Output format
-parser.add_option("-f", "--format", action="store", dest="format",
-                  help="display the output in either GRID (default), "
-                       "TAB, CSV, or VERTICAL format", default="GRID")
+add_format_option(parser, "display the output in either grid (default), "
+                  "tab, csv, or vertical format", "grid")  
 
 # Add skips
 parser.add_option("--skip-object-compare", action="store_true",
@@ -94,7 +90,7 @@ parser.add_option("-a", "--run-all-tests", action="store_true",
 # turn off binlog mode
 parser.add_option("--disable-binary-logging", action="store_true",
                   default="False", dest="toggle_binlog",
-                  help="Turn binary logging off during operation if enabled "
+                  help="turn binary logging off during operation if enabled "
                   "(SQL_LOG_BIN=1). Note: may require SUPER privilege. "
                   "Prevents compare operations from being written to the "
                   "binary log.")
@@ -116,12 +112,6 @@ opt, args = parser.parse_args()
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
-
-# Fail if format specified is invalid
-try:
-    opt.format = check_format_option(opt.format).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
 
 # Set options for database operations.
 options = {

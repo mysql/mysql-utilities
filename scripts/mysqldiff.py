@@ -30,6 +30,7 @@ from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -41,12 +42,8 @@ USAGE = "%prog --server1=user:pass@host:port:socket " + \
 PRINT_WIDTH = 75
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, False, False)
 
 # Connection information for the source server
 parser.add_option("--server1", action="store", dest="server1",

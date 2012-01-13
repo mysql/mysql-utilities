@@ -53,26 +53,26 @@ mysqlrplshow - show slaves attached to a master
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --master=MASTER       connection information for master server in the form:
                         <user>:<password>@<host>:<port>:<socket>
-  -l, --show-list       Print a list of the topology.
+  -l, --show-list       print a list of the topology.
   -f FORMAT, --format=FORMAT
-                        display the list in either GRID (default), TAB, CSV,
-                        or VERTICAL format
-  -r, --recurse         Traverse the list of slaves to find additional
+                        display the list in either grid (default), tab, csv,
+                        or vertical format
+  -r, --recurse         traverse the list of slaves to find additional
                         master/slave connections. User this option to map a
                         replication topology.
   --max-depth=MAX_DEPTH
-                        Limit the traversal to this depth. Valid only with the
+                        limit the traversal to this depth. Valid only with the
                         --recurse option. Valid values are non-negative
                         integers.
-  -p, --prompt          Prompt for slave user and password if different from
+  -p, --prompt          prompt for slave user and password if different from
                         master login.
   -n NUM_RETRIES, --num-retries=NUM_RETRIES
-                        Number of retries allowed for failed slave login
+                        number of retries allowed for failed slave login
                         attempt. Valid with --prompt only.
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
 Test Case 6 : Testing show topology with CSV format 
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:3311

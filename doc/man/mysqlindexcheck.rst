@@ -12,7 +12,7 @@ SYNOPSIS
   mysqlindexcheck --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[ --help | --version ] |
                  [ --show-drops | --skip | --verbose | --show-indexes |
-                 --format=[GRID|SQL|TAB|CSV] |
+                 --format=[grid|sql|tab|csv] |
                  --stats [--best[=<N>] | --worst[=<N>] ]]
                  <db>[.<table>] ... ]
 
@@ -62,20 +62,20 @@ To change the format of the index lists displayed for the
 :option:`--show-indexes`, :option:`--best`, and :option:`--worst` options,
 use one of the following values with the :option:`--format` option:
 
-**GRID** (default)
+**grid** (default)
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**SQL**
+**sql**
   print SQL statements rather than a list.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
@@ -105,9 +105,8 @@ OPTIONS
 .. option:: --format=<index_format>, -f<index_format>
 
    Specify the index list display format for output produced by
-   :option:`--stats`. Permitted format values are
-   GRID, CSV, TAB, SQL, and VERTICAL, or the corresponding shortcuts G, C, T,
-   S, and V.  The default is GRID.
+   :option:`--stats`. Permitted format values are grid, csv, tab, sql, and
+   vertical. The default is grid.
 
 .. option:: --server=<source>
 
@@ -153,6 +152,11 @@ NOTES
 
 The login user must have the appropriate permissions to read all databases
 and tables listed.
+
+The permitted values for the :option:`--format` option are case insensitive.
+The option also permits the user to specify a prefix for a valid value. For
+example, --format=g will specify the grid format. An error will be generated if
+a prefix matches more than one valid value.
 
 EXAMPLES
 --------

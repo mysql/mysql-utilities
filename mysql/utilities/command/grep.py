@@ -249,7 +249,7 @@ class ObjectGrep(object):
         """
         from mysql.utilities.exception import FormatError, EmptyResultError
 
-        format = kwrds.get('format', "GRID")
+        format = kwrds.get('format', "grid")
         entries = []
         for info in connections:
             conn = parse_connection(info)

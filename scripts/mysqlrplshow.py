@@ -27,8 +27,9 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_verbosity
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.command import rpl
 from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
@@ -41,12 +42,8 @@ USAGE = "%prog --master=root@localhost:3306 "
 PRINT_WIDTH = 75
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, True, False)
 
 # Setup utility-specific options:
 
@@ -58,41 +55,40 @@ parser.add_option("--master", action="store", dest="master",
 
 # Show graph option
 parser.add_option("-l", "--show-list", action="store_true", dest="show_list",
-                  help="Print a list of the topology.", default=False)
+                  help="print a list of the topology.", default=False)
 
 # Output format
-parser.add_option("-f", "--format", action="store", dest="format",
-                  help="display the list in either GRID (default), "
-                       "TAB, CSV, or VERTICAL format", default="GRID")
+add_format_option(parser, "display the list in either grid (default), "
+                  "tab, csv, or vertical format", "grid")
 
 # Check slaves option - if True, recurse slaves from master to find
 # additional master/slave connections
 parser.add_option("-r", "--recurse", action="store_true",
                   dest="recurse",
-                  help="Traverse the list of slaves to find additional "
+                  help="traverse the list of slaves to find additional "
                   "master/slave connections. User this option to map a "
                   "replication topology.", default=False)
 
 # Add limit for recursion
 parser.add_option("--max-depth", action="store", default=None, type="int",
-                  help="Limit the traversal to this depth. Valid only with "
+                  help="limit the traversal to this depth. Valid only with "
                   "the --recurse option. Valid values are non-negative "
                   "integers.", dest="max_depth")
 
 # Prompt for slave connections if default login/password fail
 parser.add_option("-p", "--prompt", action="store_true", dest="prompt",
-                  help="Prompt for slave user and password if different from "
+                  help="prompt for slave user and password if different from "
                   "master login.", default=False)
 
 # Number of retries for failed slave login
 parser.add_option("-n", "--num-retries", action="store", dest="num_retries",
-                  type="int", help="Number of retries allowed for failed "
+                  type="int", help="number of retries allowed for failed "
                   "slave login attempt. Valid with --prompt only.",
                   default=0)
 
 # Add quiet
 parser.add_option("-q", "--quiet", action="store_true", dest="quiet",
-                  help="Turn off all messages for quiet execution.")
+                  help="turn off all messages for quiet execution.")
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -101,12 +97,6 @@ opt, args = parser.parse_args()
 if opt.recurse and opt.max_depth is not None:
     if opt.max_depth < 0:
         parser.error("The --max-depth option needs to be >= 0.")
-
-# Fail if format specified is invalid
-try:
-    opt.format = check_format_option(opt.format).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
 
 # Parse master connection values
 try:

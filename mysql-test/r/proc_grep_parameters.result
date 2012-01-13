@@ -5,36 +5,36 @@ mysqlprocgrep - search process information
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -G, --basic-regexp, --regexp
-                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
   -Q, --print-sql, --sql
-                        Print the statement instead of sending it to the
+                        print the statement instead of sending it to the
                         server. If a kill option is submitted, a procedure
                         will be generated containing the code for executing
                         the kill.
-  --sql-body            Only print the body of the procedure.
-  --kill-connection     Kill all matching connections.
-  --kill-query          Kill query for all matching processes.
-  --print               Print all matching processes.
+  --sql-body            only print the body of the procedure.
+  --kill-connection     kill all matching connections.
+  --kill-query          kill query for all matching processes.
+  --print               print all matching processes.
   -f FORMAT, --format=FORMAT
-                        display the output in either GRID (default), TAB, CSV,
-                        or VERTICAL format
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  --match-user=PATTERN  Match the 'USER' column of the PROCESSLIST table
-  --match-host=PATTERN  Match the 'HOST' column of the PROCESSLIST table
-  --match-db=PATTERN    Match the 'DB' column of the PROCESSLIST table
+  --match-user=PATTERN  match the 'USER' column of the PROCESSLIST table
+  --match-host=PATTERN  match the 'HOST' column of the PROCESSLIST table
+  --match-db=PATTERN    match the 'DB' column of the PROCESSLIST table
   --match-command=PATTERN
-                        Match the 'COMMAND' column of the PROCESSLIST table
-  --match-info=PATTERN  Match the 'INFO' column of the PROCESSLIST table
+                        match the 'COMMAND' column of the PROCESSLIST table
+  --match-info=PATTERN  match the 'INFO' column of the PROCESSLIST table
   --match-state=PATTERN
-                        Match the 'STATE' column of the PROCESSLIST table
-  --age=AGE             Only show processes that been in the current state
-                        more than a given time
+                        match the 'STATE' column of the PROCESSLIST table
+  --age=AGE             show only processes that have been in the current
+                        state more than a given time
 Test case 2 - do the SQL for a simple search
 SELECT
   Id, User, Host, Db, Command, Time, State, Info

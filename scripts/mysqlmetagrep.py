@@ -26,7 +26,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import UtilError
 
 # Setup the command parser and setup server, help
@@ -38,7 +38,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Setup utility-specific options:
 parser.add_option("-b", "--body",
                   dest="check_body", action="store_true", default=False,
-                  help="Search the body of routines, triggers, and events as well")
+                  help="search the body of routines, triggers, and events as well")
 
 def quote(string):
     return "'" + string + "'"
@@ -47,7 +47,7 @@ def quote(string):
 parser.add_option(
     '--search-objects', '--object-types', 
     dest="object_types", default=','.join(OBJECT_TYPES),
-    help="The object type to search in: a comma-separated list"
+    help="the object type to search in: a comma-separated list"
     " of one or more of: " + ', '.join(map(quote, OBJECT_TYPES)))
 
 # Add regexp
@@ -56,30 +56,21 @@ add_regexp(parser)
 parser.add_option(
     "-p", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,
-    help="Print the statement instead of sending it to the server")
+    help="print the statement instead of sending it to the server")
 parser.add_option(
     "-e", "--pattern",
     dest="pattern",
-    help="Pattern to use when matching. Required if the pattern looks like a connection specification.")
+    help="pattern to use when matching. Required if the pattern looks like a connection specification.")
 parser.add_option(
     "--database",
     dest="database_pattern", default=None,
-    help="Only look at objects in databases matching this pattern")
+    help="only look at objects in databases matching this pattern")
 
 # Output format
-parser.add_option(
-    "-f", "--format", 
-    action="store", dest="format", default="GRID",
-    help="display the output in either GRID (default), "
-    "TAB, CSV, or VERTICAL format")
+add_format_option(parser, "display the output in either grid (default), "
+                  "tab, csv, or vertical format", "grid")     
 
 options, args = parser.parse_args()
-
-# Fail if format specified is invalid
-try:
-    options.format = check_format_option(options.format).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
 
 _LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a
 connection specification. Use --pattern if this is really what you

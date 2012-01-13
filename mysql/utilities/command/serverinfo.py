@@ -303,7 +303,7 @@ def show_server_info(servers, options):
     If the format option is set, the output will be in the format specified.
     
     If the no_headers option is set, the output will not have a header row (no
-    column names) except for format = VERTICAL.
+    column names) except for format = vertical.
     
     If the basedir and start options are set, the method will attempt to start
     the server in read only mode to get the information. Specifying only
@@ -323,7 +323,7 @@ def show_server_info(servers, options):
     from mysql.utilities.common.format import print_list
     
     no_headers = options.get("no_headers", False)
-    format = options.get("format", "GRID")
+    format = options.get("format", "grid")
     show_defaults = options.get("show_defaults", False)
     basedir = options.get("basedir", None)
     datadir = options.get("datadir", None)

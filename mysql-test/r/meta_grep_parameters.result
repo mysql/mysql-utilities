@@ -5,31 +5,31 @@ mysqlmetagrep - search metadata
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
-  -b, --body            Search the body of routines, triggers, and events as
+  -b, --body            search the body of routines, triggers, and events as
                         well
   --search-objects=OBJECT_TYPES, --object-types=OBJECT_TYPES
-                        The object type to search in: a comma-separated list
+                        the object type to search in: a comma-separated list
                         of one or more of: 'database', 'trigger', 'user',
                         'routine', 'column', 'table', 'partition', 'event',
                         'view'
   -G, --basic-regexp, --regexp
-                        Use 'REGEXP' operator to match pattern. Default is to
+                        use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
   -p, --print-sql, --sql
-                        Print the statement instead of sending it to the
+                        print the statement instead of sending it to the
                         server
   -e PATTERN, --pattern=PATTERN
-                        Pattern to use when matching. Required if the pattern
+                        pattern to use when matching. Required if the pattern
                         looks like a connection specification.
   --database=DATABASE_PATTERN
-                        Only look at objects in databases matching this
+                        only look at objects in databases matching this
                         pattern
   -f FORMAT, --format=FORMAT
-                        display the output in either GRID (default), TAB, CSV,
-                        or VERTICAL format
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
 Test case 2 - do the SQL for a simple search
 
 SELECT 

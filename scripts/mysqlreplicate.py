@@ -26,6 +26,7 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.command import rpl
@@ -38,12 +39,8 @@ USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
         "--server-id=3 --rpl_user=rpl:passwd "
 
 # Setup the command parser
-parser = optparse.OptionParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, True, False)
 
 # Setup utility-specific options:
 
@@ -68,7 +65,7 @@ parser.add_option("--rpl-user", action="store", dest="rpl_user",
 
 # Pedantic mode for failing if storage engines differ
 parser.add_option("-p", "--pedantic", action="store_true", default=False,
-                  dest="pedantic", help="Fail if storage engines differ "
+                  dest="pedantic", help="fail if storage engines differ "
                   "among master and slave.")
 
 # Test replication option
@@ -78,18 +75,18 @@ parser.add_option("--test-db", action="store", dest="test_db",
 
 # Add master log file option
 parser.add_option("--master-log-file", action="store", dest="master_log_file",
-                  type="string", help="Use this master log file to initiate "
+                  type="string", help="use this master log file to initiate "
                   "the slave.", default=None)
 
 # Add master log position option
 parser.add_option("--master-log-pos", action="store", dest="master_log_pos",
-                  type="int", help="Use this position in the master log file "
+                  type="int", help="use this position in the master log file "
                   "to initiate the slave.", default=-1)
 
 # Add start from beginning option
 parser.add_option("-b", "--start-from-beginning", action="store_true",
                   default=False, dest="from_beginning",
-                  help="Start replication from the first event recorded in "
+                  help="start replication from the first event recorded in "
                   "the binary logging of the master."
                   "Not valid with --master-log-file or --master-log-pos.")
 

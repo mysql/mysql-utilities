@@ -1,4 +1,4 @@
-Test case 1 - SQL format with --file-per-table
+Test case 1 - sql format with --file-per-table
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.
@@ -20,7 +20,7 @@ Running import...
 11 Test Basic database example 
 12 Test Basic database example 
 13 Test Basic database example 
-Test case 2 - GRID format with --file-per-table
+Test case 2 - grid format with --file-per-table
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.
@@ -44,7 +44,7 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 13 Test Basic database example 
-Test case 3 - CSV format with --file-per-table
+Test case 3 - csv format with --file-per-table
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.
@@ -68,7 +68,7 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 13 Test Basic database example 
-Test case 4 - TAB format with --file-per-table
+Test case 4 - tab format with --file-per-table
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.
@@ -92,7 +92,7 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 13 Test Basic database example 
-Test case 5 - VERTICAL format with --file-per-table
+Test case 5 - vertical format with --file-per-table
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.

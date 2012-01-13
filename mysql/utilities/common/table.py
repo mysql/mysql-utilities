@@ -1007,7 +1007,7 @@ class Table(object):
         This shows the best (first n) or worst (last n) performing queries
         for a given table.
 
-        format[in]         format out output = SQL, TABLE, TAB, CSV
+        format[in]         format out output = sql, table, tab, csv
         limit[in]          number to limit the display
         best[in]           (optional) if True, print best performing indexes
                                       if False, print worst performing indexes
@@ -1074,13 +1074,13 @@ class Table(object):
         """Print the list of indexes
 
         indexes[in]        list of indexes to print
-        format[in]         format out output = SQL, TABLE, TAB, CSV
+        format[in]         format out output = sql, table, tab, csv
         no_header[in]      (optional) if True, do not print the header
         """
 
         from mysql.utilities.common.format import print_list
 
-        if format == "SQL":
+        if format == "sql":
             for index in indexes:
                 index.print_index_sql()
         else:
@@ -1094,11 +1094,11 @@ class Table(object):
     def print_indexes(self, format):
         """Print all indexes for this table
 
-        format[in]         format out output = SQL, TABLE, TAB, CSV
+        format[in]         format out output = sql, table, tab, csv
         """
 
         print "# Showing indexes from %s:\n#" % (self.table)
-        if format == "SQL":
+        if format == "sql":
             self.__print_index_list(self.btree_indexes, format)
             self.__print_index_list(self.hash_indexes, format, False)
             self.__print_index_list(self.rtree_indexes, format, False)

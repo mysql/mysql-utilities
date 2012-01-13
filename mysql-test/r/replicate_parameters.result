@@ -13,28 +13,28 @@ mysqlreplicate - establish replication with a master
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --master=MASTER       connection information for master server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --slave=SLAVE         connection information for slave server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement - e.g. rpl:passwd - default = rpl:rpl
-  -p, --pedantic        Fail if storage engines differ among master and slave.
+  -p, --pedantic        fail if storage engines differ among master and slave.
   --test-db=TEST_DB     database name to use in testing  replication setup
                         (optional)
   --master-log-file=MASTER_LOG_FILE
-                        Use this master log file to initiate the slave.
+                        use this master log file to initiate the slave.
   --master-log-pos=MASTER_LOG_POS
-                        Use this position in the master log file to initiate
+                        use this position in the master log file to initiate
                         the slave.
   -b, --start-from-beginning
-                        Start replication from the first event recorded in the
+                        start replication from the first event recorded in the
                         binary logging of the master.Not valid with --master-
                         log-file or --master-log-pos.
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  -q, --quiet           Turn off all messages for quiet execution.
+  -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the verbose feature
 # master on localhost: ... connected.
 # slave on localhost: ... connected.

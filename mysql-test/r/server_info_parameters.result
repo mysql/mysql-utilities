@@ -1,16 +1,16 @@
 Test case 1 - show help
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket -f GRID
+Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo - show server information
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   -f FORMAT, --format=FORMAT
-                        display the output in either GRID (default), TAB, CSV,
-                        or VERTICAL format
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
   -h, --no-headers      do not show column headers
   -d, --show-defaults   show defaults from the config file per server
   -s, --start           start server in read only mode if offline
@@ -19,7 +19,7 @@ Options:
   --port-range=PORTS    the port range to search for running mysql servers on
                         Windows systems
   --show-servers        show any known MySQL servers running on this host
-  -v, --verbose         Control how much information is displayed. e.g., -v =
+  -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
 Test case 2 - no headers
 # Source on localhost: ... connected.

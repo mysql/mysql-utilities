@@ -14,8 +14,8 @@ SYNOPSIS
              --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
              EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
              --verbose | --version | --bulk-insert | --file-per-table |
-             --export=[DEFINITIONS|DATA|BOTH] |
-             --format=[SQL|S|GRID|G|TAB|T|CSV|C|VERTICAL|V] ] |
+             --export=[definitions|data|both] |
+             --format=[sql|grid|tab|csv|vertical] ] |
              --exclude=<name>[|,--exclude=<name>]
 
 DESCRIPTION
@@ -35,36 +35,36 @@ statements for BLOB data, specify the :option:`--skip-blobs` option.
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
 
-**SQL** (default)
+**sql** (default)
   Display output using SQL statements. For definitions, this consists of
   the appropriate **CREATE** and **GRANT** statements. For data, this
   is an **INSERT** statement (or bulk insert if the
   :option:`--bulk-insert` option is specified).
 
-**GRID**
+**grid**
   Display output in grid or table format like that of the
   :command:`mysql` monitor.
 
-**CSV**
+**csv**
   Display output in comma-separated values format.
 
-**TAB**
+**tab**
   Display output in tab-separated format.
 
-**VERTICAL**
+**vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
 To specify how much data to display, use one of the following values
 with the :option:`--display` option:
 
-**BRIEF**
+**brief**
   Display only the minimal columns for recreating the objects.
 
-**FULL**
+**full**
   Display the complete column list for recreating the objects.
 
-**NAMES**
+**names**
   Display only the object names.
 
 Note: For SQL-format output, the :option:`--display` option is ignored.
@@ -121,9 +121,9 @@ OPTIONS
 
 .. option:: --display=<display>, -d<display>
 
-   Control the number of columns shown. Permitted display values are BRIEF
-   = minimal columns for object creation, FULL = all columns, and NAMES =
-   only object names (not valid for --format=SQL). The default is BRIEF.
+   Control the number of columns shown. Permitted display values are 'brief'
+   = minimal columns for object creation, 'full' = all columns, and 'names' =
+   only object names (not valid for --format=sql). The default is 'brief'.
 
 .. option:: --exclude=<exclude>, -x<exclude> 
 
@@ -153,9 +153,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are SQL,
-   GRID, CSV, TAB, and VERTICAL, or the corresponding shortcuts S, G,
-   C, T, and V.  The default is SQL.
+   Specify the output display format. Permitted format values are
+   sql, grid, tab, csv, and vertical. The default is sql.
 
 .. option:: --locking=<locking>
 
@@ -226,6 +225,12 @@ For example, eliminating tables but not views may result in an error when the
 view is imported on another server.
 
 The :option:`--exclude` option does not apply to grants.
+
+The permitted values for the :option:`--format`, :option:`--export`, and
+:option:`--display` options are case insensitive. The option also permits the
+user to specify a prefix for a valid value. For example, --format=g will
+specify the grid format. An error will be generated if a prefix matches more
+than one valid value.
 
 EXAMPLES
 --------

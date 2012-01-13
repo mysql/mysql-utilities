@@ -41,7 +41,7 @@ def check_index(src_val, table_args, options):
                          skip         : skip non-existant tables
                          verbosity    : print extra information
                          show-indexes : show all indexes for each table
-                         index-format : index format = SQL, TABLE, TAB, CSV
+                         index-format : index format = sql, table, tab, csv
                          worst        : show worst performing indexes
                          best         : show best performing indexes
     

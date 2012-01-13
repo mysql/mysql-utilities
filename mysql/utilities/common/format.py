@@ -175,12 +175,12 @@ def print_list(file, format, columns, rows, no_headers=False, sort=False):
     list_options = {
         'print_header' : not no_headers
     }
-    if format == "VERTICAL":
+    if format == "vertical":
         format_vertical_list(file, columns, rows)
-    elif format == "TAB":
+    elif format == "tab":
         list_options['separator'] = '\t'
         format_tabular_list(file, columns, rows, list_options)
-    elif format == "CSV":
+    elif format == "csv":
         list_options['separator'] = ','
         format_tabular_list(file, columns, rows, list_options)
     else:  # default to table format

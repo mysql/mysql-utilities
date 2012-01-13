@@ -32,7 +32,7 @@ from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import check_format_option
+from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.exception import UtilError
 
@@ -40,6 +40,9 @@ from mysql.utilities.exception import UtilError
 NAME = "MySQL Utilities - mysqldbexport "
 DESCRIPTION = "mysqldbexport - export metadata and data from databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
+
+_PERMITTED_DISPLAY = ["names", "brief", "full"]
+_PERMITTED_EXPORTS = ["data", "definitions", "both"]
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -59,48 +62,49 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Setup utility-specific options:
 
 # Output format
-parser.add_option("-f", "--format", action="store", dest="format", default="SQL",
-                  help="display the output in either SQL|S (default), "
-                       "GRID|G, TAB|T, CSV|C, or VERTICAL|V format")
+add_format_option(parser, "display the output in either sql (default), "
+                  "grid, tab, csv, or vertical format", "sql", True)     
 
-# Output format
+# Display format
 parser.add_option("-d", "--display", action="store", dest="display",
-                  default="BRIEF", help="control the number of columns shown: "
-                  "BRIEF = minimal columns for object creation (default), "
-                  "FULL = all columns, NAMES = only object names (not "
-                  "valid for --format=SQL)")
+                  default="brief", help="control the number of columns shown: "
+                  "'brief' = minimal columns for object creation (default), "
+                  "'full' = all columns, 'names' = only object names (not "
+                  "valid for --format=sql)", type="choice",
+                  choices=_PERMITTED_DISPLAY)
 
 # Export mode
 parser.add_option("-e", "--export", action="store", dest="export",
                   default="definitions", help="control the export of either "
-                  "DATA|D = only the table data for the tables in the database "
-                  "list, DEFINITIONS|F = export only the definitions for "
-                  "the objects in the database list, or BOTH|B = export "
+                  "'data' = only the table data for the tables in the database "
+                  "list, 'definitions' = export only the definitions for "
+                  "the objects in the database list, or 'both' = export "
                   "the metadata followed by the data "
-                  "(default: export definitions)")
+                  "(default: export definitions)", type="choice",
+                  choices=_PERMITTED_EXPORTS)
 
 # Single insert mode
 parser.add_option("-b", "--bulk-insert", action="store_true",
-                  dest="bulk_import", default=False, help="Use bulk insert "
+                  dest="bulk_import", default=False, help="use bulk insert "
                   "statements for data (default:False)")
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
                   default=False, help="do not display the column headers - "
-                  "ignored for GRID format")
+                  "ignored for grid format")
 
 # Skip blobs for export
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
-                  default=False, help="Do not export blob data.")
+                  default=False, help="do not export blob data.")
 
 # File-per-table mode
 parser.add_option("--file-per-table", action="store_true", dest="file_per_tbl",
-                  default=False, help="Write table data to separate files. "
+                  default=False, help="write table data to separate files. "
                   "Valid only for --export=data or --export=both.")
 
 # Add the exclude database option
 parser.add_option("-x", "--exclude", action="append", dest="exclude",
-                  type="string", default=None, help="Exclude one or more "
+                  type="string", default=None, help="exclude one or more "
                   "objects from the operation using either a specific name "
                   "(e.g. db1.t1), a LIKE pattern (e.g. db1.t% or db%.%) or a "
                   "REGEXP search pattern. To use a REGEXP search pattern for "
@@ -142,60 +146,28 @@ if len(args) == 0 and not opt.all:
 # Fail if we have arguments and all databases option listed.
 check_all(parser, opt, args, "databases")
 
-# Fail if format specified is invalid
-try:
-    opt.format = check_format_option(opt.format, True, True).upper()
-except UtilError, e:
-    parser.error(e.errmsg)
-
-_PERMITTED_DISPLAY_TYPES = ("NAMES", "BRIEF", "FULL")
-
-if opt.display.upper() not in _PERMITTED_DISPLAY_TYPES:
-    print "# WARNING : '%s' is not a valid display mode. Using default." % \
-          opt.display
-    opt.display = "BRIEF"
-else:
-    opt.display = opt.display.upper()
-
-_PERMITTED_EXPORTS = ("DATA", "DEFINITIONS", "BOTH", "D", "F", "B")
-
-if opt.export.upper() not in _PERMITTED_EXPORTS:
-    print "# WARNING : '%s' is not a valid export mode. Using default." % \
-          opt.export
-    opt.export = "DEFINITIONS"
-else:
-    opt.export = opt.export.upper()
-
-# Convert to full word for easier coding in command module
-if opt.export == "D":
-    opt.export = "DATA"
-elif opt.export == "F":
-    opt.export = "DEFINITIONS"
-elif opt.export == "B":
-    opt.export = "BOTH"
-
-if opt.skip_blobs and not opt.export == "DATA":
+if opt.skip_blobs and not opt.export == "data":
     print "# WARNING: --skip-blobs option ignored for metadata export."
 
-if opt.file_per_tbl and opt.export in ("DEFINITIONS", "BOTH"):
+if opt.file_per_tbl and opt.export in ("definitions", "both"):
     print "# WARNING: --file-per-table option ignored for metadata export."
 
-if "DATA" in skips and opt.export == "DATA":
+if "data" in skips and opt.export == "data":
     print "ERROR: You cannot use --export=data and --skip-data when exporting " \
           "table data."
     exit(1)
 
 # Set options for database operations.
 options = {
-    "skip_tables"      : "TABLES" in skips,
-    "skip_views"       : "VIEWS" in skips,
-    "skip_triggers"    : "TRIGGERS" in skips,
-    "skip_procs"       : "PROCEDURES" in skips,
-    "skip_funcs"       : "FUNCTIONS" in skips,
-    "skip_events"      : "EVENTS" in skips,
-    "skip_grants"      : "GRANTS" in skips,
-    "skip_create"      : "CREATE_DB" in skips,
-    "skip_data"        : "DATA" in skips,
+    "skip_tables"      : "tables" in skips,
+    "skip_views"       : "views" in skips,
+    "skip_triggers"    : "triggers" in skips,
+    "skip_procs"       : "procedures" in skips,
+    "skip_funcs"       : "functions" in skips,
+    "skip_events"      : "events" in skips,
+    "skip_grants"      : "grants" in skips,
+    "skip_create"      : "create_db" in skips,
+    "skip_data"        : "data" in skips,
     "skip_blobs"       : opt.skip_blobs,
     "format"           : opt.format,
     "no_headers"       : opt.no_headers,
@@ -226,10 +198,10 @@ try:
     # record start time
     if opt.verbosity >= 3:
         start_test = time.time()
-    if opt.export in ("DEFINITIONS", "BOTH"):
+    if opt.export in ("definitions", "both"):
         dbexport.export_metadata(server_values, db_list, options)
-    if opt.export in ("DATA", "BOTH"):
-        if opt.display != "BRIEF":
+    if opt.export in ("data", "both"):
+        if opt.display != "brief":
             print "# NOTE : --display is ignored for data export."
         dbexport.export_data(server_values, db_list, options)
     if opt.verbosity >= 3:

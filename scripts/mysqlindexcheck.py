@@ -33,6 +33,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import add_format_option
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
@@ -57,11 +58,10 @@ parser.add_option("-s", "--skip", action="store_true", dest="skip",
                   help="skip tables that do not exist",
                   default=False)
 
-# Index list mode
-parser.add_option("--format", action="store",
-                  dest="index_format", default="GRID",
-                  help="display the list of indexes per table in either " \
-                       "SQL, GRID (default), TAB, CSV, or VERTICAL format")
+# Index list format
+add_format_option(parser, "display the list of indexes per table in either "
+                  "sql, grid (default), tab, csv, or vertical format", "grid",
+                  True)     
 
 # Show index statistics
 parser.add_option("--stats", action="store_true",
@@ -87,15 +87,6 @@ opt, args = parser.parse_args()
 # Check to make sure at least one table specified.
 if len(args) == 0:
     parser.error("You must specify at least one table or database to check.")
-    
-PERMITTED_FORMATS = ("SQL", "GRID", "TAB", "CSV", "VERTICAL")
-
-if opt.index_format.upper() not in PERMITTED_FORMATS:
-    print "WARNING : '%s' is not a valid index format. Using default." % \
-          opt.index_format
-    opt.index_format = "GRID"
-else:
-    opt.index_format = opt.index_format.upper()
 
 # Parse source connection values
 try:
@@ -146,7 +137,7 @@ options = {
     "skip"          : opt.skip,
     "verbosity"     : opt.verbosity,
     "show-indexes"  : opt.show_indexes,
-    "index-format"  : opt.index_format,
+    "index-format"  : opt.format,
     "stats"         : opt.stats,
     "best"          : best,
     "worst"         : worst

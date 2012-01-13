@@ -39,7 +39,7 @@ class test(export_parameters_def.test):
         except:
             raise MUTLibError("Cannot drop database for test case 1.")
 
-        _FORMAT_DISPLAY = ("SQL","GRID","CSV","TAB","VERTICAL")
+        _FORMAT_DISPLAY = ("sql","grid","csv","tab","vertical")
 
         cmd_str = "mysqldbexport.py util_test --export=data " \
                   "--file-per-table %s --quiet --format=" % from_conn
