@@ -31,12 +31,12 @@ import time
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.options import parse_connection, add_verbosity
+from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import MUTLibError
 from mutlib.mutlib import Server_list
 
 # Constants
 NAME = "MySQL Utilities Test - mut "
-VERSION = "1.0.0 alpha"
 DESCRIPTION = "mut - run tests on the MySQL Utilities"
 USAGE = "%prog --server=user:passwd@host:port:socket test1 test2"
 
@@ -255,9 +255,8 @@ def find_tests(path):
     return test_files
 
 # Begin 'main' code
-parser = optparse.OptionParser(version=VERSION, description=DESCRIPTION,
-                               usage=USAGE, add_help_option=False)
-parser.add_option("--help", action="help")
+parser = setup_common_options(os.path.basename(sys.argv[0]),
+                              DESCRIPTION, USAGE, False, False)
 
 # Add server option
 parser.add_option("--server", action="append", dest="servers",
@@ -314,9 +313,11 @@ parser.add_option("--start-port", action="store", dest="start_port",
 parser.add_option("--record", action="store_true", dest="record",
                   help="record output of specified test if successful")
 
-# Add record option
-parser.add_option("--sorted", action="store_true", dest="sorted",
-                  default=True, help="execute tests sorted by suite.name")
+# Add sorted option
+parser.add_option("--sort", action="store", dest="sort",
+                  default="asc", help="execute tests sorted by suite.name "
+                  "either ascending (asc) or descending (desc).", type="choice",
+                  choices=['asc', 'desc'])
 
 # Add utility directory option
 parser.add_option("--utildir", action="store", dest="utildir",
@@ -364,7 +365,7 @@ sys.path.append(opt.utildir)
 print "\nMySQL Utilities Testing - MUT\n"
 print "Parameters used: "
 print "  Display Width       = %d" % (opt.width)
-print "  Sorted              = %s" % (opt.sorted is not None)
+print "  Sort                = %s" % (opt.sort)
 print "  Force               = %s" % (opt.force is not None)
 print "  Test directory      = '%s'" % (opt.testdir)
 print "  Utilities directory = '%s'" % (opt.utildir)
@@ -481,9 +482,8 @@ test_files.extend(find_tests(opt.testdir))
 if len(test_files) == 0:
     print "No tests match criteria specified."
 
-# Sort test cases if option turned on
-if opt.sorted:
-    test_files.sort()
+# Sort test cases
+test_files.sort(reverse=(opt.sort == 'desc'))
 
 # Check for validity of --start-test
 if start_sequence:

@@ -10,7 +10,7 @@ SYNOPSIS
 
 ::
 
- mut [[--help | --version ] | --verbose | --sorted | --record |
+ mut [[--help | --version ] | --verbose | --sort=[asc|desc] | --record |
             --utildir=<path> | --width=<num> | --start-port=<num> |
             --testdir=<path> | --do-test=<prefix> | --force |
             [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
@@ -89,9 +89,10 @@ OPTIONS
 
    Exclude all tests that begin with *prefix*.
 
-.. option:: --sorted
+.. option:: --sort
 
-   Execute tests sorted by suite.testname (default = True).
+   Execute tests sorted by suite.name either ascending (asc) or descending
+   (desc). Default is ascending.
 
 .. option:: --start-port=<port>
 
