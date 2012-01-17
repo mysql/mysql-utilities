@@ -240,10 +240,13 @@ def get_common_objects(server1, server2, db1, db2,
     in_both, in_db1_not_db2, in_db2_not_db1 = get_common_lists(db1_objects,
                                                                db2_objects)
     if print_list:
-        print_missing_list(in_db1_not_db2,
-                           "server1:"+db1, "server2:"+db2) 
-        print_missing_list(in_db2_not_db1,
-                           "server2:"+db2, "server1:"+db1)
+        server1_str = "server1." + db1
+        if server1 == server2:
+            server2_str = "server1." + db2
+        else:
+            server2_str = "server2." + db2
+        print_missing_list(in_db1_not_db2, server1_str, server2_str)
+        print_missing_list(in_db2_not_db1, server2_str, server1_str)
     
     return (in_both, in_db1_not_db2, in_db2_not_db1)
 

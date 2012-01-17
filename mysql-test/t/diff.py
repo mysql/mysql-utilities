@@ -57,6 +57,7 @@ class test(mutlib.System_test):
         
         s1_conn = "--server1=" + self.build_connection_string(self.server1)
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
+        s2_conn_dupe = "--server2=" + self.build_connection_string(self.server1)
        
         cmd_str = "mysqldiff.py %s %s " % (s1_conn, s2_conn)
 
@@ -92,6 +93,24 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
             
+        # execute a diff on the same server to test messages
+        
+        self.server1.exec_query("CREATE DATABASE util_test1")
+        
+        comment = "Test case 6 - diff two databases on same server w/server2"
+        cmd_str = "mysqldiff.py %s %s " % (s1_conn, s2_conn_dupe)
+        res = self.run_test_case(1, cmd_str + "util_test:util_test1 ",
+                                 comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
+        comment = "Test case 7 - diff two databases on same server"
+        cmd_str = "mysqldiff.py %s " % s1_conn
+        res = self.run_test_case(1, cmd_str + "util_test:util_test1 ",
+                                 comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
         
@@ -122,6 +141,7 @@ class test(mutlib.System_test):
     
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
+        self.drop_db(self.server1, "util_test1")
         self.drop_db(self.server2, "util_test")
         return True
 

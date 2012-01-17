@@ -54,9 +54,9 @@ mysqldiff.py: error: Incorrect object compare argument. Format should be: db1.ob
 Test case 11 - some objects don't exist in dbs
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# WARNING: Objects in server1:util_test but not in server2:util_test:
+# WARNING: Objects in server1.util_test but not in server2.util_test:
 #        TABLE: t5
-# WARNING: Objects in server2:util_test but not in server1:util_test:
+# WARNING: Objects in server2.util_test but not in server1.util_test:
 #        TABLE: t6
 Compare failed. One or more differences found.
 Test case 12 - no objects specified.

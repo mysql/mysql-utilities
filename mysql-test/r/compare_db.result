@@ -20,7 +20,7 @@ Test case 2 - check database with known differences direction = server1 (default
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -94,7 +94,7 @@ Test case 3 - check database with known differences direction = server2
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -168,7 +168,7 @@ Test case 4 - check database with known differences direction = server1 and reve
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -296,7 +296,7 @@ Test case 5 - check database with known differences direction = server2 and reve
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -415,6 +415,61 @@ stock_number,description,qty,cost,type,notes,supplier
 #
 
 
+
+# Database consistency check failed.
+#
+# ...done
+Test case 6 - compare two databases on same server w/server2
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory2 on server2
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- inventory
++++ inventory2
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `inventory2` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+# WARNING: Objects in server1.inventory but not in server1.inventory2:
+#         VIEW: finishing_up
+#        TABLE: supplier
+#        TABLE: supplies
+#         VIEW: tools
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# -------------------------------------------------------------------------
+
+# Database consistency check failed.
+#
+# ...done
+Test case 7 - compare two databases on same server
+# server1 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory2 on server2
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- inventory
++++ inventory2
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `inventory2` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+# WARNING: Objects in server1.inventory but not in server1.inventory2:
+#         VIEW: finishing_up
+#        TABLE: supplier
+#        TABLE: supplies
+#         VIEW: tools
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# -------------------------------------------------------------------------
 
 # Database consistency check failed.
 #

@@ -73,7 +73,7 @@ Test case 2 -  --skip-row-count --format=csv -a
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -143,7 +143,7 @@ Test case 3 -  --skip-diff --format=csv -a
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -207,7 +207,7 @@ Test case 4 -  --skip-data-check --format=csv -a
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
