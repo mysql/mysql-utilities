@@ -51,11 +51,11 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -140,11 +140,11 @@ Test case 3 - Use  -a --difftype=unified --format=csv
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -206,11 +206,11 @@ Test case 4 - Use  -a --difftype=unified --format=tab
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -272,11 +272,11 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -424,11 +424,11 @@ Test case 6 - Use  -a --difftype=context --format=grid
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -517,11 +517,11 @@ Test case 7 - Use  -a --difftype=context --format=csv
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -589,11 +589,11 @@ Test case 8 - Use  -a --difftype=context --format=tab
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -661,11 +661,11 @@ Test case 9 - Use  -a --difftype=context --format=vertical
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -842,11 +842,11 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -939,11 +939,11 @@ Test case 11 - Use  -a --difftype=differ --format=csv
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -1005,11 +1005,11 @@ Test case 12 - Use  -a --difftype=differ --format=tab
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -1071,11 +1071,11 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                                   Defn    Row     Data   
@@ -1233,11 +1233,11 @@ ERROR: The list of objects differs among database inventory and inventory.
 Test case 15 -  -d differ --format=csv --quiet -a
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 
@@ -1291,11 +1291,11 @@ Test case 16 -  --format=csv -a --width=65
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                                         Defn    Row     Data   
@@ -1357,11 +1357,11 @@ Test case 17 -  --format=csv -a --width=55
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 #                               Defn    Row     Data   
@@ -1423,11 +1423,11 @@ Test case 18 -  --format=csv -vvv -a
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 Looking for object types table, view, trigger, procedure, function, and event.
@@ -1537,11 +1537,11 @@ Test case 19 -  --format=csv -vvv -a --disable-binary-logging
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
-# WARNING: Objects in server2:inventory but not in server1:inventory:
+# WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 Looking for object types table, view, trigger, procedure, function, and event.

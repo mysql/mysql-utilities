@@ -85,3 +85,28 @@ Test case 5 - diff multiple objects + database - some same
 # Comparing util_test.trg to util_test.trg                         [PASS]
 # Comparing util_test.v1 to util_test.v1                           [PASS]
 Compare failed. One or more differences found.
+Test case 6 - diff two databases on same server w/server2
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# WARNING: Objects in server1.util_test but not in server1.util_test1:
+#    PROCEDURE: p1
+#        TABLE: t4
+#      TRIGGER: trg
+#        TABLE: t1
+#        TABLE: t3
+#     FUNCTION: f1
+#         VIEW: v1
+#        TABLE: t2
+Compare failed. One or more differences found.
+Test case 7 - diff two databases on same server
+# server1 on localhost: ... connected.
+# WARNING: Objects in server1.util_test but not in server1.util_test1:
+#    PROCEDURE: p1
+#        TABLE: t4
+#      TRIGGER: trg
+#        TABLE: t1
+#        TABLE: t3
+#     FUNCTION: f1
+#         VIEW: v1
+#        TABLE: t2
+Compare failed. One or more differences found.

@@ -20,7 +20,7 @@ Test case 2 - check database with known differences generate SQL direction = ser
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -79,7 +79,7 @@ Test case 3 - check database with known differences generate SQL direction = ser
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -138,7 +138,7 @@ Test case 4 - check database with known differences generate SQL direction = ser
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #
@@ -230,7 +230,7 @@ Test case 5 - check database with known differences generate SQL direction = ser
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
-# WARNING: Objects in server1:inventory but not in server2:inventory:
+# WARNING: Objects in server1.inventory but not in server2.inventory:
 #         VIEW: finishing_up
 #         VIEW: cleaning
 #

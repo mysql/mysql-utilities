@@ -171,15 +171,18 @@ def _check_objects(server1, server2, db1, db2,
                                                  db1, db2, False, options)
     in_both.sort()
     if not options['no_object_check']:
-        if (len(in_db1) > 0 or len(in_db2) > 0):
+        server1_str = "server1." + db1
+        if server1 == server2:
+            server2_str = "server1." + db2
+        else:
+            server2_str = "server2." + db2
+        if len(in_db1) or len(in_db2):
             if options['run_all_tests']:
                 if len(in_db1) > 0:
-                    print_missing_list(in_db1,
-                                       "server1:"+db1, "server2:"+db2)
+                    print_missing_list(in_db1, server1_str, server2_str)
                     print "#"
                 if len(in_db2) > 0:
-                    print_missing_list(in_db2,
-                                       "server2:"+db2, "server1:"+db1)
+                    print_missing_list(in_db2, server2_str, server1_str)
                     print "#"
             else:
                 raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
@@ -433,7 +436,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     reporter.print_heading()
     
     # Remaining operations can occur in a loop one for each object.        
-    success = True
+    success = True if len(in_both) > 0 else False
     for item in in_both:
         error_list = []
         obj_type = db1_conn.get_object_type(item[1][0])
