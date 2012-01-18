@@ -117,7 +117,7 @@ OPTIONS
 
 .. option:: --bulk-insert, -b
 
-   Use bulk insert statements for data (default:False).
+   Use bulk insert statements for data.
 
 .. option:: --display=<display>, -d<display>
 

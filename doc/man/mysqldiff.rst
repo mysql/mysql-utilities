@@ -69,36 +69,27 @@ difference report (default) or the transformation report (designated with the
   mysqldiff --server1=root@host1 --server2=root@host2 --difftype=sql \
     db1.table1:dbx.table3
 
-In this example, db1 exists on host1 and dbx exists on host2 as
-defined by position where the database and object to the left of
-the colon are located on the server designated by :option:`--server1`
-and the database and object on the right is located on the server
-designated by :option:`--server2`.
+The leftmost database (``db1``) exists on the server 
+designated by the :option:`--server1` option (``host1``).
+The rightmost database (``dbx``) exists on the server 
+designated by the :option:`--server2` option (``host2``).
 
-* :option:`--changes-for=server1`: The object definition on server1 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server2. The output therefore is the
-  transformation needed to make the object on server1 like the object on
-  server2.
-* :option:`--changes-for=server2`: The object definition on server2 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server1. The output therefore is the
-  transformation needed to make the object on server2 like the object on
-  server1.
+* :option:`--changes-for=server1`: Produce output that shows how to make the
+  definitions of objects on ``server1`` like the definitions of the
+  corresponding objects on ``server2``.
+* :option:`--changes-for=server2`: Produce output that shows how to make the
+  definitions of objects on ``server2`` like the definitions of the
+  corresponding objects on ``server1``.
 
-The default direction is server1. 
+The default direction is ``server1``. 
 
-For difference type SQL, you can also see the reverse transformation by
-specifying the :option:`--show-reverse` option.
-      
+For difference format **SQL**, you can also see the reverse transformation
+by specifying the :option:`--show-reverse` option.
+
 The utility stops on the first occurrence of missing objects or when an
 object does not match. To override this behavior, specify the
-:option:`--force` option, which causes the utility to attempt to compare
-all objects listed as arguments.
-
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges to
-access all objects in the operation.
+:option:`--force` option, which causes the utility to attempt to compare all
+objects listed as arguments.
 
 OPTIONS
 -------
@@ -167,8 +158,9 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate read permissions for all objects to
-be compared.
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges to
+access all objects to be compared.
 
 The SQL transformation feature has the following known limitations:
 

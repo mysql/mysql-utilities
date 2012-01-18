@@ -10,14 +10,14 @@ SYNOPSIS
 
 ::
 
- mut [options] [suitename.]testname ...
+ mut [options] [suite_name.]test_name ...
 
 DESCRIPTION
 -----------
 
 This utility executes predefined tests to test the MySQL
-Utilities. The tests are divided into suites (stored as folders). By default,
-all tests located in the /test folder are considered the 'main' suite.
+Utilities. The tests are located under the ``/mysql-test`` directory and divided into suites (stored as folders). By default,
+all tests located in the ``/t`` folder are considered the 'main' suite.
 
 You can select any number of tests to run, select one or more suites to
 restrict the tests, exclude suites and tests, and specify the location of
@@ -81,11 +81,13 @@ OPTIONS
 
 .. option:: --sorted
 
-   Execute tests sorted by suite.testname (default = True).
+   Execute tests sorted by suite_name.test_name. The default is ``True``.
 
 .. option:: --start-port=<port>
 
-   The starting port for spawned servers.
+   The first port to use for spawned servers. If you run the entire test
+   suite, you may see up to 12 new instances created. The default is to
+   use ports 3310 to 3321.
 
 .. option:: --start-test=<prefix>
 
@@ -144,7 +146,7 @@ The example displays the test name, status, and relative time::
       Display Width       = 70
       Sorted              = True
       Force               = False
-      Test directory      = './test'
+      Test directory      = './t'
       Utilities directory = '../scripts'
       Starting port       = 3310
       Test wildcard       = 'clone_user%'

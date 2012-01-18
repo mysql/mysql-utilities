@@ -431,4 +431,5 @@ Conclusion
 If you find some primitives missing or would like to see more specific
 functionality in the library or scripts, please contact us with your ideas or
 better still, write them yourselves! We welcome all suggestions in code or
-text.
+text.  To file a feature request or bug report, visit http://bugs.mysql.com.
+For discussions, visit http://forums.mysql.com/list.php?155.

@@ -135,7 +135,7 @@ OPTIONS
 
 .. option:: --threads
 
-    Use multiple threads for cross-server copy (default = 1).
+    Use multiple threads for cross-server copy. The default is 1.
 
 .. option:: --verbose, -v
 

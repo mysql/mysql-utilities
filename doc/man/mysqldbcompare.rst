@@ -9,14 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqldbcompare --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-              [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
-              --help | --version | --verbose | --run-all-tests | --quiet |
-              --format=<format> | --width=<width> |
-              --changes-for=[server1|server2] | 
-              [--difftype=[unified|context|differ|sql]]
-              [<db1:db2> | <db> [<db1:db2>* | db*] [--skip-object-compare |
-              --skip-row-count | --skip-diff | --skip-data-check]
+  mysqldbcompare [options] db1[:db2] ...
 
 DESCRIPTION
 -----------
@@ -28,25 +21,24 @@ choice. Differences in the data are shown using a similar diff-style
 format. Changed or missing rows are shown in a standard format of
 GRID, CSV, TAB, or VERTICAL.
 
-To specify the databases to compare, use the notation db1:db2 or db.
-In the latter case, the databases to compare have the same name; this
-is a convenience notation for comparing databases on two servers.
+Use the notation db1:db2 to name two databases to compare, or, alternatively
+just db1 to compare two databases with the same name.  The latter case is a
+convenience notation for comparing same-named databases on different
+servers.
 
 The comparison may be run against two databases of different names on a
 single server by specifying only the :option:`--server1` option. The user
 can also connect to another server by specifying the :option:`--server2`
-option. In this case, the database or database object pair align such that
-db1 (or db1.obj1) are taken from server1 and db2 (or db2.obj2) are taken
-from server2.
+option. In this case, db1 is taken from server1 and db2 from server2.
 
 Those objects considered in the database include tables, views, triggers,
-procedures, functions, and events. A count of each object type can be shown
+procedures, functions, and events. A count for each object type can be shown
 with the :option:`-vv` option.
 
-The check is performed using a series of steps called tests. The utility is
-designed to stop on the first failed test but the user may specify the
-:option:`--run-all-tests` option which causes the utility to run
-all tests regardless of their end state.
+The check is performed using a series of steps called tests. By default, the
+utility stops on the first failed test, but you can specify the
+:option:`--run-all-tests` option to cause the utility to run all tests
+regardless of their end state.
 
 Note: Using :option:`--run-all-tests` may produce expected cascade failures.
 For example, if the row counts differ among two tables being compared, the data
@@ -55,35 +47,46 @@ consistency will also fail.
 The tests include the following:
 
 1) Check database definitions
+
+   A database existance precondition check ensures that both databases
+   exist. If they do not, no further processing is possible and the
+   :option:`--run-all-tests` option is ignored.
+
 2) Check existance of objects in both databases
-3) Compare the definitions of objects
-4) Check row count for tables
-5) Check data consistency for tables
 
-(1) A database existance precondition check ensures that both databases exist.
-If they do not, no further processing is possible and the
-:option:`--run-all-tests` option is ignored.
+   The test for objects in both databases identifies those objects
+   missing from one or another database. The remaining tests apply
+   only to those objects that appear in both databases. To skip this
+   test, use the :option:`--skip-object-compare` option. That can be
+   useful when there are known missing objects among the databases.
 
-(2) The test for objects in both databases identifies those objects missing
-from one or another database. The following tests (3)-(5) apply only to those
-objects that appear in both databases.
+3) Compare object definitions
 
-(3) The definitions (the **CREATE** statements) are compared and differences are
-presented. In the case of name differences only, this test fails (since the
-statements are not the same) but the user may elect that this is normal and
-therefore may want to run the utility again with the :option:`--skip-diff`
-option to skip this test.
+   The definitions (the **CREATE** statements) are compared and
+   differences are presented. To skip this test, use the
+   :option:`--skip-diff` option. That can be useful when there are
+   object name differences only that you want to ignore.
 
-(4) The row count check ensures that both tables have the same
-number of rows. Note that this does not ensure the table data is
-consistent. It is merely a cursory check to indicate possible missing
-rows in one or the other table being compared. The data consistency
-check (5) identifies the missing rows.
+4) Check table row counts
 
-(5) The data consistency check identifies both changed rows as well as
-missing rows from one or another of the tables in the databases. Changed rows
-are displayed as a diff-style report with the format chosen (default is GRID)
-and missing rows are also displayed using the format chosen.
+   This check ensures that both tables have the same number of rows.
+   This does not ensure that the table data is consistent. It is merely
+   a cursory check to indicate possible missing rows in one table or
+   the other. The data consistency check identifies the missing rows.
+   To skip this test, use the :option:`--skip-row-count` option.
+
+5) Check table data consistency
+
+   This check identifies both changed rows as well as missing rows
+   from one or another of the tables in the databases. Changed rows
+   are displayed as a diff-style report with the format chosen (**GRID**
+   by default) and missing rows are also displayed using the format
+   chosen. To skip this test, use the :option:`--skip-data-check` option.
+
+You may want to use the ``--skip-xxx`` options to run only one of
+the tests.  This might be helpful when working to bring two databases
+into synchronization, to avoid running all of the tests repeatedly
+during the process.
 
 Each test completes with one of the following states:
 
@@ -102,17 +105,6 @@ Each test completes with one of the following states:
 **-**
   The test is not applicable to this object.
 
-Several of the tests may be skipped with a ``--skip-xxx`` option. For example, the
-user can skip the object compare step if there are known missing objects among
-the databases by using the :option:`--skip-object-compare` option, skip the
-definition comparison if there are known differences in the definitions by
-using the :option:`--skip-diff` option, skip the row count step using the
-:option:`--skip-row-count` option, and skip the data check step using the
-:option:`--skip-data-check` options. A user may want to use these options to
-run only one of the tests. This may be helpful when working to bring two
-databases into synchronization to avoid running all of the tests repeatedly
-during the process.
-
 To specify how to display diff-style output, use one of the following
 values with the :option:`--difftype` option:
 
@@ -128,7 +120,7 @@ values with the :option:`--difftype` option:
 **sql**
   Display SQL transformation statement output.
 
-To specify how to display changed or missing row output, use one of
+To specify how to display output for changed or missing rows, use one of
 the following values with the :option:`--format` option:
 
 **grid** (default)
@@ -151,26 +143,21 @@ difference report (default) or the transformation report (designated with the
 :option:`--difftype=sql` option). Consider the following command::
 
   mysqldbcompare --server1=root@host1 --server2=root@host2 --difftype=sql \
-    db1.table1:dbx.table3
+    db1:dbx
 
-In this example, db1 exists on host1 and dbx exists on host2 as
-defined by position where the database and object to the left of
-the colon are located on the server designated by :option:`--server1`
-and the database and object on the right is located on the server
-designated by :option:`--server2`.
+The leftmost database (``db1``) exists on the server 
+designated by the :option:`--server1` option (``host1``).
+The rightmost database (``dbx``) exists on the server 
+designated by the :option:`--server2` option (``host2``).
 
-* :option:`--changes-for=server1`: The object definition on server1 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server2. The output therefore is the
-  transformation needed to make the object on server1 like the object on
-  server2.
-* :option:`--changes-for=server2`: The object definition on server2 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server1. The output therefore is the
-  transformation needed to make the object on server2 like the object on
-  server1.
+* :option:`--changes-for=server1`: Produce output that shows how to make the
+  definitions of objects on ``server1`` like the definitions of the
+  corresponding objects on ``server2``.
+* :option:`--changes-for=server2`: Produce output that shows how to make the
+  definitions of objects on ``server2`` like the definitions of the
+  corresponding objects on ``server1``.
 
-The default direction is server1. 
+The default direction is ``server1``. 
 
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to

@@ -101,7 +101,7 @@ OPTIONS
 
 .. option:: --bulk-insert, -b
 
-   Use bulk insert statements for data (default:False).
+   Use bulk insert statements for data.
 
 .. option:: --default-storage-engine=<def_engine>
 
