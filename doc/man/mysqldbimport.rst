@@ -62,8 +62,8 @@ with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-To indicate that input in CSV or TAB format does not contain column headers,
-specify the :option:`--no-headers` option.
+To indicate that input in **csv** or **tab* format does not contain column
+headers, specify the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
 
@@ -125,16 +125,16 @@ OPTIONS
    
 .. option:: --import=<import_type>, -i<import_type>
 
-   Specify the import format. Permitted format values are definitions =
+   Specify the import format. Permitted format values are **definitions** =
    import only the definitions (metadata) for the objects in the database list,
-   data = import only the table data for the tables in the database list,
-   and both = import the definitions and the data. The default is
-   definitions.
+   **data** = import only the table data for the tables in the database list,
+   and **both** = import the definitions and the data. The default is
+   **definitions**.
 
    If you attempt to import objects into an existing database, the result
-   depends on the import format. If the format is definitions or both, an
-   error occurs unless :option:`--drop-first` is given. If the format is
-   data, imported table data is added to existing table data.
+   depends on the import format. If the format is **definitions** or **both**,
+   an error occurs unless :option:`--drop-first` is given. If the format is
+   **data**, imported table data is added to existing table data.
    
 .. option:: --new-storage-engine=<new_engine>
 
@@ -143,7 +143,7 @@ OPTIONS
 .. option::  --no-headers, -h
 
    Input does not contain column headers. This option applies only for
-   CSV and TAB input.
+   **csv** and **tab** output.
 
 .. option:: --quiet, -q
 
@@ -162,7 +162,7 @@ OPTIONS
 
 .. option:: --skip-blobs
 
-   Do not import BLOB data.
+   Do not import ``BLOB`` data.
 
 .. option:: --verbose, -v
 
@@ -188,14 +188,14 @@ database.
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
 contains certain objects such as views or events and whether binary
-logging is turned on (hence the need for **SUPER**).
+logging is enabled.
 
 Some combinations of the options may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error when the view is imported on another server.
 
 The :option:`--new-storage-engine` and :option:`--default-storage-engine`
-options apply to all tables in the operation.
+options apply to all destination tables in the operation.
 
 For the :option:`--format` and :option:`--import` options, the permitted
 values are not case sensitive. In addition, values may be specified as any

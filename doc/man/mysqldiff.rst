@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
               --changes-for=[server1|server2] --quiet |
@@ -103,9 +103,10 @@ OPTIONS
 .. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
-   example, to see the transformation for transforming server1 to match
-   server2, use --changes-for=server1. Valid values are 'server1' or
-   'server2'. The default is 'server1'.
+   example, to see the transformation for transforming object definitions on
+   server1 to match the corresponding definitions on server2, use
+   :option:`--changes-for=server1`. Permitted values are **server1** and
+   **server2**. The default is **server1**.
 
 .. option:: --difftype=<difftype>, -d<difftype>
 

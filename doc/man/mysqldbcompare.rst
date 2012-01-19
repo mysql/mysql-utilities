@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqldbcompare [options] db1[:db2] ...
+ mysqldbcompare [options] db1[:db2] ...
 
 DESCRIPTION
 -----------
@@ -179,9 +179,10 @@ OPTIONS
 .. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
-   example, to see the transformation for transforming server1 to match
-   server2, use --changes-for=server1. Valid values are 'server1' or
-   'server2'. The default is 'server1'.
+   example, to see the transformation for transforming object definitions on
+   server1 to match the corresponding definitions on server2, use
+   :option:`--changes-for=server1`. Permitted values are **server1** and
+   **server2**. The default is **server1**.
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
@@ -191,14 +192,15 @@ OPTIONS
    
 .. option:: --disable-binary-logging
 
-   Turn binary logging off during operation if enabled (SQL_LOG_BIN=1).
-   Prevents comparison operations from being written to the binary log. Note:
-   Requires the SUPER privilege.
+   If binary logging is enabled, disable it during the operation to prevent
+   comparison operations from being written to the binary log. Note:
+   Disabling binary logging requires the **SUPER** privilege.
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the missing-row display format. Permitted format values are
-   grid, csv, tab, and vertical. The default is grid.
+   Specify the display format for changed or missing rows. Permitted format
+   values are **grid**, **csv**, **tab**, and **vertical**. The default is
+   **grid**.
    
 .. option:: --quiet, -q
 
@@ -231,7 +233,7 @@ OPTIONS
 
 .. option:: --skip-diff
 
-   Skip the object diff check.
+   Skip the object definition difference check.
 
 .. option:: --skip-object-compare
 
@@ -272,9 +274,8 @@ type. An error is generated if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-To scan all of the tables in the employees database to see the possible
-redundant and duplicate indexes as well as the DROP statements for the indexes,
-use this command::
+Use the following command to compare the ``emp1`` and ``emp2`` databases on
+the local server, and run all tests even if earlier tests fail::
 
     $ mysqldbcompare --server1=root@localhost emp1:emp2 --run-all-tests
     # server1 on localhost: ... connected.
@@ -320,7 +321,7 @@ use this command::
     
     # ...done
 
-Given : two databases with the same table layout. Data for each table
+Given: two databases with the same table layout. Data for each table
 contains::
   
     mysql> select * from db1.t1;
@@ -345,11 +346,11 @@ contains::
     +---+---------------+
     4 rows in set (0.00 sec)
   
-To generate the SQL statements for data transformations to make db1.t1 the
-same as db2.t1, use the :option:`--changes-for=server1` option. We must also
-include the :option:`-a` option to ensure the data consistency test is run.
-The following command illustrates the options used and an excerpt from the
-results generated::
+To generate the SQL statements for data transformations to make ``db1.t1``
+the same as ``db2.t1``, use the :option:`--changes-for=server1` option. We
+must also include the :option:`-a` option to ensure that the data
+consistency test is run.  The following command illustrates the options used
+and an excerpt from the results generated::
 
     $ mysqldbcompare --server1=root:root@localhost \
 	--server2=root:root@localhost db1:db2 --changes-for=server1 -a \
@@ -372,8 +373,8 @@ results generated::
 
     # Database consistency check failed.  # # ...done
 
-Similarly, when the same command is run with --changes-for=server2 and
---difftype=sql, the following report is generated::
+Similarly, when the same command is run with :option:`--changes-for=server2`
+and :option:`--difftype=sql`, the following report is generated::
 
     $ mysqldbcompare --server1=root:root@localhost \
 	--server2=root:root@localhost db1:db2 --changes-for=server2 -a \

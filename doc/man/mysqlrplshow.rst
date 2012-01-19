@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlrplshow --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqlrplshow --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               --help | --version | --show-list | --quiet |
               --recurse | --prompt | --num-retries |
               --format=[sql|grid|tab|csv|vertical]

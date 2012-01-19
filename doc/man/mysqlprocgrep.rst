@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlprocgrep [ --version | --help ] | --format=<format> |
+ mysqlprocgrep [ --version | --help ] | --format=<format> |
                 --kill-connection | --kill-query | --regexp | --sql-body |
                 --print | --verbose | --match-user=<pattern> |
                 --match-host=<pattern> | --match-command=<pattern> |

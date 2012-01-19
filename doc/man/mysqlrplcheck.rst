@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlrplcheck --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqlrplcheck --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               --slave=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
               --help | --version | --verbose | --show-slave-status |
               --master-info-file=<file> | --quiet | --suppress

@@ -10,7 +10,7 @@ SYNOPSIS
 
 ::
 
-  mysqluserclone --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqluserclone --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  --destination=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[--help | --version | --list | --format=<format>] |
                  [ --dump  | --verbose | --force | --quiet |

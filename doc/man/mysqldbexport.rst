@@ -9,28 +9,31 @@ SYNOPSIS
 
 ::
 
- mysqldbexport --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-             (<db_name>[, <db_name>])+ [--quiet | --help | --no-headers |
-             --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
-             EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --help |
-             --verbose | --version | --bulk-insert | --file-per-table |
-             --export=[definitions|data|both] |
-             --format=[sql|grid|tab|csv|vertical] ] |
-             --exclude=<name>[|,--exclude=<name>]
+ mysqldbexport [options] db_name ...
 
 DESCRIPTION
 -----------
 
-This utility exports the metadata
-(object definitions) or data or both from one or more
-databases. By default, the utility exports only definitions.
+This utility exports metadata (object definitions) or data or both from one
+or more databases. By default, the export includes only definitions.
 
-You can also skip objects by type using the :option:`--skip` option
+:command:`mysqldbexport` differs from :command:`mysqldump` in that it can
+produce output in a variety of formats to make your data
+extraction/transport much easier. It permits you to export your data in the
+format most suitable to an external tool, another MySQL server, or other use
+without the need to reformat the data.
+
+To exclude specific objects by name, use the :option:`--exclude` option with
+a name in *db*.*obj* format, or you can supply a search pattern. For example,
+:option:`--exclude=db1.trig1` excludes the single trigger and
+:option:`--exclude=trig_` excludes all objects from all databases having a
+name that begins with ``trig`` and has a following character.
+
 To skip objects by type, use the :option:`--skip` option
 with a list of the objects to skip. This enables you to extract a
 particular set of objects, say, for exporting only events (by
 excluding all other types). Similarly, to skip creation of **UPDATE**
-statements for BLOB data, specify the :option:`--skip-blobs` option.
+statements for ``BLOB`` data, specify the :option:`--skip-blobs` option.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -69,42 +72,24 @@ with the :option:`--display` option:
 
 Note: For SQL-format output, the :option:`--display` option is ignored.
 
-To turn off the headers for CSV or TAB display format, specify
+To turn off the headers for **csv* or **tab** display format, specify
 the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
 
-You can also have the utility write the data for the tables to separate files
-by using the :option:`--file-per-table` option. This creates files with a
-file name composed of the database and table name followed by the format of the
-file. For example, the following command produces files named
-db1.<table_name>.csv::
+To write the data for individual tables to separate files, use the
+:option:`--file-per-table` option. The name of each file is composed of the
+database and table names followed by the file format.  For example, the
+following command produces files named db1.*table_name*.csv::
 
   mysqldbexport --server=root@server1:3306 --format=csv db1 --export=data
 
-To exclude specific objects by name, use the :option:`--exclude` option
-whereby you specify a name in <db>.<object> format or supply a
-regex search pattern. For example, :option:`--exclude=db1.trig1` excludes
-the single named trigger and :option:`--exclude=trig_` excludes all objects
-from all databases whose name begins with trig and has a following character
-or digit.
-
-:command:`mysqldbexport` differs from :command:`mysqldump` in that it can produce output in a
-variety of formats to make your data extraction/transport much easier. It
-permits you to export your data in the format most suitable to an external
-tool, another MySQL server, or a yet another use without the need to
-reformat the data.
-
-By default, the export operation uses a consistent snapshot to read
-from the selected databases. To change the locking mode, use the
-:option:`--locking` option. To disable locking altogether or use
-only table locks, use an option value of 'no-locks' or 'lock-all',
-respectively. The default value is 'snapshot'.
-
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges to
-access all objects in the operation.
-For details, see :ref:`mysqldbexport-notes`.
+By default, the operation uses a consistent snapshot to read the source
+databases. To change the locking mode, use the :option:`--locking` option
+with a locking type value.  Use a value of **no-locks** to turn off locking
+altogether or **lock-all** to use only table locks. The default value is
+**snapshot**. Additionally, the utility uses WRITE locks to lock the
+destination tables during the copy.
 
 OPTIONS
 -------
@@ -121,52 +106,55 @@ OPTIONS
 
 .. option:: --display=<display>, -d<display>
 
-   Control the number of columns shown. Permitted display values are 'brief'
-   = minimal columns for object creation, 'full' = all columns, and 'names' =
-   only object names (not valid for --format=sql). The default is 'brief'.
+   Control the number of columns shown. Permitted display values are **brief**
+   (minimal columns for object creation), **full* (all columns), and **names**
+   (only object names; not valid for :option:`--format=sql`). The default is
+   **brief**.
 
 .. option:: --exclude=<exclude>, -x<exclude> 
 
    Exclude one or more objects from the operation using either a specific name
-   such as db1.t1 or a search pattern.  Use this option multiple times
-   to specify multiple exclusions. By default, patterns use LIKE matching.
-   With the :option:`--regexp` option, patterns use REGEXP matching.
+   such as ``db1.t1`` or a search pattern.  Use this option multiple times
+   to specify multiple exclusions. By default, patterns use **LIKE** matching.
+   With the :option:`--regexp` option, patterns use **REGEXP** matching.
 
    This option does not apply to grants.
 
 .. option:: --export=<export>, -e<export>
 
-   Specify the export format. Permitted format values are DEFINITIONS (or F) =
+   Specify the export format. Permitted format values are **definitions** =
    export only the definitions (metadata) for the objects in the database list,
-   DATA (or D) = export only the table data for the tables in the database list,
-   and BOTH (or B) = export the definitions followed by the data. The default is
-   DEFINITIONS.
+   **data** = export only the table data for the tables in the database list,
+   and **both** = export the definitions and the data. The default is
+   **definitions**.
 
 .. option:: --file-per-table
 
    Write table data to separate files. This is Valid only if the export
    output includes data (that is, if :option:`--export=data`
    or :option:`--export=both` are given). This option produces files named
-   <db_name>.<tbl_name>.<format>. For example, a CSV export of two tables in
-   db1, t1 and t2, results in files named db1.t1.csv and db1.t2.csv. If
-   definitions are included, they are written to stdout as usual.
+   *db_name*.*tbl_name*.*format*. For example, a **csv** export of two tables
+   named ``t1`` and ``t2`` in database ``d1``, results in files named
+   ``db1.t1.csv`` and ``db1.t2.csv``. If table definitions are included in the
+   export, they are written to stdout as usual.
 
 .. option:: --format=<format>, -f<format>
 
    Specify the output display format. Permitted format values are
-   sql, grid, tab, csv, and vertical. The default is sql.
+   **sql**, **grid**, **tab**, **csv**, and **vertical**. The default is
+   **sql.
 
 .. option:: --locking=<locking>
 
-   Choose the lock type for the operation. Permitted lock values are no-locks
-   = do not use any table locks, lock-all = use table locks but no transaction
-   and no consistent read, and snaphot = consistent read using a single
-   transaction. The default is snapshot.
+   Choose the lock type for the operation. Permitted lock values are
+   **no-locks** (do not use any table locks), **lock-all** (use table locks
+   but no transaction and no consistent read), and **snaphot** (consistent
+   read using a single transaction). The default is **snapshot**.
 
 .. option::  --no-headers, -h
 
-   Do not display column headers. This option applies only for CSV and TAB
-   output.
+   Do not display column headers. This option applies only for **csv** and
+   **tab** output.
 
 .. option:: --quiet, -q
 
@@ -190,7 +178,7 @@ OPTIONS
 
 .. option:: --skip-blobs
 
-   Do not export BLOB data.
+   Do not export ``BLOB`` data.
 
 .. option:: --verbose, -v
 
@@ -208,23 +196,21 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to
-read the old database and access (read) the mysql database.
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges to
+access all objects in the operation.
 
-To export all objects from a source database, the user must have **SELECT** and
-**SHOW VIEW** privileges on the database as well as **SELECT** on the
-mysql database.
+To export all objects from a source database, the user must have these
+privileges: **SELECT** and **SHOW VIEW** on the database as well as
+**SELECT** on the ``mysql`` database.
 
 Actual privileges needed may differ from installation to installation
 depending on the security privileges present and whether the database
-contains certain objects such as views or events and whether binary
-logging is turned on (hence the need for **SUPER**).
+contains certain objects such as views or events.
 
-Some combinations of the options may result in errors during the operation.
-For example, eliminating tables but not views may result in an error when the
-view is imported on another server.
-
-The :option:`--exclude` option does not apply to grants.
+Some combinations of the options may result in errors when the export is
+imported later. For example, eliminating tables but not views may result in
+an error when a view is imported on another server.
 
 For the :option:`--format`, :option:`--export`, and :option:`--display`
 options, the permitted values are not case sensitive. In addition, values
@@ -235,9 +221,9 @@ prefix matches more than one valid value.
 EXAMPLES
 --------
 
-To export the definitions of the database 'dev' from a MySQL server on
-localhast via port 3306, producing output consisting of **CREATE** statements,
-use this command::
+To export the definitions of the database ``dev`` from a MySQL server on the
+local host via port 3306, producing output consisting of **CREATE**
+statements, use this command::
 
     $ mysqldbexport --server=root:pass@localhost \
       --skip=GRANTS --export=DEFINITIONS util_test
@@ -271,7 +257,7 @@ use this command::
     [...]
     #...done.
 
-Similarly, to export the data of the database 'util_test', producing bulk
+Similarly, to export the data of the database ``util_test``, producing bulk
 insert statements, use this command::
 
     $ mysqldbexport --server=root:pass@localhost \
@@ -300,8 +286,9 @@ insert statements, use this command::
     #...done.
     
 If the database to be exported does not contain only InnoDB tables and you
-want to ensure data integrity of the exported data  by locking the tables
-during the read step, add a :option:`--locking=lock-all` option to the command::
+want to ensure data integrity of the exported data by locking the tables
+during the read step, add a :option:`--locking=lock-all` option to the
+command::
 
     $ mysqldbexport --server=root:pass@localhost \
       --export=DATA --bulk-insert util_test --locking=lock-all

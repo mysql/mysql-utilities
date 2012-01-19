@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqlmetagrep [ --version | --help ] | --format=<format> |
+ mysqlmetagrep [ --version | --help ] | --format=<format> |
                 --body | --search-objects=<types> | --regexp | --sql |
                 --database=<pattern> | --pattern=<pattern>
                 --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
