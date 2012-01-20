@@ -174,12 +174,18 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
 def _connect_server(name, values, quiet):        
     """Connect to a server
     
+    If the name is 'master' or 'slave', the connection will be made via the
+    Master or Slave class else a normal Server class shall be used.
+    
     name[in]           name of the server
     values[in]         dictionary of connection values
     quiet[in]          if True, do not print messages
     
     Returns Server class instance
     """
+    from mysql.utilities.common.replication import Master
+    from mysql.utilities.common.replication import Slave
+    
     server_conn = None
 
     # Try to connect to the MySQL database server.
@@ -190,11 +196,17 @@ def _connect_server(name, values, quiet):
         'conn_info' : values,
         'role'      : name,
     }
-    server_conn = Server(server_options)
+    if name.lower() == 'master':
+        server_conn = Master(server_options)
+    elif name.lower() == 'slave':
+        server_conn = Slave(server_options)
+    else:
+        server_conn = Server(server_options)
     server_conn.connect()
 
     return server_conn
- 
+
+
 def _require_version(server, version):
     """Check version of server
     
@@ -824,9 +836,9 @@ class Server(object):
         
         Returns bool - True - binary logging is ON, False = OFF
         """
-        res = self.show_server_variable("sql_log_bin")
+        res = self.show_server_variable("log_bin")
         if not res:
-            raise UtilDBError("Cannot retrieve status of sql_log_bin variable.")
+            raise UtilRplError("Cannot retrieve status of log_bin variable.")
         if res[0][1] in ("OFF", "0"):
             return False
         return True
@@ -875,4 +887,43 @@ class Server(object):
         if value is not None:
             res = self.exec_query(_FOREIGN_KEY_SET % value, {'fetch':'false'})
 
+
+    def get_server_id(self):
+        """Retrieve the server id.
+        
+        Returns int - server id.
+        """
+        try:
+            res = self.show_server_variable("server_id")
+        except:
+            raise UtilRplError("Cannot retrieve server id from "
+                               "%s." % self.role)
+        
+        return int(res[0][1])
+
+
+    def get_lctn(self):
+        """Get lower_case_table_name setting.
+        
+        Returns lctn value or None if cannot get value
+        """
+        res = self.show_server_variable("lower_case_table_names")
+        if res != []:
+            return res[0][1]
+        return None
+
+    
+    def get_binary_logs(self, options={}):
+        """Return a list of the binary logs.
+        
+        options[in]        query options
+        
+        Returns list - binlogs or None if binary logging turned off
+        """
+        if self.binlog_enabled():
+            return self.exec_query("SHOW BINARY LOGS", options)
+            
+        return None
+    
+    
 

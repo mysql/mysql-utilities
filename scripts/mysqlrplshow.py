@@ -30,7 +30,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.common.options import add_format_option
-from mysql.utilities.command import rpl
+from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
@@ -116,7 +116,7 @@ options = {
 }
   
 try:
-    res = rpl.show_topology(m_values, options)
+    res = show_topology(m_values, options)
     if res:
         exit(1)
 except UtilError, e:

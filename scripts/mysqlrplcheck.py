@@ -29,7 +29,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.command import rpl
+from mysql.utilities.command.check_rpl import check_replication
 from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
@@ -110,7 +110,7 @@ options = {
 }
   
 try:
-    res = rpl.check_replication(m_values, s_values, options)
+    res = check_replication(m_values, s_values, options)
     if res:
         exit(1)
 except UtilError, e:

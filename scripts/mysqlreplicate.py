@@ -29,7 +29,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.command import rpl
+from mysql.utilities.command.setup_rpl import setup_replication
 from mysql.utilities import VERSION_FRM
 
 # Constants
@@ -129,8 +129,8 @@ options = {
 }
 
 try:
-    res = rpl.replicate(m_values, s_values, opt.rpl_user,
-                        options, opt.test_db)
+    res = setup_replication(m_values, s_values, opt.rpl_user,
+                            options, opt.test_db)
 except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

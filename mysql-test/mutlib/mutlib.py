@@ -880,7 +880,8 @@ class System_test(object):
         Returns True - success, False - fail
         """
         if results:
-            res_fname = os.path.normpath(os.path.join("./r", name + ".result"))
+            res_fname = os.path.normpath(os.path.join(self.res_dir, name +
+                                                      ".result"))
             res_file = open(res_fname, 'w+')
             if not res_file:
                 return False
