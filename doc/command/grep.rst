@@ -4,10 +4,10 @@
 
 .. module:: mysql.utilities.command.grep
 
-This module provide utilities to search for objects on a server. The module
+This module provides utilities to search for objects on a server. The module
 defines a set of *object types* that can be searched by searching the
-*fields* of each object. The notion of a field of an object is in this case
-very loosly defined and basically means any names occurring as part of the
+*fields* of each object. The notion of an object field is
+very loosely defined and means any names occurring as part of the
 object definition. For example, the fields of a table include the table
 name, the column names, and the partition names (if it is a partitioned
 table).
@@ -16,8 +16,7 @@ table).
 Constants
 ---------
 
-The following constants denote the different object types that can be
-searched.
+The following constants denote the object types that can be searched.
 
 .. data:: ROUTINE
           EVENT
@@ -29,7 +28,7 @@ searched.
 
 The following constant is a sequence of all the object types that are
 available. It can be used to generate a version-independent list of object
-types that can be searched in; for example, options and help texts.
+types that can be searched; for example, options and help texts.
 
 .. data:: OBJECT_TYPES
 
@@ -38,16 +37,17 @@ Classes
 
 .. class:: ObjectGrep(pattern[, database_pattern=None, types=OBJECT_TYPES, check_body=False, use_regexp=False])
 
-   Search for objects on a MySQL server by name or content.
-
-   This command class searches one or more MySQL server
-   instances for objects where the name (or content) of routines,
-   triggers, or events) matches a given pattern.
+   Search MySQL server instances for objects where the name (or content, for
+   routines, triggers, or events) matches a given pattern.
 
    .. method:: sql() -> string
 
       Return the SQL code for executing the search in the form of a
       `SELECT`_ statement.
+
+      :returns: SQL code for executing the operation specified by the
+                options.
+      :rtype: string
 
    .. method:: execute(connections[, output=sys.output, connector=mysql.connector])
 
@@ -55,8 +55,8 @@ Classes
       aggregate of the result as a grid table.
 
       :param connections: Sequence of :ref:`connection specifiers` to send the query to
-      :param output: Output stream where the result will be written
-      :param connector: Connector to use when connecting to the servers
+      :param output: File object to use for writing the result
+      :param connector: Connector to use for connecting to the servers
 
 
 .. References

@@ -9,7 +9,7 @@ SYNOPSIS
 
 ::
 
-  mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
               [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
               --help | --version | --verbose | --force | --width=<width> |
               --changes-for=[server1|server2] --quiet |
@@ -69,36 +69,27 @@ difference report (default) or the transformation report (designated with the
   mysqldiff --server1=root@host1 --server2=root@host2 --difftype=sql \
     db1.table1:dbx.table3
 
-In this example, db1 exists on host1 and dbx exists on host2 as
-defined by position where the database and object to the left of
-the colon are located on the server designated by :option:`--server1`
-and the database and object on the right is located on the server
-designated by :option:`--server2`.
+The leftmost database (``db1``) exists on the server 
+designated by the :option:`--server1` option (``host1``).
+The rightmost database (``dbx``) exists on the server 
+designated by the :option:`--server2` option (``host2``).
 
-* :option:`--changes-for=server1`: The object definition on server1 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server2. The output therefore is the
-  transformation needed to make the object on server1 like the object on
-  server2.
-* :option:`--changes-for=server2`: The object definition on server2 is the object to be
-  transformed and is used to produce the difference or transformation
-  compared to the definition on server1. The output therefore is the
-  transformation needed to make the object on server2 like the object on
-  server1.
+* :option:`--changes-for=server1`: Produce output that shows how to make the
+  definitions of objects on ``server1`` like the definitions of the
+  corresponding objects on ``server2``.
+* :option:`--changes-for=server2`: Produce output that shows how to make the
+  definitions of objects on ``server2`` like the definitions of the
+  corresponding objects on ``server1``.
 
-The default direction is server1. 
+The default direction is ``server1``. 
 
-For difference type SQL, you can also see the reverse transformation by
-specifying the :option:`--show-reverse` option.
-      
+For difference format **SQL**, you can also see the reverse transformation
+by specifying the :option:`--show-reverse` option.
+
 The utility stops on the first occurrence of missing objects or when an
 object does not match. To override this behavior, specify the
-:option:`--force` option, which causes the utility to attempt to compare
-all objects listed as arguments.
-
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges to
-access all objects in the operation.
+:option:`--force` option, which causes the utility to attempt to compare all
+objects listed as arguments.
 
 OPTIONS
 -------
@@ -112,9 +103,10 @@ OPTIONS
 .. option:: --changes-for=<direction>
 
    Specify the server to show transformations to match the other server. For
-   example, to see the transformation for transforming server1 to match
-   server2, use --changes-for=server1. Valid values are 'server1' or
-   'server2'. The default is 'server1'.
+   example, to see the transformation for transforming object definitions on
+   server1 to match the corresponding definitions on server2, use
+   :option:`--changes-for=server1`. Permitted values are **server1** and
+   **server2**. The default is **server1**.
 
 .. option:: --difftype=<difftype>, -d<difftype>
 
@@ -167,8 +159,9 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate read permissions for all objects to
-be compared.
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges to
+access all objects to be compared.
 
 The SQL transformation feature has the following known limitations:
 
@@ -191,10 +184,10 @@ The SQL transformation feature has the following known limitations:
 
 * MySQL Cluster-specific SQL extensions are not supported.
 
-The permitted values for the :option:`--difftype` option is case insensitive.
-The option also permits the user to specify a prefix for a valid value. For
-example, --difftype=d will specify the differ type. An error will be generated
-if a prefix matches more than one valid value.
+For the :option:`--difftype` option, the permitted values are not case
+sensitive. In addition, values may be specified as any unambiguous prefix of
+a valid value. For example, :option:`--difftype=d` specifies the differ
+type. An error is generated if a prefix matches more than one valid value.
 
 EXAMPLES
 --------

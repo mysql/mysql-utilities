@@ -10,7 +10,7 @@ SYNOPSIS
 
 ::
 
-  mysqluserclone --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqluserclone --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  --destination=<user>[:<passwd>]@<host>[:<port>][:<socket>]
                  [[--help | --version | --list | --format=<format>] |
                  [ --dump  | --verbose | --force | --quiet |
@@ -122,10 +122,10 @@ execute **CREATE USER** (and **DROP USER** if the :option:`--force` option is
 given), and privileges to execute **GRANT** for all privileges to be granted to
 the new accounts.
 
-The permitted values for the :option:`--format` option are case insensitive.
-The option also permits the user to specify a prefix for a valid value. For
-example, --format=g will specify the grid format. An error will be generated if
-a prefix matches more than one valid value.
+For the :option:`--format` option, the permitted values are not case
+sensitive. In addition, values may be specified as any unambiguous prefix of
+a valid value.  For example, :option:`--format=g` specifies the grid format.
+An error is generated if a prefix matches more than one valid value.
 
 EXAMPLES
 --------

@@ -57,7 +57,7 @@ with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-To turn off the headers for CSV or TAB display format, specify
+To turn off the headers for **csv* or **tab** display format, specify
 the :option:`--no-headers` option.
 
 To see the common default settings for the local server's configuration
@@ -98,8 +98,8 @@ OPTIONS
 
 .. option:: --no-headers, -h
 
-   Do not display column headers. This option applies only for CSV and TAB
-   output.
+   Do not display column headers. This option applies only for **csv** and
+   **tab** output.
    
 .. option:: --port-range=<start:end>
 
@@ -140,10 +140,10 @@ OPTIONS
 
 .. _mysqlserverinfo-notes:
 
-The permitted values for the :option:`--format` option are case insensitive.
-The option also permits the user to specify a prefix for a valid value. For
-example, --format=g will specify the grid format. An error will be generated if
-a prefix matches more than one valid value.
+For the :option:`--format` option, the permitted values are not case
+sensitive. In addition, values may be specified as any unambiguous prefix of
+a valid value.  For example, :option:`--format=g` specifies the grid format.
+An error is generated if a prefix matches more than one valid value.
 
 EXAMPLES
 --------
