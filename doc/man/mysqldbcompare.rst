@@ -394,13 +394,13 @@ and :option:`--difftype=sql`, the following report is generated::
     FROM db2.t1 WHERE a = '5'; INSERT INTO db2.t1 (a, b) VALUES('4', 'New
     row - db1');
 
-When the :option:`--changes-for=both` option is set with the
-:option:`--difftype=sql` SQL generation option set, the following shows an
-excerpt of the results::
+With the :option:`--difftype=sql` SQL generation option set,
+:option:`--show-reverse` shows the object transformations in both
+directions.  Here is an excerpt of the results::
 
     $ mysqldbcompare --server1=root:root@localhost \
-	--server2=root:root@localhost db1:db2 --changes-for=both -a \
-	--difftype=sql
+	--server2=root:root@localhost db1:db2 --changes-for=server1 \
+    --show-reverse -a --difftype=sql
 
     [...]
 
