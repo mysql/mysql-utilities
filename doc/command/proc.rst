@@ -4,18 +4,17 @@
 
 .. module:: mysql.utilities.command.proc
 
-Module for searching processes on a server and optionally killing either
+This module searches processes on a server and optionally kills either
 the query or the connection for all matching processes.
 
-The processes are searched by matching the fields in the
-`INFORMATION_SCHEMA.PROCESSLIST`_ table in the server (this means that
-the module only works for servers with version 5.1.7 and later). The
-module operates internally by constructing a `SELECT`_ statement for
-finding matching processes, and then sending it to the server.
-Instead of performing the search, SQL code performing the query can be
-printed on standard output, which can be useful if you want to execute
-the query later, or feed it into some other program that process SQL
-queries further.
+Processes are matched by searching the fields of the
+`INFORMATION_SCHEMA.PROCESSLIST`_ table (which is available only for servers
+from MySQL 5.1.7 and later). Internally, the module operates by constructing
+a `SELECT`_ statement for finding matching processes, and then sending it to
+the server.  Instead of performing the search, the module can return the SQL
+code that performs the query. This can be useful if you want to execute the
+query later or feed it to some other program that processes SQL queries
+further.
 
 
 Constants
@@ -66,10 +65,10 @@ Classes
    >>> grep = ProcessGrep(matches=[(USER, "mats")], actions=[KILL_QUERY])
    >>> grep.execute("root@server-1.example.com", "root@server-2.example.com")
 
-   :param matches: Sequence of field comparison conditions. In each
-                   condition, *var* is one of the constants listed earlier
-                   and *pat* is a pattern. All field conditions must
-                   match for the process to match.
+   :param matches: Sequence of field comparison conditions. In each condition,
+                   *var* is one of the constants listed earlier that specify
+                   ``PROCESSLIST`` table fields and *pat* is a pattern. For a
+                   process to match, all field conditions must match.
 
    :type matches: List of *(var, pat)* pairs
 
@@ -92,7 +91,7 @@ Classes
                 options.
       :rtype: string
 
-   .. method:: execute(connection, ...[, output=sys.stdout, connector=mysql.connector])
+   .. method:: execute(connections, ...[, output=sys.stdout, connector=mysql.connector])
 
       Execute the search on each of the connections supplied. If
       *output* is not ``None``, the value is treated as a
@@ -101,9 +100,9 @@ Classes
       be supplied as keyword arguments. All other arguments
       are treated as connection specifiers.
 
-      :type connection: A :ref:`connection specifiers`
-      :param output: File object for printing output to
-      :param connector: Connector to use
+      :param connections: Sequence of :ref:`connection specifiers` to send the search to
+      :param output: File object to use for writing the result
+      :param connector: Connector to use for connecting to the servers
 
 
 .. References
