@@ -9,48 +9,44 @@ SYNOPSIS
 
 ::
 
- mysqlindexcheck --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-                 [[ --help | --version ] |
-                 [ --show-drops | --skip | --verbose | --show-indexes |
-                 --format=[grid|sql|tab|csv] |
-                 --stats [--best[=<N>] | --worst[=<N>] ]]
-                 <db>[.<table>] ... ]
+ mysqlindexcheck [options] db[:table] ...
 
 DESCRIPTION
 -----------
 
-This utility read the indexes for one or more tables and identifies
-duplicate and potentially redundant indexes. Depending on the index
-type, the utility applies the following rules to compare indexes
-(designated as idx_a and idx_b):
+This utility reads the indexes for one or more tables and identifies
+duplicate and potentially redundant indexes.
 
-**BTREE**
-  idx_b is redundant to idx_a if and only if the first n columns in idx_b
-  also appear in idx_a. Order and uniqueness count.
-
-**HASH**
-  idx_a and idx_b are duplicates if and only if they contain the same
-  columns in the same order. Uniqueness counts.
-
-**SPATIAL**
-  idx_a and idx_b are duplicates if and only if they contain the same
-  column (only one column is permitted).
-
-**FULLTEXT**
-  idx_b is redundant to idx_a if and only if all columns in idx_b are
-  included in idx_a. Order counts.
-
-To scan all tables in a database, specify only the database name. To scan
-a specific table, name the table in *db*.*table* format. It is possible
+To check all tables in a database, specify only the database name. To check
+a specific table, name the table in *db.table* format. It is possible
 to mix database and table names.
 
 You can scan tables in any database except the internal databases
 **mysql**, **INFORMATION_SCHEMA**, and **performance_schema**.
 
+Depending on the index type, the utility applies the following rules to
+compare indexes (designated as ``idx_a`` and ``idx_b``):
+
+**BTREE**
+  ``idx_b`` is redundant to ``idx_a`` if and only if the first *n* columns in
+  ``idx_b`` also appear in ``idx_a``. Order and uniqueness count.
+
+**HASH**
+  ``idx_a`` and ``idx_b`` are duplicates if and only if they contain the same
+  columns in the same order. Uniqueness counts.
+
+**SPATIAL**
+  ``idx_a`` and ``idx_b`` are duplicates if and only if they contain the same
+  column (only one column is permitted).
+
+**FULLTEXT**
+  ``idx_b`` is redundant to ``idx_a`` if and only if all columns in ``idx_b``
+   are included in ``idx_a``. Order counts.
+
 To see **DROP** statements to drop redundant indexes,
 specify the :option:`--show-drops` option. To examine the existing
 indexes, use the :option:`--verbose` option, which prints the
-equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys).
+equivalent **CREATE INDEX** (or **ALTER TABLE** for primary keys.
 
 To display the best or worst nonprimary key indexes for each table,
 use the :option:`--best` or :option:`--worst` option. This causes the
@@ -82,11 +78,6 @@ use one of the following values with the :option:`--format` option:
 Note: The :option:`--best` and :option:`--worst` lists cannot be
 printed as SQL statements.
 
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges to
-read all objects accessed during the operation.
-For details, see :ref:`mysqlindexcheck-notes`.
-
 OPTIONS
 -------
 
@@ -99,14 +90,14 @@ OPTIONS
 .. option:: --best[=<N>]
 
    If :option:`--stats` is given,
-   limit index statistics to the best N indexes. The default value of N is
+   limit index statistics to the best *N* indexes. The default value of *N* is
    5 if omitted.
 
 .. option:: --format=<index_format>, -f<index_format>
 
    Specify the index list display format for output produced by
-   :option:`--stats`. Permitted format values are grid, csv, tab, sql, and
-   vertical. The default is grid.
+   :option:`--stats`. Permitted format values are *grid*, *csv*, *tab*,
+   *sql*, and *vertical*. The default is *grid*.
 
 .. option:: --server=<source>
 
@@ -142,7 +133,7 @@ OPTIONS
 .. option:: --worst[=<N>]
 
    If :option:`--stats` is given,
-   limit index statistics to the worst N indexes. The default value of N is
+   limit index statistics to the worst *N* indexes. The default value of *N* is
    5 if omitted.
 
 .. _mysqlindexcheck-notes:
@@ -150,8 +141,9 @@ OPTIONS
 NOTES
 -----
 
-The login user must have the appropriate permissions to read all databases
-and tables listed.
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges to
+read all objects accessed during the operation.
 
 For the :option:`--format` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
@@ -161,8 +153,8 @@ An error occurs if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-To scan all tables in the employees database to see the
-possible redundant and duplicate indexes, use this command::
+To check all tables in the ``employees`` database on the local server to see
+the possible redundant and duplicate indexes, use this command::
 
     $ mysqlindexcheck --server=root@localhost employees
     # Source on localhost: ... connected.
