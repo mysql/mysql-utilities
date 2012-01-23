@@ -9,35 +9,24 @@ SYNOPSIS
 
 ::
 
- mysqldbimport --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-             [--quiet | --help | --no-headers | --dryrun |
-             --skip=(TABLES,TRIGGERS,VIEWS,PROCEDURES,FUNCTIONS,
-             EVENTS,GRANTS,DATA,CREATE_DB)* | --skip-blobs | --verbose |
-             --version | --bulk-insert | --drop-first ]
-             --import=[definitiions|data|both] |
-             --format=[sql|grid|tab|csv|vertical] |
-             --new-storage-engine=<engine> | --default-storage-engine=<engine>
-             <file> [|,<file>]
+ mysqldbimport [options] import_file ...
 
 DESCRIPTION
 -----------
 
-This utility imports the metadata (object definitions) or data for
+This utility imports metadata (object definitions) or data or both for
 one or more databases from one or more files in any of SQL, CSV,
-TAB, GRID, or VERTICAL formats. These formats are the output of the
-:command:`mysqldbexport` utility.  For a list of databases, the :command:`mysqldbimport`
-utility enables you to import the object definitions, the data, or
-both.
+TAB, GRID, or VERTICAL formats. These are the output formats of the
+:command:`mysqldbexport` utility.
 
 If an object exists on the destination server with the same name as an
 imported object, it is dropped first before importing the new object.
 
-You can also skip objects by type using the :option:`--skip` option
+To skip objects by type, use the :option:`--skip` option
 with a list of the objects to skip. This enables you to extract a
-and listing the objects to skip. This enables you to extract a
 particular set of objects, say, for importing only events (by
-excluding all other types). Similarly, you can skip creating blob
-UPDATE commands by specifying the :option:`--skip-blobs` option.
+excluding all other types). Similarly, to skip creation of **UPDATE**
+statements for ``BLOB`` data, specify the :option:`--skip-blobs` option.
 
 To specify the input format, use one of the following values
 with the :option:`--format` option:
@@ -67,11 +56,11 @@ headers, specify the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
 
-By default, each table is created on the destination server using the same
-storage engine as the original table.  To override this and specify the
-storage engine to be used for all tables created on the destination server,
+By default, the utility creates each table on the destination server using
+the same storage engine as the original table.  To override this and specify
+the storage engine to use for all tables created on the destination server,
 use the :option:`--new-storage-engine` option. If the destination server
-supports the new engine, all tables will use that engine.
+supports the new engine, all tables use that engine.
 
 To specify the storage engine to use for tables for which the destination
 server does not support the original storage engine on the source server,
@@ -149,7 +138,7 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
-.. option:: --server=<SERVER>
+.. option:: --server=<server>
 
    Connection information for the server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
@@ -180,7 +169,7 @@ NOTES
 -----
 
 The login user must have the appropriate permissions to create new
-objects, access (read) the mysql database, and grant privileges.
+objects, access (read) the ``mysql`` database, and grant privileges.
 If a database to be imported already exists, the user must have read
 permission for it, which is needed to check the existence of objects in the
 database.
@@ -191,8 +180,8 @@ contains certain objects such as views or events and whether binary
 logging is enabled.
 
 Some combinations of the options may result in errors during the
-operation.  For example, eliminating tables but not views may result
-in an error when the view is imported on another server.
+operation.  For example, excluding tables but not views may result
+in an error when a view is imported.
 
 The :option:`--new-storage-engine` and :option:`--default-storage-engine`
 options apply to all destination tables in the operation.
@@ -200,14 +189,14 @@ options apply to all destination tables in the operation.
 For the :option:`--format` and :option:`--import` options, the permitted
 values are not case sensitive. In addition, values may be specified as any
 unambiguous prefix of a valid value.  For example, :option:`--format=g`
-specifies the grid format. An error is generated if a prefix matches more
+specifies the grid format. An error occurs if a prefix matches more
 than one valid value.
 
 EXAMPLES
 --------
 
-To import the metadata of the database 'util_test' to server1 on port 3306
-using a file in CSV format, use this command::
+To import the metadata from the ``util_test`` database to the server
+on the local host using a file in CSV format, use this command::
 
     $ mysqldbimport --server=root@localhost --import=definitions \
       --format=csv data.csv
@@ -215,8 +204,9 @@ using a file in CSV format, use this command::
     # Importing definitions from data.csv.
     #...done.
 
-Similarly, to import the data of the database 'util_test' to server1 on port
-3306, importing the data using bulk insert statements, use this command::
+Similarly, to import the data from the ``util_test`` database to the server
+on the local host,
+importing the data using bulk insert statements, use this command::
 
     $ mysqldbimport --server=root@localhost --import=data \
       --bulk-insert --format=csv data.csv
@@ -224,9 +214,9 @@ Similarly, to import the data of the database 'util_test' to server1 on port
     # Importing data from data.csv.
     #...done.
 
-Also, to import both the data and definitions of the database 'util_test' to
-server1 on port 3306, importing the data using bulk insert statements from a
-file that contains SQL statements, use this command::
+To import both data and definitions from the ``util_test`` database,
+importing the data using bulk insert statements from a file that
+contains SQL statements, use this command::
 
     $ mysqldbimport --server=root@localhost --import=both \
       --bulk-insert --format=sql data.sql

@@ -9,34 +9,44 @@ SYNOPSIS
 
 ::
 
- mysqldiff --server1=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-              [ --server2=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
-              --help | --version | --verbose | --force | --width=<width> |
-              --changes-for=[server1|server2] --quiet |
-              [--difftype=[unified|context|differ|sql]]
-              [<db1:db2> [<db1:db2>*] | --show-reverse |
-               <db1.obj1:db2.obj2> [<db1.obj1:db2.obj2>*]]
+ mysqldiff [options] {db1[:db1] | db1.obj1[:db2.obj2]} ...
 
 DESCRIPTION
 -----------
 
 This utility reads the definitions of objects and compares them using a
-diff-like method to determine whether they are the same. If the objects are
-not the same, the differences are displayed. The user may specify any
-combination of either a database and object pair in the form
-database1.object1:database2.object2 or a database pair in the form
-database1:database2 as arguments. If a database pair is specified, all of
-the objects in database1 are compared to those in database2. Any objects not
-appearing in either database produce an error.
+diff-like method to determine whether they are the same. The utility displays
+the differences for objects that are
+not the same.
 
-The diff may be run against a single server for comparing two
+Use the notation db1:db2 to name two databases to compare, or, alternatively
+just db1 to compare two databases with the same name.  The latter case is a
+convenience notation for comparing same-named databases on different
+servers.
+
+The comparison may be run against two databases of different names on a
+single server by specifying only the :option:`--server1` option. The user
+can also connect to another server by specifying the :option:`--server2`
+option. In this case, db1 is taken from server1 and db2 from server2.
+
+When a database pair is specified, all objects in one database are
+compared to the corresponding objects in the other. Any objects
+not appearing in either database produce an error.
+
+To compare a specific pair of objects, add an object name to each database
+name in *db.obj* format. For example, use ``db1.obj1:db2.obj2`` to compare two
+named objects, or db1.obj1 to compare an object with the same name in
+databases with the same name. It is not legal to mix a database name with an
+object name. For example, ``db1.obj1:db2`` and ``db1:db2.obj2`` are illegal.
+
+The comparison may be run against a single server for comparing two
 databases of different names on the same server by specifying only the
 :option:`--server1` option. Alternatively, you can also connect to
 another server by specifying the :option:`--server2` option. In this
 case, the first object to compare is taken from server1 and the second
 from server2.
 
-By default, the utilty generates object differences in the form of
+By default, the utilty generates object differences as
 a difference report. However, you can generate a transformation
 report containing SQL statements for transforming the objects for
 conformity instead.  Use the 'sql' value for the :option:`--difftype`
@@ -83,12 +93,12 @@ designated by the :option:`--server2` option (``host2``).
 
 The default direction is ``server1``. 
 
-For difference format **SQL**, you can also see the reverse transformation
+For **sql** difference format, you can also see the reverse transformation
 by specifying the :option:`--show-reverse` option.
 
 The utility stops on the first occurrence of missing objects or when an
 object does not match. To override this behavior, specify the
-:option:`--force` option, which causes the utility to attempt to compare all
+:option:`--force` option to cause the utility to attempt to compare all
 objects listed as arguments.
 
 OPTIONS
@@ -116,7 +126,8 @@ OPTIONS
    
 .. option:: --force
 
-   Do not halt at the first difference found. Process all objects.
+   Do not halt at the first difference found. Process all objects to find
+   all differences.
    
 .. option:: --quiet, -q
 
@@ -163,7 +174,7 @@ You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges to
 access all objects to be compared.
 
-The SQL transformation feature has the following known limitations:
+The SQL transformation feature has these known limitations:
 
 * When tables with partition differences are encountered, the utility
   generates the **ALTER TABLE** statement for all other changes but
@@ -182,18 +193,17 @@ The SQL transformation feature has the following known limitations:
 
 * Changes in the definer clause for events are not supported.
 
-* MySQL Cluster-specific SQL extensions are not supported.
+* SQL extensions specific to MySQL Cluster are not supported.
 
 For the :option:`--difftype` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value. For example, :option:`--difftype=d` specifies the differ
-type. An error is generated if a prefix matches more than one valid value.
+type. An error occurs if a prefix matches more than one valid value.
 
 EXAMPLES
 --------
 
-To scan all tables in the employees database to see the possible redundant
-and duplicate indexes as well as the **DROP** statements for the indexes,
+To compare the ``employees`` and ``emp`` databases on the local server,
 use this command::
 
     $ mysqldiff --server1=root@localhost employees:emp1 
@@ -231,14 +241,16 @@ use this command::
 The following examples show how to generate a transformation report. Assume
 the following object definitions:
 
-Host1:
-CREATE TABLE db1.table1 (num int, misc char(30));
+Host1::
 
-Host2:
-CREATE TABLE dbx.table3 (num int, notes char(30), misc char(55));
+   CREATE TABLE db1.table1 (num int, misc char(30));
 
-To generate a set of SQL statements to transform the definition of db1.table1 to
-dbx.table3, use this command::
+Host2::
+
+   CREATE TABLE dbx.table3 (num int, notes char(30), misc char(55));
+
+To generate a set of SQL statements that transform the definition of
+``db1.table1`` to ``dbx.table3``, use this command::
 
     $ mysqldiff --server1=root@host1 --server2=root@host2 \
           --changes-for=server1 --difftype=sql \
@@ -254,8 +266,8 @@ dbx.table3, use this command::
 
     Compare failed. One or more differences found.
 
-To generate a set of SQL statements to transform the definition of dbx.table3 to
-db1.table1, use this command::
+To generate a set of SQL statements that transform the definition of
+``dbx.table3`` to ``db1.table1``, use this command::
 
     $ mysqldiff --server1=root@host1 --server2=root@host2 \
           --changes-for=server2 --difftype=sql \
@@ -271,8 +283,8 @@ db1.table1, use this command::
 
     Compare failed. One or more differences found.
 
-To generate a set of SQL statements to transform the definitions of dbx.table3
-and db1.table1 in both directions, use this command::
+To generate a set of SQL statements that transform the definitions of
+``dbx.table3`` and ``db1.table1`` in both directions, use this command::
 
     $ mysqldiff --server1=root@host1 --server2=root@host2 \
           --show-reverse --difftype=sql \

@@ -268,7 +268,7 @@ and tables listed.
 For the :option:`--difftype` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value. For example, :option:`--difftype=d` specifies the differ
-type. An error is generated if a prefix matches more than one valid value.
+type. An error occurs if a prefix matches more than one valid value.
 
 
 EXAMPLES

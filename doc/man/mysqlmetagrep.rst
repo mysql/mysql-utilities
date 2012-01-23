@@ -197,7 +197,7 @@ NOTES
 For the :option:`--format` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value.  For example, :option:`--format=g` specifies the grid format.
-An error is generated if a prefix matches more than one valid value.
+An error occurs if a prefix matches more than one valid value.
 
 
 EXAMPLES

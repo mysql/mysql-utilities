@@ -10,11 +10,7 @@ SYNOPSIS
 
 ::
 
- mysqldiskusage --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-             [--help | --no-headers | --version | --verbose |
-             --binlog | --relaylog | --logs | --empty | --all 
-             --format=[grid|tab|csv|vertical]
-             [<db> ...]
+ mysqldiskusage [options] db ...
 
 DESCRIPTION
 -----------
@@ -24,26 +20,24 @@ The utility optionally displays disk usage for the binary log, slow
 query log, error log, general query log, relay log, and InnoDB
 tablespaces. The default is to show only database disk usage.
 
-If the command line lists no no databases, the utility shows the
+If the command line lists no databases, the utility shows the
 disk space usage for all databases.
 
-Size values displayed without a unit indicator such as MB are in bytes.
+Sizes displayed without a unit indicator such as MB are in bytes.
 
 The utility determines the the location of the data directory by requesting
 it from the server. For a local server, the utility obtains size information
 directly from files in the data directory and InnoDB home directory. In this
 case, you must have file system access to read those directories.  Disk
-space usage shown includes the sum of all storage engine specific files such
-as the .MYI and .MYD files for MyISAM and similarly includes the tablespace
-files for InnoDB.
+space usage shown includes the sum of all storage engine- specific files such
+as the .MYI and .MYD files for MyISAM and the tablespace files for InnoDB.
 
-If that fails, or if the server is not local, the utility is limited to
-information that can be obtained from the system tables and therefore should
-be considered an estimate. This is because the utility cannot include
-.frm and related miscellaneous files in the calculations.
-For information read from the server, the account used to connect to the
-server must have the appropriate permissions to read any objects accessed
-during the operation.
+If the file system read fails, or if the server is not local, the utility
+cannot determine exact file sizes. It is limited to information that can be
+obtained from the system tables, which therefore should be considered an
+estimate.  For information read from the server, the account used to connect
+to the server must have the appropriate permissions to read any objects
+accessed during the operation.
 
 If information requested requires file system access but is not available
 that way, the utility prints a message that the information is not
@@ -69,11 +63,6 @@ with the :option:`--format` option:
 
 To turn off the headers for **csv* or **tab** display format, specify
 the :option:`--no-headers` option.
-
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges for
-all objects accessed during the operation.
-For details, see :ref:`mysqldiskusage-notes`.
 
 OPTIONS
 -------
@@ -102,7 +91,7 @@ OPTIONS
    Specify the output display format. Permitted format values are
    grid, csv, tab, and vertical. The default is grid.
     
-.. option::  --InnoDB, -i
+.. option::  --innodb, -i
 
     Display InnoDB tablespace usage. This includes information about the
     shared InnoDB tablespace as well as .idb files for InnoDB tables with
@@ -145,13 +134,20 @@ OPTIONS
 For the :option:`--format` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value.  For example, :option:`--format=g` specifies the grid format.
-An error is generated if a prefix matches more than one valid value.
+An error occurs if a prefix matches more than one valid value.
+
+NOTES
+-----
+
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges for
+all objects accessed during the operation.
 
 EXAMPLES
 --------
 
-To show only the disk space usage for the employees and test databases in
-grid format (the default), use this command::
+To show only the disk space usage for the ``employees`` and ``test``
+databases in grid format (the default), use this command::
 
     $ mysqldiskusage --server=root@localhost employees test
     # Source on localhost: ... connected.
