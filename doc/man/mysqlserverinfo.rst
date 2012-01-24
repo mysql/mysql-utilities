@@ -93,8 +93,8 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are
-   grid, csv, tab, and vertical. The default is grid.
+   Specify the output display format. Permitted format values are **grid**,
+   **csv**, **tab**, and **vertical**. The default is **grid**.
 
 .. option:: --no-headers, -h
 
@@ -111,8 +111,7 @@ OPTIONS
 
    Connection information for the server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   Use this option multiple times
-   to see information for multiple servers.
+   Use this option multiple times to see information for multiple servers.
 
 .. option:: --show-defaults
 

@@ -1,45 +1,41 @@
 .. _ `mysqlmetagrep`:
 
-#############################################
-``mysqlmetagrep`` - Search Object Definitions
-#############################################
+######################################################
+``mysqlmetagrep`` - Search Database Object Definitions
+######################################################
 
 SYNOPSIS
 --------
 
 ::
 
- mysqlmetagrep [ --version | --help ] | --format=<format> |
-                --body | --search-objects=<types> | --regexp | --sql |
-                --database=<pattern> | --pattern=<pattern>
-                --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqlmetagrep [options] [pattern | server] ...
 
 DESCRIPTION
 -----------
 
 This utility searches for objects matching a given pattern on all the
 servers specified using instances of the :option:`--server` option. It
-produces output that displays the objects that match.  By default, the first
+produces output that displays the matching objects.  By default, the first
 nonoption argument is taken to be the pattern unless the :option:`--pattern`
 option is given. If the :option:`--pattern` option is given, all nonoption
 arguments are treated as connection specifications.
 
 Internally, the utility generates an SQL statement for searching the
-necessary tables in the **INFORMATION_SCHEMA** database on the
-designated servers and executes it in turn before collecting the result
-and printing it as a table. If you do not want to send the statement
-to the servers and instead have the utility emit the statement, you
-can use the :option:`--sql` option. This can be useful if you want to
-feed the output of the statement to another application such as the :command:`mysql`
-monitor.
+necessary tables in the **INFORMATION_SCHEMA** database on the designated
+servers and executes it in turn before collecting the result and printing it
+as a table. Use the :option:`--sql` option to have the utility display the
+statement rather than execute it.  This can be useful if you want to feed
+the output of the statement to another application such as the
+:command:`mysql` monitor.
 
-The MySQL server uses two forms of patterns when matching strings:
-:ref:`simple_pattern` and :ref:`posix_regexp`.
+The MySQL server supports two forms of patterns when matching strings:
+:ref:`simple_pattern` (used with the **LIKE** operator) and
+:ref:`posix_regexp` (used with the **REGEXP** operator).
 
-Normally, the **LIKE** operator is used to match the name (and
-optionally, the body) of objects, but this can be changed to use
-the **REGEXP** operator instead by using the :option:`--regexp`
-option.
+By default, the utility uses the **LIKE** operator to match the name (and
+optionally, the body) of objects. To use the **REGEXP** operator instead,
+use the :option:`--regexp` option.
 
 Note that since the **REGEXP** operator does substring searching, it
 is necessary to anchor the expression to the beginning of the string
@@ -69,18 +65,18 @@ SQL Simple Patterns
 ^^^^^^^^^^^^^^^^^^^
 
 The simple patterns defined by the SQL standard consist of a string of
-characters with two characters that have special meaning: **%**
-(percent) matches zero or more characters and **_** (underscore)
+characters with two characters that have special meaning: ``%``
+(percent) matches zero or more characters and ``_`` (underscore)
 matches exactly one character.
 
 For example:
 
 ``'mats%'``
-  Matches any string that starts with 'mats'.
+  Match any string that starts with 'mats'.
 ``'%kindahl%'``
-  Matches any string containing the word 'kindahl'.
+  Match any string containing the word 'kindahl'.
 ``'%_'``
-  Matches any string consisting of one or more characters.
+  Match any string consisting of one or more characters.
 
 
 .. _posix_regexp:
@@ -93,34 +89,34 @@ defined in the SQL standard. A regular expression is a string of
 characters, optionally containing characters with special meaning:
 
 **.**
-   Matches any character.
+   Match any character.
 **^**
-   Matches the beginning of a string.
+   Match the beginning of a string.
 **$**
-   Matches the end of a string.
+   Match the end of a string.
 **[axy]**
-   Matches **a**, **x**, or **y**.
+   Match **a**, **x**, or **y**.
 **[a-f]**
-   Matches any character in the range **a** to
+   Match any character in the range **a** to
    **f** (that is, **a**, **b**, **c**, **d**,
    **e**, or **f**).
 **[^axy]**
-   Matches any character *except* **a**, **x**,
+   Match any character *except* **a**, **x**,
    or **y**.
 **a\***
-   Matches a sequence of zero or more **a**.
+   Match a sequence of zero or more **a**.
 **a+**
-   Matches a sequence of one or more **a**.
+   Match a sequence of one or more **a**.
 **a?**
-   Matches zero or one **a**.
+   Match zero or one **a**.
 **ab|cd**
-   Matches **ab** or **cd**.
+   Match **ab** or **cd**.
 **a{5}**
-   Matches 5 instances of **a**.
+   Match five instances of **a**.
 **a{2,5}**
-   Matches from 2 to 5 instances of **a**.
+   Match from two to five instances of **a**.
 **(abc)+**
-   Matches one or more repetitions of **abc**.
+   Match one or more repetitions of **abc**.
 
 This is but a brief set of examples of regular expressions. The full
 syntax is described in the `MySQL manual`_, but can often be found in
@@ -149,12 +145,12 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are
-   grid, csv, tab, and vertical. The default is grid.
+   Specify the output display format. Permitted format values are **grid**,
+   **csv**, **tab**, and **vertical**. The default is **grid**.
 
 .. option:: --object-types=<types>, --search-objects=<types>
 
-   Search only for/in objects named in <types>, which is a comma-separated
+   Search only the object types named in *types*, which is a comma-separated
    list of one or more of the values **procedure**, **function**, **event**,
    **trigger**, **table**, and **database**.
 
@@ -166,7 +162,7 @@ OPTIONS
    argument looks like a connection specification rather than a pattern.
 
    If the :option:`--pattern` option is given, the first nonoption argument
-   is not treated as a pattern but as a connection specifier.
+   is treated as a connection specifier, not as a pattern.
 
 .. option:: --regexp, --basic-regexp, -G
 
@@ -176,15 +172,15 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   Connection information for the servers to search in the format:
+   Connection information for a server to search in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   The option may be repeated to form a list of servers to search.
+   Use this option multiple times to search multiple servers.
 
 .. option::  --sql, --print-sql, -p
 
    Print rather than executing the SQL code that would be executed to find
-   all matching objects. This can be useful if you want to save the statement
-   for later execution, or use it as input for other programs.
+   all matching objects. This can be useful to save the statement
+   for later execution or to use it as input for other programs.
 
 .. option:: --version
 
@@ -225,6 +221,9 @@ routines, triggers, and events)::
     | root:*@localhost:3306  | TRIGGER      | tr_foo       | test      |
     | root:*@localhost:3306  | TABLE        | t2           | test      |
     +------------------------+--------------+--------------+-----------+
+
+In the preceding output, the trigger name does not match the pattern,
+but is displayed because its body does.
 
 This is the same as the previous example, but using the **REGEXP** operator.
 Note that in the pattern it is not necessary to add wildcards before or

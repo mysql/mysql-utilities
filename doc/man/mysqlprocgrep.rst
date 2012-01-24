@@ -85,8 +85,8 @@ Options
 
 .. option::  --format=<format>, -f<format>
 
-   Specify the output display format. Permitted format values are
-   grid, csv, tab, and vertical. The default is grid.
+   Specify the output display format. Permitted format values are **grid**,
+   **csv**, **tab**, and **vertical**. The default is **grid**.
 
 .. option:: --kill-connection
 

@@ -71,8 +71,8 @@ OPTIONS
 
 .. option::  --format=<list_format>, -f<list_format>
 
-   Specify the user display format. Permitted format values are
-   grid, csv, tab, and vertical. The default is grid.
+   Specify the user display format.  Permitted format values are **grid**,
+   **csv**, **tab**, and **vertical**. The default is **grid**.
    This option is valid only if :option:`--list` is given.
 
 .. option:: --force

@@ -100,9 +100,9 @@ OPTIONS
 
 .. option:: --format=<format>, -f<format>
 
-   Specify the display format for column list output . Permitted format values
-   are grid, csv, tab, and verticaL. The default is grid. This option applies
-   only if :option:`--show-list` is given.
+   Specify the display format for column list output.  Permitted format values
+   are **grid**, **csv**, **tab**, and **vertical**. The default is **grid**.
+   This option applies only if :option:`--show-list` is given.
 
 .. option:: --master=<source>
 
