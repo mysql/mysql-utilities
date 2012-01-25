@@ -9,12 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlprocgrep [ --version | --help ] | --format=<format> |
-                --kill-connection | --kill-query | --regexp | --sql-body |
-                --print | --verbose | --match-user=<pattern> |
-                --match-host=<pattern> | --match-command=<pattern> |
-                --match-info=<pattern> | --match-state=<pattern> |
-                --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
+ mysqlprocgrep [options]
 
 DESCRIPTION
 -----------
@@ -30,10 +25,10 @@ If no :option:`--age` or ``--match-xxx`` options are given, the utility
 selects all processes.
 
 The ``--match-xxx`` options correspond to the columns in the
-INFORMATION_SCHEMA.PROCESSLIST table. For example, :option:`--match-command`
-specifies a matching condition for **PROCESSLIST.COMMAND** column values.
-There is no ``--match-time`` option, however. To specify a condition based on
-process time, use :option:`--age`.
+**INFORMATION_SCHEMA.PROCESSLIST** table. For example,
+:option:`--match-command` specifies a matching condition for
+**PROCESSLIST.COMMAND** column values.  There is no ``--match-time`` option.
+To specify a condition based on process time, use :option:`--age`.
 
 Processes that can be seen and killed are subject to whether the
 account used to connect to the server has the **PROCESS** and
@@ -75,8 +70,8 @@ Options
    either using the ``hh:mm:ss`` format, with hours and minutes optional,
    or as a sequence of numbers with a suffix giving the period size.
 
-   The permitted suffixes are **s** (second), **m** (minute), **h**
-   (hour), **d** (day), and **w** (week), so **4h15m** mean 4 hours and
+   The permitted suffixes are **s** (second), **m** (minute), **h** (hour),
+   **d** (day), and **w** (week). For example, **4h15m** mean 4 hours and
    15 minutes.
 
    For both formats, the specification can optionally be preceeded by 
@@ -136,17 +131,17 @@ Options
 
 .. option:: --server=<source>
 
-   Connection information for the server to search in the format:
+   Connection information for a server to search in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
-   The option may be repeated to form a list of servers to search.
+   Use this option multiple times to search multiple servers.
 
 .. option:: --sql, --print-sql, -Q
 
    Instead of displaying the selected processes, emit the **SELECT**
    statement that retrieves information about them. If the
    :option:`--kill-connection` or :option:`--kill-query` option is
-   given, a stored procedure named ``kill_processes()`` for killing the
-   queries is generated rather than a **SELECT** statement.
+   given, the utility generates a stored procedure named ``kill_processes()``
+   for killing the queries rather than a **SELECT** statement.
 
 .. option:: --sql-body
 
@@ -158,8 +153,8 @@ Options
    When used with a kill option, code for killing the matching queries
    is generated. Note that it is not possible to execute the emitted
    code unless it is put in a stored routine, event, or trigger. For
-   example, the following code could be generated to kill all
-   connections for user **www-data** that are idle::
+   example, the following code could be generated to kill all idle
+   connections for user ``www-data``::
 
      $ mysqlprocgrep --kill-connection --sql-body \
      >   --match-user=www-data --match-state=sleep
@@ -208,17 +203,15 @@ An error occurs if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-For all the examples, we assume that the **root** user on
-**localhost** has sufficient privileges to kill queries and
-connections.
+For each example, assume that the **root** user on **localhost** has
+sufficient privileges to kill queries and connections.
 
-To kill all queries created by user "mats" that are younger than 1
-minute::
+Kill all queries created by user "mats" that are younger than 1 minute::
 
   mysqlprocgrep --server=root@localhost \
     --match-user=mats --age=-1m --kill-query
 
-To kill all connections that has been idle for more than 1 hour::
+Kill all connections that have been idle for more than 1 hour::
 
   mysqlprocgrep --server=root@localhost \
     --match-command=sleep --age=1h --kill-connection
