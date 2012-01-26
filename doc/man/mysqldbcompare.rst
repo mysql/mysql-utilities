@@ -46,13 +46,13 @@ consistency will also fail.
 
 The tests include the following:
 
-1) Check database definitions
+#. Check database definitions
 
    A database existance precondition check ensures that both databases
    exist. If they do not, no further processing is possible and the
    :option:`--run-all-tests` option is ignored.
 
-2) Check existance of objects in both databases
+#. Check existance of objects in both databases
 
    The test for objects in both databases identifies those objects
    missing from one or another database. The remaining tests apply
@@ -60,14 +60,14 @@ The tests include the following:
    test, use the :option:`--skip-object-compare` option. That can be
    useful when there are known missing objects among the databases.
 
-3) Compare object definitions
+#. Compare object definitions
 
    The definitions (the **CREATE** statements) are compared and
    differences are presented. To skip this test, use the
    :option:`--skip-diff` option. That can be useful when there are
    object name differences only that you want to ignore.
 
-4) Check table row counts
+#. Check table row counts
 
    This check ensures that both tables have the same number of rows.
    This does not ensure that the table data is consistent. It is merely
@@ -75,7 +75,7 @@ The tests include the following:
    the other. The data consistency check identifies the missing rows.
    To skip this test, use the :option:`--skip-row-count` option.
 
-5) Check table data consistency
+#. Check table data consistency
 
    This check identifies both changed rows as well as missing rows
    from one or another of the tables in the databases. Changed rows

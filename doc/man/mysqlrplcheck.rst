@@ -9,48 +9,43 @@ SYNOPSIS
 
 ::
 
- mysqlrplcheck --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-              --slave=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
-              --help | --version | --verbose | --show-slave-status |
-              --master-info-file=<file> | --quiet | --suppress
+ mysqlrplcheck [options]
 
 DESCRIPTION
 -----------
 
 This utility checks the prerequisites for replication between a master and
 a slave. These checks (called tests) are designed to ensure a healthy
-replication setup. Each of these tests are described in more detail here::
+replication setup. The utility performs the following tests:
 
- Test# Description
- ----- ----------------------------------------------------------------------
-   1   Is binary log enabled on the master?
-   2   Are there binary logging exceptions (such as *_do_db or *_ignore_db
-       settings)? If so, display them.
-   3   Does the rpl user exist on the master with the correct privileges?
-   4   Are there server-id conflicts?
-   5   Is the slave connected to this master? If not, display the master
-       host and port.
-   6   Are there conflicts between the master.info file on the slave and
-       the values shown in SHOW SLAVE STATUS on the master?
-   7   Are the InnoDB configurations compatible (plugin vs. native)?
-   8   Are the storage engines compatible (have same on slave as master)?
-   9   Are the lower-case-tables-names settings compatible? Warn if there are
-       settings for lowercase/uppercase table names that can cause problems.
-       See BUG#59240.
-  10   Is the slave behind the master?
+#. Is the binary log enabled on the master?
+#. Are there binary logging exceptions (such as ``*_do_db`` or
+   ``*_ignore_db`` settings)? If so, display them.
+#. Does the replication user exist on the master with the correct privileges?
+#. Are there ``server_id`` conflicts?
+#. Is the slave connected to this master? If not, display the master
+   host and port.
+#. Are there conflicts between the ``master.info`` file on the slave and
+   the values shown in **SHOW SLAVE STATUS** on the master?
+#. Are the InnoDB configurations compatible (plugin vs. native)?
+#. Are the storage engines compatible (have same on slave as master)?
+#. Are the ``lower_case_tables_names`` settings compatible? Warn if there are
+   settings for lowercase/uppercase table names that can cause problems.
+   See Bug #59240.
+#. Is the slave behind the master?
 
-The utility runs each of the tests in turn unless there is a fatal error
+The utility runs each test in turn unless there is a fatal error
 preventing further testing, such as a loss of connection to the servers.
 
-Each test can complete with one of the following states: (pass, fail, warn)
-where pass means the prerequisites are met, fail means the prerequisites were
-met but one or more errors occurred or there are exceptions to consider, and
-warn means the test found some unusual settings that should be examined
-further but may not be in error.
+Each test can complete with one of the following states: pass (the
+prerequisites are met), fail (the prerequisites were met but one or more
+errors occurred or there are exceptions to consider), or warn (the test
+found some unusual settings that should be examined further but may not be
+in error).
 
-Use the :option:`--verbose` option to see additional information such
-as server IDs, lower-case-table-name settings, and the contents of the master
-information file on the slave.
+Use the :option:`--verbose` option to see additional information such as
+server IDs, ``lower_case_table_name`` settings, and the contents of the
+master information file on the slave.
 
 To see the values from the **SHOW SLAVE STATUS** statement, use the
 :option:`--show-slave-status` option.
@@ -72,9 +67,9 @@ OPTIONS
 .. option:: --master-info-file=<file>
 
    The name of the master information file on the slave. The default is
-   'master.info' read from the data directory. Note: This option requires that
-   you run the utility on the slave and that you have appropriate file read
-   access to the data directory.
+   ``master.info`` read from the data directory. Note: This option requires
+   that you run the utility on the slave and that you have appropriate file
+   read access for the data directory.
 
 .. option:: --quiet, -q
 
@@ -104,11 +99,17 @@ OPTIONS
 
    Display version information and exit.
 
+.. option:: --width=<number>
+
+   Change the display width of the test report.
+   The default is 75 characters.
+
 NOTES
 -----
 
 The login user must have the appropriate permissions to execute **SHOW SLAVE
-STATUS**, **SHOW MASTER STATUS**, and **SHOW VARIABLES**.
+STATUS**, **SHOW MASTER STATUS**, and **SHOW VARIABLES** on the appropriate
+servers.
 
 EXAMPLES
 --------
@@ -130,7 +131,7 @@ performing replication, use the following command::
     Checking InnoDB compatibility                                     [pass]
     Checking storage engines compatibilit                             [pass]
     Checking lower_case_table_names settings                          [pass]
-    Checking slave delay (seconds behind master                       [pass]
+    Checking slave delay (seconds behind master)                      [pass]
     # ...done.
 
 As shown in the example, you must provide valid login information

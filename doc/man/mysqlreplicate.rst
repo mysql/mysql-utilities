@@ -26,12 +26,11 @@ must be running the same "type" of InnoDB (built-in or the InnoDB Plugin),
 and InnoDB on both servers must have the same major and minor version
 numbers and enabled state.
 
-Warnings are issued by default or you can use the
-:option:`--pedantic` option to require storage engines to be the same on the
-master and slave. This means that both servers have the same storage engines
-enabled, the same default storage engine, and the InnoDB storage engine must
-be the same.
-  
+By default, the utility issues warnings for mismatches between the sets of
+storage engines, the default storage engine, and the InnoDB storage engine.
+To produce errors instead, use the :option:`--pedantic` option, which
+requires storage engines to be the same on the master and slave.
+
 The :option:`-vv` option displays any discrepancies between the storage
 engines and InnoDB values, with or without the :option:`--pedantic` option.
 
@@ -80,7 +79,8 @@ OPTIONS
 .. option:: --master-log-pos=<master_log_pos>
 
    Begin replication from this position in the master log file specified
-   with the :option:`--master-log-file` option.
+   with the :option:`--master-log-file` option, which is required if you
+   use :option:`--master-log-pos`.
 
 .. option:: --pedantic, -p
 
