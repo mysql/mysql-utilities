@@ -11,8 +11,6 @@ Classes
 -------
 
 .. class:: GeneralQueryLog(stream)
-
-    Parse the MySQL General Query Log.
     
     This class parses the MySQL General Query Log. Instances are iterable,
     but the class does not provide multiple independent iterators.
@@ -60,8 +58,6 @@ Classes
 
 .. class:: SlowQueryLog(stream)
 
-    Parse the MySQL Slow Query Log.
-    
     This class parses the MySQL Slow Query Log. Instances are iterable,
     but the class does not provide multiple independent iterators.
     

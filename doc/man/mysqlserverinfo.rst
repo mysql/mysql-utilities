@@ -9,11 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlserverinfo [ --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] |
-                   [, --server=<user>[:<passwd>]@<host>[:<port>][:<socket>] ] |
-                   --format=[grid|tab|csv|vertical] ] | --no-headers |
-                   --show-defaults | [--start --basedir=<base directory> 
-                   --datadir=<data directory>] --verbose
+ mysqlserverinfo [options]
 
 DESCRIPTION
 -----------
@@ -23,7 +19,7 @@ in diagnosing problems. The information displayed includes the
 following:
 
 * Server connection information
-* Version number of the server
+* Server version number
 * Data directory path name
 * Base directory path name
 * Plugin directory path name
@@ -33,12 +29,12 @@ following:
 
 This utility can be used to see the diagnostic information for servers that
 are running or offline.  If you want to see information about an offline
-server, the utility starts server in read-only mode. In this case, you must
+server, the utility starts the server in read-only mode. In this case, you must
 specify the :option:`--basedir`, :option:`--datadir`, and :option:`--start`
 options to prevent the utility from starting an offline server accidentally.
-Note: Be sure to consider the ramifications of starting a server on the
+Note: Be sure to consider the ramifications of starting an offline server on the
 error and similar logs. It is best to save this information prior to running
-this utility on an offline server.
+this utility.
 
 To specify how to display output, use one of the following values
 with the :option:`--format` option:
@@ -85,11 +81,13 @@ OPTIONS
 
 .. option:: --basedir=<basedir>
 
-   The base directory for the server.
+   The base directory for the server. This option is required for starting an
+   offline server.
   
 .. option:: --datadir=<datadir>
 
-   The data directory for the server.
+   The data directory for the server. This option is required for starting an
+   offline server.
 
 .. option:: --format=<format>, -f<format>
 
@@ -109,11 +107,11 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in the format:
+   Connection information for a server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
    Use this option multiple times to see information for multiple servers.
 
-.. option:: --show-defaults
+.. option:: --show-defaults, -d
 
    Display default settings for :command:`mysqld` from the local configuration
    file. It uses :command:`my_print_defaults` to obtain the options.
@@ -125,7 +123,8 @@ OPTIONS
 
 .. option:: --start, -s
 
-   Start server in read-only mode if offline.
+   Start the server in read-only mode if it is offline. With this option, you
+   must also give the :option:`--basedir` and :option:`--datadir` options.
 
 .. option:: --verbose, -v
 

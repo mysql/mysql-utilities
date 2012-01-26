@@ -10,12 +10,7 @@ SYNOPSIS
 
 ::
 
- mysqluserclone --source=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-                 --destination=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-                 [[--help | --version | --list | --format=<format>] |
-                 [ --dump  | --verbose | --force | --quiet |
-                 --include-global-privileges ] <base_user>
-                 <new_user>[:<password>] [,<new_user>[:<password>]]]
+ mysqluserclone [options] base_user new_user[:password] ...
 
 DESCRIPTION
 -----------
@@ -24,11 +19,6 @@ This utility uses an existing MySQL user account on one server as a
 template, and clones it to create one or more new user accounts with the
 same privileges as the original user.  The new users can be created on the
 original server or a different server.
-
-You must provide connection parameters (user, host, password, and
-so forth) for an account that has the appropriate privileges to
-access all objects in the operation.
-For details, see :ref:`mysqluserclone-notes`.
 
 To list users for a server, specify the :option:`--list` option.  This
 prints a list of the users on the source (no destination is needed). To
@@ -114,6 +104,10 @@ OPTIONS
 NOTES
 -----
 
+You must provide connection parameters (user, host, password, and
+so forth) for an account that has the appropriate privileges to
+access all objects in the operation.
+
 The account used to connect to the source server must have privileges to
 read the **mysql** database.
 
@@ -130,7 +124,7 @@ An error occurs if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-To clone 'joe' as 'sam' and 'sally' with passwords and logging in as root on
+To clone ``joe`` as ``sam`` and ``sally`` with passwords and logging in as root on
 the local machine, use this command::
 
     $ mysqluserclone --source=root@localhost \
@@ -143,7 +137,7 @@ the local machine, use this command::
     # Cloning joe@localhost to user sally:secret2@localhost
     # ...done.
 
-The following shows all of the users on the localhost server in the most
+The following command shows all users on the local server in the most
 verbose output in CSV format::
 
     $ mysqluserclone --source=root@localhost --list --format=csv -vvv

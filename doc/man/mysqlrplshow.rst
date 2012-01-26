@@ -9,10 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlrplshow --master=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-              --help | --version | --show-list | --quiet |
-              --recurse | --prompt | --num-retries |
-              --format=[sql|grid|tab|csv|vertical]
+ mysqlrplshow [options]
 
 DESCRIPTION
 -----------
@@ -20,12 +17,20 @@ DESCRIPTION
 This utility shows the replication slaves for a master. It prints a graph of
 the master and its slaves labeling each with the host name and port number.
 
-You can choose to explore the slaves for each client with the
-:option:`--recurse` option. This permits the utility to connect to
-each slave found and attempt to find if it has any slaves. If slaves are found,
-the process continues until the slave is found in the list of servers serving
-as masters (a circular topology). The graph displays the topology with
-successive indents. A notation is made for circular topologies.
+To explore the slaves for each client, use the :option:`--recurse` option.
+This causes the utility to connect to each slave found and attempt to
+determine whether it has any slaves. If slaves are found, the process
+continues until the slave is found in the list of servers serving as masters
+(a circular topology). The graph displays the topology with successive
+indents. A notation is made for circular topologies.
+
+If you use the :option:`--recurse` option, the utility attempts to connect
+to the slaves using the user name and password provided for the master. By
+default, if the connection attempt fails, the utility throws an error and
+stops. To change this behavior, use the :option:`--prompt` option, which
+permits the utility to prompt for the user name and password for each slave
+that fails to connect. You can also use the :option:`--num-retries=n` option
+to reattempt a failed connection 'n' times before the utility fails.
 
 An example graph for a typical topology with relay slaves is shown here::
 
@@ -39,8 +44,8 @@ An example graph for a typical topology with relay slaves is shown here::
          |
          +--- localhost:3313 - (SLAVE)
 
-MASTER, SLAVE, and SLAVE + MASTER indicate that a server is a master only,
-slave only, or both slave and master, respectively.
+``MASTER``, ``SLAVE``, and ``SLAVE + MASTER`` indicate that a server
+is a master only, slave only, and both slave and master, respectively.
 
 A circular replication topology is shown like this, where ``<-->`` indicates
 circularity::
@@ -73,15 +78,6 @@ list, use one of the following values with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-
-If you use the :option:`--recurse` option, the utility attempts to connect
-to the slaves using the user name and password provided for the master. By
-default, if the connection attempt fails, the utility throws an error and
-stops. To change this behavior, use the :option:`--prompt` option, which
-permits the utility to prompt for the user name and password for each slave
-that fails to connect. You can also use the :option:`--num-retries=n` option
-to reattempt a failed connection 'n' times before the utility fails.
-
 The utility uses of the **SHOW SLAVE HOSTS** statement to determine which
 slaves the master has. If you want to use the :option:`--recurse` option,
 slaves should have been started with the ``--report-host`` and
@@ -109,6 +105,11 @@ OPTIONS
    Connection information for the master server in the format:
    <user>[:<passwd>]@<host>[:<port>][:<socket>]
    
+.. option:: --max-depth=<N>
+
+   The maximum recursion depth. This option is valid only if
+   :option:`--recurse` is given.
+   
 .. option:: --num-retries=<num_retries>, -n<num_retries>
 
    The number of retries permitted for failed slave login attempts. This
@@ -125,8 +126,8 @@ OPTIONS
 
 .. option:: --quiet, -q
 
-   Turn off all messages for quiet execution. Note: Errors and warnings are
-   not suppressed.
+   Turn off all messages for quiet execution. This option does not suppress
+   errors or warnings.
    
 .. option:: --recurse, -r
 
@@ -177,8 +178,7 @@ for the master.
 To show the full replication topology of a master running on the local host,
 use the following command::
 
-    $ mysqlrplshow  --master=root@localhost:3311 
-                    --recurse
+    $ mysqlrplshow  --master=root@localhost:3311 --recurse
     # master on localhost: ... connected.
     # Finding slaves for master: localhost:3311
     
@@ -195,7 +195,7 @@ To show the full replication topology of a master running on the local host,
 prompting for the user name and password for slaves that do not have the same
 user name and password credentials as the master, use the following command::
 
-    $ mysqlrplshow --recurse --prompt --num-retries=1
+    $ mysqlrplshow --recurse --prompt --num-retries=1 \
       --master=root@localhost:3331
      
     Server localhost:3331 is running on localhost.

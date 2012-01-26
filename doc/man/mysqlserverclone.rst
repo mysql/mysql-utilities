@@ -9,10 +9,7 @@ SYNOPSIS
 
 ::
 
- mysqlserverclone [[ --help | --version] | --quiet |
-                  --server=<user>[:<passwd>]@<host>[:<port>][:<socket>]
-                  [ --new-data=<datadir> | --new-port=<port> |
-                  --new-id=<server_id> ] | --root-password=<passwd> ]
+ mysqlserverclone [options]
 
 DESCRIPTION
 -----------
@@ -37,7 +34,9 @@ OPTIONS
    Additional options for :command:`mysqld`. To specify multiple options,
    separate them by spaces. Use appropriate quoting as necessary. For example,
    to specify ``--log-bin=binlog`` and ``--general-log-file="my log file"``,
-   use :option:`--mysqld="--log-bin=binlog --general-log-file='my log file'"`.
+   use::
+
+   --mysqld="--log-bin=binlog --general-log-file='my log file'"
 
 .. option:: --new-data=<path_to_new_datadir>
 
@@ -47,7 +46,7 @@ OPTIONS
 
 .. option:: --new-id=<server_id>
 
-   The ``server_id`` value for the new server instance. The default 2.
+   The ``server_id`` value for the new server instance. The default is 2.
 
 .. option:: --new-port=<port>
 
@@ -85,8 +84,8 @@ OPTIONS
 EXAMPLES
 --------
 
-The following demonstrates how to create a new instance of a running server,
-set the root password and enable binary logging::
+The following command demonstrates how to create a new instance of a running
+server, set the root password and enable binary logging::
 
     $ mkdir /source/test123
     $ mysqlserverclone --server=root:pass@localhost \
