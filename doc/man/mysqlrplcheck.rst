@@ -61,15 +61,15 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   Connection information for the master server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the master server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --master-info-file=<file>
 
    The name of the master information file on the slave. The default is
    ``master.info`` read from the data directory. Note: This option requires
-   that you run the utility on the slave and that you have appropriate file
-   read access for the data directory.
+   that you run the utility on the slave and that you have appropriate
+   read access for the file.
 
 .. option:: --quiet, -q
 
@@ -82,8 +82,8 @@ OPTIONS
 
 .. option:: --slave=<source>
 
-   Connection information for the slave server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the slave server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
    
 .. option:: --suppress
 
@@ -92,8 +92,9 @@ OPTIONS
 .. option::  --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

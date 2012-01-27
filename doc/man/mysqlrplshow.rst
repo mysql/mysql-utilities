@@ -102,8 +102,8 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   Connection information for the master server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the master server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
    
 .. option:: --max-depth=<N>
 

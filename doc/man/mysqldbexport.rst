@@ -72,7 +72,7 @@ with the :option:`--display` option:
 
 Note: For SQL-format output, the :option:`--display` option is ignored.
 
-To turn off the headers for **csv* or **tab** display format, specify
+To turn off the headers for **csv** or **tab** display format, specify
 the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
@@ -142,7 +142,7 @@ OPTIONS
 
    Specify the output display format. Permitted format values are
    **sql**, **grid**, **tab**, **csv**, and **vertical**. The default is
-   **sql.
+   **sql**.
 
 .. option:: --locking=<locking>
 
@@ -167,14 +167,15 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --skip=<skip-objects>
 
    Specify objects to skip in the operation as a comma-separated list
-   (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
+   (no spaces). Permitted values are **CREATE_DB**, **DATA**, **EVENTS**,
+   **FUNCTIONS**, **GRANTS**, **PROCEDURES**, **TABLES**, **TRIGGERS**,
+   and **VIEWS**.
 
 .. option:: --skip-blobs
 
@@ -183,8 +184,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

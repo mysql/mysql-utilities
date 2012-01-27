@@ -61,7 +61,7 @@ with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-To turn off the headers for **csv* or **tab** display format, specify
+To turn off the headers for **csv** or **tab** display format, specify
 the :option:`--no-headers` option.
 
 OPTIONS
@@ -89,7 +89,7 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the output display format. Permitted format values are
-   *grid*, *csv*, *tab*, and *vertical*. The default is *grid*.
+   **grid**, **csv**, **tab**, and **vertical**. The default is **grid**.
     
 .. option::  --innodb, -i
 
@@ -116,14 +116,15 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

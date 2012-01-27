@@ -76,8 +76,8 @@ OPTIONS
 
 .. option:: --destination=<destination>
 
-   Connection information for the destination server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the destination server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format,
    where <passwd> is
    optional and either <port> or <socket> must be provided.
 
@@ -119,13 +119,14 @@ OPTIONS
 .. option:: --skip=<objects>
 
    Specify objects to skip in the operation as a comma-separated list
-   (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
+   (no spaces). Permitted values are **CREATE_DB**, **DATA**, **EVENTS**,
+   **FUNCTIONS**, **GRANTS**, **PROCEDURES**, **TABLES**, **TRIGGERS**,
+   and **VIEWS**.
 
 .. option:: --source=<source>
 
-   Connection information for the source server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the source server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format,
    where <passwd> is
    optional and either <port> or <socket> must be provided.
 
@@ -136,8 +137,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

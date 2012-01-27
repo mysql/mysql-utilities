@@ -131,8 +131,8 @@ Options
 
 .. option:: --server=<source>
 
-   Connection information for a server to search in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for a server to search in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
    Use this option multiple times to search multiple servers.
 
 .. option:: --sql, --print-sql, -Q
@@ -182,8 +182,9 @@ Options
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 
@@ -203,10 +204,10 @@ An error occurs if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-For each example, assume that the **root** user on **localhost** has
+For each example, assume that the ``root`` user on ``localhost`` has
 sufficient privileges to kill queries and connections.
 
-Kill all queries created by user "mats" that are younger than 1 minute::
+Kill all queries created by user ``mats`` that are younger than 1 minute::
 
   mysqlprocgrep --server=root@localhost \
     --match-user=mats --age=-1m --kill-query

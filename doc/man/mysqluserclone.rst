@@ -10,7 +10,7 @@ SYNOPSIS
 
 ::
 
- mysqluserclone [options] base_user new_user[:password] ...
+ mysqluserclone [options] base_user new_user[:password][@host_name] ...
 
 DESCRIPTION
 -----------
@@ -50,8 +50,8 @@ OPTIONS
 
 .. option:: --destination=<destination>
 
-   Connection information for the destination server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the destination server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --dump, -d 
 
@@ -86,14 +86,15 @@ OPTIONS
 
 .. option:: --source=<source>
 
-   Connection information for the source server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the source server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 
@@ -124,8 +125,8 @@ An error occurs if a prefix matches more than one valid value.
 EXAMPLES
 --------
 
-To clone ``joe`` as ``sam`` and ``sally`` with passwords and logging in as root on
-the local machine, use this command::
+To clone ``joe`` as ``sam`` and ``sally`` with passwords and logging in as
+``root`` on the local machine, use this command::
 
     $ mysqluserclone --source=root@localhost \
       --destination=root@localhost \

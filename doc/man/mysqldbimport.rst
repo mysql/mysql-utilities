@@ -15,9 +15,7 @@ DESCRIPTION
 -----------
 
 This utility imports metadata (object definitions) or data or both for
-one or more databases from one or more files in any of SQL, CSV,
-TAB, GRID, or VERTICAL formats. These are the output formats of the
-:command:`mysqldbexport` utility.
+one or more databases from one or more files.
 
 If an object exists on the destination server with the same name as an
 imported object, it is dropped first before importing the new object.
@@ -28,8 +26,9 @@ particular set of objects, say, for importing only events (by
 excluding all other types). Similarly, to skip creation of **UPDATE**
 statements for ``BLOB`` data, specify the :option:`--skip-blobs` option.
 
-To specify the input format, use one of the following values
-with the :option:`--format` option:
+To specify the input format, use one of the following values with the
+:option:`--format` option. These correspond to the output formats of the
+:command:`mysqldbexport` utility:
 
 **sql** (default)
   Input consists of SQL statements. For definitions, this consists of
@@ -51,7 +50,7 @@ with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-To indicate that input in **csv** or **tab* format does not contain column
+To indicate that input in **csv** or **tab** format does not contain column
 headers, specify the :option:`--no-headers` option.
 
 To turn off all feedback information, specify the :option:`--quiet` option.
@@ -110,7 +109,8 @@ OPTIONS
 .. option:: --format=<format>, -f<format>
 
    Specify the input format. Permitted format values are
-   sql, grid, tab, csv, and vertical. The default is sql.
+   **sql**, **grid**, **tab**, **csv**, and **vertical**. The default is
+   **sql**.
    
 .. option:: --import=<import_type>, -i<import_type>
 
@@ -140,14 +140,15 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --skip=<skip_objects>
 
    Specify objects to skip in the operation as a comma-separated list
-   (no spaces). Permitted values are CREATE_DB, DATA, EVENTS, FUNCTIONS,
-   GRANTS, PROCEDURES, TABLES, TRIGGERS, and VIEWS.
+   (no spaces). Permitted values are **CREATE_DB**, **DATA**, **EVENTS**,
+   **FUNCTIONS**, **GRANTS**, **PROCEDURES**, **TABLES**, **TRIGGERS**,
+   and **VIEWS**.
 
 .. option:: --skip-blobs
 
@@ -156,8 +157,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

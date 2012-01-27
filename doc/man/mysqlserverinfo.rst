@@ -53,7 +53,7 @@ with the :option:`--format` option:
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
 
-To turn off the headers for **csv* or **tab** display format, specify
+To turn off the headers for **csv** or **tab** display format, specify
 the :option:`--no-headers` option.
 
 To see the common default settings for the local server's configuration
@@ -107,8 +107,8 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for a server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for a server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
    Use this option multiple times to see information for multiple servers.
 
 .. option:: --show-defaults, -d
@@ -129,8 +129,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

@@ -135,13 +135,13 @@ OPTIONS
 
 .. option:: --server1=<source>
 
-   Connection information for the first server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the first server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --server2=<source>
 
-   Connection information for the second server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the second server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
    
 .. option:: --show-reverse
 
@@ -154,8 +154,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

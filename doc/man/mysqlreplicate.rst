@@ -34,29 +34,25 @@ requires storage engines to be the same on the master and slave.
 The :option:`-vv` option displays any discrepancies between the storage
 engines and InnoDB values, with or without the :option:`--pedantic` option.
 
-The utility sets up replication to start from the current binary log file
-and position of the master. To start from the beginning of recorded events
-instead, use the :option:`--start-from-beginning` option.  To start
-replication from the first event in a specific binary log file on the
-master, use the :option:`--master-log-file` option.  To start replication
-from a specific binary log file and position, use the
-:option:`--master-log-file` and :option:`--master-log-pos` options. In
-summary, replication can be started using one of the following strategies.
+Replication can be started using one of the following strategies.
 
-Start from current position (default)
-  Start replication from last known binary log file and position from the
-  master. The utility uses the **SHOW MASTER STATUS** statement to retrieve
-  this information.
+Start from the current position (default)
+  Start replication from the current master binary log file and position. The
+  utility uses the **SHOW MASTER STATUS** statement to retrieve this
+  information.
 
 Start from the beginning
   Start replication from the first event recorded in the master binary log.
+  To do this, use the :option:`--start-from-beginning` option.
   
 Start from a binary log file
-  Start replication at the first event in a specific binary log file.
+  Start replication from the first event in a specific master binary log file.
+  To do this, use the :option:`--master-log-file` option.
   
 Start from a specific event
   Start replication from specific event coordinates (specific binary log file
-  and position).
+  and position). To do this, use the :option:`--master-log-file` and
+  :option:`--master-log-pos` options.
 
 OPTIONS
 -------
@@ -69,8 +65,8 @@ OPTIONS
 
 .. option:: --master=<master>
 
-   Connection information for the master server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the master server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --master-log-file=<master_log_file>
 
@@ -78,9 +74,8 @@ OPTIONS
 
 .. option:: --master-log-pos=<master_log_pos>
 
-   Begin replication from this position in the master log file specified
-   with the :option:`--master-log-file` option, which is required if you
-   use :option:`--master-log-pos`.
+   Begin replication from this position in the master log file. This option
+   is not valid unless :option:`--master-log-file` is given.
 
 .. option:: --pedantic, -p
 
@@ -94,13 +89,13 @@ OPTIONS
 
 .. option:: --slave=<slave>
 
-   Connection information for the slave server in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the slave server in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --start-from-beginning, -b
 
    Start replication at the beginning of events logged in the master binary
-   log. This option is not valid if :option:`--master-log-file` or
+   log. This option is not valid unless both :option:`--master-log-file` and
    :option:`--master-log-pos` are given.
 
 .. option:: --test-db=<test_database>
@@ -111,8 +106,9 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 

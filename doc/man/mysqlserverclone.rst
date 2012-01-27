@@ -58,18 +58,19 @@ OPTIONS
 
 .. option:: --root-password=<password>
 
-   The password for the root user of the new server instance.
+   The password for the ``root`` user of the new server instance.
 
 .. option:: --server=<source>
 
-   Connection information for the server to be cloned in the format:
-   <user>[:<passwd>]@<host>[:<port>][:<socket>]
+   Connection information for the server to be cloned in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
 
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug.
 
 .. option:: --version
 
@@ -85,7 +86,7 @@ EXAMPLES
 --------
 
 The following command demonstrates how to create a new instance of a running
-server, set the root password and enable binary logging::
+server, set the ``root`` user password and enable binary logging::
 
     $ mkdir /source/test123
     $ mysqlserverclone --server=root:pass@localhost \

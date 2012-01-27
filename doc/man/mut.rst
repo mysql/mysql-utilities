@@ -55,9 +55,9 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Use the server given by *server* in the tests. The format of
-   *server* is given in :ref:`connspec`. Use this option multiple times
-   to specify multiple servers.
+   Connection information for the server to use in the tests, in
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Use this option multiple times to specify multiple servers.
 
 .. option:: --skip-long
 
@@ -109,10 +109,10 @@ OPTIONS
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
-   multiple times to increase the amount of information.  For example, -v =
-   verbose, -vv = more verbose, -vvv = debug. To diagnose test execution
-   problems, use -vvv to display the actual results of test cases and ignore
-   result processing.
+   multiple times to increase the amount of information.  For example,
+   :option:`-v` = verbose, :option:`-vv` = more verbose, :option:`-vvv` =
+   debug. To diagnose test execution problems, use :option:`-vvv` to display
+   the actual results of test cases and ignore result processing.
 
 .. option:: --version
 
@@ -127,7 +127,7 @@ NOTES
 
 The connection specifier must name a valid account for the server.
 
-Any test named ???_template.py is skipped. This enables the developer
+Any test named *???_template.py* is skipped. This enables the developer
 to create a base class to import for a collection of tests based on a common
 code base.
 
