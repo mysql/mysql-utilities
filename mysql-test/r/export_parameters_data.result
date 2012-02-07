@@ -597,8 +597,8 @@ Test case 19 - GRID format with BRIEF display
 +----+----+
 #...done.
 Test case 20 - GRID format with FULL display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 +---------------------------------+
@@ -636,8 +636,8 @@ Test case 20 - GRID format with FULL display
 +----+----+
 #...done.
 Test case 21 - GRID format with NAMES display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 +---------------------------------+
@@ -701,8 +701,8 @@ c,d
 3,2
 #...done.
 Test case 23 - CSV format with FULL display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -728,8 +728,8 @@ c,d
 3,2
 #...done.
 Test case 24 - CSV format with NAMES display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -781,8 +781,8 @@ c	d
 3	2
 #...done.
 Test case 26 - TAB format with FULL display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -808,8 +808,8 @@ c	d
 3	2
 #...done.
 Test case 27 - TAB format with NAMES display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -882,8 +882,8 @@ Test case 28 - VERTICAL format with BRIEF display
 1 rows.
 #...done.
 Test case 29 - VERTICAL format with FULL display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 *************************       1. row *************************
@@ -930,8 +930,8 @@ Test case 29 - VERTICAL format with FULL display
 1 rows.
 #...done.
 Test case 30 - VERTICAL format with NAMES display
-# NOTE : --display is ignored for data export.
 # Source on localhost: ... connected.
+# NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 *************************       1. row *************************

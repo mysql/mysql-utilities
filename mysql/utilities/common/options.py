@@ -34,6 +34,7 @@ from optparse import Option as CustomOption, OptionValueError as ValueError
 
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
+_PERMITTED_RPL_DUMP = ["master", "slave"]
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -366,6 +367,80 @@ def add_regexp(parser):
                       action="store_true", default=False, help="use 'REGEXP' "
                       "operator to match pattern. Default is to use 'LIKE'.")
 
+
+def add_rpl_user(parser, default_val="rpl:rpl"):
+    """Add the --rpl-user option.
+
+    parser[in]        the parser instance
+    default_val[in]   default value for user, password
+                      Default = rpl, rpl
+    """
+    parser.add_option("--rpl-user", action="store", dest="rpl_user",
+                      type = "string", default=default_val,
+                      help="the user and password for the replication " 
+                           "user requirement - e.g. rpl:passwd " 
+                           "- default = %default")
+
+
+def add_rpl_mode(parser, do_both=True, add_file=True):
+    """Add the --rpl and --rpl-file options.
+
+    parser[in]        the parser instance
+    do_both[in]       if True, include the "both" value for the --rpl option
+                      Default = True
+    add_file[in]      if True, add the --rpl-file option
+                      Default = True
+    """
+    rpl_mode_both = ""
+    rpl_mode_options = _PERMITTED_RPL_DUMP
+    if do_both:
+        rpl_mode_options.append("both")
+        rpl_mode_both = ", and 'both' = include 'master' and 'slave' " + \
+                        "options where applicable"
+    parser.add_option("--rpl", "--replication", dest="rpl_mode", action="store",
+                      help="include replication information. Choices = 'master'"
+                      " = include the CHANGE MASTER command using source "
+                      "server as the mastert, 'slave' = include the CHANGE "
+                      "MASTER command using the destination server's master "
+                      "information%s." % rpl_mode_both,
+                      choices=rpl_mode_options)
+    if add_file:
+        parser.add_option("--rpl-file", "--replication-file", dest="rpl_file",
+                          action="store", help="path and file name to place the "
+                          "replication information generated. Valid on if the "
+                          "--rpl option is specified.")
+    
+    
+def check_rpl_options(parser, options):
+    """Check replication dump options for validity
+    
+    This method ensures the optional --rpl-* options are valid only when
+    --rpl is specified.
+    
+    parser[in]        the parser instance
+    options[in]       command options
+    """
+    if options.rpl_mode is None:
+        errors = []
+        if parser.has_option("--comment-rpl") and options.rpl_file is not None:
+            errors.append("--rpl-file")
+
+        if options.rpl_user is not None:
+            errors.append("--rpl-user")
+                    
+        # It's Ok if the options do not include --comment-rpl
+        if parser.has_option("--comment-rpl") and options.comment_rpl:
+            errors.append("--comment-rpl")
+        
+        if len(errors) > 1:
+            num_opt_str = "s"
+        else:
+            num_opt_str = ""
+
+        if len(errors) > 0:
+            parser.error("The %s option%s must be used with the --rpl "
+                         "option." % (", ".join(errors), num_opt_str))
+            
 
 def obj2sql(obj):
     """Convert a Python object to an SQL object.

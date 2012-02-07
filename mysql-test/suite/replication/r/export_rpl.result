@@ -1,0 +1,528 @@
+Test case 1 - rpl = master and lock_type = no-locks
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 2 - rpl = master and lock_type = lock-all
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 3 - rpl = master and lock_type = snapshot
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 4 - rpl = slave and lock_type = no-locks
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server's master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 5 - rpl = slave and lock_type = lock-all
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server's master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 6 - rpl = slave and lock_type = snapshot
+# Source on localhost: ... connected.
+STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server's master
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 7 - rpl = both and lock_type = no-locks
+# Source on localhost: ... connected.
+# STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+# CHANGE MASTER <goes here>
+# Connecting to the current server's master
+# CHANGE MASTER <goes here>
+# START SLAVE;
+Test case 8 - rpl = both and lock_type = lock-all
+# Source on localhost: ... connected.
+# STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+# CHANGE MASTER <goes here>
+# Connecting to the current server's master
+# CHANGE MASTER <goes here>
+# START SLAVE;
+Test case 9 - rpl = both and lock_type = snapshot
+# Source on localhost: ... connected.
+# STOP SLAVE;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS util_test;
+CREATE DATABASE util_test;
+USE util_test;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+#...done.
+USE util_test;
+# Exporting data from util_test
+# Data for table util_test.t1: 
+INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+# Data for table util_test.t2: 
+INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
+INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
+# Data for table util_test.t3: 
+INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
+INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
+INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
+# Data for table util_test.t4: 
+INSERT INTO util_test.t4 VALUES (3, 2);
+#...done.
+# Connecting to the current server as master
+# CHANGE MASTER <goes here>
+# Connecting to the current server's master
+# CHANGE MASTER <goes here>
+# START SLAVE;

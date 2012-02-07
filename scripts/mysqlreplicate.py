@@ -27,7 +27,7 @@ import sys
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, add_rpl_user
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.command.setup_rpl import setup_replication
 from mysql.utilities import VERSION_FRM
@@ -57,11 +57,7 @@ parser.add_option("--slave", action="store", dest="slave",
                   "the form: <user>:<password>@<host>:<port>:<socket>")
 
 # Replication user and password
-parser.add_option("--rpl-user", action="store", dest="rpl_user",
-                  type = "string", default="rpl:rpl",
-                  help="the user and password for the replication " 
-                       "user requirement - e.g. rpl:passwd " 
-                       "- default = %default")
+add_rpl_user(parser)
 
 # Pedantic mode for failing if storage engines differ
 parser.add_option("-p", "--pedantic", action="store_true", default=False,

@@ -202,7 +202,6 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-# Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
 # Data for table util_test.t1: 
@@ -381,7 +380,6 @@ GRANT TRIGGER ON util_test.* TO 'joe'@'user'
 # Grant:
 GRANT UPDATE ON util_test.* TO 'joe'@'user'
 #...done.
-# Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
 # Data for table util_test.t1: 

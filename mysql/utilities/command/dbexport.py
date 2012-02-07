@@ -21,11 +21,15 @@ This file contains the export operations that will export object metadata or
 table data.
 """
 
+import os
 import re
 import sys
-from mysql.utilities.exception import UtilDBError
+from mysql.utilities.exception import UtilError, UtilDBError
 
-def export_metadata(src_val, db_list, options):
+_RPL_COMMANDS, _RPL_FILE = 0, 1
+_RPL_PREFIX = "-- "
+
+def export_metadata(source, src_val, db_list, options):
     """Produce rows to be used to recreate objects in a database.
 
     This method retrieves the objects for each database listed in the form
@@ -33,6 +37,7 @@ def export_metadata(src_val, db_list, options):
     The valid values for the format parameter are SQL, CSV, TSV, VERTICAL,
     or GRID.
 
+    source[in]         Server instance
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -46,7 +51,6 @@ def export_metadata(src_val, db_list, options):
     """
 
     from mysql.utilities.common.database import Database
-    from mysql.utilities.common.server import connect_servers
     from mysql.utilities.common.format import format_tabular_list
     from mysql.utilities.common.format import format_vertical_list
 
@@ -62,14 +66,6 @@ def export_metadata(src_val, db_list, options):
     skip_funcs = options.get("skip_funcs", False)
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
-
-    conn_options = {
-        'quiet'     : quiet,
-        'version'   : "5.1.30",
-    }
-    servers = connect_servers(src_val, None, conn_options)
-
-    source = servers[0]
 
     if options.get("all", False):
         rows = source.get_all_databases()
@@ -275,7 +271,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
                             data_rows)
 
 
-def export_data(src_val, db_list, options):
+def export_data(source, src_val, db_list, options):
     """Produce data for the tables in a database.
 
     This method retrieves the data for each table in the databases listed in
@@ -283,6 +279,7 @@ def export_data(src_val, db_list, options):
     specified. The valid values for the format parameter are SQL, CSV, TSV,
     VERITCAL, or GRID.
 
+    source[in]         Server instance
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -295,11 +292,8 @@ def export_data(src_val, db_list, options):
     Returns bool True = success, False = error
     """
 
-    from mysql.utilities.command.dbcopy import get_copy_lock
     from mysql.utilities.common.database import Database
-    from mysql.utilities.common.lock import Lock
     from mysql.utilities.common.table import Table
-    from mysql.utilities.common.server import connect_servers
 
     format = options.get("format", "sql")
     no_headers = options.get("no_headers", True)
@@ -313,23 +307,13 @@ def export_data(src_val, db_list, options):
     skip_funcs = options.get("skip_funcs", False)
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
-    locking = options.get("locking", "snapshot")
-    my_lock = None
-
-    conn_options = {
-        'quiet'     : quiet,
-        'version'   : "5.1.30",
-    }
-    servers = connect_servers(src_val, None, conn_options)
-
-    source = servers[0]
 
     if options.get("all", False):
         rows = source.get_all_databases()
         for row in rows:
             if row[0] not in db_list:
                 db_list.append(row[0])
-
+                
     # Check if database exists and user permissions on source for all databases
     table_lock_list = []
     table_list = []
@@ -352,17 +336,11 @@ def export_data(src_val, db_list, options):
             
         source_db.check_read_access(src_val["user"], src_val["host"],
                                     access_options)
-        
+
         # Build table list
-        # if this is a lock-all type, find all tables for locking
         tables = source_db.get_db_objects("TABLE")
         for table in tables:
             table_list.append((db_name, table[0]))
-            if locking == 'lock-all':
-                table_lock_list.append(("%s.%s" % (db_name, table[0]),
-                                        'READ'))
-
-    my_lock = get_copy_lock(source, table_lock_list, options, True)        
         
     old_db = ""
     for table in table_list:
@@ -412,9 +390,199 @@ def export_data(src_val, db_list, options):
         if file_per_table:
             outfile.close()
   
-    my_lock.unlock()
-
     if not quiet:
         print "#...done."
 
     return True
+
+
+def get_change_master_command(source, options={}):
+    """Get the CHANGE MASTER command for export or copy of databases
+    
+    This method creates the replication commands based on the options chosen.
+    This includes the stop and start slave commands as well as the change
+    master command as follows.
+    
+    To create the CHANGE MASTER command for connecting to the existing server
+    as the master, set rpl_mode = 'master'.
+    
+    To create the CHANGE MASTER command for using the existing server as the
+    master, set rpl_mode = 'master'.
+    
+    You can also get both CHANGE MASTER commands by setting rpl_mode = 'both'.
+    In this case, the second change master command (rpl_mode = 'slave') will
+    be commented out.
+    
+    The method also checks the rpl_file option. If a file name is provided, it
+    is checked to see if file exists or the user does not have access, an error
+    is thrown. If no file is provided, the method writes the commands to
+    stdout.
+    
+    The user may also comment the replication commands by specifying the
+    comment_rpl option (True = comment).
+                   
+    The method calls the negotiate_rpl_connection method of the replication
+    module to create the CHANGE MASTER command. Additional error checking is
+    performed in that method as follows. See the negotiate_rpl_connection
+    method documentation for complete specifics.
+    
+      - binary log must be ON for a master
+      - the rpl_user must exist   
+            
+    source[in]         Server instance
+    options[in]        option dictionary
+
+    Returns tuple - CHANGE MASTER command[s], output file for writing commands
+    """
+
+    from mysql.utilities.common.replication import negotiate_rpl_connection
+
+    rpl_file = None
+    rpl_cmds = []
+    
+    rpl_filename = options.get("rpl_file", None)
+    rpl_mode = options.get("rpl_mode", "master")
+    quiet = options.get("quiet", False)
+    
+    # Check for rpl_file and empty it
+    if rpl_filename:
+        rpl_file = rpl_filename
+        try:
+            rf = open(rpl_filename, "w")
+        except:
+            raise UtilError("File inaccessible or bad path: %s" % rpl_filename)
+        rf.write("# Replication Commands:\n")
+        rf.close()
+
+    strict = rpl_mode == 'both' or options.get("strict", False)
+    # Get change master as if this server was a master
+    if rpl_mode in ["master", "both"]:
+        
+        if not quiet:
+            rpl_cmds.append("# Connecting to the current server as master")
+            
+        change_master = negotiate_rpl_connection(source, True, strict, options)
+
+        rpl_cmds.extend(change_master)
+
+    # Get change master using this slave's master information            
+    if rpl_mode in ["slave", "both"]:
+
+        if not quiet:
+            rpl_cmds.append("# Connecting to the current server's master")
+        
+        change_master = negotiate_rpl_connection(source, False, strict, options)
+            
+        rpl_cmds.extend(change_master)
+    
+    return (rpl_cmds, rpl_file)
+
+
+def write_commands(file, rows, options):
+    """Write commands to file or stdout
+    
+    This method writes the rows passed to either a file specified in the
+    rpl_file option or stdout if no file is specified.
+    
+    file[in]           filename to use or None for sys.stdout
+    rows[in]           rows to write
+    options[in]        replication options
+    """
+    
+    format = options.get("format", "sql")
+    rpl_filename = options.get("rpl_file", None)
+    quiet = options.get("quiet", False)
+    verbosity = options.get("verbosity", 0)
+    
+    # if using --rpl_file then open the file for append
+    if rpl_filename:
+        rpl_file = open(rpl_filename, "a")
+    else:
+        rpl_file = sys.stdout
+
+    if not quiet:
+        if verbosity:
+            rpl_file.write("#\n")
+
+    # calculate comment character
+    if options.get("comment_rpl", False) or \
+       options.get("rpl_mode", "master") == "both":
+        prefix_str = "# "
+    else:
+        prefix_str = ""
+        
+    # write rows
+    for row in rows:
+        if row[0] == '#':
+            rpl_file.write("{0}\n".format(row))
+        else:
+            if format != 'sql':
+                prefix_str += _RPL_PREFIX
+            rpl_file.write("{0}{1}\n".format(prefix_str, row))
+        
+    if not quiet:
+        if verbosity:
+            rpl_file.write("#\n")
+
+    # if using --rpl_file then close the file
+    if rpl_filename:
+        rpl_file.close()
+    
+
+def export_databases(server_values, db_list, options):
+    """Export one or more databases
+    
+    This method performs the export of a list of databases first dumping the
+    definitions then the data. It supports dumping replication commands (STOP
+    SLAVE, CHANGE MASTER, START SLAVE) for exporting data for use in
+    replication scenarios.
+    
+    server_values[in]      server connection value dictionary
+    db_list[in]            list of database names
+    options[in]            option dictionary
+                           Must include the skip_* options for copy and export
+    """
+    
+    from mysql.utilities.command.dbcopy import get_copy_lock
+    from mysql.utilities.common.server import connect_servers
+
+    export = options.get("export", "definitions")
+    rpl_mode = options.get("rpl_mode", "master")
+    quiet = options.get("quiet", False)
+    verbosity = options.get("verbosity", 0)
+    locking = options.get("locking", "snapshot")
+    
+    conn_options = {
+        'quiet'     : quiet,
+        'version'   : "5.1.30",
+    }
+    servers = connect_servers(server_values, None, conn_options)
+    source = servers[0]
+    
+    # Lock tables first
+    my_lock = get_copy_lock(source, db_list, options, True)
+
+    # if --rpl specified, write initial replication command
+    if rpl_mode:
+        rpl_info = get_change_master_command(source, options)
+        write_commands(rpl_info[_RPL_FILE], ["STOP SLAVE;"], options)
+        
+    # dump metadata
+    if export in ("definitions", "both"):
+        export_metadata(source, server_values, db_list, options)
+        
+    # dump data
+    if export in ("data", "both"):
+        if options.get("display", "brief") != "brief":
+            print "# NOTE : --display is ignored for data export."
+        export_data(source, server_values, db_list, options)
+        
+    # if --rpl specified, write replication end command
+    if rpl_mode:
+        write_commands(rpl_info[_RPL_FILE], rpl_info[_RPL_COMMANDS],
+                                options)
+        write_commands(rpl_info[_RPL_FILE], ["START SLAVE;"], options)
+
+    my_lock.unlock()
+
+

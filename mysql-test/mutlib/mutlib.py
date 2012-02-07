@@ -836,7 +836,7 @@ class System_test(object):
         #
         # Now convert the diff to a string list and write reject file
         #
-        rej_fname = os.path.normpath(os.path.join("./r", name + ".reject"))
+        rej_fname = os.path.normpath(os.path.join(self.res_dir, name + ".reject"))
         rej_file = open(rej_fname, 'w+')
         rej_list = []
         try:

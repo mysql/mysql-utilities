@@ -91,6 +91,43 @@ altogether or **lock-all** to use only table locks. The default value is
 **snapshot**. Additionally, the utility uses WRITE locks to lock the
 destination tables during the copy.
 
+You can include replication commands for exporting data among a master and
+slave or between slaves. The :option:`--rpl` permits you to select from the
+following replication commands to include in the export.
+
+**master**
+  Include the CHANGE MASTER command to start a new slave with the current
+  server acting as the master. This will place the appropriate STOP and
+  START slave commands in the export whereby the STOP SLAVE command is placed
+  at the start of the export and the CHANGE MASTER followed by the START SLAVE
+  command are placed after the export stream.
+    
+**slave**
+  Include the CHANGE MASTER command to start a new slave using the current
+  server's master information. This will place the appropriate STOP and
+  START slave commands in the export whereby the STOP SLAVE command is placed
+  at the start of the export and the CHANGE MASTER followed by the START SLAVE
+  command are placed after the export stream.
+  
+**both**
+  Include both the 'master' and 'slave' information for CHANGE MASTER commands
+  for either spawning a new slave with the current server's master or using the
+  current server as the master. All commands generated are labeled and
+  commented to allow the user to choose which to include when imported.
+
+If you wish to include the replication user in the CHANGE MASTER command, you
+can use the :option:`--rpl-user` option to specify the user and password. If
+this option is omitted, the utility will attempt to identify the replication
+user. In the event there are multiple candidates or the user requires a
+password, these statements will be placed inside comments for the CHANGE MASTER
+command.
+
+You can also use the :option:`--comment-rpl` to place the replication commands
+inside comments for later examination.
+
+If you specify the :option:`--rpl-file`, the utility will write the replication
+commands to the file specified instead of including them in the export stream.
+
 OPTIONS
 -------
 
@@ -104,6 +141,11 @@ OPTIONS
 
    Use bulk insert statements for data.
 
+.. option:: --comment-rpl
+
+   Place the replication statements in comment statements. Valid only with
+   --rpl option.
+ 
 .. option:: --display=<display>, -d<display>
 
    Control the number of columns shown. Permitted display values are **brief**
@@ -165,6 +207,23 @@ OPTIONS
    Perform pattern matches using the **REGEXP** operator. The default is
    to use **LIKE** for matching.
 
+.. option:: --rpl=<dump_option>, --replication=<dump_option>
+
+   Include replication information. Choices = 'master' = include the CHANGE
+   MASTER command using source server as the mastert, 'slave' = include the
+   CHANGE MASTER command using the destination server's master information, and
+   'both' = include 'master' and 'slave' options where applicable.
+
+.. option:: --rpl-file=RPL_FILE, --replication-file=RPL_FILE
+
+   Path and file name to place the replication information generated. Valid on
+   if the --rpl option is specified.
+
+.. option:: --rpl-user=<user[:password]>
+
+   The user and password for the replication user requirement - e.g. rpl:passwd
+   - default = rpl:rpl.
+ 
 .. option:: --server=<server>
 
    Connection information for the server in
@@ -317,6 +376,97 @@ command::
     INSERT INTO util_test.t4 VALUES  (3, 2);
     #...done.
 
+If you want to export a database and include the replication commands to use
+the current server as the master, for example, to start a new slave using the
+current server as the master, use the following command.::
+
+    $ mysqldbexport --server=root@localhost:3311 util_test \
+      --export=both --rpl-user=rpl:rpl --rpl=master -v
+    # Source on localhost: ... connected.
+    #
+    # Stopping slave
+    STOP SLAVE;
+    #
+    # Source on localhost: ... connected.
+    # Exporting metadata from util_test
+    DROP DATABASE IF EXISTS util_test;
+    CREATE DATABASE util_test;
+    USE util_test;
+    # TABLE: util_test.t1
+    CREATE TABLE `t1` (
+      `a` char(30) DEFAULT NULL
+    ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+    #...done.
+    # Source on localhost: ... connected.
+    USE util_test;
+    # Exporting data from util_test
+    # Data for table util_test.t1: 
+    INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+    #...done.
+    #
+    # Connecting to the current server as master
+    CHANGE MASTER TO MASTER_HOST = 'localhost', 
+      MASTER_USER = 'rpl', 
+      MASTER_PASSWORD = 'rpl', 
+      MASTER_PORT = 3311, 
+      MASTER_LOG_FILE = 'clone-bin.000001' , 
+      MASTER_LOG_POS = 106;
+    #
+    # Starting slave
+    START SLAVE;
+    #
+
+Similarly, if you want to export a database and include the replication
+commands to use the current server's master, for example, to start a new
+slave using the same the master, use the following command.::
+
+    $ mysqldbexport --server=root@localhost:3311 util_test \
+      --export=both --rpl-user=rpl:rpl --rpl=slave -v
+    # Source on localhost: ... connected.
+    #
+    # Stopping slave
+    STOP SLAVE;
+    #
+    # Source on localhost: ... connected.
+    # Exporting metadata from util_test
+    DROP DATABASE IF EXISTS util_test;
+    CREATE DATABASE util_test;
+    USE util_test;
+    # TABLE: util_test.t1
+    CREATE TABLE `t1` (
+      `a` char(30) DEFAULT NULL
+    ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+    #...done.
+    # Source on localhost: ... connected.
+    USE util_test;
+    # Exporting data from util_test
+    # Data for table util_test.t1: 
+    INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
+    INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
+    #...done.
+    #
+    # Connecting to the current server's master
+    CHANGE MASTER TO MASTER_HOST = 'localhost', 
+      MASTER_USER = 'rpl', 
+      MASTER_PASSWORD = 'rpl', 
+      MASTER_PORT = 3310, 
+      MASTER_LOG_FILE = 'clone-bin.000001' , 
+      MASTER_LOG_POS = 1739;
+    #
+    # Starting slave
+    START SLAVE;
+    #
 
 COPYRIGHT
 ---------

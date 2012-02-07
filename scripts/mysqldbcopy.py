@@ -34,7 +34,8 @@ from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.common.options import add_all, check_all, add_locking
-from mysql.utilities.common.options import add_regexp
+from mysql.utilities.common.options import add_regexp, add_rpl_mode
+from mysql.utilities.common.options import check_rpl_options, add_rpl_user
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -109,6 +110,12 @@ add_locking(parser)
 # Add regexp
 add_regexp(parser)
 
+# Replication user and password
+add_rpl_user(parser, None)
+
+# Add replication options but don't include 'both'
+add_rpl_mode(parser, False, False)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -155,6 +162,9 @@ options = {
     "all"              : opt.all,
     "locking"          : opt.locking,
     "use_regexp"       : opt.use_regexp,
+    "rpl_user"         : opt.rpl_user,
+    "rpl_mode"         : opt.rpl_mode,
+    "verbosity"        : opt.verbosity,
 }
 
 # Parse source connection values
@@ -169,6 +179,14 @@ try:
 except:
     parser.error("Destination connection values invalid or cannot be parsed.")
 
+# Check to see if attempting to use --rpl on the same server
+if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:
+    parser.error("You cannot use the --rpl option for copying on the "
+                 "same server.")
+
+# Check replication options
+check_rpl_options(parser, opt)
+    
 # Build list of databases to copy
 db_list = []
 for db in args:

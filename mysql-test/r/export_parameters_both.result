@@ -66,7 +66,6 @@ Test case 1 - GRID format with BRIEF display
 | 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 +---------------------------------+
@@ -172,7 +171,6 @@ Test case 2 - GRID format with FULL display
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 +---------------------------------+
@@ -276,7 +274,6 @@ Test case 3 - GRID format with NAMES display
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 +---------------------------------+
@@ -360,7 +357,6 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
 #...done.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -433,7 +429,6 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',UPDATE,util_test,,,
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -504,7 +499,6 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',UPDATE,util_test,,,
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -576,7 +570,6 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
 #...done.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -649,7 +642,6 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	UPDATE	util_test			
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -720,7 +712,6 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	UPDATE	util_test			
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 a
@@ -1083,7 +1074,6 @@ Test case 10 - VERTICAL format with BRIEF display
    ROUTINE_NAME: None
 18 rows.
 #...done.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 *************************       1. row *************************
@@ -1598,7 +1588,6 @@ Test case 11 - VERTICAL format with FULL display
 18 rows.
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 *************************       1. row *************************
@@ -1804,7 +1793,6 @@ Test case 12 - VERTICAL format with NAMES display
 18 rows.
 #...done.
 # NOTE : --display is ignored for data export.
-# Source on localhost: ... connected.
 # Exporting data from util_test
 # Data for table util_test.t1: 
 *************************       1. row *************************
@@ -1899,7 +1887,6 @@ DROP DATABASE IF EXISTS wesaysocorp;
 CREATE DATABASE wesaysocorp;
 USE wesaysocorp;
 #...done.
-# Source on localhost: ... connected.
 USE util_test;
 # Exporting data from util_test
 # Data for table util_test.t1: 

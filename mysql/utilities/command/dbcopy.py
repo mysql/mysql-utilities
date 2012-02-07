@@ -24,7 +24,10 @@ is exactly the same among two servers.
 import sys
 from mysql.utilities.exception import UtilError
 
-def get_copy_lock(server, table_lock_list, options, include_mysql=False):
+_RPL_COMMANDS, _RPL_FILE = 0, 1
+
+def get_copy_lock(server, db_list, options, include_mysql=False,
+                  cloning=False):
     """Get an instance of the Lock class with a standard copy (read) lock
     
     This method creates an instance of the Lock class using the lock type
@@ -32,18 +35,56 @@ def get_copy_lock(server, table_lock_list, options, include_mysql=False):
     and related operations.
     
     server[in]             Server instance for locking calls
-    table_lock_list[in]    List of tables in form (db.name, type)
-                           Example = [('db1.t1', 'READ')]
+    db_list[in]            list of database names
     options[in]            option dictionary
                            Must include the skip_* options for copy and export
     include_mysql[in]      if True, include the mysql tables for copy operation
+    cloning[in]            if True, create lock tables with WRITE on dest db
+                           Default = False
     
     Returns Lock - Lock class instance
     """
+
+    from mysql.utilities.common.database import Database
     from mysql.utilities.common.lock import Lock
 
-    # if this is a lock-all type, find all tables and lock them
-    if options.get('locking', 'snapshot') == 'lock-all':
+    rpl_mode = options.get("rpl_mode", None)
+    locking = options.get('locking', 'snapshot')
+    table_lock_list = []
+    
+    # Determine if we need to use FTWRL. There are two conditions:
+    #  - running on master (rpl_mode = 'master')
+    #  - using locking = 'lock-all' and rpl_mode present
+    if (rpl_mode in ["master", "both"]) or (rpl_mode and locking == 'lock-all'):
+        new_opts = options.copy()
+        new_opts['locking'] = 'flush'
+        lock = Lock(server, [], new_opts)
+
+    # if this is a lock-all type and not replication operation,
+    # find all tables and lock them
+    elif locking == 'lock-all':
+        table_lock_list = []
+
+        # Build table lock list
+        for db_name in db_list:
+            db = db_name[0] if type(db_name) == tuple else db_name
+            source_db = Database(server, db)
+            tables = source_db.get_db_objects("TABLE")
+            for table in tables:
+                table_lock_list.append(("%s.%s" % (db, table[0]),
+                                        'READ'))
+                # Cloning requires issuing WRITE locks because we use same conn.
+                # Non-cloning will issue WRITE lock on a new destination conn.
+                if cloning:
+                    if db_name[1] is None:
+                        db_clone = db_name[0]
+                    else:
+                        db_clone = db_name[1]
+                    # For cloning, we use the same connection so we need to
+                    # lock the destination tables with WRITE.
+                    table_lock_list.append(("%s.%s" % (db_clone, table[0]),
+                                            'WRITE'))
+                    
         # Now add mysql tables
         if include_mysql:
             # Don't lock proc tables if no procs of funcs are being read
@@ -55,9 +96,11 @@ def get_copy_lock(server, table_lock_list, options, include_mysql=False):
             if not options.get('skip_events', False):
                 table_lock_list.append(("mysql.event", 'READ'))
         lock = Lock(server, table_lock_list, options)
+
+    # Use default or no locking option
     else:
         lock = Lock(server, [], options)
-
+       
     return lock
 
 
@@ -132,7 +175,9 @@ def copy_db(src_val, dest_val, db_list, options):
     from mysql.utilities.common.database import Database
     from mysql.utilities.common.options import check_engine_options
     from mysql.utilities.common.server import connect_servers
+    from mysql.utilities.command.dbexport import get_change_master_command
 
+    verbose = options.get("verbose", False)
     quiet = options.get("quiet", False)
     skip_views = options.get("skip_views", False)
     skip_procs = options.get("skip_procs", False)
@@ -142,6 +187,9 @@ def copy_db(src_val, dest_val, db_list, options):
     skip_data = options.get("skip_data", False)
     skip_triggers = options.get("skip_triggers", False)
     skip_tables = options.get("skip_tables", False)
+    locking = options.get("locking", "snapshot")
+
+    rpl_info = ([], None)
 
     conn_options = {
         'quiet'     : quiet,
@@ -172,7 +220,6 @@ def copy_db(src_val, dest_val, db_list, options):
     #  - Check to see if executing on same server but same db name (error)
     #  - Build list of tables to lock for copying data (if no skipping data)
     #  - Check storage engine compatibility
-    table_lock_list = []
     for db_name in db_list:
         source_db = Database(source, db_name[0])
         if destination is None:
@@ -198,19 +245,6 @@ def copy_db(src_val, dest_val, db_list, options):
         dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                    access_options)
 
-        # Build table list
-        if not skip_data and options.get('locking', 'snapshot') == 'lock-all':
-            tables = source_db.get_db_objects("TABLE")
-            for table in tables:
-                table_lock_list.append(("%s.%s" % (db_name[0], table[0]),
-                                        'READ'))
-                # Cloning requires issuing WRITE locks because we use same conn.
-                # Non-cloning will issue WRITE lock on a new destination conn.
-                if cloning:
-                    # For cloning, we use the same connection so we need to
-                    # lock the destination tables with WRITE.
-                    table_lock_list.append(("%s.%s" % (db, table[0]), 'WRITE'))
-
         # Error is source db and destination db are the same and we're cloning
         if destination == source and db_name[0] == db_name[1]:
             raise UtilError("Destination database name is same as "
@@ -227,17 +261,33 @@ def copy_db(src_val, dest_val, db_list, options):
                              options.get("def_engine", None),
                              False, options.get("quiet", False))
 
+    # Get replication commands if rpl_mode specified.
+    # if --rpl specified, dump replication initial commands
+    if options.get("rpl_mode", None):
+        new_opts = options.copy()
+        new_opts['multiline'] = False
+        new_opts['strict'] = True
+        rpl_info = get_change_master_command(src_val, new_opts)
+        destination.exec_query("STOP SLAVE;")
 
     # Copy objects
     # We need to delay trigger and events to after data is loaded
     new_opts = options.copy()
     new_opts['skip_triggers'] = True
     new_opts['skip_events'] = True
+    
+    # Get the table locks unless we are cloning with lock-all
+    if not (cloning and locking == 'lock-all'):
+        my_lock = get_copy_lock(source, db_list, options, True)
+
     _copy_objects(source, destination, db_list, new_opts)
+
+    # If we are cloning, take the write locks prior to copying data
+    if cloning and locking == 'lock-all':
+        my_lock = get_copy_lock(source, db_list, options, True, cloning)
 
     # Copy data
     if not skip_data and not skip_tables:
-        my_lock = get_copy_lock(source, table_lock_list, options, True)
     
         # Copy tables
         for db_name in db_list:
@@ -250,10 +300,10 @@ def copy_db(src_val, dest_val, db_list, options):
             db.copy_data(db_name[1], options, destination,
                          options.get("threads", False))
             
+    # if cloning with lock-all unlock here to avoid system table lock conflicts
+    if cloning and locking == 'lock-all':
         my_lock.unlock()
 
-    # TODO: Refactor with sub methods!
-      
     # Create triggers for all databases
     if not skip_triggers:
         new_opts = options.copy()
@@ -277,6 +327,19 @@ def copy_db(src_val, dest_val, db_list, options):
         new_opts['skip_grants'] = True
         new_opts['skip_create'] = True
         _copy_objects(source, destination, db_list, new_opts, False, False)
+
+    if not (cloning and locking == 'lock-all'):
+        my_lock.unlock()
+
+    if options.get("rpl_mode", None):
+        for cmd in rpl_info[_RPL_COMMANDS]:
+            if cmd[0] == '#' and not quiet:
+                print cmd
+            else:
+                if verbose:
+                    print cmd
+                destination.exec_query(cmd)
+        destination.exec_query("START SLAVE;")
 
     if not quiet:
         print "#...done."

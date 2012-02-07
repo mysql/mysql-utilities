@@ -318,7 +318,7 @@ class Database(object):
         """
 
         if self.verbose:
-            print "Dropping new object %s %s.%s" % \
+            print "# Dropping new object %s %s.%s" % \
                   (obj_type, self.new_db, name)
         drop_str = "DROP %s %s.%s" % \
                    (obj_type, self.new_db, name)

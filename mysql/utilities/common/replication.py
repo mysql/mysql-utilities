@@ -43,6 +43,18 @@ _PRINT_WIDTH = 75
 
 _MASTER_DO_DB, _MASTER_IGNORE_DB = 2, 3
 
+_RPL_USER_QUERY = """
+    SELECT user, host, password = "" as has_password
+    FROM mysql.user
+    WHERE repl_slave_priv = 'Y'
+"""
+
+_WARNING = "# WARNING: %s"
+_MASTER_BINLOG = "Server '%s' does not have binary logging turned on."
+_NO_RPL_USER = "No --rpl-user specified and multiple users found with " + \
+               "replication privileges."
+_RPL_USER_PASS = "No --rpl-user specified and the user found with " + \
+                 "replication privileges requires a password."
 
 def _get_list(rows, cols):
     """Return a list of information in GRID format to stdout.
@@ -58,6 +70,128 @@ def _get_list(rows, cols):
     ostream = StringIO.StringIO()
     format_tabular_list(ostream, cols, rows)
     return ostream.getvalue().splitlines()
+    
+    
+def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
+    """Determine replication connection
+    
+    This method attempts to determine if it is possible to build a CHANGE
+    MASTER command based on the server passed. If it is possible, the method
+    will return a CHANGE MASTER command. If there are errors and the strict
+    option is turned on, it will throw errors if there is something missing.
+    Otherwise, it will return the CHANGE MASTER command with warnings.
+        
+    If the server is a master, the following error checks will be performed.
+    
+      - if binary log is turned OFF, and strict = False, a warning message
+        is added to the strings returned else an error is thrown
+        
+      - if the rpl_user option is missing, the method attempts to find a
+        replication user. If more than one user is found or none are found, and
+        strict = False, a warning message is added to the strings returned else
+        an error is thrown
+        
+      - if a replication user is found but the user requires a password,
+        the MASTER_USER and MASTER_PASSWORD options are commented out
+    
+    Note: the CHANGE MASTER command is formatted whereby each option is
+          separated by a newline and indented two spaces
+          
+    Note: the make_change_master method does not support SSL connections
+    
+    server[in]        a Server class instance
+    is_master[in]     if True, the server is acting as a master
+                      Default = True
+    strict[in]        if True, raise exception on errors
+                      Default = True
+    options[in]       replication options including rpl_user, quiet, multiline
+
+    Returns list - strings containing the CHANGE MASTER command
+    """
+
+    rpl_mode = options.get("rpl_mode", "master")
+    rpl_user = options.get("rpl_user", None)
+    quiet = options.get("quiet", False)
+
+    # Copy options and add connected server    
+    new_opts = options.copy()
+    new_opts["conn_info"] = server
+
+    master_values = {}
+    change_master = []
+    
+    # If server is a master, perform error checking
+    if is_master:    
+        master = Master(new_opts)
+        master.connect()
+    
+        # Check master for binlog
+        if not master.binlog_enabled():
+            raise UtilError("Master must have binary logging turned on.")
+        else:
+            # Check rpl user
+            if rpl_user is None and not quiet:
+                # Try to find the replication user
+                res = master.get_rpl_users()
+                if len(res) > 1:
+                    uname = ""
+                    passwd = ""
+                    # Throw error if strict but not for rpl_mode = both
+                    if strict and not rpl_mode == 'both':
+                        raise UtilRplError(_NO_RPL_USER)
+                    else:
+                        change_master.append(_WARNING % _NO_RPL_USER)
+                else:
+                    uname = res[0][0]
+                    if res[0][2]:
+                        # Throw error if strict but not for rpl_mode = both
+                        if strict and not rpl_mode == 'both':
+                            raise UtilRplError(_RPL_USER_PASS)
+                        else:
+                            change_master.append(_WARNING % _RPL_USER_PASS)
+                    passwd = res[0][1]
+            else:
+                try:
+                    uname, passwd = rpl_user.split(":")
+                except:
+                    uname = rpl_user
+                    passwd = ''
+                    
+                # Check replication user privileges
+                errors = master.check_rpl_user(uname, master.host)
+                if errors != []:
+                    raise UtilError(errors[0])
+                
+            res = master.get_status()
+            if not res:
+               raise UtilError("Cannot retrieve master status.")
+                   
+            # Need to get the master values for the make_change_master command
+            master_values = {
+                'Master_Host'          : master.host,
+                'Master_Port'          : master.port,
+                'Master_User'          : uname,
+                'Master_Password'      : passwd,
+                'Master_Log_File'      : res[0][0],
+                'Read_Master_Log_Pos'  : res[0][1],
+            }
+
+    # Use slave class to get change master command 
+    slave = Slave(new_opts)
+    slave.connect()
+    cm_cmd = slave.make_change_master(False, master_values)
+
+    if rpl_user is None and uname == "" and not quiet:
+        cm_cmd = cm_cmd.replace("MASTER_PORT", "# MASTER_USER = '', "
+                                "# MASTER_PASSWORD = '', MASTER_PORT")
+    
+    if options.get("multiline", False):
+        cm_cmd = cm_cmd.replace(", ", ", \n  ") + ";"
+        change_master.extend(cm_cmd.split("\n"))
+    else:
+        change_master.append(cm_cmd + ";")
+        
+    return change_master
 
 
 class Replication(object):
@@ -635,6 +769,16 @@ class Master(Server):
                 rows.append(('master', do_db, ignore_db))
 
         return rows
+    
+    
+    def get_rpl_users(self, options={}):
+        """Attempts to find the users who have the REPLICATION SLAVE privilege
+        
+        options[in]    query options
+
+        Returns tuple list - (string, string, bool) = (user, host, has_password)
+        """
+        return self.exec_query(_RPL_USER_QUERY, options)
 
 
     def reset(self, options={}):
@@ -741,7 +885,7 @@ class Slave(Server):
         res = self.get_status()
         if res == []:
             return False
-        return True
+        return res[0][10].upper() == "YES"
 
 
     def get_state(self):
@@ -973,7 +1117,11 @@ class Slave(Server):
             
         Returns string - CHANGE MASTER command
         """
-        if self.is_connected():
+        if master_values == {} and not self.is_connected():
+            raise UtilRplError("Cannot generate CHANGE MASTER command. The "
+                               "slave is not connected to a master and no "
+                               "master information was provided.")
+        elif self.is_connected():
             filename = self.options.get("master_info", "master.info")
             master_info = self.get_master_info(filename, True)
             if master_info is None and master_values == {}:
@@ -1005,11 +1153,13 @@ class Slave(Server):
                                             master_info['Read_Master_Log_Pos'])
             
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % master_host
-        change_master += "MASTER_USER = '%s', " % master_user
-        change_master += "MASTER_PASSWORD = '%s', " % master_passwd
+        if master_user:
+            change_master += "MASTER_USER = '%s', " % master_user
+        if master_passwd:
+            change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
         if not from_beginning:
-            change_master += ", MASTER_LOG_FILE = '%s' " % master_log_file
+            change_master += ", MASTER_LOG_FILE = '%s'" % master_log_file
             if master_log_pos >= 0:
                 change_master += ", MASTER_LOG_POS = %s" % master_log_pos
             

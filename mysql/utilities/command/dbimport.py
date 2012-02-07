@@ -36,6 +36,8 @@ _IMPORT_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT,
 _DEFINITION_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT]
 _BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP"]
 _DATA_COMMANDS = ["INSERT", "UPDATE"]
+_RPL_COMMANDS = ["START", "STOP", "CHANGE"]
+_RPL_PREFIX = "-- "
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
@@ -53,7 +55,7 @@ def _read_row(file, format, skip_comments=False):
     if format == "sql":
         # Easiest - just read a row and return it.
         for row in file.readlines():
-            if row[0] != '#':
+            if row[0] != '#' and row[0:2] != "--":
                 yield row.strip('\n')
     elif format == "vertical":
         # This format is a bit trickier. We need to read a set of rows that
@@ -71,6 +73,12 @@ def _read_row(file, format, skip_comments=False):
         header = []
         data_row = []
         for row in file.readlines():
+            # Process replication commands
+            if row[0:len(_RPL_PREFIX)] == _RPL_PREFIX:
+                # find first word
+                first_word = row[len(_RPL_PREFIX):row.find(' ')].upper()
+                if first_word in _RPL_COMMANDS:
+                    yield row
             # Skip comment rows
             if row[0] == '#':
                 if len(header) > 0:
@@ -131,11 +139,21 @@ def _read_row(file, format, skip_comments=False):
             separator = "|"
         csv_reader = csv.reader(file, delimiter=separator)
         for row in csv_reader:
-            if format == "grid":
+            # find first word
+            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX:
+                rpl = len(_RPL_PREFIX)
+                first_word = row[0][rpl:rpl+row[0][rpl:].find(' ')].upper()
+            else:
+                first_word = ""
+            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX and \
+                first_word in _RPL_COMMANDS:
+                yield row
+            elif format == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
                         continue
-                    elif row[0][0] == '#' and not skip_comments:
+                    elif (row[0][0] == '#' or row[0][0:2] == "--") and \
+                         not skip_comments:
                         yield row
                 else:
                     new_row = []
@@ -143,8 +161,9 @@ def _read_row(file, format, skip_comments=False):
                         new_row.append(col.strip())
                     yield new_row
             else:
-                if len(row[0]) == 0 or row[0][0] != '#' or \
-                   row[0][0] == '#' and not skip_comments:
+                if (len(row[0]) == 0 or row[0][0] != '#' or \
+                    row[0][0:2] != "--") or ((row[0][0] == '#' or \
+                    row[0][0:2] == "--") and not skip_comments):
                     yield row
 
 
@@ -214,6 +233,12 @@ def read_next(file, format, no_headers=False):
                     yield (cmd_type, sql_cmd)
                 cmd_type = "sql"
                 sql_cmd = row
+            elif first_word in _RPL_COMMANDS:
+                if len(sql_cmd) > 0:
+                    #yield goes here
+                    yield (cmd_type, sql_cmd)
+                cmd_type = "RPL_COMMAND"
+                sql_cmd = row
             elif first_word in _DATA_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
@@ -227,6 +252,17 @@ def read_next(file, format, no_headers=False):
         table_rows = []
         found_obj = ""
         for row in _read_row(file, format, False):
+            # find first word
+            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX:
+                rpl = len(_RPL_PREFIX)
+                first_word = row[0][rpl:rpl+row[0][rpl:].find(' ')].upper()
+            else:
+                first_word = ""
+            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX and \
+                first_word in _RPL_COMMANDS:
+                new_row = ", ".join(row)
+                yield("RPL_COMMAND", new_row[len(_RPL_PREFIX):])
+                continue
             # Check to see if we have a marker for rows of objects or data
             for obj in _IMPORT_LIST:
                 if _check_for_object_list(row[0], obj):
@@ -249,11 +285,11 @@ def read_next(file, format, no_headers=False):
                 continue
             else:
                 # We're reading rows here
-                if len(row[0]) > 0 and row[0][0] == "#":
+                if len(row[0]) > 0 and (row[0][0] == "#" or row[0][0:2] == "--"):
                     continue
                 else:
                     yield (cmd_type, row)
-        if row[0][0] != "#":
+        if row[0][0] != "#" and row[0][0:2] != "--":
             yield (cmd_type, row)
 
 
@@ -495,8 +531,10 @@ def _build_create_objects(obj_type, db, definitions):
                 tbl = "*"
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, db, tbl, user)
             create_strings.append(create_str)
+        elif obj_type == "RPL_COMMAND":
+            create_strings.append([defn])
         else:
-            raise UtilError("Unknown object type discovered: %s", obj_type)
+            raise UtilError("Unknown object type discovered: %s" % obj_type)
     return create_strings
 
 
@@ -806,9 +844,15 @@ def import_file(dest_val, file_name, options):
     statements = []
     table_col_list = []
     tbl_name = ""
+    skip_rpl = options.get("skip_rpl", False)
 
     # Read the file one object/definition group at a time
     for row in read_next(file, format):
+        # Check for replication command
+        if row[0] == "RPL_COMMAND":
+            if not skip_rpl:
+                statements.append(row[1])
+            continue
         # If this is the first pass, get the database name from the file
         if get_db:
             if skip_header:
@@ -833,7 +877,7 @@ def import_file(dest_val, file_name, options):
 
             dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                        access_options)
-
+            
         # Now check to see if we want definitions, data, or both:
         if row[0] == "sql" or row[0] in _DEFINITION_LIST:
             if format != "sql" and len(row[1]) == 1:

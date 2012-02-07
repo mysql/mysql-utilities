@@ -96,6 +96,10 @@ parser.add_option("--dryrun", action="store_true", dest="dryrun",
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
                   default=False, help="do not import blob data.")
 
+# Skip replication commands
+parser.add_option("--skip-rpl", action="store_true", dest="skip_rpl",
+                  default=False, help="do not execute replication commands.")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -156,6 +160,7 @@ options = {
     "debug"         : opt.verbosity >= 3,
     "new_engine"    : opt.new_engine,
     "def_engine"    : opt.def_engine,
+    "skip_rpl"      : opt.skip_rpl,
 }
 
 # Parse server connection values

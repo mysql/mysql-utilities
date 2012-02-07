@@ -27,13 +27,14 @@ import re
 import sys
 import time
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command import dbexport
+from mysql.utilities.command.dbexport import export_databases
 from mysql.utilities.common.options import parse_connection, add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.options import add_format_option, add_rpl_mode
 from mysql.utilities.common.options import add_all, check_all, add_locking
+from mysql.utilities.common.options import add_rpl_user, check_rpl_options
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -126,6 +127,17 @@ add_regexp(parser)
 # Add locking
 add_locking(parser)
 
+# Replication user and password
+add_rpl_user(parser, None)
+
+# Add replication options
+add_rpl_mode(parser)
+
+# Add comment replication output
+parser.add_option("--comment-rpl", action="store_true", default=False,
+                  dest="comment_rpl", help="place the replication statements "
+                  "in comment statements. Valid only with --rpl option.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -142,6 +154,9 @@ except UtilError, e:
 if len(args) == 0 and not opt.all:
     parser.error("You must specify at least one database to export or "
                  "use the --all option to export all databases.")
+
+# Check replication options
+check_rpl_options(parser, opt)
     
 # Fail if we have arguments and all databases option listed.
 check_all(parser, opt, args, "databases")
@@ -181,6 +196,11 @@ options = {
     "all"              : opt.all,
     "use_regexp"       : opt.use_regexp,
     "locking"          : opt.locking,
+    "rpl_user"         : opt.rpl_user,
+    "rpl_mode"         : opt.rpl_mode,
+    "rpl_file"         : opt.rpl_file,
+    "comment_rpl"      : opt.comment_rpl,
+    "export"           : opt.export,
 }
 
 # Parse server connection values
@@ -198,14 +218,14 @@ try:
     # record start time
     if opt.verbosity >= 3:
         start_test = time.time()
-    if opt.export in ("definitions", "both"):
-        dbexport.export_metadata(server_values, db_list, options)
-    if opt.export in ("data", "both"):
-        if opt.display != "brief":
-            print "# NOTE : --display is ignored for data export."
-        dbexport.export_data(server_values, db_list, options)
+        
+    # Export all databases specified
+    export_databases(server_values, db_list, options)
+        
+    # record elapsed time
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
+
 except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)

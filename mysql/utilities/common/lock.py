@@ -34,6 +34,7 @@ _START_TRANSACTION = "START TRANSACTION WITH CONSISTENT SNAPSHOT"
 _LOCK_WARNING = "WARNING: Lock in progress. You must call unlock() " + \
                 "to unlock your tables."
 
+_FLUSH_TABLES_READ_LOCK = "FLUSH TABLES WITH READ LOCK"
 
 class Lock(object):
     
@@ -46,13 +47,15 @@ class Lock(object):
            - (default) use consistent read with a single transaction
            - lock all tables without consistent read and no transaction
            - no locks, no transaction, no consistent read
+           - flush (replication only) - issue a FTWRL command
 
         server[in]         Server instance of server to run locks
         table_list[in]     list of tuples (table_name, lock_type)
         options[in]        dictionary of options
-                           locking = [snapshot|lock-all|no-locks],
+                           locking = [snapshot|lock-all|no-locks|flush],
                            verbosity int
-                           silent book 
+                           silent bool
+                           rpl_mode string
         """
         self.locked = False
         self.silent = options.get('silent', False)
@@ -94,6 +97,12 @@ class Lock(object):
         elif self.locking == 'snapshot':
             self.server.exec_query(_SESSION_ISOLATION_LEVEL)
             self.server.exec_query(_START_TRANSACTION)
+            
+        # Execute a FLUSH TABLES WITH READ LOCK for replication uses only
+        elif self.locking == 'flush' and options.get("rpl_mode", None):
+            if self.verbosity >= 3 and not self.silent:
+                print "# LOCK STRING: %s" % _FLUSH_TABLES_READ_LOCK
+            self.server.exec_query(_FLUSH_TABLES_READ_LOCK)
 
         else:
             raise UtilError("Invalid locking type: '%s'." % self.locking)

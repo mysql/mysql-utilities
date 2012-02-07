@@ -1,0 +1,8 @@
+Test case 1 - error: --rpl-user=root but no --rpl
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: You cannot use the --rpl option for copying on the same server.
+Test case 2 - error: using --rpl with cloning
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: You cannot use the --rpl option for copying on the same server.

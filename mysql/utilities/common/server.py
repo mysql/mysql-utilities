@@ -389,7 +389,8 @@ class Server(object):
         try:
             self.host = conn_values["host"]
             self.user = conn_values["user"]
-            self.passwd = conn_values["passwd"]
+            self.passwd = conn_values["passwd"] \
+                          if "passwd" in conn_values else None
             self.socket = conn_values["unix_socket"] \
                           if "unix_socket" in conn_values else None
             self.port = 3306

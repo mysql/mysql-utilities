@@ -223,7 +223,16 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-
+        # Check --rpl option errors        
+        test_num = 23        
+        cmd_str = "mysqldbcopy.py %s %s util_test " % (to_conn, from_conn)
+        comment = "Test case %s - error: %s but no --rpl" % \
+                  (test_num, "--rpl-user=root")
+        res = self.run_test_case(2, cmd_str + "--rpl-user=root", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+            
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")

@@ -1,0 +1,23 @@
+Test case 1 - error: --rpl=both
+Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy.py: error: option --rpl: invalid choice: 'both' (choose from 'master', 'slave')
+Test case 2 - warning: --rpl-user missing
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+ERROR: No --rpl-user specified and multiple users found with replication privileges.
+Test case 3 - error: --rpl-user missing user
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+ERROR: The replication user missing@localhost was not found on the master.
+Test case 4 - error: --rpl-user missing privileges
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+ERROR: Replication user does not have the correct privilege. She needs 'REPLICATION SLAVE' on all replicated databases.
+Test case 5 - error: slave not connected
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+ERROR: Cannot generate CHANGE MASTER command. The slave is not connected to a master and no master information was provided.
+Test case 6 - error: no binlog
+# Source on localhost: ... connected.
+ERROR: Master must have binary logging turned on.

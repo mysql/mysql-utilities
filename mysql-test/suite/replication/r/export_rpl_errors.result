@@ -1,0 +1,39 @@
+Test case 1 - error: --rpl-file=test.txt but no --rpl
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport.py: error: The --rpl-file option must be used with the --rpl option.
+Test case 2 - error: --comment-rpl but no --rpl
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport.py: error: The --comment-rpl option must be used with the --rpl option.
+Test case 3 - error: --rpl-user=root but no --rpl
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport.py: error: The --rpl-user option must be used with the --rpl option.
+Test case 4 - error: --rpl-file=test.txt --comment-rpl --rpl-user=root but no --rpl
+Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport.py: error: The --rpl-file, --rpl-user, --comment-rpl options must be used with the --rpl option.
+Test case 5 - error: --rpl-file bad path
+# Source on localhost: ... connected.
+ERROR: File inaccessible or bad path: /bad/path/not/there.atall
+Test case 6 - warning: --rpl-user missing
+# Source on localhost: ... connected.
+STOP SLAVE;
+#...done.
+# Connecting to the current server as master
+# WARNING: No --rpl-user specified and multiple users found with replication privileges.
+CHANGE MASTER <goes here>
+START SLAVE;
+Test case 7 - error: --rpl-user missing user
+# Source on localhost: ... connected.
+ERROR: The replication user missing@localhost was not found on the master.
+Test case 8 - error: --rpl-user missing privileges
+# Source on localhost: ... connected.
+ERROR: Replication user does not have the correct privilege. She needs 'REPLICATION SLAVE' on all replicated databases.
+Test case 9 - error: slave not connected
+# Source on localhost: ... connected.
+ERROR: Cannot generate CHANGE MASTER command. The slave is not connected to a master and no master information was provided.
+Test case 10 - error: no binlog
+# Source on localhost: ... connected.
+ERROR: Master must have binary logging turned on.
