@@ -91,42 +91,44 @@ altogether or **lock-all** to use only table locks. The default value is
 **snapshot**. Additionally, the utility uses WRITE locks to lock the
 destination tables during the copy.
 
-You can include replication commands for exporting data among a master and
-slave or between slaves. The :option:`--rpl` permits you to select from the
-following replication commands to include in the export.
+You can include replication statements for exporting data among a master and
+slave or between slaves. The :option:`--rpl` option permits you to select
+from the following replication statements to include in the export.
 
 **master**
-  Include the CHANGE MASTER command to start a new slave with the current
-  server acting as the master. This will place the appropriate STOP and
-  START slave commands in the export whereby the STOP SLAVE command is placed
-  at the start of the export and the CHANGE MASTER followed by the START SLAVE
-  command are placed after the export stream.
+  Include the **CHANGE MASTER** statement to start a new slave with the current
+  server acting as the master. This places the appropriate STOP and
+  START slave statements in the export whereby the **STOP SLAVE** statement is
+  placed at the start of the export and the **CHANGE MASTER** followed by the
+  **START SLAVE** statements are placed after the export stream.
     
 **slave**
-  Include the CHANGE MASTER command to start a new slave using the current
-  server's master information. This will place the appropriate STOP and
-  START slave commands in the export whereby the STOP SLAVE command is placed
-  at the start of the export and the CHANGE MASTER followed by the START SLAVE
-  command are placed after the export stream.
+  Include the **CHANGE MASTER** statement to start a new slave using the
+  current server's master information. This places the appropriate STOP and
+  START slave statements in the export whereby the **STOP SLAVE** statment is
+  placed at the start of the export and the **CHANGE MASTER** followed by
+  the **START SLAVE** statements are placed after the export stream.
   
 **both**
-  Include both the 'master' and 'slave' information for CHANGE MASTER commands
-  for either spawning a new slave with the current server's master or using the
-  current server as the master. All commands generated are labeled and
-  commented to allow the user to choose which to include when imported.
+  Include both the 'master' and 'slave' information for **CHANGE MASTER**
+  statements for either spawning a new slave with the current server's master
+  or using the current server as the master. All statements generated are
+  labeled and commented to enable the user to choose which to include when
+  imported.
 
-If you wish to include the replication user in the CHANGE MASTER command, you
-can use the :option:`--rpl-user` option to specify the user and password. If
-this option is omitted, the utility will attempt to identify the replication
-user. In the event there are multiple candidates or the user requires a
-password, these statements will be placed inside comments for the CHANGE MASTER
-command.
+To include the replication user in the **CHANGE MASTER** statement,
+use the :option:`--rpl-user` option to specify the user and password. If
+this option is omitted, the utility attempts to identify the replication
+user. In the event that there are multiple candidates or the user requires a
+password, these statements are placed inside comments for the **CHANGE
+MASTER** statement.
 
-You can also use the :option:`--comment-rpl` to place the replication commands
-inside comments for later examination.
+You can also use the :option:`--comment-rpl` option to place the replication
+statements inside comments for later examination.
 
-If you specify the :option:`--rpl-file`, the utility will write the replication
-commands to the file specified instead of including them in the export stream.
+If you specify the :option:`--rpl-file` option, the utility writes the
+replication statements to the file specified instead of including them
+in the export stream.
 
 OPTIONS
 -------
@@ -144,7 +146,7 @@ OPTIONS
 .. option:: --comment-rpl
 
    Place the replication statements in comment statements. Valid only with
-   --rpl option.
+   the :option:`--rpl` option.
  
 .. option:: --display=<display>, -d<display>
 
@@ -209,20 +211,21 @@ OPTIONS
 
 .. option:: --rpl=<dump_option>, --replication=<dump_option>
 
-   Include replication information. Choices = 'master' = include the CHANGE
-   MASTER command using source server as the mastert, 'slave' = include the
-   CHANGE MASTER command using the destination server's master information, and
-   'both' = include 'master' and 'slave' options where applicable.
+   Include replication information. Permitted values are **master** (include
+   the **CHANGE MASTER** statement using the source server as the master),
+   **slave** (include the **CHANGE MASTER** statement using the destination
+   server's master information), and **both** (include the **master** and
+   **slave** options where applicable).
 
 .. option:: --rpl-file=RPL_FILE, --replication-file=RPL_FILE
 
-   Path and file name to place the replication information generated. Valid on
-   if the --rpl option is specified.
+   The path and file name where the generated replication information should
+   be written. Valid only with the :option:`--rpl` option.
 
 .. option:: --rpl-user=<user[:password]>
 
-   The user and password for the replication user requirement - e.g. rpl:passwd
-   - default = rpl:rpl.
+   The user and password for the replication user requirement; for example,
+   ``rpl:passwd``. The default is ``rpl:rpl``.
  
 .. option:: --server=<server>
 
@@ -376,9 +379,9 @@ command::
     INSERT INTO util_test.t4 VALUES  (3, 2);
     #...done.
 
-If you want to export a database and include the replication commands to use
-the current server as the master, for example, to start a new slave using the
-current server as the master, use the following command.::
+To export a database and include the replication commands to use
+the current server as the master (for example, to start a new slave using the
+current server as the master), use the following command::
 
     $ mysqldbexport --server=root@localhost:3311 util_test \
       --export=both --rpl-user=rpl:rpl --rpl=master -v
@@ -422,9 +425,9 @@ current server as the master, use the following command.::
     START SLAVE;
     #
 
-Similarly, if you want to export a database and include the replication
-commands to use the current server's master, for example, to start a new
-slave using the same the master, use the following command.::
+Similarly, to export a database and include the replication
+commands to use the current server's master (for example, to start a new
+slave using the same the master), use the following command::
 
     $ mysqldbexport --server=root@localhost:3311 util_test \
       --export=both --rpl-user=rpl:rpl --rpl=slave -v
