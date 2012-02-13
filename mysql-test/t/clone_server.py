@@ -19,32 +19,15 @@ class test(mutlib.System_test):
         self.new_server = None
         return True
     
-    def run(self):
-        cmd_str = "mysqlserverclone.py --server=%s " % \
-                  self.build_connection_string(self.servers.get_server(0))
-       
-        port1 = int(self.servers.get_next_port())
-        cmd_str += " --new-port=%d --root-password=root " % port1
+    def check_connect(self, port, full_datadir, name="cloned_server"):
 
-        comment = "Test case 1 - clone the current servers[0]"
-        self.results.append(comment+"\n")
-        full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
-        cmd_str += "--new-data=%s " % full_datadir
-        res = self.exec_util(cmd_str, "start.txt")
-        for line in open("start.txt").readlines():
-            # Don't save lines that have [Warning]
-            index = line.find("[Warning]")
-            if index <= 0:
-                self.results.append(line)
-        if res:
-            raise MUTLibError("%s: failed" % comment)
-       
+        new_server = None
         # Create a new instance
         conn = {
             "user"   : "root",
             "passwd" : "root",
             "host"   : "localhost",
-            "port"   : port1,
+            "port"   : port,
             "unix_socket" : full_datadir + "/mysql.sock"
         }
         if os.name != "posix":
@@ -52,21 +35,76 @@ class test(mutlib.System_test):
         
         server_options = {
             'conn_info' : conn,
-            'role'      : "cloned_server",
+            'role'      : name,
         }
-        self.new_server = Server(server_options)
-        if self.new_server is None:
-            return False
+        new_server = Server(server_options)
+        if new_server is None:
+            return None
         
         # Connect to the new instance
         try:
-            self.new_server.connect()
+            new_server.connect()
         except MUTLibError, e:
-            self.new_server = None
             raise MUTLibError("Cannot connect to spawned server.")
-            return False
+        
+        return new_server
+
+    def run(self):
+        self.server0 = self.servers.get_server(0)
+        cmd_str = "mysqlserverclone.py --server=%s " % \
+                  self.build_connection_string(self.server0)
+       
+        port1 = int(self.servers.get_next_port())
+        cmd_str += " --new-port=%d --root-password=root " % port1
+
+        comment = "Test case 1 - clone a running server"
+        self.results.append(comment+"\n")
+        full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
+        cmd_str += "--new-data=%s " % full_datadir
+        res = self.exec_util(cmd_str, "start.txt")
+        for line in open("start.txt").readlines():
+            # Don't save lines that have [Warning]
+            if "[Warning]" in line:
+                continue
+            self.results.append(line)
+        if res:
+            raise MUTLibError("%s: failed" % comment)
+       
+        self.new_server = self.check_connect(port1, full_datadir)
+
+        basedir = ""
+        # Get basedir
+        rows = self.server0.exec_query("SHOW VARIABLES LIKE 'basedir'")
+        if not rows:
+            raise UtilError("Unable to determine basedir of running server.")
+
+        basedir = rows[0][1]
+        port2 = int(self.servers.get_next_port())
+        cmd_str = "mysqlserverclone.py --root-password=root "
+        cmd_str += "--new-port=%d --basedir=%s " % (port2, basedir)
+
+        comment = "Test case 2 - clone a server from basedir"
+        self.results.append(comment+"\n")
+        full_datadir = os.path.join(os.getcwd(), "temp_%s" % port2)
+        cmd_str += "--new-data=%s " % full_datadir
+        res = self.exec_util(cmd_str, "start.txt")
+        for line in open("start.txt").readlines():
+            # Don't save lines that have [Warning]
+            if "[Warning]" in line:
+                continue
+            self.results.append(line)
+        if res:
+            raise MUTLibError("%s: failed" % comment)
+       
+        server = self.check_connect(port2, full_datadir,
+                                    "cloned_server_basedir")
+        
+        self.servers.stop_server(server)
+        self.servers.clear_last_port()
         
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
+        self.replace_result("# Cloning the MySQL server located at",
+                            "# Cloning the MySQL server located at XXXX\n")
         
         return True
 

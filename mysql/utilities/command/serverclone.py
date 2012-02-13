@@ -71,17 +71,32 @@ def clone_server(conn_val, options):
     verbosity = options.get('verbosity', 0)
     quiet = options.get('quiet', False)
     cmd_file = options.get('cmd_file', None)
-    
-    # Try to connect to the MySQL database server.
-    server1_options = {
-        'conn_info' : conn_val,
-        'role'      : "source",
-    }
-    server1 = Server(server1_options)
-    server1.connect()
 
-    if not quiet:
-        print "# Cloning the MySQL server running on %s." % conn_val["host"]
+    # Clone running server    
+    if conn_val is not None:
+        # Try to connect to the MySQL database server.
+        server1_options = {
+            'conn_info' : conn_val,
+            'role'      : "source",
+        }
+        server1 = Server(server1_options)
+        server1.connect()
+    
+        if not quiet:
+            print "# Cloning the MySQL server running on %s." % conn_val["host"]
+    
+        basedir = ""
+        # Get basedir
+        rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
+        if not rows:
+            raise UtilError("Unable to determine basedir of running server.")
+        basedir = rows[0][1]
+
+    # Cloning downed or offline server
+    else:
+        basedir = options.get("basedir", None)
+        if not quiet:
+            print "# Cloning the MySQL server located at %s." % basedir
 
     # If datadir exists, delete it
     if os.path.exists(new_data):
@@ -96,25 +111,20 @@ def clone_server(conn_val, options):
         except:
             raise UtilError("Unable to create directory '%s'" % new_data)
 
-    basedir = ""
-    # Get basedir
     if not quiet:
         print "# Configuring new instance..."
-    rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
-    if rows:
-        basedir = rows[0][1]
-    else:
-        raise UtilError("Unable to determine basedir of running server.")
-
-    if not quiet:
         print "# Locating mysql tools..."
+
     mysqld_path = get_tool_path(basedir, "mysqld")
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
     mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys",
                                   False, False)
     mysql_basedir = basedir
-    if os.path.exists(basedir + "local/mysql/share/"):
-        mysql_basedir += "local/mysql/"
+    if os.path.exists(os.path.join(basedir, "local/mysql/share/")):
+        mysql_basedir = os.path.join(mysql_basedir, "local/mysql/")
+    # for source trees
+    elif os.path.exists(os.path.join(basedir, "/sql/share/english/")):
+        mysql_basedir = os.path.join(mysql_basedir, "/sql/")
     system_tables = get_tool_path(basedir, "mysql_system_tables.sql", False)
     system_tables_data = get_tool_path(basedir,
                                         "mysql_system_tables_data.sql", False)
@@ -214,7 +224,7 @@ def clone_server(conn_val, options):
     conn = {
         "user"   : "root",
         "passwd" : "",
-        "host"   : conn_val["host"],
+        "host"   : conn_val["host"] if conn_val is not None else "localhost",
         "port"   : port_int,
         "unix_socket" : new_sock
     }

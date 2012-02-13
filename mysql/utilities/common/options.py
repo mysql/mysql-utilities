@@ -84,7 +84,8 @@ class CaseInsensitiveChoicesOption(CustomOption):
 
 
 def setup_common_options(program_name, desc_str, usage_str,
-                         append=False, server=True):
+                         append=False, server=True,
+                         server_default="root@localhost:3306"):
     """Setup option parser and options common to all MySQL Utilities.
 
     This method creates an option parser and adds options for user
@@ -98,6 +99,8 @@ def setup_common_options(program_name, desc_str, usage_str,
                        (default = False)
     server[in]         If True, add the --server option
                        (default = True)
+    server_default[in] Default value for option
+                       (default = "root@localhost:3306")
 
     Returns parser object
     """
@@ -120,7 +123,7 @@ def setup_common_options(program_name, desc_str, usage_str,
                               "<socket>")
         else:
             parser.add_option("--server", action="store", dest="server",
-                              type = "string", default="root@localhost:3306",
+                              type = "string", default=server_default,
                               help="connection information for the server in "
                               "the form: <user>:<password>@<host>:<port>:"
                               "<socket>")

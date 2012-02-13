@@ -38,7 +38,7 @@ USAGE = "%prog --server=user:pass@host:port:socket --new-data=/tmp/data2 " \
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE)
+                              DESCRIPTION, USAGE, False, True, None)
 
 # Setup utility-specific options:
 
@@ -73,8 +73,16 @@ parser.add_option("--write-command", "-w", action="store", dest='cmd_file',
 # Add verbosity and quiet mode
 add_verbosity(parser, True)
 
+# Add --basedir option
+parser.add_option("--basedir", action="store", dest="basedir", default=None,
+                  type="string", help="the base directory for the server")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Can only use --basedir and --datadir if --server is missing
+if opt.basedir is not None and opt.server is not None:
+    parser.error("Cannot use the --basedir and --server options together.")
 
 # Fail if no database path specified.
 if opt.new_data is None:
@@ -94,13 +102,27 @@ options = {
     'verbosity'      : opt.verbosity,
     'quiet'          : opt.quiet,
     'cmd_file'       : opt.cmd_file,
+    'basedir'        : opt.basedir,
 }
 
-# Parse source connection values
-try:
-    conn = parse_connection(opt.server)
-except:
-    parser.error("Source connection values invalid or cannot be parsed.")
+# Expand user paths and resolve relative paths
+if opt.new_data and opt.new_data[0] == '~':
+    options['new_data'] = os.path.expanduser(opt.new_data)
+if opt.basedir and opt.basedir[0] == '~':
+    options['basedir'] = os.path.expanduser(opt.basedir)
+if opt.new_data and opt.new_data[0] == '.':
+    options['new_data'] = os.path.abspath(opt.new_data)
+if opt.basedir and opt.basedir[0] == '.':
+    options['basedir'] = os.path.abspath(opt.basedir)
+
+# Parse source connection values if we have a running server
+if opt.basedir is None:
+    try:
+        conn = parse_connection(opt.server)
+    except:
+        parser.error("Source connection values invalid or cannot be parsed.")
+else:
+    conn = None
 
 try:
     res = serverclone.clone_server(conn, options)

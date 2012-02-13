@@ -32,6 +32,8 @@ def _add_basedir(search_paths, path_str):
     path_str[in]        The basedir path to append
     """
     search_paths.append(path_str)
+    search_paths.append(os.path.join(path_str, "sql"))       # for source trees
+    search_paths.append(os.path.join(path_str, "client"))    # for source trees
     search_paths.append(os.path.join(path_str, "share"))
     search_paths.append(os.path.join(path_str, "scripts"))
     search_paths.append(os.path.join(path_str, "bin"))
