@@ -60,28 +60,29 @@ altogether or **lock-all** to use only table locks. The default value is
 **snapshot**. Additionally, the utility uses WRITE locks to lock the
 destination tables during the copy.
 
-You can include replication commands for copying data among a master and
-slave or between slaves. The :option:`--rpl` permits you to select from the
-following replication commands to include in the export.
+You can include replication statements for copying data among a master and
+slave or between slaves. The :option:`--rpl` option permits you to select
+from the following replication statements to include in the export.
 
 **master**
-  Include the CHANGE MASTER command to start a new slave with the current
-  server acting as the master. This will execute the appropriate STOP and START
-  slave commands. The STOP SLAVE command is executed at the start of the copy
-  and the CHANGE MASTER followed by the START SLAVE command are executed after
-  the copy.
+  Include the **CHANGE MASTER** statement to start a new slave with the current
+  server acting as the master. This executes the appropriate STOP and START
+  slave statements. The **STOP SLAVE** statement is executed at the start of
+  the copy and the **CHANGE MASTER** followed by the **START SLAVE** statements
+  are executed after the copy.
     
 **slave**
-  Include the CHANGE MASTER command to start a new slave using the current
-  server's master information. This will execute the appropriate STOP and START
-  slave commands. The STOP SLAVE command is executed at the start of the copy
-  and the CHANGE MASTER followed by the START SLAVE command are after the copy.
+  Include the **CHANGE MASTER** statement to start a new slave using the
+  current server's master information. This executes the appropriate STOP and
+  START slave statements. The STOP SLAVE statement is executed at the start of
+  the copy and the **CHANGE MASTER** followed by the **START SLAVE** statements
+  follow the copy.
   
-If you wish to include the replication user in the CHANGE MASTER command, you
-can use the :option:`--rpl-user` option to specify the user and password. If
-this option is omitted, the utility will attempt to identify the replication
-user. In the event there are multiple candidates or the user requires a
-password, the utility will abort with an error.
+To include the replication user in the **CHANGE MASTER** statement,
+use the :option:`--rpl-user` option to specify the user and password. If
+this option is omitted, the utility attempts to identify the replication
+user. In the event that there are multiple candidates or the user requires a
+password, the utility aborts with an error.
 
 OPTIONS
 -------
@@ -141,10 +142,11 @@ OPTIONS
 
 .. option:: --rpl=<dump_option>, --replication=<dump_option>
 
-   Include replication information. Choices = 'master' = include the CHANGE
-   MASTER command using source server as the mastert, 'slave' = include the
-   CHANGE MASTER command using the destination server's master information, and
-   'both' = include 'master' and 'slave' options where applicable.
+   Include replication information. Permitted values are **master** (include
+   the **CHANGE MASTER** statement using the source server as the master),
+   **slave** (include the **CHANGE MASTER** statement using the destination
+   server's master information), and **both** (include the **master** and
+   **slave** options where applicable).
 
 .. option:: --rpl-user=<user[:password]>
 
@@ -210,8 +212,8 @@ Some option combinations may result in errors during the
 operation.  For example, eliminating tables but not views may result
 in an error a the view is copied.
 
-The :option:`--rpl` is not valid for copying databases on the same server. An
-error will be generated.
+The :option:`--rpl` option is not valid for copying databases on the same
+server. An error will be generated.
 
 EXAMPLES
 --------
@@ -271,9 +273,9 @@ command::
     # Copying GRANTS from util_test
     #...done.
     
-If you want to copy one or more databases from a master to a slave, you can use
+To copy one or more databases from a master to a slave, you can use
 the following command to copy the databases. Use the master as the source and
-the slave as the destination.::
+the slave as the destination::
 
     $ mysqldbcopy --source=root@localhost:3310 \
       --destination=root@localhost:3311 test123 --rpl=master \
@@ -289,10 +291,10 @@ the slave as the destination.::
     # Starting slave
     #...done.
 
-If you want to copy a database from one slave to another attached to the same
+To copy a database from one slave to another attached to the same
 master, you can use the following command using the slave with the database to
 be copied as the source and the slave where the database needs to copied to as
-the destination.
+the destination::
 
     $ mysqldbcopy --source=root@localhost:3311 \
       --destination=root@localhost:3312 test123 --rpl=slave \
