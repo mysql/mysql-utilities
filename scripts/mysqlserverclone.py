@@ -129,3 +129,5 @@ try:
 except exception.UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
+    
+exit()

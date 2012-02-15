@@ -102,3 +102,5 @@ except EmptyResultError as details:
 except Exception as details:
     print >>sys.stderr, 'ERROR:', details
     exit(2)
+
+exit()
