@@ -154,6 +154,10 @@ OPTIONS
 
    Do not import ``BLOB`` data.
 
+.. option:: --skip-rpl
+
+   Do not execute replication commands.
+
 .. option:: --verbose, -v
 
    Specify how much information to display. Use this option
