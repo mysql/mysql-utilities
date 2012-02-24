@@ -5,6 +5,7 @@ Command-Line Utilities
 
 .. toctree::
 
+   overview
    mysqldbcompare
    mysqldbcopy
    mysqldbimport
