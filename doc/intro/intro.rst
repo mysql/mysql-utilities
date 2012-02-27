@@ -4,8 +4,6 @@
 Introduction to MySQL Utilities
 ###############################
 
-.. toctree::
-
 What are the MySQL Utilities?
 -----------------------------
 

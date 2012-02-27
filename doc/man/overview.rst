@@ -4,8 +4,6 @@
 Brief overview of command-line utilities
 ########################################
 
-.. toctree::
-
 This is a brief overview of the MySQL command-line utilities. See their 
 respective manual pages for further details and examples:
 

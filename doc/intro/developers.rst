@@ -4,8 +4,6 @@
 Introduction to extending the MySQL Utilities
 #############################################
 
-.. toctree::
-
 Administration and maintenance on the MySQL server can at times be
 complicated. Sometimes tasks require tedious or even repetitive operations
 that can be time consuming to type and re-type. For these reasons and more,
