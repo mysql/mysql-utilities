@@ -1,4 +1,4 @@
-.. intro-index:
+.. `developers`:
 
 #############################################
 Introduction to extending the MySQL Utilities
