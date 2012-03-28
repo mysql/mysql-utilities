@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,14 +100,21 @@ class Server_list(object):
         if servers is None:
             self.server_list = []
 
+
+    def view_next_port(self):
+        """View the next available server port but don't consume it.
+        """
+        return self.new_port
+    
+    
     def get_next_port(self):
         """Get the next available server port.
         """
         new_port = self.new_port
         self.new_port += 1
         return new_port
-    
-    
+
+
     def clear_last_port(self):
         """Return last port used to available status.
         """
@@ -188,7 +195,7 @@ class Server_list(object):
         cmd += " --new-port=%s " % port
         cmd += "--new-id=%s " % server_id
         cmd += "--new-data=%s " % os.path.normpath(full_datadir)
-        if parameters:
+        if parameters is not None:
             cmd += "--mysqld=%s" % parameters
             
         res = _exec_util(cmd, "cmd.txt", self.utildir)
@@ -265,15 +272,21 @@ class Server_list(object):
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
 
+        # disconnect user
+        server.disconnect()
+        
         # Stop the server
-        f_out = open("temp.txt", 'w+')
+        file = os.devnull
+        f_out = open(file, 'w')
         proc = subprocess.Popen(cmd, shell=True,
                                 stdout = f_out, stderr = f_out)
-        ret_val = proc.wait()                
+        ret_val = proc.wait()
         f_out.close()
+        
+        # if shutdown doesn't work, exit.
+        if int(ret_val) != 0:
+            return False
 
-        os.unlink("temp.txt")
-                
         # If datadir exists, delete it
         if drop:
             delete_directory(datadir)
@@ -336,14 +349,27 @@ class Server_list(object):
     def shutdown_spawned_servers(self):
         """Shutdown all spawned servers.
         """
+        import subprocess
         for server in self.server_list:
-            if server[1]:
+            if server[1] and server[0] is not None and server[0].is_alive():
                 try:
                     print "  Shutting down server %s..." % server[0].role,
-                    self.stop_server(server[0])
-                    print "success."
+                    if self.stop_server(server[0]):
+                        print "success."
+                    elif server[2] is not None:
+                        print "WARN - attempting SIGTERM - pid = %s" % server[2] 
+                        # try signal termination
+                        if os.name == "posix":
+                            retval = os.kill(server[2],
+                                             subprocess.signal.SIGTERM)
+                        else:
+                            retval = subprocess.Popen("taskkill /F /T /PID %i" %
+                                                      server[2],
+                                                      shell=True)
+                    else:
+                        print "ERROR"
                 except MUTLibError, e:
-                    print "ERROR!"
+                    print "ERROR"
                     print "    Unable to shutdown server %s." % server[0].role
             
             
@@ -356,7 +382,20 @@ class Server_list(object):
         """
         if new_server is not None:
             self.server_list.append((new_server, spawned, id))
-                        
+
+
+    def remove_server(self, name):
+        """Remove a server from the server lists.
+        
+        name[in]           Name (role) of the server to remove.
+        """
+        index = self.find_server_by_name(name)
+        if index == -1:
+            return False
+        self.server_list.pop(index)
+        return True
+    
+
     def num_servers(self):
         """Return number of servers in the list.
         """
@@ -513,7 +552,37 @@ class System_test(object):
         """
         for result in self.results:
             del result
+
             
+    def check_gtid_unsafe(self, on = False):
+        """Check for gtid enabled base server
+        
+        If on is True, method ensures server0 has the server variable
+        DISABLE_GTID_UNSAFE_STATEMENTS=ON, else if on is False, method ensures
+        server0 does not have DISABLE_GTID_UNSAFE_STATEMENTS=ON.
+        
+        Returns bool - False if no DISABE_GTID_UNSAFE_STATEMENTS variable
+                       found, else throws exception if criteria not met.
+        """
+        if on:
+            # Need servers with DISABLE_GTID_UNSAFE_STATEMENTS
+            self.server0 = self.servers.get_server(0)
+            res = self.server0.show_server_variable("DISABLE_GTID_UNSAFE_"
+                                                    "STATEMENTS")
+            if res != [] and res[0][1] != "ON":
+                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_STATEMENTS"
+                                  " = ON")
+        else:
+            # Need servers without DISABLE_GTID_UNSAFE_STATEMENTS
+            self.server0 = self.servers.get_server(0)
+            res = self.server0.show_server_variable("DISABLE_GTID_UNSAFE_"
+                                                    "STATEMENTS")
+            if res != [] and res[0][1] == "ON":
+                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_STATEMENTS"
+                                  " = OFF or a server prior to version 5.6.5.")
+
+        return False
+
 
     def exec_util(self, cmd, file_out, abspath=False):
         """Execute Utility

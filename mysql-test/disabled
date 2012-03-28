@@ -7,3 +7,5 @@
 # main.example, This is a test (bug#xxxxx)
 #
 main.copy_db_multithreaded, Does not run on all platforms. Need to move to an optional performance suite.
+replication.failover, Does not run on all platforms. Need better test to test interactive consoles.
+replication.failover_instances, Does not run on all platforms. Need better test to test interactive consoles.

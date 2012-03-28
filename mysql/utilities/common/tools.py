@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ This module contains methods for working with mysql server tools.
 """
 
 import os
+import sys
 import shutil
 
 def _add_basedir(search_paths, path_str):
@@ -39,6 +40,7 @@ def _add_basedir(search_paths, path_str):
     search_paths.append(os.path.join(path_str, "bin"))
     search_paths.append(os.path.join(path_str, "libexec"))    
     search_paths.append(os.path.join(path_str, "mysql"))    
+
 
 def get_tool_path(basedir, tool, fix_ext=True, required=True):
     """Search for a MySQL tool and return the full path
@@ -75,6 +77,7 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True):
         
     return None
 
+
 def delete_directory(dir):
     """Remove a directory (folder) and its contents.
     
@@ -94,4 +97,49 @@ def delete_directory(dir):
                 i += 1
         else:
             shutil.rmtree(dir, True)
+
+
+def execute_script(run_cmd, file=None):
+    """Execute a script.
+    
+    This method spawns a subprocess to execute a script. If a file is
+    specified, it will direct output to that file else it will suppress
+    all output from the script.
+    
+    run_cmd[in]        command/script to execute
+    file[in]           file path name to file, os.stdout, etc.
+                       Default is None (do not log/write output)
+    
+    Returns int - result from process execution
+    """
+    import subprocess
+
+    if file is None:
+        file = os.devnull
+    f_out = open(file, 'w')
+    proc = subprocess.Popen(run_cmd, shell=True, stdout=f_out, stderr=f_out)
+    ret_val = proc.wait()
+    f_out.close()
+    return ret_val
+
+
+def ping_host(host, timeout):
+    """Execute 'ping' against host to see if it is alive.
+    
+    host[in]           hostname or IP to ping
+    timeout[in]        timeout in seconds to wait
+                       
+    returns bool - True = host is reachable via ping
+    """
+    if sys.platform == "darwin":
+        run_cmd = "ping -o -t %s %s" % (timeout, host)
+    elif os.name == "posix":
+        run_cmd = "ping -w %s %s" % (timeout, host)
+    else: # must be windows
+        run_cmd = "ping -n %s %s" % (timeout, host)
+
+    ret_val = execute_script(run_cmd)
+
+    return (ret_val == 0)
+
 

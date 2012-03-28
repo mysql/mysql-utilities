@@ -1,0 +1,23 @@
+Test case 1 - warning for --exec* and not switchover or failover
+WARNING: The --exec-* options are used only with the failover and switchover commands.
+host,port,role,state,gtid_mode,health
+localhost,PORT1,MASTER,UP,NO,OK
+localhost,PORT2,SLAVE,UP,NO,OK
+localhost,PORT3,SLAVE,UP,NO,OK
+localhost,PORT4,SLAVE,UP,NO,OK
+Test case 2 - warning for --candidate and not switchover
+WARNING: The --candidates option is used only with the failover and elect commands.
+host,port,role,state,gtid_mode,health
+localhost,PORT1,MASTER,UP,NO,OK
+localhost,PORT2,SLAVE,UP,NO,OK
+localhost,PORT3,SLAVE,UP,NO,OK
+localhost,PORT4,SLAVE,UP,NO,OK
+Test case 3 - warning for --new-master and not switchover
+WARNING: The --new-master option is used only with the switchover command.
+host	port	role	state	gtid_mode	health
+localhost	PORT1	MASTER	UP	NO	OK
+localhost	PORT2	SLAVE	UP	NO	OK
+localhost	PORT3	SLAVE	UP	NO	OK
+localhost	PORT4	SLAVE	UP	NO	OK
+Test case 4 - warning for --format and not health or gtid
+WARNING: The --format option is used only with the health and gtid commands.

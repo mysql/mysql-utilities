@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,6 +99,9 @@ def _shutdown_running_servers(server_list, processes, basedir):
         except:  # if we cannot connect, don't try to shut it down.
             ok_to_shutdown = False
             print "    WARNING: shutdown failed - cannot connect."
+        if not ok_to_shutdown and os.name == "posix":
+            # Attempt kill
+            os.system("kill -9 %s" % process[0])
 
         # 2) if nt, verify datadirectory
         if os.name == "nt" and ok_to_shutdown:
@@ -173,7 +176,7 @@ def _read_disabled_tests():
     file = open("disabled")
     csv_reader = csv.reader(file)
     for row in csv_reader:
-        if row[0] != '#':
+        if row[0][0] != '#':
             disabled_tests.append(row)
     file.close()
     return disabled_tests

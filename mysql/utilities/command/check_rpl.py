@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2011 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class _BaseTestReplication(object):
         """
         if not self.quiet:
             print "[%s]" % state
-        if len(errors) > 0:
+        if type(errors) == list and len(errors) > 0:
             print
             for error in errors:
                 print error
@@ -217,7 +217,8 @@ class _BaseTestReplication(object):
             return False
 
         # Check to see if test passed or if there were errors returned.
-        if res == []:
+        if (type(res) == list and res == []) or \
+           (type(res) == bool and res):
             return not self.report_status("pass", [])
         else:
             if self.warning:

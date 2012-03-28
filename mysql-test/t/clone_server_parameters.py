@@ -106,6 +106,8 @@ class test(mutlib.System_test):
         self.replace_result("#         fill_help_tables.sql:",
                             "#         fill_help_tables.sql: XXXXXXXXXXXX\n")
         
+        self.remove_result("# trying again...")
+        
         return True
 
     def get_result(self):

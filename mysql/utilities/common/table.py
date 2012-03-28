@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1067,7 +1067,7 @@ class Table(object):
                   (type, self.table)
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")
-            print_list(sys.stdout, format, cols, rows, False)
+            print_list(sys.stdout, format, cols, rows)
 
 
     def __print_index_list(self, indexes, format, no_header=False):

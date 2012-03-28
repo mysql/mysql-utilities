@@ -66,6 +66,10 @@ class test(clone_user.test):
         res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+            
+        # Replace error code.
+        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
 
         return True
 

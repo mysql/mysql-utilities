@@ -1,0 +1,56 @@
+Test case 1 - Multiple commands issued.
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: You can only specify one command to execute at a time.
+Test case 2 - No commands.
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: You must specify a command to execute.
+Test case 3 - Invalid command.
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: 'notacommand' is not a valid command.
+Test case 4 - Switchover but no --master, --new-master,
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The switchover command requires the --master and --new-master options.
+Test case 5 - No slaves or discover-slaves-login
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The switchover command requires the --master and --new-master options.
+Test case 6 - Force used with failover
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: You cannot use the --force option with failover.
+Test case 7 - Bad --new-master connection string
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: New master connection values invalid or cannot be parsed.
+Test case 8 - Bad --master connection string
+ERROR: Master connection values invalid or cannot be parsed.
+Test case 9 - Bad --slaves connection string
+ERROR: Slave connection values invalid or cannot be parsed: what
+Test case 10 - Bad --candidates connection string
+ERROR: Candidate connection values invalid or cannot be parsed: what
+Test case 11 - Not enough privileges - health joe
+# Checking privileges.
+User joe on localhost does not have sufficient privileges to execute the health command.
+ERROR: Not enough privileges to execute command.
+Test case 12 - Not enough privileges - health jane
+# Checking privileges.
+# Getting health for master: localhost:PORT1.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 13 - Not enough privileges - switchover jane
+# Checking privileges.
+User jane on localhost does not have sufficient privileges to execute the switchover command.
+ERROR: Not enough privileges to execute command.

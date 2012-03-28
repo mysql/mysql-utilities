@@ -12,6 +12,7 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         # Need at least one server.
         self.server1 = None
         self.need_servers = False
@@ -133,6 +134,8 @@ class test(mutlib.System_test):
         self.show_data("t2")
         self.show_data("t3")
         self.show_data("t4")
+        
+        self.remove_result("Warning: Using a password on the")
 
         return True
 

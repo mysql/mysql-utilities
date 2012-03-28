@@ -18,6 +18,7 @@ class test(import_basic.test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         # Need at least one server.
         self.server1 = None
         self.need_servers = False

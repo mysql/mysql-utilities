@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2011 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import sys
 from mysql.utilities.exception import UtilError
 
 def show_topology(master_vals, options={}):
-    """Show the slaves/topology for a master.
+    """Show the slaves/topology map for a master.
 
     This method find the slaves attached to a server if it is a master. It
     can also discover the replication topology if the recurse option is
@@ -52,10 +52,10 @@ def show_topology(master_vals, options={}):
       max_depth        maximum depth of recursive search
                        Default = None
     """
-    from mysql.utilities.common.topology import Topology
+    from mysql.utilities.common.topology_map import TopologyMap
     
-    topo = Topology(master_vals, options)
-    topo.generate_topology(options.get('max_depth', None))
+    topo = TopologyMap(master_vals, options)
+    topo.generate_topology_map(options.get('max_depth', None))
 
     if not options.get("quiet", False) and topo.depth():
         print "\n# Replication Topology Graph"
@@ -70,7 +70,7 @@ def show_topology(master_vals, options={}):
         from mysql.utilities.common.format import print_list
         
         # make a list from the topology
-        topology_list = topo.get_topology_list()
+        topology_list = topo.get_topology_map()
         print_list(sys.stdout, options.get("format", "GRID"),
                    ["Master", "Slave"], topology_list, False, True)
 

@@ -10,6 +10,8 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        if self.servers.get_server(0).check_version_compat(5, 6, 5):
+            raise MUTLibError("Test requires server version prior to 5.6.5")
         # Need at least one server.
         self.server1 = None
         self.server2 = None

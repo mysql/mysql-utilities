@@ -1,0 +1,16 @@
+Test case 1 - No master
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: You must specify a master to monitor.
+Test case 2 - No slaves or discover-slaves-login
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: You must supply a list of slaves or the --discover-slaves-login option.
+Test case 3 - Low value for interval.
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The --interval option requires a value greater than or equal to 5.
+Test case 4 - elect mode but no candidates
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: Failover mode = 'elect' reqiures at least one candidate.

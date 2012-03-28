@@ -33,6 +33,7 @@ class test(replicate.test):
     #
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         return replicate.test.check_prerequisites(self)
         
     def stop_slave(self, comment, slave):

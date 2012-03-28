@@ -10,6 +10,7 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         self.server1 = None
         self.need_servers = False
         if not self.check_num_servers(2):

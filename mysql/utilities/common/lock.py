@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ class Lock(object):
             if self.verbosity >= 3 and not self.silent:
                 print "# LOCK STRING: %s" % _FLUSH_TABLES_READ_LOCK
             self.server.exec_query(_FLUSH_TABLES_READ_LOCK)
-
+            self.locked = True
         else:
             raise UtilError("Invalid locking type: '%s'." % self.locking)
 
@@ -124,16 +124,25 @@ class Lock(object):
         """
         if not self.locked:
             return
-        
+
+        if self.verbosity >= 3 and not self.silent and \
+           self.locking != 'no-locks':
+            print "# UNLOCK STRING:",
         # Call unlock:
-        if self.locking == 'lock-all':
+        if self.locking in ['lock-all', 'flush']:
+            if self.verbosity >= 3 and not self.silent:
+                print "UNLOCK TABLES"
             self.server.exec_query("UNLOCK TABLES")
             self.locked = False
         
         # Stop transaction if locking == 0
         elif self.locking == 'snapshot':
             if not abort:
+                if self.verbosity >= 3 and not self.silent:
+                    print "COMMIT"
                 self.server.exec_query("COMMIT")
             else:
                 self.server.exec_queery("ROLLBACK")
+                if self.verbosity >= 3 and not self.silent:
+                    print "ROLLBACK"
                 

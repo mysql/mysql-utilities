@@ -1,0 +1,220 @@
+Test case 1 - show help
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin - administration utility for MySQL replication
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --candidates=CANDIDATES
+                        connection information for candidate slave servers for
+                        failover in the form:
+                        <user>:<password>@<host>:<port>:<socket>. Valid only
+                        with failover command. List multiple slaves in comma-
+                        separated list.
+  --discover-slaves-login=DISCOVER
+                        at startup, query master for all registered slaves and
+                        use the user name and password specified to connect.
+                        Supply the user and password in the form
+                        user:password. For example, --discover=joe:secret will
+                        use 'joe' as the user and 'secret' as the password for
+                        each discovered slave.
+  --exec-after=EXEC_AFTER
+                        name of script to execute after failover or switchover
+  --exec-before=EXEC_BEFORE
+                        name of script to execute before failover or
+                        switchover
+  --log=LOG_FILE        specify a log file to use for logging messages
+  --log-age=LOG_AGE     specify maximum age of log entries in days. Entries
+                        older than this will be purged on startup. Default = 7
+                        days.
+  --master=MASTER       connection information for master server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --max-position=MAX_POSITION
+                        Used to detect slave delay. The maximum difference
+                        between the master's log position and the slave's
+                        reported read position of the master. A value greater
+                        than this means the slave is too far behind the
+                        master. Default is 0.
+  --ping=PING           Number of ping attempts for detecting downed server.
+  --seconds-behind=MAX_DELAY
+                        Used to detect slave delay. The maximum number of
+                        seconds behind the master permitted before slave is
+                        considered behind the master. Default is 0.
+  --slaves=SLAVES       connection information for slave servers in the form:
+                        <user>:<password>@<host>:<port>:<socket>. List
+                        multiple slaves in comma-separated list.
+  --timeout=TIMEOUT     Maximum timeout in seconds to wait for each
+                        replication command to complete. For example, timeout
+                        for slave waiting to catch up to master. Default = 3.
+  --new-master=NEW_MASTER
+                        connection information for the slave to be used to
+                        replace the master for switchover in the form:
+                        <user>:<password>@<host>:<port>:<socket>. Valid only
+                        with switchover command.
+  --force               ignore prerequsite check results and execute action
+  -f FORMAT, --format=FORMAT
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
+  --demote-master       make master a slave after switchover.
+  --no-health           turn off health report after switchover or failover.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           turn off all messages for quiet execution.
+
+Available Commands:
+
+  elect       - perform best slave election and report best slave
+  failover    - conduct failover from master to best slave
+  gtid        - show status of global transaction id variables
+                also displays uuids for all servers
+  health      - display the replication health 
+  reset       - stop and reset all slaves
+  start       - start all slaves
+  stop        - stop all slaves
+  switchover  - perform slave promotion
+  
+Test case 2 - test slave discovery
+# Discovering slaves for master at localhost:PORT1
+# Checking privileges.
+# Getting health for master: localhost:PORT1.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 3 - switchover with verbosity
+WARNING: The --ping option is used only with the health command.
+# Discovering slaves for master at localhost:PORT1
+# Checking privileges.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Checking eligibility of slave localhost:PORT2 for candidate.
+#   Slave connected to master ... Ok
+#   Slave not behind master ... Ok
+#   Logging filters agree ... Ok
+#   Logging filters agree ... Ok
+#   Binary logging turned on ... Ok
+# Creating replication user if it does not exist.
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# UNLOCK STRING: UNLOCK TABLES
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST [...]
+# Executing CHANGE MASTER on localhost:PORT4.
+# CHANGE MASTER TO MASTER_HOST [...]
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST [...]
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
+#   Executing start on slave localhost:PORT1 Ok
+# Checking slaves for errors.
+# localhost:PORT3 status: Ok 
+# localhost:PORT4 status: Ok 
+# localhost:PORT1 status: Ok 
+# Switchover complete.
+# ...done.
+Test case 4 - switchover with quiet
+WARNING: The --ping option is used only with the health command.
+NOTE: Log file 'temp_log.txt' does not exist. Will be created.
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+A switchover writes 15 entries in the log.
+There are (before) 2 entries in the log.
+Test case 5 - switchover with logs
+WARNING: The --ping option is used only with the health command.
+# Discovering slaves for master at localhost:PORT1
+# Checking privileges.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT2.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT2  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+There are (after) 16 entries in the log.
+Test case 6 - attempt risky switchover without force
+WARNING: The --ping option is used only with the health command.
+# Checking privileges.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
+# Checking candidate slave prerequisites.
+Candidate is not connected to the correct master.
+ERROR: Candidate is not connected to the correct master.
+# Errors found. Switchover aborted.
+# Getting health for master: localhost:PORT3.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------------------------+
+| host       | port  | role    | state  | gtid_mode  | health                    |
++------------+-------+---------+--------+------------+---------------------------+
+| localhost  | PORT3  | MASTER  | UP     | NO         | OK                        |
+| localhost  | PORT1  | SLAVE   | WARN   |            | Cannot connect to slave.  |
+| localhost  | PORT2  | SLAVE   | WARN   |            | Cannot connect to slave.  |
+| localhost  | PORT4  | SLAVE   | WARN   |            | Cannot connect to slave.  |
++------------+-------+---------+--------+------------+---------------------------+
+# ...done.
+Test case 7 - attempt risky switchover with --force
+WARNING: The --ping option is used only with the health command.
+# Checking privileges.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
+# Checking candidate slave prerequisites.
+Candidate is not connected to the correct master.
+ERROR: Candidate is not connected to the correct master.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT3.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT3  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.

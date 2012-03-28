@@ -38,6 +38,7 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
+        self.check_gtid_unsafe()
         self.options = {
             'skip_procs'  : False,
             'skip_funcs'  : False,

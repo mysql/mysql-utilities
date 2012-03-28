@@ -16,11 +16,11 @@ Test case 4 - error: old database doesn't exist
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 5 - error: cannot connect to source
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
-Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
+Error XXXX: Access denied
 Test case 6 - error: cannot connect to destination
 # Source on localhost: ... connected.
 # Destination on localhost: ... ERROR: Cannot connect to the Destination server.
-Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
+Error XXXX: Access denied
 Test case 7 - users with minimal privileges
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

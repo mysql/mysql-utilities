@@ -1,5 +1,5 @@
 #
-#DROP DATABASE IF EXISTS util_test;
+# DROP DATABASE IF EXISTS util_test;
 #
 CREATE DATABASE util_test;
 CREATE TABLE util_test.t1 (a char(30)) ENGINE=MEMORY;

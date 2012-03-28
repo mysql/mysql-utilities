@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -204,7 +204,8 @@ def add_verbosity(parser, quiet=True):
                       "e.g., -v = verbose, -vv = more verbose, -vvv = debug")
     if quiet:
         parser.add_option("-q", "--quiet", action="store_true", dest="quiet",
-                          help="turn off all messages for quiet execution.")
+                          help="turn off all messages for quiet execution.",
+                          default=False)
 
 
 def check_verbosity(options):
@@ -444,6 +445,93 @@ def check_rpl_options(parser, options):
             parser.error("The %s option%s must be used with the --rpl "
                          "option." % (", ".join(errors), num_opt_str))
             
+
+    
+def add_failover_options(parser):
+    """Add the common failover options.
+    
+    This adds the following options:
+    
+      --candidates
+      --discover-slaves-login
+      --exec-after
+      --exec-before
+      --log
+      --log-age
+      --master
+      --max-position
+      --ping
+      --seconds-behind
+      --slaves
+      --timeout
+      
+    parser[in]        the parser instance
+    """
+    parser.add_option("--candidates", action="store", dest="candidates",
+                      type="string", default=None,
+                      help="connection information for candidate slave servers "
+                      "for failover in the form: <user>:<password>@<host>:"
+                      "<port>:<socket>. Valid only with failover command. "
+                      "List multiple slaves in comma-separated list.")
+
+    parser.add_option("--discover-slaves-login", action="store", dest="discover",
+                      default=None, type="string", help="at startup, query "
+                      "master for all registered slaves and use the user name "
+                      "and password specified to connect. Supply the user and "
+                      "password in the form user:password. For example, "
+                      "--discover=joe:secret will use 'joe' as the user and "
+                      "'secret' as the password for each discovered slave.")
+
+    parser.add_option("--exec-after", action="store", dest="exec_after",
+                      default=None, type="string", help="name of script to "
+                      "execute after failover or switchover")
+    
+    parser.add_option("--exec-before", action="store", dest="exec_before",
+                      default=None, type="string", help="name of script to "
+                      "execute before failover or switchover")
+
+    parser.add_option("--log", action="store", dest="log_file", default=None,
+                      type="string", help="specify a log file to use for "
+                      "logging messages")
+    
+    parser.add_option("--log-age", action="store", dest="log_age", default=7,
+                      type="int", help="specify maximum age of log entries in "
+                      "days. Entries older than this will be purged on startup. "
+                      "Default = 7 days.")
+
+    parser.add_option("--master", action="store", dest="master", default=None,
+                      type="string", help="connection information for master "
+                      "server in the form: <user>:<password>@<host>:<port>:"
+                      "<socket>")
+    
+    parser.add_option("--max-position", action="store", dest="max_position",
+                      default=0, type="int", help="Used to detect slave "
+                      "delay. The maximum difference between the master's "
+                      "log position and the slave's reported read position of "
+                      "the master. A value greater than this means the slave "
+                      "is too far behind the master. Default is 0.")
+    
+    parser.add_option("--ping", action="store", dest="ping", default=None,
+                      help="Number of ping attempts for detecting downed "
+                      "server.")
+    
+    parser.add_option("--seconds-behind", action="store", dest="max_delay",
+                      default=0, type="int", help="Used to detect slave "
+                      "delay. The maximum number of seconds behind the master "
+                      "permitted before slave is considered behind the master. "
+                      "Default is 0.")
+
+    parser.add_option("--slaves", action="store", dest="slaves",
+                      type="string", default=None,
+                      help="connection information for slave servers in " 
+                      "the form: <user>:<password>@<host>:<port>:<socket>. "
+                      "List multiple slaves in comma-separated list.")
+    
+    parser.add_option("--timeout", action="store", dest="timeout", default=3,
+                      help="Maximum timeout in seconds to wait for each "
+                      "replication command to complete. For example, timeout "
+                      "for slave waiting to catch up to master. Default = 3.")
+
 
 def obj2sql(obj):
     """Convert a Python object to an SQL object.

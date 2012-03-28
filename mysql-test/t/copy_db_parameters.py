@@ -14,6 +14,7 @@ class test(copy_db.test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         self.server1 = None
         self.server2 = None
         self.server3 = None

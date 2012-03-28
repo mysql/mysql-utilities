@@ -12,6 +12,7 @@ class test(import_basic.test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         return import_basic.test.check_prerequisites(self)
 
     def setup(self):

@@ -1,0 +1,307 @@
+Test case 1 - show health before switchover
+# Checking privileges.
+# Getting health for master: localhost:PORT1.
+#
+# Replication Topology Health:
+*************************       1. row *************************
+      host: localhost
+      port: PORT1
+      role: MASTER
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       2. row *************************
+      host: localhost
+      port: PORT2
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       3. row *************************
+      host: localhost
+      port: PORT3
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       4. row *************************
+      host: localhost
+      port: PORT4
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+4 rows.
+# ...done.
+Test case 2 - switchover to slave1
+# Checking privileges.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT2.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT2  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 3 - show health after switchover
+# Checking privileges.
+# Getting health for master: localhost:PORT2.
+#
+# Replication Topology Health:
+*************************       1. row *************************
+      host: localhost
+      port: PORT2
+      role: MASTER
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       2. row *************************
+      host: localhost
+      port: PORT3
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       3. row *************************
+      host: localhost
+      port: PORT4
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       4. row *************************
+      host: localhost
+      port: PORT1
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+4 rows.
+# ...done.
+Test case 4 - switchover to slave2
+# Checking privileges.
+# Performing switchover from master at localhost:PORT2 to slave at localhost:PORT3.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT3.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT3  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 5 - show health after switchover
+# Checking privileges.
+# Getting health for master: localhost:PORT3.
+#
+# Replication Topology Health:
+*************************       1. row *************************
+      host: localhost
+      port: PORT3
+      role: MASTER
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       2. row *************************
+      host: localhost
+      port: PORT2
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       3. row *************************
+      host: localhost
+      port: PORT4
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       4. row *************************
+      host: localhost
+      port: PORT1
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+4 rows.
+# ...done.
+Test case 6 - switchover to slave3
+# Checking privileges.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT4.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT4.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT4  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 7 - show health after switchover
+# Checking privileges.
+# Getting health for master: localhost:PORT4.
+#
+# Replication Topology Health:
+*************************       1. row *************************
+      host: localhost
+      port: PORT4
+      role: MASTER
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       2. row *************************
+      host: localhost
+      port: PORT3
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       3. row *************************
+      host: localhost
+      port: PORT2
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       4. row *************************
+      host: localhost
+      port: PORT1
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+4 rows.
+# ...done.
+Test case 8 - switchover to master
+# Checking privileges.
+# Performing switchover from master at localhost:PORT4 to slave at localhost:PORT1.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# Getting health for master: localhost:PORT1.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 9 - show health after switchover
+# Checking privileges.
+# Getting health for master: localhost:PORT1.
+#
+# Replication Topology Health:
+*************************       1. row *************************
+      host: localhost
+      port: PORT1
+      role: MASTER
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       2. row *************************
+      host: localhost
+      port: PORT2
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       3. row *************************
+      host: localhost
+      port: PORT3
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+*************************       4. row *************************
+      host: localhost
+      port: PORT4
+      role: SLAVE
+     state: UP
+ gtid_mode: NO
+    health: OK
+4 rows.
+# ...done.
+Test case 10 - run command stop
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# ...done.
+Test case 11 - run command start
+# Checking privileges.
+# Performing START on all slaves.
+#   Executing start on slave localhost:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
+# ...done.
+Test case 12 - run command stop
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# ...done.
+Test case 13 - run command reset
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# Performing RESET on all slaves.
+#   Executing reset on slave localhost:PORT2 Ok
+#   Executing reset on slave localhost:PORT3 Ok
+#   Executing reset on slave localhost:PORT4 Ok
+# ...done.

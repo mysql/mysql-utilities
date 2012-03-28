@@ -85,9 +85,9 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        from_conn = "--source=joe@localhost:3306 "
+        from_conn = "--source=joe@localhost:%s " % self.server1.port
         # Watchout for Windows: it doesn't use sockets!
-        if os.name == "posix":
+        if os.name == "posix" and self.server2.socket is not None:
             to_conn = "--destination=joe@localhost:%s:%s" % \
                     (self.server2.port, self.server2.socket)
         else:
@@ -99,8 +99,8 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        from_conn = "--source=sam@localhost:3306 "
-        if os.name == "posix":
+        from_conn = "--source=sam@localhost:%s " % self.server1.port
+        if os.name == "posix" and self.server2.socket is not None:
             to_conn = "--destination=joe@localhost:%s:%s" % \
                       (self.server2.port, self.server2.socket)
         else:
@@ -240,6 +240,10 @@ class test(copy_db.test):
                             "# Destination: joe@localhost:[] ... connected\n")
         self.replace_result("# Destination: sam@localhost:",
                             "# Destination: sam@localhost:[] ... connected\n")
+
+        # Replace error code.
+        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
 
         return True
   

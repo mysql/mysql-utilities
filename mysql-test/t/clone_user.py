@@ -21,6 +21,9 @@ class test(mutlib.System_test):
         except MUTLibError, e:
             raise MUTLibError("Failed to read commands from file %s: " % \
                                data_file + e.errmsg)
+        except Exception, e:
+            raise MUTLibError("Failed to read commands from file %s: " % \
+                               data_file + e)
         return True
 
     def show_user_grants(self, user):

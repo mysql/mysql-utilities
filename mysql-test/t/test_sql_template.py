@@ -138,6 +138,8 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+#        if self.servers.get_server(0).check_version_compat(5, 6, 5):
+#            raise MUTLibError("Test requires server version prior to 5.6.5")
         self.test_objects = []
         
         # Need at least one server.
@@ -236,6 +238,11 @@ class test(mutlib.System_test):
                     command = "%s -uroot " % self.mysql_path
                     if conn_val[1] is not None and len(conn_val[1]) > 0:
                         command += "-p%s " % conn_val[1]
+                    if conn_val[2] is not None and len(conn_val[2]) > 0:
+                        if conn_val[2] != "localhost":
+                            command += "-h %s " % conn_val[2]
+                        else:
+                            command += "-h 127.0.0.1 " 
                     if conn_val[3] is not None:
                         command += "--port=%s " % conn_val[3]
                     if conn_val[4] is not None:

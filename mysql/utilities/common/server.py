@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2011 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -105,6 +105,7 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     import string
     import subprocess
     import tempfile
+    from mysql.utilities.common.tools import execute_script
 
     processes = []
     if os.name == "posix":
@@ -146,10 +147,7 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
                     processes.append((proc_id, datadir_arg[10:]))
     elif os.name == "nt":
         f_out = open("portlist", 'w+')
-        proc = subprocess.Popen("netstat -anop tcp", shell=True,
-                                stdout=f_out, stderr=f_out)
-        res = proc.wait()
-        f_out.close()
+        res = execute_script("netstat -anop tcp", "portlist")
         f_out = open("portlist", 'r')
         for line in f_out.readlines():
             proginfo = string.split(line)
@@ -171,8 +169,8 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     return processes
 
 
-def _connect_server(name, values, quiet):        
-    """Connect to a server
+def get_server(name, values, quiet):        
+    """Connect to a server and return Server instance
     
     If the name is 'master' or 'slave', the connection will be made via the
     Master or Slave class else a normal Server class shall be used.
@@ -221,6 +219,42 @@ def _require_version(server, version):
             return False
     return True
         
+
+def get_server_state(server, host, pingtime=3, verbose=False):
+    """Return the state of the server.
+    
+    This method returns one of the following states based on the
+    criteria shown.
+    
+      UP   - server is connected
+      WARN - server is not connected but can be pinged
+      DOWN - server cannot be pinged nor is connected
+
+    server[in]     Server class instance
+    host[in]       host name to ping if server is not connected
+    pingtime[in]   timeout in seconds for ping operation
+                   Default = 3 seconds
+    verbose[in]    if True, show ping status messages
+                   Default = False
+
+    Returns string - state
+    """
+    from mysql.utilities.common.tools import ping_host
+
+    if verbose:
+        print "# Attempting to contact %s ..." % host,
+    if server is not None and server.is_alive():
+        if verbose:
+            print "Success"
+        return "UP"
+    elif ping_host(host, pingtime):
+        if verbose:
+            print "Server is reachable"
+        return "WARN"
+    if verbose:
+        print "FAIL"
+    return "DOWN"
+
 
 def connect_servers(src_val, dest_val, options={}):
     """Connect to a source and destination server.
@@ -290,7 +324,7 @@ def connect_servers(src_val, dest_val, options={}):
     if isinstance(src_val, Server):
         source = src_val
     else:
-        source = _connect_server(src_name, src_dict, quiet)
+        source = get_server(src_name, src_dict, quiet)
         if not quiet:
             print "connected."
     if not _require_version(source, version):
@@ -303,7 +337,7 @@ def connect_servers(src_val, dest_val, options={}):
         if isinstance(dest_val, Server):
             destination = dest_val
         else:
-            destination = _connect_server(dest_name, dest_dict, quiet)
+            destination = get_server(dest_name, dest_dict, quiet)
             if not quiet:
                 print "connected."
         if not _require_version(destination, version):
@@ -401,7 +435,28 @@ class Server(object):
         self.connect_error = None
         # Set to TRUE when foreign key checks are ON. Check with
         # foreign_key_checks_enabled.
-        self.fkeys = None  
+        self.fkeys = None
+        self.read_only = False
+        
+    
+    def is_alive(self):
+        """Determine if connection to server is still alive.
+        
+        Returns bool - True = alive, False = error or cannot connect.
+        """
+        res = True
+        try:
+            if self.db_conn is None:
+                res = False
+            else:
+                # ping and is_connected only work partially, try exec_query
+                # to make sure connection is really alive
+                retval = self.db_conn.is_connected()
+                if retval:
+                    self.exec_query("SHOW DATABASES")
+        except:
+            res = False
+        return res
 
 
     def get_connection_values(self):
@@ -451,6 +506,32 @@ class Server(object):
                               "Error %s" % (self.role, e.msg), e.errno)
             return False
         self.connect_error = None
+        self.read_only = self.show_server_variable("READ_ONLY")[0][1]
+        
+
+    def disconnect(self):
+        """Disconnect from the server.
+        """
+        try:
+            self.db_conn.disconnect()
+        except:
+            pass
+
+
+    def get_version(self):
+        """Return version number of the server.
+
+        Returns string - version string or None if error
+        """
+        version_str = None
+        try:
+            res = self.show_server_variable("VERSION")
+            if res:
+                version_str = res[0][1]
+        except:
+            pass
+            
+        return version_str
 
 
     def check_version_compat(self, t_major, t_minor, t_rel):
@@ -465,14 +546,13 @@ class Server(object):
         Returns bool True if server version is GE (>=) version specified,
                      False if server version is LT (<) version specified
         """
-        res = self.show_server_variable("VERSION")
-        if res:
-            version_str = res[0][1]
+        version_str = self.get_version()
+        if version_str is not None:
             index = version_str.find("-")
             if index >= 0:
-                parts = res[0][1][0:index].split(".")
+                parts = version_str[0:index].split(".")
             else:
-                parts = res[0][1].split(".")
+                parts = version_str.split(".")
             major = parts[0]
             minor = parts[1]
             rel = parts[2]
@@ -539,8 +619,8 @@ class Server(object):
             cur.close()
             raise UtilDBError("Query failed. " + e.__str__())
         except Exception, e:
-            cursor.close()
-            raise UtilError("Unknown error. Command: %s" % query_str, e.errno)
+            cur.close()
+            raise UtilError("Unknown error. Command: %s" % query_str)
         if fetch or columns:
             try:
                 results = cur.fetchall()
@@ -574,6 +654,89 @@ class Server(object):
         return self.exec_query("SHOW VARIABLES LIKE '%s'" % variable)
 
 
+    def get_uuid(self):
+        """Return the uuid for this server if it is GTID aware.
+        
+        Returns uuid or None if server is not GTID aware.
+        """
+        if self.supports_gtid() != "NO":
+            res = self.show_server_variable("server_uuid")
+            return res[0][1]
+        return None
+    
+
+    def supports_gtid(self):
+        """Determine if server supports GTIDs
+        
+        Returns string - 'ON' = gtid supported and turned on,
+                         'OFF' = supported but not enabled,
+                         'NO' = not supported
+        """
+        # Check servers for GTID support
+        version_ok = self.check_version_compat(5,6,5)
+        if not version_ok:
+            return "NO"
+        try:
+            res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
+        except:
+            return "NO"
+        
+        return res[0][0]
+
+
+    def get_gtid_status(self):
+        """Get the GTID information for the server.
+        
+        This method attempts to retrieve the GTID lists. If the server
+        does not have GTID turned on or does not support GTID, the method
+        will throw and exception.
+        
+        Returns [list, list, list]
+        """
+        # Check servers for GTID support
+        if not self.supports_gtid():
+            raise UtilError("Global Transaction IDs are not supported.")
+            
+        res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
+        if res[0][0].upper() == 'OFF':
+            raise UtilError("Global Transaction IDs are not enabled.")
+
+        gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_DONE")[0],
+                     self.exec_query("SELECT @@GLOBAL.GTID_LOST")[0],
+                     self.exec_query("SELECT @@GLOBAL.GTID_OWNED")[0]]
+            
+        return gtid_data
+
+
+    def check_rpl_user(self, user, host):
+        """Check replication user exists and has the correct privileges.
+        
+        user[in]      user name of rpl_user
+        host[in]      host name of rpl_user
+
+        Returns [] - no exceptions, list if exceptions found
+        """
+        
+        from mysql.utilities.common.user import User
+        
+        errors = []
+        result = self.exec_query("SELECT * FROM mysql.user WHERE user = '%s' "
+                                 "AND host = '%s'" % (user, host))
+        if result is None or result == []:
+            errors.append("The replication user %s@%s was not found "
+                          "on the master." % (user, host))
+        else:
+            rpl_user = User(self, "%s@%s" % (user, host))
+            if not rpl_user.has_privilege('*', '*',
+                                          'REPLICATION SLAVE'):
+                errors.append("Replication user does not have the "
+                              "correct privilege. She needs "
+                              "'REPLICATION SLAVE' on all replicated "
+                              "databases.")
+
+        return errors
+
+    
     def get_all_databases(self):
         """Return a result set containing all databases on the server
         except for internal databases (mysql, INFORMATION_SCHEMA,
@@ -926,5 +1089,16 @@ class Server(object):
             
         return None
     
-    
+
+    def set_read_only(self, on=False):
+        """Turn read only mode on/off
+        
+        on[in]         if True, turn read_only ON
+                       Default is False
+        """
+        # Only turn on|off read only if it were off at connect()
+        if not self.read_only:
+            return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
+                                   "ON" if on else "OFF")
+        return None
 

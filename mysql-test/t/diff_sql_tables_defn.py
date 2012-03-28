@@ -55,6 +55,7 @@ class test(test_sql_template.test):
     """
 
     def check_prerequisites(self):
+        self.check_gtid_unsafe()
         return test_sql_template.test.check_prerequisites(self)
 
     def setup(self):

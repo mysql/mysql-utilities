@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -84,6 +84,24 @@ def get_copy_lock(server, db_list, options, include_mysql=False,
                     # lock the destination tables with WRITE.
                     table_lock_list.append(("%s.%s" % (db_clone, table[0]),
                                             'WRITE'))
+            # We must include views for server version 5.6.5 and higher
+            if server.check_version_compat(5, 6, 5):
+                tables = source_db.get_db_objects("VIEW")
+                for table in tables:
+                    table_lock_list.append(("%s.%s" % (db, table[0]),
+                                            'READ'))
+                    # Cloning requires issuing WRITE locks because we use same conn.
+                    # Non-cloning will issue WRITE lock on a new destination conn.
+                    if cloning:
+                        if db_name[1] is None:
+                            db_clone = db_name[0]
+                        else:
+                            db_clone = db_name[1]
+                        # For cloning, we use the same connection so we need to
+                        # lock the destination tables with WRITE.
+                        table_lock_list.append(("%s.%s" % (db_clone, table[0]),
+                                                'WRITE'))
+                
                     
         # Now add mysql tables
         if include_mysql:

@@ -66,6 +66,10 @@ class test(copy_user.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Replace error code.
+        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
+
         return True
 
     def get_result(self):
