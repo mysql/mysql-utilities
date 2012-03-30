@@ -1,3 +1,15 @@
+Release 1.0.5rc1 (Released March 28, 2012)
+------------------------------------------
+
+- BUG#13554556: MySQL Utilities : Refactor option choices
+- BUG#13554750: Warning message in mysqldiff shows wrong server
+- BUG#13576571: Remove unused option in mysqluserclone and mysqldbcopy
+- BUG#13592147: MUT - sorted option always on
+- BUG#13698224: Add clone server from basedir to mysqlserverclone
+- BUG#13721467: Utilities throwing error on exit
+- WL#5987: add replication options to mysqldbcopy, mysqldbexport
+- WL#6143: Failover Utility for Global Transaction ID
+- WL#6152: Replication classes split and code modularized for maintainability
 
 Release 1.0.4 (Released December 22, 2011)
 ------------------------------------------
