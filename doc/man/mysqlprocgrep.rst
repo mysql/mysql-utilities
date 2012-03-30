@@ -74,7 +74,7 @@ Options
    **d** (day), and **w** (week). For example, **4h15m** mean 4 hours and
    15 minutes.
 
-   For both formats, the specification can optionally be preceeded by 
+   For both formats, the specification can optionally be preceded by 
    ``+`` or ``-``, where ``+`` means older than the given time, and
    ``-`` means younger than the given time.
 

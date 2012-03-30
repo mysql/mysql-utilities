@@ -34,6 +34,11 @@ respective manual pages for further details and examples:
   * Show disk usage for databases
   * Generate reports in SQL, CSV, TAB, Grid, Vertical
 
+`mysqlfailover`
+  * Performs replication health monitoring
+  * Provides automatic failover on a replication topology
+  * Uses Global Transaction Identifiers (GTID, MySQL Server 5.6.5+)
+
 `mysqlindexcheck`
   * Read indexes for one or more tables
   * Check for redundant and duplicate indexes
@@ -52,6 +57,11 @@ respective manual pages for further details and examples:
 `mysqlreplicate`
   * Setup replication
   * Start from beginning, current, specific binlog, pos
+
+`mysqlrpladmin`
+  * Administers the replication topology
+  * Allows recovery of the master
+  * Commands include elect, failover, gtid, health, start, stop, and switchover
 
 `mysqlrplcheck`
   * Check replication configuration

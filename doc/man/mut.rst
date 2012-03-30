@@ -22,7 +22,7 @@ You can select any number of tests to run, select one or more suites to
 restrict the tests, exclude suites and tests, and specify the location of
 the utilities and tests.
 
-The utility requires the existance of at least one server to
+The utility requires the existence of at least one server to
 clone for testing purposes. You must specify at least one server, but you may
 specify multiple servers for tests designed to use additional servers.
 

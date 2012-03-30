@@ -130,7 +130,7 @@ performing replication, use the following command::
     Is slave connected to master?                                     [pass]
     Check master information file                                     [pass]
     Checking InnoDB compatibility                                     [pass]
-    Checking storage engines compatibilit                             [pass]
+    Checking storage engines compatibility                            [pass]
     Checking lower_case_table_names settings                          [pass]
     Checking slave delay (seconds behind master)                      [pass]
     # ...done.
