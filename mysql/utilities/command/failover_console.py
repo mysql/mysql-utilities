@@ -25,7 +25,7 @@ import logging
 import os
 import sys
 import time
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilRplError
 
 _CONSOLE_HEADER = "MySQL Replication Monitor and Failover Utility"
 _CONSOLE_FOOTER = "Q-quit R-refresh H-health G-GTID Lists U-UUIDs"

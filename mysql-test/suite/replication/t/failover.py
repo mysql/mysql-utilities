@@ -9,13 +9,6 @@ import time
 from mysql.utilities.exception import MUTLibError
 
 _FAILOVER_LOG = "fail_log.txt"
-_EXPECTED_RESULTS = [
-    # (console_retval, log_entry present)
-    (0, True),
-    (0, True),
-    (-1, True),
-]
-
 _TIMEOUT = 30
 
 class test(rpl_admin_gtid.test):
@@ -32,9 +25,13 @@ class test(rpl_admin_gtid.test):
         return True
 
     def check_prerequisites(self):
-        # Need non-Windows platform
-        if os.name == "nt":
-            raise MUTLibError("Test requires a non-Windows platform.")
+        if self.servers.get_server(0).supports_gtid() != "ON":
+            raise MUTLibError("Test requires server version 5.6.5 with "
+                              "GTID_MODE=ON.")
+        if os.name == "posix":
+            self.failover_dir = "./fail_event"
+        else:
+            self.failover_dir = ".\\fail_event"
         if self.debug:
             print
         for log in ["1","2","3"]:
@@ -45,17 +42,6 @@ class test(rpl_admin_gtid.test):
         return rpl_admin_gtid.test.check_prerequisites(self)
 
     def setup(self):
-        try:
-            # Only valid for *nix systems.
-            import termios, sys
-            if self.debug:
-                print "# Getting old terminal settings."
-            self.old_terminal_settings = termios.tcgetattr(sys.stdin)
-            if self.debug:
-                print "# Got old terminal settings."
-        except Exception, e:
-            # Ok to fail for Windows
-            self.old_terminal_settings = None
         return rpl_admin_gtid.test.setup(self)
         
     def start_process(self, cmd):
@@ -67,14 +53,24 @@ class test(rpl_admin_gtid.test):
              proc = subprocess.Popen(cmd, stdout=f_out, stderr=f_out)
         return (proc, f_out)
      
+    def kill(self, pid, force=False):
+        if os.name == "posix":
+            if force:
+                res = os.kill(pid, subprocess.signal.SIGABRT)
+            else:
+                res = os.kill(pid, subprocess.signal.SIGTERM)
+        else:
+            f_out = open(os.devnull, 'w')
+            proc = subprocess.Popen("taskkill /F /T /PID %i" % pid, shell=True,
+                                    stdout=f_out, stdin=f_out)
+            res = 0  # Ignore spurious Windows results
+            f_out.close()
+        return res
+
     def stop_process(self, proc, f_out, kill=True):
         res = -1
         if kill:
-            if os.name == "posix":
-                retval = os.kill(proc.pid, subprocess.signal.SIGTERM)
-            else:
-                retval = subprocess.Popen("taskkill /F /T /PID %i" % proc.pid,
-                                          shell=True) 
+            retval = self.kill(proc.pid)
             res = 0 if retval is None else -1
         else:
             if proc.poll() is None:
@@ -105,7 +101,14 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print comment
             print "# COMMAND:", cmd
-            
+
+        # Cleanup in case previous test case failed
+        if os.path.exists(self.failover_dir):
+            try:
+                os.system("rmdir %s" % self.failover_dir)
+            except:
+                pass
+        
         # Launch the console in stealth mode
         proc, f_out = self.start_process(cmd)
 
@@ -133,16 +136,12 @@ class test(rpl_admin_gtid.test):
 
         # Stop the server 
         server.disconnect()
-        if os.name == "posix":
-            os.kill(pid, subprocess.signal.SIGABRT)
-        else:
-            subprocess.Popen("taskkill /F /T /PID %i" % pid, shell=True) 
+        self.kill(pid, True)
         
         # Need to wait until the process is really dead.
         if self.debug:
             print "# Waiting for master to stop."
         i = 0
-        # TODO: may need to add datadir for Windows machines...
         while self.is_process_alive(pid, int(server.port)-1,
                                     int(server.port)+1):
             time.sleep(1)
@@ -155,67 +154,31 @@ class test(rpl_admin_gtid.test):
          
         # Now wait for interval to occur.
         if self.debug:
-            print "# Waiting for interval to end."
-        time.sleep(interval)
-
-        if kill_console:            
-            # Need to poll here and wait for exec_after to fire.
-            if self.debug:
-                print "# Waiting for failover to complete."
-            i = 0
-            while os.path.exists("./before_ok"):
-                time.sleep(1)
-                i += 1
-                if i > _TIMEOUT:
-                    if self.debug:
-                        print "# Timeout console failover."
-                    raise MUTLibError("%s: failed - timeout waiting for "
-                                      "exec_after." % comment)
-    
-        # Now wait for failover to complete and logs to be written.
-        if self.debug:
             print "# Waiting for failover to complete."
-        time.sleep(interval)
-
+        i = 0
+        while not os.path.exists(self.failover_dir):
+            time.sleep(1)
+            i += 1
+            if i > _TIMEOUT:
+                if self.debug:
+                    print "# Timeout console failover."
+                raise MUTLibError("%s: failed - timeout waiting for "
+                                  "exec_post_fail." % comment)
+    
         # Need to poll here and wait for console to really end.
         ret_val = self.stop_process(proc, f_out, kill_console)
-        if not kill_console:
-            # Wait for console to end
-            if self.debug:
-                print "# Waiting for console to end."
-            i = 0
-            while proc.poll() is None:
-                time.sleep(1)
-                i += 1
-                if i > _TIMEOUT:
-                    if self.debug:
-                        print "# Timeout console to end."
-                    raise MUTLibError("%s: failed - timeout waiting for "
-                                      "console to end." % comment)
-        # We elected to kill the console so let's wait until it has written
-        # the failover complete string.
-        else:
-            if self.debug:
-                print "# Waiting for log to be updated."
-            i = 0
-            done = False
-            while not done:
-                log_file = open(log_filename)
-                rows = log_file.readlines()
-                for row in rows:
-                    if 'Failover console stopped' in row:
-                        if self.debug:
-                            print "# Found:", row[:len(row)-1]
-                        done = True
-                log_file.close()
-                if not done:
-                    time.sleep(1)
-                    i += 1
-                    if i > _TIMEOUT:
-                        if self.debug:
-                            print "# Timeout failover to complete."
-                        raise MUTLibError("%s: failed - timeout waiting for "
-                                          "failover to complete." % comment)
+        # Wait for console to end
+        if self.debug:
+            print "# Waiting for console to end."
+        i = 0
+        while proc.poll() is None:
+            time.sleep(1)
+            i += 1
+            if i > _TIMEOUT:
+                if self.debug:
+                    print "# Timeout console to end."
+                raise MUTLibError("%s: failed - timeout waiting for "
+                                  "console to end." % comment)
                     
         if self.debug:
             print "# Return code from console termination =", ret_val
@@ -239,19 +202,24 @@ class test(rpl_admin_gtid.test):
             for row in rows:
                 print row,
         
+        # Cleanup after test case
         try:
             os.unlink(log_filename)
         except:
             pass
         
+        if os.path.exists(self.failover_dir):
+            try:
+                os.system("rmdir %s" % self.failover_dir)
+            except:
+                pass
+
         # Remove server from the list.
         if self.debug:
             print "# Removing server name '%s'." % server.role
         self.servers.remove_server(server.role)
 
-        if self.debug:
-            print "# Test case results = (%s,%s)." % (ret_val, found_row)
-        return (ret_val, found_row)
+        return (comment, found_row)
 
     def run(self):
         self.res_fname = "result.txt"
@@ -270,10 +238,10 @@ class test(rpl_admin_gtid.test):
         self.test_results = []
         self.test_cases = []
 
-        failover_cmd = "python ../scripts/mysqlfailover.py --interval=15 " + \
+        failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
                        " --discover-slaves-login=root:root %s --failover-" + \
-                       "mode=%s --log=%s --exec-before='mkdir ./before_ok'" + \
-                       " --exec-after='rmdir ./before_ok' "
+                       'mode=%s --log=%s --exec-post-fail="mkdir ' + \
+                       self.failover_dir + '" '
         
         conn_str = " ".join([master_str, slaves_str])
         str = failover_cmd % (conn_str, 'auto', "1"+_FAILOVER_LOG)
@@ -296,7 +264,7 @@ class test(rpl_admin_gtid.test):
         for test_case in self.test_cases:
             res = self.test_failover_console(test_case, 20)
             if res is not None:
-                self.test_results.append((res[0], res[1], test_case[4]))
+                self.test_results.append(res)
             else:
                 raise MUTLibError("%s: failed" % comment)
                 
@@ -307,12 +275,9 @@ class test(rpl_admin_gtid.test):
         # We check all and show a list of those that failed.
         msg = ""
         for i in range(0,len(self.test_results)):
-            exp_res = _EXPECTED_RESULTS[i]
             act_res = self.test_results[i]
-            if int(exp_res[0]) != int(act_res[0]) or \
-               exp_res[1] != act_res[1]:
-                msg += "\n%s\nExpected results = " % act_res[2] + \
-                        "%s, actual results = %s.\n" % (exp_res, act_res[0:2])
+            if not act_res[1]:
+                msg += "\n%s\nEvent missing from log. " % act_res[0]
                 return (False, msg)
             
         return (True, '')
@@ -321,15 +286,6 @@ class test(rpl_admin_gtid.test):
         return True # Not a comparative test
     
     def cleanup(self):
-        if self.old_terminal_settings is not None:
-            import termios, sys
-            if self.debug:
-                print "# Resetting old terminal settings."
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
-                              self.old_terminal_settings)
-            if self.debug:
-                print "# Set old terminal settings."
-            
         for log in ["1","2","3"]:
             try:
                 os.unlink(log+_FAILOVERLOG)

@@ -1189,8 +1189,6 @@ class Slave(Server):
         Returns int - number of trans behind master
         """
         slave_gtids = self.exec_query(_GTID_DONE)[0][0]
-        print "M:", master_gtids
-        print "S:", slave_gtids
         gtids = self.exec_query("SELECT GTID_SUBTRACT('%s','%s')" %
                                (master_gtids[0][0], slave_gtids))[0]
         if len(gtids) == 1 and len(gtids[0]) == 0:

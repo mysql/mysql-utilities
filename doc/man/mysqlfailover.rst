@@ -194,6 +194,11 @@ OPTIONS
 
    Name of script to execute on each interval to invoke failover.
 
+.. option:: --exec-post-failover=<script>
+
+   Name of script to execute after failover is complete and the utility has
+   refreshed the health report.
+
 .. option:: --failover-mode=<mode>, -f <mode>
 
    Action to take when the master fails. 'auto' = automatically fail to best

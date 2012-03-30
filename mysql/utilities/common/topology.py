@@ -471,7 +471,7 @@ class Topology(Replication):
         return user, passwd
 
     
-    def _run_script(self, script, quiet):
+    def run_script(self, script, quiet):
         """Run an external script
         
         This method executes an external script. Result is checked for
@@ -1181,7 +1181,7 @@ class Topology(Replication):
                                            m_candidate.port)
 
         # Call exec_before script - display output if verbose on
-        self._run_script(self.before_script, False)
+        self.run_script(self.before_script, False)
         
         if self.verbose:
             self._report("# Blocking writes on master.")
@@ -1279,7 +1279,7 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
         
         # Call exec_after script - display output if verbose on
-        self._run_script(self.after_script, False)
+        self.run_script(self.after_script, False)
     
         # Check all slaves for status, errors
         self._report("# Checking slaves for errors.")
@@ -1469,7 +1469,7 @@ class Topology(Replication):
         res = self.master.create_rpl_user(rpl_user, host, port)
 
         # Call exec_before script - display output if verbose on
-        self._run_script(self.before_script, False)
+        self.run_script(self.before_script, False)
 
         # Stop all slaves
         self._report("# Stopping slaves.")
@@ -1489,7 +1489,7 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
 
         # Call exec_after script - display output if verbose on
-        self._run_script(self.after_script, False)
+        self.run_script(self.after_script, False)
 
         # Check slaves for errors
         self._report("# Checking slaves for errors.")

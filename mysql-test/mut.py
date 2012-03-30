@@ -509,6 +509,11 @@ print "\n" + "-" * opt.width
 print "TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME"
 print "=" * opt.width
 
+# Protect against interactive consoles that fail: save terminal settings.
+if os.name == "posix":
+    import termios
+    old_terminal_settings = termios.tcgetattr(sys.stdin)
+
 # Run the tests selected
 num_tests_run = 0
 last_test = None
@@ -695,5 +700,11 @@ if (server_list.cleanup_list) > 0:
 del server_list
 
 sys.stdout.write("\n")
+
+# Protect against interactive consoles that fail: restore terminal settings.
+if os.name == "posix":
+    import termios
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
+                      old_terminal_settings)
 
 exit(0)

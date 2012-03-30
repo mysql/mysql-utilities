@@ -62,5 +62,8 @@ Options:
                         failover
   --force               override the registration check on master for multiple
                         instances of the console monitoring the same master.
+  --exec-post-failover=EXEC_POST_FAIL
+                        name of script to execute after failover is complete
+                        and the utility has refreshed the health report.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug

@@ -4,18 +4,12 @@ import os
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --report-host=localhost --report-port=%s "'
-
 class test(mutlib.System_test):
     """test replication failover utility
-    This test runs the mysqlfailover utility on a known topology.
-    
-    Note: this test will **NOT** run against older servers. 
+    This test runs the mysqlfailover utility parameters on a known topology.
     """
 
     def check_prerequisites(self):
-        if not self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version 5.6.5 or higher.")
         return self.check_num_servers(1)
 
     def setup(self):

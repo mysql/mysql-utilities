@@ -425,6 +425,7 @@ class RplCommands(object):
         timeout = self.options.get("timeout", 3)
         exec_fail = self.options.get("exec_fail", None)
         force = self.options.get("force", False)
+        post_fail = self.options.get("post_fail", None)
                 
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
@@ -448,7 +449,7 @@ class RplCommands(object):
         no_exec_fail_msg = "Failover check script cannot be found. Please " + \
                            "check the path and filename for accuracy and " + \
                            "restart the failover console."
-        if exec_fail is not None and not os.path.exists(exec_fail):
+        if exec_fail is not None and not os.path.exists(fail_check):
             self._report(no_exec_fail_msg, logging.CRITICAL, False)
             raise UtilRplError(no_exec_fail_msg)
                
@@ -535,11 +536,15 @@ class RplCommands(object):
                     msg = _FAILOVER_ERROR % \
                           "Master has failed and automatic failover is not enabled. "
                     self._report(msg, logging.CRITICAL, False)
+                    # Execute post failover script
+                    self.topology.run_script(post_fail, False)
                     raise UtilRplError(msg, _FAILOVER_ERRNO)
                 if not res:
                     msg = _FAILOVER_ERROR % "An error was encountered " + \
                           "during failover. "
                     self._report(msg, logging.CRITICAL, False)
+                    # Execute post failover script
+                    self.topology.run_script(post_fail, False)
                     raise UtilRplError(msg)
                 self.master = self.topology.master
                 console.master = self.master
@@ -550,6 +555,8 @@ class RplCommands(object):
                 time.sleep(5)
                 console.clear()
                 failover = False
+                # Execute post failover script
+                self.topology.run_script(post_fail, False)
 
             # discover slaves if option was specified at startup
             elif self.options.get("discover", None) is not None \

@@ -116,6 +116,12 @@ parser.add_option("--force", action="store_true", dest="force",
                   "multiple instances of the console monitoring the same "
                   "master.")
 
+# Add refresh script external point
+parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
+                  type="string", default=None, help="name of script to "
+                  "execute after failover is complete and the utility has "
+                  "refreshed the health report.")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -162,6 +168,7 @@ options = {
     'logging'       : opt.log_file is not None,
     'log_file'      : opt.log_file,
     'force'         : opt.force,
+    'post_fail'     : opt.exec_post_fail,
 }
 
 # Purge log file of old data

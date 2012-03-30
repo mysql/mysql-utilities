@@ -20,9 +20,9 @@ class test(failover.test):
     """
 
     def check_prerequisites(self):
-        # Need non-Windows platform
-        if os.name == "nt":
-            raise MUTLibError("Test requires a non-Windows platform.")
+        if self.servers.get_server(0).supports_gtid() != "ON":
+            raise MUTLibError("Test requires server version 5.6.5 with "
+                              "GTID_MODE=ON.")
         if self.debug:
             print
         for log in ["a","b"]:
@@ -33,7 +33,7 @@ class test(failover.test):
         return rpl_admin_gtid.test.check_prerequisites(self)
 
     def setup(self):
-        return failover.test.setup(self)
+        return rpl_admin_gtid.test.setup(self)
         
     def run(self):
         self.res_fname = "result.txt"
@@ -158,9 +158,6 @@ class test(failover.test):
         except:
             pass
         
-        if self.debug:
-            print "# Test case results = (%s,%s)." % (ret_val, found_row)
-                
         return True
 
     def get_result(self):
@@ -177,15 +174,6 @@ class test(failover.test):
         return True # Not a comparative test
     
     def cleanup(self):
-        if self.old_terminal_settings is not None:
-            import termios, sys
-            if self.debug:
-                print "# Resetting old terminal settings."
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
-                              self.old_terminal_settings)
-            if self.debug:
-                print "# Set old terminal settings."
-            
         for log in ["a","b"]:
             try:
                 os.unlink(log+_FAILOVERLOG)
