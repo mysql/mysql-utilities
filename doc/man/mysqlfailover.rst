@@ -299,9 +299,9 @@ following examples.
 
 The default interface will display the replication health report like the
 following. In this example the log file is enabled. A sample startup command is
-shown below.::
+shown below::
 
-$ mysqlfailover --master=root@localhost:3331 --discover-slaves-login=root
+  $ mysqlfailover --master=root@localhost:3331 --discover-slaves-login=root
 
   MySQL Replication Monitor and Failover Utility
   Failover Mode = auto     Next Interval = Mon Mar 19 15:56:03 2012
