@@ -143,3 +143,44 @@ def ping_host(host, timeout):
     return (ret_val == 0)
 
 
+def get_mysqld_version(mysqld_path):
+    """Return the version number for a mysqld executable.
+
+    mysqld_path[in]    location of the mysqld executable
+    
+    Returns tuple - (major, minor, release), or None if error
+    """
+    import subprocess
+    
+    args = [
+        " --version",
+    ]
+    out = open("version_check", 'w')
+    proc = subprocess.Popen("%s --version" % mysqld_path,
+                            stdout=out, stderr=out, shell=True)
+    proc.wait()
+    out.close()
+    out = open("version_check", 'r')
+    line = None
+    for line in out.readlines():
+        if "Ver" in line:
+            break
+    out.close()
+    
+    try:
+        os.unlink('version_check')
+    except:
+        pass
+    
+    if line is None:
+        return None
+    version = line.split(' ', 5)[3]
+    try:
+        maj, min, dev = version.split(".")
+        rel = dev.split("-")
+        return (maj, min, rel[0])
+    except:
+        return None
+        
+    return None
+

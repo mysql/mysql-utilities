@@ -374,6 +374,7 @@ def test_connect(conn_info):
             'dest_name' : None,
         }
         s = connect_servers(src_val, None, conn_options)
+        s[0].disconnect()
     except UtilError, e:
         return False
     return True

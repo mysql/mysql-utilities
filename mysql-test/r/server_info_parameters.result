@@ -88,7 +88,9 @@ Test case 8 - show servers
 1 rows.
 #...done.
 Test case 9 - run against offline server
-# Server is offline. Starting read-only instance of the server ... done.
+# Server is offline.
+# Checking server version ... done.
+# Starting read-only instance of the server ... done.
 # Source on localhost: ... connected.
 # Shutting down server ... done.
 *************************       1. row *************************

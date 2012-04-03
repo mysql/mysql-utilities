@@ -166,6 +166,7 @@ def _server_info(server_val, get_defaults=False, options={}):
     plugin_dir = res[0][1]
     binlog, binlog_pos = _get_binlog(server)
     relay_log, relay_log_pos = _get_relay_log(server)
+    server.disconnect()
 
     return ((server_id, version, datadir, basedir, plugin_dir, config_file,
              binlog, binlog_pos, relay_log, relay_log_pos), defaults)
@@ -184,19 +185,25 @@ def _start_server(server_val, basedir, datadir, options={}):
     datadir[in]       the data directory for the server
     options[in]       dictionary of options (verbosity)
     """
-    from mysql.utilities.common.tools import get_tool_path
+    from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
     from mysql.utilities.common.server import Server
     import time
     
     verbosity = options.get("verbosity", 0)
     
-    # Start the instance
     mysqld_path = get_tool_path(basedir, "mysqld")
-
-    sys.stdout.write("# Server is offline. Starting read-only "
-                     "instance of the server ... ")
-    sys.stdout.flush()
     
+    print "# Server is offline."
+
+    # Check server version
+    print "# Checking server version ...",
+    version = get_mysqld_version(mysqld_path)
+    print "done."
+    post_5_6 = version is not None and \
+               int(version[0]) >= 5 and int(version[1]) >= 6
+    
+    # Start the instance
+    print "# Starting read-only instance of the server ...",
     args = [
         " -uroot",
         "--skip-grant-tables",
@@ -205,6 +212,17 @@ def _start_server(server_val, basedir, datadir, options={}):
         "--basedir=" + basedir,
         "--datadir=" + datadir,
     ]
+    # It the server is 5.6 or later, we must use additional parameters
+    if post_5_6:
+        args_5_6 = [
+            "--skip-slave-start",
+            "--skip-innodb",
+            "--default-storage-engine=MYISAM",
+            "--default-tmp-storage-engine=MYISAM",
+            "--server-id=0",
+        ]
+        args.extend(args_5_6)
+
     socket = server_val.get('unix_socket', None)
     if socket is not None:
         args.append("--socket=%(unix_socket)s" % server_val)
@@ -227,7 +245,7 @@ def _start_server(server_val, basedir, datadir, options={}):
     else:
         time.sleep(1)
     server.connect()
-    sys.stdout.write("done.\n")
+    print "done."
     
 
 def _stop_server(server_val, basedir, options={}):
@@ -247,8 +265,7 @@ def _stop_server(server_val, basedir, options={}):
     verbosity = options.get("verbosity", 0)
     socket = server_val.get("unix_socket", None)
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
-    sys.stdout.write("# Shutting down server ... ")
-    sys.stdout.flush()
+    print "# Shutting down server ...",
 
     if os.name == "posix":
         cmd = mysqladmin_path + " shutdown -uroot "
@@ -265,7 +282,7 @@ def _stop_server(server_val, basedir, options={}):
                                 stdout=fnull, stderr=fnull)
     # Wait for subprocess to finish
     res = proc.wait()
-    sys.stdout.write("done.\n")
+    print "done."
 
 
 def _show_running_servers(start=3306, end=3333):
@@ -276,21 +293,20 @@ def _show_running_servers(start=3306, end=3333):
     """
     from mysql.utilities.common.server import get_local_servers
 
-    sys.stdout.write("# \n")
+    print "# "
     processes = get_local_servers(True, start, end)
     if len(processes) > 0:
-        sys.stdout.write("# The following MySQL servers are active "
-                         "on this host:\n")
+        print "# The following MySQL servers are active on this host:"
         for process in processes:
             if os.name == "posix":
-                sys.stdout.write("#  Process id: %6d, Data path: %s\n" % 
-                                 (int(process[0]), process[1]))
+                print "#  Process id: %6d, Data path: %s" % \
+                       (int(process[0]), process[1])
             elif os.name == "nt":
-                sys.stdout.write("#  Process id: %6d, Port: %s\n" % 
-                                 (int(process[0]), process[1]))
+                print "#  Process id: %6d, Port: %s" % \
+                      (int(process[0]), process[1])
     else:
-        sys.stdout.write("# No active MySQL servers found.\n")
-    sys.stdout.write("# \n")
+        print "# No active MySQL servers found."
+    print "# "
     
 
 def show_server_info(servers, options):
@@ -377,4 +393,4 @@ def show_server_info(servers, options):
 
     if show_defaults and len(defaults_rows) > 0:
         for row in defaults_rows:
-            sys.stdout.write("  %s\n" % row)
+            print "  %s" % row
