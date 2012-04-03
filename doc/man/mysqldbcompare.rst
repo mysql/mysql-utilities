@@ -48,11 +48,11 @@ The tests include the following:
 
 #. Check database definitions
 
-   A database existance precondition check ensures that both databases
+   A database existence precondition check ensures that both databases
    exist. If they do not, no further processing is possible and the
    :option:`--run-all-tests` option is ignored.
 
-#. Check existance of objects in both databases
+#. Check existence of objects in both databases
 
    The test for objects in both databases identifies those objects
    missing from one or another database. The remaining tests apply

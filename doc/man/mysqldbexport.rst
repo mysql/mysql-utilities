@@ -192,7 +192,7 @@ OPTIONS
 
    Choose the lock type for the operation. Permitted lock values are
    **no-locks** (do not use any table locks), **lock-all** (use table locks
-   but no transaction and no consistent read), and **snaphot** (consistent
+   but no transaction and no consistent read), and **snapshot** (consistent
    read using a single transaction). The default is **snapshot**.
 
 .. option::  --no-headers, -h

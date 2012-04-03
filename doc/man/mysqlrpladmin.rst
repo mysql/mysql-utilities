@@ -445,7 +445,7 @@ following command.::
   # Failover complete.
   # ...done.
 
-After this command, the log file will contain entries like the following.
+After this command, the log file will contain entries like the following::
 
   2012-03-19 14:44:17 PM INFO Executing failover command...
   2012-03-19 14:44:17 PM INFO Performing failover.
