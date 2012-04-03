@@ -336,7 +336,6 @@ class FailoverConsole(object):
         self.max_cols, self.max_rows = get_terminal_size()
         
         # Refresh
-        print "KEY =", key
         if key in ['r','R']:
             self._refresh()
         # Show GTIDs

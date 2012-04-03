@@ -467,7 +467,9 @@ class RplCommands(object):
             self._report("Multiple instances of failover console found for "
                          "master %s:%s." % (self.topology.master.host,
                                             self.topology.master.port),
-                         logging.WARN, False)
+                         logging.WARN)
+            print "Failover mode changed to 'FAIL'. Console will start in 5 seconds."
+            time.sleep(5)
         
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)

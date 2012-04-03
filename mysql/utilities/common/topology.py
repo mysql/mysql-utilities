@@ -1018,14 +1018,15 @@ class Topology(Replication):
         """
         from mysql.utilities.common.user import User
         
-        users = []
+        servers = []
         errors = []
 
         # Collect all users first.
-        users.append((self.master.user, self.master.host, self.master))
-        for slave_conn in self.slaves:
-            slave = slave_conn['instance']
-            users.append((slave.user, slave.host, slave))
+        if self.master is not None:
+            servers.append(self.master)
+            for slave_conn in self.slaves:
+                slave = slave_conn['instance']
+                servers.append(slave)
 
         # If candidates were specified, check those too.
         candidates = self.options.get("candidates", None)
@@ -1036,19 +1037,19 @@ class Topology(Replication):
                 slave_dict = self.connect_candidate(candidate, False)
                 slave = slave_dict['instance']
                 if slave is not None:
-                    users.append((slave.user, slave.host, slave))
+                    servers.append(slave)
                     candidate_slaves.append(slave)
             
-        for user in users:
-            user_inst = User(user[2], "%s@%s" % (user[0], user[1]))
+        for server in servers:
+            user_inst = User(server, "%s@%s" % (server.user, server.host))
             if not failover:
                 if not user_inst.has_privilege("*", "*", "SUPER"):
-                    errors.append(user)
+                    errors.append((server.user, server.host))
             else:
                 if not user_inst.has_privilege("*", "*", "SUPER") or \
                    not user_inst.has_privilege("*", "*", "GRANT") or \
                    not user_inst.has_privilege("*", "*", "REPLICATION SLAVE"):
-                    errors.append(user)
+                    errors.append((server.user, server.host))
 
         # Disconnect if we connected to any candidates
         for slave in candidate_slaves:
@@ -1444,8 +1445,6 @@ class Topology(Replication):
                 self._report(msg, logging.CRITICAL)
                 raise UtilRplError(msg)
 
-        # Take the server out of the list.
-        self._remove_slave(new_master_dict)
         host = new_master_dict['host']
         port = new_master_dict['port']
         self._report("# Candidate slave %s:%s will become the new master." % 
@@ -1483,6 +1482,9 @@ class Topology(Replication):
                 continue
             slave.switch_master(self.master, user, passwd, False, None, None,
                                 self.verbose and not self.quiet)
+
+        # Take the server out of the list.
+        self._remove_slave(new_master_dict)
 
         # Starting all slaves
         self._report("# Starting slaves.")
