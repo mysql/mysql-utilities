@@ -568,7 +568,7 @@ class FailoverConsole(object):
         self._print_header()
         self._print_master_status()
         self._print_list(False)
-        self._print_footer()
+        self._print_footer(self.scroll_on)
         
 
     def display_console(self):
