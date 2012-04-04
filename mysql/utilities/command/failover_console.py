@@ -27,7 +27,7 @@ import sys
 import time
 from mysql.utilities.exception import UtilError, UtilRplError
 
-_CONSOLE_HEADER = "MySQL Replication Monitor and Failover Utility"
+_CONSOLE_HEADER = "MySQL Replication Failover Utility"
 _CONSOLE_FOOTER = "Q-quit R-refresh H-health G-GTID Lists U-UUIDs"
 
 _COMMAND_KEYS = {'\x1b[A':'ARROW_UP', '\x1b[B':'ARROW_DN'}
@@ -35,10 +35,9 @@ _COMMAND_KEYS = {'\x1b[A':'ARROW_UP', '\x1b[B':'ARROW_DN'}
 # Minimum number of rows needed to display screen
 _MINIMUM_ROWS = 15
 _HEALTH_LIST = "Replication Health Status"
-_GTID_LISTS = ["Transactions executed on the server",
-               "Transactions to be executed on the server",
-               "Transactions purged from the server",
-               "Transactions owned by another server"]
+_GTID_LISTS = ["Transactions executed on the servers:",
+               "Transactions purged from the servers:",
+               "Transactions owned by another server:"]
 _UUID_LIST = "UUIDs"
 _LOG_LIST = "Log File"
 _GEN_UUID_COLS = ['host','port','role','uuid']
@@ -335,6 +334,10 @@ class FailoverConsole(object):
         # We check for screen resize here
         self.max_cols, self.max_rows = get_terminal_size()
         
+        # Reset the GTID list counter
+        if key not in ['g','G']:
+            self.gtid_list = -1
+
         # Refresh
         if key in ['r','R']:
             self._refresh()
@@ -529,6 +532,9 @@ class FailoverConsole(object):
             self.scroll_size = len(rows)
             print_list(sys.stdout, 'GRID', self.list_data[0], rows)
             self.rows_printed += self.scroll_size + 4
+        else:
+            print "0 Rows Found."
+            self.rows_printed += 1
 
         if refresh:
             self._print_footer(self.scroll_on)
@@ -590,6 +596,7 @@ class FailoverConsole(object):
             self.list_data = self.get_health_data()
             self.start_list = 0
             self.end_list = len(self.list_data[1])
+            self.gtid_list = -1   # Reset the GTID list counter
                     
         # Draw the screen
         self._refresh()

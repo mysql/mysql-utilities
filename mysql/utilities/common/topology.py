@@ -873,7 +873,7 @@ class Topology(Replication):
         # Get master health
         rpl_health = self.master.check_rpl_health()
         self._report("# Getting health for master: %s:%s." %
-                     (self.master.host, self.master.port))
+                     (self.master.host, self.master.port), logging.INFO, False)
         have_gtid = self.master.supports_gtid()
         rows = []
         master_data = [
