@@ -41,6 +41,7 @@ _GTID_LISTS = ["Transactions executed on the servers:",
 _UUID_LIST = "UUIDs"
 _LOG_LIST = "Log File"
 _GEN_UUID_COLS = ['host','port','role','uuid']
+_GEN_GTID_COLS = ['host','port','role','gtid']
 _DATE_LEN = 22
 
 _DROP_FC_TABLE = "DROP TABLE mysql.failover_console"
@@ -255,7 +256,7 @@ class FailoverConsole(object):
             
         self.start_list = 0
         self.end_list = len(rows)
-        return (_GEN_UUID_COLS, rows)
+        return (_GEN_GTID_COLS, rows)
 
 
     def _format_health_data(self):
