@@ -1,3 +1,9 @@
+Release 1.0.5 (Released April 06, 2012)
+---------------------------------------
+
+- BUG#13916903: mysqlserverinfo fails when run against offline mysql v5.6
+- WL#6143: Failover Utility for Global Transaction ID - Minor fixes
+
 Release 1.0.5rc1 (Released March 28, 2012)
 ------------------------------------------
 
