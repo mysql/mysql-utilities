@@ -1,6 +1,5 @@
 Test case 1 - show health before switchover
 # Checking privileges.
-# Getting health for master: localhost:PORT1.
 #
 # Replication Topology Health:
 *************************       1. row *************************
@@ -46,7 +45,6 @@ Test case 2 - switchover to slave1
 # Performing START on all slaves.
 # Checking slaves for errors.
 # Switchover complete.
-# Getting health for master: localhost:PORT2.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
@@ -60,7 +58,6 @@ Test case 2 - switchover to slave1
 # ...done.
 Test case 3 - show health after switchover
 # Checking privileges.
-# Getting health for master: localhost:PORT2.
 #
 # Replication Topology Health:
 *************************       1. row *************************
@@ -106,7 +103,6 @@ Test case 4 - switchover to slave2
 # Performing START on all slaves.
 # Checking slaves for errors.
 # Switchover complete.
-# Getting health for master: localhost:PORT3.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
@@ -120,7 +116,6 @@ Test case 4 - switchover to slave2
 # ...done.
 Test case 5 - show health after switchover
 # Checking privileges.
-# Getting health for master: localhost:PORT3.
 #
 # Replication Topology Health:
 *************************       1. row *************************
@@ -166,7 +161,6 @@ Test case 6 - switchover to slave3
 # Performing START on all slaves.
 # Checking slaves for errors.
 # Switchover complete.
-# Getting health for master: localhost:PORT4.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
@@ -180,7 +174,6 @@ Test case 6 - switchover to slave3
 # ...done.
 Test case 7 - show health after switchover
 # Checking privileges.
-# Getting health for master: localhost:PORT4.
 #
 # Replication Topology Health:
 *************************       1. row *************************
@@ -226,7 +219,6 @@ Test case 8 - switchover to master
 # Performing START on all slaves.
 # Checking slaves for errors.
 # Switchover complete.
-# Getting health for master: localhost:PORT1.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
@@ -240,7 +232,6 @@ Test case 8 - switchover to master
 # ...done.
 Test case 9 - show health after switchover
 # Checking privileges.
-# Getting health for master: localhost:PORT1.
 #
 # Replication Topology Health:
 *************************       1. row *************************

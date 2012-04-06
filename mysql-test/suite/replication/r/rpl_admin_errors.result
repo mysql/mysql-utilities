@@ -38,7 +38,6 @@ User joe on localhost does not have sufficient privileges to execute the health 
 ERROR: Not enough privileges to execute command.
 Test case 12 - Not enough privileges - health jane
 # Checking privileges.
-# Getting health for master: localhost:PORT1.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
