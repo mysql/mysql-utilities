@@ -12,10 +12,12 @@ Command-Line Utilities
    mysqldbexport
    mysqldiff
    mysqldiskusage
+   mysqlfailover
    mysqlindexcheck
    mysqlmetagrep
    mysqlprocgrep
    mysqlreplicate
+   mysqlrpladmin
    mysqlrplcheck
    mysqlrplshow
    mysqlserverclone

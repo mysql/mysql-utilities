@@ -100,7 +100,7 @@ Classes
       be supplied as keyword arguments. All other arguments
       are treated as connection specifiers.
 
-      :param connections: Sequence of :ref:`connection specifiers` to send the search to
+      :param connections: Sequence of connection specifiers to send the search to
       :param output: File object to use for writing the result
       :param connector: Connector to use for connecting to the servers
 

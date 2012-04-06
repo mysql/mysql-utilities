@@ -12,10 +12,10 @@ three different ways:
 
 - As a dictionary containing the connection parameters.
 
-- As a :ref:`connection specification` string containing the connection
+- As a connection specification string containing the connection
   parameters.
 
-- As a :ref:`Server instance`.
+- As a Server instance.
 
 When providing the connection parameters as a dictionary, the
 parameters are passed unchanged to the connector's ``connect``
@@ -50,7 +50,7 @@ _`unix_socket`
 Providing the connection parameters as a string requires the string to
 have the format ``user[:passwd]@host[:port][:socket]``, where some values
 are optional. If a connection specification string is provided, it
-is parsed using the :ref:`options.parse_connection` function.
+is parsed using the options.parse_connection function.
 
 .. _`getpass.getuser`: http://docs.python.org/library/getpass.html#getpass.getuser
 
