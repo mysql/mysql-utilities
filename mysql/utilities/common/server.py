@@ -721,6 +721,8 @@ class Server(object):
         from mysql.utilities.common.user import User
         
         errors = []
+        if host == '127.0.0.1':
+            host = 'localhost'
         result = self.exec_query("SELECT * FROM mysql.user WHERE user = '%s' "
                                  "AND host = '%s'" % (user, host))
         if result is None or result == []:

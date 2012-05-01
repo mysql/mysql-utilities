@@ -83,6 +83,12 @@ class test(mutlib.System_test):
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+            
+        # Build connection string with loopback address instead of localhost
+        slave_ports = [self.server2.port, self.server3.port, self.server4.port]
+        slaves_loopback = "root:root@127.0.0.1:%s," % self.server2.port
+        slaves_loopback += "root:root@127.0.0.1:%s," % self.server3.port
+        slaves_loopback += "root:root@127.0.0.1:%s" % self.server4.port
 
         # Perform switchover from original master to all other slaves and back.
         test_cases = [
@@ -117,6 +123,16 @@ class test(mutlib.System_test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
+
+        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_opts = " health --disc=root:root "
+        cmd_opts += "--slaves=%s" % slaves_loopback
+        comment= "Test case %s - health with loopback and discovery" % test_num
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
 
         # Perform stop, start, and reset
         commands = ['stop', 'start', 'stop', 'reset']

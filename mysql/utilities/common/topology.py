@@ -317,6 +317,8 @@ class Topology(Replication):
                 found = False
                 # Eliminate if already a slave
                 for slave_dict in self.slaves:
+                    if slave_dict['host'] == '127.0.0.1':
+                        slave_dict['host'] = 'localhost'
                     if slave_dict['host'] == host and \
                        int(slave_dict['port']) == int(port):
                         found = True

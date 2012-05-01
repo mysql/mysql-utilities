@@ -53,6 +53,15 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
             
+        self.server1.exec_query("STOP SLAVE")
+        self.server1.exec_query("CHANGE MASTER TO MASTER_HOST='127.0.0.1'")
+        self.server1.exec_query("START SLAVE")
+
+        comment = "Test case 4 - normal run with loopback"
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
         self.do_replacements()
 
         return True

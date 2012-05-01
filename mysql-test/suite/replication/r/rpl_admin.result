@@ -264,28 +264,42 @@ Test case 9 - show health after switchover
     health: OK
 4 rows.
 # ...done.
-Test case 10 - run command stop
+Test case 10 - health with loopback and discovery
+# Discovering slaves for master at localhost:PORT1
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 11 - run command stop
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 11 - run command start
+Test case 12 - run command start
 # Checking privileges.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
-Test case 12 - run command stop
+Test case 13 - run command stop
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 13 - run command reset
+Test case 14 - run command reset
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok

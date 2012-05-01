@@ -926,6 +926,8 @@ class Slave(Server):
             return None
         m_host = res[0][_SLAVE_MASTER_HOST]
         m_port = res[0][_SLAVE_MASTER_PORT]
+        if m_host == '127.0.0.1':
+            m_host = 'localhost'
 
         return (m_host, m_port)
 
@@ -1334,8 +1336,7 @@ class Slave(Server):
             host = 'localhost'
         if res != [] and res[0] != []:
             res = res[0]
-            m_host = res[_SLAVE_MASTER_HOST]
-            m_port = res[_SLAVE_MASTER_PORT]
+            m_host, m_port = self.get_master_host_port()
             if m_host != host or int(m_port) != int(port):
                 return False
         return True
@@ -1373,8 +1374,7 @@ class Slave(Server):
         if res != [] and res[0] != []:
             res = res[0]
             state = res[_SLAVE_IO_STATE]
-            m_host = res[_SLAVE_MASTER_HOST]
-            m_port = res[_SLAVE_MASTER_PORT]
+            m_host, m_port = self.get_master_host_port()
             m_log = res[_SLAVE_MASTER_LOG_FILE]
             m_log_pos = res[_SLAVE_MASTER_LOG_FILE_POS]
             io_running = res[_SLAVE_IO_RUNNING]
