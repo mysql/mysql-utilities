@@ -724,7 +724,7 @@ class Server(object):
         if host == '127.0.0.1':
             host = 'localhost'
         result = self.exec_query("SELECT * FROM mysql.user WHERE user = '%s' "
-                                 "AND host = '%s'" % (user, host))
+                                 "AND host in ('%s', '%%')" % (user, host))
         if result is None or result == []:
             errors.append("The replication user %s@%s was not found "
                           "on the master." % (user, host))
