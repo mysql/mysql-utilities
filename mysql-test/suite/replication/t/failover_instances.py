@@ -11,6 +11,7 @@ from mysql.utilities.exception import MUTLibError
 
 _FAILOVER_LOG = "fail_log.txt"
 _TIMEOUT = 30
+_LOG_PREFIX = ["a","b","c","d"]
 
 class test(failover.test):
     """test replication failover console
@@ -25,9 +26,9 @@ class test(failover.test):
                               "GTID_MODE=ON.")
         if self.debug:
             print
-        for log in ["a","b"]:
+        for log in _LOG_PREFIX:
             try:
-                os.unlink(log+_FAILOVERLOG)
+                os.unlink(log+_FAILOVER_LOG)
             except:
                 pass
         return rpl_admin_gtid.test.check_prerequisites(self)
@@ -35,6 +36,43 @@ class test(failover.test):
     def setup(self):
         return rpl_admin_gtid.test.setup(self)
         
+    def _poll_console(self, start, name, proc, comment):
+        msg = "Timeout waiting for console %s to " % name
+        msg += "start." if start else "end."
+        if self.debug:
+            print "# Waiting for console %s to" % name,
+            print "start." if start else "end."
+        elapsed = 0
+        delay = 1
+        done = False
+        while not done:
+            if start:
+                done = proc.poll() is None
+            else:
+                done = proc.poll() is not None
+            time.sleep(delay)
+            elapsed += delay
+            if elapsed >= _TIMEOUT:
+                if self.debug:
+                    print "#", msg
+                raise MUTLibError("%s: " % comment + msg)
+                
+    def _check_result(self, prefix, target):
+        found_row = False
+        log_file = open(prefix + _FAILOVER_LOG)
+        if self.debug:
+            print "# Looking for mode change in log."
+        for row in log_file.readlines():
+            if self.debug:
+                print row,
+            if target in row:
+                found_row = True
+                break
+                if self.debug:
+                    print "# Found in row = '%s'." % row,
+        log_file.close()
+        return found_row
+
     def run(self):
         self.res_fname = "result.txt"
         
@@ -51,9 +89,13 @@ class test(failover.test):
         
         failover_cmd = "python ../scripts/mysqlfailover.py --interval=15 " + \
                        " --discover-slaves-login=root:root --failover-" + \
-                       "mode=auto --log=%s " + master_str
-        failover_cmd1 = failover_cmd % ("a" + _FAILOVER_LOG)
-        failover_cmd2 = failover_cmd % ("b" + _FAILOVER_LOG)
+                       "mode=%s --log=%s %s "
+        failover_cmd1 = failover_cmd % ("auto", "a" + _FAILOVER_LOG, master_str)
+        failover_cmd2 = failover_cmd % ("auto", "b" + _FAILOVER_LOG, master_str)
+        failover_cmd3 = failover_cmd % ("elect", "c" + _FAILOVER_LOG, master_str)
+        failover_cmd3 += " --candidate=%s" % slave1_conn
+        failover_cmd4 = failover_cmd % ("auto", "d" + _FAILOVER_LOG,
+                                        "--master="+slave2_conn)
         
         # We launch one console, wait for interval, then start another,
         # wait for interval, then kill both, and finally check log of each
@@ -67,24 +109,8 @@ class test(failover.test):
             print "# First instance:", failover_cmd1
             print "# Second instance:", failover_cmd2
             
-        # Launch the consoles in stealth mode
         proc1, f_out1 = failover.test.start_process(self, failover_cmd1)
-
-        # Wait for console to load
-        if self.debug:
-            print "# Waiting for consoles to start."
-        i = 1
-        time.sleep(1)
-        while proc1.poll() is not None:
-            if self.debug:
-                print "# Polling first console:", proc1.pid, proc1.poll()
-            time.sleep(1)
-            i += 1
-            if i > _TIMEOUT:
-                if self.debug:
-                    print "# Timeout first console to start."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "first console to start." % comment)  
+        self._poll_console(True, "first", proc1, comment)
 
         # Now wait for interval to occur.
         if self.debug:
@@ -92,72 +118,60 @@ class test(failover.test):
         time.sleep(interval)
 
         proc2, f_out2 = failover.test.start_process(self, failover_cmd2)
-        i = 1
-        time.sleep(1)
-        while proc2.poll() is not None:
-            if self.debug:
-                print "# Polling second console:", proc2.pid, proc2.poll()
-            time.sleep(1)
-            i += 1
-            if i > _TIMEOUT:
-                if self.debug:
-                    print "# Timeout second console to start."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "second console to start." % comment)  
-                
-        # Need to poll here and wait for console to really end.
+        self._poll_console(True, "second", proc2, comment)
+
         ret_val = failover.test.stop_process(self, proc1, f_out1, True)
-        # Wait for console to end
-        if self.debug:
-            print "# Waiting for first console to end."
-        i = 0
-        while proc1.poll() is None:
-            time.sleep(1)
-            i += 1
-            if i > _TIMEOUT:
-                if self.debug:
-                    print "# Timeout first console to end."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "first console to end." % comment)
+        self._poll_console(False, "first", proc1, comment)
 
         ret_val = failover.test.stop_process(self, proc2, f_out2, True)
-        # Wait for console to end
-        if self.debug:
-            print "# Waiting for second console to end."
-        i = 0
-        while proc2.poll() is None:
-            time.sleep(1)
-            i += 1
-            if i > _TIMEOUT:
-                if self.debug:
-                    print "# Timeout second console to end."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "second console to end." % comment)
+        self._poll_console(False, "second", proc1, comment)
 
         # Check to see if second console changed modes.
-        found_row = False
-        log_file = open("b"+_FAILOVER_LOG)
-        rows = log_file.readlines()
-        if self.debug:
-            print "# Looking for mode change in log."
-        for row in rows:
-            if "Multiple instances of failover console found" in row:
-                found_row = True
-                if self.debug:
-                    print "# Found in row = '%s'." % row[:len(row)-1]
-        log_file.close()
+        found_row = self._check_result("b", "Multiple instances of failover")
         self.results.append((comment, found_row))
+                    
+        comment = "Test case 2 : test failed instance restart"
+        if self.debug:
+            print comment
+            print "# Third instance:", failover_cmd3
+            print "# Fourth instance:", failover_cmd4
+            
+        # Launch the console in stealth mode
+        proc3, f_out3 = failover.test.start_process(self, failover_cmd3)
+        self._poll_console(True, "third", proc3, comment)
+
+        # Now, kill the master - wha-ha-ha!
+        res = self.server1.show_server_variable('pid_file')
+        pid_file = open(res[0][1])
+        pid = int(pid_file.readline().strip('\n'))
+        if self.debug:
+            print "# Terminating server", self.server1.port, "via pid =", pid
+        pid_file.close()
+
+        # Stop the server 
+        self.server1.disconnect()
+        failover.test.kill(self, pid, True)
+
+        self.servers.remove_server(self.server1.role)
         
-        if not found_row:
-            print "# ERROR: Cannot find entry in log:"
-            for row in rows:
-                print row,
+        # Now wait for interval to occur.
+        if self.debug:
+            print "# Waiting for interval to end."
+        time.sleep(interval)
+
+        ret_val = failover.test.stop_process(self, proc3, f_out3, True)
+        self._poll_console(False, "third", proc3, comment)
+                
+        # Restart the console - should not demote the failover mode.
+        proc4, f_out4 = failover.test.start_process(self, failover_cmd4)
+        self._poll_console(True, "fourth", proc4, comment)
         
-        try:
-            os.unlink(log_filename)
-        except:
-            pass
-        
+        ret_val = failover.test.stop_process(self, proc4, f_out4, True)
+        self._poll_console(False, "fourth", proc4, comment)
+
+        found_row = self._check_result("d", "Multiple instances of failover")
+        self.results.append((comment, found_row == False))
+
         return True
 
     def get_result(self):
@@ -174,12 +188,11 @@ class test(failover.test):
         return True # Not a comparative test
     
     def cleanup(self):
-        for log in ["a","b"]:
+        for log in _LOG_PREFIX:
             try:
-                os.unlink(log+_FAILOVERLOG)
+                os.unlink(log+_FAILOVER_LOG)
             except:
                 pass
         return rpl_admin_gtid.test.cleanup(self)
-
 
 

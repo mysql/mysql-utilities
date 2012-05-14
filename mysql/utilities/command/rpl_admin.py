@@ -400,6 +400,69 @@ class RplCommands(object):
     def auto_failover(self, interval):
         """Automatic failover
         
+        Wrapper class for running automatic failover. See
+        run_automatic_failover for details on implementation.
+        
+        This method ensures the registration/deregistration occurs
+        regardless of exception or errors.
+
+        interval[in]   time in seconds to wait to check status of servers
+        
+        Returns bool - True = success, raises exception on error
+        """
+        import time
+        from mysql.utilities.command.failover_console import FailoverConsole
+
+        failover_mode = self.options.get("failover_mode", "auto")
+        force = self.options.get("force", False)
+
+        # Initialize a console
+        console = FailoverConsole(self.topology.master,
+                                  self.topology.get_health,
+                                  self.topology.get_gtid_data,
+                                  self.topology.get_server_uuids,
+                                  self.options)
+        
+        # Register instance
+        self._report("Registering instance on master.", logging.INFO, False)
+        old_mode = failover_mode
+        failover_mode = console.register_instance(force)
+        if failover_mode != old_mode:
+            self._report("Multiple instances of failover console found for "
+                         "master %s:%s." % (self.topology.master.host,
+                                            self.topology.master.port),
+                         logging.WARN)
+            print "If this is an error, restart the console with --force. "
+            print "Failover mode changed to 'FAIL' for this instance. "
+            print "Console will start in 10 seconds.",
+            sys.stdout.flush()
+            for i in range(0, 9):
+                time.sleep(1)
+                sys.stdout.write('.')
+                sys.stdout.flush()
+            print "starting Console."
+            time.sleep(1)
+        
+        try:
+            res = self.run_auto_failover(console, interval);
+        except:
+            raise
+        finally:
+            try:
+                # Unregister instance
+                self._report("Unregistering instance on master.", logging.INFO,
+                             False)
+                console.register_instance(False, False)
+                self._report("Failover console stopped.", logging.INFO, False)
+            except:
+                pass
+
+        return res
+        
+
+    def run_auto_failover(self, console, interval):
+        """Run automatic failover
+        
         This method implements the automatic failover facility. It uses the
         FailoverConsole class from the failover_console.py to implement all
         user interface commands and uses the existing failover() method of
@@ -411,12 +474,12 @@ class RplCommands(object):
         2) failover to list of candidates only
         3) fail
             
+        console[in]    instance of the failover console class
         interval[in]   time in seconds to wait to check status of servers
         
         Returns bool - True = success, raises exception on error
         """
         import time
-        from mysql.utilities.command.failover_console import FailoverConsole
         from mysql.utilities.common.tools import ping_host
         from mysql.utilities.common.tools import execute_script
         
@@ -424,7 +487,6 @@ class RplCommands(object):
         pingtime = self.options.get("pingtime", 3)
         timeout = self.options.get("timeout", 3)
         exec_fail = self.options.get("exec_fail", None)
-        force = self.options.get("force", False)
         post_fail = self.options.get("post_fail", None)
                 
         # Only works for GTID_MODE=ON
@@ -453,24 +515,6 @@ class RplCommands(object):
             self._report(no_exec_fail_msg, logging.CRITICAL, False)
             raise UtilRplError(no_exec_fail_msg)
                
-        # Initialize a console
-        console = FailoverConsole(self.topology.master, self.topology.get_health,
-                                  self.topology.get_gtid_data,
-                                  self.topology.get_server_uuids,
-                                  self.options)
-        
-        # Register instance
-        self._report("Registering instance on master.", logging.INFO, False)
-        old_mode = failover_mode
-        failover_mode = console.register_instance(force)
-        if failover_mode != old_mode:
-            self._report("Multiple instances of failover console found for "
-                         "master %s:%s." % (self.topology.master.host,
-                                            self.topology.master.port),
-                         logging.WARN)
-            print "Failover mode changed to 'FAIL'. Console will start in 5 seconds."
-            time.sleep(5)
-        
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
         
@@ -573,10 +617,5 @@ class RplCommands(object):
                     return False   # Errors detected
                 done = True        # User has quit
             first_pass = False
-
-        # Unregister instance
-        self._report("Unregistering instance on master.", logging.INFO, False)
-        console.register_instance(False, False)
-        self._report("Failover console stopped.", logging.INFO, False)
 
         return True

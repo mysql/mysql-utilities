@@ -184,6 +184,8 @@ try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
     rpl_cmds.auto_failover(opt.interval)
 except UtilError, e:
+    # log the error in case it was an usual exception
+    logging.log(logging.CRITICAL, e.errmsg.strip(' '))  
     print "ERROR:", e.errmsg
     exit(1)
     
