@@ -9,7 +9,7 @@ ERROR: No --rpl-user specified and multiple users found with replication privile
 Test case 3 - error: --rpl-user missing user
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: The replication user missing@localhost was not found on the master.
+ERROR: The replication user missing@localhost was not found on localhost:PORT1.
 Test case 4 - error: --rpl-user missing privileges
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

@@ -727,7 +727,7 @@ class Server(object):
                                  "AND host in ('%s', '%%')" % (user, host))
         if result is None or result == []:
             errors.append("The replication user %s@%s was not found "
-                          "on the master." % (user, host))
+                          "on %s:%s." % (user, host, self.host, self.port))
         else:
             rpl_user = User(self, "%s@%s" % (user, host))
             if not rpl_user.has_privilege('*', '*',

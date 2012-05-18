@@ -57,6 +57,9 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)            
         
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
+                                "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+        
         comment = "Test case 3 - switchover with verbosity"
         cmd_str = "%s %s " % (base_cmd, master_str)
         cmd_opts = " --discover-slaves-login=root:root --verbose switchover "

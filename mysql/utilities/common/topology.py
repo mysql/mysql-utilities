@@ -630,13 +630,17 @@ class Topology(Replication):
                 
         # Check replication user - must exist with correct privileges
         user, passwd = slave.get_rpl_user()
-        if user is None or slave.check_rpl_user(user, passwd) == []:
-            msg = "#   Replication user exists ... %s"
-            if self.verbose and not force and not quiet:
-                self._report(msg % "FAIL", logging.WARN)
-            return (False, "RPL_USER",
-                    "Candidate slave is missing replication user.")
-        if self.verbose and not self.force and not quiet:
+        msg = "#   Replication user exists ... %s"
+        if user is None or slave.check_rpl_user(user, slave.host) != []:
+            if not self.force:
+                if self.verbose and not quiet:
+                    self._report(msg % "FAIL", logging.WARN)
+                return (False, "RPL_USER",
+                        "Candidate slave is missing replication user.")
+            else:
+                self._report("Replication user not found but --force used.",
+                             logging.WARN)
+        elif self.verbose and not quiet:
             self._report(msg % "Ok")
                 
         # If no GTIDs, we need binary logging enabled on candidate.
@@ -1356,6 +1360,9 @@ class Topology(Replication):
                                                          slave, check_master)
             if slave_ok is not None and slave_ok[0]:
                 return slave_dict
+            else:
+                self._report("# Candidate %s:%s does not meet the requirements." %
+                             (slave.host, slave.port), logging.WARN)
             
         # If strict is on and we have found no viable candidates, return None
         if strict:
@@ -1379,7 +1386,9 @@ class Topology(Replication):
                                                              check_master)
                 if slave_ok is not None and slave_ok[0]:
                     return slave_dict
-            except:
+            except UtilError, e:
+                self._report("# Slave eliminated due to error: %s" % e.errmsg,
+                             logging.WARN)
                 pass # Slave gone away, skip it.
             
         return None

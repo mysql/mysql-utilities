@@ -139,7 +139,9 @@ class test(replicate.test):
 
         self.replace_result("CHANGE MASTER", "CHANGE MASTER <goes here>\n")
         self.replace_result("# CHANGE MASTER", "# CHANGE MASTER <goes here>\n")
-    
+        self.replace_substring(str(self.server1.port), "PORT1")
+        self.replace_substring(str(self.server2.port), "PORT2")
+
         return True
 
     def get_result(self):

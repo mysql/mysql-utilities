@@ -91,6 +91,9 @@ class test(export_rpl_errors.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        self.replace_substring(str(self.server1.port), "PORT1")
+        self.replace_substring(str(self.server2.port), "PORT2")
+
         return True
 
     def get_result(self):

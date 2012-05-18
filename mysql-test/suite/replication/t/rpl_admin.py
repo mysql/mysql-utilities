@@ -62,6 +62,10 @@ class test(mutlib.System_test):
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
+        
+        for slave in [self.server2, self.server3, self.server4]:
+            slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
+                              "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
 
         # Form replication topology - 1 master, 3 slaves
         return self.reset_topology()
