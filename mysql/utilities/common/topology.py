@@ -298,9 +298,9 @@ class Topology(Replication):
         # Get user and password
         try:
             user, password = discover.split(":")
-        except:
+        except ValueError:
             user = discover
-            passord = None
+            password = None
             
         # Find discovered slaves
         new_slaves_found = False
@@ -872,6 +872,8 @@ class Topology(Replication):
         """    
         assert (self.master is not None), "No master or connection failed."
 
+        import operator
+        
         # Get master health
         rpl_health = self.master.check_rpl_health()
         self._report("# Getting health for master: %s:%s." %
@@ -905,6 +907,7 @@ class Topology(Replication):
     
         rows.append(master_data)
         
+        slave_rows = []
         # Get the health of the slaves
         if have_gtid == "ON":
             master_gtids = self.master.exec_query(_GTID_DONE)
@@ -944,7 +947,7 @@ class Topology(Replication):
             # Show additional details if verbosity turned on
             if self.verbosity > 0:
                 if slave is None:
-                    slave_data.extend(["","","","","","","","","","","","",""])
+                    slave_data.extend([""]*13)
                 else:
                     slave_data.append(slave.get_version())
                     res = slave.get_rpl_details()
@@ -956,10 +959,14 @@ class Topology(Replication):
                         else:
                             slave_data.extend([""])
                     else:
-                        slave_data.extend(["","","","","","","","","","","","",""])
+                        slave_data.extend([""]*13)
                                    
-            rows.append(slave_data)
-    
+            slave_rows.append(slave_data)
+
+        # order the slaves
+        slave_rows.sort(key=operator.itemgetter(0, 1))
+        rows.extend(slave_rows)
+
         return (columns, rows)
         
         

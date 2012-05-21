@@ -172,6 +172,8 @@ class test(failover.test):
         found_row = self._check_result("d", "Multiple instances of failover")
         self.results.append((comment, found_row == False))
 
+        rpl_admin_gtid.test.reset_topology(self)
+
         return True
 
     def get_result(self):

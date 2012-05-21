@@ -51,9 +51,9 @@ Test case 2 - switchover to slave1
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT2  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - show health after switchover
@@ -69,21 +69,21 @@ Test case 3 - show health after switchover
     health: OK
 *************************       2. row *************************
       host: localhost
-      port: PORT3
+      port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: NO
     health: OK
 *************************       3. row *************************
       host: localhost
-      port: PORT4
+      port: PORT3
       role: SLAVE
      state: UP
  gtid_mode: NO
     health: OK
 *************************       4. row *************************
       host: localhost
-      port: PORT1
+      port: PORT4
       role: SLAVE
      state: UP
  gtid_mode: NO
@@ -109,9 +109,9 @@ Test case 4 - switchover to slave2
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT3  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 5 - show health after switchover
@@ -127,21 +127,21 @@ Test case 5 - show health after switchover
     health: OK
 *************************       2. row *************************
       host: localhost
-      port: PORT2
+      port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: NO
     health: OK
 *************************       3. row *************************
       host: localhost
-      port: PORT4
+      port: PORT2
       role: SLAVE
      state: UP
  gtid_mode: NO
     health: OK
 *************************       4. row *************************
       host: localhost
-      port: PORT1
+      port: PORT4
       role: SLAVE
      state: UP
  gtid_mode: NO
@@ -167,8 +167,8 @@ Test case 6 - switchover to slave3
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT4  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
@@ -185,7 +185,7 @@ Test case 7 - show health after switchover
     health: OK
 *************************       2. row *************************
       host: localhost
-      port: PORT3
+      port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: NO
@@ -199,7 +199,7 @@ Test case 7 - show health after switchover
     health: OK
 *************************       4. row *************************
       host: localhost
-      port: PORT1
+      port: PORT3
       role: SLAVE
      state: UP
  gtid_mode: NO
@@ -225,8 +225,8 @@ Test case 8 - switchover to master
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.

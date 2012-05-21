@@ -21,17 +21,17 @@ class test(rpl_admin.test):
 
     def setup(self):
         self.res_fname = "result.txt"
-
+        
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld)
+        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld)
+        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld)
+        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld)
+        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
         
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
@@ -51,6 +51,8 @@ class test(rpl_admin.test):
         
         test_num = 14
         
+        rpl_admin.test.reset_topology(self)
+
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
@@ -77,15 +79,12 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
         
-        # Mask GTIDs
-        self.replace_result("localhost,%s,MASTER," % self.m_port,
-                            "localhost,PORT1,MASTER,GTID_HERE\n")
-        self.replace_result("localhost,%s,SLAVE," % self.s1_port,
-                            "localhost,PORT2,SLAVE,GTID_HERE\n")
-        self.replace_result("localhost,%s,SLAVE," % self.s2_port,
-                            "localhost,PORT3,SLAVE,GTID_HERE\n")
-        self.replace_result("localhost,%s,SLAVE," % self.s3_port,
-                            "localhost,PORT4,SLAVE,GTID_HERE\n")
+        # Remove GTIDs here because they are not deterministic when run with
+        # other tests that reuse these servers.
+        self.remove_result("localhost,%s,MASTER," % self.m_port)
+        self.remove_result("localhost,%s,SLAVE," % self.s1_port)
+        self.remove_result("localhost,%s,SLAVE," % self.s2_port)
+        self.remove_result("localhost,%s,SLAVE," % self.s3_port)
 
         comment = "Test case %s - heatlh with discover" % test_num
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
@@ -128,7 +127,6 @@ class test(rpl_admin.test):
         return True
 
     def get_result(self):
-        return (True, '')
         return self.compare(__name__, self.results)
     
     def record(self):

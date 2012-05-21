@@ -19,10 +19,17 @@ class test(mutlib.System_test):
             raise MUTLibError("Test requires server version prior to 5.6.5")
         return self.check_num_servers(1)
 
-    def spawn_server(self, name, mysqld=None):
+    def spawn_server(self, name, mysqld=None, kill=False):
+        index = self.servers.find_server_by_name(name)
+        if index >= 0 and kill:
+            server = self.servers.get_server(index)
+            if self.debug:
+                print "# Killing server %s." % server.role
+            self.servers.stop_server(server)
+            self.servers.remove_server(server.role)
+            index = -1
         if self.debug:
             print "# Spawning %s" % name
-        index = self.servers.find_server_by_name(name)
         if index >= 0:
             if self.debug:
                 print "# Found it in the servers list."
@@ -155,15 +162,22 @@ class test(mutlib.System_test):
         return True
 
     def do_masks(self):
-        self.replace_substring("%s" % self.m_port, "PORT1")
-        self.replace_substring("%s" % self.s1_port, "PORT2")
-        self.replace_substring("%s" % self.s2_port, "PORT3")
-        self.replace_substring("%s" % self.s3_port, "PORT4")
+        self.replace_substring(str(self.m_port), "PORT1")
+        self.replace_substring(str(self.s1_port), "PORT2")
+        self.replace_substring(str(self.s2_port), "PORT3")
+        self.replace_substring(str(self.s3_port), "PORT4")
         
     def reset_topology(self):
         # Form replication topology - 1 master, 3 slaves
         self.master_str = "--master=%s" % \
                           self.build_connection_string(self.server1)
+        for slave in [self.server1, self.server2, self.server3, self.server4]:
+            try:
+                slave.exec_query("STOP SLAVE")
+                slave.exec_query("RESET SLAVE")
+            except:
+                pass
+        
         for slave in [self.server2, self.server3, self.server4]:
             slave_str = " --slave=%s" % self.build_connection_string(slave)
             conn_str = self.master_str + slave_str
