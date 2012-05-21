@@ -387,3 +387,14 @@ Test case 18 - show health after failover
     health: OK
 3 rows.
 # ...done.
+Test case 19 - elect with missing rpl user
+# Checking privileges.
+# Checking privileges on candidates.
+# Electing candidate slave from candidate list then slaves list.
+# Checking eligibility of slave localhost:PORT2 for candidate.
+#   Slave connected to master ... Ok
+#   GTID_MODE=ON ... Ok
+#   Logging filters agree ... Ok
+#   Replication user exists ... Ok
+# Best slave found is located on localhost:PORT2.
+# ...done.

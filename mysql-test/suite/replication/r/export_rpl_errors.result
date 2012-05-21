@@ -27,7 +27,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 Test case 7 - error: --rpl-user missing user
 # Source on localhost: ... connected.
-ERROR: The replication user missing@localhost was not found on the master.
+ERROR: The replication user missing@localhost was not found on localhost:PORT1.
 Test case 8 - error: --rpl-user missing privileges
 # Source on localhost: ... connected.
 ERROR: Replication user does not have the correct privilege. She needs 'REPLICATION SLAVE' on all replicated databases.

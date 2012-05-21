@@ -118,6 +118,19 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
         
+        # Test for BUG#14080657
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'")
+        
+        cmd_str = "mysqlrpladmin.py --master=%s " % slave3_conn
+        comment = "Test case %s - elect with missing rpl user" % test_num
+        cmd_opts = " --slaves=%s elect -vvv --candidates=%s " % \
+                   (slaves, slave1_conn)
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 

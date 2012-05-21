@@ -98,7 +98,7 @@ WARNING: The --ping option is used only with the health command.
 #   Slave connected to master ... Ok
 #   Slave not behind master ... Ok
 #   Logging filters agree ... Ok
-#   Logging filters agree ... Ok
+#   Replication user exists ... Ok
 #   Binary logging turned on ... Ok
 # Creating replication user if it does not exist.
 # Blocking writes on master.
