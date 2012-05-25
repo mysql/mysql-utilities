@@ -246,6 +246,7 @@ def _start_server(server_val, basedir, datadir, options={}):
         time.sleep(1)
     server.connect()
     print "done."
+    return server
     
 
 def _stop_server(server_val, basedir, options={}):
@@ -360,6 +361,7 @@ def show_server_info(servers, options):
     server_val = {}
     get_defaults = True
     for server in servers:
+        new_server = None
         server_alive = True
         server_started = False
         if not test_connect(server):
@@ -374,7 +376,7 @@ def show_server_info(servers, options):
                     except:
                         raise UtilError("Source connection values in"
                                              "valid or cannot be parsed.")
-                    res = _start_server(server_val, basedir, datadir, options)
+                    new_server = _start_server(server_val, basedir, datadir, options)
                     server_started = True                    
                 else:
                     server_alive = False
@@ -385,8 +387,9 @@ def show_server_info(servers, options):
             if defaults is not None and len(defaults_rows) == 0:
                 defaults_rows = defaults
                 get_defaults = False
-        if server_started:
+        if server_started and new_server is not None:
             # Need to stop the server!
+            new_server.disconnect()
             res = _stop_server(server_val, basedir, options)
 
     print_list(sys.stdout, format, _COLUMNS, rows, no_headers)
