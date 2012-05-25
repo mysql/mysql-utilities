@@ -319,16 +319,22 @@ class _TestMasterInfo(_BaseTestReplication):
         """Execute test.
         """
         # Check master.info file
+        from mysql.utilities.common.replication import MasterInfo
+        
         self.warning = True
+        m_info = MasterInfo(self.rpl.slave, self.options)
         self.report_test("Check master information file")
-        return self.rpl.slave.check_master_info(self.options)
+        return m_info.check_master_info()
         
     def report_epilog(self):
         """Report master info contents.
         """
+        from mysql.utilities.common.replication import MasterInfo
+        
         if self.verbosity > 0 and not self.quiet:
+            m_info = MasterInfo(self.rpl.slave, self.options)
             print "\n#\n# Master information file: \n#" 
-            self.rpl.slave.show_master_info(self.options)
+            master_info = m_info.show_master_info()
             print
             
 

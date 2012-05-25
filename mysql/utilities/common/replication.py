@@ -31,7 +31,9 @@ _MASTER_INFO_COL = [
     'Master_Log_File', 'Read_Master_Log_Pos', 'Master_Host', 'Master_User',
     'Master_Password', 'Master_Port', 'Connect_Retry', 'Master_SSL_Allowed',
     'Master_SSL_CA_File', 'Master_SSL_CA_Path', 'Master_SSL_Cert',
-    'Master_SSL_Cipher', 'Master_SSL_Key', 'Master_SSL_Verify_Server_Cert'
+    'Master_SSL_Cipher', 'Master_SSL_Key', 'Master_SSL_Verify_Server_Cert',
+    'Heartbeat', 'Bind', 'Ignored_server_ids', 'Uuid', 'Retry_count',
+    'SSL_CRL', 'SSL_CRL_Path', 'Enabled_auto_position',
 ]
 
 _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
@@ -843,6 +845,234 @@ class Master(Server):
         """Stop blocking writes
         """
 
+class MasterInfo(object):
+    """The MasterInfo is an abstraction of the mechanism for storing the
+    master information for slave servers. It is designed to return an
+    implementation neutral representation of the information for use in
+    newer servers that use a table to store the information as well as
+    older servers that use a file to store the information.
+    """
+    
+    def __init__(self, slave, options):
+        """Constructor
+
+        The method accepts one of the following types for options['conn_info']:
+        
+            - dictionary containing connection information including:
+              (user, passwd, host, port, socket)
+            - connection string in the form: user:pass@host:port:socket
+            - an instance of the Server class
+             
+        options[in]        options for controlling behavior:
+          filename         filename for master info file - valid only for
+                           servers with master-info-repository=FILE or
+                           versions prior to 5.6.5.
+          verbosity        determines level of output. Default = 0.
+          quiet            turns off all messages except errors.
+                           Default is False.
+        """
+        
+        assert slave is not None, "MasterInfo requires an instance of Slave."
+        self.slave = slave
+        self.filename = options.get("master_info", "master.info")
+        self.quiet = options.get("quiet", False)
+        self.verbosity = options.get("verbosity", 0)
+        self.values = {}      # internal dictionary of the values
+        self.repo = "FILE"
+        if self.slave is not None:
+            res = self.slave.show_server_variable("master_info_repository")
+            if res is not None and res != [] and \
+               res[0][1].upper() == "TABLE":
+                self.repo = "TABLE"
+
+    
+    def read(self):
+        """Read the master information
+        
+        This method reads the master information either from a file or a
+        table depending on the availability of and setting for
+        master-info-repository. If missing (server version < 5.6.5), it
+        defaults to reading from a file.
+        
+        Returns bool - True = success
+        """
+        if self.verbosity > 2:
+            print "# Reading master information from a %s." % self.repo.lower()
+        if self.repo == "FILE":
+            return self._read_master_info_file()
+        else:
+            return self._read_master_info_table()
+
+
+    def _check_read(self, refresh=False):
+        """Check if master information has been read
+        
+        refresh[in]    if True, re-read the master information.
+                       Default is False.
+        
+        If the master information has not been read, read it and populate
+        the dictionary.
+        """
+        # Read the values if not already read or user says to refresh them.
+        if self.values is None or self.values == {} or refresh:
+            self.read()
+
+
+    def _build_dictionary(self, rows):
+        """Build the internal dictionary of values.
+        
+        rows[in]       Rows as read from the file or table
+        """
+        if self.verbosity > 2:
+            print
+            print "# Raw dump of master information:"
+            i = 0
+            for row in rows:
+                print i, ">", row
+                i+=1
+        for i in range(0, len(rows)):
+            self.values[_MASTER_INFO_COL[i]] = rows[i]
+            
+    
+    def _read_master_info_file(self):
+        """Read the contents of the master.info file.
+        
+        This method will raise an error if the file is missing or cannot be
+        read by the user.
+        
+        Returns bool - success = True
+        """
+        contents = []
+        res = self.slave.show_server_variable('datadir')
+        if res is None or res == []:
+            raise UtilRplError("Cannot get datadir.")
+        datadir = res[0][1]
+        if self.filename == 'master.info':
+            self.filename = os.path.join(datadir, self.filename)
+
+        if os.path.exists(self.filename):
+            mfile = open(self.filename, 'r')
+            num = int(mfile.readline())
+            # Protect overrun of array if master_info file length is
+            # changed (more values added).
+            if num > len(_MASTER_INFO_COL):
+                num = len(_MASTER_INFO_COL)
+            # Build the dictionary 
+            for i in range(1, num):
+                contents.append(mfile.readline().strip('\n'))
+            self._build_dictionary(contents)
+            mfile.close()
+        else:
+            raise UtilRplError("Cannot read master information file: "
+                               "%s." % self.filename)
+        return True
+        
+        
+    def _read_master_info_table(self):
+        """Read the contents of the slave_master_info table.
+        
+        This method will raise an error if the file is missing or cannot be
+        read by the user.
+        
+        Returns bool - success = True
+        """
+        res = None        
+        try:
+            res = self.slave.exec_query("SELECT * FROM "
+                                        "mysql.slave_master_info")
+        except UtilError, e:
+            raise UtilRplError("Unable to read the slave_master_info table. "
+                               "Error: %s" % e.errmsg)
+        if res is None or res == []:
+            return False
+
+        # Build dictionary for the information with column information
+        rows = []
+        for i in range(0, len(res[0][2:])):
+            rows.append(res[0][i+2])
+        self._build_dictionary(rows)
+
+        return True
+        
+        
+    def show_master_info(self, refresh=False):
+        """Display the contents of the master information.
+
+        refresh[in]    if True, re-read the master information.
+                       Default is False.
+        """
+        # Check to see if we need to read the information
+        self._check_read(refresh)
+        stop = len(self.values)
+        for i in range(0, stop):
+            print "{0:>30} : {1}".format(_MASTER_INFO_COL[i],
+                                         self.values[_MASTER_INFO_COL[i]])
+        
+    
+    def check_master_info(self, refresh=False):
+        """Check to see if master info file matches slave status
+        
+        This method will return a list of discrepancies if the master.info
+        file does not match slave status. It will also raise errors if there
+        are problem accessing the master.info file.
+        
+        refresh[in]    if True, re-read the master information.
+                       Default is False.
+        
+        Returns [] - no exceptions, list if exceptions found
+        """
+        # Check to see if we need to read the information
+        self._check_read(refresh)
+        errors = []
+        res = self.slave.get_status()
+        if res != []:
+            state = res[0][_SLAVE_IO_STATE]
+            if not state:
+                raise UtilRplError("Slave is stopped.")
+            m_host = res[0][_SLAVE_MASTER_HOST]
+            m_port = res[0][_SLAVE_MASTER_PORT]
+            rpl_user = res[0][_SLAVE_MASTER_USER]
+            if m_host != self.values['Master_Host'] or \
+               int(m_port) != int(self.values['Master_Port']) or \
+               rpl_user != self.values['Master_User']:
+                errors.append("Slave is connected to master differently "
+                              "than what is recorded in the master "
+                              "information file. Master information file "
+                              "= user=%s, host=%s, port=%s." %
+                              (self.values['Master_User'],
+                               self.values['Master_Host'],
+                               self.values['Master_Port']))
+
+        return errors
+   
+
+    def get_value(self, key, refresh=False):
+        """Returns the value found for the key or None if key not found.
+
+        refresh[in]    if True, re-read the master information.
+                       Default is False.
+        
+        Returns value - Value found for the key or None if key missing
+        """
+        # Check to see if we need to read the information        
+        self._check_read(refresh)
+        try:
+            return self.values[key]
+        except:
+            return None
+    
+    def get_master_info(self, refresh=False):
+        """Returns the master information dictionary.
+
+        refresh[in]    if True, re-read the master information.
+                       Default is False.
+        
+        Returns dict - master information
+        """
+        # Check to see if we need to read the information
+        self._check_read(refresh)
+        return self.values
+        
 
 class Slave(Server):
     """The Slave class is a subclass of the Server class. It represents a
@@ -884,6 +1114,7 @@ class Slave(Server):
         assert not options.get("conn_info") == None
         self.options = options
         Server.__init__(self, options)
+        self.master_info = None
         
 
     def get_status(self, col_options={}):
@@ -1048,103 +1279,12 @@ class Slave(Server):
             stop = len(res[0])
             cols = res[0]
             rows = res[1]
-            for i in range(0,stop):
+            for i in range(0, stop):
                 print "{0:>30} : {1}".format(cols[i], rows[0][i])
         else:
             raise UtilRplError("Cannot get slave status or slave is "
                                  "not configured as a slave or not "
                                  "started.")
-        
-        
-    def get_master_info(self, filename, silent=False):
-        """Return the contents of the master.info file.
-        
-        This method will raise an error if the file is missing or cannot be
-        read by the user.
-        
-        filename[in]  path to master information file
-        silent[in]    if True, do not print or raise errors
-                      (default = False)
-
-        Returns dictionary - values in master.info 
-        """
-        contents = {}
-        
-        res = self.show_server_variable('datadir')
-        if res is None or res == []:
-            raise UtilRplError("Cannot get datadir.")
-        datadir = res[0][1]
-        if filename == 'master.info':
-            filename = os.path.join(datadir, filename)
-
-        if os.path.exists(filename):
-            mfile = open(filename, 'r')
-            num = int(mfile.readline())
-            # Protect overrun of array if master_info file length is
-            # changed (more values added).
-            if num > len(_MASTER_INFO_COL):
-                num = len(_MASTER_INFO_COL)
-            for i in range(1,num):
-                contents[_MASTER_INFO_COL[i-1]] = mfile.readline().strip('\n')
-            mfile.close()
-        else:
-            if silent:
-                return None
-            else:
-                raise UtilRplError("Cannot read master information file: "
-                                     "%s." % filename)
-
-        return contents
-        
-        
-    def show_master_info(self, options):
-        """Display the contents of the master information file.
-        
-        options[in]   dictionary of options (verbose, pedantic)
-        """
-        
-        filename = options.get("master_info", 'master.info')
-        contents = self.get_master_info(filename)
-        stop = len(contents)
-        for i in range(0,stop):
-            print "{0:>30} : {1}".format(_MASTER_INFO_COL[i],
-                                         contents[_MASTER_INFO_COL[i]])
-        
-    
-    def check_master_info(self, options):
-        """Check to see if master info file matches slave status
-        
-        This method will return a list of discrepancies if the master.info
-        file does not match slave status. It will also raise errors if there
-        are problem accessing the master.info file.
-        
-        options[in]   dictionary of options (verbose, pedantic)
-
-        Returns [] - no exceptions, list if exceptions found
-        """
-        errors = []
-        filename = options.get("master_info", "master.info")
-        master_info = self.get_master_info(filename)
-        res = self.get_status()
-        if res != []:
-            state = res[0][_SLAVE_IO_STATE]
-            if not state:
-                raise UtilRplError("Slave is stopped.")
-            m_host = res[0][_SLAVE_MASTER_HOST]
-            m_port = res[0][_SLAVE_MASTER_PORT]
-            rpl_user = res[0][_SLAVE_MASTER_USER]
-            if m_host != master_info['Master_Host'] or \
-               int(m_port) != int(master_info['Master_Port']) or \
-               rpl_user != master_info['Master_User']:
-                errors.append("Slave is connected to master differently "
-                              "than what is recorded in the master "
-                              "information file. Master information file "
-                              "= user=%s, host=%s, port=%s." %
-                              (master_info['Master_User'],
-                               master_info['Master_Host'],
-                               master_info['Master_Port']))
-
-        return errors
     
 
     def get_rpl_user(self):
@@ -1152,10 +1292,11 @@ class Slave(Server):
         
         Returns - tuple = (user, password) or (None, None) if errors
         """
-        filename = self.options.get("master_info", "master.info")
-        master_info = self.get_master_info(filename)
-        if master_info is not None:
-            return (master_info['Master_User'], master_info['Master_Password'])
+        self.master_info = MasterInfo(self, self.options)
+        m_host = self.master_info.get_value("Master_User")
+        m_passwd = self.master_info.get_value("Master_Password")
+        if m_host is not None:
+            return (m_host, m_passwd)
         return (None, None)
 
 
@@ -1277,8 +1418,8 @@ class Slave(Server):
                                "slave is not connected to a master and no "
                                "master information was provided.")
         elif self.is_connected():
-            filename = self.options.get("master_info", "master.info")
-            master_info = self.get_master_info(filename, True)
+            m_info = MasterInfo(self, self.options)
+            master_info = m_info.get_master_info()
             if master_info is None and master_values == {}:
                 raise UtilRplError("Cannot create CHANGE MASTER command.")
         else:

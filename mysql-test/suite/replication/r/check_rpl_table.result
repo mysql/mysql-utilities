@@ -47,6 +47,14 @@ Check master information file                                        [pass]
              Master_SSL_Cipher : 
                 Master_SSL_Key : 
  Master_SSL_Verify_Server_Cert : 0
+                     Heartbeat : 1800
+                          Bind : 
+            Ignored_server_ids : 0
+                          Uuid : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                   Retry_count : 86400
+                       SSL_CRL : 
+                  SSL_CRL_Path : 
+         Enabled_auto_position : 0
 
 Checking InnoDB compatibility                                        [pass]
 Checking storage engines compatibility                               [pass]
@@ -114,6 +122,19 @@ Checking slave delay (seconds behind master)                         [pass]
                  Last_IO_Error : 
                 Last_SQL_Errno : 0
                 Last_SQL_Error : 
+                   Master_UUID : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              Master_Info_File : mysql.slave_master_info
+                     SQL_Delay : 0
+           SQL_Remaining_Delay : None
+       Slave_SQL_Running_State : Slave has read all relay log; waiting for the slave I/O thread to update it
+            Master_Retry_Count : 86400
+                   Master_Bind : 
+       Last_IO_Error_Timestamp : 
+      Last_SQL_Error_Timestamp : 
+                Master_SSL_Crl : 
+            Master_SSL_Crlpath : 
+            Retrieved_Gtid_Set : 
+             Executed_Gtid_Set : 
 # ...done.
 Test case 4 - normal run with loopback
 # master on localhost: ... connected.
