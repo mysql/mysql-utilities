@@ -34,7 +34,7 @@ class test(rpl_admin_gtid.test):
             self.failover_dir = ".\\fail_event"
         if self.debug:
             print
-        for log in ["1","2","3"]:
+        for log in ["1","2","3","4"]:
             try:
                 os.unlink(log+_FAILOVERLOG)
             except:
@@ -268,6 +268,60 @@ class test(rpl_admin_gtid.test):
             else:
                 raise MUTLibError("%s: failed" % comment)
                 
+                
+        # Now we must test the --force option. But first, ensure the master
+        # does not have the table.
+        try:
+            self.server4.exec_query("DROP TABLE IF EXISTS mysql.failover_console")
+        except:
+            pass
+        
+        comment = "Test case 4 - test --force on first run"
+        # Note: test should pass without any errors. If the start or stop
+        #       timeout, the test case has failed and the log will contain
+        #       the error.
+        if self.debug:
+            print comment
+
+        failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
+                       " --discover-slaves-login=root:root --force " + \
+                       "--master=%s --log=%s" % (slave3_conn, "4"+_FAILOVER_LOG)
+        
+        if self.debug:
+            print failover_cmd
+
+        # Launch the console in stealth mode
+        proc, f_out = self.start_process(failover_cmd)
+
+        # Wait for console to load
+        if self.debug:
+            print "# Waiting for console to start."
+        i = 1
+        time.sleep(1)
+        while proc.poll() is not None:
+            time.sleep(1)
+            i += 1
+            if i > _TIMEOUT:
+                if self.debug:
+                    print "# Timeout console to start."
+                raise MUTLibError("%s: failed - timeout waiting for "
+                                  "console to start." % comment)  
+
+        # Need to poll here and wait for console to really end.
+        ret_val = self.stop_process(proc, f_out, True)
+        # Wait for console to end
+        if self.debug:
+            print "# Waiting for console to end."
+        i = 0
+        while proc.poll() is None:
+            time.sleep(1)
+            i += 1
+            if i > _TIMEOUT:
+                if self.debug:
+                    print "# Timeout console to end."
+                raise MUTLibError("%s: failed - timeout waiting for "
+                                  "console to end." % comment)
+                
         return True
 
     def get_result(self):
@@ -286,7 +340,7 @@ class test(rpl_admin_gtid.test):
         return True # Not a comparative test
     
     def cleanup(self):
-        for log in ["1","2","3"]:
+        for log in ["1","2","3","4"]:
             try:
                 os.unlink(log+_FAILOVERLOG)
             except:
