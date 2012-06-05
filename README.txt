@@ -135,7 +135,7 @@ temporary directory and add this to PYTHONPATH.
   # cd to repository for mysql.utilities
   python setup.py build -b /temp/something
   cd mysql-test
-  PYTHONPATH=/temp/something/lib.* python mut.pu --server=<as above>
+  PYTHONPATH=/temp/something/lib.* python mut.py --server=<as above>
 
 Operating System Notes
 ----------------------

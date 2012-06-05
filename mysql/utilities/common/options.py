@@ -570,12 +570,12 @@ _CONN_IPv6 = re.compile(
      "(?:(?!:)|:(?=:))"          # Colon iff it would be part of a wildcard
      "(?:"                       # Repeat 6 times:
      "[0-9a-f]{0,4}"             #   A group of at most four hexadecimal digits
-     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceeded by wildcard
+     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceded by wildcard
      "){6}(?:"                   # Either
      "[0-9a-f]{0,4}"             #   Another group
-     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceeded by wildcard
+     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceded by wildcard
      "[0-9a-f]{0,4}"             #   Last group
-     "(?:(?<=::)"                #   Colon iff preceeded by exacly one colon
+     "(?:(?<=::)"                #   Colon iff preceded by exacly one colon
      "|(?<!:)|(?<=:)(?<!::) :)"  # OR
      "|"                         #   A v4 address with NO leading zeros 
      "(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)"

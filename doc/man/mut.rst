@@ -138,7 +138,7 @@ The following example demonstrates how to invoke :command:`mut` to execute
 a subset of the tests using an existing server which is cloned.
 The example displays the test name, status, and relative time::
 
-    $ python mut --server=root@localhost --do-tests=clone_user --width=70
+    $ mut --server=root@localhost --do-tests=clone_user --width=70
 
     MySQL Utilities Testing - MUT
 
