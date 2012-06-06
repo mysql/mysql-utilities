@@ -6,6 +6,7 @@ import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
 _DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s "'
+_DEFAULT_MYSQL_OPTS_TABLE = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=table"'
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -26,11 +27,11 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_TABLE % self.servers.view_next_port()
         self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_TABLE % self.servers.view_next_port()
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
         
         self.m_port = self.server1.port

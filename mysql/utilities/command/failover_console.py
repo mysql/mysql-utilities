@@ -44,7 +44,7 @@ _GEN_UUID_COLS = ['host','port','role','uuid']
 _GEN_GTID_COLS = ['host','port','role','gtid']
 _DATE_LEN = 22
 
-_DROP_FC_TABLE = "DROP TABLE mysql.failover_console"
+_DROP_FC_TABLE = "DROP TABLE IF EXISTS mysql.failover_console"
 _CREATE_FC_TABLE = "CREATE TABLE IF NOT EXISTS mysql.failover_console " + \
                    "(host char(30), port char(10))"
 _SELECT_FC_TABLE = "SELECT * FROM mysql.failover_console WHERE host = '%s' " + \

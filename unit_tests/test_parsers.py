@@ -37,7 +37,7 @@ from mysql.utilities.exception import (
     LogParserError,
     )
 
-from mysql.utilities.parser import *
+from mysql.utilities.common.parser import *
 
 LOG_HEADERS = [
     ('/usr/sbin/mysqld, Version: 5.1.54-1ubuntu4-log'
