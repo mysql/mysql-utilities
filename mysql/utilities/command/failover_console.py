@@ -131,6 +131,10 @@ class FailoverConsole(object):
     
       - H = show replication health
       - G = toggle through GTID lists (GTID_DONE, GTID_LOST, GTID_OWNED)
+      - U = show UUIDs of servers
+      - R = refresh screen
+      - L = (iff --log specified) show log contents
+      - Q = quit the console
     
     """
     
@@ -173,6 +177,8 @@ class FailoverConsole(object):
         self.get_health_data = get_health_data
         self.get_gtid_data = get_gtid_data
         self.get_uuid_data = get_uuid_data
+        
+        self.report_mode = 'H'
         
         self._reset_screen_size()
         
@@ -256,6 +262,7 @@ class FailoverConsole(object):
             
         self.start_list = 0
         self.end_list = len(rows)
+        self.report_mode = 'G'
         return (_GEN_GTID_COLS, rows)
 
 
@@ -273,6 +280,7 @@ class FailoverConsole(object):
             health_data = self.get_health_data()
             self.start_list = 0
             self.end_list = len(health_data[1])
+            self.report_mode = 'H'
             return health_data
         
         return ([], [])
@@ -292,9 +300,9 @@ class FailoverConsole(object):
             self.comment = _UUID_LIST
             rows = self.get_uuid_data()
 
-        print rows
         self.start_list = 0
         self.end_list = len(rows)
+        self.report_mode = 'U'
         return (_GEN_UUID_COLS, rows)
         
     
@@ -316,6 +324,7 @@ class FailoverConsole(object):
             self.start_list = 0
             self.end_list = len(rows)
 
+        self.report_mode = 'L'
         return(cols, rows)
 
         
@@ -574,6 +583,9 @@ class FailoverConsole(object):
         self._reset_screen_size()
         self._print_header()
         self._print_master_status()
+        # refresh health if already displayed
+        if self.report_mode == 'H':
+            self.list_data = self._format_health_data()
         self._print_list(False)
         self._print_footer(self.scroll_on)
         
@@ -611,6 +623,10 @@ class FailoverConsole(object):
             if key in ['Q','q']:
                 return True
             else:
+                # Refresh health on interval
+                if self.report_mode == 'H':
+                    self.list_data = self._format_health_data()
+                    self._print_list()
                 self._do_command(key)
 
         return False
