@@ -1,0 +1,72 @@
+Test case 1 - master as 127.0.0.1.
+mysqlrplcheck.py --master=root:root@127.0.0.1:PORT2 --slave=root:root@localhost:PORT1 
+# master on 127.0.0.1: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+
+Test case 2 - master as localhost.
+mysqlrplcheck.py --master=root:root@localhost:PORT2 --slave=root:root@localhost:PORT1 
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+
+Test case 3 - master as HOSTNAME.
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+# master on HOSTNAME: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+
+Test case 4 - master as IP_ADDRESS.
+mysqlrplcheck.py --master=root:root@IP_ADDRESS:PORT2 --slave=root:root@localhost:PORT1 
+# master on IP_ADDRESS: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+

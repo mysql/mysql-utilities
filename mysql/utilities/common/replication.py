@@ -424,12 +424,7 @@ class Replication(object):
         state = self.slave.get_io_running()
         if not state:
             raise UtilRplError("Slave is stopped.")
-        host, port = self.slave.get_master_host_port()
-        if self.master.host == '127.0.0.1':
-            m_host = 'localhost'
-        else:
-            m_host = self.master.host
-        if host != m_host or int(port) != int(self.master.port) or \
+        if not self.slave.is_connected_to_master(self.master) or \
            state.upper() != "YES":
             return False
         return True
@@ -923,13 +918,6 @@ class MasterInfo(object):
         
         rows[in]       Rows as read from the file or table
         """
-        if self.verbosity > 2:
-            print
-            print "# Raw dump of master information:"
-            i = 0
-            for row in rows:
-                print i, ">", row
-                i+=1
         for i in range(0, len(rows)):
             self.values[_MASTER_INFO_COL[i]] = rows[i]
             
@@ -1157,8 +1145,6 @@ class Slave(Server):
             return None
         m_host = res[0][_SLAVE_MASTER_HOST]
         m_port = res[0][_SLAVE_MASTER_PORT]
-        if m_host == '127.0.0.1':
-            m_host = 'localhost'
 
         return (m_host, m_port)
 
@@ -1464,21 +1450,18 @@ class Slave(Server):
         return change_master
     
     
-    def is_connected_to_master(self, host, port):
+    def is_connected_to_master(self, master):
         """Check that slave is connected to the master at host, port.
         
-        host[in]       host name of the master
-        port[in]       port of the master
+        master[in]     instance of the master
         
         Returns bool - True = is connected
         """
         res = self.get_status()
-        if host == '127.0.0.1':
-            host = 'localhost'
         if res != [] and res[0] != []:
             res = res[0]
             m_host, m_port = self.get_master_host_port()
-            if m_host != host or int(m_port) != int(port):
+            if not master.is_alias(m_host) or int(m_port) != int(master.port):
                 return False
         return True
 
@@ -1527,11 +1510,7 @@ class Slave(Server):
             io_error_text = res[_SLAVE_IO_ERROR]
             
             # Check to see that slave is connected to the right master
-            if master.host == '127.0.0.1':
-                master_host = 'localhost'
-            else:
-                master_host = master.host
-            if m_host != master_host or int(m_port) != int(master.port):
+            if not self.is_connected_to_master(master):
                 return (False, ["Not connected to correct master."])
 
             # Check slave status for errors, threads activity

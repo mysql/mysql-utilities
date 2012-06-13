@@ -413,11 +413,11 @@ class Server(object):
             charset        Default character set for the connection.
                            (default latin1)
         """
-        
         assert not options.get("conn_info") == None
         
         self.verbose = options.get("verbose", False)
         self.db_conn = None
+        self.host = None
         self.charset = options.get("charset", "latin1")
         self.role = options.get("role", "Server")
         conn_values = get_connection_dictionary(options.get("conn_info"))
@@ -438,8 +438,10 @@ class Server(object):
         # foreign_key_checks_enabled.
         self.fkeys = None
         self.read_only = False
+        self.aliases = []
+        self.is_alias("")
         
-    
+
     def is_alive(self):
         """Determine if connection to server is still alive.
         
@@ -458,6 +460,57 @@ class Server(object):
         except:
             res = False
         return res
+
+
+    def is_alias(self, host_or_ip):
+        """Determine if host_or_ip is an alias for this host
+        
+        host_or_ip[in] host or IP number to check
+        
+        Returns bool - True = host_or_ip is an alias
+        """
+        import socket
+        
+        if self.aliases:
+            return host_or_ip in self.aliases
+
+        # First, get the local information
+        try:
+            local_info = socket.gethostbyname_ex(socket.gethostname())
+            local_aliases = [local_info[0]]
+            local_aliases.extend(['127.0.0.1', 'localhost'])
+            local_aliases.extend(local_info[1])
+            local_aliases.extend(local_info[2])
+        except (socket.herror, socket.gaierror):
+            local_aliases = []
+        
+        # Check for local
+        if self.host in local_aliases:
+            self.aliases.extend(local_aliases)
+        else:
+            self.aliases.append(self.host)
+            if "." in self.host: # IP or dotted host name
+                try:
+                    my_host = socket.gethostbyaddr(self.host)
+                    self.aliases.append(my_host[0])
+                    host_ip = socket.gethostbyname_ex(my_host[0])
+                except Exception, e:
+                    host_ip = ([],[],[])
+                    if self.verbose:
+                        print "WARNING: IP lookup failed", e
+            else:
+                try:
+                    host_ip = socket.gethostbyname_ex(self.host)
+                    self.aliases.append(host_ip[0])
+                except Exception, e:
+                    host_ip = ([],[],[])
+                    if self.verbose:
+                        print "WARNING: Hostname lookup failed", e
+
+            self.aliases.extend(host_ip[1])
+            self.aliases.extend(host_ip[2])
+
+        return host_or_ip in self.aliases
 
 
     def get_connection_values(self):

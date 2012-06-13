@@ -140,7 +140,7 @@ NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 | localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
-A switchover writes 15 entries in the log.
+Switchover has written to the log.
 There are (before) 2 entries in the log.
 Test case 5 - switchover with logs
 WARNING: The --ping option is used only with the health command.
@@ -168,7 +168,7 @@ WARNING: The --ping option is used only with the health command.
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-There are (after) 16 entries in the log.
+There are additional entries in the log.
 Test case 6 - attempt risky switchover without force
 WARNING: The --ping option is used only with the health command.
 # Checking privileges.

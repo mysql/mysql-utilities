@@ -81,8 +81,11 @@ class test(rpl_admin.test):
             
         # Now check the log and dump its entries
         log_file = open(_LOGNAME, "r")
-        self.results.append("A switchover writes %s entries in the log.\n" %
-                            len(log_file.readlines()))
+        num_log_lines = len(log_file.readlines())
+        if num_log_lines > 0:
+            self.results.append("Switchover has written to the log.\n")
+        else:
+            self.results.append("ERROR! Nothing written to the log.\n")
         log_file.close()
             
         # Now overwrite the log file and populate with known 'old' entries
@@ -104,8 +107,10 @@ class test(rpl_admin.test):
         
         # Now check the log and dump its entries
         log_file = open(_LOGNAME, "r")
-        self.results.append("There are (after) %s entries in the log.\n" %
-                            len(log_file.readlines()))
+        if len(log_file.readlines()) > num_log_lines:
+            self.results.append("There are additional entries in the log.\n")
+        else:
+            self.results.append("ERROR: Nothing else written to the log.\n")
         log_file.close()
         try:
             os.unlink(_LOGNAME)

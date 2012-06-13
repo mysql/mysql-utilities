@@ -305,10 +305,12 @@ class Topology(Replication):
         # Find discovered slaves
         new_slaves_found = False
         self._report("# Discovering slaves for master at %s:%s" %
-                     (self.master.host, self.master.port), False)
+                     (self.master.host, self.master.port))
         discovered_slaves = self.master.get_slaves()
         for slave in discovered_slaves:
             host, port = slave.split(":")
+            self._report("Discovering slave at %s:%s" % (host, port),
+                         logging.INFO, False)
             # Skip hosts that are not registered properly
             if host == 'unknown host':
                 continue
@@ -334,22 +336,24 @@ class Topology(Replication):
                     slave_conn = Slave(conn_dict)
                     try:
                         slave_conn.connect()
-                        m_host = self.master.host
-                        m_port = self.master.port
                         # Skip discovered slaves that are not connected
                         # to the master
-                        if slave_conn.is_connected_to_master(m_host, m_port) \
+                        if slave_conn.is_connected_to_master(self.master) \
                            and slave_conn.is_connected():
                             self.slaves.append({ 'host' : host, 'port' : port,
                                                  'instance' : slave_conn,
                                                  'discovered' : True})
-                            new_slaves_found = True                            
-                    except:
-                        msg = "Cannot connect to slave %s:%s as user '%s'." % \
+                            new_slaves_found = True
+                            self._report("Found slave: %s:%s" %
+                                         (host, port), logging.INFO, False)
+                            new_slaves_found = True
+                        else:
+                            self._report("Not found.", logging.WARN, False)
+                    except Exception, e:
+                        msg = "Cannot connect to slave %s:%s as user '%s'. " % \
                               (host, port, user)
                         if skip_conn_err:
-                            if self.verbose:
-                                self._report("# ERROR: %s" % msg, logging.ERROR)
+                            self._report(msg + e, logging.WARN, False)
                         else:
                             raise UtilRplError(msg)
         
@@ -585,8 +589,7 @@ class Topology(Replication):
                     self._report(msg % "FAIL", logging.WARN)
                 return (False, "CONNECTED",
                         "Connection to slave server lost.")            
-            if not slave.is_connected_to_master(self.master.host,
-                                                self.master.port):
+            if not slave.is_connected_to_master(self.master):
                 if self.verbose and not quiet:
                     self._report(msg % "FAIL", logging.WARN)
                 return (False, "CONNECTED",
@@ -921,8 +924,7 @@ class Topology(Replication):
             slave = slave_dict['instance']
             if slave is None or \
                (slave is not None and (not slave.is_alive() or \
-               not slave.is_connected_to_master(self.master.host,
-                                                self.master.port))):
+               not slave.is_connected_to_master(self.master))):
                 rpl_health = (False, ["Cannot connect to slave."])
                 slave = None
             if slave is not None:

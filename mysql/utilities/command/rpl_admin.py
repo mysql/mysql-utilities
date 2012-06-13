@@ -517,7 +517,8 @@ class RplCommands(object):
                
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
-        
+        self.topology.discover_slaves()
+       
         # Main loop - loop and fire on interval.
         done = False
         first_pass = True

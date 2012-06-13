@@ -155,6 +155,20 @@ sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value.  For example, :option:`--format=g` specifies the grid format.
 An error occurs if a prefix matches more than one valid value.
 
+Mixing IP and hostnames is not recommended. The replication-specific utilities
+will attempt to compare hostnames and IP addresses as aliases for checking
+slave connectivity to the master. However, if your installation does not
+support reverse name lookup, the comparison could fail. Without the ability to
+do a reverse name lookup, the replication utilities could report a false
+negative that the slave is (not) connected to the master.
+
+For example, if you setup replication using MASTER_HOST=ubuntu.net on the
+slave and later connect to the slave with mysqlrplcheck and have the master
+specified as --master=192.168.0.6 using the valid IP address for ubuntu.net,
+you must have the ability to do a reverse name lookup to compare the IP
+(192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
+machine. 
+
 EXAMPLES
 --------
 
