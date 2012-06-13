@@ -149,6 +149,7 @@ class Topology(Replication):
         self.after_script = self.options.get("after", None)
         self.timeout = self.options.get("timeout", 3)
         self.logging = self.options.get("logging", False)
+        self.rpl_user = self.options.get("rpl_user", None)
         
         # Attempt to connect to all servers        
         self.master, self.slaves = self._connect_to_servers(master_vals,
@@ -281,6 +282,23 @@ class Topology(Replication):
             if not slave_dict.get("discovered", False):
                 new_list.append(slave_dict)
         self.slaves = new_list
+
+
+    def check_master_info_type(self, repo="TABLE"):
+        """Check all slaves for master_info_repository=repo
+        
+        repo[in]       value for master info = "TABLE" or "FILE"
+                       Default is "TABLE"
+
+        Returns bool - True if master_info_repository == repo
+        """
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            if slave is not None:
+                res = slave.show_server_variable("master_info_repository")
+                if not res or res[0][1].upper() != repo.upper():
+                    return False
+        return True
 
 
     def discover_slaves(self, skip_conn_err=True):
@@ -450,8 +468,8 @@ class Topology(Replication):
             # Create replication user if --force is specified.
             if self.force and candidate_ok[1] == "RPL_USER":
                 user, passwd = slave.get_rpl_user()
-                m_candidate.create_rpl_user("%s:%s" % (user, passwd),
-                                            slave.host, slave.port)
+                m_candidate.create_rpl_user(slave.host, slave.port,
+                                            user, passwd)
             else:
                 msg = candidate_ok[2]
                 self._report(msg, logging.CRITICAL)
@@ -468,10 +486,20 @@ class Topology(Replication):
         
         Returns tuple - user, password
         """
-        slave = self._change_role(server)
-        user, passwd = slave.get_rpl_user()
-        return user, passwd
+        # Get replication user from server if rpl_user not specified
+        if self.rpl_user is None:
+            slave = self._change_role(server)
+            user, passwd = slave.get_rpl_user()
+            return (user, passwd)
 
+        # Get user and password
+        try:
+            user, passwd =  self.rpl_user.split(":")
+        except ValueError:
+            user = self.rpl_user.strip(":")
+            passwd = None
+        return (user, passwd)
+    
     
     def run_script(self, script, quiet):
         """Run an external script
@@ -1185,14 +1213,10 @@ class Topology(Replication):
 
         user, passwd = self._get_rpl_user(m_candidate)
         # Create user on m_candidate.
-        if passwd:
-            rpl_user = "%s:%s" % (user, passwd)
-        else:
-            rpl_user = user
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
-        res = m_candidate.create_rpl_user(rpl_user, m_candidate.host,
-                                           m_candidate.port)
+        res = m_candidate.create_rpl_user(m_candidate.host, m_candidate.port,
+                                          user, passwd)
 
         # Call exec_before script - display output if verbose on
         self.run_script(self.before_script, False)
@@ -1475,15 +1499,11 @@ class Topology(Replication):
         self._prepare_candidate_for_failover(new_master, user, passwd)
 
         # Create replication user on candidate.
-        if passwd:
-            rpl_user = "%s:%s" % (user, passwd)
-        else:
-            rpl_user = user
         self._report("# Creating replication user if it does not exist.")
             
         # Need Master class instance to check master and replication user
         self.master = self._change_role(new_master, False)
-        res = self.master.create_rpl_user(rpl_user, host, port)
+        res = self.master.create_rpl_user(host, port, user, passwd)
 
         # Call exec_before script - display output if verbose on
         self.run_script(self.before_script, False)

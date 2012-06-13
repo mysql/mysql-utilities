@@ -244,6 +244,11 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
+.. option:: --rpl-user=<user>[:<password>]
+
+   The user and password for the replication user requirement - e.g. rpl:passwd
+   Default = None.
+
 .. option:: --seconds-behind=<seconds>
 
    Used to detect slave delay. The maximum number of seconds behind the master
@@ -283,6 +288,11 @@ servers as well as grant the REPLICATE SLAVE privilege. The utility checks
 permissions for the master, slaves, and candidates at startup.
 
 The :option:`--force` option cannot be used with the failover command.
+
+If the user does not specify the :option:`--rpl-user` and the user has
+specified the switchover or failover command, the utility will check to see if
+the slaves are using --master-info-repository=TABLE. If they are not, the
+utility will stop with an error.
 
 
 EXAMPLES

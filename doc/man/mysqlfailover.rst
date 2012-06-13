@@ -240,6 +240,11 @@ OPTIONS
    Number of ping attempts for detecting downed server. Note: on some
    platforms this is the same as number of seconds to wait for ping to
    return.
+   
+.. option:: --rpl-user=<user>[:<password>]
+
+   The user and password for the replication user requirement - e.g. rpl:passwd
+   Default = None.
 
 .. option:: --seconds-behind=<seconds>
 
@@ -283,6 +288,9 @@ the console will be blocked from running failover. When a console quits, it
 deregisters itself from the master. If this process is broken, the user may
 override the registration check by using the :option:`--force` option.
 
+If the user does not specify the :option:`--rpl-user`, the utility will check
+to see if the slaves are using --master-info-repository=TABLE. If they are not,
+the utility will stop with an error.
 
 EXAMPLES
 --------

@@ -29,7 +29,7 @@ import sys
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.common.options import add_format_option
-from mysql.utilities.common.options import add_failover_options
+from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -87,6 +87,9 @@ parser.add_option("--no-health", action="store_true", dest="no_health",
 
 # Add verbosity mode
 add_verbosity(parser, True)
+
+# Replication user and password
+add_rpl_user(parser, None)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -180,6 +183,7 @@ options = {
     'logging'      : opt.log_file is not None,
     'log_file'     : opt.log_file,
     'no_health'    : opt.no_health,
+    'rpl_user'     : opt.rpl_user,
 }
  
 # If command = HEALTH, turn on --force
