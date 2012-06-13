@@ -5,8 +5,8 @@ import mutlib
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s "'
-_DEFAULT_MYSQL_OPTS_TABLE = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=table"'
+_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=table"'
+_DEFAULT_MYSQL_OPTS_FILE = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=file"'
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -27,17 +27,21 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS_TABLE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS_TABLE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
-        
+        # Spawn a server with MIR=FILE
+        mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
+        self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
+        self.s4_port = self.server5.port
         
         rpl_admin.test.reset_topology(self)
 
@@ -58,6 +62,7 @@ class test(rpl_admin.test):
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
+        slave4_conn = self.build_connection_string(self.server5).strip(' ')
         
         comment = "Test case %s - elect" % test_num
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
@@ -131,12 +136,49 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
+        
+        # Now we return the topology to its original state for other tests
+        rpl_admin.test.reset_topology(self)
+
+        # Test for missing --rpl-user
+        
+        # Add server5 to the topology
+        conn_str = " --slave=%s" % self.build_connection_string(self.server5)
+        conn_str += self.master_str 
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        res = self.exec_util(cmd, self.res_fname)
+        if res != 0:
+            return False
+
+        comment = "Test case %s - mix FILE/TABLE and missing --rpl-user" % test_num
+        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
+        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_opts = " --discover-slaves-login=root:root switchover "
+        cmd_opts += "--new-master=root:root@localhost:%s " % self.s4_port
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
+        comment = "Test case %s - mix FILE/TABLE and --rpl-user" % test_num
+        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
+        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_opts = " --discover-slaves-login=root:root switchover "
+        cmd_opts += "--new-master=root:root@localhost:%s " % self.s4_port
+        cmd_opts += " --rpl-user=rpl:rpl "
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
+        self.replace_substring(str(self.s4_port), "PORT5")
         
         return True
 

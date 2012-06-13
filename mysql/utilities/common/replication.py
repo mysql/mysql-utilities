@@ -483,16 +483,19 @@ class Replication(object):
         return errors
     
     
-    def create_rpl_user(self, rpl_user):
+    def create_rpl_user(self, r_user, r_pass=None):
         """Create the replication user and grant privileges
         
         If the user exists, check privileges and add privileges as needed.
         Calls Master class method to execute.
         
+        r_user[in]     user to create
+        r_pass[in]     password for user to create (optional)
+
         Returns bool - True = success, False = errors
         """
-        return self.master.create_rpl_user(rpl_user, self.slave.host,
-                                           self.slave.port, self.verbosity)
+        return self.master.create_rpl_user(self.slave.host, self.slave.port,
+                                           r_user, r_pass, self.verbosity)
 
     
     def setup(self, rpl_user, num_tries):
@@ -516,7 +519,7 @@ class Replication(object):
         r_user, r_pass = re.match("(\w+)(?:\:(\w+))?", rpl_user).groups()
         
         # Check to see if rpl_user is present, else create her
-        if not self.create_rpl_user(rpl_user):
+        if not self.create_rpl_user(r_user, r_pass):
             return False
 
         # Read master log file information
@@ -725,14 +728,15 @@ class Master(Server):
         return self.exec_query(_RPL_USER_QUERY, options)
 
 
-    def create_rpl_user(self, user, host, port, verbosity=0):
+    def create_rpl_user(self, host, port, r_user, r_pass=None, verbosity=0):
         """Create the replication user and grant privileges
         
         If the user exists, check privileges and add privileges as needed.
         
-        user[in]       user to create in form 'user:passwd' (:passwd optional)
         host[in]       host of the slave
         port[in]       port of the slave
+        r_user[in]     user to create
+        r_pass[in]     password for user to create (optional)
         verbosity[in]  verbosity of output
                        Default = 0
         
@@ -740,8 +744,6 @@ class Master(Server):
         """
         
         from mysql.utilities.common.user import User
-
-        r_user, r_pass = re.match("(\w+)(?:\:(\w+))?", user).groups()
 
         # Create user class instance
         user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)

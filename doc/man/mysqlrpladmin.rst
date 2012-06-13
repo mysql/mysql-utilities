@@ -244,6 +244,11 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
+.. option:: --rpl-user=<user>[:<password>]
+
+   The user and password for the replication user requirement - e.g. rpl:passwd
+   Default = None.
+
 .. option:: --seconds-behind=<seconds>
 
    Used to detect slave delay. The maximum number of seconds behind the master
@@ -297,6 +302,11 @@ specified as --master=192.168.0.6 using the valid IP address for ubuntu.net,
 you must have the ability to do a reverse name lookup to compare the IP
 (192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
 machine.
+
+If the user does not specify the :option:`--rpl-user` and the user has
+specified the switchover or failover command, the utility will check to see if
+the slaves are using --master-info-repository=TABLE. If they are not, the
+utility will stop with an error.
 
 
 EXAMPLES

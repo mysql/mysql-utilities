@@ -31,7 +31,7 @@ class test(rpl_admin.test):
     def run(self):
         self.res_fname = "result.txt"
         
-        base_cmd = "mysqlrpladmin.py --ping=5 --timeout=7 " + \
+        base_cmd = "mysqlrpladmin.py --ping=5 --timeout=7 --rpl-user=rpl:rpl " + \
                    "--seconds-behind=30 --max-position=100 "
 
         master_conn = self.build_connection_string(self.server1).strip(' ')

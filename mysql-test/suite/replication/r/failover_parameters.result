@@ -67,3 +67,5 @@ Options:
                         and the utility has refreshed the health report.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
+  --rpl-user=RPL_USER   the user and password for the replication user
+                        requirement - e.g. rpl:passwd - default = none

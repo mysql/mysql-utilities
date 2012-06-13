@@ -61,6 +61,8 @@ Options:
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
+  --rpl-user=RPL_USER   the user and password for the replication user
+                        requirement - e.g. rpl:passwd - default = none
 
 Available Commands:
 

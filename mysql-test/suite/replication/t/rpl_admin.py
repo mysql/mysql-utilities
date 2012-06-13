@@ -117,7 +117,7 @@ class test(mutlib.System_test):
         for case in test_cases:
             slaves_str = ",".join(case[1])
             comment = "Test case %s - switchover to %s" % (test_num, case[3])
-            cmd_str = "mysqlrpladmin.py --master=%s " % case[0]
+            cmd_str = "mysqlrpladmin.py --master=%s --rpl-user=rpl:rpl " % case[0]
             cmd_opts = " --new-master=%s --demote-master " % case[2]
             cmd_opts += " --slaves=%s switchover" % slaves_str
             res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,

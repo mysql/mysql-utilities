@@ -29,7 +29,7 @@ import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.options import parse_connection, add_verbosity
-from mysql.utilities.common.options import add_failover_options
+from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities import VERSION_FRM
@@ -125,6 +125,9 @@ parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
 # Add verbosity mode
 add_verbosity(parser, False)
 
+# Replication user and password
+add_rpl_user(parser, None)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -169,6 +172,7 @@ options = {
     'log_file'      : opt.log_file,
     'force'         : opt.force,
     'post_fail'     : opt.exec_post_fail,
+    'rpl_user'      : opt.rpl_user,
 }
 
 # Purge log file of old data

@@ -240,6 +240,11 @@ OPTIONS
    Number of ping attempts for detecting downed server. Note: on some
    platforms this is the same as number of seconds to wait for ping to
    return.
+   
+.. option:: --rpl-user=<user>[:<password>]
+
+   The user and password for the replication user requirement - e.g. rpl:passwd
+   Default = None.
 
 .. option:: --seconds-behind=<seconds>
 
@@ -297,6 +302,9 @@ you must have the ability to do a reverse name lookup to compare the IP
 (192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
 machine. 
 
+If the user does not specify the :option:`--rpl-user`, the utility will check
+to see if the slaves are using --master-info-repository=TABLE. If they are not,
+the utility will stop with an error.
 
 EXAMPLES
 --------

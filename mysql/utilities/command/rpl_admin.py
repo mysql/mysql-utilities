@@ -149,6 +149,7 @@ class RplCommands(object):
         self.quiet = self.options.get("quiet", False)
         self.logging = self.options.get("logging", False)
         self.candidates = self.options.get("candidates", None)
+        self.rpl_user = self.options.get("rpl_user", None)
         self.topology = Topology(master_vals, slave_vals, self.options,
                                  skip_conn_err)
         
@@ -270,6 +271,10 @@ class RplCommands(object):
         from mysql.utilities.exception import FormatError
         from mysql.utilities.common.options import parse_connection
         
+        # Check for --master-info-repository=TABLE if rpl_user is None
+        if not self._check_master_info_type():
+            return False
+
         # Check prerequisites - need valid candidate
         candidate = self.options.get("new_master", None)
         if candidate is None:
@@ -331,12 +336,38 @@ class RplCommands(object):
             self._report("# WARNING: slave election requires GTID_MODE=ON "
                          "for all servers.", logging.WARN)
             return
+        
+        # Check for --master-info-repository=TABLE if rpl_user is None
+        if not self._check_master_info_type():
+            return False
+
         self._report("# Performing failover.")
         if not self.topology.failover(self.candidates, strict):
             self._report("# Errors found.", logging.ERROR)
             return False
         return True
+
+
+    def _check_master_info_type(self, halt=True):
+        """Check for master information set to TABLE if rpl_user not provided
         
+        halt[in]       if True, raise error on failure. Default is True
+        
+        Returns bool - True if rpl_user is specified or False if rpl_user not
+                       specified and at least one slave does not have
+                       --master-info-repository=TABLE.
+        """
+        error = "You must specify either the --rpl-user or set all slaves " + \
+                "to use --master-info-repository=TABLE."
+        # Check for --master-info-repository=TABLE if rpl_user is None
+        if self.rpl_user is None:
+            if not self.topology.check_master_info_type("TABLE"):
+                if halt:
+                    raise UtilRplError(error)
+                self._report(error, logging.ERROR)
+                return False
+        return True
+
 
     def execute_command(self, command):
         """Execute a replication admin command
@@ -488,6 +519,7 @@ class RplCommands(object):
         timeout = self.options.get("timeout", 3)
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
+        rpl_user = self.options.get("rpl_user", None)
                 
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
@@ -506,6 +538,10 @@ class RplCommands(object):
                 self._report(msg % (error[0], error[1], command),
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
+            
+        # Check for --master-info-repository=TABLE if rpl_user is None
+        if not self._check_master_info_type():
+            return False
 
         # Test failover script. If it doesn't exist, fail.
         no_exec_fail_msg = "Failover check script cannot be found. Please " + \
