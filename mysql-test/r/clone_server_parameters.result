@@ -1,4 +1,29 @@
 Test case 1 : show help
+Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/data2 --new-port=3310 --new-id=12 --root-password=root
+
+mysqlserverclone - start another instance of a running server
+
+Options:
+  --version             show program's version number and exit
+  --help                display a help message and exit
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --new-data=NEW_DATA   the full path to the location of the data directory
+                        for the new instance
+  --new-port=NEW_PORT   the new port for the new instance - default=3307
+  --new-id=NEW_ID       the server_id for the new instance - default=2
+  --root-password=ROOT_PASS
+                        password for the root user
+  --mysqld=MYSQLD       additional options for mysqld
+  -w CMD_FILE, --write-command=CMD_FILE
+                        path to file for writing startup command. For example:
+                        start_server1.sh
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           turn off all messages for quiet execution.
+  --basedir=BASEDIR     the base directory for the server
+  --delete-data         delete the folder specified by --new-data if it exists
+                        and is not empty.
 Test case 2 : write command to file
 # Cloning the MySQL server running on localhost.
 # Creating new data directory...

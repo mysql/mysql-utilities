@@ -19,7 +19,7 @@ class test(mutlib.System_test):
         self.new_server = None
         return True
 
-    def _test_server_clone(self, cmd_str, comment, kill=True):
+    def _test_server_clone(self, cmd_str, comment, kill=True, capture_all=False):
         self.results.append(comment+"\n")
         port1 = int(self.servers.get_next_port())
         cmd_str += " --new-port=%d " % port1
@@ -29,7 +29,7 @@ class test(mutlib.System_test):
         for line in open("start.txt").readlines():
             # Don't save lines that have [Warning] or don't start with #
             index = line.find("[Warning]")
-            if index <= 0 and line[0] == '#':
+            if capture_all or (index <= 0 and line[0] == '#'):
                 self.results.append(line)
         if res:
             raise MUTLibError("%s: failed" % comment)
@@ -74,21 +74,22 @@ class test(mutlib.System_test):
        
         test_cases = [
             # (comment, command options, kill running server)
-            ("show help", " --help ", False),
-            ("write command to file", " --write-command=startme.sh ", True),
-            ("write command to file shortcut", " -w startme.sh ", True),
-            ("verbosity = -v", " -v ", True),
-            ("verbosity = -vv", " -vv ", True),
-            ("verbosity = -vvv", " -vvv ", True),
+            ("show help", " --help ", False, True),
+            ("write command to file", " --write-command=startme.sh ",
+             True, False),
+            ("write command to file shortcut", " -w startme.sh ", True, False),
+            ("verbosity = -v", " -v ", True, False),
+            ("verbosity = -vv", " -vv ", True, False),
+            ("verbosity = -vvv", " -vvv ", True, False),
             ("-vvv and write command to file shortcut",
-             " -vvv -w startme.sh ", True),
+             " -vvv -w startme.sh ", True, False),
         ]
         
         test_num = 1
         for row in test_cases:
             new_comment = "Test case %d : %s" % (test_num, row[0])
             if not self._test_server_clone(base_cmd + row[1],
-                                           new_comment, row[2]):
+                                           new_comment, row[2], row[3]):
                 raise MUTLibError("%s: failed" % new_comment)
             test_num += 1
 

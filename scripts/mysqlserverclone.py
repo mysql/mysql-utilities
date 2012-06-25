@@ -77,6 +77,11 @@ add_verbosity(parser, True)
 parser.add_option("--basedir", action="store", dest="basedir", default=None,
                   type="string", help="the base directory for the server")
 
+# Add --delete-data
+parser.add_option("--delete-data", action="store_true", dest="delete",
+                  help="delete the folder specified by --new-data if it "
+                  "exists and is not empty.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -92,6 +97,17 @@ if opt.new_data is None:
 if opt.root_pass is None or opt.root_pass == '':
     print "# WARNING: Root password for new instance has not been set."
 
+# Fail if user does not have access to new data dir.
+if os.path.exists(opt.new_data):
+    if not os.access(opt.new_data, os.R_OK|os.W_OK):
+        parser.error("You do not have enough privileges to access the folder "
+                     "specified by --new-data.")
+    
+    # Fail if new data is not empty and delete not specified
+    if os.listdir(opt.new_data) and not opt.delete:
+        parser.error("Target data directory exists and is not empty. Use "
+                     "--delete-data option to delete folder before cloning.")
+
 # Build options
 options = {
     'new_data'       : opt.new_data,
@@ -103,6 +119,7 @@ options = {
     'quiet'          : opt.quiet,
     'cmd_file'       : opt.cmd_file,
     'basedir'        : opt.basedir,
+    'delete'         : opt.delete,
 }
 
 # Expand user paths and resolve relative paths

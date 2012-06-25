@@ -188,7 +188,7 @@ class Server_list(object):
         full_datadir = os.getcwd() + "/temp_%s" % port
         
         # Attempt to clone existing server
-        cmd = "mysqlserverclone.py --server="
+        cmd = "mysqlserverclone.py --delete-data --server="
         cmd += self.get_connection_string(cur_server)
         if passwd:
            cmd += " --root-password=%s " % passwd

@@ -20,6 +20,14 @@ on the same host.  The utility creates a new datadir (:option:`--new-data`),
 and starts the server with a socket file. You can optionally add a
 password for the login user account on the new instance.
 
+If the user does not have read and write access to the folder specified by the
+:option:`--new-data` option, the utility shall issue an error.
+
+Similarly, if the folder specified by :option:`--new-data` exists and is not
+empty, the utility will not delete the folder and will issue an error message.
+Users must specify the :option:`--delete-data` option to permit the utility to
+remove the folder prior to starting the cloned server. 
+
 OPTIONS
 -------
 
@@ -29,6 +37,10 @@ OPTIONS
 
    Display a help message and exit.
 
+.. option:: --delete-data
+
+   Delete the folder specified by --new-data if it exists and is not empty.
+  
 .. option:: --mysqld=<options>
 
    Additional options for :command:`mysqld`. To specify multiple options,

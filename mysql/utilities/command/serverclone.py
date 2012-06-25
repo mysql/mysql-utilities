@@ -98,18 +98,18 @@ def clone_server(conn_val, options):
         if not quiet:
             print "# Cloning the MySQL server located at %s." % basedir
 
-    # If datadir exists, delete it
-    if os.path.exists(new_data):
-        shutil.rmtree(new_data, True)
-
     # Create new data directory if it does not exist
-    if not quiet:
-        print "# Creating new data directory..."
     if not os.path.exists(new_data):
+        if not quiet:
+            print "# Creating new data directory..."
         try:
             res = os.mkdir(new_data)
         except:
             raise UtilError("Unable to create directory '%s'" % new_data)
+    # If datadir exists, has data, and user said it was Ok, delete it
+    elif options.get("delete", False) and os.listdir(new_data):
+        shutil.rmtree(new_data, True)
+        
 
     if not quiet:
         print "# Configuring new instance..."

@@ -51,7 +51,7 @@ class test(mutlib.System_test):
 
     def run(self):
         self.server0 = self.servers.get_server(0)
-        cmd_str = "mysqlserverclone.py --server=%s " % \
+        cmd_str = "mysqlserverclone.py --server=%s --delete-data " % \
                   self.build_connection_string(self.server0)
        
         port1 = int(self.servers.get_next_port())
