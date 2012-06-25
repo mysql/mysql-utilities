@@ -565,6 +565,11 @@ _CONN_IPv4 = re.compile(
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
+_CONN_IPv4_NUM_ONLY = re.compile(
+    # we match IPv4 addresses only
+    r"(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))"  
+    )
+
 _CONN_IPv6 = re.compile(
     r"((?!.*::.*::)"             # Only a single whildcard allowed
      "(?:(?!:)|:(?=:))"          # Colon iff it would be part of a wildcard
@@ -586,6 +591,21 @@ _CONN_IPv6 = re.compile(
 
 _BAD_CONN_FORMAT = "Connection '{0}' cannot be parsed as a connection"
 _BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
+
+
+def hostname_is_ip(hostname):
+    """Determine hostname is an IP address.
+    
+    Return bool - True = is IP address
+    """
+    if len(hostname.split(":")) <= 3:  # if fewer colons, must be IPv4
+        grp = _CONN_IPv4_NUM_ONLY.match(hostname)
+    else:
+        grp = _CONN_IPv6.match(hostname)
+    if not grp:
+        return False
+    return True
+
 
 def parse_connection(connection_values):
     """Parse connection values.

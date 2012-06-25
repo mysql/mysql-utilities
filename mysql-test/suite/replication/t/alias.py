@@ -134,9 +134,9 @@ class test(mutlib.System_test):
         self.replace_substring(_MASTER_ALIASES[3], "IP_ADDRESS")
         
         # Get rid of the servers
-        self.server1.disconnect()
+        self.servers.stop_server(self.server1, 10, False)
         self.servers.remove_server(self.server1.role)
-        self.server2.disconnect()
+        self.servers.stop_server(self.server2, 10, False)
         self.servers.remove_server(self.server2.role)
         
         return True

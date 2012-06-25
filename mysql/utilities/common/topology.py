@@ -367,11 +367,11 @@ class Topology(Replication):
                             new_slaves_found = True
                         else:
                             self._report("Not found.", logging.WARN, False)
-                    except Exception, e:
+                    except UtilDBError, e:
                         msg = "Cannot connect to slave %s:%s as user '%s'. " % \
                               (host, port, user)
                         if skip_conn_err:
-                            self._report(msg + e, logging.WARN, False)
+                            self._report(msg + e.errmsg, logging.WARN, False)
                         else:
                             raise UtilRplError(msg)
         

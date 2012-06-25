@@ -122,6 +122,12 @@ parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
                   "execute after failover is complete and the utility has "
                   "refreshed the health report.")
 
+
+# Add rediscover on interval
+parser.add_option("--rediscover", action="store_true", dest="rediscover",
+                  help="Rediscover slaves on interval. Allows console to "
+                  "detect when slaves have been removed or added.")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -173,6 +179,7 @@ options = {
     'force'         : opt.force,
     'post_fail'     : opt.exec_post_fail,
     'rpl_user'      : opt.rpl_user,
+    'rediscover'    : opt.rediscover,
 }
 
 # Purge log file of old data

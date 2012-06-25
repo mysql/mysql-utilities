@@ -31,7 +31,7 @@ def parse_user_host(user_name):
 
     user_tuple = (None, None, None)
     no_ticks = user_name.replace("'", "")
-    user_credentials = re.match("(\w+)(?:\:(\w+))?@([\w-]+(?:\.[\w-]+)*)",
+    user_credentials = re.match("(\w+)(?:\:(\w+))?@([\w-]+(?:\.[\w-]+)*|%)",
                                 no_ticks)
     if user_credentials:
         user_tuple = user_credentials.groups()

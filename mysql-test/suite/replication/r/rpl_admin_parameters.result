@@ -76,6 +76,9 @@ Available Commands:
   stop        - stop all slaves
   switchover  - perform slave promotion
   
+  Note: elect, failover, gtid, and health require --master and either
+        --slaves or --discover-slave-login
+  
 Test case 2 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
 # Checking privileges.

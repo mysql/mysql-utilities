@@ -104,7 +104,8 @@ class test(rpl_admin.test):
 
         comment = "Test case %s - failover to %s:%s" % \
                   (test_num, self.server4.host, self.server4.port)
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
+        slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
+                           slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
         cmd_opts = " --candidates=%s  " % slave3_conn
         cmd_opts += " --slaves=%s failover" % slaves

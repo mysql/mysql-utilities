@@ -469,6 +469,7 @@ class Server(object):
         
         Returns bool - True = host_or_ip is an alias
         """
+        from mysql.utilities.common.options import hostname_is_ip
         import socket
         
         if self.aliases:
@@ -489,7 +490,7 @@ class Server(object):
             self.aliases.extend(local_aliases)
         else:
             self.aliases.append(self.host)
-            if "." in self.host: # IP or dotted host name
+            if hostname_is_ip(self.host): # IP address
                 try:
                     my_host = socket.gethostbyaddr(self.host)
                     self.aliases.append(my_host[0])
