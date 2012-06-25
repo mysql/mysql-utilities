@@ -479,8 +479,9 @@ def add_failover_options(parser):
                       "master for all registered slaves and use the user name "
                       "and password specified to connect. Supply the user and "
                       "password in the form user:password. For example, "
-                      "--discover=joe:secret will use 'joe' as the user and "
-                      "'secret' as the password for each discovered slave.")
+                      "--discover-slaves-login=joe:secret will use 'joe' as "
+                      "the user and 'secret' as the password for each "
+                      "discovered slave.")
 
     parser.add_option("--exec-after", action="store", dest="exec_after",
                       default=None, type="string", help="name of script to "
