@@ -592,7 +592,10 @@ class Replication(object):
             else:
                 print "# Starting slave from the beginning..."
         res = self.slave.start(self.query_options)
-        
+
+        # Add commit because C/Py are auto_commit=0 by default        
+        self.slave.exec_query("COMMIT")
+    
         # Check slave status
         i = 0
         while i < num_tries:
@@ -1635,7 +1638,7 @@ class Slave(Server):
         if show_command:
             print "# Change master command for %s:%s" % (self.host, self.port)
             print "#", change_master
-        res= self.exec_query(change_master)
+        res = self.exec_query(change_master)
         if res is None or res != ():
             raise UtilRplError("Slave %s:%s change master failed.",
                                (hostport, res[0]))

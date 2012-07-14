@@ -767,6 +767,8 @@ class Topology(Replication):
             lock_ftwrl.unlock()
 
             res = candidate.start()
+            candidate.exec_query("COMMIT")
+    
             if res is None or res != () and not self.quiet:
                 self._report("Candidate %s:%s failed to start." % 
                              (hostport, res[0]))
