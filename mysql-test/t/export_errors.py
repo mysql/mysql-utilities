@@ -56,7 +56,7 @@ class test(export_basic.test):
             raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbexport.py "
-        cmd_str += "--server=nope:nada@localhost:3306 util_test"
+        cmd_str += "--server=nope:nada@localhost:%s util_test" % self.server0.port
         comment = "Test case 5 - error: cannot connect to server"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:

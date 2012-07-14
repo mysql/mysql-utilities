@@ -174,7 +174,7 @@ class test(mutlib.System_test):
         
     def reset_topology(self):
         # Form replication topology - 1 master, 3 slaves
-        self.master_str = "--master=%s" % \
+        self.master_str = " --master=%s" % \
                           self.build_connection_string(self.server1)
         for slave in [self.server1, self.server2, self.server3, self.server4]:
             try:

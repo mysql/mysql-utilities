@@ -1,6 +1,6 @@
-Test case 1 - master as 127.0.0.1.
-mysqlrplcheck.py --master=root:root@127.0.0.1:PORT2 --slave=root:root@localhost:PORT1 
-# master on 127.0.0.1: ... connected.
+Test case 1 - master as HOSTNAME.
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+# master on HOSTNAME: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
@@ -52,9 +52,9 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 
-Test case 4 - master as IP_ADDRESS.
-mysqlrplcheck.py --master=root:root@IP_ADDRESS:PORT2 --slave=root:root@localhost:PORT1 
-# master on IP_ADDRESS: ... connected.
+Test case 4 - master as HOSTNAME.
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+# master on HOSTNAME: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------

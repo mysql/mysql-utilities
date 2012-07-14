@@ -175,6 +175,20 @@ def clone_server(conn_val, options):
 
     # Wait for subprocess to finish
     res = proc.wait()
+      
+    # Kill subprocess just in case it didn't finish - Ok if proc doesn't exist
+    if int(res) != 0:
+        if os.name == "posix":
+            try:
+                os.kill(proc.pid, subprocess.signal.SIGTERM)
+            except OSError:
+                pass
+        else:
+            try:
+                retval = subprocess.Popen("taskkill /F /T /PID %i" % proc.pid,
+                                          shell=True)
+            except:
+                pass
 
     # Drop the bootstrap file
     if os.path.isfile("bootstrap.sql"):

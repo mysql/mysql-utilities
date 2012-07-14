@@ -130,8 +130,9 @@ class test(mutlib.System_test):
                     
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_substring(str(self.server2.port), "PORT2")
+        self.replace_substring("127.0.0.1", "HOSTNAME")
         self.replace_substring(_MASTER_ALIASES[2], "HOSTNAME")
-        self.replace_substring(_MASTER_ALIASES[3], "IP_ADDRESS")
+        self.replace_substring(_MASTER_ALIASES[3], "HOSTNAME")
         
         # Get rid of the servers
         self.servers.stop_server(self.server1, 10, False)

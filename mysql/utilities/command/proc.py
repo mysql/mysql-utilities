@@ -217,6 +217,7 @@ class ProcessGrep(object):
         
         # If output is None, nothing is printed
         if len(entries) > 0 and output:
+            entries.sort(key = lambda fifth:fifth[5]) 
             print_list(output, format, headers, entries)
         elif PRINT_PROCESS in self.__actions:
             raise EmptyResultError("No matches found")
