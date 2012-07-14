@@ -1,3 +1,23 @@
+Release 1.0.6 (Released July 14, 2012)
+--------------------------------------
+
+- BUG#13986713: Wrong slave health output when slave uses loopback addr
+- BUG#13986931: Parser code in wrong location
+- BUG#14008015: Minor spelling errors
+- BUG#14008057: Missing man page build
+- BUG#14021531: Replication user check fails for global host
+- BUG#14021551: mysqlrplcheck not reading slave_master_info table
+- BUG#14021576: exception thrown for GTID servers without password
+- BUG#14031894: mysqlfailover fails to cleanup on error
+- BUG#14080657: Slave election can fail if FILE vs TABLE used
+- BUG#14123022: mysqlfailover fails to report stopped slaves
+- BUG#14140174: failover doesn't see new slave
+- BUG#14147098: mysqlfailover fails if --force used on initial load
+- BUG#14158085: connection fails to connect for aliases
+- BUG#14159369: fail|switchover can fail if --master-info-repository=file
+- BUG#14208442: incorrect help text for --discover-slaves-login
+- BUG#14298750: slave_master_info not updated 
+
 Release 1.0.5 (Released April 06, 2012)
 ---------------------------------------
 
