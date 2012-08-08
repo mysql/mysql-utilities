@@ -38,6 +38,7 @@ def _get_replication_tests(rpl, options):
         _TestBinlogExceptions(rpl, options),
         _TestRplUser(rpl, options),
         _TestServerIds(rpl, options),
+        _TestUUIDs(rpl, options),
         _TestSlaveConnection(rpl, options),
         _TestMasterInfo(rpl, options),
         _TestInnoDB(rpl, options),
@@ -296,6 +297,29 @@ class _TestServerIds(_BaseTestReplication):
             slave_id = self.rpl.slave.get_server_id()
             print "\n master id = %s" % master_id
             print "  slave id = %s\n" % slave_id
+            
+
+class _TestUUIDs(_BaseTestReplication):
+    """Test server uuids are different.
+    """
+    
+    def rpl_test(self):
+        """Execute test.
+        """
+        # Check server ids
+        self.report_test("Checking server_uuid values")
+        return self.rpl.check_server_uuids()
+        
+    def report_epilog(self):
+        """Report server_ids.
+        """
+        if self.verbosity > 0 and not self.quiet:
+            master_uuid = self.rpl.master.get_server_uuid()
+            slave_uuid = self.rpl.slave.get_server_uuid()
+            print "\n master uuid = %s" % \
+                  (master_uuid if master_uuid is not None else "Not supported.")
+            print "  slave uuid = %s\n" % \
+                  (slave_uuid if slave_uuid is not None else "Not supported.")
             
 
 class _TestSlaveConnection(_BaseTestReplication):

@@ -274,6 +274,34 @@ class Replication(object):
                                  "master.")
         
         return []
+        
+        
+    def check_server_uuids(self):
+        """Check UUIDs on master and slave
+        
+        This method will check the UUIDs on the master and slave. It will
+        raise exceptions for error conditions. 
+        
+        Returns [] if compatible or no UUIDs used, list of errors if not
+        """
+        master_uuid = self.master.get_uuid()
+        slave_uuid = self.slave.get_uuid()
+        
+        # Check for both not supporting UUIDs.
+        if master_uuid is None and slave_uuid is None:
+            return []
+        
+        # Check for unbalanced servers - one with UUID, one without
+        if master_uuid is None or slave_uuid is None:
+            raise UtilRplError("%s does not support UUIDs." %
+                               "Master" if master_uuid is None else "Slave")
+
+        # Check for uuid uniqueness
+        if master_uuid == slave_uuid:
+            raise UtilRplError("The slave's UUID is the same as the "
+                                 "master.")
+        
+        return []
 
 
     def check_innodb_compatibility(self, options):

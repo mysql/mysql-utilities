@@ -169,6 +169,10 @@ class test(mutlib.System_test):
         
         self.replace_result("#  slave id =", "#  slave id = XXX\n")
         self.replace_result("# master id =", "# master id = XXX\n")
+        self.replace_result("# master uuid = ",
+                            "# master uuid = XXXXX\n")
+        self.replace_result("#  slave uuid = ",
+                            "#  slave uuid = XXXXX\n")
         
         self.remove_result("# Creating replication user...")
         self.remove_result("CREATE USER 'rpl'@'localhost'")

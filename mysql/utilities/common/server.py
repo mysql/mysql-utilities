@@ -1123,6 +1123,22 @@ class Server(object):
         return int(res[0][1])
 
 
+    def get_server_uuid(self):
+        """Retrieve the server uuid.
+        
+        Returns string - server uuid.
+        """
+        try:
+            res = self.show_server_variable("server_uuid")
+            if res is None or res == []:
+                return None
+        except:
+            raise UtilRplError("Cannot retrieve server_uuid from "
+                               "%s." % self.role)
+        
+        return res[0][1]
+
+
     def get_lctn(self):
         """Get lower_case_table_name setting.
         
