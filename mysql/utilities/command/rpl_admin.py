@@ -576,9 +576,12 @@ class RplCommands(object):
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
             
-        # Check for --master-info-repository=TABLE if rpl_user is None
-        if not self._check_master_info_type():
-            return False
+        # Require --master-info-repository=TABLE for all slaves
+        if not self.topology.check_master_info_type("TABLE"):
+            msg = "Failover requires --master-info-repository=TABLE for " + \
+                  "all slaves."
+            self._report(msg, logging.ERROR, False)
+            raise UtilRplError(msg)
         
         # Check for mixing IP and hostnames
         if not self._check_host_references():

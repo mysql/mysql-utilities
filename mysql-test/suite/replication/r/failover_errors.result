@@ -17,4 +17,4 @@ mysqlfailover.py: error: Failover mode = 'elect' reqiures at least one candidate
 Test case 5 - FILE/TABLE mix and missing --rpl-user
 NOTE: Log file 'a.txt' does not exist. Will be created.
 # Checking privileges.
-ERROR: You must specify either the --rpl-user or set all slaves to use --master-info-repository=TABLE.
+ERROR: Failover requires --master-info-repository=TABLE for all slaves.
