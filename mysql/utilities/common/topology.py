@@ -367,11 +367,11 @@ class Topology(Replication):
                             new_slaves_found = True
                         else:
                             self._report("Not found.", logging.WARN, False)
-                    except Exception, e:
+                    except UtilDBError, e:
                         msg = "Cannot connect to slave %s:%s as user '%s'. " % \
                               (host, port, user)
                         if skip_conn_err:
-                            self._report(msg + e, logging.WARN, False)
+                            self._report(msg + e.errmsg, logging.WARN, False)
                         else:
                             raise UtilRplError(msg)
         
@@ -767,6 +767,8 @@ class Topology(Replication):
             lock_ftwrl.unlock()
 
             res = candidate.start()
+            candidate.exec_query("COMMIT")
+    
             if res is None or res != () and not self.quiet:
                 self._report("Candidate %s:%s failed to start." % 
                              (hostport, res[0]))
@@ -950,11 +952,15 @@ class Topology(Replication):
             host = slave_dict['host']
             port = slave_dict['port']
             slave = slave_dict['instance']
-            if slave is None or \
-               (slave is not None and (not slave.is_alive() or \
-               not slave.is_connected_to_master(self.master))):
+            if slave is None:
                 rpl_health = (False, ["Cannot connect to slave."])
+            elif not slave.is_alive():
+                rpl_health = (False, ["Slave is not alive."])
                 slave = None
+            elif not slave.is_connected_to_master(self.master):
+                rpl_health = (False, ["Slave is not connected to master."])
+                slave = None
+
             if slave is not None:
                 rpl_health = slave.check_rpl_health(self.master,
                                                     master_log, master_log_pos,

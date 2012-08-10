@@ -195,9 +195,12 @@ if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
     parser.error("Error purging log file.")
 
 # Setup log file
-logging.basicConfig(filename=opt.log_file, level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt=_DATE_FORMAT)
+try:
+    logging.basicConfig(filename=opt.log_file, level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt=_DATE_FORMAT)
+except IOError, e:
+    parser.error("Error opening log file: %s" % str(e.args[1]))
 
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)

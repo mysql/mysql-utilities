@@ -303,6 +303,10 @@ you must have the ability to do a reverse name lookup to compare the IP
 (192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
 machine.
 
+Similarly, if you use localhost to connect to the master, the health report
+may not show all of the slaves. It is best to use the actual hostname of
+the master when connecting or setting up replication.
+
 If the user does not specify the :option:`--rpl-user` and the user has
 specified the switchover or failover command, the utility will check to see if
 the slaves are using --master-info-repository=TABLE. If they are not, the

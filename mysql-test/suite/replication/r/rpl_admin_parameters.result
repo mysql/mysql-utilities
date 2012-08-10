@@ -16,9 +16,9 @@ Options:
                         at startup, query master for all registered slaves and
                         use the user name and password specified to connect.
                         Supply the user and password in the form
-                        user:password. For example, --discover=joe:secret will
-                        use 'joe' as the user and 'secret' as the password for
-                        each discovered slave.
+                        user:password. For example, --discover-slaves-
+                        login=joe:secret will use 'joe' as the user and
+                        'secret' as the password for each discovered slave.
   --exec-after=EXEC_AFTER
                         name of script to execute after failover or switchover
   --exec-before=EXEC_BEFORE
@@ -75,6 +75,9 @@ Available Commands:
   start       - start all slaves
   stop        - stop all slaves
   switchover  - perform slave promotion
+  
+  Note: elect, failover, gtid, and health require --master and either
+        --slaves or --discover-slave-login
   
 Test case 2 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
@@ -181,14 +184,14 @@ ERROR: Candidate is not connected to the correct master.
 # Errors found. Switchover aborted.
 #
 # Replication Topology Health:
-+------------+-------+---------+--------+------------+---------------------------+
-| host       | port  | role    | state  | gtid_mode  | health                    |
-+------------+-------+---------+--------+------------+---------------------------+
-| localhost  | PORT3  | MASTER  | UP     | NO         | OK                        |
-| localhost  | PORT1  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-| localhost  | PORT2  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-| localhost  | PORT4  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-+------------+-------+---------+--------+------------+---------------------------+
++------------+-------+---------+--------+------------+------------------------------------+
+| host       | port  | role    | state  | gtid_mode  | health                             |
++------------+-------+---------+--------+------------+------------------------------------+
+| localhost  | PORT3  | MASTER  | UP     | NO         | OK                                 |
+| localhost  | PORT1  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT2  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
++------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
 Test case 7 - attempt risky switchover with --force
 WARNING: The --ping option is used only with the health command.

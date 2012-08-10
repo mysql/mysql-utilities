@@ -79,7 +79,7 @@ class test(import_basic.test):
         test_num += 1
 
         cmd_str = "mysqldbimport.py %s " % self.export_import_file
-        cmd_str += "--server=nope:nada@localhost:3306"
+        cmd_str += "--server=nope:nada@localhost:%s" % self.server0.port
         comment = "Test case %d - error: cannot connect to server" % test_num
         res = self.run_test_case(1, cmd_str, comment)
         if not res:

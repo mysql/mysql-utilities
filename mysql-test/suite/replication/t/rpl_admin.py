@@ -110,7 +110,8 @@ class test(mutlib.System_test):
              slave2_conn, "slave2", [slave1_conn, slave3_conn, master_conn]),
             (slave2_conn, [slave1_conn, slave3_conn, master_conn],
              slave3_conn, "slave3", [slave2_conn, slave1_conn, master_conn]),
-            (slave3_conn, [slave2_conn, slave1_conn, master_conn],
+            (slave3_conn, ["root:root@127.0.0.1:%s" % self.server3.port,
+                           slave1_conn, master_conn],
              master_conn, "master", [slave1_conn, slave2_conn, slave3_conn]),
         ]
         test_num = 2
@@ -173,7 +174,7 @@ class test(mutlib.System_test):
         
     def reset_topology(self):
         # Form replication topology - 1 master, 3 slaves
-        self.master_str = "--master=%s" % \
+        self.master_str = " --master=%s" % \
                           self.build_connection_string(self.server1)
         for slave in [self.server1, self.server2, self.server3, self.server4]:
             try:

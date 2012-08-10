@@ -41,7 +41,8 @@ class test(show_rpl.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqlrplshow.py --master=wanda:fish@localhost:3310"
+        cmd_str = "mysqlrplshow.py --master=wanda:fish@localhost:%s" % \
+                  self.server_list[0].port
         comment = "Test case 2 - error: invalid login to master"
         res =  mutlib.System_test.run_test_case(self, 1, cmd_str, comment)
         if not res:

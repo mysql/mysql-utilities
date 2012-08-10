@@ -356,15 +356,15 @@ class Server_list(object):
                     print "  Shutting down server %s..." % server[0].role,
                     if self.stop_server(server[0]):
                         print "success."
-                    elif server[2] is not None:
+                    elif server[2] is not None and server[2] > 1:
                         print "WARN - attempting SIGTERM - pid = %s" % server[2] 
                         # try signal termination
                         if os.name == "posix":
-                            retval = os.kill(server[2],
+                            retval = os.kill(int(server[2]),
                                              subprocess.signal.SIGTERM)
                         else:
                             retval = subprocess.Popen("taskkill /F /T /PID %i" %
-                                                      server[2],
+                                                      int(server[2]),
                                                       shell=True)
                     else:
                         print "ERROR"
@@ -381,6 +381,9 @@ class Server_list(object):
         id[in]             The process id if known
         """
         if new_server is not None:
+            if id == -1:
+                datadir = new_server.show_server_variable("datadir")[0][1]
+                id = self.get_process_id(datadir)
             self.server_list.append((new_server, spawned, id))
 
 

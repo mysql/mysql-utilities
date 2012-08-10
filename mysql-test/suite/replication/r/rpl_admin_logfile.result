@@ -1,0 +1,27 @@
+Test Case 1 - Log file is newly created
+NOTE: Log file 'temp_log.txt' does not exist. Will be created.
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+----------------+
+| host       | port  | role    | state  | gtid_mode  | health         |
++------------+-------+---------+--------+------------+----------------+
+| localhost  | 3310  | MASTER  | UP     | NO         | OK             |
+| localhost  | 3311  | SLAVE   | UP     | NO         | Not connected  |
++------------+-------+---------+--------+------------+----------------+
+# ...done.
+Test Case 2 - Log file is reopened
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+----------------+
+| host       | port  | role    | state  | gtid_mode  | health         |
++------------+-------+---------+--------+------------+----------------+
+| localhost  | 3310  | MASTER  | UP     | NO         | OK             |
+| localhost  | 3311  | SLAVE   | UP     | NO         | Not connected  |
++------------+-------+---------+--------+------------+----------------+
+# ...done.
+Test Case 3 - Log file can not be written too
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Error opening log file: Permission denied

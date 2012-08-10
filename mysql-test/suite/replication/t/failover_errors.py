@@ -63,7 +63,7 @@ class test(rpl_admin_gtid.test):
         
         # Add server5 to the topology
         conn_str = " --slave=%s" % self.build_connection_string(self.server5)
-        conn_str += "--master=%s " % master_conn 
+        conn_str += " --master=%s " % master_conn 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
@@ -72,9 +72,9 @@ class test(rpl_admin_gtid.test):
         comment = "Test case 5 - FILE/TABLE mix and missing --rpl-user"
         cmd_str = "mysqlfailover.py "        
         cmd_opts = " --master=%s --log=a.txt" % master_conn
-        cmd_opts += "--slaves=%s " % ",".join([slave1_conn, slave2_conn,
+        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn,
                                                slave3_conn, slave4_conn])
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

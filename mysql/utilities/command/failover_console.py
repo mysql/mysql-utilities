@@ -204,6 +204,9 @@ class FailoverConsole(object):
         if self.master is None or self.mode == 'fail':
             return self.mode
         
+        # Turn binary log off first
+        self.master.toggle_binlog("DISABLE")
+        
         host_port = (self.master.host, self.master.port)
         # Drop the table if specified
         if clear:
@@ -223,6 +226,9 @@ class FailoverConsole(object):
         # Unregister the console if our mode was changed
         elif self.old_mode != self.mode:
             res = self.master.exec_query(_DELETE_FC_TABLE % host_port)
+        
+        # Turn binary log on
+        self.master.toggle_binlog("ENABLE")
         
         return self.mode
 

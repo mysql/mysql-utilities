@@ -39,6 +39,9 @@ Available Commands:
   stop        - stop all slaves
   switchover  - perform slave promotion
   
+  Note: elect, failover, gtid, and health require --master and either
+        --slaves or --discover-slave-login
+  
 """
 
 _VALID_COMMANDS = ["elect", "failover", "gtid", "health", "reset", "start",
@@ -54,6 +57,11 @@ _FAILOVER_ERRNO = 911
 
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 _DATE_LEN = 22
+
+_HOST_IP_WARNING = "You may be mixing host names and IP " + \
+                   "addresses. This may result in negative status " + \
+                   "reporting if your DNS services do not support " + \
+                   "reverse name lookup."
 
 def get_valid_rpl_command_text():
     """Provide list of valid command descriptions to caller.
@@ -260,6 +268,24 @@ class RplCommands(object):
             print_list(sys.stdout, format, _GTID_COLS, owned)
 
 
+    def _check_host_references(self):
+        """Check to see if using all host or all IP addresses
+        
+        Returns bool - True = all references are consistent
+        """
+        from mysql.utilities.common.options import hostname_is_ip
+        
+        uses_ip = hostname_is_ip(self.topology.master.host)
+        for slave_dict in self.topology.slaves:
+            slave = slave_dict['instance']
+            if slave is not None:
+                host, port = slave.get_master_host_port()
+                if uses_ip != hostname_is_ip(slave.host) or \
+                   uses_ip != hostname_is_ip(host):
+                    return False
+        return True
+                
+
     def _switchover(self):
         """Perform switchover from master to candidate slave
         
@@ -274,6 +300,11 @@ class RplCommands(object):
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
+
+        # Check for mixing IP and hostnames
+        if not self._check_host_references():
+            print "# WARNING: %s" % _HOST_IP_WARNING
+            self._report(_HOST_IP_WARNING, logging.WARN, False)
 
         # Check prerequisites - need valid candidate
         candidate = self.options.get("new_master", None)
@@ -304,6 +335,12 @@ class RplCommands(object):
             self._report("# WARNING: slave election requires GTID_MODE=ON "
                          "for all servers.", logging.WARN)
             return
+
+        # Check for mixing IP and hostnames
+        if not self._check_host_references():
+            print "# WARNING: %s" % _HOST_IP_WARNING
+            self._report(_HOST_IP_WARNING, logging.WARN, False)
+
         candidates = self.options.get("candidates", None)
         if candidates is None or len(candidates) == 0:
             self._report("# Electing candidate slave from known slaves.")
@@ -539,9 +576,19 @@ class RplCommands(object):
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
             
-        # Check for --master-info-repository=TABLE if rpl_user is None
-        if not self._check_master_info_type():
-            return False
+        # Require --master-info-repository=TABLE for all slaves
+        if not self.topology.check_master_info_type("TABLE"):
+            msg = "Failover requires --master-info-repository=TABLE for " + \
+                  "all slaves."
+            self._report(msg, logging.ERROR, False)
+            raise UtilRplError(msg)
+        
+        # Check for mixing IP and hostnames
+        if not self._check_host_references():
+            print "# WARNING: %s" % _HOST_IP_WARNING
+            self._report(_HOST_IP_WARNING, logging.WARN, False)
+            print "#\n# Failover console will start in 10 seconds."
+            time.sleep(10)
 
         # Test failover script. If it doesn't exist, fail.
         no_exec_fail_msg = "Failover check script cannot be found. Please " + \
@@ -553,7 +600,6 @@ class RplCommands(object):
                
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
-        self.topology.discover_slaves()
        
         # Main loop - loop and fire on interval.
         done = False
@@ -642,8 +688,8 @@ class RplCommands(object):
                 self.topology.run_script(post_fail, False)
 
             # discover slaves if option was specified at startup
-            elif self.options.get("discover", None) is not None \
-                and not first_pass:
+            elif self.options.get("discover", None) is not None and \
+                (not first_pass or self.options.get("rediscover", False)):
                 # Force refresh of health list if new slaves found
                 if self.topology.discover_slaves():
                     console.list_data = None

@@ -64,7 +64,16 @@ def setup_replication(master_vals, slave_vals, rpl_user,
     if verbosity > 0:
         print "# master id = %s" % master.get_server_id()
         print "#  slave id = %s" % slave.get_server_id()
+
+    errors = rpl.check_server_uuids()
+    for error in errors:
+        print error
     
+    # Check for server_uuid uniqueness
+    if verbosity > 0:
+        print "# master uuid = %s" % master.get_server_uuid()
+        print "#  slave uuid = %s" % slave.get_server_uuid()
+
     # Check InnoDB compatibility
     if verbosity > 0:
         print "# Checking InnoDB statistics for type and version conflicts."
