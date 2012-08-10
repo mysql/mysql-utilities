@@ -691,6 +691,7 @@ class Master(Server):
         
         assert not options.get("conn_info") == None
         
+        self.options = options
         Server.__init__(self, options)
         
 
@@ -826,13 +827,24 @@ class Master(Server):
             return slave_info
         
         slaves = []
-        
+        no_host_slaves = []
         res = self.exec_query("SHOW SLAVE HOSTS")
         if not res == []:
             res.sort()  # Sort for conformity
             for row in res:
-                slaves.append(_get_slave_info(row[1], row[2]))
-                    
+                info = _get_slave_info(row[1], row[2])
+                if row[1]:
+                    slaves.append(info)
+                else:
+                    no_host_slaves.append(info)
+        
+        if no_host_slaves:
+            print "WARNING: There are slaves that have not been registered" + \
+                  " with --report-host or --report-port."
+            if self.options.get("verbosity", 0) > 0:
+              for row in no_host_slaves:
+                  print "\t", row
+            
         return slaves
 
 

@@ -6,8 +6,8 @@ import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
 class test(rpl_admin.test):
-    """test replication administration commands
-    This test exercises the mysqlrpladmin utility warnings concerning options.
+    """test show replication topology
+    This test exercises the mysqlrplshow utility warnings concerning options.
     It uses the rpl_admin test for setup and teardown methods.
     """
 
@@ -54,41 +54,10 @@ class test(rpl_admin.test):
         master_str = "--master=" + master_conn
         slaves_str = "--slaves=" + \
                      ",".join([slave1_conn, slave2_conn, slave3_conn])
-        candidates_str = "--candidates=" + \
-                         ",".join([slave1_conn, slave2_conn, slave3_conn])
         
-        comment = "Test case 1 - warning for --exec* and not switchover or failover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=csv " % slaves_str
-        cmd_opts += " --exec-before=dummy --exec-after=dummy"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-
-        comment = "Test case 2 - warning for --candidate and not switchover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=csv " % slaves_str
-        cmd_opts += " %s " % candidates_str
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-
-        comment = "Test case 3 - warning for --new-master and not switchover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=tab " % slaves_str
-        cmd_opts += " --new-master=%s " % slave2_conn
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-
-        comment = "Test case 4 - warning for missing --report-host"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --disco=root:root health --format=csv "
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        comment = "Test case 1 - warning for missing --report-host"
+        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
@@ -97,14 +66,6 @@ class test(rpl_admin.test):
             self.server5.exec_query("RESET SLAVE")
         except:
             pass
-
-        comment = "Test case 5 - warning for --format and not health or gtid"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s stop --quiet --format=tab " % slaves_str
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
