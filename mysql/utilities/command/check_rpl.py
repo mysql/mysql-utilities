@@ -283,7 +283,7 @@ class _TestRplUser(_BaseTestReplication):
         if res is None or res == []:
             raise UtilRplError("Slave is not connected to a master.")
         return self.rpl.master.check_rpl_user(res[0][_RPL_USER],
-                                              res[0][_RPL_HOST])
+                                              self.rpl.slave.host)
 
 class _TestServerIds(_BaseTestReplication):
     """Test server ids are different.
