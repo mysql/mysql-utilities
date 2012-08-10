@@ -22,7 +22,7 @@ setup.
 """
 
 import sys
-from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.exception import UtilError, UtilRplError, UtilRplWarn
 
 _PRINT_WIDTH = 75    
 _RPL_HOST, _RPL_USER = 1, 2
@@ -214,6 +214,14 @@ class _BaseTestReplication(object):
             else:
                 print "Test: %s failed. Error: %s" % (self.description,
                                                       e.errmsg)
+            return False
+        # Check for warnings
+        except UtilRplWarn, e:
+            if not self.quiet:
+                self.report_status("WARN", [e.errmsg])
+            else:
+                print "Test: %s had warnings. %s" % (self.description,
+                                                     e.errmsg)
             return False
 
         # Check to see if test passed or if there were errors returned.

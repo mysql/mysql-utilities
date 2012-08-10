@@ -473,12 +473,12 @@ class Server(object):
         import socket
         
         if self.aliases:
-            return host_or_ip in self.aliases
+            return host_or_ip.lower() in self.aliases
 
         # First, get the local information
         try:
             local_info = socket.gethostbyname_ex(socket.gethostname())
-            local_aliases = [local_info[0]]
+            local_aliases = [local_info[0].lower()]
             local_aliases.extend(['127.0.0.1', 'localhost'])
             local_aliases.extend(local_info[1])
             local_aliases.extend(local_info[2])
@@ -511,7 +511,7 @@ class Server(object):
             self.aliases.extend(host_ip[1])
             self.aliases.extend(host_ip[2])
 
-        return host_or_ip in self.aliases
+        return host_or_ip.lower() in self.aliases
 
 
     def get_connection_values(self):

@@ -66,7 +66,7 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        same_str = "--master=root@this:3306 --slave=root@that:3306"
+        same_str = "--master=root@this:13330 --slave=root@that:13330"
         comment = "Test case 5b - error: slave and master same port"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
@@ -77,8 +77,7 @@ class test(replicate.test):
         # off for the next test case.
 
         self.port3 = int(self.servers.get_next_port())
-
-        res = self.servers.start_new_server(self.server1, 
+        res = self.servers.start_new_server(self.server0, 
                                             self.port3,
                                             self.servers.get_next_id(),
                                             "root", "temprep1")

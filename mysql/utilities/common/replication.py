@@ -24,7 +24,7 @@ import re
 import time
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.exception import UtilError, UtilDBError, UtilRplWarn
 from mysql.utilities.exception import UtilRplError, UtilBinlogError
 
 _MASTER_INFO_COL = [
@@ -899,7 +899,14 @@ class MasterInfo(object):
         if self.verbosity > 2:
             print "# Reading master information from a %s." % self.repo.lower()
         if self.repo == "FILE":
-            return self._read_master_info_file()
+            import socket
+            
+            # Check host name of this host. If not the same, issue error.
+            if self.slave.is_alias(socket.gethostname()):
+                return self._read_master_info_file()
+            else:
+                raise UtilRplWarn("Cannot read master information file "
+                                  "from a remote machine.")
         else:
             return self._read_master_info_table()
 
@@ -943,21 +950,26 @@ class MasterInfo(object):
         if self.filename == 'master.info':
             self.filename = os.path.join(datadir, self.filename)
 
-        if os.path.exists(self.filename):
+        if not os.path.exists(self.filename):
+            raise UtilRplError("Cannot find master information file: "
+                               "%s." % self.filename)
+        try:
             mfile = open(self.filename, 'r')
             num = int(mfile.readline())
             # Protect overrun of array if master_info file length is
             # changed (more values added).
             if num > len(_MASTER_INFO_COL):
                 num = len(_MASTER_INFO_COL)
-            # Build the dictionary 
-            for i in range(1, num):
-                contents.append(mfile.readline().strip('\n'))
-            self._build_dictionary(contents)
-            mfile.close()
-        else:
+        except:
             raise UtilRplError("Cannot read master information file: "
-                               "%s." % self.filename)
+                               "%s.\nUser needs to have read access to "
+                               "the file." % self.filename)
+        # Build the dictionary 
+        for i in range(1, num):
+            contents.append(mfile.readline().strip('\n'))
+        self._build_dictionary(contents)
+        mfile.close()
+
         return True
         
         
@@ -1487,7 +1499,7 @@ class Slave(Server):
                            value, the slave health is not Ok
         max_pos[in]        maximum position difference from master to slave to
                            determine if slave health is not Ok
-        verbosity[in]      if > 0, return detailed errors else return only
+        verbosity[in]      if > 1, return detailed errors else return only
                            short phrases
         
         Returns tuple (bool, []) - (True, []) = Ok,
@@ -1560,10 +1572,7 @@ class Slave(Server):
             rpl_ok = False
         
         if len(errors) > 1:
-            if verbosity == 0:
-                errors = ["ERROR"]
-            else:
-                errors = [", ".join(errors)]
+            errors = [", ".join(errors)]
         
         return (rpl_ok, errors)
 

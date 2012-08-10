@@ -39,7 +39,7 @@ Checking server_id values                                            [pass]
 Is slave connected to master?                                        [pass]
 Check master information file                                        [FAIL]
 
-Cannot read master information file: m.info.
+Cannot find master information file: m.info.
 
 Checking InnoDB compatibility                                        [pass]
 Checking storage engines compatibility                               [pass]
@@ -68,7 +68,7 @@ Checking slave delay (seconds behind master)               [pass]
 # ...done.
 Test case 4 - quiet
 Test case 5 - test failure with quiet
-Test: Check master information file failed. Error: Cannot read master information file: m.info.
+Test: Check master information file failed. Error: Cannot find master information file: m.info.
 Test case 6 - test warning without quiet
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
