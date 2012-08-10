@@ -184,14 +184,14 @@ ERROR: Candidate is not connected to the correct master.
 # Errors found. Switchover aborted.
 #
 # Replication Topology Health:
-+------------+-------+---------+--------+------------+---------------------------+
-| host       | port  | role    | state  | gtid_mode  | health                    |
-+------------+-------+---------+--------+------------+---------------------------+
-| localhost  | PORT3  | MASTER  | UP     | NO         | OK                        |
-| localhost  | PORT1  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-| localhost  | PORT2  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-| localhost  | PORT4  | SLAVE   | WARN   |            | Cannot connect to slave.  |
-+------------+-------+---------+--------+------------+---------------------------+
++------------+-------+---------+--------+------------+------------------------------------+
+| host       | port  | role    | state  | gtid_mode  | health                             |
++------------+-------+---------+--------+------------+------------------------------------+
+| localhost  | PORT3  | MASTER  | UP     | NO         | OK                                 |
+| localhost  | PORT1  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT2  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
++------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
 Test case 7 - attempt risky switchover with --force
 WARNING: The --ping option is used only with the health command.

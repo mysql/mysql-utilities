@@ -105,6 +105,10 @@ class test(replicate.test):
                             " master id = XXXXX\n")
         self.replace_result("  slave id = ",
                             "  slave id = XXXXX\n")
+        self.replace_result(" master uuid = ",
+                            " master uuid = XXXXX\n")
+        self.replace_result("  slave uuid = ",
+                            "  slave uuid = XXXXX\n")
             
         self.replace_result("               Master_Log_File :",
                             "               Master_Log_File : XXXXX\n")

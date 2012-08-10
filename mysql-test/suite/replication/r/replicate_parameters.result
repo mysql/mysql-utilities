@@ -40,6 +40,8 @@ Test case 3 - use the verbose feature
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# master uuid = XXXXX
+#  slave uuid = XXXXX
 # Checking InnoDB statistics for type and version conflicts.
 # Checking storage engines...
 # Checking for binary logging on master...

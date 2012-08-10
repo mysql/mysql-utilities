@@ -473,12 +473,12 @@ class Server(object):
         import socket
         
         if self.aliases:
-            return host_or_ip in self.aliases
+            return host_or_ip.lower() in self.aliases
 
         # First, get the local information
         try:
             local_info = socket.gethostbyname_ex(socket.gethostname())
-            local_aliases = [local_info[0]]
+            local_aliases = [local_info[0].lower()]
             local_aliases.extend(['127.0.0.1', 'localhost'])
             local_aliases.extend(local_info[1])
             local_aliases.extend(local_info[2])
@@ -511,8 +511,27 @@ class Server(object):
             self.aliases.extend(host_ip[1])
             self.aliases.extend(host_ip[2])
 
-        return host_or_ip in self.aliases
+        return host_or_ip.lower() in self.aliases
 
+
+    def user_host_exists(self, user, host_or_ip):
+        """Check to see if a user, host exists
+        
+        This method attempts to see if a user name matches the users on the
+        server and that any user, host pair can match the host or IP address
+        specified. This attempts to resolve wildcard matches.
+        
+        user[in]       user name
+        host_or_ip[in] host or IP address
+        
+        Returns string - host from server that matches the host_or_ip or
+                         None if no match.
+        """
+        res = self.exec_query("SELECT host FROM mysql.user WHERE user = '%s' AND '%s' LIKE host " % (user, host_or_ip))
+        if res:
+            return res[0][0]
+        return None
+        
 
     def get_connection_values(self):
         """Return a dictionary of connection values for the server.
@@ -777,13 +796,12 @@ class Server(object):
         errors = []
         if host == '127.0.0.1':
             host = 'localhost'
-        result = self.exec_query("SELECT * FROM mysql.user WHERE user = '%s' "
-                                 "AND host in ('%s', '%%')" % (user, host))
+        result = self.user_host_exists(user, host)
         if result is None or result == []:
             errors.append("The replication user %s@%s was not found "
                           "on %s:%s." % (user, host, self.host, self.port))
         else:
-            rpl_user = User(self, "%s@%s" % (user, host))
+            rpl_user = User(self, "%s@" % user + result)
             if not rpl_user.has_privilege('*', '*',
                                           'REPLICATION SLAVE'):
                 errors.append("Replication user does not have the "
@@ -1121,6 +1139,22 @@ class Server(object):
                                "%s." % self.role)
         
         return int(res[0][1])
+
+
+    def get_server_uuid(self):
+        """Retrieve the server uuid.
+        
+        Returns string - server uuid.
+        """
+        try:
+            res = self.show_server_variable("server_uuid")
+            if res is None or res == []:
+                return None
+        except:
+            raise UtilRplError("Cannot retrieve server_uuid from "
+                               "%s." % self.role)
+        
+        return res[0][1]
 
 
     def get_lctn(self):
