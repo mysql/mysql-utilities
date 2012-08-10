@@ -58,6 +58,10 @@ class test(replicate.test):
         self.remove_result("# CHANGE MASTER TO MASTER_HOST")
         self.mask_result("# master id =", "= ", "= XXX")
         self.mask_result("#  slave id =", "= ", "= XXX")
+        self.replace_result("# master uuid = ",
+                            "# master uuid = XXXXX\n")
+        self.replace_result("#  slave uuid = ",
+                            "#  slave uuid = XXXXX\n")
 
         return True
 

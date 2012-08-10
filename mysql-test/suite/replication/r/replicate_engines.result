@@ -3,6 +3,8 @@ Test case 1 - show warnings if slave has different default engines
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# master uuid = XXXXX
+#  slave uuid = XXXXX
 # Checking InnoDB statistics for type and version conflicts.
 # Checking storage engines...
 WARNING: The master and slave have differing storage engine configurations!
@@ -32,6 +34,8 @@ Test case 2 - use pedantic to fail if slave has different default engines
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# master uuid = XXXXX
+#  slave uuid = XXXXX
 # Checking InnoDB statistics for type and version conflicts.
 # Checking storage engines...
 # Storage engine configuration on Master:
@@ -54,6 +58,8 @@ Test case 3 - show warnings if master has different default engines
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# master uuid = XXXXX
+#  slave uuid = XXXXX
 # Checking InnoDB statistics for type and version conflicts.
 # Checking storage engines...
 WARNING: The master and slave have differing storage engine configurations!
@@ -83,6 +89,8 @@ Test case 4 - use pedantic to fail if master has different default engines
 # slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
+# master uuid = XXXXX
+#  slave uuid = XXXXX
 # Checking InnoDB statistics for type and version conflicts.
 # Checking storage engines...
 # Storage engine configuration on Master:

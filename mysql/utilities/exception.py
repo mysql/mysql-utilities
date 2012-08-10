@@ -54,6 +54,16 @@ class UtilRplError(UtilError):
         self.slave = slave
 
 
+class UtilRplWarn(UtilError):
+    """Replication warnings raised during replication operations.
+    """
+    
+    def __init__(self, message, errno=0, master=None, slave=None):
+        UtilError.__init__(self, message, errno)
+        self.master = master
+        self.slave = slave
+
+
 class UtilBinlogError(UtilError):
     """Errors raised during binary log operations.
     """

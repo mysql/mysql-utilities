@@ -24,7 +24,7 @@ import re
 import time
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.exception import UtilError, UtilDBError, UtilRplWarn
 from mysql.utilities.exception import UtilRplError, UtilBinlogError
 
 _MASTER_INFO_COL = [
@@ -271,6 +271,34 @@ class Replication(object):
         # Check for server_id uniqueness
         if master_server_id == slave_server_id:
             raise UtilRplError("The slave's server_id is the same as the "
+                                 "master.")
+        
+        return []
+        
+        
+    def check_server_uuids(self):
+        """Check UUIDs on master and slave
+        
+        This method will check the UUIDs on the master and slave. It will
+        raise exceptions for error conditions. 
+        
+        Returns [] if compatible or no UUIDs used, list of errors if not
+        """
+        master_uuid = self.master.get_uuid()
+        slave_uuid = self.slave.get_uuid()
+        
+        # Check for both not supporting UUIDs.
+        if master_uuid is None and slave_uuid is None:
+            return []
+        
+        # Check for unbalanced servers - one with UUID, one without
+        if master_uuid is None or slave_uuid is None:
+            raise UtilRplError("%s does not support UUIDs." %
+                               "Master" if master_uuid is None else "Slave")
+
+        # Check for uuid uniqueness
+        if master_uuid == slave_uuid:
+            raise UtilRplError("The slave's UUID is the same as the "
                                  "master.")
         
         return []
@@ -691,6 +719,7 @@ class Master(Server):
         
         assert not options.get("conn_info") == None
         
+        self.options = options
         Server.__init__(self, options)
         
 
@@ -826,13 +855,24 @@ class Master(Server):
             return slave_info
         
         slaves = []
-        
+        no_host_slaves = []
         res = self.exec_query("SHOW SLAVE HOSTS")
         if not res == []:
             res.sort()  # Sort for conformity
             for row in res:
-                slaves.append(_get_slave_info(row[1], row[2]))
-                    
+                info = _get_slave_info(row[1], row[2])
+                if row[1]:
+                    slaves.append(info)
+                else:
+                    no_host_slaves.append(info)
+        
+        if no_host_slaves:
+            print "WARNING: There are slaves that have not been registered" + \
+                  " with --report-host or --report-port."
+            if self.options.get("verbosity", 0) > 0:
+              for row in no_host_slaves:
+                  print "\t", row
+            
         return slaves
 
 
@@ -899,7 +939,14 @@ class MasterInfo(object):
         if self.verbosity > 2:
             print "# Reading master information from a %s." % self.repo.lower()
         if self.repo == "FILE":
-            return self._read_master_info_file()
+            import socket
+            
+            # Check host name of this host. If not the same, issue error.
+            if self.slave.is_alias(socket.gethostname()):
+                return self._read_master_info_file()
+            else:
+                raise UtilRplWarn("Cannot read master information file "
+                                  "from a remote machine.")
         else:
             return self._read_master_info_table()
 
@@ -943,21 +990,26 @@ class MasterInfo(object):
         if self.filename == 'master.info':
             self.filename = os.path.join(datadir, self.filename)
 
-        if os.path.exists(self.filename):
+        if not os.path.exists(self.filename):
+            raise UtilRplError("Cannot find master information file: "
+                               "%s." % self.filename)
+        try:
             mfile = open(self.filename, 'r')
             num = int(mfile.readline())
             # Protect overrun of array if master_info file length is
             # changed (more values added).
             if num > len(_MASTER_INFO_COL):
                 num = len(_MASTER_INFO_COL)
-            # Build the dictionary 
-            for i in range(1, num):
-                contents.append(mfile.readline().strip('\n'))
-            self._build_dictionary(contents)
-            mfile.close()
-        else:
+        except:
             raise UtilRplError("Cannot read master information file: "
-                               "%s." % self.filename)
+                               "%s.\nUser needs to have read access to "
+                               "the file." % self.filename)
+        # Build the dictionary 
+        for i in range(1, num):
+            contents.append(mfile.readline().strip('\n'))
+        self._build_dictionary(contents)
+        mfile.close()
+
         return True
         
         
@@ -1487,7 +1539,7 @@ class Slave(Server):
                            value, the slave health is not Ok
         max_pos[in]        maximum position difference from master to slave to
                            determine if slave health is not Ok
-        verbosity[in]      if > 0, return detailed errors else return only
+        verbosity[in]      if > 1, return detailed errors else return only
                            short phrases
         
         Returns tuple (bool, []) - (True, []) = Ok,
@@ -1560,10 +1612,7 @@ class Slave(Server):
             rpl_ok = False
         
         if len(errors) > 1:
-            if verbosity == 0:
-                errors = ["ERROR"]
-            else:
-                errors = [", ".join(errors)]
+            errors = [", ".join(errors)]
         
         return (rpl_ok, errors)
 

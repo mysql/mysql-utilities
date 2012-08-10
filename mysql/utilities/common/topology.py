@@ -952,11 +952,15 @@ class Topology(Replication):
             host = slave_dict['host']
             port = slave_dict['port']
             slave = slave_dict['instance']
-            if slave is None or \
-               (slave is not None and (not slave.is_alive() or \
-               not slave.is_connected_to_master(self.master))):
+            if slave is None:
                 rpl_health = (False, ["Cannot connect to slave."])
+            elif not slave.is_alive():
+                rpl_health = (False, ["Slave is not alive."])
                 slave = None
+            elif not slave.is_connected_to_master(self.master):
+                rpl_health = (False, ["Slave is not connected to master."])
+                slave = None
+
             if slave is not None:
                 rpl_health = slave.check_rpl_health(self.master,
                                                     master_log, master_log_pos,
