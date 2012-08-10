@@ -73,6 +73,16 @@ class test(replicate.test):
             raise MUTLibError("%s: failed" % comment)
             
         self.server2.exec_query("DROP USER rpl@'%'")
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@'local%'"
+                                " IDENTIFIED BY 'rpl'")
+        self.server2.exec_query("FLUSH PRIVILEGES")
+
+        comment = "Test case 6 - normal run with grant with wildcard rpl@'local%'"
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
+        self.server2.exec_query("DROP USER rpl@'local%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@localhost"
                                 " IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")

@@ -22,7 +22,7 @@ setup.
 """
 
 import sys
-from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.exception import UtilError, UtilRplError, UtilRplWarn
 
 _PRINT_WIDTH = 75    
 _RPL_HOST, _RPL_USER = 1, 2
@@ -216,6 +216,14 @@ class _BaseTestReplication(object):
                 print "Test: %s failed. Error: %s" % (self.description,
                                                       e.errmsg)
             return False
+        # Check for warnings
+        except UtilRplWarn, e:
+            if not self.quiet:
+                self.report_status("WARN", [e.errmsg])
+            else:
+                print "Test: %s had warnings. %s" % (self.description,
+                                                     e.errmsg)
+            return False
 
         # Check to see if test passed or if there were errors returned.
         if (type(res) == list and res == []) or \
@@ -276,7 +284,7 @@ class _TestRplUser(_BaseTestReplication):
         if res is None or res == []:
             raise UtilRplError("Slave is not connected to a master.")
         return self.rpl.master.check_rpl_user(res[0][_RPL_USER],
-                                              res[0][_RPL_HOST])
+                                              self.rpl.slave.host)
 
 class _TestServerIds(_BaseTestReplication):
     """Test server ids are different.
