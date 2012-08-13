@@ -339,6 +339,10 @@ parser.add_option("-f", "--force", action="store_true", dest="force",
 # Add verbosity mode
 add_verbosity(parser, False)
 
+# Skip cleanup mode
+parser.add_option("--skip-cleanup", action="store_true", dest="skip_cleanup",
+                  help="Do not shutdown spawned servers - debug only mode.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -688,14 +692,15 @@ else:
     print "\n"
 
 # Shutdown connections and spawned servers
-if server_list.num_spawned_servers():
-    print "\nShutting down spawned servers "
-    server_list.shutdown_spawned_servers()
-
-if (server_list.cleanup_list) > 0:
-    sys.stdout.write("\nDeleting temporary files...")
-    server_list.remove_files()
-    print "success."
+if not opt.skip_cleanup:
+    if server_list.num_spawned_servers():
+        print "\nShutting down spawned servers "
+        server_list.shutdown_spawned_servers()
+    
+    if (server_list.cleanup_list) > 0:
+        sys.stdout.write("\nDeleting temporary files...")
+        server_list.remove_files()
+        print "success."
 
 del server_list
 

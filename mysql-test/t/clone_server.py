@@ -80,7 +80,7 @@ class test(mutlib.System_test):
 
         basedir = rows[0][1]
         port2 = int(self.servers.get_next_port())
-        cmd_str = "mysqlserverclone.py --root-password=root "
+        cmd_str = "mysqlserverclone.py --root-password=root --delete-data "
         cmd_str += "--new-port=%d --basedir=%s " % (port2, basedir)
 
         comment = "Test case 2 - clone a server from basedir"

@@ -479,6 +479,11 @@ class Server(object):
         try:
             local_info = socket.gethostbyname_ex(socket.gethostname())
             local_aliases = [local_info[0].lower()]
+            # if dotted host name, take first part and use as an alias
+            try:
+                local_aliases.append(local_info[0].split('.')[0])
+            except:
+                pass
             local_aliases.extend(['127.0.0.1', 'localhost'])
             local_aliases.extend(local_info[1])
             local_aliases.extend(local_info[2])

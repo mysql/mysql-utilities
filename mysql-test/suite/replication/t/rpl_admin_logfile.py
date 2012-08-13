@@ -14,20 +14,13 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
+        if self.servers.get_server(0).check_version_compat(5, 6, 5):
+            raise MUTLibError("Test requires server version prior to 5.6.5")
         return self.check_num_servers(1)
 
     def setup(self):
         self.res_fname = "result.txt"
-        
-        # Spawn server
-        self.server0 = self.servers.get_server(0)
-        self.server1 = self.spawn_server("rep_master")
-        self.server2 = self.spawn_server("rep_slave")
-        
-        self.m_port = self.server1.port
-        self.s_port = self.server2.port
-        
-        return True
+        return rpl_admin.test.setup(self)
         
     def run(self):
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -62,12 +55,14 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         
         # Test Case 3
-        comment = "Test Case 3 - Log file can not be written too"
+        comment = "Test Case 3 - Log file can not be written to"
         os.chmod(_LOGNAME, stat.S_IREAD) # Make log read-only
         res = mutlib.System_test.run_test_case(
             self, 2, ' '.join(cmd), comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+            
+        rpl_admin.test.do_masks(self)
         
         return True
 

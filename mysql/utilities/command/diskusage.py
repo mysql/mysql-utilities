@@ -150,23 +150,29 @@ def _find_tablespace_files(folder, verbosity=0):
     """
     total = 0
     tablespaces = []
-    for item in os.listdir(folder):
-        itempath = os.path.join(folder, item)
-        if os.path.isfile(itempath):
+    # skip inaccessible files.
+    try:
+        for item in os.listdir(folder):
+            itempath = os.path.join(folder, item)
             name, ext = os.path.splitext(item)
-            if ext.upper() == "IBD":
-                size = os.path.getsize(itempath)
-                total += size
-                if verbosity > 0:
-                    row = (item, size,'file tablespace', '')
-                else:
-                    row = (item, size)
-
-                tablespaces.append(row)
-        else:
-            subdir, tot = _find_tablespace_files(itempath, verbosity)
-            total += tot
-            tablespaces.extend(subdir)
+            if os.path.isfile(itempath):
+                name, ext = os.path.splitext(item)
+                if ext.upper() == "IBD":
+                    size = os.path.getsize(itempath)
+                    total += size
+                    if verbosity > 0:
+                        row = (item, size,'file tablespace', '')
+                    else:
+                        row = (item, size)
+    
+                    tablespaces.append(row)
+            else:
+                subdir, tot = _find_tablespace_files(itempath, verbosity)
+                if subdir is not None:
+                    total += tot
+                    tablespaces.extend(subdir)
+    except:
+        return (None, None)
 
     return tablespaces, total
 
