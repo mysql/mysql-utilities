@@ -361,7 +361,6 @@ class Topology(Replication):
                             self.slaves.append({ 'host' : host, 'port' : port,
                                                  'instance' : slave_conn,
                                                  'discovered' : True})
-                            new_slaves_found = True
                             self._report("Found slave: %s:%s" %
                                          (host, port), logging.INFO, False)
                             new_slaves_found = True

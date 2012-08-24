@@ -36,7 +36,7 @@ from mysql.utilities import VERSION_FRM
 NAME = "MySQL Utilities - mysqlreplicate "
 DESCRIPTION = "mysqlreplicate - establish replication with a master"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
-        "--rpl_user=rpl:passwd "
+        "--rpl-user=rpl:passwd "
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),

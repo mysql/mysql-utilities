@@ -30,6 +30,7 @@ from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.options import parse_connection, add_verbosity
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
+from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -93,6 +94,9 @@ add_rpl_user(parser, None)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Check slaves list
+check_server_lists(parser, opt.master, opt.slaves)
 
 # Check for invalid command
 if len(args) > 1:

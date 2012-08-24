@@ -77,6 +77,15 @@ class test(rpl_admin.test):
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
 
+        # Now test to see what happens when master is listed as a slave
+        comment = "Test case %s - Master listed as a slave" % test_num
+        cmd_str = "%s health %s %s,%s" % (base_cmd, master_str, slaves_str, master_conn)
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 

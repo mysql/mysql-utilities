@@ -53,7 +53,7 @@ class test(rpl_admin_gtid.test):
         comment = "Test case 4 - elect mode but no candidates"
         cmd_str = "mysqlfailover.py " 
         cmd_opts = " --master=root:root@localhost --failover-mode=elect "
-        cmd_opts += "--slaves=root:root@localhost "
+        cmd_opts += "--slaves=%s " % slave1_conn
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
@@ -79,6 +79,17 @@ class test(rpl_admin_gtid.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         
+        # Now test to see what happens when master is listed as a slave
+        comment = "Test case 6 - Master listed as a slave" 
+        cmd_str = "mysqlfailover.py health "        
+        cmd_opts = " --master=%s " % master_conn
+        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn,
+                                               slave3_conn, master_conn])
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         self.reset_topology()
         
         self.replace_substring(str(self.m_port), "PORT1")

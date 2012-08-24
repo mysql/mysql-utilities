@@ -53,3 +53,7 @@ Test case 13 - Not enough privileges - switchover jane
 # Checking privileges.
 User jane on localhost does not have sufficient privileges to execute the switchover command.
 ERROR: Not enough privileges to execute command.
+Test case 14 - Master listed as a slave
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: You cannot list the master as a slave.

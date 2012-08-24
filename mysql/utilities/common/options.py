@@ -534,6 +534,19 @@ def add_failover_options(parser):
                       "for slave waiting to catch up to master. Default = 3.")
 
 
+def check_server_lists(parser, master, slaves):
+    """Check to see if master is listed in slaves list
+    
+    Returns bool - True = master not in slaves, issue error if it appears
+    """
+    if slaves:
+        for slave in slaves.split(','):
+            if master == slave:
+                parser.error("You cannot list the master as a slave.")
+
+    return True
+
+
 def obj2sql(obj):
     """Convert a Python object to an SQL object.
 
