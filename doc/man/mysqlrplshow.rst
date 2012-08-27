@@ -17,6 +17,9 @@ DESCRIPTION
 This utility shows the replication slaves for a master. It prints a graph of
 the master and its slaves labeling each with the host name and port number.
 
+You must specify the :option:`--discover-slaves-login` option to provide the
+user name and password to discover any slaves in the topology.
+
 To explore the slaves for each client, use the :option:`--recurse` option.
 This causes the utility to connect to each slave found and attempt to
 determine whether it has any slaves. If slaves are found, the process
@@ -93,6 +96,13 @@ OPTIONS
 .. option:: --help
 
    Display a help message and exit.
+
+.. option:: --discover-slaves-login=<user:password>
+
+   Supply the user and password in the form <*user*>[:<*passwd*>] for
+   discovering slaves and relay slaves in the topology. For example,
+   --discover=joe:secret will use 'joe' as the user and 'secret' as
+   the password for each discovered slave.
 
 .. option:: --format=<format>, -f<format>
 
@@ -175,7 +185,7 @@ EXAMPLES
 To show the slaves for a master running on port 3311 on the local host, use
 the following command::
 
-    $ mysqlrplshow  --master=root@localhost:3311 
+    $ mysqlrplshow  --master=root@localhost:3311 --discover-slaves-login=root
     # master on localhost: ... connected.
     # Finding slaves for master: localhost:3311
     
@@ -192,7 +202,8 @@ for the master.
 To show the full replication topology of a master running on the local host,
 use the following command::
 
-    $ mysqlrplshow  --master=root@localhost:3311 --recurse
+    $ mysqlrplshow  --master=root@localhost:3311 --recurse \
+       --discover-slaves-login=root
     # master on localhost: ... connected.
     # Finding slaves for master: localhost:3311
     
@@ -210,7 +221,7 @@ prompting for the user name and password for slaves that do not have the same
 user name and password credentials as the master, use the following command::
 
     $ mysqlrplshow --recurse --prompt --num-retries=1 \
-      --master=root@localhost:3331
+      --master=root@localhost:3331 --discover-slaves-login=root
      
     Server localhost:3331 is running on localhost.
     # master on localhost: ... connected.

@@ -24,6 +24,9 @@ class test(show_rpl.test):
         if self.server_list[2] is None:
             return False
             
+        self.port_repl = []
+        self.port_repl.append(self.server_list[1].port)
+        self.port_repl.append(self.server_list[2].port)
         return True
 
     def run(self):
@@ -62,7 +65,7 @@ class test(show_rpl.test):
         except UtilError, e:
             raise MUTLibError(e.errmsg)
         
-        cmd_str = "mysqlrplshow.py " + master_str
+        cmd_str = "mysqlrplshow.py --disco=root:root " + master_str
 
         comment = "Test case 1 - show topology - without list"
         cmd_opts = "  --recurse "

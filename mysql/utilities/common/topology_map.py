@@ -64,6 +64,7 @@ class TopologyMap(object):
         self.socket_path = options.get("socket_path", None)
         self.seed_server = seed_server
         self.topology = []
+        self.options = options
 
 
     def _connect(self, conn):
@@ -177,14 +178,26 @@ class TopologyMap(object):
         if not self.quiet:
             print "# Finding slaves for master: %s" % master_info
     
+        # See if the user wants us to discover slaves.
+        discover = self.options.get("discover", None)
+        if discover is None:
+            return
+        
+        # Get user and password
+        try:
+            user, password = discover.split(":", 1)
+        except ValueError:
+            user = discover
+            password = None
+
         # Get replication topology
-        slaves = master.get_slaves()
+        slaves = master.get_slaves(user, password)
         slave_list = []
         depth = 0
         if len(slaves) > 0:
             for slave in slaves:
                 if slave.find(":") > 0:
-                    host, port = slave.split(":")
+                    host, port = slave.split(":", 1)
                 else:
                     host = slave
                     port = START_PORT  # Use the default

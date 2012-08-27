@@ -324,7 +324,7 @@ class Topology(Replication):
         new_slaves_found = False
         self._report("# Discovering slaves for master at %s:%s" %
                      (self.master.host, self.master.port))
-        discovered_slaves = self.master.get_slaves()
+        discovered_slaves = self.master.get_slaves(user, password)
         for slave in discovered_slaves:
             host, port = slave.split(":")
             self._report("Discovering slave at %s:%s" % (host, port),
@@ -356,8 +356,7 @@ class Topology(Replication):
                         slave_conn.connect()
                         # Skip discovered slaves that are not connected
                         # to the master
-                        if slave_conn.is_connected_to_master(self.master) \
-                           and slave_conn.is_connected():
+                        if slave_conn.is_connected():
                             self.slaves.append({ 'host' : host, 'port' : port,
                                                  'instance' : slave_conn,
                                                  'discovered' : True})
@@ -616,7 +615,7 @@ class Topology(Replication):
                     self._report(msg % "FAIL", logging.WARN)
                 return (False, "CONNECTED",
                         "Connection to slave server lost.")            
-            if not slave.is_connected_to_master(self.master):
+            if not slave.is_configured_for_master(self.master):
                 if self.verbose and not quiet:
                     self._report(msg % "FAIL", logging.WARN)
                 return (False, "CONNECTED",
@@ -956,7 +955,7 @@ class Topology(Replication):
             elif not slave.is_alive():
                 rpl_health = (False, ["Slave is not alive."])
                 slave = None
-            elif not slave.is_connected_to_master(self.master):
+            elif not slave.is_configured_for_master(self.master):
                 rpl_health = (False, ["Slave is not connected to master."])
                 slave = None
 

@@ -24,6 +24,9 @@ class test(show_rpl.test):
         if self.server_list[2] is None:
             return False
             
+        self.port_repl = []
+        self.port_repl.append(self.server_list[1].port)
+        self.port_repl.append(self.server_list[2].port)
         return True
 
     def run(self):
@@ -35,13 +38,13 @@ class test(show_rpl.test):
                     self.build_connection_string(self.server_list[1])
         conn_str = master_str + slave_str
         
-        cmd_str = "mysqlrplshow.py --master=wikiwakawonky"
+        cmd_str = "mysqlrplshow.py --master=wikiwakawonky --disco=root:root"
         comment = "Test case 1 - error: cannot parse master string"
         res =  mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqlrplshow.py --master=wanda:fish@localhost:%s" % \
+        cmd_str = "mysqlrplshow.py --disco=root:root --master=wanda:fish@localhost:%s" % \
                   self.server_list[0].port
         comment = "Test case 2 - error: invalid login to master"
         res =  mutlib.System_test.run_test_case(self, 1, cmd_str, comment)
@@ -60,7 +63,7 @@ class test(show_rpl.test):
         except UtilError, e:
             raise MUTLibError(e.errmsg)
         
-        cmd_str = "mysqlrplshow.py " + master_str
+        cmd_str = "mysqlrplshow.py --disco=root:root " + master_str
 
         comment = "Test case 3 - show topology - bad format"
         cmd_opts = "  --show-list --recurse --format=XXXXXX"
@@ -72,7 +75,7 @@ class test(show_rpl.test):
         # Create a user to test error for not enough permissions
         self.server_list[2].exec_query("CREATE USER 'josh'@'localhost'")
 
-        cmd_str = "mysqlrplshow.py --master=josh@localhost:%s" % \
+        cmd_str = "mysqlrplshow.py --disco=root:root --master=josh@localhost:%s" % \
                   self.server_list[2].port
         if not self.server_list[2].socket is None:
             cmd_str += ":" + self.server_list[2].socket
@@ -108,6 +111,15 @@ class test(show_rpl.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        comment = "Test case 7 - show topology - discover-slaves-login missing"
+        cmd_str = "mysqlrplshow.py --master=josh@localhost:%s" % \
+                  self.server_list[2].port
+        cmd_opts = "  --show-list --recurse --max-depth=9999"
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+                                                   comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
         show_rpl.test.do_replacements(self)
 
         show_rpl.test.stop_replication(self, self.server_list[1])

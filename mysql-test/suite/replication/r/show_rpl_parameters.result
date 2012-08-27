@@ -1,50 +1,50 @@
 Test case 1 - show topology - without list
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Test case 2 - show topology - with list
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| localhost:3311  | localhost:3310  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 3 - show topology - with list and quiet
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| localhost:3311  | localhost:3310  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 4 - show topology - with format and without list
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Test case 5 - show topology - help
 Usage: mysqlrplshow.py --master=root@localhost:3306 
@@ -73,60 +73,67 @@ Options:
                         number of retries allowed for failed slave login
                         attempt. Valid with --prompt only.
   -q, --quiet           turn off all messages for quiet execution.
+  --discover-slaves-login=DISCOVER
+                        at startup, query master for all registered slaves and
+                        use the user name and password specified to connect.
+                        Supply the user and password in the form
+                        user:password. For example, --discover-slaves-
+                        login=joe:secret will use 'joe' as the user and
+                        'secret' as the password for each discovered slave.
 Test Case 6 : Testing show topology with CSV format 
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Master,Slave
-localhost:3311,localhost:3310
+localhost:PORT2,localhost:PORT1
 Test Case 7 : Testing show topology with TAB format 
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Master	Slave
-localhost:3311	localhost:3310
+localhost:PORT2	localhost:PORT1
 Test Case 8 : Testing show topology with GRID format 
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| localhost:3311  | localhost:3310  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test Case 9 : Testing show topology with VERTICAL format 
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3311
+# Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
-# Finding slaves for master: localhost:3310
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-localhost:3311 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- localhost:3310 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 *************************       1. row *************************
- Master: localhost:3311
-  Slave: localhost:3310
+ Master: localhost:PORT2
+  Slave: localhost:PORT1
 1 rows.

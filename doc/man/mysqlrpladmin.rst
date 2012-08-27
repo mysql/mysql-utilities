@@ -258,7 +258,9 @@ OPTIONS
 
    Connection information for slave servers in the form:
    <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>]. List multiple slaves
-   in comma-separated list.
+   in comma-separated list. The list will be evaluated literally whereby each
+   server is considered a slave to the master listed regardless if they are a
+   slave of the master.
 
 .. option:: --timeout=<seconds>
 
