@@ -90,8 +90,22 @@ parser.add_option("-n", "--num-retries", action="store", dest="num_retries",
 parser.add_option("-q", "--quiet", action="store_true", dest="quiet",
                   help="turn off all messages for quiet execution.")
 
+parser.add_option("--discover-slaves-login", action="store", dest="discover",
+                  default=None, type="string", help="at startup, query "
+                  "master for all registered slaves and use the user name "
+                  "and password specified to connect. Supply the user and "
+                  "password in the form user:password. For example, "
+                  "--discover-slaves-login=joe:secret will use 'joe' as "
+                  "the user and 'secret' as the password for each "
+                  "discovered slave.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Fail is --discover-slaves-login not specified
+if opt.discover is None:
+    parser.error("The --discover-slaves-login is required to test slave "
+                 "connectivity.")
 
 # Fail if recurse specified and max-depth is invalid
 if opt.recurse and opt.max_depth is not None:
@@ -113,6 +127,7 @@ options = {
     'show_list'      : opt.show_list,
     'format'         : opt.format,
     'max_depth'      : opt.max_depth,
+    'discover'       : opt.discover,
 }
   
 try:

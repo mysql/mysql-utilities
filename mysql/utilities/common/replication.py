@@ -452,7 +452,7 @@ class Replication(object):
         state = self.slave.get_io_running()
         if not state:
             raise UtilRplError("Slave is stopped.")
-        if not self.slave.is_connected_to_master(self.master) or \
+        if not self.slave.is_configured_for_master(self.master) or \
            state.upper() != "YES":
             return False
         return True
@@ -838,12 +838,44 @@ class Master(Server):
         return (rpl_ok, errors)
 
 
-    def get_slaves(self):
+    def _check_discovered_slave(self, conn_dict):
+        """ Check discovered slave is configured to this master
+        
+        This method attempts to determine if the slave specified is
+        configured to connect to this master.
+        
+        conn_dict[in]  dictionary of connection information
+        
+        Returns bool - True - is configured, False - not configured
+        """
+        if conn_dict['conn_info']['host'] == '127.0.0.1':
+            conn_dict['conn_info']['host'] = 'localhost'
+        # Now we must attempt to connect to the slave.
+        slave_conn = Slave(conn_dict)
+        is_configured = False
+        try:
+            slave_conn.connect()
+            # Skip discovered slaves that are not configured
+            # to connect to the master
+            if slave_conn.is_configured_for_master(self):
+                is_configured = True
+        except:
+            pass # if connect errors, ignore slave
+        finally:
+            slave_conn.disconnect()
+
+        return is_configured
+
+
+    def get_slaves(self, user, password):
         """Return the slaves registered for this master.
         
         This method returns a list of slaves (host, port) if this server is
         a master in a replication topology and has slaves registered.
 
+        user[in]       user login
+        password[in]   user password
+        
         Returns list - [host:port, ...]
         """
         def _get_slave_info(host, port):
@@ -861,10 +893,21 @@ class Master(Server):
             res.sort()  # Sort for conformity
             for row in res:
                 info = _get_slave_info(row[1], row[2])
-                if row[1]:
+                conn_dict = {
+                    'conn_info' : { 'user' : user, 'passwd' : password,
+                                    'host' : row[1], 'port' : row[2],
+                                    'socket' : None },
+                    'role'      : 'slave',
+                    'verbose'   : self.options.get("verbosity", 0) > 0,
+                }
+                if not row[1]:
+                    no_host_slaves.append(info)
+                elif self._check_discovered_slave(conn_dict):
                     slaves.append(info)
                 else:
-                    no_host_slaves.append(info)
+                    # Ignore any slaves that appear in the SHOW SLAVE HOSTS
+                    # but are not configured to attach to this master.
+                    pass
         
         if no_host_slaves:
             print "WARNING: There are slaves that have not been registered" + \
@@ -1507,7 +1550,7 @@ class Slave(Server):
         return change_master
     
     
-    def is_connected_to_master(self, master):
+    def is_configured_for_master(self, master):
         """Check that slave is connected to the master at host, port.
         
         master[in]     instance of the master
@@ -1515,11 +1558,12 @@ class Slave(Server):
         Returns bool - True = is connected
         """
         res = self.get_status()
-        if res != [] and res[0] != []:
-            res = res[0]
-            m_host, m_port = self.get_master_host_port()
-            if not master.is_alias(m_host) or int(m_port) != int(master.port):
-                return False
+        if res == [] or res[0] == []:
+            return False
+        res = res[0]
+        m_host, m_port = self.get_master_host_port()
+        if not master.is_alias(m_host) or int(m_port) != int(master.port):
+            return False
         return True
 
 
@@ -1567,7 +1611,7 @@ class Slave(Server):
             io_error_text = res[_SLAVE_IO_ERROR]
             
             # Check to see that slave is connected to the right master
-            if not self.is_connected_to_master(master):
+            if not self.is_configured_for_master(master):
                 return (False, ["Not connected to correct master."])
 
             # Check slave status for errors, threads activity

@@ -56,7 +56,7 @@ class test(rpl_admin.test):
                      ",".join([slave1_conn, slave2_conn, slave3_conn])
         
         comment = "Test case 1 - warning for missing --report-host"
-        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
+        cmd_str = "mysqlrplshow.py --master=%s --disco=root:root " % master_conn
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
