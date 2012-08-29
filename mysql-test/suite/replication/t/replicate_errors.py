@@ -3,6 +3,7 @@
 import os
 import replicate
 import mutlib
+import socket
 from mysql.utilities.exception import MUTLibError
 
 class test(replicate.test):
@@ -61,14 +62,17 @@ class test(replicate.test):
         same_str = "--master=%s --slave=%s " % (str, str)
 
         comment = "Test case 5a - error: slave and master same machine"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str +
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        same_str = "--master=root@this:13330 --slave=root@that:13330"
-        comment = "Test case 5b - error: slave and master same port"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str +
+        str = self.build_connection_string(self.server1)
+        same_str = "--master=%s --slave=root:root@%s:%s " % \
+                   (str, socket.gethostname().split('.', 1)[0],
+                    self.server1.port)
+        comment = "Test case 5b - error: slave and master same alias/host"
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str +
                         same_str + "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

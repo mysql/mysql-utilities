@@ -18,7 +18,15 @@ Test case 5 - FILE/TABLE mix and missing --rpl-user
 NOTE: Log file 'a.txt' does not exist. Will be created.
 # Checking privileges.
 ERROR: Failover requires --master-info-repository=TABLE for all slaves.
-Test case 6 - Master listed as a slave
+Test case 6 - Master listed as a slave - literal
 Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
-mysqlfailover.py: error: You must specify a master to monitor.
+mysqlfailover.py: error: The master and one of the slaves are the same host and port.
+Test case 7 - Master listed as a slave - alias
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The master and one of the slaves are the same host and port.
+Test case 8 - Master listed as a candiate - alias
+Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The master and one of the candidates are the same host and port.

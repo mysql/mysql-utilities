@@ -29,6 +29,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.command.check_rpl import check_replication
 from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
@@ -98,6 +99,10 @@ try:
 except FormatError, e:
     parser.error("Slave connection values invalid or cannot be parsed.")
 
+# Check hostname alias
+if check_hostname_alias(m_values, s_values):
+    parser.error("The master and slave are the same host and port.")
+    
 # Create dictionary of options
 options = {
     'verbosity'    : opt.verbosity,

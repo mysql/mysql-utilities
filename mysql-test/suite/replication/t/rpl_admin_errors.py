@@ -3,6 +3,7 @@
 import os
 import mutlib
 import rpl_admin
+import socket
 from mysql.utilities.exception import MUTLibError
 
 class test(rpl_admin.test):
@@ -78,8 +79,29 @@ class test(rpl_admin.test):
             test_num += 1
 
         # Now test to see what happens when master is listed as a slave
-        comment = "Test case %s - Master listed as a slave" % test_num
+        comment = "Test case %s - Master listed as a slave - literal" % test_num
         cmd_str = "%s health %s %s,%s" % (base_cmd, master_str, slaves_str, master_conn)
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
+        comment = "Test case %s - Master listed as a slave - alias"  % test_num
+        cmd_str = "%s health %s %s" % (base_cmd, master_str,
+                  "--slaves=root:root@%s:%s" % \
+                    (socket.gethostname().split('.', 1)[0], self.server1.port))
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
+        comment = "Test case %s - Master listed as a candiate - alias" % test_num
+        cmd_str = "%s elect %s %s %s" % (base_cmd, master_str,
+                  "--candidates=root:root@%s:%s" % \
+                    (socket.gethostname().split('.', 1)[0], self.server1.port),
+                  slaves_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str,
                                                comment)
         if not res:

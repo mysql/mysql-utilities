@@ -380,6 +380,21 @@ def test_connect(conn_info):
     return True
 
 
+def check_hostname_alias(server1_vals, server2_vals):
+    """Check to see if the servers are the same machine by host name.
+    
+    server1_vals[in]   connection dictionary for server1
+    server2_vals[in]   connection dictionary for server2
+    
+    Returns bool - true = server1 and server2 are the same host
+    """
+    server1 = Server({'conn_info' : server1_vals})
+    server2 = Server({'conn_info' : server2_vals})
+
+    return (server1.is_alias(server2.host) and
+            int(server1.port) == int(server2.port))
+
+
 class Server(object):
     """The Server class can be used to connect to a running MySQL server.
     The following utilities are provided:

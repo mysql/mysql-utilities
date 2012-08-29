@@ -14,10 +14,13 @@ Test case 4 - error: invalid login to server (slave)
 # slave on nada: ... ERROR: Cannot connect to the slave server.
 Error ####: Can't connect to local MySQL server ####...
 Test case 5a - error: slave and master same machine
-ERROR: You must specify two different servers for the operation.
-Test case 5b - error: slave and master same port
-# master on this: ... ERROR: Cannot connect to the master server.
-Error ####: Can't connect to local MySQL server ####...
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
+
+mysqlreplicate.py: error: The master and slave are the same host and port.
+Test case 5b - error: slave and master same alias/host
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
+
+mysqlreplicate.py: error: The master and slave are the same host and port.
 Test case 6 - error: No binary logging on master
 # master on localhost: ... connected.
 # slave on localhost: ... connected.

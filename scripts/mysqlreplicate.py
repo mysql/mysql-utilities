@@ -30,6 +30,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_rpl_user
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.command.setup_rpl import setup_replication
+from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities import VERSION_FRM
 
 # Constants
@@ -103,6 +104,10 @@ try:
     s_values = parse_connection(opt.slave)
 except:
     parser.error("Slave connection values invalid or cannot be parsed.")
+    
+# Check hostname alias
+if check_hostname_alias(m_values, s_values):
+    parser.error("The master and slave are the same host and port.")
     
 # Check required --master-log-file for --master-log-pos
 if (opt.master_log_pos >= 0 and opt.master_log_file is None):

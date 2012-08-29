@@ -3,6 +3,7 @@
 import os
 import check_rpl
 import mutlib
+import socket
 from mysql.utilities.exception import MUTLibError
 
 class test(check_rpl.test):
@@ -52,10 +53,10 @@ class test(check_rpl.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 3 - same server"
+        comment = "Test case 3 - same server literal specification"
         same_str = self.build_connection_string(self.server2)
         cmd_opts = " --master=%s --slave=%s" % (same_str, same_str)
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -73,6 +74,14 @@ class test(check_rpl.test):
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         master_str + " --slave=nope@nada:localhost:5511",
                         comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
+        comment = "Test case 6 - master and slave same host"
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str +
+                        master_str + " --slave=root:root@%s:%s" %
+                        (socket.gethostname().split('.', 1)[0],
+                         self.server2.port), comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 

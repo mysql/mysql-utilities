@@ -540,7 +540,7 @@ def check_server_lists(parser, master, slaves):
     Returns bool - True = master not in slaves, issue error if it appears
     """
     if slaves:
-        for slave in slaves.split(','):
+        for slave in slaves.split(',', 1):
             if master == slave:
                 parser.error("You cannot list the master as a slave.")
 

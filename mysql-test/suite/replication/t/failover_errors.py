@@ -3,6 +3,7 @@
 import os
 import mutlib
 import rpl_admin_gtid
+import socket
 from mysql.utilities.exception import MUTLibError
 
 class test(rpl_admin_gtid.test):
@@ -80,12 +81,33 @@ class test(rpl_admin_gtid.test):
             raise MUTLibError("%s: failed" % comment)
         
         # Now test to see what happens when master is listed as a slave
-        comment = "Test case 6 - Master listed as a slave" 
+        comment = "Test case 6 - Master listed as a slave - literal" 
         cmd_str = "mysqlfailover.py health "        
         cmd_opts = " --master=%s " % master_conn
         cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn,
                                                slave3_conn, master_conn])
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 7 - Master listed as a slave - alias" 
+        cmd_str = "mysqlfailover.py health "        
+        cmd_opts = " --master=%s " % master_conn
+        cmd_opts += " --slaves=root:root@%s:%s " % \
+                    (socket.gethostname().split('.', 1)[0], self.server1.port)
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 8 - Master listed as a candiate - alias" 
+        cmd_str = "mysqlfailover.py health "        
+        cmd_opts = " --master=%s " % master_conn
+        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn])
+        cmd_opts += " --candidates=root:root@%s:%s " % \
+                    (socket.gethostname().split('.', 1)[0], self.server1.port)
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
