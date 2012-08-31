@@ -1,3 +1,18 @@
+Release 1.0.7 (Released August 31, 2012)
+----------------------------------------
+
+- BUG#14208415: mysqlrepladmin produces a trace when log can not be written
+- BUG#14378252: replication user check fails with wildcard host
+- BUG#14381965: need better error reporting in health reports
+- BUG#14382552: Check for duplicate UUIDs
+- BUG#14382982: no warning issued for missing --report-host 
+- BUG#14383189: require --master-info-repo=TABLE for failover
+- BUG#14488825: Regression testing fixes
+- BUG#14501757: mysqlrplshow -r includes spurious master
+- BUG#14526940: Master can be used in slaves list
+- BUG#14383094: errors on reading master.info file
+- BUG#14238782: serverclone shouldn't del datadir 
+
 Release 1.0.6 (Released July 14, 2012)
 --------------------------------------
 
