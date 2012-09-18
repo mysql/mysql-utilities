@@ -1,0 +1,205 @@
+Test Case 1: Help
+Usage: mysqluc.py 
+
+mysqluc - Command line client for running MySQL Utilities
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  --width=WIDTH         display width
+  --utildir=UTILDIR     location of utilities
+  -e COMMANDS, --execute=COMMANDS
+                        Execute commands and exit. Multiple commands are
+                        separated with semi-colons. Note: some platforms may
+                        require double quotes around command list.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           turn off all messages for quiet execution.
+Test Case 2: Normal
+
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+
+Options:
+Option                     Description                                     
+-------------------------  ------------------------------------------------
+--version                  show program's version number and exit          
+--help                     display a help message and exit                 
+--server1=SERVER1          connection information for first server in the  
+                           form: <user>:<password>@<host>:<port>:<socket>  
+--server2=SERVER2          connection information for second server in the 
+                           form: <user>:<password>@<host>:<port>:<socket>  
+--width=WIDTH              display width                                   
+--force                    do not abort when a diff test fails             
+-v, --verbose              control how much information is displayed. e.g.,
+                           -v = verbose, -vv = more verbose, -vvv = debug  
+-q, --quiet                turn off all messages for quiet execution.      
+-d, --difftype=DIFFTYPE    display differences in context format in one of 
+                           the following formats:                          
+                           [unified|context|differ|sql] (default: unified).
+--changes-for=CHANGES_FOR  specify the server to show transformations to   
+                           match the other server. For example, to see the 
+                           transformation for transforming server1 to match
+                           server2, use --changes-for=server1. Valid values
+                           are 'server1' or 'server2'. The default is      
+                           'server1'.                                      
+--show-reverse             produce a transformation report containing the  
+                           SQL statements to conform the object definitions
+                           specified in reverse. For example if --changes- 
+                           for is set to server1, also generate the        
+                           transformation for server2. Note: the reverse   
+                           changes are annotated and marked as comments.   
+
+Test Case 3: Verbosity
+
+Executing command: help mysqldiff
+
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+
+Options:
+Option                     Description                                     
+-------------------------  ------------------------------------------------
+--version                  show program's version number and exit          
+--help                     display a help message and exit                 
+--server1=SERVER1          connection information for first server in the  
+                           form: <user>:<password>@<host>:<port>:<socket>  
+--server2=SERVER2          connection information for second server in the 
+                           form: <user>:<password>@<host>:<port>:<socket>  
+--width=WIDTH              display width                                   
+--force                    do not abort when a diff test fails             
+-v, --verbose              control how much information is displayed. e.g.,
+                           -v = verbose, -vv = more verbose, -vvv = debug  
+-q, --quiet                turn off all messages for quiet execution.      
+-d, --difftype=DIFFTYPE    display differences in context format in one of 
+                           the following formats:                          
+                           [unified|context|differ|sql] (default: unified).
+--changes-for=CHANGES_FOR  specify the server to show transformations to   
+                           match the other server. For example, to see the 
+                           transformation for transforming server1 to match
+                           server2, use --changes-for=server1. Valid values
+                           are 'server1' or 'server2'. The default is      
+                           'server1'.                                      
+--show-reverse             produce a transformation report containing the  
+                           SQL statements to conform the object definitions
+                           specified in reverse. For example if --changes- 
+                           for is set to server1, also generate the        
+                           transformation for server2. Note: the reverse   
+                           changes are annotated and marked as comments.   
+
+Test Case 4: Quiet
+Quiet mode, saving output to XXXXXXXXXXXXXX
+Test Case 5: Normal - width 55
+
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+
+Options:
+Option                     Description                 
+-------------------------  ----------------------------
+--version                  show program's version      
+                           number and exit             
+--help                     display a help message and  
+                           exit                        
+--server1=SERVER1          connection information for  
+                           first server in the form: <u
+                           ser>:<password>@<host>:<port
+                           >:<socket>                  
+--server2=SERVER2          connection information for  
+                           second server in the form: <
+                           user>:<password>@<host>:<por
+                           t>:<socket>                 
+--width=WIDTH              display width               
+--force                    do not abort when a diff    
+                           test fails                  
+-v, --verbose              control how much information
+                           is displayed. e.g., -v =    
+                           verbose, -vv = more verbose,
+                           -vvv = debug                
+-q, --quiet                turn off all messages for   
+                           quiet execution.            
+-d, --difftype=DIFFTYPE    display differences in      
+                           context format in one of the
+                           following formats:          
+                           [unified|context|differ|sql]
+                           (default: unified).         
+--changes-for=CHANGES_FOR  specify the server to show  
+                           transformations to match the
+                           other server. For example,  
+                           to see the transformation   
+                           for transforming server1 to 
+                           match server2, use          
+                           --changes-for=server1. Valid
+                           values are 'server1' or     
+                           'server2'. The default is   
+                           'server1'.                  
+--show-reverse             produce a transformation    
+                           report containing the SQL   
+                           statements to conform the   
+                           object definitions specified
+                           in reverse. For example if  
+                           --changes-for is set to     
+                           server1, also generate the  
+                           transformation for server2. 
+                           Note: the reverse changes   
+                           are annotated and marked as 
+                           comments.                   
+
+Test Case 6: Normal - width 66
+
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+
+Options:
+Option                     Description                            
+-------------------------  ---------------------------------------
+--version                  show program's version number and exit 
+--help                     display a help message and exit        
+--server1=SERVER1          connection information for first server
+                           in the form: <user>:<password>@<host>:<
+                           port>:<socket>                         
+--server2=SERVER2          connection information for second      
+                           server in the form: <user>:<password>@<
+                           host>:<port>:<socket>                  
+--width=WIDTH              display width                          
+--force                    do not abort when a diff test fails    
+-v, --verbose              control how much information is        
+                           displayed. e.g., -v = verbose, -vv =   
+                           more verbose, -vvv = debug             
+-q, --quiet                turn off all messages for quiet        
+                           execution.                             
+-d, --difftype=DIFFTYPE    display differences in context format  
+                           in one of the following formats:       
+                           [unified|context|differ|sql] (default: 
+                           unified).                              
+--changes-for=CHANGES_FOR  specify the server to show             
+                           transformations to match the other     
+                           server. For example, to see the        
+                           transformation for transforming server1
+                           to match server2, use --changes-       
+                           for=server1. Valid values are 'server1'
+                           or 'server2'. The default is 'server1'.
+--show-reverse             produce a transformation report        
+                           containing the SQL statements to       
+                           conform the object definitions         
+                           specified in reverse. For example if   
+                           --changes-for is set to server1, also  
+                           generate the transformation for        
+                           server2. Note: the reverse changes are 
+                           annotated and marked as comments.      
+
+Test Case 7: Replacement
+ERROR: Nothing matches 'NOTTHERE%' in any database, trigger, user, routine, column, table, partition, event, or view
+
+
+
+Variable  Value                                                            
+--------  -----------------------------------------------------------------
+SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
+
+
+

@@ -1,0 +1,260 @@
+Test Case 1: Show Help
+
+Command                 Description                                          
+----------------------  -----------------------------------------------------
+help utilities          Display list of all utilities supported.             
+help <utility>          Display help for a specific utility.                 
+help | help commands    Show this list.                                      
+exit | quit             Exit the console.                                    
+set <variable>=<value>  Store a variable for recall in commands.             
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
+<ENTER>                 Press ENTER to execute command.                      
+<ESCAPE>                Press ESCAPE to clear the command entry.             
+<DOWN>                  Press DOWN to retrieve the previous command.         
+<UP>                    Press UP to retrieve the next command in history.    
+<TAB>                   Press TAB for type completion of utility, option, or 
+                        variable names.                                      
+<TAB><TAB>              Press TAB twice for list of matching type completion 
+                        (context sensitive).                                 
+
+Test Case 2: Show Help Commands
+
+Command                 Description                                          
+----------------------  -----------------------------------------------------
+help utilities          Display list of all utilities supported.             
+help <utility>          Display help for a specific utility.                 
+help | help commands    Show this list.                                      
+exit | quit             Exit the console.                                    
+set <variable>=<value>  Store a variable for recall in commands.             
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
+<ENTER>                 Press ENTER to execute command.                      
+<ESCAPE>                Press ESCAPE to clear the command entry.             
+<DOWN>                  Press DOWN to retrieve the previous command.         
+<UP>                    Press UP to retrieve the next command in history.    
+<TAB>                   Press TAB for type completion of utility, option, or 
+                        variable names.                                      
+<TAB><TAB>              Press TAB twice for list of matching type completion 
+                        (context sensitive).                                 
+
+Test Case 3: Show Help Commands
+
+Command                 Description                                          
+----------------------  -----------------------------------------------------
+help utilities          Display list of all utilities supported.             
+help <utility>          Display help for a specific utility.                 
+help | help commands    Show this list.                                      
+exit | quit             Exit the console.                                    
+set <variable>=<value>  Store a variable for recall in commands.             
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
+<ENTER>                 Press ENTER to execute command.                      
+<ESCAPE>                Press ESCAPE to clear the command entry.             
+<DOWN>                  Press DOWN to retrieve the previous command.         
+<UP>                    Press UP to retrieve the next command in history.    
+<TAB>                   Press TAB for type completion of utility, option, or 
+                        variable names.                                      
+<TAB><TAB>              Press TAB twice for list of matching type completion 
+                        (context sensitive).                                 
+
+Test Case 4: Show Utilities
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqldbcompare    compare databases for consistency                          
+mysqldbcopy       copy databases from one server to another                  
+mysqldbexport     export metadata and data from databases                    
+mysqldbimport     import metadata and data from files                        
+mysqldiff         compare object definitions among objects where the         
+                  difference is how db1.obj1 differs from db2.obj2           
+mysqldiskusage    show disk usage for databases                              
+mysqlfailover     automatic replication health monitoring and failover       
+mysqlindexcheck   check for duplicate or redundant indexes                   
+mysqlmetagrep     search metadata                                            
+mysqlprocgrep     search process information                                 
+mysqlreplicate    establish replication with a master                        
+mysqlrpladmin     administration utility for MySQL replication               
+mysqlrplcheck     check replication                                          
+mysqlrplshow      show slaves attached to a master                           
+mysqlserverclone  start another instance of a running server                 
+mysqlserverinfo   show server information                                    
+mysqluserclone    clone a MySQL user account to one or more new users        
+
+Test Case 5: Show Options
+
+
+Option     Value                                                             
+---------  ------------------------------------------------------------------
+width      77                                                                
+commands   None                                                              
+prompt     mysqluc>                                                          
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
+quiet      False                                                             
+custom     True                                                              
+
+Test Case 6: Do Exit
+
+Test Case 7: Do Quit
+
+Test Case 8: Invalid Command
+
+
+Unknown command: WHATSIT? 
+
+Test Case 9: Invalid Command Sequence
+
+
+Unknown command: So 
+
+
+
+Unknown command: this 
+
+
+
+Unknown command: is 
+
+
+
+Unknown command: a 
+
+
+
+Unknown command: Crock! 
+
+Test Case 10: Show Help + Help Utilities
+
+Command                 Description                                          
+----------------------  -----------------------------------------------------
+help utilities          Display list of all utilities supported.             
+help <utility>          Display help for a specific utility.                 
+help | help commands    Show this list.                                      
+exit | quit             Exit the console.                                    
+set <variable>=<value>  Store a variable for recall in commands.             
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
+<ENTER>                 Press ENTER to execute command.                      
+<ESCAPE>                Press ESCAPE to clear the command entry.             
+<DOWN>                  Press DOWN to retrieve the previous command.         
+<UP>                    Press UP to retrieve the next command in history.    
+<TAB>                   Press TAB for type completion of utility, option, or 
+                        variable names.                                      
+<TAB><TAB>              Press TAB twice for list of matching type completion 
+                        (context sensitive).                                 
+
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqldbcompare    compare databases for consistency                          
+mysqldbcopy       copy databases from one server to another                  
+mysqldbexport     export metadata and data from databases                    
+mysqldbimport     import metadata and data from files                        
+mysqldiff         compare object definitions among objects where the         
+                  difference is how db1.obj1 differs from db2.obj2           
+mysqldiskusage    show disk usage for databases                              
+mysqlfailover     automatic replication health monitoring and failover       
+mysqlindexcheck   check for duplicate or redundant indexes                   
+mysqlmetagrep     search metadata                                            
+mysqlprocgrep     search process information                                 
+mysqlreplicate    establish replication with a master                        
+mysqlrpladmin     administration utility for MySQL replication               
+mysqlrplcheck     check replication                                          
+mysqlrplshow      show slaves attached to a master                           
+mysqlserverclone  start another instance of a running server                 
+mysqlserverinfo   show server information                                    
+mysqluserclone    clone a MySQL user account to one or more new users        
+
+Test Case 11: Show Utilities + Options
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqldbcompare    compare databases for consistency                          
+mysqldbcopy       copy databases from one server to another                  
+mysqldbexport     export metadata and data from databases                    
+mysqldbimport     import metadata and data from files                        
+mysqldiff         compare object definitions among objects where the         
+                  difference is how db1.obj1 differs from db2.obj2           
+mysqldiskusage    show disk usage for databases                              
+mysqlfailover     automatic replication health monitoring and failover       
+mysqlindexcheck   check for duplicate or redundant indexes                   
+mysqlmetagrep     search metadata                                            
+mysqlprocgrep     search process information                                 
+mysqlreplicate    establish replication with a master                        
+mysqlrpladmin     administration utility for MySQL replication               
+mysqlrplcheck     check replication                                          
+mysqlrplshow      show slaves attached to a master                           
+mysqlserverclone  start another instance of a running server                 
+mysqlserverinfo   show server information                                    
+mysqluserclone    clone a MySQL user account to one or more new users        
+
+
+
+Option     Value                                                             
+---------  ------------------------------------------------------------------
+width      77                                                                
+commands   None                                                              
+prompt     mysqluc>                                                          
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
+quiet      False                                                             
+custom     True                                                              
+
+Test Case 12: Show Utilities + Options + NULL
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqldbcompare    compare databases for consistency                          
+mysqldbcopy       copy databases from one server to another                  
+mysqldbexport     export metadata and data from databases                    
+mysqldbimport     import metadata and data from files                        
+mysqldiff         compare object definitions among objects where the         
+                  difference is how db1.obj1 differs from db2.obj2           
+mysqldiskusage    show disk usage for databases                              
+mysqlfailover     automatic replication health monitoring and failover       
+mysqlindexcheck   check for duplicate or redundant indexes                   
+mysqlmetagrep     search metadata                                            
+mysqlprocgrep     search process information                                 
+mysqlreplicate    establish replication with a master                        
+mysqlrpladmin     administration utility for MySQL replication               
+mysqlrplcheck     check replication                                          
+mysqlrplshow      show slaves attached to a master                           
+mysqlserverclone  start another instance of a running server                 
+mysqlserverinfo   show server information                                    
+mysqluserclone    clone a MySQL user account to one or more new users        
+
+
+
+Option     Value                                                             
+---------  ------------------------------------------------------------------
+width      77                                                                
+commands   None                                                              
+prompt     mysqluc>                                                          
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
+quiet      False                                                             
+custom     True                                                              
+
+
+Test Case 13: Do Exit + Quit
+
+Test Case 14: Set and Show Variables
+
+
+
+
+Variable  Value                                                              
+--------  -------------------------------------------------------------------
+killer    123                                                                
+ABC       'test123'                                                          
+
+Test Case 15: Attempt to run extraneous command.
+
+
+Unknown command: mkdir make_mischief
+
