@@ -77,7 +77,8 @@ class test(mutlib.System_test):
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.replace_result("Quiet mode, saving output to",
                             "Quiet mode, saving output to XXXXXXXXXXXXXX\n")
-        
+        self.remove_result("Launching console ...")
+         
         return True    
           
     def get_result(self):

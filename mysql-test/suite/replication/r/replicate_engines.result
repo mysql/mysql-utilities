@@ -27,7 +27,6 @@ WARNING: The master and slave have differing storage engine configurations!
 # Connecting slave to master...
 # Starting slave from master's last position...
 # status: Waiting for master to send event
-# error: 0:
 # ...done.
 Test case 2 - use pedantic to fail if slave has different default engines
 # master on localhost: ... connected.
@@ -82,7 +81,6 @@ WARNING: The master and slave have differing storage engine configurations!
 # Connecting slave to master...
 # Starting slave from master's last position...
 # status: Waiting for master to send event
-# error: 0:
 # ...done.
 Test case 4 - use pedantic to fail if master has different default engines
 # master on localhost: ... connected.

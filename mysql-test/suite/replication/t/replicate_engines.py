@@ -98,7 +98,7 @@ class test(replicate.test):
                                  comment, None)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+            
         comment = "Test case 2 - use pedantic to fail if slave has " \
                   "different default engines"
         res = self.run_test_case(self.server3, self.server2, self.s3_serverid,
@@ -132,6 +132,11 @@ class test(replicate.test):
             raise MUTLibError("%s: Failed to stop slave." % comment)
 
         replicate.test.mask_results(self)
+
+        # Mask out inconsistent results when run on slower machines
+        self.remove_result("# status: Queueing master event to the relay log")
+        self.remove_result("# error: 0:")
+        self.remove_result("# Waiting for slave to synchronize with master")
         
         return True
 

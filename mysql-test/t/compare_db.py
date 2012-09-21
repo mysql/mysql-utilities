@@ -134,6 +134,8 @@ class test(mutlib.System_test):
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+            
+        self.do_replacements()
 
         return True
           
@@ -149,6 +151,10 @@ class test(mutlib.System_test):
             for name in names:
                 self.replace_result("%s inventory.%s" % (prefix, name),
                                     "%s inventory.%s\n" % (prefix, name))
+                
+        # Mask inconsistent Python 2.7 behavior
+        self.replace_result("@@ -1 +1 @@", "@@ -1,1 +1,1 @@\n")
+        self.replace_result("# @@ -1 +1 @@", "# @@ -1,1 +1,1 @@\n")
     
     def record(self):
         return self.save_result_file(__name__, self.results)

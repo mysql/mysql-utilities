@@ -22,5 +22,6 @@ Command-Line Utilities
    mysqlrplshow
    mysqlserverclone
    mysqlserverinfo
+   mysqluc
    mysqluserclone
    mut

@@ -27,24 +27,24 @@ The console has a list of console or base commands. These allow the user to
 interact with the features of the console itself. The list of base commands is
 shown below along with a brief description.::
 
-Command                 Description                                        
-----------------------  ---------------------------------------------------
-help utilities          Display list of all utilities supported.           
-help <utility>          Display help for a specific utility.               
-help | help commands    Show this list.                                    
-exit | quit             Exit the console.                                  
-set <variable>=<value>  Store a variable for recall in commands.           
-show options            Display list of options specified by the user on   
-                        launch.                                            
-show variables          Display list of variables.                         
-<ENTER>                 Press ENTER to execute command.                    
-<ESCAPE>                Press ESCAPE to clear the command entry.           
-<DOWN>                  Press DOWN to retrieve the previous command.       
-<UP>                    Press UP to retrieve the next command in history.  
-<TAB>                   Press TAB for type completion of utility, option,  
-                        or variable names.                                 
-<TAB><TAB>              Press TAB twice for list of matching type          
-                        completion (context sensitive).                    
+  Command                 Description                                        
+  ----------------------  ---------------------------------------------------
+  help utilities          Display list of all utilities supported.           
+  help <utility>          Display help for a specific utility.               
+  help | help commands    Show this list.                                    
+  exit | quit             Exit the console.                                  
+  set <variable>=<value>  Store a variable for recall in commands.           
+  show options            Display list of options specified by the user on   
+                          launch.                                            
+  show variables          Display list of variables.                         
+  <ENTER>                 Press ENTER to execute command.                    
+  <ESCAPE>                Press ESCAPE to clear the command entry.           
+  <DOWN>                  Press DOWN to retrieve the previous command.       
+  <UP>                    Press UP to retrieve the next command in history.  
+  <TAB>                   Press TAB for type completion of utility, option,  
+                          or variable names.                                 
+  <TAB><TAB>              Press TAB twice for list of matching type          
+                          completion (context sensitive).                    
 
 One of the most helpful base commands is the ability to see the options for a
 given utility by typing 'help <utility>'. When the user types this command and

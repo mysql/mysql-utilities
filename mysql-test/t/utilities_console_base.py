@@ -84,6 +84,7 @@ class test(mutlib.System_test):
                      base_command % "mkdir make_mischief")
 
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
+        self.remove_result("Launching console ...")
             
         return True    
             
