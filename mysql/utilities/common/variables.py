@@ -92,11 +92,8 @@ class Variables(dict):
         if self.options.get("quiet", False):
             return
         
-        if variables:
-            var_list = variables
-        else:
-            var_list = [ { 'name': key, 'value': value }
-                         for key, value in self.iteritems() ]
+        var_list = [ { 'name': key, 'value': value }
+                     for key, value in self.iteritems() ]
         
         print "\n"
         if not self:
