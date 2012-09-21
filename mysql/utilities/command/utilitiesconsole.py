@@ -265,6 +265,8 @@ class UtilitiesConsole(Console):
         
         if not os.path.splitext(command.lower()) == '.py':
             command += '.py'
+        if not command.lower().startswith('mysql'):
+            command = 'mysql' + command
         cmd = 'python ' + os.path.join(self.utils.util_path, command)
         cmd += ' ' + parameters
         if self.quiet:

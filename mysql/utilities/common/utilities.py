@@ -213,6 +213,8 @@ class Utilities(object):
         Returns dictionary entry for utility based on matching first n chars
         """
         matches = []
+        if not util_prefix.lower().startswith('mysql'):
+            util_prefix = 'mysql' + util_prefix
         for util in self.util_list:
             if util['name'][0:len(util_prefix)].lower() == util_prefix:
                 matches.append(util)

@@ -86,7 +86,12 @@ extension. The console will add these if neeeded.
 The user can also run commands using the `:option:--execute` option. The value
 for this option is a semi-colon separated list of commands to execute. These
 can be base commands or MySQL Utility commands. The console will execute each
-command and display the output. Note: if there is an error in the console or
+command and display the output. All commands to be run by the console must
+appear inside a quoted string and separated by semi-colons. Commands outside
+of the quoted string will be treated as arguments for the mysqluc utility
+itself and thus ignored for execution.
+
+Note: if there is an error in the console or
 related code, the console will stop executing commands at the point of failure.
 Commands may also be piped into the console using a mechanism like 'echo
 "<commands>" | mysqluc". 
@@ -97,6 +102,9 @@ list of all variables by entering the 'show variables' command. To use the
 values of these variables in utility commands, the user must prefix the value
 with a '$'. For example, --server=$SERVER1 will substitute the value of the
 SERVER1 user-defined variable when the utility is executed.
+
+Note: user-defined variables have a session lifetime. They are not saved from
+one execution to another of the users console.
 
 User-defined variables may also be set by passing them as arguments to the
 mysqluc command. For example, to set the SERVER1 variable and launch the

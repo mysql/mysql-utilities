@@ -71,6 +71,8 @@ def build_variable_dictionary_list(args):
             variables.append({'name': name, 'value': value})
             arguments.pop(i)
     
+    if len(arguments) % 2:
+        parser.error("Unbalanced arguments. Please check your command.")
     for i in range(0, len(arguments), 2):
         variables.append({'name': arguments[i], 'value': arguments[i+1]})
     return variables
@@ -132,6 +134,7 @@ options = {
 }
 
 try:
+    print "Launching console ..."
     util_con = UtilitiesConsole(options)
     util_con.run_console()
 except KeyboardInterrupt:
