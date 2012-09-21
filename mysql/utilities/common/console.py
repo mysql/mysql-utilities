@@ -603,7 +603,7 @@ class Console(object):
         else:
             # Do command completion here
             if len(matches) == 1:
-                new_var = matches[0]['name'] + ' '
+                new_var = matches[0].items()[0][0] + ' '
                 self.cmd_line.add(new_var[len(variable):])
                 self.tab_count = 0
 
