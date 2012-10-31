@@ -94,6 +94,9 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        self.replace_result("Error 1045", "Error 1045: Access denied for user "
+                            "'nope'@'localhost' (using password: YES)\n")
+
         return True
           
     def get_result(self):

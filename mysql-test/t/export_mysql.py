@@ -12,6 +12,9 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        # Check MySQL server version - Must be 5.1.0 or higher
+        if not self.servers.get_server(0).check_version_compat(5, 1, 0):
+            raise MUTLibError("Test requires server version 5.1.0 or higher")
         self.check_gtid_unsafe()
         # Need at least one server.
         self.server1 = None
