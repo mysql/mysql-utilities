@@ -1,0 +1,16 @@
+Test case 1 - compare two databases on unsupported server
+# server1 on localhost: ... connected.
+ERROR: The server1 version is incompatible. Utility requires version 5.1.30 or higher.
+
+# Database consistency check failed.
+#
+# ...done
+
+Test case 2 - compare two databases on unsupported 2nd server
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+ERROR: The server2 version is incompatible. Utility requires version 5.1.30 or higher.
+
+# Database consistency check failed.
+#
+# ...done

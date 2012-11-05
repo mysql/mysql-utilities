@@ -72,6 +72,11 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True):
             toolpath = os.path.join(norm_path, tool)
             if os.path.isfile(toolpath):
                 return toolpath
+            else:
+                if tool == "mysqld.exe":
+                    toolpath = os.path.join(norm_path, "mysqld-nt.exe")
+                    if os.path.isfile(toolpath):
+                        return toolpath
     if required:
         raise UtilError("Cannot find location of %s." % tool)
         
