@@ -17,7 +17,7 @@
 
 """
 This module contains the following methods design to support common option
-parsing among the multiple utlities.
+parsing among the multiple utilities.
 
 Methods:
   setup_common_options()     Setup standard options for utilities
@@ -62,7 +62,7 @@ def prefix_check_choice(option, opt, value):
                           "%r (choose from %s)") % (opt, value, choices))
         
     # Doesn't match. Show user possible choices.
-    raise ValueError(("option %s: invalid choice: %r (choose from %s)")
+    raise ValueError("option %s: invalid choice: %r (choose from %s)"
                      % (opt, value, choices))
 
 
@@ -186,6 +186,24 @@ def add_format_option(parser, help_text, default_val, sql=False):
     formats = _PERMITTED_FORMATS
     if sql:
         formats.append('sql')
+    parser.add_option("-f", "--format", action="store", dest="format",
+                      default=default_val, help=help_text, type="choice",
+                      choices=formats)
+
+
+def add_format_option_with_extras(parser, help_text, default_val,
+                                  extra_formats):
+    """Add the format option.
+
+    parser[in]        the parser instance
+    help_text[in]     help text
+    default_val[in]   default value
+    extra_formats[in] list of additional formats to support
+
+    Returns corrected format value
+    """
+    formats = _PERMITTED_FORMATS
+    formats.extend(extra_formats)
     parser.add_option("-f", "--format", action="store", dest="format",
                       default=default_val, help=help_text, type="choice",
                       choices=formats)
@@ -696,7 +714,3 @@ def parse_connection(connection_values):
         connection['unix_socket'] = socket
 
     return connection
-
-def test_suite():
-    import tests.test_options
-    return tests.test_options.test_suite()

@@ -242,8 +242,8 @@ class test(copy_db.test):
                             "# Destination: sam@localhost:[] ... connected\n")
 
         # Replace error code.
-        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
-        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 1045", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003", "Error XXXX: Access denied\n")
 
         return True
   

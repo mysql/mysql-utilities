@@ -65,6 +65,8 @@ Test Case 4: Show Utilities
 
 Utility           Description                                                
 ----------------  -----------------------------------------------------------
+mysqlauditadmin   audit log maintenance utility                              
+mysqlauditgrep    audit log search utility                                   
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -151,6 +153,8 @@ show variables          Display list of variables.
 
 Utility           Description                                                
 ----------------  -----------------------------------------------------------
+mysqlauditadmin   audit log maintenance utility                              
+mysqlauditgrep    audit log search utility                                   
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -174,6 +178,8 @@ Test Case 11: Show Utilities + Options
 
 Utility           Description                                                
 ----------------  -----------------------------------------------------------
+mysqlauditadmin   audit log maintenance utility                              
+mysqlauditgrep    audit log search utility                                   
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -209,6 +215,8 @@ Test Case 12: Show Utilities + Options + NULL
 
 Utility           Description                                                
 ----------------  -----------------------------------------------------------
+mysqlauditadmin   audit log maintenance utility                              
+mysqlauditgrep    audit log search utility                                   
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    

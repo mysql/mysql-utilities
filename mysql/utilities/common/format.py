@@ -248,3 +248,30 @@ def print_dictionary_list(column_names, keys, dictionary_list,
                                              max_value)
 
 
+def convert_dictionary_list(dict_list):
+    """Convert a dictionary to separated lists of keys and values.
+
+    Convert the list of items of the given dictionary (i.e. pairs key, value)
+    to a set of columns containing the keys and a set of rows containing the
+    values.
+
+    dict_list[in]    Dictionary with a list of items to convert
+
+    Returns tuple - (columns, rows)
+    """
+    cols = []
+    rows = []
+    # First, get a list of the columns
+    for node in dict_list:
+        for key in node.keys():
+            if key not in cols:
+                cols.append(key)
+
+    # Now form the rows replacing missing columns with None
+    for node in dict_list:
+        row = []
+        for col in cols:
+            row.append(node.get(col, None))
+        rows.append(row)
+
+    return (cols, rows)

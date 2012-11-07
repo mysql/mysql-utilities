@@ -128,6 +128,9 @@ class test(replicate.test):
                             "   Slave lower_case_table_names: XX\n")
         self.remove_result("   Replicate_Ignore_Server_Ids :")
         self.remove_result("              Master_Server_Id :")
+        self.remove_result("                     Heartbeat :")
+        self.remove_result("                          Bind :")
+        self.remove_result("            Ignored_server_ids :")
     
     def get_result(self):
         return self.compare(__name__, self.results)

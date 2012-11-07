@@ -1,0 +1,249 @@
+Test case 1 - show the help 
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin - audit log maintenance utility
+
+Options:
+  --version             show program's version number and exit
+  --help                display this help message and exit
+  --server=SERVER       connection information for the server in the form:
+                        <user>:<password>@<host>:<port>:<socket>
+  --audit-log-name=LOG_NAME
+                        full path and file name for the audit log file. Used
+                        for stats and copy options.
+  --show-options        display the audit log system variables.
+  --remote-login=RLOGIN
+                        user name and host to be used for remote login for
+                        copying log files. Format: <user>:<host_or_ip>
+                        Password will be prompted.
+  --file-stats          display the audit log file statistics.
+  --copy-to=COPY_LOCATION
+                        the location to copy the audit log file specified. The
+                        path must be locally accessible for the current user.
+  --value=VALUE         value used to set variables based on the command
+                        specified. See --help for list per command.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+
+Available Commands:
+
+  copy             - copy the audit log to a locally accessible path
+  policy           - set the audit log policy
+                     Values = ALL, NONE, LOGINS, QUERIES, DEFAULT
+  rotate           - perform audit log rotation
+  rotate_on_size   - set the rotate log size limit for auto rotation
+                     Values = 0, 4294967295
+
+Test case 2 - show the audit options 
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+Test case 3 - show file stats - before rotate 
++------------+-------+---------------------------+---------------------------+
+| File       | Size  | Created                   | Last Modified             |
++------------+-------+---------------------------+---------------------------+
+| audit.log [...] 
++------------+-------+---------------------------+---------------------------+
+Test case 4 - rotate the audit log 
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+#
+# Executing ROTATE command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+Test case 5 - show file stats after rotate 
++------------------------------+-------+---------------------------+---------------------------+
+| File                         | Size  | Created                   | Last Modified             |
++------------------------------+-------+---------------------------+---------------------------+
+| audit.log [...] 
+| audit.log [...] 
++------------------------------+-------+---------------------------+---------------------------+
+Test case 6 - change the policy to QUERIES
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+#
+# Executing POLICY command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | QUERIES       |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+Test case 7 - change the policy to default
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | QUERIES       |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+#
+# Executing POLICY command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+Test case 8 - change the rotate_on_size to 32535
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+#
+# Executing ROTATE_ON_SIZE command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 28672         |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+Test case 9 - change the rotate_on_size to default
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 28672         |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+
+#
+# Executing ROTATE_ON_SIZE command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++---------------------------+---------------+
+| Variable_name             | Value         |
++---------------------------+---------------+
+| audit_log_buffer_size     | 1048576       |
+| audit_log_file            | audit.log     |
+| audit_log_flush           | OFF           |
+| audit_log_policy          | ALL           |
+| audit_log_rotate_on_size  | 0             |
+| audit_log_strategy        | ASYNCHRONOUS  |
++---------------------------+---------------+
+

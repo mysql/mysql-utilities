@@ -128,4 +128,4 @@ Test case 9 - skip tables only - will fail
 # Destination on localhost: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying VIEW util_test.v1
-ERROR: Cannot operate on VIEW object. Error: Query failed. 1146: Table 'util_db_clone.t1' doesn't exist
+ERROR: Cannot operate on VIEW object. Error: Query failed. 1146: [...]

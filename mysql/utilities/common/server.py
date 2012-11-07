@@ -831,6 +831,27 @@ class Server(object):
 
         return errors
 
+    def supports_plugin(self, plugin):
+        """Check if the given plugin is supported.
+
+        Check to see if the server supports a plugin. Return True if
+        plugin installed and active.
+
+        plugin[in]     Name of plugin to check
+
+        Returns True if plugin is supported, and False otherwise.
+        """
+        _PLUGIN_QUERY = ("SELECT * FROM INFORMATION_SCHEMA.PLUGINS "
+                         "WHERE PLUGIN_NAME ")
+        res = self.exec_query("".join([_PLUGIN_QUERY, "LIKE ",
+                                        "'%s" % plugin, "%'"]))
+        if not res:
+            return False
+        # Now see if it is active.
+        elif res[0][2] != 'ACTIVE':
+            return False
+        return True
+
     
     def get_all_databases(self):
         """Return a result set containing all databases on the server

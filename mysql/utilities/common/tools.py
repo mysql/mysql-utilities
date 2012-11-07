@@ -22,6 +22,11 @@ This module contains methods for working with mysql server tools.
 import os
 import sys
 import shutil
+import time
+import subprocess
+
+from mysql.utilities.common.format import print_list
+
 
 def _add_basedir(search_paths, path_str):
     """Add a basedir and all known sub directories
@@ -184,3 +189,54 @@ def get_mysqld_version(mysqld_path):
         
     return None
 
+
+def show_file_statistics(file_name, wild=False, out_format="GRID"):
+    """Show file statistics for file name specified
+
+    file_name[in]    target file name and path
+    wild[in]         if True, get file statistics for all files with prefix of
+                     file_name. Default is False
+    out_format[in]   output format to print file statistics. Default is GRID.
+    """
+
+    def _get_file_stats(path, file_name):
+        stats = os.stat(os.path.join(path, file_name))
+        return ((file_name, stats.st_size, time.ctime(stats.st_ctime),
+                 time.ctime(stats.st_mtime)))
+
+    columns = ["File", "Size", "Created", "Last Modified"]
+    rows = []
+    path, filename = os.path.split(file_name)
+    if wild:
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.startswith(filename):
+                    rows.append(_get_file_stats(path, f))
+    else:
+        rows.append(_get_file_stats(path, filename))
+
+    print_list(sys.stdout, out_format, columns, rows)
+
+
+def remote_copy(filepath, user, host, local_path, verbosity=0):
+    """Copy a file from a remote machine to the localhost.
+
+    filepath[in]       The full path and file name of the file on the remote
+                       machine
+    user[in]           Remote login
+    local_path[in]     The path to where the file is to be copie
+
+    Returns bool - True = succes, False = failure or exception
+    """
+
+    if os.name == "posix":  # use scp
+        run_cmd = "scp %s@%s:%s %s" % (user, host, filepath, local_path)
+        if verbosity > 1:
+            print "# Command =", run_cmd
+        print "# Copying file from %s:%s to %s:" % (host, filepath, local_path)
+        proc = subprocess.Popen(run_cmd, shell=True)
+        ret_val = proc.wait()
+    else:
+        print "Remote copy not supported. Please use UNC paths and omit " + \
+              "the --remote-login option to use a local copy operation."
+    return True

@@ -115,6 +115,11 @@ class test(copy_db.test):
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")
+        self.replace_result("ERROR: Cannot operate on VIEW object. Error: "
+                            "Query failed. 1146",
+                            "ERROR: Cannot operate on VIEW object. Error: "
+                            "Query failed. 1146: [...]\n")
+        
 
         return True
   

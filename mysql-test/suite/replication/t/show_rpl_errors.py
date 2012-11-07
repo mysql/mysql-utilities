@@ -122,6 +122,10 @@ class test(show_rpl.test):
             
         show_rpl.test.do_replacements(self)
 
+        self.replace_result("Error 1045", "Error 1045: Access denied for "
+                            "user 'wanda'@'localhost' (using password: "
+                            "YES)\n")
+
         show_rpl.test.stop_replication(self, self.server_list[1])
 
         return True

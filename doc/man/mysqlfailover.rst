@@ -1,7 +1,7 @@
 .. `mysqlfailover`:
 
 ########################################################################
-``mysqlfailover`` - Automatic replication health monitoring and failover
+``mysqlfailover`` - Automatic Replication Health Monitoring and Failover
 ########################################################################
 
 SYNOPSIS

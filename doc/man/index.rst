@@ -24,4 +24,6 @@ Command-Line Utilities
    mysqlserverinfo
    mysqluc
    mysqluserclone
+   mysqlauditadmin
+   mysqlauditgrep
    mut

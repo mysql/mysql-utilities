@@ -1,0 +1,51 @@
+Test case 1 - Missing audit log file
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: You must specify the audit log file to be processed.
+Test case 2 - Specified argument is not a file
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The specified argument is not a file: xpto.log
+Test case 3 - Malformed log file
+ERROR: Malformed XML - Cannot parse log file: 'std_data/audit.log.invalid'
+Invalid XML element: '  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Quit" CONNECTION_ID="6" STATUS="0"\n'
+Test case 4 - Only one file search at a time
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: You can only process one audit log file at a time.
+Test case 5 - Invalid --users value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The value for the option --users is not valid: ',,'
+Test case 6 - Invalid --start-date format
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid start date/time format (yyyy-mm-ddThh:mm:ss): T12:30:05
+Test case 7 - Invalid --end-date format
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid start date format (yyyy-mm-dd): 2012/09/30
+Test case 8 - Invalid --query-type option value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The value for the option --query-type is not valid: ','
+Test case 9 - Invalid QUERY_TYPE value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The specified QUERY_TYPE value is not valid: 'audit'
+Supported values: create,alter,drop,truncate,rename,grant,revoke,select,insert,update,delete,commit,show,set,call,prepare,execute,deallocate
+Test case 10 - Invalid --event-type option value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The value for the option --event-type is not valid: ',,,'
+Test case 11 - Invalid EVENT_TYPE value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The specified EVENT_TYPE value is not valid: 'insert'
+Supported values: audit,binlog dump,change user,close stmt,connect out,connect,create db,daemon,debug,delayed insert,drop db,execute,fetch,field list,init db,kill,long data,noaudit,ping,prepare,processlist,query,quit,refresh,register slave,reset stmt,set option,shutdown,sleep,statistics,table dump,time
+Test case 12 - Option --pattern required
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The --pattern option is required if REGEXP option is set.
+Test case 13 - Invalid regexp pattern
+ERROR: Invalid Pattern: *.

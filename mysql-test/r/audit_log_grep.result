@@ -1,0 +1,282 @@
+Test case 1 - Show the help
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep - audit log search utility
+
+Options:
+  --version             show program's version number and exit
+  --help                display this help message and exit
+  -f FORMAT, --format=FORMAT
+                        Display the output in either GRID (default), TAB, CSV,
+                        VERTICAL and RAW format
+  -u USERS, --users=USERS
+                        Find log entries by user name. Accepts a comma-
+                        separated list of user names, for example:
+                        joe,sally,nick
+  --file-stats          Display the audit log statistics.
+  --start-date=START_DATE
+                        Retrieve log entries starting from the specified
+                        date/time. If not specified or the value is 0, all
+                        entries from the start of the log are displayed.
+                        Accepted formats: yyyy-mm-ddThh:mm:ss or yyyy-mm-dd.
+  --end-date=END_DATE   Retrieve log entries until the specified date/time.If
+                        not specified or the value is 0, all entries to the
+                        end of the log are displayed. Accepted formats: yyyy-
+                        mm-ddThh:mm:ss or yyyy-mm-dd.
+  -e PATTERN, --pattern=PATTERN
+                        Search pattern to retrieve matching entries.
+  --query-type=QUERY_TYPE
+                        Search for all SQL statements/commands from the given
+                        list of commands. Accepts a comma-separated list of
+                        commands. Supported values: CREATE, ALTER, DROP,
+                        TRUNCATE, RENAME, GRANT, REVOKE, SELECT, INSERT,
+                        UPDATE, DELETE, COMMIT, SHOW, SET, CALL, PREPARE,
+                        EXECUTE, DEALLOCATE
+  --event-type=EVENT_TYPE
+                        Search for all recorded event types from the given
+                        list of supported log events. Accepts a comma-
+                        separated list of event types. Supported values:
+                        Audit, Binlog Dump, Change user, Close stmt, Connect
+                        Out, Connect, Create DB, Daemon, Debug, Delayed
+                        insert, Drop DB, Execute, Fetch, Field List, Init DB,
+                        Kill, Long Data, NoAudit, Ping, Prepare, Processlist,
+                        Query, Quit, Refresh, Register Slave, Reset stmt, Set
+                        option, Shutdown, Sleep, Statistics, Table Dump, Time
+  -G, --basic-regexp, --regexp
+                        use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+Test case 2 - Show audit log statistics
+#
+# Audit Log File Statistics:
+#
+*************************       1. row *************************
+          File: audit.log
+          Size: ...
+       Created: ...
+ Last Modified: ...
+1 rows.
+
+#
+# Audit Log Startup Entries:
+#
+
+*************************       1. row *************************
+       SERVER_ID: <SERVER_ID>
+ STARTUP_OPTIONS: ...
+            NAME: Audit
+       TIMESTAMP: ...
+   MYSQL_VERSION: ...
+      OS_VERSION: ...
+         VERSION: ...
+1 rows.
+Test case 3 - No search criteria defined
+#
+# No search criteria defined.
+#
+Test case 4 - Convert all records to the defined format
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Audit" SERVER_ID="1" VERSION="1" STARTUP_OPTIONS="/home/user/mysql-5.5/sql/mysqld --defaults-group-suffix=.1 --defaults-file=/home/user/mysql-5.5/mysql-test/var/my.cnf --log-output=file --default-storage-engine=MyISAM --loose-skip-log-bin --core-file --loose-debug-sync-timeout=300" OS_VERSION="x86_64-Linux" MYSQL_VERSION="5.5.29-log"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Query" CONNECTION_ID="6" STATUS="0" SQLTEXT="install plugin audit_log soname 'audit_log.so'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Quit" CONNECTION_ID="6" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Connect" CONNECTION_ID="7" STATUS="0" USER="root" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SET @@session.autocommit = OFF"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'READ_ONLY'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'datadir'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'basedir'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Connect" CONNECTION_ID="8" STATUS="0" USER="root" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="SET @@session.autocommit = OFF"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="8" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'READ_ONLY'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Ping" CONNECTION_ID="8" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'basedir'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Query" CONNECTION_ID="8" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:47" NAME="Ping" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:47" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:47" NAME="Query" CONNECTION_ID="7" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:34:48" NAME="Quit" CONNECTION_ID="7" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:34:48" NAME="Quit" CONNECTION_ID="8" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Connect" CONNECTION_ID="9" STATUS="0" USER="root" PRIV_USER="tester" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="SET @@session.autocommit = OFF"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="9" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'READ_ONLY'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="9" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="9" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Quit" CONNECTION_ID="9" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Connect" CONNECTION_ID="10" STATUS="0" USER="root" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SET @@session.autocommit = OFF"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="10" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'READ_ONLY'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="10" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SET @@GLOBAL.audit_log_flush = ON"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="10" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'audit_log_policy'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="10" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="SHOW VARIABLES LIKE 'audit_log_rotate_on_size'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Query" CONNECTION_ID="10" STATUS="0" SQLTEXT="COMMIT"/>
+  <AUDIT_RECORD TIMESTAMP="2012-09-28T11:26:50" NAME="Ping" CONNECTION_ID="10" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:55:55" NAME="Connect" CONNECTION_ID="11" STATUS="0" USER="tester" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:55:55" NAME="Query" CONNECTION_ID="11" STATUS="0" SQLTEXT="select @@version_comment limit 1"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:56:10" NAME="Query" CONNECTION_ID="11" STATUS="0" SQLTEXT="show databases"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:57:26" NAME="Query" CONNECTION_ID="11" STATUS="1046" SQLTEXT="show tables test"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:57:36" NAME="Query" CONNECTION_ID="11" STATUS="1046" SQLTEXT="show tables test"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:57:51" NAME="Query" CONNECTION_ID="11" STATUS="0" SQLTEXT="show tables in test"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T15:57:59" NAME="Quit" CONNECTION_ID="11" STATUS="0"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T17:35:42" NAME="Connect" CONNECTION_ID="12" STATUS="0" USER="tester" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T17:35:42" NAME="Query" CONNECTION_ID="12" STATUS="0" SQLTEXT="select @@version_comment limit 1"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T17:44:55" NAME="Query" CONNECTION_ID="12" STATUS="1146" SQLTEXT="select * from teste.employees where salary &gt; 500 and salary &lt; 1000"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T17:47:17" NAME="Query" CONNECTION_ID="12" STATUS="1046" SQLTEXT="select * from test_encoding where value = '&lt;&gt;&quot;&amp;'"/>
+  <AUDIT_RECORD TIMESTAMP="2012-10-10T17:47:22" NAME="Quit" CONNECTION_ID="12" STATUS="0"/>
+Test case 5 - Search entries of specific users
++---------+------------+----------+----------------------+----------------+------------+---------+------------+------------+---------------------------------------------------------------------------+
+| STATUS  | SERVER_ID  | NAME     | TIMESTAMP            | CONNECTION_ID  | HOST       | USER    | PRIV_USER  | IP         | SQLTEXT                                                                   |
++---------+------------+----------+----------------------+----------------+------------+---------+------------+------------+---------------------------------------------------------------------------+
+| 0       | 1          | Connect  | 2012-09-28T11:26:50  | 9              | localhost  | root    | tester     | 127.0.0.1  | None                                                                      |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'                            |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | SET @@session.autocommit = OFF                                            |
+| 0       | 1          | Ping     | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | None                                                                      |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | SHOW VARIABLES LIKE 'READ_ONLY'                                           |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | COMMIT                                                                    |
+| 0       | 1          | Ping     | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | None                                                                      |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | 1          | Query    | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | COMMIT                                                                    |
+| 0       | 1          | Quit     | 2012-09-28T11:26:50  | 9              | None       | root    | tester     | None       | None                                                                      |
+| 0       | 1          | Connect  | 2012-10-10T15:55:55  | 11             | localhost  | tester  | root       | 127.0.0.1  | None                                                                      |
+| 0       | 1          | Query    | 2012-10-10T15:55:55  | 11             | None       | tester  | root       | None       | select @@version_comment limit 1                                          |
+| 0       | 1          | Query    | 2012-10-10T15:56:10  | 11             | None       | tester  | root       | None       | show databases                                                            |
+| 1046    | 1          | Query    | 2012-10-10T15:57:26  | 11             | None       | tester  | root       | None       | show tables test                                                          |
+| 1046    | 1          | Query    | 2012-10-10T15:57:36  | 11             | None       | tester  | root       | None       | show tables test                                                          |
+| 0       | 1          | Query    | 2012-10-10T15:57:51  | 11             | None       | tester  | root       | None       | show tables in test                                                       |
+| 0       | 1          | Quit     | 2012-10-10T15:57:59  | 11             | None       | tester  | root       | None       | None                                                                      |
+| 0       | 1          | Connect  | 2012-10-10T17:35:42  | 12             | localhost  | tester  | root       | 127.0.0.1  | None                                                                      |
+| 0       | 1          | Query    | 2012-10-10T17:35:42  | 12             | None       | tester  | root       | None       | select @@version_comment limit 1                                          |
+| 1146    | 1          | Query    | 2012-10-10T17:44:55  | 12             | None       | tester  | root       | None       | select * from teste.employees where salary > 500 and salary < 1000        |
+| 1046    | 1          | Query    | 2012-10-10T17:47:17  | 12             | None       | tester  | root       | None       | select * from test_encoding where value = '<>"&'                          |
+| 0       | 1          | Quit     | 2012-10-10T17:47:22  | 12             | None       | tester  | root       | None       | None                                                                      |
++---------+------------+----------+----------------------+----------------+------------+---------+------------+------------+---------------------------------------------------------------------------+
+Test case 6 - No entry found for specified users
+#
+# No entry found!
+#
+Test case 7 - Search entries for a specific datetime range
++---------+----------------------+--------+----------------+---------------------------------------------------------------------------+
+| STATUS  | TIMESTAMP            | NAME   | CONNECTION_ID  | SQLTEXT                                                                   |
++---------+----------------------+--------+----------------+---------------------------------------------------------------------------+
+| 0       | 2012-09-27T13:33:47  | Ping   | 7              | None                                                                      |
+| 0       | 2012-09-27T13:33:47  | Query  | 7              | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | 2012-09-27T13:33:47  | Query  | 7              | COMMIT                                                                    |
+| 0       | 2012-09-27T13:34:48  | Quit   | 7              | None                                                                      |
+| 0       | 2012-09-27T13:34:48  | Quit   | 8              | None                                                                      |
++---------+----------------------+--------+----------------+---------------------------------------------------------------------------+
+Test case 8 - No entry found for specified datetime range
+#
+# No entry found!
+#
+Test case 9 - Search entries matching SQL LIKE pattern 
++---------+----------------------+--------+---------------------------------+----------------+
+| STATUS  | TIMESTAMP            | NAME   | SQLTEXT                         | CONNECTION_ID  |
++---------+----------------------+--------+---------------------------------+----------------+
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF  | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF  | 8              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF  | 9              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF  | 10             |
++---------+----------------------+--------+---------------------------------+----------------+
+Test case 10 - Search entries matching REGEXP pattern 
++---------+----------------------+--------+---------------------------------------------------+----------------+
+| STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                           | CONNECTION_ID  |
++---------+----------------------+--------+---------------------------------------------------+----------------+
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF                    | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF                    | 8              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF                    | 9              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF                    | 10             |
+| 1046    | 2012-10-10T17:47:17  | Query  | select * from test_encoding where value = '<>"&'  | 12             |
++---------+----------------------+--------+---------------------------------------------------+----------------+
+Test case 11 - No entry found matching specified pattern 
+#
+# No entry found!
+#
+Test case 12 - Search entries of specific query types
++---------+----------------------+--------+-------------------------------------------------+----------------+
+| STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                         | CONNECTION_ID  |
++---------+----------------------+--------+-------------------------------------------------+----------------+
+| 0       | 2012-09-27T13:33:39  | Query  | SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'  | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF                  | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SHOW VARIABLES LIKE 'READ_ONLY'                 | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SHOW VARIABLES LIKE 'datadir'                   | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SHOW VARIABLES LIKE 'basedir'                   | 7              |
+| 0       | 2012-09-27T13:33:39  | Query  | SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'  | 8              |
+| 0       | 2012-09-27T13:33:39  | Query  | SET @@session.autocommit = OFF                  | 8              |
+| 0       | 2012-09-27T13:33:39  | Query  | SHOW VARIABLES LIKE 'READ_ONLY'                 | 8              |
+| 0       | 2012-09-27T13:33:39  | Query  | SHOW VARIABLES LIKE 'basedir'                   | 8              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'  | 9              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF                  | 9              |
+| 0       | 2012-09-28T11:26:50  | Query  | SHOW VARIABLES LIKE 'READ_ONLY'                 | 9              |
+| 0       | 2012-09-28T11:26:50  | Query  | SET NAMES 'latin1' COLLATE 'latin1_swedish_ci'  | 10             |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF                  | 10             |
+| 0       | 2012-09-28T11:26:50  | Query  | SHOW VARIABLES LIKE 'READ_ONLY'                 | 10             |
+| 0       | 2012-09-28T11:26:50  | Query  | SET @@GLOBAL.audit_log_flush = ON               | 10             |
+| 0       | 2012-09-28T11:26:50  | Query  | SHOW VARIABLES LIKE 'audit_log_policy'          | 10             |
+| 0       | 2012-09-28T11:26:50  | Query  | SHOW VARIABLES LIKE 'audit_log_rotate_on_size'  | 10             |
+| 0       | 2012-10-10T15:56:10  | Query  | show databases                                  | 11             |
+| 1046    | 2012-10-10T15:57:26  | Query  | show tables test                                | 11             |
+| 1046    | 2012-10-10T15:57:36  | Query  | show tables test                                | 11             |
+| 0       | 2012-10-10T15:57:51  | Query  | show tables in test                             | 11             |
++---------+----------------------+--------+-------------------------------------------------+----------------+
+Test case 13 - No entry found for specified query types
+#
+# No entry found!
+#
+Test case 14 - Search entries of specific event types
++---------+----------+----------------------+----------------+------------+---------+------------+------------+
+| STATUS  | NAME     | TIMESTAMP            | CONNECTION_ID  | HOST       | USER    | PRIV_USER  | IP         |
++---------+----------+----------------------+----------------+------------+---------+------------+------------+
+| 0       | Connect  | 2012-09-27T13:33:39  | 7              | localhost  | root    | root       | 127.0.0.1  |
+| 0       | Ping     | 2012-09-27T13:33:39  | 7              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-27T13:33:39  | 7              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-27T13:33:39  | 7              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-27T13:33:39  | 7              | None       | None    | None       | None       |
+| 0       | Connect  | 2012-09-27T13:33:39  | 8              | localhost  | root    | root       | 127.0.0.1  |
+| 0       | Ping     | 2012-09-27T13:33:39  | 8              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-27T13:33:39  | 8              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-27T13:33:47  | 7              | None       | None    | None       | None       |
+| 0       | Connect  | 2012-09-28T11:26:50  | 9              | localhost  | root    | tester     | 127.0.0.1  |
+| 0       | Ping     | 2012-09-28T11:26:50  | 9              | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-28T11:26:50  | 9              | None       | None    | None       | None       |
+| 0       | Connect  | 2012-09-28T11:26:50  | 10             | localhost  | root    | root       | 127.0.0.1  |
+| 0       | Ping     | 2012-09-28T11:26:50  | 10             | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-28T11:26:50  | 10             | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-28T11:26:50  | 10             | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-28T11:26:50  | 10             | None       | None    | None       | None       |
+| 0       | Ping     | 2012-09-28T11:26:50  | 10             | None       | None    | None       | None       |
+| 0       | Connect  | 2012-10-10T15:55:55  | 11             | localhost  | tester  | root       | 127.0.0.1  |
+| 0       | Connect  | 2012-10-10T17:35:42  | 12             | localhost  | tester  | root       | 127.0.0.1  |
++---------+----------+----------------------+----------------+------------+---------+------------+------------+
+Test case 15 - No entry found for specified event types
+#
+# No entry found!
+#
+Test case 16 - Apply all search criteria
++---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
+| STATUS  | SERVER_ID  | NAME   | TIMESTAMP            | CONNECTION_ID  | USER    | PRIV_USER  | SQLTEXT                                           |
++---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
+| 1046    | 1          | Query  | 2012-10-10T17:47:17  | 12             | tester  | root       | select * from test_encoding where value = '<>"&'  |
++---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+

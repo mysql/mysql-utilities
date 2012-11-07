@@ -316,12 +316,11 @@ class Server_list(object):
         
         cur_num_servers = self.num_servers()
         for server_num in range(0, num_to_add):
-            datadir = "new_server_%d" % (cur_num_servers)
             cur_num_servers += 1
             server = self.start_new_server(orig_server,
                                            self.get_next_port(),
-                                           self.get_next_id(), "root",
-                                           datadir)
+                                           self.get_next_id(), "root")
+            datadir = server[0].show_server_variable('datadir')[0][1]
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
 

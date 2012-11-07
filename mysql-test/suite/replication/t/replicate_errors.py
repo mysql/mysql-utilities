@@ -189,6 +189,8 @@ class test(replicate.test):
         self.replace_result("Error 2003: Can't connect to",
                             "Error ####: Can't connect to local MySQL server "
                             "####...\n")
+        self.replace_result("ERROR: Query failed. 1227",
+                            "ERROR: Query failed. 1227: Access denied;\n")
 
         return True
 

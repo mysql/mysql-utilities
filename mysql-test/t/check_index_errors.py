@@ -73,8 +73,8 @@ class test(check_index.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        self.replace_result("Error 1045:", "Error XXXX: Access denied\n")
-        self.replace_result("Error 2003:", "Error XXXX: Access denied\n")
+        self.replace_result("Error 1045", "Error XXXX: Access denied\n")
+        self.replace_result("Error 2003", "Error XXXX: Access denied\n")
 
         return True
   
