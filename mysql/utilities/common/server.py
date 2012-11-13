@@ -23,9 +23,8 @@ server operations used in multiple utilities.
 
 import os
 import re
-import sys
 import mysql.connector
-from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
 from mysql.utilities.common.options import parse_connection
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
@@ -472,6 +471,8 @@ class Server(object):
                 retval = self.db_conn.is_connected()
                 if retval:
                     self.exec_query("SHOW DATABASES")
+                else:
+                    res = False
         except:
             res = False
         return res
@@ -700,7 +701,7 @@ class Server(object):
                 cur = self.db_conn.cursor(
                     cursor_class=mysql.connector.cursor.MySQLCursorBufferedRaw)
             else:
-                cur = self.db_conn.cursor(buffered)
+                cur = self.db_conn.cursor(buffered=True)
         else:
             cur = self.db_conn.cursor(raw=True)
 
@@ -795,8 +796,8 @@ class Server(object):
         if res[0][0].upper() == 'OFF':
             raise UtilError("Global Transaction IDs are not enabled.")
 
-        gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_DONE")[0],
-                     self.exec_query("SELECT @@GLOBAL.GTID_LOST")[0],
+        gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0],
+                     self.exec_query("SELECT @@GLOBAL.GTID_PURGED")[0],
                      self.exec_query("SELECT @@GLOBAL.GTID_OWNED")[0]]
             
         return gtid_data

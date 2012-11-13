@@ -5,8 +5,17 @@ import mutlib
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=table"'
-_DEFAULT_MYSQL_OPTS_FILE = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s --sync-master-info=1 --master-info-repository=file"'
+_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start ' + \
+                      '--log-slave-updates --gtid-mode=on ' + \
+                      '--enforce-gtid-consistency --report-host=localhost ' + \
+                      '--report-port=%s ' + \
+                      '--sync-master-info=1 --master-info-repository=table"'
+
+_DEFAULT_MYSQL_OPTS_FILE = '"--log-bin=mysql-bin --skip-slave-start ' + \
+                           '--log-slave-updates --gtid-mode=on ' + \
+                           '--enforce-gtid-consistency ' + \
+                           '--report-host=localhost --report-port=%s ' + \
+                           '--sync-master-info=1 --master-info-repository=file"'
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -16,8 +25,8 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
-        if not self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version 5.6.5")
+        if not self.servers.get_server(0).check_version_compat(5, 6, 9):
+            raise MUTLibError("Test requires server version 5.6.9")
         return self.check_num_servers(1)
 
     def setup(self):

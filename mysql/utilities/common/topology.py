@@ -20,8 +20,6 @@ This module contains abstractions of MySQL replication functionality.
 """
 
 import logging
-import os
-import re
 import time
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.replication import Master, Slave, Replication
@@ -36,8 +34,8 @@ _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
                        "Remaining_Delay", "IO_Error_Num", "IO_Error",
                        "SQL_Error_Num", "SQL_Error", "Trans_Behind"]
 
-_GTID_DONE = "SELECT @@GLOBAL.GTID_DONE"
-_GTID_WAIT = "SELECT SQL_THREAD_WAIT_AFTER_GTIDS('%s', %s)"
+_GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
+_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 
 def parse_failover_connections(options):
@@ -470,8 +468,8 @@ class Topology(Replication):
             # Create replication user if --force is specified.
             if self.force and candidate_ok[1] == "RPL_USER":
                 user, passwd = slave.get_rpl_user()
-                m_candidate.create_rpl_user(slave.host, slave.port,
-                                            user, passwd)
+                candidate.create_rpl_user(slave.host, slave.port,
+                                          user, passwd)
             else:
                 msg = candidate_ok[2]
                 self._report(msg, logging.CRITICAL)
@@ -774,7 +772,7 @@ class Topology(Replication):
             if self.verbose and not self.quiet:
                 self._report("# Waiting for candidate to catch up to slave " 
                              "%s:%s." % (s_host, s_port))
-            master_gtid = master.exec_query(_GTID_DONE)
+            master_gtid = master.exec_query(_GTID_EXECUTED)
             candidate.wait_for_slave_gtid(master_gtid, self.timeout,
                                           self.verbose and not self.quiet)
             
@@ -945,7 +943,7 @@ class Topology(Replication):
         slave_rows = []
         # Get the health of the slaves
         if have_gtid == "ON":
-            master_gtids = self.master.exec_query(_GTID_DONE)
+            master_gtids = self.master.exec_query(_GTID_EXECUTED)
         for slave_dict in self.slaves:
             host = slave_dict['host']
             port = slave_dict['port']
@@ -1241,7 +1239,7 @@ class Topology(Replication):
         # Wait for all slaves to catch up.
         gtid_enabled = self.master.supports_gtid() == "ON"
         if gtid_enabled:
-            master_gtid = self.master.exec_query(_GTID_DONE)
+            master_gtid = self.master.exec_query(_GTID_EXECUTED)
         self._report("# Waiting for slaves to catch up to old master.")
         for slave_dict in self.slaves:
             master_info = self.master.get_status()[0]

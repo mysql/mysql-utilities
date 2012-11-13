@@ -137,7 +137,7 @@ def _get_db_dir_size(folder):
             if os.path.isfile(itemfolder):
                 total_size += os.path.getsize(itemfolder)
             elif os.path.isdir(itemfolder):
-                total_size += getfolderSize(itemfolder)
+                total_size += _get_db_dir_size(itemfolder)
     return total_size
 
 

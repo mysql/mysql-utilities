@@ -130,8 +130,8 @@ At each interval, if the discover slaves option was specified at startup and
 new slaves are discovered, the health report is refreshed.
 
 **gtid**
-Display the contents of the GTID variables, @@GLOBAL.GTID_DONE,
-@@GLOBAL.GTID_LOST, and @@GLOBAL.GTID_OWNED.
+Display the contents of the GTID variables, @@GLOBAL.GTID_EXECUTED,
+@@GLOBAL.GTID_PURGED, and @@GLOBAL.GTID_OWNED.
 
 **UUID**
 Display universally unique identifiers (UUIDs) for all servers.

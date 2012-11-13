@@ -55,7 +55,7 @@ up-to-date slave.
 
 **gtid**
 This command is available to only those servers supporting GTIDs. It displays
-the contents of the GTID variables, @@GLOBAL.GTID_DONE, @@GLOBAL.GTID_LOST, and
+the contents of the GTID variables, @@GLOBAL.GTID_EXECUTED, @@GLOBAL.GTID_PURGED, and
 @@GLOBAL.GTID_OWNED. The command also displays universally unique identifiers
 (UUIDs) for all servers.
 

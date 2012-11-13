@@ -25,6 +25,7 @@ import os
 import sys
 
 from mysql.utilities.common.format import print_dictionary_list
+from mysql.utilities.exception import UtilError
 
 _MAX_WIDTH = 78
 

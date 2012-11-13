@@ -6,7 +6,11 @@ import failover
 import time
 from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start --log-slave-updates --gtid-mode=on --disable-gtid-unsafe-statements --report-host=localhost --report-port=%s "'
+_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start ' + \
+                      '--log-slave-updates --gtid-mode=on ' + \
+                      '--enforce-gtid-consistency --report-host=localhost ' + \
+                      '--report-port=%s "'
+
 _TIMEOUT = 30
 
 class test(failover.test):

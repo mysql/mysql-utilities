@@ -24,7 +24,7 @@ class test(mutlib.System_test):
         port1 = int(self.servers.get_next_port())
         cmd_str += " --new-port=%d " % port1
         full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
-        cmd_str += " --new-data=%s " % full_datadir
+        cmd_str += " --new-data=%s --delete " % full_datadir
         res = self.exec_util(cmd_str, "start.txt")
         for line in open("start.txt").readlines():
             # Don't save lines that have [Warning] or don't start with #

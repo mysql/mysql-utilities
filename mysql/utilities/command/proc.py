@@ -186,7 +186,7 @@ class ProcessGrep(object):
           format           format for display
                            default = GRID
         """
-        from mysql.utilities.exception import EmptyResultError
+        from mysql.utilities.exception import EmptyResultError, FormatError
         from ..common.options import parse_connection
         from ..common.format import print_list
 

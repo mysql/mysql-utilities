@@ -130,7 +130,7 @@ class FailoverConsole(object):
     topology. The interface supports these commands:
     
       - H = show replication health
-      - G = toggle through GTID lists (GTID_DONE, GTID_LOST, GTID_OWNED)
+      - G = toggle through GTID lists (GTID_EXECUTED, GTID_PURGED, GTID_OWNED)
       - U = show UUIDs of servers
       - R = refresh screen
       - L = (iff --log specified) show log contents

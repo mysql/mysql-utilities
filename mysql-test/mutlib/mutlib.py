@@ -266,11 +266,30 @@ class Server_list(object):
         # Build the shutdown command
         cmd = ""
         res = server.show_server_variable("basedir")
-        cmd += os.path.normpath(os.path.join(res[0][1], "bin", "mysqladmin"))
+        mysqladmin = os.path.normpath(os.path.join(res[0][1], "bin",
+                                                   "mysqladmin"))
+        if not os.path.exists(mysqladmin):
+            mysqladmin = os.path.normpath(os.path.join(res[0][1], "client",
+                                                       "mysqladmin"))
+        if not os.path.exists(mysqladmin) and not os.name == 'posix':
+            mysqladmin = os.path.normpath(os.path.join(res[0][1],
+                                                       "client/debug",
+                                                       "mysqladmin"))
+        if not os.path.exists(mysqladmin) and not os.name == 'posix':
+            mysqladmin = os.path.normpath(os.path.join(res[0][1],
+                                                       "client/release",
+                                                       "mysqladmin"))
+        cmd += mysqladmin
         cmd += " shutdown "
         cmd += self.get_connection_parameters(server)
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
+
+        # Kill all connections so shutdown will work correctly
+        res = server.exec_query("SHOW PROCESSLIST")
+        for row in res:
+            if not row[7] or not row[7].upper().startswith("SHOW PROCESS"):
+                server.exec_query("KILL CONNECTION %s" % row[0])
 
         # disconnect user
         server.disconnect()
@@ -278,7 +297,7 @@ class Server_list(object):
         # Stop the server
         file = os.devnull
         f_out = open(file, 'w')
-        proc = subprocess.Popen(cmd, shell=True,
+        proc = subprocess.Popen(cmd, shell=True, 
                                 stdout = f_out, stderr = f_out)
         ret_val = proc.wait()
         f_out.close()
