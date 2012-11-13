@@ -329,7 +329,7 @@ def connect_servers(src_val, dest_val, options={}):
     if not _require_version(source, version):
         raise UtilError("The %s version is incompatible. Utility "
                         "requires version %s or higher." %
-                        (source.name, version))
+                        (src_name, version))
 
     # If not cloning, connect to the destination server and check version
     if not cloning:
@@ -342,7 +342,7 @@ def connect_servers(src_val, dest_val, options={}):
         if not _require_version(destination, version):
             raise UtilError("The %s version is incompatible. Utility "
                             "requires version %s or higher." %
-                            (destination.name, version))
+                            (dest_name, version))
     elif not quiet and dest_dict is not None and \
          not isinstance(dest_val, Server):
         _print_connection(dest_name, src_dict)
@@ -643,22 +643,13 @@ class Server(object):
         """
         version_str = self.get_version()
         if version_str is not None:
-            index = version_str.find("-")
-            if index >= 0:
-                parts = version_str[0:index].split(".")
+            match = re.match(r'^(\d+\.\d+(\.\d)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                return version >= [int(t_major), int(t_minor), int(t_rel)]
             else:
-                parts = version_str.split(".")
-            major = parts[0]
-            minor = parts[1]
-            rel = parts[2]
-            if int(t_major) > int(major):
                 return False
-            elif int(t_major) == int(major):
-                if int(t_minor) > int(minor):
-                    return False
-                elif int(t_minor) == int(minor):
-                    if int(t_rel) > int(rel):
-                        return False
         return True
 
 
