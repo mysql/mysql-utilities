@@ -58,8 +58,8 @@ nearest multiple.
 **rotate**
 This command is used to perform an on-demand audit log rotation, and only 
 requires the specification of :option:`--server`. Note: this command has no 
-effect if the audit_log_rotate_on_size variable is set with a value greater 
-than 0.
+effect if the audit log file size is smaller than 4096 (i.e., minimum allowed
+value greater than 0 for the audit_log_rotate_on_size variable).
 
 
 OPTIONS
@@ -121,6 +121,9 @@ NOTES
 -----
 
 This utility can only be applied to servers with the audit log plug-in enabled.
+
+This utility requires the use of Python version 2.7 or higher, but does not 
+support Python 3.
 
 
 LIMITATIONS

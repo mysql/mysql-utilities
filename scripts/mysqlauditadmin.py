@@ -37,6 +37,11 @@ from mysql.utilities.command.audit_log import command_requires_log_name
 from mysql.utilities.command.audit_log import command_requires_server
 from mysql.utilities import VERSION_FRM
 
+# Check Python version requisites to run this utility
+if sys.version_info < (2, 7) or sys.version_info > (3, 0):
+    sys.exit("ERROR: Python version 2.7 or higher, but less than 3.0, "
+             "must be used to run this utility.")
+
 
 class MyParser(optparse.OptionParser):
     def format_epilog(self, formatter):
@@ -125,14 +130,30 @@ if args:
 else:
     command = None
 
+# At least one valid option must be specified
+if (not opt.log_name and not opt.rlogin and not opt.value and not opt.server
+    and not opt.copy_location and not opt.show_options
+    and opt.file_stats == False):
+    parser.error("At least one valid option must be specified.")
+
 # if command, check to see if it requires a value.
 if command and command_requires_value(command) and not opt.value:
-        parser.error("The command %s requires the --value option." % command)
+    parser.error("The command %s requires the --value option." % command)
+
+# The --value option must be used with a valid command
+if opt.value and not command_requires_value(command):
+    parser.error("The --value option must be used with a valid command.")
 
 # The --server option is required.
 if command_requires_server(command) and not opt.server:
     parser.error("The --server option is required for the %s command." %
                  command)
+
+# The --server option must be used with --show-options and/or a valid command
+if opt.server and (not opt.show_options
+                   and not command_requires_server(command)):
+    parser.error("The --server option requires --show-options and/or "
+                 "a valid command.")
 
 # The --server option is also required by --show-options
 if opt.show_options and not opt.server:
@@ -144,6 +165,11 @@ if command_requires_log_name(command) and not opt.log_name:
     parser.error("The --audit-log-name option is required for the %s command."
                  % command)
 
+if opt.log_name and (not opt.file_stats
+                     and not command_requires_log_name(command)):
+    parser.error("The --audit-log-name option requires --file-stats and/or "
+                 "a valid command.")
+
 # Attempt to parse the --server option
 server_values = None
 if opt.server:
@@ -152,14 +178,15 @@ if opt.server:
     except FormatError as details:
         parser.error(details)
 
-# If copying or getting file stats and not a local machine,
-#if (command and command == "COPY" and opt.copy_location) and not opt.rlogin:
-#    parser.error("A remote login is required for copying log files.")
-
 # Check for copy prerequisites
 if command and command == "COPY" and not opt.copy_location:
     parser.error("You must specify the --copy-to option for copying a log "
                  "file.")
+
+# The --copy-to option requires the command COPY
+if opt.copy_location and not (command == "COPY"):
+    parser.error("The --copy-to option can only be used with the COPY "
+                 "command.")
 
 # Check copy-to location
 if (command and command == "COPY" and opt.copy_location) and \

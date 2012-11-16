@@ -64,3 +64,23 @@ Test case 17 - Only one command at a time
 Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
 
 mysqlauditadmin.py: error: You can only perform one command at a time.
+Test case 18 - No option specified
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin.py: error: At least one valid option must be specified.
+Test case 19 - Additional server option/command missing
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin.py: error: The --server option requires --show-options and/or a valid command.
+Test case 20 - Value option requires a valid command
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin.py: error: The --value option must be used with a valid command.
+Test case 21 - Additional audit log name option\command missing
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin.py: error: The --audit-log-name option requires --file-stats and/or a valid command.
+Test case 22 - Copy-to option requires command COPY
+Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+
+mysqlauditadmin.py: error: The --copy-to option can only be used with the COPY command.

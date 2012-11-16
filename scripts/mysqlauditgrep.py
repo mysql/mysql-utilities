@@ -40,6 +40,12 @@ from mysql.utilities.command.audit_log import AuditLog
 from mysql.utilities import VERSION_FRM
 
 
+# Check Python version requisites to run this utility
+if sys.version_info < (2, 7) or sys.version_info > (3, 0):
+    sys.exit("ERROR: Python version 2.7 or higher, but less than 3.0, "
+             "must be used to run this utility.")
+
+
 class MyParser(optparse.OptionParser):
 
     def format_epilog(self, formatter):

@@ -241,25 +241,29 @@ class AuditLog(object):
         """Rotate the log.
 
         To rotate the log, first discover the value of rotate_on_size
-        then set rotate_on_size to < that value then force rotation
-        with some loggable command (might need to check policy)
+        then set rotate_on_size to the minimum allowed value (i.e. 4096) and
+        force rotation with a manual flush. Note: the rotation will only
+        effectively occur if the audit log file size is greater than 4096.
         """
-        res = server.exec_query("SET @@GLOBAL.audit_log_flush = ON")
 
-        policy = server.show_server_variable("audit_log_policy")[0][1].upper()
+        # Get the current rotation size
+        rotate_size = server.show_server_variable(
+                                            "audit_log_rotate_on_size")[0][1]
+        min_rotation_size = 4096
 
-        rotate_size = server.show_server_variable("audit_log_rotate_on_size")[0][1]
-        if int(rotate_size) == 0:
-            target_rotate_size = 4097
-        else:
-            target_rotate_size = rotate_size - 1
+        # If needed, set rotation size to the minimum allowed value.
+        if int(rotate_size) != min_rotation_size:
+            #
+            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %d" % \
+                              min_rotation_size)
 
-        res = server.exec_query(
-                "SET @@GLOBAL.audit_log_rotate_on_size = %d" % \
-                (int(target_rotate_size) - 1))
+        # Flush the audit_log forcing the rotation if the file size is greater
+        # than the minimum (i.e. 4096).
+        server.exec_query("SET @@GLOBAL.audit_log_flush = ON")
 
-        # Now, restore it to what it was before the rotate
-        server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %s" %
+        # If needed, restore the rotation size to what it was initially.
+        if int(rotate_size) != min_rotation_size:
+            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %s" %
                           rotate_size)
 
     def do_command(self):

@@ -95,7 +95,7 @@ class test(audit_log_admin.test):
         num_test += 1
         comment = "Test case %d - Missing audit-log-name for command copy" \
                   % num_test
-        cmd_opts = "copy"
+        cmd_opts = "copy --copy-to=."
         res = self.run_test_case(2, cmd_base + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -146,7 +146,7 @@ class test(audit_log_admin.test):
         num_test += 1
         comment = "Test case %d - Server option required for command rotate" \
                   % num_test
-        cmd_opts = "rotate"
+        cmd_opts = "rotate --show-options"
         res = self.run_test_case(2, cmd_base + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -157,7 +157,47 @@ class test(audit_log_admin.test):
         res = self.run_test_case(2, cmd_base + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
+        num_test += 1
+        comment = "Test case %d - No option specified" % num_test
+        res = self.run_test_case(2, cmd_base, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        s1_conn = "--server=" + self.build_connection_string(self.server1)
+
+        num_test += 1
+        comment = "Test case %d - Additional server option/command missing" \
+                  % num_test
+        cmd_opts = s1_conn
+        res = self.run_test_case(2, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        num_test += 1
+        comment = "Test case %d - Value option requires a valid command" \
+                  % num_test
+        cmd_opts = "--value=XPTO"
+        res = self.run_test_case(2, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        num_test += 1
+        comment = ("Test case %d - Additional audit log name option\command "
+                  "missing" % num_test)
+        cmd_opts = "--audit-log-name=%s" % audit_log_name
+        res = self.run_test_case(2, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        num_test += 1
+        comment = "Test case %d - Copy-to option requires command COPY" \
+                  % num_test
+        cmd_opts = "--copy-to=%s" % data_dir
+        res = self.run_test_case(2, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         return True
     
     def get_result(self):

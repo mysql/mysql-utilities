@@ -254,6 +254,9 @@ NOTES
 This utility can only be applied to valid audit log files from servers with
 the audit log plug-in.
 
+This utility requires the use of Python version 2.7 or higher, but does not 
+support Python 3.
+
 Single or double quote characters (respectively, **'** or **"**) can be used
 around option values. In fact, quotes are required to set some options values
 correctly (e.g., values with whitespace). For example, to specify the event
