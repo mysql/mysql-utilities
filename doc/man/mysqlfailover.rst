@@ -130,8 +130,11 @@ At each interval, if the discover slaves option was specified at startup and
 new slaves are discovered, the health report is refreshed.
 
 **gtid**
-Display the contents of the GTID variables, @@GLOBAL.GTID_EXECUTED,
-@@GLOBAL.GTID_PURGED, and @@GLOBAL.GTID_OWNED.
+Display the master's list of executed GTIDs, contents of the GTID variables;
+@@GLOBAL.GTID_EXECUTED, @@GLOBAL.GTID_PURGED, and @@GLOBAL.GTID_OWNED. Thus,
+the user can toggle through four screens by pressing the 'G' key repeatedly.
+The display will cycle through all four screens restarting after the fourth
+screen.
 
 **UUID**
 Display universally unique identifiers (UUIDs) for all servers.
@@ -325,6 +328,11 @@ discover any other slaves connected to the master.
 An example of the user interface and some of the report views are shown in the
 following examples.
 
+Note: The GTID Executed Set will display the first GTID listed in the SHOW
+MASTER STATUS view. If there are multiple GTIDs listed, the utility shall
+display [...] to indicate there are additional GTIDs to view. You can view
+the complete list of GTIDs on the GTID display screens.
+
 The default interface will display the replication health report like the
 following. In this example the log file is enabled. A sample startup command is
 shown below::
@@ -337,7 +345,10 @@ shown below::
   Master Information
   ------------------
   Binary Log File   Position  Binlog_Do_DB  Binlog_Ignore_DB  
-  mysql-bin.000001  571                                       
+  mysql-bin.000001  571
+  
+  GTID Executed Set
+  2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7 [...]
   
   Replication Health Status
   +------------+-------+---------+--------+------------+---------+
@@ -354,7 +365,8 @@ Pressing the 'q' key will exit the utility. Pressing the 'r' key will refresh
 the current display. Pressing the 'h' key will return to the replication health
 report.
 
-If the user presses the 'g' key, the gtid report is shown like the following.::
+If the user presses the 'g' key, the gtid report is shown like the following.
+The first page shown is the master's executed GTID set. ::
 
   MySQL Replication Monitor and Failover Utility
   Failover Mode = auto     Next Interval = Mon Mar 19 15:59:33 2012
@@ -364,15 +376,18 @@ If the user presses the 'g' key, the gtid report is shown like the following.::
   Binary Log File   Position  Binlog_Do_DB  Binlog_Ignore_DB  
   mysql-bin.000001  571                                       
   
-  Transactions executed on the server
-  +------------+-------+---------+-------------------------------------------+
-  | host       | port  | role    | uuid                                      |
-  +------------+-------+---------+-------------------------------------------+
-  | localhost  | 3331  | MASTER  | 55C65A00-71FD-11E1-9F80-AC64EF85C961:1-2  |
-  | localhost  | 3332  | SLAVE   | 55C65A00-71FD-11E1-9F80-AC64EF85C961:1-2  |
-  | localhost  | 3332  | SLAVE   | 5DD30888-71FD-11E1-9F80-DC242138B7EC:1    |
-  | localhost  | 3333  | SLAVE   | 55C65A00-71FD-11E1-9F80-AC64EF85C961:1-2  |
-  +------------+-------+---------+-------------------------------------------+
+  GTID Executed Set
+  2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7 [...]
+  
+  Master GTID Executed Set
+  +-------------------------------------------+
+  | gtid                                      |
+  +-------------------------------------------+
+  | 2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7  |
+  | 5503D37E-2DB2-11E2-A781-8077D4C14B33:1-3  |
+  +-------------------------------------------+
+
+
   Q-quit R-refresh H-health G-GTID Lists U-UUIDs L-log entries Up|Down-scroll
 
 If the user continues to press the 'g' key, the display will cycle through the
@@ -392,6 +407,9 @@ shown.::
   ------------------
   Binary Log File   Position  Binlog_Do_DB  Binlog_Ignore_DB  
   mysql-bin.000001  571                                       
+  
+  GTID Executed Set
+  2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7 [...]
   
   UUIDs
   +------------+-------+---------+---------------------------------------+
@@ -436,6 +454,9 @@ report.::
   Binary Log File   Position  Binlog_Do_DB  Binlog_Ignore_DB  
   mysql-bin.000001  1117                                      
   
+  GTID Executed Set
+  2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7 [...]
+  
   UUIDs
   +------------+-------+---------+--------+------------+---------+
   | host       | port  | role    | state  | gtid_mode  | health  |
@@ -458,6 +479,9 @@ for space allowance.::
   ------------------
   Binary Log File   Position  Binlog_Do_DB  Binlog_Ignore_DB  
   mysql-bin.000001  1117                                      
+  
+  GTID Executed Set
+  2A67DE00-2DA1-11E2-A711-00764F2BE90F:1-7 [...]
   
   Log File
   +-------------------------+----------------------------------------- ... --+
