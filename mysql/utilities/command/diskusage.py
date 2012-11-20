@@ -433,15 +433,14 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
             # Put in commas and justify strings
             for i in range(0,num_cols):
                 fmt_data[i] = locale.format("%d", row[i+1], grouping=True)
-                fmt_data[i] = "{0:>{1}}".format(dbdir_size, max_col[i])
-                if num_cols == 4: # get all columns
-                    fmt_rows.append((row[0], fmt_data[0], fmt_data[1],
-                                     fmt_data[2], fmt_data[3]))
-                elif num_cols == 3:
-                    fmt_rows.append((row[0], fmt_data[0], fmt_data[1],
-                                     fmt_data[2]))
-                else:
-                    fmt_rows.append((row[0], fmt_data[0]))
+            if num_cols == 4: # get all columns
+                fmt_rows.append((row[0], fmt_data[0], fmt_data[1],
+                                 fmt_data[2], fmt_data[3]))
+            elif num_cols == 3:
+                fmt_rows.append((row[0], fmt_data[0], fmt_data[1],
+                                 fmt_data[2]))
+            else:
+                fmt_rows.append((row[0], fmt_data[0]))
     else:
         fmt_rows = results
 
@@ -460,19 +459,22 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
                     if format:
                         fmt_data = ['','','','','']
                         for i in range(0,num_cols):
-                            fmt_data[i] = locale.format("%d",
-                                                        row[i+1], grouping=True)
-                            fmt_data[i] = "{0:>{1}}".format(dbdir_size,
-                                                            max_col[i])
-                            if num_cols == 4: # get all columns
-                                fmt_rows.insert(0, (db[0], fmt_data[0],
-                                                    fmt_data[1], fmt_data[2],
-                                                    fmt_data[3]))
-                            elif num_cols == 3:
-                                fmt_rows.insert(0, (db[0], fmt_data[0],
-                                                 fmt_data[1], fmt_data[2]))
+                            if type(row[i+1]) == type(int):
+                                fmt_data[i] = locale.format("%s",
+                                                            int(row[i+1]),
+                                                            grouping=True)
                             else:
-                                fmt_rows.insert(0, (db[0], fmt_data[0]))
+                                fmt_data[i] = locale.format("%s", row[i+1],
+                                                            grouping=True)
+                        if num_cols == 4: # get all columns
+                            fmt_rows.insert(0, (db[0], fmt_data[0],
+                                                fmt_data[1], fmt_data[2],
+                                                fmt_data[3]))
+                        elif num_cols == 3:
+                            fmt_rows.insert(0, (db[0], fmt_data[0],
+                                             fmt_data[1], fmt_data[2]))
+                        else:
+                            fmt_rows.insert(0, (db[0], fmt_data[0]))
                     else:
                         if num_cols == 4:
                             fmt_rows.insert(0, (db[0], 0, 0, 0, 0))

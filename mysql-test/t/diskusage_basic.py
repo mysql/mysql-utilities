@@ -117,6 +117,13 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("DISKUSAGE: %s: failed" % comment)
 
+        cmd_base = "mysqldiskusage.py %s util_test --empty test" % from_conn
+        test_num = 2
+        comment = "Test Case %d : Testing disk space (with empty)" % test_num
+        res = self.run_test_case(0, cmd_base, comment)
+        if not res:
+            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
+
         self.mask()
 
         return True

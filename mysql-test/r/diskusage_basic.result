@@ -7,3 +7,15 @@ util_test,XXXXXXX
 Total database disk usage = XXXXXXX
 
 #...done.
+Test Case 2 : Testing disk space (with empty)
+# Source on localhost: ... connected.
+# Database totals:
++------------+----------+
+| db_name    |   total  |
++------------+----------+
+| util_test  | XXXXXXX  |
++------------+----------+
+
+Total database disk usage = XXXXXXX
+
+#...done.

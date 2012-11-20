@@ -643,7 +643,7 @@ class Server(object):
         """
         version_str = self.get_version()
         if version_str is not None:
-            match = re.match(r'^(\d+\.\d+(\.\d)*).*$', version_str.strip())
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
             if match:
                 version = [int(x) for x in match.group(1).split('.')]
                 version = (version + [0])[:3]  # Ensure a 3 elements list
