@@ -8,15 +8,16 @@ import mysql.utilities
 
 META_INFO = {
     'name': 'mysql-utilities',
-    'description': 'MySQL Utilities',
-    'maintainer': 'MySQL Utilities Team',
-    'maintainer_email': "gui-tools@lists.mysql.com",
+    'description': 'MySQL Utilities ' + mysql.utilities.RELEASE_STRING,
+    'maintainer': 'Oracle',
+    'maintainer_email': '',
     'version': mysql.utilities.VERSION_STRING,
-    'url': 'http://launchpad.net/mysql-utilities',
+    'url': 'http://dev.mysql.com',
     'license': 'GNU GPLv2 (with FOSS License Exception)',
     'classifiers': [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Environment :: Console',
         'Environment :: Win32 (MS Windows)',
         'License :: OSI Approved :: GNU General Public License (GPL)',
