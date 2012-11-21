@@ -363,7 +363,7 @@ class Topology(Replication):
                             new_slaves_found = True
                         else:
                             self._report("Not found.", logging.WARN, False)
-                    except UtilDBError, e:
+                    except UtilError, e:
                         msg = "Cannot connect to slave %s:%s as user '%s'. " % \
                               (host, port, user)
                         if skip_conn_err:
@@ -1071,7 +1071,10 @@ class Topology(Replication):
             servers.append(self.master)
             for slave_conn in self.slaves:
                 slave = slave_conn['instance']
-                servers.append(slave)
+                # A slave instance is None if the connection failed during the
+                # creation of the topology. In this case ignore the slave.
+                if slave is not None:
+                    servers.append(slave)
 
         # If candidates were specified, check those too.
         candidates = self.options.get("candidates", None)

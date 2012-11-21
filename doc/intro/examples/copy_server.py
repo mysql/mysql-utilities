@@ -31,7 +31,7 @@ from mysql.utilities.command import serverclone
 from mysql.utilities.command import userclone
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities import exception
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "example - copy_server "

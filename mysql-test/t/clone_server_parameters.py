@@ -4,7 +4,7 @@ import os
 import mutlib
 
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilError, MUTLibError
 
 class test(mutlib.System_test):
     """clone server parameters
@@ -57,10 +57,9 @@ class test(mutlib.System_test):
             # Connect to the new instance
             try:
                 self.new_server.connect()
-            except MUTLibError, e:
+            except UtilError, e:
                 self.new_server = None
                 raise MUTLibError("Cannot connect to spawned server.")
-                return False
             self.servers.stop_server(self.new_server)
 
         self.servers.clear_last_port()

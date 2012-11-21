@@ -31,7 +31,7 @@ import string
 import subprocess
 import sys
 import time
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilError, MUTLibError
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -222,7 +222,7 @@ class Server_list(object):
         # Connect to the new instance
         try:
             self.new_server.connect()
-        except MUTLibError, e:
+        except UtilError, e:
             raise MUTLibError("Cannot connect to spawned server: %s" % \
                                e.errmsg)
             

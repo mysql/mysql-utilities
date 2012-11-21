@@ -24,7 +24,7 @@ candidate slave.
 
 This utility is designed to work exclusively for servers that support global
 transaction identifiers (GTIDs) and have GTID_MODE=ON. MySQL server versions
-5.6.5 and higher support GTIDs. See the MySQL server online reference manual
+5.6.9 and higher support GTIDs. See the MySQL server online reference manual
 for more information about setting up replication with GTIDs enabled.
 
 The user can specify the interval in seconds to use for detecting the master
@@ -174,7 +174,7 @@ OPTIONS
 
    Connection information for candidate slave servers for failover in the form:
    <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>]. Valid only with
-   failover command. List multiple slaves in comma- separated list.
+   failover command. List multiple slaves in comma-separated list.
 
 .. option:: --discover-slaves-login=<user:password>
 
@@ -311,9 +311,9 @@ Similarly, if you use localhost to connect to the master, the health report
 may not show all of the slaves. It is best to use the actual hostname of
 the master when connecting or setting up replication.
 
-If the user does not specify the :option:`--rpl-user`, the utility will check
-to see if the slaves are using --master-info-repository=TABLE. If they are not,
-the utility will stop with an error.
+The utility will check to see if the slaves are using the option 
+--master-info-repository=TABLE. If they are not, the utility will stop with 
+an error.
 
 EXAMPLES
 --------
@@ -337,7 +337,8 @@ The default interface will display the replication health report like the
 following. In this example the log file is enabled. A sample startup command is
 shown below::
 
-  $ mysqlfailover --master=root@localhost:3331 --discover-slaves-login=root
+  $ mysqlfailover --master=root@localhost:3331 --discover-slaves-login=root \
+    --log=log.txt
 
   MySQL Replication Monitor and Failover Utility
   Failover Mode = auto     Next Interval = Mon Mar 19 15:56:03 2012

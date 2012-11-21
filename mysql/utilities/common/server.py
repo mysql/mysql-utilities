@@ -597,9 +597,8 @@ class Server(object):
             parameters['charset'] = self.charset
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
-            raise UtilDBError("Cannot connect to the %s server.\n"
-                              "Error %s" % (self.role, e.msg), e.errno)
-            return False
+            raise UtilError("Cannot connect to the %s server.\n"
+                            "Error %s" % (self.role, e.msg), e.errno)
         self.connect_error = None
         self.read_only = self.show_server_variable("READ_ONLY")[0][1]
         
