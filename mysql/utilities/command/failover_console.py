@@ -483,9 +483,11 @@ class FailoverConsole(object):
         self.master_gtids = []
         for gtid in status[4].split("\n"):
             if len(gtid):
-                self.master_gtids.append(gtid.strip(","))
+                # Add each GTID to a tuple to match the required format to
+                # print the full GRID list correctly.
+                self.master_gtids.append((gtid.strip(","),))
         print "\nGTID Executed Set"
-        print self.master_gtids[0],
+        print self.master_gtids[0][0],
         if len(self.master_gtids) > 1:
             print "[...]"
         else:
