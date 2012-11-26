@@ -327,6 +327,9 @@ class Topology(Replication):
             host, port = slave.split(":")
             self._report("Discovering slave at %s:%s" % (host, port),
                          logging.INFO, False)
+            # Convert local IP to localhost
+            if host == '127.0.0.1':
+                host = 'localhost'
             # Skip hosts that are not registered properly
             if host == 'unknown host':
                 continue
@@ -335,11 +338,10 @@ class Topology(Replication):
                 found = False
                 # Eliminate if already a slave
                 for slave_dict in self.slaves:
-                    if slave_dict['host'] == '127.0.0.1':
-                        slave_dict['host'] = 'localhost'
                     if slave_dict['host'] == host and \
                        int(slave_dict['port']) == int(port):
                         found = True
+                        break
                 if not found:
                     # Now we must attempt to connect to the slave.
                     conn_dict = {
@@ -1125,7 +1127,7 @@ class Topology(Replication):
         
         self._report("# Performing %s on all slaves." %
                      command.upper())
-        i = 0
+
         for slave_dict in self.slaves:
             hostport = "%s:%s" % (slave_dict['host'], slave_dict['port'])
             msg = "#   Executing %s on slave %s " % (command, hostport)
@@ -1155,7 +1157,6 @@ class Topology(Replication):
                                  logging.WARN)
                 elif not quiet:
                     self._report(msg + "Ok")
-            i += 1
             
             
     def connect_candidate(self, candidate, master=True):
