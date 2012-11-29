@@ -84,8 +84,8 @@ def get_copy_lock(server, db_list, options, include_mysql=False,
                     # lock the destination tables with WRITE.
                     table_lock_list.append(("%s.%s" % (db_clone, table[0]),
                                             'WRITE'))
-            # We must include views for server version 5.6.5 and higher
-            if server.check_version_compat(5, 6, 5):
+            # We must include views for server version 5.5.3 and higher
+            if server.check_version_compat(5, 5, 3):
                 tables = source_db.get_db_objects("VIEW")
                 for table in tables:
                     table_lock_list.append(("%s.%s" % (db, table[0]),

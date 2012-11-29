@@ -597,6 +597,10 @@ class Server(object):
             parameters['charset'] = self.charset
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
+            # Reset any previous value if the connection cannot be established,
+            # before raising an exception. This prevents the use of a broken
+            # database connection.
+            self.db_conn = None
             raise UtilError("Cannot connect to the %s server.\n"
                             "Error %s" % (self.role, e.msg), e.errno)
         self.connect_error = None
