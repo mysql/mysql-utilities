@@ -109,15 +109,34 @@ class install_scripts(_install_scripts):
         if not building_rpm:
             self.copy_file(outfile, install_dir)
 
+    def _create_batch_file(self, script):
+        """Create Batch files to make scripts executable on MSWindows
+        """
+        if os.name != 'nt':
+            return
+        scriptname = os.path.basename(script)
+        log.info("creating Batch executable for %s", scriptname)
+        batfile = script + '.bat'
+        scriptloc = os.path.join(sys.exec_prefix, 'Scripts', scriptname)
+        fp = open(batfile, 'w')
+        fp.write("@{0} {1} %*".format(sys.executable, scriptloc))
+        fp.close()
+        #self.outfiles.append(batfile)
+
     def run(self):
         # We should probably use distutils.dist.execute here to allow
         # --dry-run to work properly.
         self._create_shell_profile()
         _install_scripts.run(self)
+        
+        # self.outfiles will be updated by the for-loop
+        scripts = self.get_outputs()
+        for script in scripts:
+            self._create_batch_file(script)
 
     def get_outputs(self):
         outputs = _install_scripts.get_outputs(self)
-        if not self.skip_profile:
+        if not self.skip_profile and os.name != 'nt':
             outputs.append(self.profile_file)
         return outputs
 
@@ -239,17 +258,20 @@ class build_scripts(_build_scripts):
 
     When ``run`` is called, this command class will:
     1. Create a copy of all ``.py`` files in the **scripts** option
-       that does not have the ``.py`` extension.
+       that does not have the ``.py`` extension. On Windows, also
+       create a Batch file which executes the Python script.
     2. Replace the list in the **scripts** attribute with a list
        consisting of the script files with the ``.py`` extension
        removed.
     3. Call run method in `distutils.command.build_scripts`.
     4. Restore the scripts list to the old value, for other commands
-       to use."""
+       to use.
+    """
 
     def run(self):
         if not self.scripts:
             return
+
 
         saved_scripts = self.scripts
         self.scripts = []
@@ -259,10 +281,12 @@ class build_scripts(_build_scripts):
 
             if script_ext != '.py':
                 log.debug("Not removing extension from %s since it's not '.py'", script)
-            else:
-                log.debug("Copying %s -> %s", script, script_copy)
-                self.copy_file(script, script_copy)
-                self.scripts.append(script_copy)
+                continue
+
+            log.debug("Copying %s -> %s", script, script_copy)
+            self.copy_file(script, script_copy)
+            self.scripts.append(script_copy)
+
         # distutils is compatible with 2.1 so we cannot use super() to
         # call it.
         _build_scripts.run(self)
@@ -370,6 +394,14 @@ if os.name != "nt":
         'build_scripts': build_scripts,
         'install_scripts': install_scripts,
         'bdist_rpm': bdist_rpm,
+        })
+if os.name == "nt" and sys.version_info >= (2, 7):
+    # MSI only supported for Python 2.7 and greater
+    from support import dist_msi
+    COMMANDS['cmdclass'].update({
+        'build_scripts': build_scripts,
+        'install_scripts': install_scripts,
+        'sdist_msi': dist_msi.SourceMSI,
         })
 
 ARGS.update(META_INFO)

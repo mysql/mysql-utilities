@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'> 
+  <Product Id="*"
+   Name="$(var.ProductName) $(var.ReleaseString)" Language="1033"
+   Version="$(var.Version)"
+   Manufacturer="Oracle"
+   UpgradeCode="$(var.UpgradeCode)">
+   
+    <Package Compressed="yes" InstallerVersion="200"
+     Description="$(var.ProductName) Installer"
+     Comments="$(var.Copyright)"
+     InstallScope="perMachine"/>
+   
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion OnlyDetect="no"
+       Minimum="$(var.Major_Version).$(var.Minor_Version).0"
+       Maximum="$(var.Major_Version).$(var.Minor_Version).$(var.Patch_Version)"
+       Property="OLDERVERSIONBEINGUPGRADED"
+       IncludeMaximum="yes"/>
+      <UpgradeVersion OnlyDetect="yes"
+       Minimum="$(var.Major_Version).$(var.Minor_Version).$(var.Patch_Version)"
+       Property="NEWERVERSIONDETECTED"/>
+    </Upgrade>
+
+    <Condition Message="A later version of $(var.ProductName) is already installed. Setup will now exit.">
+      NOT NEWERVERSIONDETECTED OR Installed
+    </Condition>
+    
+    <Property Id="PYTHONINSTALLPATH">
+      <RegistrySearch Id="PythonInstallPath32" Root="HKLM" Type="raw"
+       Key="Software\Python\PythonCore\$(var.PythonVersion)\InstallPath" Win64="no"/>
+      <RegistrySearch Id="PythonInstallPath64" Root="HKLM" Type="raw"
+       Key="Software\Python\PythonCore\$(var.PythonVersion)\InstallPath" Win64="yes"/>
+    </Property>
+    
+    <Condition Message="Python v$(var.PythonVersion) not found. We only support Python installed using the Microsoft Windows Installer (MSI) downloaded from http://www.python.org/download/. Please check the MySQL Utilities manual on http://dev.mysql.com/doc/ for more information.">
+      Installed OR PYTHONINSTALLPATH
+    </Condition>
+    
+    <Media Id="1" Cabinet="ConnectorPython_Python.cab" EmbedCab="yes"/>
+   
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLDIR" Name="$(var.PythonInstallDir)">
+        <Directory Id="PythonLibDir" Name="Lib">
+          <Directory Id="SitePackagesDir" Name="site-packages">
+            <Directory Id="MySQLPackageDir" Name="mysql">
+              <Directory Id="UtilsPackageDir" Name="utilities">
+                <Directory Id="CommandDir" Name="command"/>
+                <Directory Id="CommonDir" Name="common"/>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+        <Directory Id="PythonScriptsDir" Name="Scripts"/>
+      </Directory>
+
+      <Directory Id="ProgramFilesFolder" Name="ProgFilesFolder">
+        <Directory Id="CompanyDir" Name="MySQL">
+          <Directory Id="MySQLUtilsDir" Name="$(var.ProductName)"/>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="SitePackagesDir">
+      <Component Id="SitePackages" Guid="e8c482f2-c8fa-4e60-9ebb-83d045fdce20">
+        <File Id="EggInfo" Name="mysql_utilities-$(var.FullVersion)-py$(var.PythonVersion).egg-info"
+         Source="$(var.SitePkgDist)\mysql_utilities-$(var.FullVersion)-py$(var.PythonVersion).egg-info" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    
+    <DirectoryRef Id="MySQLPackageDir">
+      <Component Id="MySQLPackage" Guid="b266a02b-67bb-4f06-82c8-4aab5a5b47a3">
+        <File Id="mysql_initpy" Name="__init__.py"
+         Source="$(var.SitePkgDist)\mysql\__init__.py" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="UtilsPackageDir">
+      <Component Id="UtilsPackage" Guid="dbdea4b9-6b65-4b06-a7db-9bda3806a957">
+        <File Id="initpy" Name="__init__.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\__init__.py" DiskId="1"/>
+        <File Id="exceptionpy" Name="exception.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\exception.py" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="CommandDir">
+      <Component Id="Command" Guid="c4eb7b61-2749-4dfd-9753-02afac09dbda">
+        <File Id="cmd_initpy" Name="__init__.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\__init__.py" DiskId="1"/>
+        <File Id="cmd_auditlogpy" Name="audit_log.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\audit_log.py" DiskId="1"/>
+        <File Id="cmd_checkrplpy" Name="check_rpl.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\check_rpl.py" DiskId="1"/>
+        <File Id="cmd_dbcomparepy" Name="dbcompare.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\dbcompare.py" DiskId="1"/>
+        <File Id="cmd_dbcopypy" Name="dbcopy.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\dbcopy.py" DiskId="1"/>
+        <File Id="cmd_dbexportpy" Name="dbexport.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\dbexport.py" DiskId="1"/>
+        <File Id="cmd_dbimportpy" Name="dbimport.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\dbimport.py" DiskId="1"/>
+        <File Id="cmd_diffpy" Name="diff.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\diff.py" DiskId="1"/>
+        <File Id="cmd_diskusagepy" Name="diskusage.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\diskusage.py" DiskId="1"/>
+        <File Id="cmd_failoverconsolepy" Name="failover_console.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\failover_console.py" DiskId="1"/>
+        <File Id="cmd_greppy" Name="grep.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\grep.py" DiskId="1"/>
+        <File Id="cmd_indexcheckpy" Name="indexcheck.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\indexcheck.py" DiskId="1"/>
+        <File Id="cmd_procpy" Name="proc.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\proc.py" DiskId="1"/>
+        <File Id="cmd_rpladminpy" Name="rpl_admin.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\rpl_admin.py" DiskId="1"/>
+        <File Id="cmd_serverclonepy" Name="serverclone.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\serverclone.py" DiskId="1"/>
+        <File Id="cmd_serverinfopy" Name="serverinfo.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\serverinfo.py" DiskId="1"/>
+        <File Id="cmd_setuprplpy" Name="setup_rpl.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\setup_rpl.py" DiskId="1"/>
+        <File Id="cmd_showrplpy" Name="show_rpl.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\show_rpl.py" DiskId="1"/>
+        <File Id="cmd_userclonepy" Name="userclone.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\userclone.py" DiskId="1"/>
+        <File Id="cmd_utilitiesconsolepy" Name="utilitiesconsole.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\command\utilitiesconsole.py" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="CommonDir">
+      <Component Id="Common" Guid="dbb7820b-4b59-4e6b-93ea-c24aeb4ed1b4">
+        <File Id="cmm_initpy" Name="__init__.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\__init__.py" DiskId="1"/>
+        <File Id="cmm_auditlogparserpy" Name="audit_log_parser.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\audit_log_parser.py" DiskId="1"/>
+        <File Id="cmm_auditlogreaderpy" Name="audit_log_reader.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\audit_log_reader.py" DiskId="1"/>
+        <File Id="cmm_consolepy" Name="console.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\console.py" DiskId="1"/>
+        <File Id="cmm_databasepy" Name="database.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\database.py" DiskId="1"/>
+        <File Id="cmm_dbcomparepy" Name="dbcompare.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\dbcompare.py" DiskId="1"/>
+        <File Id="cmm_formatpy" Name="format.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\format.py" DiskId="1"/>
+        <File Id="cmm_lockpy" Name="lock.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\lock.py" DiskId="1"/>
+        <File Id="cmm_optionspy" Name="options.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\options.py" DiskId="1"/>
+        <File Id="cmm_parserpy" Name="parser.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\parser.py" DiskId="1"/>
+        <File Id="cmm_patternmatchingpy" Name="pattern_matching.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\pattern_matching.py" DiskId="1"/>
+        <File Id="cmm_replicationpy" Name="replication.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\replication.py" DiskId="1"/>
+        <File Id="cmm_serverpy" Name="server.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\server.py" DiskId="1"/>
+        <File Id="cmm_sqltransformpy" Name="sql_transform.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\sql_transform.py" DiskId="1"/>
+        <File Id="cmm_tablepy" Name="table.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\table.py" DiskId="1"/>
+        <File Id="cmm_toolspy" Name="tools.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\tools.py" DiskId="1"/>
+        <File Id="cmm_topologypy" Name="topology.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\topology.py" DiskId="1"/>
+        <File Id="cmm_topologymappy" Name="topology_map.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\topology_map.py" DiskId="1"/>
+        <File Id="cmm_userpy" Name="user.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\user.py" DiskId="1"/>
+        <File Id="cmm_utilitiespy" Name="utilities.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\utilities.py" DiskId="1"/>
+        <File Id="cmm_variablespy" Name="variables.py"
+         Source="$(var.SitePkgDist)\mysql\utilities\common\variables.py" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="PythonScriptsDir">
+      <Component Id="UtilsScripts" Guid="ad3556a3-1c3c-4b9e-916f-f00792649bab">
+        <File Id="script_mysqlauditadmin" Name="mysqlauditadmin"
+         Source="$(var.ScriptsDist)\mysqlauditadmin" DiskId="1"/>
+        <File Id="script_mysqlauditgrep" Name="mysqlauditgrep"
+         Source="$(var.ScriptsDist)\mysqlauditgrep" DiskId="1"/>
+        <File Id="script_mysqldbcompare" Name="mysqldbcompare"
+         Source="$(var.ScriptsDist)\mysqldbcompare" DiskId="1"/>
+        <File Id="script_mysqldbcopy" Name="mysqldbcopy"
+         Source="$(var.ScriptsDist)\mysqldbcopy" DiskId="1"/>
+        <File Id="script_mysqldbexport" Name="mysqldbexport"
+         Source="$(var.ScriptsDist)\mysqldbexport" DiskId="1"/>
+        <File Id="script_mysqldbimport" Name="mysqldbimport"
+         Source="$(var.ScriptsDist)\mysqldbimport" DiskId="1"/>
+        <File Id="script_mysqldiff" Name="mysqldiff"
+         Source="$(var.ScriptsDist)\mysqldiff" DiskId="1"/>
+        <File Id="script_mysqldiskusage" Name="mysqldiskusage"
+         Source="$(var.ScriptsDist)\mysqldiskusage" DiskId="1"/>
+        <File Id="script_mysqlfailover" Name="mysqlfailover"
+         Source="$(var.ScriptsDist)\mysqlfailover" DiskId="1"/>
+        <File Id="script_mysqlindexcheck" Name="mysqlindexcheck"
+         Source="$(var.ScriptsDist)\mysqlindexcheck" DiskId="1"/>
+        <File Id="script_mysqlmetagrep" Name="mysqlmetagrep"
+         Source="$(var.ScriptsDist)\mysqlmetagrep" DiskId="1"/>
+        <File Id="script_mysqlprocgrep" Name="mysqlprocgrep"
+         Source="$(var.ScriptsDist)\mysqlprocgrep" DiskId="1"/>
+        <File Id="script_mysqlreplicate" Name="mysqlreplicate"
+         Source="$(var.ScriptsDist)\mysqlreplicate" DiskId="1"/>
+        <File Id="script_mysqlrpladmin" Name="mysqlrpladmin"
+         Source="$(var.ScriptsDist)\mysqlrpladmin" DiskId="1"/>
+        <File Id="script_mysqlrplcheck" Name="mysqlrplcheck"
+         Source="$(var.ScriptsDist)\mysqlrplcheck" DiskId="1"/>
+        <File Id="script_mysqlrplshow" Name="mysqlrplshow"
+         Source="$(var.ScriptsDist)\mysqlrplshow" DiskId="1"/>
+        <File Id="script_mysqlserverclone" Name="mysqlserverclone"
+         Source="$(var.ScriptsDist)\mysqlserverclone" DiskId="1"/>
+        <File Id="script_mysqlserverinfo" Name="mysqlserverinfo"
+         Source="$(var.ScriptsDist)\mysqlserverinfo" DiskId="1"/>
+        <File Id="script_mysqluc" Name="mysqluc"
+         Source="$(var.ScriptsDist)\mysqluc" DiskId="1"/>
+        <File Id="script_mysqluserclone" Name="mysqluserclone"
+         Source="$(var.ScriptsDist)\mysqluserclone" DiskId="1"/>
+
+        <File Id="bat_mysqlauditadmin" Name="mysqlauditadmin.bat"
+         Source="$(var.ScriptsDist)\mysqlauditadmin.bat" DiskId="1"/>
+        <File Id="bat_mysqlauditgrep" Name="mysqlauditgrep.bat"
+         Source="$(var.ScriptsDist)\mysqlauditgrep.bat" DiskId="1"/>
+        <File Id="bat_mysqldbcompare" Name="mysqldbcompare.bat"
+         Source="$(var.ScriptsDist)\mysqldbcompare.bat" DiskId="1"/>
+        <File Id="bat_mysqldbcopy" Name="mysqldbcopy.bat"
+         Source="$(var.ScriptsDist)\mysqldbcopy.bat" DiskId="1"/>
+        <File Id="bat_mysqldbexport" Name="mysqldbexport.bat"
+         Source="$(var.ScriptsDist)\mysqldbexport.bat" DiskId="1"/>
+        <File Id="bat_mysqldbimport" Name="mysqldbimport.bat"
+         Source="$(var.ScriptsDist)\mysqldbimport.bat" DiskId="1"/>
+        <File Id="bat_mysqldiff" Name="mysqldiff.bat"
+         Source="$(var.ScriptsDist)\mysqldiff.bat" DiskId="1"/>
+        <File Id="bat_mysqldiskusage" Name="mysqldiskusage.bat"
+         Source="$(var.ScriptsDist)\mysqldiskusage.bat" DiskId="1"/>
+        <File Id="bat_mysqlfailover" Name="mysqlfailover.bat"
+         Source="$(var.ScriptsDist)\mysqlfailover.bat" DiskId="1"/>
+        <File Id="bat_mysqlindexcheck" Name="mysqlindexcheck.bat"
+         Source="$(var.ScriptsDist)\mysqlindexcheck.bat" DiskId="1"/>
+        <File Id="bat_mysqlmetagrep" Name="mysqlmetagrep.bat"
+         Source="$(var.ScriptsDist)\mysqlmetagrep.bat" DiskId="1"/>
+        <File Id="bat_mysqlprocgrep" Name="mysqlprocgrep.bat"
+         Source="$(var.ScriptsDist)\mysqlprocgrep.bat" DiskId="1"/>
+        <File Id="bat_mysqlreplicate" Name="mysqlreplicate.bat"
+         Source="$(var.ScriptsDist)\mysqlreplicate.bat" DiskId="1"/>
+        <File Id="bat_mysqlrpladmin" Name="mysqlrpladmin.bat"
+         Source="$(var.ScriptsDist)\mysqlrpladmin.bat" DiskId="1"/>
+        <File Id="bat_mysqlrplcheck" Name="mysqlrplcheck.bat"
+         Source="$(var.ScriptsDist)\mysqlrplcheck.bat" DiskId="1"/>
+        <File Id="bat_mysqlrplshow" Name="mysqlrplshow.bat"
+         Source="$(var.ScriptsDist)\mysqlrplshow.bat" DiskId="1"/>
+        <File Id="bat_mysqlserverclone" Name="mysqlserverclone.bat"
+         Source="$(var.ScriptsDist)\mysqlserverclone.bat" DiskId="1"/>
+        <File Id="bat_mysqlserverinfo" Name="mysqlserverinfo.bat"
+         Source="$(var.ScriptsDist)\mysqlserverinfo.bat" DiskId="1"/>
+        <File Id="bat_mysqluc" Name="mysqluc.bat"
+         Source="$(var.ScriptsDist)\mysqluc.bat" DiskId="1"/>
+        <File Id="bat_mysqluserclone" Name="mysqluserclone.bat"
+         Source="$(var.ScriptsDist)\mysqluserclone.bat" DiskId="1"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MySQLUtilsDir">
+      <Component Id="MySQLUtilsFiles" Guid="68608e06-d064-4909-9e3e-a60bd6f3f09b">
+        <File Id="README" Name="README.txt"
+         Source="$(var.BaseDist)\README.txt" DiskId="1"/>
+        <File Id="LICENSE" Name="LICENSE.txt"
+         Source="$(var.BaseDist)\LICENSE.txt" DiskId="1"/>
+        <!--
+        <File Id="ManualPDF" Name="$(var.ProductName) v$(var.Major_Version).$(var.Minor_Version) Manual.pdf"
+         Source="$(var.BaseDist)\$(var.ManualPDF)" DiskId="1"/>
+        <File Id="ManualHTML" Name="$(var.ProductName) v$(var.Major_Version).$(var.Minor_Version) Manual.html"
+         Source="$(var.BaseDist)\$(var.ManualHTML)" DiskId="1"/>
+        -->
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="Complete" Level="1">
+      <Feature Id="Install" Level="1">
+        <ComponentRef Id="SitePackages"/>
+        <ComponentRef Id="MySQLPackage"/>
+        <ComponentRef Id="UtilsPackage"/>
+        <ComponentRef Id="Command"/>
+        <ComponentRef Id="Common"/>
+        <ComponentRef Id="UtilsScripts"/>
+        <ComponentRef Id="MySQLUtilsFiles"/>
+      </Feature>
+    </Feature>
+    
+    <CustomAction Id="SetInstallDir" Property="INSTALLDIR" Value="[PYTHONINSTALLPATH]"/>
+    <CustomAction Id="ErrDebug" Error="Installdir: [INSTALLDIR]"/>
+    
+    <InstallExecuteSequence>
+      <Custom Action="SetInstallDir" After="AppSearch">NOT Installed</Custom>
+      <RemoveExistingProducts After="InstallInitialize"/>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>
+
