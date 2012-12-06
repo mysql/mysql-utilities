@@ -38,6 +38,14 @@ _BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP"]
 _DATA_COMMANDS = ["INSERT", "UPDATE"]
 _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
+_RPL = len(_RPL_PREFIX)
+_GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", "SET @@SESSION.SQL_LOG_",
+                          "SET @@GLOBAL.GTID_PURG"]
+_GTID_PREFIX = 22
+_GTID_SKIP_WARNING = "# WARNING: GTID commands are present in the import " + \
+    "file but the server does not support GTIDs. Commands are ignored."
+_GTID_MISSING_WARNING = "# WARNING: GTIDs are enabled on this server but " + \
+    "the import file did not contain any GTID commands."
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
@@ -52,10 +60,14 @@ def _read_row(file, format, skip_comments=False):
     Returns (tuple) - one row of data
     """
 
+    warnings_found = []
     if format == "sql":
         # Easiest - just read a row and return it.
         for row in file.readlines():
-            if row[0] != '#' and row[0:2] != "--":
+            if row.startswith("# WARNING"):
+                warnings_found.append(row)
+                continue
+            if not (row.startswith('#') or row.startswith('--')):
                 yield row.strip('\n')
     elif format == "vertical":
         # This format is a bit trickier. We need to read a set of rows that
@@ -73,12 +85,23 @@ def _read_row(file, format, skip_comments=False):
         header = []
         data_row = []
         for row in file.readlines():
+            # Show warnings from file
+            if row.startswith("# WARNING"):
+                warnings_found.append(row)
+                continue
             # Process replication commands
-            if row[0:len(_RPL_PREFIX)] == _RPL_PREFIX:
+            if row[0:_RPL] == _RPL_PREFIX:
                 # find first word
-                first_word = row[len(_RPL_PREFIX):row.find(' ')].upper()
+                first_word = row[_RPL:row.find(' ', _RPL)].upper()
                 if first_word in _RPL_COMMANDS:
-                    yield row
+                    yield [row.strip('\n')]
+                    continue
+                # Check for GTID commands
+                elif len(row) > _GTID_PREFIX + _RPL and \
+                   row[_RPL:_GTID_PREFIX + _RPL] \
+                      in _GTID_COMMANDS:
+                    yield [row.strip('\n')]
+                    continue
             # Skip comment rows
             if row[0] == '#':
                 if len(header) > 0:
@@ -139,15 +162,23 @@ def _read_row(file, format, skip_comments=False):
             separator = "|"
         csv_reader = csv.reader(file, delimiter=separator)
         for row in csv_reader:
+            if row[0].startswith("# WARNING"):
+                warnings_found.append(row[0])
+                continue
             # find first word
-            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX:
-                rpl = len(_RPL_PREFIX)
-                first_word = row[0][rpl:rpl+row[0][rpl:].find(' ')].upper()
+            if row[0][0:_RPL] == _RPL_PREFIX:
+                first_word = row[0][_RPL:_RPL+row[0][_RPL:].find(' ')].upper()
             else:
                 first_word = ""
-            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX and \
-                first_word in _RPL_COMMANDS:
-                yield row
+            # Process replication commands
+            if row[0][0:_RPL] == _RPL_PREFIX:
+                if first_word in _RPL_COMMANDS:
+                    yield row
+                # Check for GTID commands
+                elif len(row[0]) > _GTID_PREFIX + _RPL and \
+                   row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
+                    yield row
+                    
             elif format == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
@@ -165,6 +196,11 @@ def _read_row(file, format, skip_comments=False):
                     row[0][0:2] != "--") or ((row[0][0] == '#' or \
                     row[0][0:2] == "--") and not skip_comments):
                     yield row
+    if warnings_found:
+        print "CAUTION: The following %s warning " % len(warnings_found) + \
+              "messages were included in the import file:"
+        for row in warnings_found:
+            print row.strip('\n')
 
 
 def _check_for_object_list(row, obj_type):
@@ -239,11 +275,17 @@ def read_next(file, format, no_headers=False):
                     yield (cmd_type, sql_cmd)
                 cmd_type = "RPL_COMMAND"
                 sql_cmd = row
+            elif len(row) > _GTID_PREFIX and \
+                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
+                #yield goes here
+                yield (cmd_type, sql_cmd)
+                cmd_type = "GTID_COMMAND"
+                sql_cmd = row
             elif first_word in _DATA_COMMANDS:
+                cmd_type = "DATA"
                 if len(sql_cmd) > 0:
                     #yield goes here
                     yield (cmd_type, sql_cmd)
-                cmd_type = "DATA"
                 sql_cmd = row
             else:
                 sql_cmd += row
@@ -253,15 +295,23 @@ def read_next(file, format, no_headers=False):
         found_obj = ""
         for row in _read_row(file, format, False):
             # find first word
-            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX:
-                rpl = len(_RPL_PREFIX)
-                first_word = row[0][rpl:rpl+row[0][rpl:].find(' ')].upper()
+            if row[0][0:_RPL] == _RPL_PREFIX:
+                first_word = row[0][_RPL:_RPL+row[0][_RPL:].find(' ',
+                                                                 _RPL)].upper()
             else:
                 first_word = ""
-            if row[0][0:len(_RPL_PREFIX)] == _RPL_PREFIX and \
+            if row[0][0:_RPL] == _RPL_PREFIX and \
                 first_word in _RPL_COMMANDS:
-                new_row = ", ".join(row)
-                yield("RPL_COMMAND", new_row[len(_RPL_PREFIX):])
+                # join the parts if CSV or TAB
+                if format in ['csv', 'tab']:
+                    yield("RPL_COMMAND", ", ".join(row).strip("--"))
+                else:
+                    yield("RPL_COMMAND", row[0][_RPL:])
+                continue
+            if row[0][0:_RPL] == _RPL_PREFIX and \
+               len(row[0]) > _GTID_PREFIX + _RPL and \
+               row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
+                yield("GTID_COMMAND", row[0][_RPL:])
                 continue
             # Check to see if we have a marker for rows of objects or data
             for obj in _IMPORT_LIST:
@@ -531,7 +581,7 @@ def _build_create_objects(obj_type, db, definitions):
                 tbl = "*"
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, db, tbl, user)
             create_strings.append(create_str)
-        elif obj_type == "RPL_COMMAND":
+        elif obj_type in ["RPL_COMMAND", "GTID_COMMAND"]:
             create_strings.append([defn])
         else:
             raise UtilError("Unknown object type discovered: %s" % obj_type)
@@ -704,12 +754,13 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
             if dryrun:
                 print statement
             elif format != "sql" or not _skip_sql(statement, options):
-                destination.exec_query(statement)
+                res = destination.exec_query(statement)
         # Here we capture any exception and raise UtilError to communicate to
         # the script/user. Since all util errors (exceptions) derive from
         # Exception, this is safe.
         except Exception, e:
-            raise UtilError("Invalid statement:\n%s" % statement)
+            raise UtilError("Invalid statement:\n%s" % statement +
+                            "\nERROR: %s" % e.errmsg)
     return True
 
 
@@ -805,6 +856,7 @@ def import_file(dest_val, file_name, options):
     dryrun = options.get("dryrun", False)
     do_drop = options.get("do_drop", False)
     skip_blobs = options.get("skip_blobs", False)
+    skip_gtid = options.get("skip_gtid", False)
 
     # Attempt to connect to the destination server
     conn_options = {
@@ -845,12 +897,25 @@ def import_file(dest_val, file_name, options):
     table_col_list = []
     tbl_name = ""
     skip_rpl = options.get("skip_rpl", False)
+    gtid_command_found = False
+    supports_gtid = servers[0].supports_gtid() == 'ON'
+    skip_gtid_warning_printed = False
 
     # Read the file one object/definition group at a time
     for row in read_next(file, format):
         # Check for replication command
         if row[0] == "RPL_COMMAND":
             if not skip_rpl:
+                statements.append(row[1])
+            continue
+        if row[0] == "GTID_COMMAND":
+            gtid_command_found = True
+            if not supports_gtid:
+                # only display warning once
+                if not skip_gtid_warning_printed:
+                    print _GTID_SKIP_WARNING
+                    skip_gtid_warning_printed = True
+            elif not skip_gtid:
                 statements.append(row[1])
             continue
         # If this is the first pass, get the database name from the file
@@ -864,7 +929,8 @@ def import_file(dest_val, file_name, options):
                     statements.append("DROP DATABASE IF EXISTS `%s`;" % \
                                       db_name)
                 if import_type != "data":
-                    if not _skip_object("CREATE_DB", options):
+                    if not _skip_object("CREATE_DB", options) and \
+                       not format == 'sql':
                         statements.append("CREATE DATABASE `%s`;" % db_name)
 
         # This is the first time through the loop so we must
@@ -946,6 +1012,10 @@ def import_file(dest_val, file_name, options):
     _exec_statements(statements, destination, format, options, dryrun)
 
     file.close()
+    
+    # Check gtid process
+    if supports_gtid and not gtid_command_found:
+        print _GTID_MISSING_WARNING
 
     if not quiet:
         print "#...done."

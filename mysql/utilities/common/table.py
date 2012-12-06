@@ -1065,7 +1065,7 @@ class Table(object):
                                          query_options)
         if rows:
             print "#"
-            print "# Showing the top 5 %s performing indexes from %s:\n#" % \
+            print "# Showing the top %s performing indexes from %s:\n#" % \
                   (type, self.table)
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")

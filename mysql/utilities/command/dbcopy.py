@@ -26,6 +26,21 @@ from mysql.utilities.exception import UtilError
 
 _RPL_COMMANDS, _RPL_FILE = 0, 1
 
+_GTID_WARNING = "# WARNING: The server supports GTIDs but you have " + \
+    "elected to skip exexcuting the GTID_EXECUTED statement. Please refer " + \
+    "to the MySQL online reference manual for more information about how " + \
+    "to handle GTID enabled servers with backup and restore operations."
+_GTID_BACKUP_WARNING = "# WARNING: A partial copy from a server that has " + \
+    "GTIDs enabled will by default include the GTIDs of all transactions, " + \
+    "even those that changed suppressed parts of the database. If you " + \
+    "don't want to generate the GTID statement, use the --skip-gtid " + \
+    "option. To export all databases, use the --all option and do not " + \
+    "specify a list of databases."
+_NON_GTID_WARNING = "# WARNING: The %s server does not support " + \
+    "GTIDs yet the %s server does support GTIDs. To suppress this " + \
+    "warning, use the --skip-gtid option when copying %s a non-GTID " + \
+    "enabled server."
+
 def get_copy_lock(server, db_list, options, include_mysql=False,
                   cloning=False):
     """Get an instance of the Lock class with a standard copy (read) lock
@@ -194,6 +209,7 @@ def copy_db(src_val, dest_val, db_list, options):
     from mysql.utilities.common.options import check_engine_options
     from mysql.utilities.common.server import connect_servers
     from mysql.utilities.command.dbexport import get_change_master_command
+    from mysql.utilities.command.dbexport import get_gtid_commands
 
     verbose = options.get("verbose", False)
     quiet = options.get("quiet", False)
@@ -205,6 +221,7 @@ def copy_db(src_val, dest_val, db_list, options):
     skip_data = options.get("skip_data", False)
     skip_triggers = options.get("skip_triggers", False)
     skip_tables = options.get("skip_tables", False)
+    skip_gtid = options.get("skip_gtid", False)
     locking = options.get("locking", "snapshot")
 
     rpl_info = ([], None)
@@ -217,6 +234,9 @@ def copy_db(src_val, dest_val, db_list, options):
 
     source = servers[0]
     destination = servers[1]
+    
+    src_gtid = source.supports_gtid() == 'ON'
+    dest_gtid = destination.supports_gtid() == 'ON'if destination else False
 
     cloning = (src_val == dest_val) or dest_val is None
     
@@ -232,6 +252,17 @@ def copy_db(src_val, dest_val, db_list, options):
                 db_list.append((row[0], None)) # Keep same name
         else:
             raise UtilError("Cannot copy all databases on the same server.")
+    elif not skip_gtid and src_gtid:
+        # Check to see if this is a full copy (complete backup)
+        all_dbs = source.exec_query("SHOW DATABASES")
+        dbs = [db[0] for db in db_list]
+        for db in all_dbs:
+            if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
+                                 "PERFORMANCE_SCHEMA"]:
+                continue
+            if not db[0] in dbs:
+                print _GTID_BACKUP_WARNING
+                break
 
     # Do error checking and preliminary work:
     #  - Check user permissions on source and destination for all databases
@@ -281,6 +312,30 @@ def copy_db(src_val, dest_val, db_list, options):
 
     # Get replication commands if rpl_mode specified.
     # if --rpl specified, dump replication initial commands
+    rpl_info = None
+
+    # Get GTID commands
+    new_opts = options.copy()
+    if not skip_gtid:
+        gtid_info = get_gtid_commands(source, new_opts)
+        if src_gtid and not dest_gtid:
+            print _NON_GTID_WARNING % ("destination", "source", "to")
+        elif not src_gtid and dest_gtid:
+            print _NON_GTID_WARNING % ("source", "destination", "from")
+    else:
+        gtid_info = None
+        if src_gtid and not cloning:
+            print _GTID_WARNING
+        
+    # If cloning, turn off gtid generation
+    if gtid_info and cloning:
+        gtid_info = None
+    # if GTIDs enabled, write the GTID commands
+    if gtid_info and dest_gtid:
+        for cmd in gtid_info[0]:
+            print "# GTID operation:", cmd
+            destination.exec_query(cmd)
+    
     if options.get("rpl_mode", None):
         new_opts = options.copy()
         new_opts['multiline'] = False
@@ -348,6 +403,11 @@ def copy_db(src_val, dest_val, db_list, options):
 
     if not (cloning and locking == 'lock-all'):
         my_lock.unlock()
+
+    # if GTIDs enabled, write the GTID-related commands
+    if gtid_info and dest_gtid:
+        print "# GTID operation:", gtid_info[1]
+        destination.exec_query(gtid_info[1])
 
     if options.get("rpl_mode", None):
         for cmd in rpl_info[_RPL_COMMANDS]:

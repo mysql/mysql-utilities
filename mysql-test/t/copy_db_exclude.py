@@ -25,7 +25,8 @@ class test(copy_db.test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server2)
 
-        cmd_str = "mysqldbcopy.py %s %s --skip=grants " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py --skip-gtid %s %s --skip=grants " % \
+                  (from_conn, to_conn)
         cmd_str += "util_test:util_db_clone "
 
         comment = "Test case 1 - exclude by name"
@@ -50,6 +51,9 @@ class test(copy_db.test):
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Ignore GTID messages (skipping GTIDs in this test)
+        self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
 

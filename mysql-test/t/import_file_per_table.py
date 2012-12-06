@@ -48,7 +48,7 @@ class test(import_basic.test):
 
         _FORMAT_DISPLAY = ("sql","grid","csv","tab","vertical")
 
-        exp_cmd_str = "mysqldbexport.py util_test --export=data " \
+        exp_cmd_str = "mysqldbexport.py util_test --export=data --skip-gtid " \
                       "--file-per-table %s --quiet --format=" % from_conn
         imp_cmd_str = "mysqldbimport.py --import=data %s --format=" % to_conn
         starting_case_num = 1

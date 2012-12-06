@@ -25,7 +25,8 @@ class test(clone_db.test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server1)
 
-        cmd_str = "mysqldbcopy.py %s %s --skip=grants " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py --skip-gtid %s %s --skip=grants " % \
+                  (from_conn, to_conn)
         cmd_str += "util_test:util_db_clone "
 
         comment = "Test case 1 - exclude by name"

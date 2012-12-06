@@ -24,7 +24,7 @@ class test(copy_db_parameters.test):
 
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
 
-        cmd = "mysqldbexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn
 
         test_num = 1
         comment = "Test case %s - export with default locking" % test_num
@@ -50,6 +50,8 @@ class test(copy_db_parameters.test):
         for replace in _REPLACEMENTS:
             self.mask_result_portion("CREATE", "DEFINER=", replace,
                                      "DEFINER=`XXXX`@`XXXXXXXXX` ")
+
+        self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
 

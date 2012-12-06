@@ -22,7 +22,7 @@ class test(export_parameters_def.test):
        
         from_conn = "--server=" + self.build_connection_string(self.server1)
        
-        cmd_str = "mysqldbexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
         
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.
@@ -32,7 +32,7 @@ class test(export_parameters_def.test):
              False, False, False, True)
         
         from_conn = "--server=" + self.build_connection_string(self.server3)
-        cmd_str = "mysqldbexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
         cmd_opts = "--skip=grants,events --all --export=both"
         comment = "Test case 13 - copy all databases"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)

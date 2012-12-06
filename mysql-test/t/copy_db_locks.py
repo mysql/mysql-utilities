@@ -54,7 +54,7 @@ class test(mutlib.System_test):
             if self.debug:
                 print comment
             self.drop_db(self.server1, "util_db_copy")
-            cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
+            cmd = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn) + \
                   " util_test:util_db_copy --force --locking=%s" % locktype
             try:
                 res = self.exec_util(cmd, self.res_fname)

@@ -64,7 +64,7 @@ class test(import_basic.test):
         for format in _FORMATS:
             # Create an import file
             export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
-                         from_conn
+                         from_conn + " --skip-gtid "
             export_cmd += "--format=%s --display=BRIEF > %s " % \
                           (format, self.export_import_file)
             comment = "Generating import file"
@@ -94,7 +94,7 @@ class test(import_basic.test):
             raise MUTLibError("Failed to add blob column: %s" % e.errmsg)
 
         export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
-                     from_conn
+                     from_conn + " --skip-gtid "
         export_cmd += "--format=%s --display=BRIEF > %s " % \
                       ("CSV", self.export_import_file)
         comment = "Generating import file"

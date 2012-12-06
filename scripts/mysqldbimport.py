@@ -100,6 +100,11 @@ parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
 parser.add_option("--skip-rpl", action="store_true", dest="skip_rpl",
                   default=False, help="do not execute replication commands.")
 
+# Add skip generation of GTID statements
+parser.add_option("--skip-gtid", action="store_true", default=False,
+                  dest="skip_gtid", help="do not execute the GTID_PURGED "
+                  "statements.")
+
 # Add the skip common options
 add_skip_options(parser)
 
@@ -161,6 +166,7 @@ options = {
     "new_engine"    : opt.new_engine,
     "def_engine"    : opt.def_engine,
     "skip_rpl"      : opt.skip_rpl,
+    "skip_gtid"     : opt.skip_gtid,
 }
 
 # Parse server connection values

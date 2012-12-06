@@ -28,7 +28,7 @@ class test(export_parameters_def.test):
         self.server1.exec_query("CREATE DATABASE IF NOT EXISTS util_test_mt")
 
         cmd_str = "mysqldbexport.py %s util_test_mt --export=definitions " \
-                  "--file-per-table" % from_conn
+                  "--file-per-table --skip-gtid " % from_conn 
         comment = "Test case 1 - warning: def only with --file-per-table"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -41,7 +41,7 @@ class test(export_parameters_def.test):
 
         _FORMAT_DISPLAY = ("sql","grid","csv","tab","vertical")
 
-        cmd_str = "mysqldbexport.py util_test --export=data " \
+        cmd_str = "mysqldbexport.py util_test --export=data --skip-gtid " \
                   "--file-per-table %s --quiet --format=" % from_conn
         starting_case_num = 2
 

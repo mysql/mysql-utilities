@@ -915,16 +915,19 @@ class Master(Server):
                   print "\t", row
             
         return slaves
-
-
-    def block_writes(block_timeout=3):
-        """Block writes for a specific period of time
-        """
-
     
-    def unblock_writes():
-        """Stop blocking writes
+    
+    def get_gtid_purged_statement(self):
+        """General the SET @@GTID_PURGED statement for backup
+        
+        Returns string - statement for slave if GTID=ON, else None
         """
+        if self.supports_gtid == "ON":
+            gtid_executed = self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0]
+            return 'SET @@GLOBAL.GTID_PURGED = "%s"' % gtid_executed
+        else:
+            return None
+
 
 class MasterInfo(object):
     """The MasterInfo is an abstraction of the mechanism for storing the

@@ -68,7 +68,7 @@ class test(copy_db.test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server2)
 
-        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py  --skip-gtid %s %s " % (from_conn, to_conn)
 
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.
@@ -106,7 +106,7 @@ class test(copy_db.test):
 
         from_conn = "--source=" + self.build_connection_string(self.server3)
 
-        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py  --skip-gtid %s %s " % (from_conn, to_conn)
 
         cmd_opts = "--force --skip=data --all "
         comment = "Test case 6 - copy all databases - but only the utils"
@@ -117,6 +117,9 @@ class test(copy_db.test):
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")
+
+        # Ignore GTID messages (skipping GTIDs in this test)
+        self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
 

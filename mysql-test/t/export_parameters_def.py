@@ -12,6 +12,10 @@ class test(export_basic.test):
     """
 
     def check_prerequisites(self):
+        self.server0 = self.servers.get_server(0)
+        sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
+        if len(sql_mode[1]):
+            raise MUTLibError("Test requires servers with sql_mode = ''.")
         return export_basic.test.check_prerequisites(self)
 
     def setup(self):
@@ -22,7 +26,7 @@ class test(export_basic.test):
        
         from_conn = "--server=" + self.build_connection_string(self.server1)
        
-        cmd_str = "mysqldbexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
         
         cmd_opts = "util_test --help"
         comment = "Test case 1 - help"
@@ -169,6 +173,7 @@ class test(export_basic.test):
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
  
 
+        self.remove_result("# WARNING: The server supports GTIDs")
         self._mask_grid()
         self._mask_csv()
         self._mask_tab()
@@ -177,7 +182,7 @@ class test(export_basic.test):
         return True
 
     def _mask_grid(self):
-	self.mask_column_result("| def ", "|", 2, " None           ")
+        self.mask_column_result("| def ", "|", 2, " None           ")
         self.mask_column_result("| None           | util_test       | trg", "|",
                                 2, " None             ")
         self.mask_column_result("| None             | util_test       | trg", "|",
@@ -349,7 +354,7 @@ class test(export_basic.test):
                             "          MAX_DATA_LENGTH: XXXXXXX\n")
         self.replace_result("                DATA_FREE:",
                             "                DATA_FREE: XXXXXXXXXXX\n")
-	self.replace_result("            TABLE_CATALOG: def",
+        self.replace_result("            TABLE_CATALOG: def",
                             "            TABLE_CATALOG: None\n")
         self.replace_result("        TABLE_CATALOG: def",
                             "        TABLE_CATALOG: None\n")

@@ -34,86 +34,23 @@ Test case 5 - No error: user with % - has permissions
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
-Test case 6 - show user@127.0.0.1 works
-# Source on 127.0.0.1: ... connected.
-# Destination on localhost: ... connected.
-# Copying database util_test renamed as util_db_clone
-# Copying TABLE util_test.t1
-# Copying TABLE util_test.t2
-# Copying TABLE util_test.t3
-# Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
-# Copying FUNCTION util_test.f1
-# Copying GRANTS from util_test
-# Copying data for TABLE util_test.t1
-# Copying data for TABLE util_test.t2
-# Copying data for TABLE util_test.t3
-# Copying data for TABLE util_test.t4
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
-#...done.
-Test case 7 - cannot parse --source
+Test case 6 - cannot parse --source
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: Source connection values invalid or cannot be parsed.
-Test case 8 - cannot parse --destination
+Test case 7 - cannot parse --destination
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: Destination connection values invalid or cannot be parsed.
-Test case 9 - no destination specified
+Test case 8 - no destination specified
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: No destination server specified.
-Test case 10 - no database specified
+Test case 9 - no database specified
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: You must specify at least one database to copy or use the --all option to copy all databases.
-Test case 11 - new storage engine missing
-# Source on 127.0.0.1: ... connected.
-# Destination on localhost: ... connected.
-WARNING: New storage engine NOTTHERE is not supported on the server.
-# Copying database util_test renamed as util_db_clone
-# Copying TABLE util_test.t1
-# Copying TABLE util_test.t2
-# Copying TABLE util_test.t3
-# Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
-# Copying FUNCTION util_test.f1
-# Copying GRANTS from util_test
-# Copying data for TABLE util_test.t1
-# Copying data for TABLE util_test.t2
-# Copying data for TABLE util_test.t3
-# Copying data for TABLE util_test.t4
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
-#...done.
-Test case 12 - default storage engine missing
-# Source on 127.0.0.1: ... connected.
-# Destination on localhost: ... connected.
-WARNING: Default storage engine NOPENOTHERE is not supported on the server.
-# Copying database util_test renamed as util_db_clone
-# Copying TABLE util_test.t1
-# Copying TABLE util_test.t2
-# Copying TABLE util_test.t3
-# Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
-# Copying FUNCTION util_test.f1
-# Copying GRANTS from util_test
-# Copying data for TABLE util_test.t1
-# Copying data for TABLE util_test.t2
-# Copying data for TABLE util_test.t3
-# Copying data for TABLE util_test.t4
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
-#...done.
-Test case 13 - database listed and --all
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
-
-mysqldbcopy.py: error: You cannot use the --all option with a list of databases.
-Test case 14 - clone with --all
+Test case 10 - clone with --all
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
 ERROR: Cannot copy all databases on the same server.

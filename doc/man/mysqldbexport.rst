@@ -130,6 +130,20 @@ If you specify the :option:`--rpl-file` option, the utility writes the
 replication statements to the file specified instead of including them
 in the export stream.
 
+If you attempt to export databases on a server with GTIDs enabled (GTID_MODE
+= ON), a warning will be generated if the export does not include all
+databases. This is because the GTID statements generated include the GTIDs
+for all databases and not only those databases in the export.
+
+The utility will also generate a warning if you export databases on a GTID
+enabled server but use the :option:`--skip-gtid` option.
+
+To make the most use of GTIDs and export/import, you should export all of the
+databases on the server with the :option:`--all` option. This will generate
+an export file with all of the databases and the GTIDs executed to that point.
+Importing this file on another server will ensure that server has all of the
+data as well as all of the GTIDs recorded correctly in its logs.
+
 OPTIONS
 -------
 
@@ -242,6 +256,10 @@ OPTIONS
 .. option:: --skip-blobs
 
    Do not export ``BLOB`` data.
+   
+.. option:: --skip-gtid
+
+   Skip creation of GTID_PURGED statements.
 
 .. option:: --verbose, -v
 

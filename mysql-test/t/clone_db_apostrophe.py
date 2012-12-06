@@ -49,8 +49,8 @@ class test(mutlib.System_test):
             format_tabular_list(sys.stdout, ['char_field', 'blob_field'], rows)
        
         # Test case 1 - clone a sample database
-        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
-              " apostrophe:apostrophe_clone"
+        cmd = "mysqldbcopy.py %s %s apostrophe:apostrophe_clone " \
+              " --skip-gtid " % (from_conn, to_conn)
         try:
             res = self.exec_util(cmd, self.res_fname)
             self.results.append(res)

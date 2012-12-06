@@ -25,6 +25,7 @@ Options:
                         not execute them - useful for testing file validity
   --skip-blobs          do not import blob data.
   --skip-rpl            do not execute replication commands.
+  --skip-gtid           do not execute the GTID_PURGED statements.
   --skip=SKIP_OBJECTS   specify objects to skip in the operation in the form
                         of a comma-separated list (no spaces). Valid values =
                         tables, views, triggers, procedures, functions,

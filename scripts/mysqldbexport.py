@@ -133,6 +133,10 @@ add_rpl_user(parser, None)
 # Add replication options
 add_rpl_mode(parser)
 
+parser.add_option("--skip-gtid", action="store_true", default=False,
+                  dest="skip_gtid", help="skip creation of GTID_PURGED "
+                  "statements.")
+
 # Add comment replication output
 parser.add_option("--comment-rpl", action="store_true", default=False,
                   dest="comment_rpl", help="place the replication statements "
@@ -201,6 +205,7 @@ options = {
     "rpl_file"         : opt.rpl_file,
     "comment_rpl"      : opt.comment_rpl,
     "export"           : opt.export,
+    "skip_gtid"        : opt.skip_gtid,
 }
 
 # Parse server connection values

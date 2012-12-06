@@ -29,7 +29,7 @@ class test(clone_db.test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server1)
 
-        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
 
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.

@@ -46,7 +46,7 @@ class test(mutlib.System_test):
         to_conn = "--destination=" + self.build_connection_string(self.server2)
        
         comment = "Test case 1 - copy a database with special symbols"
-        cmd_str = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
         res = self.run_test_case(0, cmd_str + " util_spec:util_spec_clone",
                                  comment)
         if not res:
@@ -58,6 +58,9 @@ class test(mutlib.System_test):
                                       " AND ROUTINE_NAME = 'spec_date'")
         self.results.append(res[0][0].strip(' ')+"\n")
         
+        # Ignore GTID messages (skipping GTIDs in this test)
+        self.remove_result("# WARNING: The server supports GTIDs")
+
         return True
   
     def get_result(self):
