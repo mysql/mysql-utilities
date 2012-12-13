@@ -735,7 +735,7 @@ class Topology(Replication):
                 continue
 
             # Sanity check: ensure candidate and slave are not the same.
-            if s_host == candidate.host and int(s_port) == int(candidate.port):
+            if candidate.is_alias(s_host) and int(s_port) == int(candidate.port):
                 continue
             
             res = candidate.stop()
