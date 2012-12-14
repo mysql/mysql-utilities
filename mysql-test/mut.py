@@ -149,7 +149,10 @@ def _report_error(message, test_name, mode, start_test, error=True):
     else:
         fishy = "WARNING"
     print "\n%s%s%s: %s\n" % (BOLD_ON, fishy, BOLD_OFF, message)
-    failed_tests.append(test)
+    if mode == "FAIL":
+        failed_tests.append(test)
+    else:
+        skipped_tests.append(test)
 
 # Helper method to manage exception handling
 def _exec_and_report(procedure, default_message, test_name, action,
@@ -489,6 +492,7 @@ if len(processes) > 0:
 
 test_files = []
 failed_tests = []
+skipped_tests = []
 
 test_files.extend(find_tests(SUITE_PATH))                    
 test_files.extend(find_tests(opt.testdir))
@@ -687,17 +691,24 @@ print "-" * opt.width
 print datetime.datetime.now().strftime("Testing completed: "
                                        "%A %d %B %Y %H:%M:%S\n")
 num_fail = len(failed_tests)
+num_skip = len(skipped_tests)
 num_tests = len(test_files)
-if num_fail == 0:
+if num_fail == 0 and num_skip == 0:
     if num_tests > 0:
         print "All %d tests passed." % (num_tests)
 else:
-    print "%d of %d tests completed." % \
+    print "%d of %d tests completed.\n" % \
           (num_tests_run, num_tests)
-    print "The following tests failed or were skipped:",
-    for test in failed_tests:
-        print test,
-    print "\n"
+    if num_skip:
+        print "The following tests were skipped:\n",
+        for test in skipped_tests:
+            print test,
+        print "\n"
+    if num_fail:
+        print "The following tests failed:\n",
+        for test in failed_tests:
+            print test,
+        print "\n"
 
 # Shutdown connections and spawned servers
 if not opt.skip_cleanup:

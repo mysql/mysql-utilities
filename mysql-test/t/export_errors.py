@@ -62,12 +62,10 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        joe_conn = "--server=joe@localhost:3306 "
         # Watchout for Windows: it doesn't use sockets!
-        if os.name == "posix":
-            joe_conn = "--server=joe@localhost:%s" % self.server1.port
-            if self.server1.socket is not None:
-                joe_conn += ":%s" % self.server1.socket
+        joe_conn = "--server=joe@localhost:%s" % self.server1.port
+        if os.name == "posix" and self.server1.socket is not None:
+            joe_conn += ":%s" % self.server1.socket
 
         cmd_str = "mysqldbexport.py %s util_test --skip-gtid " % joe_conn
         comment = "Test case 6 - error: not enough privileges"

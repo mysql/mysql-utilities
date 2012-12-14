@@ -216,6 +216,12 @@ unambiguous prefix of a valid value.  For example, :option:`--format=g`
 specifies the grid format. An error occurs if a prefix matches more
 than one valid value.
 
+When importing data and including the GTID commands, you may encounter an error
+similar to "GTID_PURGED can only be set when GTID_EXECUTED is empty". This
+occurs because the destination server is not in a clean replication state. To
+aleviate this problem, you can issue a "RESET MASTER" command on the
+destination prior to executing the import. 
+
 EXAMPLES
 --------
 

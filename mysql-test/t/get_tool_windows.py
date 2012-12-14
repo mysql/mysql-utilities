@@ -25,7 +25,7 @@ class test(mutlib.System_test):
         if (fail or 
             self.old_server is None): 
             raise MUTLibError("Test requires one server version prior %s" %
-                              " to 5.1.21 and Windows OS ")
+                              "to 5.1.21 and Windows OS ")
 
         self.server1 = None
         return self.check_num_servers(1)

@@ -230,6 +230,12 @@ in an error a the view is copied.
 The :option:`--rpl` option is not valid for copying databases on the same
 server. An error will be generated.
 
+When copying data and including the GTID commands, you may encounter an error
+similar to "GTID_PURGED can only be set when GTID_EXECUTED is empty". This
+occurs because the destination server is not in a clean replication state.
+To aleviate this problem, you can issue a "RESET MASTER" command on the
+destination prior to executing the copy. 
+
 EXAMPLES
 --------
 
