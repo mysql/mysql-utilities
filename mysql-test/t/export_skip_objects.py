@@ -23,7 +23,7 @@ class test(export_basic.test):
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
 
         cmd_str = "mysqldbexport.py %s util_test --format=CSV " % from_conn + \
-                  "--display=NAMES --skip=data"
+                  "--display=NAMES  --skip-gtid --skip=data"
 
         test_num = 1
         comment = "Test case %d - baseline" % test_num
@@ -42,6 +42,8 @@ class test(export_basic.test):
             res = self.run_test_case(0, cmd_opts, comment)
             if not res:
                 raise MUTLibError("%s: failed" % comment)
+
+        self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
 

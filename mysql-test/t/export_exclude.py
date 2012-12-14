@@ -23,7 +23,7 @@ class test(export_parameters_def.test):
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqldbexport.py --skip=events,grants --no-headers " + \
-                  " %s --format=CSV util_test " % from_conn
+                  " %s --format=CSV util_test --skip-gtid " % from_conn
 
         comment = "Test case 1 - exclude by name"
         cmd_opts = "--exclude=util_test.v1 --exclude=util_test.t4"

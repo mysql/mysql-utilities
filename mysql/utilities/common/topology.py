@@ -20,8 +20,6 @@ This module contains abstractions of MySQL replication functionality.
 """
 
 import logging
-import os
-import re
 import time
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.replication import Master, Slave, Replication
@@ -36,8 +34,8 @@ _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
                        "Remaining_Delay", "IO_Error_Num", "IO_Error",
                        "SQL_Error_Num", "SQL_Error", "Trans_Behind"]
 
-_GTID_DONE = "SELECT @@GLOBAL.GTID_DONE"
-_GTID_WAIT = "SELECT SQL_THREAD_WAIT_AFTER_GTIDS('%s', %s)"
+_GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
+_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 
 def parse_failover_connections(options):
@@ -329,6 +327,9 @@ class Topology(Replication):
             host, port = slave.split(":")
             self._report("Discovering slave at %s:%s" % (host, port),
                          logging.INFO, False)
+            # Convert local IP to localhost
+            if host == '127.0.0.1':
+                host = 'localhost'
             # Skip hosts that are not registered properly
             if host == 'unknown host':
                 continue
@@ -337,11 +338,10 @@ class Topology(Replication):
                 found = False
                 # Eliminate if already a slave
                 for slave_dict in self.slaves:
-                    if slave_dict['host'] == '127.0.0.1':
-                        slave_dict['host'] = 'localhost'
                     if slave_dict['host'] == host and \
                        int(slave_dict['port']) == int(port):
                         found = True
+                        break
                 if not found:
                     # Now we must attempt to connect to the slave.
                     conn_dict = {
@@ -365,7 +365,7 @@ class Topology(Replication):
                             new_slaves_found = True
                         else:
                             self._report("Not found.", logging.WARN, False)
-                    except UtilDBError, e:
+                    except UtilError, e:
                         msg = "Cannot connect to slave %s:%s as user '%s'. " % \
                               (host, port, user)
                         if skip_conn_err:
@@ -470,8 +470,8 @@ class Topology(Replication):
             # Create replication user if --force is specified.
             if self.force and candidate_ok[1] == "RPL_USER":
                 user, passwd = slave.get_rpl_user()
-                m_candidate.create_rpl_user(slave.host, slave.port,
-                                            user, passwd)
+                candidate.create_rpl_user(slave.host, slave.port,
+                                          user, passwd)
             else:
                 msg = candidate_ok[2]
                 self._report(msg, logging.CRITICAL)
@@ -735,7 +735,7 @@ class Topology(Replication):
                 continue
 
             # Sanity check: ensure candidate and slave are not the same.
-            if s_host == candidate.host and int(s_port) == int(candidate.port):
+            if candidate.is_alias(s_host) and int(s_port) == int(candidate.port):
                 continue
             
             res = candidate.stop()
@@ -774,7 +774,7 @@ class Topology(Replication):
             if self.verbose and not self.quiet:
                 self._report("# Waiting for candidate to catch up to slave " 
                              "%s:%s." % (s_host, s_port))
-            master_gtid = master.exec_query(_GTID_DONE)
+            master_gtid = master.exec_query(_GTID_EXECUTED)
             candidate.wait_for_slave_gtid(master_gtid, self.timeout,
                                           self.verbose and not self.quiet)
             
@@ -945,7 +945,7 @@ class Topology(Replication):
         slave_rows = []
         # Get the health of the slaves
         if have_gtid == "ON":
-            master_gtids = self.master.exec_query(_GTID_DONE)
+            master_gtids = self.master.exec_query(_GTID_EXECUTED)
         for slave_dict in self.slaves:
             host = slave_dict['host']
             port = slave_dict['port']
@@ -953,8 +953,18 @@ class Topology(Replication):
             if slave is None:
                 rpl_health = (False, ["Cannot connect to slave."])
             elif not slave.is_alive():
-                rpl_health = (False, ["Slave is not alive."])
-                slave = None
+                # Attempt to reconnect to the database server.
+                try:
+                    slave.connect()
+                    # Connection succeeded.
+                    if not slave.is_configured_for_master(self.master):
+                        rpl_health = (False,
+                                      ["Slave is not connected to master."])
+                        slave = None
+                except UtilError:
+                    # Connection failed.
+                    rpl_health = (False, ["Slave is not alive."])
+                    slave = None
             elif not slave.is_configured_for_master(self.master):
                 rpl_health = (False, ["Slave is not connected to master."])
                 slave = None
@@ -1073,7 +1083,10 @@ class Topology(Replication):
             servers.append(self.master)
             for slave_conn in self.slaves:
                 slave = slave_conn['instance']
-                servers.append(slave)
+                # A slave instance is None if the connection failed during the
+                # creation of the topology. In this case ignore the slave.
+                if slave is not None:
+                    servers.append(slave)
 
         # If candidates were specified, check those too.
         candidates = self.options.get("candidates", None)
@@ -1124,7 +1137,7 @@ class Topology(Replication):
         
         self._report("# Performing %s on all slaves." %
                      command.upper())
-        i = 0
+
         for slave_dict in self.slaves:
             hostport = "%s:%s" % (slave_dict['host'], slave_dict['port'])
             msg = "#   Executing %s on slave %s " % (command, hostport)
@@ -1154,7 +1167,6 @@ class Topology(Replication):
                                  logging.WARN)
                 elif not quiet:
                     self._report(msg + "Ok")
-            i += 1
             
             
     def connect_candidate(self, candidate, master=True):
@@ -1241,7 +1253,7 @@ class Topology(Replication):
         # Wait for all slaves to catch up.
         gtid_enabled = self.master.supports_gtid() == "ON"
         if gtid_enabled:
-            master_gtid = self.master.exec_query(_GTID_DONE)
+            master_gtid = self.master.exec_query(_GTID_EXECUTED)
         self._report("# Waiting for slaves to catch up to old master.")
         for slave_dict in self.slaves:
             master_info = self.master.get_status()[0]

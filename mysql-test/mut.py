@@ -149,7 +149,10 @@ def _report_error(message, test_name, mode, start_test, error=True):
     else:
         fishy = "WARNING"
     print "\n%s%s%s: %s\n" % (BOLD_ON, fishy, BOLD_OFF, message)
-    failed_tests.append(test)
+    if mode == "FAIL":
+        failed_tests.append(test)
+    else:
+        skipped_tests.append(test)
 
 # Helper method to manage exception handling
 def _exec_and_report(procedure, default_message, test_name, action,
@@ -243,11 +246,15 @@ def find_tests(path):
                     pass
                 else:
                     if opt.wildcard:
-                        if opt.wildcard == fname[0:len(opt.wildcard)]:
-                            test_files.append(test_ref)
+                        for wild in opt.wildcard:
+                            if wild == fname[0:len(wild)]:
+                                test_files.append(test_ref)
+                                break
                     elif opt.skip_tests:
-                        if opt.skip_tests != fname[0:len(opt.skip_tests)]:
-                            test_files.append(test_ref)
+                        for skip in opt.skip_tests:
+                            if skip != fname[0:len(skip)]:
+                                test_files.append(test_ref)
+                                break
                     # Add test if no wildcard and suite (dir) is included
                     else:
                         test_files.append(test_ref)
@@ -268,9 +275,10 @@ parser.add_option("--server", action="append", dest="servers",
                   "- list option multiple times for multiple servers to use")
 
 # Add test wildcard option
-parser.add_option("--do-tests", action="store", dest="wildcard",
+parser.add_option("--do-tests", action="append", dest="wildcard",
                   type = "string", help="execute all tests that begin " \
-                         "with this string")
+                         "with this string. List option multiple times "
+                         "to add multiple wildcards.")
 
 # Add suite list option
 parser.add_option("--suite", action="append", dest="suites",
@@ -279,13 +287,14 @@ parser.add_option("--suite", action="append", dest="suites",
 
 # Add skip-test list option
 parser.add_option("--skip-test", action="append", dest="skip_test",
-                  type = "string", help="exclude a test - list "
+                  type = "string", help="exclude a specific test - list "
                   "option multiple times for multiple tests")
 
 # Add skip-test list option
-parser.add_option("--skip-tests", action="store", dest="skip_tests",
+parser.add_option("--skip-tests", action="append", dest="skip_tests",
                   type = "string", help="exclude tests that begin with "
-                  "this string")
+                  "this string. List option multiple times to add "
+                  "multiple skips.")
 
 # Add start-test list option
 parser.add_option("--start-test", action="store", dest="start_test",
@@ -394,7 +403,8 @@ if opt.skip_suites:
 
 # Is there a --do-test?
 if opt.wildcard:
-    print "  Test wildcard       = '%s%%'" % opt.wildcard
+    for wild in opt.wildcard:
+        print "  Test wildcard       = '%s%%'" % wild
 
 # Check to see if we're skipping tests
 if opt.skip_test:
@@ -404,7 +414,8 @@ if opt.skip_test:
     print
 
 if opt.skip_tests:
-    print "  Skip wildcard       = '%s%%'" % opt.skip_tests
+    for skip in opt.skip_tests:
+        print "  Skip wildcard       = '%s%%'" % skip
 
 if opt.start_test:
     print "  Start test sequence = '%s%%'" % opt.start_test
@@ -481,6 +492,7 @@ if len(processes) > 0:
 
 test_files = []
 failed_tests = []
+skipped_tests = []
 
 test_files.extend(find_tests(SUITE_PATH))                    
 test_files.extend(find_tests(opt.testdir))
@@ -679,17 +691,24 @@ print "-" * opt.width
 print datetime.datetime.now().strftime("Testing completed: "
                                        "%A %d %B %Y %H:%M:%S\n")
 num_fail = len(failed_tests)
+num_skip = len(skipped_tests)
 num_tests = len(test_files)
-if num_fail == 0:
+if num_fail == 0 and num_skip == 0:
     if num_tests > 0:
         print "All %d tests passed." % (num_tests)
 else:
-    print "%d of %d tests completed." % \
+    print "%d of %d tests completed.\n" % \
           (num_tests_run, num_tests)
-    print "The following tests failed or were skipped:",
-    for test in failed_tests:
-        print test,
-    print "\n"
+    if num_skip:
+        print "The following tests were skipped:\n",
+        for test in skipped_tests:
+            print test,
+        print "\n"
+    if num_fail:
+        print "The following tests failed:\n",
+        for test in failed_tests:
+            print test,
+        print "\n"
 
 # Shutdown connections and spawned servers
 if not opt.skip_cleanup:

@@ -100,6 +100,7 @@ class test(mutlib.System_test):
         slaves_loopback = "root:root@127.0.0.1:%s," % self.server2.port
         slaves_loopback += "root:root@127.0.0.1:%s," % self.server3.port
         slaves_loopback += "root:root@127.0.0.1:%s" % self.server4.port
+        slave3_conn_ip = slave3_conn.replace("localhost", "127.0.0.1")
 
         # Perform switchover from original master to all other slaves and back.
         test_cases = [
@@ -110,7 +111,7 @@ class test(mutlib.System_test):
              slave2_conn, "slave2", [slave1_conn, slave3_conn, master_conn]),
             (slave2_conn, [slave1_conn, slave3_conn, master_conn],
              slave3_conn, "slave3", [slave2_conn, slave1_conn, master_conn]),
-            (slave3_conn, ["root:root@127.0.0.1:%s" % self.server3.port,
+            (slave3_conn_ip, ["root:root@127.0.0.1:%s" % self.server3.port,
                            slave1_conn, master_conn],
              master_conn, "master", [slave1_conn, slave2_conn, slave3_conn]),
         ]

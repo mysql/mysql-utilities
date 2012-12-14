@@ -108,10 +108,16 @@ def format_tabular_list(file, columns, rows, options={}):
 
         stop = len(columns)
         for row in rows:
-            for i in range(0, stop):
-                col_size = len("%s" % row[i]) + 1
-                if col_size > col_widths[i]:
-                    col_widths[i] = col_size
+            # if there is one column, just use row.
+            if stop == 1:
+                col_size = len(row[0]) + 1
+                if col_size > col_widths[0]:
+                    col_widths[0] = col_size
+            else:
+                for i in range(0, stop):
+                    col_size = len("%s" % row[i]) + 1
+                    if col_size > col_widths[i]:
+                        col_widths[i] = col_size
 
         # print header
         if print_header:

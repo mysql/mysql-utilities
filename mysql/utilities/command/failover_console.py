@@ -35,6 +35,8 @@ _COMMAND_KEYS = {'\x1b[A':'ARROW_UP', '\x1b[B':'ARROW_DN'}
 # Minimum number of rows needed to display screen
 _MINIMUM_ROWS = 15
 _HEALTH_LIST = "Replication Health Status"
+_MASTER_GTID_LIST = "Master GTID Executed Set"
+_MASTER_GTID_COLS = ['gtid']
 _GTID_LISTS = ["Transactions executed on the servers:",
                "Transactions purged from the servers:",
                "Transactions owned by another server:"]
@@ -130,7 +132,7 @@ class FailoverConsole(object):
     topology. The interface supports these commands:
     
       - H = show replication health
-      - G = toggle through GTID lists (GTID_DONE, GTID_LOST, GTID_OWNED)
+      - G = toggle through GTID lists (GTID_EXECUTED, GTID_PURGED, GTID_OWNED)
       - U = show UUIDs of servers
       - R = refresh screen
       - L = (iff --log specified) show log contents
@@ -259,17 +261,23 @@ class FailoverConsole(object):
 
         # Get GTID lists
         self.gtid_list += 1
-        if self.gtid_list > 2:
+        if self.gtid_list > 3:
             self.gtid_list = 0
-        if self.get_gtid_data is not None:
+        if self.gtid_list == 0 and self.master_gtids:
+            self.comment = _MASTER_GTID_LIST
+            rows = self.master_gtids
+        elif self.get_gtid_data:
             gtid_data = self.get_gtid_data()
-            self.comment = _GTID_LISTS[self.gtid_list]
-            rows = gtid_data[self.gtid_list]
+            self.comment = _GTID_LISTS[self.gtid_list - 1]
+            rows = gtid_data[self.gtid_list - 1]
             
         self.start_list = 0
         self.end_list = len(rows)
         self.report_mode = 'G'
-        return (_GEN_GTID_COLS, rows)
+        if self.gtid_list == 0:
+            return (_MASTER_GTID_COLS, rows)
+        else:
+            return (_GEN_GTID_COLS, rows)
 
 
     def _format_health_data(self):
@@ -470,8 +478,25 @@ class FailoverConsole(object):
         logfile = status[0][0:20] if len(status[0]) > 20 else status[0]
         rows = [(logfile, status[1], status[2], status[3])]
         format_tabular_list(sys.stdout, cols, rows, fmt_opts)
+        
+        # Display gtid executed set
+        self.master_gtids = []
+        for gtid in status[4].split("\n"):
+            if len(gtid):
+                # Add each GTID to a tuple to match the required format to
+                # print the full GRID list correctly.
+                self.master_gtids.append((gtid.strip(","),))
+        print "\nGTID Executed Set"
+        try:
+            print self.master_gtids[0][0],
+        except IndexError:
+            print "None",
+        if len(self.master_gtids) > 1:
+            print "[...]"
+        else:
+            print
         print
-        self.rows_printed += 4
+        self.rows_printed += 7
     
     
     def _scroll(self, key):

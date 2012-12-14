@@ -31,7 +31,7 @@ from mysql.utilities.command import serverclone
 from mysql.utilities.command import userclone
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.options import parse_connection
-from mysql.utilities import exception
+from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "example - copy_server "
@@ -128,12 +128,20 @@ else:
     for user in opt.users_to_copy.split(","):
         user_list.append(user)
 
+# Build options
+options = {
+    'new_data'       : opt.new_data,
+    'new_port'       : opt.new_port,
+    'new_id'         : opt.new_id,
+    'root_pass'      : 'root',
+    'mysqld_options' : '--report-host=localhost --report-port=%s' % opt.new_port,
+}
+
 # Clone the server
 print "# Cloning server instance..."
 try:
-    res = serverclone.clone_server(conn, opt.new_data, opt.new_port,
-                                    opt.new_id, "root", None, False, True)
-except exception.UtilError, e:
+    res = serverclone.clone_server(conn, options)
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 
@@ -155,7 +163,7 @@ options = {
 print "# Copying databases..."
 try:
     dbcopy.copy_db(conn, dest_values, db_list, options)
-except exception.UtilError, e:
+except UtilError, e:
     print "ERROR:", e.errmsg
     exit(1)
 
@@ -171,7 +179,7 @@ for user in user_list:
     try:
         res = userclone.clone_user(conn, dest_values, user,
                                    (user,), options)
-    except exception.UtilError, e:
+    except UtilError, e:
         print "ERROR:", e.errmsg
         exit(1)
 

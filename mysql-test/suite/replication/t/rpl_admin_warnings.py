@@ -12,8 +12,8 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
-        if not self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version 5.6.5 or higher")
+        if not self.servers.get_server(0).check_version_compat(5, 6, 9):
+            raise MUTLibError("Test requires server version 5.6.9 or higher")
         return self.check_num_servers(1)
 
     def setup(self):

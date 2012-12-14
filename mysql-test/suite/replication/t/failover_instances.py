@@ -21,8 +21,9 @@ class test(failover.test):
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).supports_gtid() != "ON":
-            raise MUTLibError("Test requires server version 5.6.5 with "
+        if self.servers.get_server(0).supports_gtid() != "ON" or \
+           not self.servers.get_server(0).check_version_compat(5,6,9):
+            raise MUTLibError("Test requires server version 5.6.9 with "
                               "GTID_MODE=ON.")
         if self.debug:
             print

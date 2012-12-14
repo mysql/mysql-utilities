@@ -1,3 +1,16 @@
+Release 1.1.1 (Released December 14, 2012)
+------------------------------------------
+
+- BUG#13559593: mysqldiskusage crashes if empty is specified and no empty dbs
+- BUG#14021584: mysqlfailover fails to promote a slave when master shut down
+- BUG#14031924: mysqlfailover fails to promote a slave w/explicit candidates
+- BUG#14624358: mysqlfailover should report gtid information for master
+- BUG#14711565: Exception thrown at Server module on unsupported server vers
+- BUG#14711624: mysqldbexport can fail if column is none
+- BUG#14802229: Correct GTID identifiers changed by BUG#14775984
+- BUG#15867353: Add GTID handling to mysqldbcopy, mysqldbexport
+- BUG#14735026: workbench scripts fail if db has non numeric
+
 Release 1.1.0 (Released September 21, 2012)
 -------------------------------------------
 

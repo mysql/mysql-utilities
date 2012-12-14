@@ -45,7 +45,7 @@ class test(mutlib.System_test):
         to_conn = "--destination=" + self.build_connection_string(self.server2)
        
         comment = "Test case 1 - copy a sample database X:Y"
-        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn)
+        cmd = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
         res = self.exec_util(cmd + " util_test:util_db_clone", self.res_fname)
         self.results.append(res)
         if res != 0:

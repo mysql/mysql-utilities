@@ -64,6 +64,7 @@ Options:
                         path and file name to place the replication
                         information generated. Valid on if the --rpl option is
                         specified.
+  --skip-gtid           skip creation of GTID_PURGED statements.
   --comment-rpl         place the replication statements in comment
                         statements. Valid only with --rpl option.
 Test case 2 - no grants

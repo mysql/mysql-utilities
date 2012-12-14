@@ -40,7 +40,7 @@ _EXPORT_CMD = "mysqldbexport.py --export=both --format=%s " + \
 _IMPORT_CMD = "mysqldbimport.py %s %s --import=both --format=%s %s"
 
 class test(copy_db_rpl.test):
-    """test mexport-to-import with replication features
+    """test export-to-import with replication features
     This test executes the replication feature in mysqldbexport via
     mysqldbimport to sync a slave and to test provisioning a slave from either
     a master or a slave. It uses the copy_db_rpl test as a parent for testing
@@ -56,6 +56,9 @@ class test(copy_db_rpl.test):
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
+        if os.name == "nt":
+            raise MUTLibError("Test does not run correctly on Windows. "
+                              "See BUG#16003529.")
         return copy_db_rpl.test.check_prerequisites(self)
         
     def setup(self):
@@ -107,7 +110,7 @@ class test(copy_db_rpl.test):
                   test_num
         res = self.run_test_case(0, test_num, self.server1, self.server1,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+"sql", _TEST_CASE_RESULTS,
+                                 "", comment+" sql", _TEST_CASE_RESULTS,
                                  True)        
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -127,7 +130,7 @@ class test(copy_db_rpl.test):
                   test_num
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+"sql", _TEST_CASE_RESULTS,
+                                 "", comment+" sql", _TEST_CASE_RESULTS,
                                  True)        
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -146,12 +149,12 @@ class test(copy_db_rpl.test):
         cmd_list.append(exp_cmd)
 
         imp_str = _IMPORT_CMD % (to_conn, _RPL_FILE, "sql", " --skip-rpl ")
-        cmd_list.append(imp_str)        
+        cmd_list.append(imp_str)
 
         comment = "Test case %s - Use --skip-rpl on import" % test_num
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+"sql", _TEST_CASE_RESULTS,
+                                 "", comment+" sql", _TEST_CASE_RESULTS,
                                  False, True)        
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -159,6 +162,7 @@ class test(copy_db_rpl.test):
 
         # Do the last test case again but don't skip to show rows are updated
         self.server3.exec_query("STOP SLAVE")
+        self.server3.exec_query("RESET SLAVE")
         self.server3.exec_query("DROP DATABASE util_test")
         self.server3.exec_query("DROP DATABASE master_db1")
         
@@ -173,8 +177,8 @@ class test(copy_db_rpl.test):
         comment = "Test case %s - Use --skip-rpl on import" % test_num
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+"sql", _TEST_CASE_RESULTS,
-                                 True)        
+                                 "", comment+" sql", _TEST_CASE_RESULTS,
+                                 True)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
@@ -185,12 +189,11 @@ class test(copy_db_rpl.test):
         # Here we check the result from execution of each test case.
         for i in range(0,len(_TEST_CASE_RESULTS)):
             if self.debug:
-                print self.results[i][0]
                 print "  Actual results:", self.results[i][1:]
                 print "Expected results:", _TEST_CASE_RESULTS[i]
             if self.results[i][1:] != _TEST_CASE_RESULTS[i]:
-                msg = "\n%s\nExpected result = " % self.results[i][0]+ \
-                      "%s\n  Actual result = %s\n" % (self.results[i][1:],
+                msg = "\n%s\n  Actual result = " % self.results[i][0]+ \
+                      "%s\nExpected result = %s\n" % (self.results[i][1:],
                                                      _TEST_CASE_RESULTS[i])
                 return (False, msg)
             

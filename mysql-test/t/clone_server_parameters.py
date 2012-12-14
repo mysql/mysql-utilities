@@ -4,7 +4,7 @@ import os
 import mutlib
 
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilError, MUTLibError
 
 class test(mutlib.System_test):
     """clone server parameters
@@ -24,7 +24,7 @@ class test(mutlib.System_test):
         port1 = int(self.servers.get_next_port())
         cmd_str += " --new-port=%d " % port1
         full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
-        cmd_str += " --new-data=%s " % full_datadir
+        cmd_str += " --new-data=%s --delete " % full_datadir
         res = self.exec_util(cmd_str, "start.txt")
         for line in open("start.txt").readlines():
             # Don't save lines that have [Warning] or don't start with #
@@ -57,10 +57,9 @@ class test(mutlib.System_test):
             # Connect to the new instance
             try:
                 self.new_server.connect()
-            except MUTLibError, e:
+            except UtilError, e:
                 self.new_server = None
                 raise MUTLibError("Cannot connect to spawned server.")
-                return False
             self.servers.stop_server(self.new_server)
 
         self.servers.clear_last_port()

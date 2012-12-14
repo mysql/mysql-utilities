@@ -74,6 +74,8 @@ Options:
                         as the mastert, 'slave' = include the CHANGE MASTER
                         command using the destination server's master
                         information.
+  --skip-gtid           skip creation and execution of GTID statements during
+                        copy.
 Test case 4 - no data
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

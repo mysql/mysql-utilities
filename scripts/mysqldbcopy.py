@@ -116,6 +116,11 @@ add_rpl_user(parser, None)
 # Add replication options but don't include 'both'
 add_rpl_mode(parser, False, False)
 
+# Add option to skip GTID generation
+parser.add_option("--skip-gtid", action="store_true", default=False,
+                  dest="skip_gtid", help="skip creation and execution of "
+                  "GTID statements during copy.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -165,6 +170,7 @@ options = {
     "rpl_user"         : opt.rpl_user,
     "rpl_mode"         : opt.rpl_mode,
     "verbosity"        : opt.verbosity,
+    "skip_gtid"        : opt.skip_gtid,
 }
 
 # Parse source connection values

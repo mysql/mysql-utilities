@@ -224,7 +224,7 @@ class test(replicate.test):
         to_conn = "--destination=" + self.build_connection_string(self.server2)
         db_list = ["master_db1"]
 
-        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl " % " ".join(db_list) + \
+        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl --skip-gtid " % " ".join(db_list) + \
                   "%s %s " % (from_conn, to_conn)
 
         # Copy master database
@@ -242,7 +242,7 @@ class test(replicate.test):
         to_conn = "--destination=" + self.build_connection_string(self.server3)
         db_list = ["util_test", "master_db1"]
 
-        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl " % " ".join(db_list) + \
+        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl --skip-gtid " % " ".join(db_list) + \
                   "%s %s " % (from_conn, to_conn)
 
         # Provision a new slave from master
@@ -259,7 +259,7 @@ class test(replicate.test):
         from_conn = "--source=" + self.build_connection_string(self.server2)
         to_conn = "--destination=" + self.build_connection_string(self.server3)
 
-        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl " % " ".join(db_list) + \
+        cmd_str = "mysqldbcopy.py %s --rpl-user=rpl:rpl --skip-gtid " % " ".join(db_list) + \
                   "%s %s " % (from_conn, to_conn)
 
         # Provision a new slave from existing slave

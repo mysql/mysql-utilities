@@ -209,7 +209,7 @@ Test case 7 - show health after switchover
 Test case 8 - switchover to master
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
-# Performing switchover from master at localhost:PORT4 to slave at localhost:PORT1.
+# Performing switchover from master at 127.0.0.1:PORT4 to slave at localhost:PORT1.
 # Checking candidate slave prerequisites.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
@@ -226,9 +226,9 @@ Test case 8 - switchover to master
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
-| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 9 - show health after switchover
@@ -357,7 +357,7 @@ Test case 17 - failover to localhost:PORT4
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT4  | MASTER  | UP     | ON         | OK      |
-| 127.0.0.1  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.

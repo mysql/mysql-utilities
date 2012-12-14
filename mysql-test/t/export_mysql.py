@@ -12,6 +12,9 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        # Check MySQL server version - Must be 5.1.0 or higher
+        if not self.servers.get_server(0).check_version_compat(5, 1, 0):
+            raise MUTLibError("Test requires server version 5.1.0 or higher")
         self.check_gtid_unsafe()
         # Need at least one server.
         self.server1 = None
@@ -79,7 +82,7 @@ class test(mutlib.System_test):
         if conn_val[4] is not None:
             self.server2_conn += "--socket=%s " % conn_val[4]
 
-        cmd = "mysqldbexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn
 
         comment = "Test case 1 - export metadata to new server via the " \
                   "mysql monitor"

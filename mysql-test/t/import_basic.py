@@ -81,7 +81,8 @@ class test(mutlib.System_test):
     def run_import_test(self, expected_res, from_conn, to_conn, format, type,
                         comment, export_options=None, import_options=None):
     
-        export_cmd = "mysqldbexport.py %s util_test --export=" % from_conn
+        export_cmd = "mysqldbexport.py  --skip-gtid " + \
+                     "%s util_test --export=" % from_conn
         export_cmd += type + " --format=%s " % format
         if export_options is not None:
             export_cmd += export_options

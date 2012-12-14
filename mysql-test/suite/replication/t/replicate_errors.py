@@ -179,6 +179,7 @@ class test(replicate.test):
 
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
+        self.replace_substring(" (42000)", "")
         self.replace_result("ERROR: Query failed. 1227: Access denied;",
                             "ERROR: Query failed. 1227: Access denied;\n")
 

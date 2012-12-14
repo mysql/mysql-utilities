@@ -23,9 +23,8 @@ server operations used in multiple utilities.
 
 import os
 import re
-import sys
 import mysql.connector
-from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
 from mysql.utilities.common.options import parse_connection
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
@@ -330,7 +329,7 @@ def connect_servers(src_val, dest_val, options={}):
     if not _require_version(source, version):
         raise UtilError("The %s version is incompatible. Utility "
                         "requires version %s or higher." %
-                        (source.name, version))
+                        (src_name, version))
 
     # If not cloning, connect to the destination server and check version
     if not cloning:
@@ -343,7 +342,7 @@ def connect_servers(src_val, dest_val, options={}):
         if not _require_version(destination, version):
             raise UtilError("The %s version is incompatible. Utility "
                             "requires version %s or higher." %
-                            (destination.name, version))
+                            (dest_name, version))
     elif not quiet and dest_dict is not None and \
          not isinstance(dest_val, Server):
         _print_connection(dest_name, src_dict)
@@ -472,6 +471,8 @@ class Server(object):
                 retval = self.db_conn.is_connected()
                 if retval:
                     self.exec_query("SHOW DATABASES")
+                else:
+                    res = False
         except:
             res = False
         return res
@@ -596,9 +597,12 @@ class Server(object):
             parameters['charset'] = self.charset
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
-            raise UtilDBError("Cannot connect to the %s server.\n"
-                              "Error %s" % (self.role, e.msg), e.errno)
-            return False
+            # Reset any previous value if the connection cannot be established,
+            # before raising an exception. This prevents the use of a broken
+            # database connection.
+            self.db_conn = None
+            raise UtilError("Cannot connect to the %s server.\n"
+                            "Error %s" % (self.role, e.msg), e.errno)
         self.connect_error = None
         self.read_only = self.show_server_variable("READ_ONLY")[0][1]
         
@@ -642,22 +646,13 @@ class Server(object):
         """
         version_str = self.get_version()
         if version_str is not None:
-            index = version_str.find("-")
-            if index >= 0:
-                parts = version_str[0:index].split(".")
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                return version >= [int(t_major), int(t_minor), int(t_rel)]
             else:
-                parts = version_str.split(".")
-            major = parts[0]
-            minor = parts[1]
-            rel = parts[2]
-            if int(t_major) > int(major):
                 return False
-            elif int(t_major) == int(major):
-                if int(t_minor) > int(minor):
-                    return False
-                elif int(t_minor) == int(minor):
-                    if int(t_rel) > int(rel):
-                        return False
         return True
 
 
@@ -700,7 +695,7 @@ class Server(object):
                 cur = self.db_conn.cursor(
                     cursor_class=mysql.connector.cursor.MySQLCursorBufferedRaw)
             else:
-                cur = self.db_conn.cursor(buffered)
+                cur = self.db_conn.cursor(buffered=True)
         else:
             cur = self.db_conn.cursor(raw=True)
 
@@ -795,8 +790,8 @@ class Server(object):
         if res[0][0].upper() == 'OFF':
             raise UtilError("Global Transaction IDs are not enabled.")
 
-        gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_DONE")[0],
-                     self.exec_query("SELECT @@GLOBAL.GTID_LOST")[0],
+        gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0],
+                     self.exec_query("SELECT @@GLOBAL.GTID_PURGED")[0],
                      self.exec_query("SELECT @@GLOBAL.GTID_OWNED")[0]]
             
         return gtid_data

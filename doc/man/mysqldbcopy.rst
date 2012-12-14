@@ -84,6 +84,17 @@ this option is omitted, the utility attempts to identify the replication
 user. In the event that there are multiple candidates or the user requires a
 password, the utility aborts with an error.
 
+If you attempt to copy databases on a server with GTIDs enabled (GTID_MODE
+= ON), a warning will be generated if the copy does not include all
+databases. This is because the GTID statements generated include the GTIDs
+for all databases and not only those databases in the export.
+
+The utility will also generate a warning if you copy databases on a GTID
+enabled server but use the :option:`--skip-gtid` option.
+
+To make the most use of GTIDs, you should copy all of the databases on the
+server with the :option:`--all` option.
+
 OPTIONS
 -------
 
@@ -152,7 +163,11 @@ OPTIONS
 
    The user and password for the replication user requirement - e.g. rpl:passwd
    - default = rpl:rpl.
- 
+
+.. option:: --skip-gtid
+
+   Skip creation and execution of GTID statements during the copy operation.
+
 .. option:: --skip=<objects>
 
    Specify objects to skip in the operation as a comma-separated list
@@ -214,6 +229,12 @@ in an error a the view is copied.
 
 The :option:`--rpl` option is not valid for copying databases on the same
 server. An error will be generated.
+
+When copying data and including the GTID commands, you may encounter an error
+similar to "GTID_PURGED can only be set when GTID_EXECUTED is empty". This
+occurs because the destination server is not in a clean replication state.
+To aleviate this problem, you can issue a "RESET MASTER" command on the
+destination prior to executing the copy. 
 
 EXAMPLES
 --------

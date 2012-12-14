@@ -28,6 +28,21 @@ from mysql.utilities.exception import UtilError, UtilDBError
 
 _RPL_COMMANDS, _RPL_FILE = 0, 1
 _RPL_PREFIX = "-- "
+_SESSION_BINLOG_OFF1 = "SET @MYSQLUTILS_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;"
+_SESSION_BINLOG_OFF2 = "SET @@SESSION.SQL_LOG_BIN = 0;"
+_SESSION_BINLOG_ON = "SET @@SESSION.SQL_LOG_BIN = @MYSQLUTILS_TEMP_LOG_BIN;"
+_GET_GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
+_SET_GTID_PURGED = "SET @@GLOBAL.GTID_PURGED = '%s';"
+_GTID_WARNING = "# WARNING: The server supports GTIDs but you have " + \
+    "elected to skip generating the GTID_EXECUTED statement. Please refer " + \
+    "to the MySQL online reference manual for more information about how " + \
+    "to handle GTID enabled servers with backup and restore operations."
+_GTID_BACKUP_WARNING = "# WARNING: A partial export from a server that has " + \
+    "GTIDs enabled will by default include the GTIDs of all transactions, " + \
+    "even those that changed suppressed parts of the database. If you " + \
+    "don't want to generate the GTID statement, use the --skip-gtid " + \
+    "option. To export all databases, use the --all and --export=both " + \
+    "options."
 
 def export_metadata(source, src_val, db_list, options):
     """Produce rows to be used to recreate objects in a database.
@@ -478,6 +493,29 @@ def get_change_master_command(source, options={}):
     return (rpl_cmds, rpl_file)
 
 
+def get_gtid_commands(master, options):
+    """Get the GTID commands for beginning and ending operations
+        
+    This method returns those commands needed at the start of an export/copy
+    operation (turn off session binlog, setting GTIDs) and those needed at
+    the end of an export/copy operation (turn on binlog sesson).
+    
+    master[in]         Master connection information
+    
+    Returns tuple - ([],"") = list of commands for start, command for end or
+                              None if GTIDs are not enabled.
+    """
+    if not master.supports_gtid() == "ON":
+        return None
+    rows = master.exec_query(_GET_GTID_EXECUTED)
+    master_gtids_list = ["%s" % row[0] for row in rows]
+    master_gtids = ",".join(master_gtids_list)
+    if len(master_gtids_list) == 1 and master_gtids_list[0][0] == '':
+        return None
+    return ([_SESSION_BINLOG_OFF1, _SESSION_BINLOG_OFF2,
+             _SET_GTID_PURGED % master_gtids], _SESSION_BINLOG_ON)
+    
+
 def write_commands(file, rows, options):
     """Write commands to file or stdout
     
@@ -517,7 +555,7 @@ def write_commands(file, rows, options):
             rpl_file.write("{0}\n".format(row))
         else:
             if format != 'sql':
-                prefix_str += _RPL_PREFIX
+                prefix_str = _RPL_PREFIX
             rpl_file.write("{0}{1}\n".format(prefix_str, row))
         
     if not quiet:
@@ -551,7 +589,8 @@ def export_databases(server_values, db_list, options):
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
     locking = options.get("locking", "snapshot")
-    
+    skip_gtids = options.get("skip_gtid", False) # default is to generate GTIDs
+        
     conn_options = {
         'quiet'     : quiet,
         'version'   : "5.1.30",
@@ -559,13 +598,44 @@ def export_databases(server_values, db_list, options):
     servers = connect_servers(server_values, None, conn_options)
     source = servers[0]
     
+    # Check for GTID support
+    supports_gtid = servers[0].supports_gtid()
+    if not skip_gtids and not supports_gtid == 'ON':
+        skip_gtids = True
+    elif skip_gtids and supports_gtid == 'ON':
+        print _GTID_WARNING
+        
+    if not skip_gtids and supports_gtid == 'ON':
+        warning_printed = False
+        # Check to see if this is a full export (complete backup)
+        all_dbs = servers[0].exec_query("SHOW DATABASES")
+        for db in all_dbs:
+            if warning_printed:
+                continue
+            if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
+                                 "PERFORMANCE_SCHEMA"]:
+                continue
+            if not db[0] in db_list:
+                print _GTID_BACKUP_WARNING
+                warning_printed = True
+    
     # Lock tables first
     my_lock = get_copy_lock(source, db_list, options, True)
 
     # if --rpl specified, write initial replication command
+    rpl_info = None
     if rpl_mode:
         rpl_info = get_change_master_command(source, options)
         write_commands(rpl_info[_RPL_FILE], ["STOP SLAVE;"], options)
+
+    # if GTIDs enabled and user requested the output, write the GTID commands
+    if skip_gtids:
+        gtid_info = None
+    else:
+        gtid_info = get_gtid_commands(source, options)
+
+    if gtid_info:
+        write_commands(sys.stdout, gtid_info[0], options)
         
     # dump metadata
     if export in ("definitions", "both"):
@@ -577,6 +647,9 @@ def export_databases(server_values, db_list, options):
             print "# NOTE : --display is ignored for data export."
         export_data(source, server_values, db_list, options)
         
+    # if GTIDs enabled, write the GTID-related commands
+    if gtid_info:
+        write_commands(sys.stdout, [gtid_info[1]], options)
     # if --rpl specified, write replication end command
     if rpl_mode:
         write_commands(rpl_info[_RPL_FILE], rpl_info[_RPL_COMMANDS],

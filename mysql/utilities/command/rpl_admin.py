@@ -24,7 +24,7 @@ simple master-to-slaves topology.
 import logging
 import os
 import sys
-from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.exception import UtilRplError
 
 _VALID_COMMANDS_TEXT = """
 Available Commands:
@@ -157,6 +157,15 @@ class RplCommands(object):
         self.quiet = self.options.get("quiet", False)
         self.logging = self.options.get("logging", False)
         self.candidates = self.options.get("candidates", None)
+
+        # Replace all local host IP addresses (i.e. 127.0.0.1) by localhost
+        for candidate in self.candidates:
+            if candidate['host'] == '127.0.0.1':
+                candidate['host'] = 'localhost'
+        for slave in slave_vals:
+            if slave['host'] == '127.0.0.1':
+                slave['host'] = 'localhost'
+        
         self.rpl_user = self.options.get("rpl_user", None)
         self.topology = Topology(master_vals, slave_vals, self.options,
                                  skip_conn_err)
@@ -294,9 +303,6 @@ class RplCommands(object):
         
         Returns bool - True = no errors, False = errors reported.
         """
-        from mysql.utilities.exception import FormatError
-        from mysql.utilities.common.options import parse_connection
-        
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
@@ -556,7 +562,6 @@ class RplCommands(object):
         timeout = self.options.get("timeout", 3)
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
-        rpl_user = self.options.get("rpl_user", None)
                 
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
@@ -572,7 +577,7 @@ class RplCommands(object):
             msg = "User %s on %s does not have sufficient privileges to " + \
                   "execute the %s command."
             for error in errors:
-                self._report(msg % (error[0], error[1], command),
+                self._report(msg % (error[0], error[1], 'failover'),
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
             
@@ -594,7 +599,7 @@ class RplCommands(object):
         no_exec_fail_msg = "Failover check script cannot be found. Please " + \
                            "check the path and filename for accuracy and " + \
                            "restart the failover console."
-        if exec_fail is not None and not os.path.exists(fail_check):
+        if exec_fail is not None and not os.path.exists(exec_fail):
             self._report(no_exec_fail_msg, logging.CRITICAL, False)
             raise UtilRplError(no_exec_fail_msg)
                
@@ -616,7 +621,7 @@ class RplCommands(object):
                 else:
                     self._report("# Spawning external script for failover "
                                  "checking.")
-                    res = execute_script(script)
+                    res = execute_script(exec_fail)
                     if res == 0:
                         self._report("# Failover check script completed Ok. "
                                      "Failover averted.")

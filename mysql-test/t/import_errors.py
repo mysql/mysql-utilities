@@ -36,7 +36,7 @@ class test(import_basic.test):
             test_num += 1
 
         export_cmd = "mysqldbexport.py %s util_test --export=BOTH" % from_conn
-        export_cmd += " --format=SQL "
+        export_cmd += " --format=SQL --skip-gtid "
         export_cmd += " > %s" % self.export_import_file
         
         # First run the export to a file.
@@ -172,6 +172,8 @@ class test(import_basic.test):
                                 "std_data\\bad_sql.sql",
                                 "# Importing definitions from "
                                 "std_data/bad_sql.sql.\n")
+            
+        self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
 
         return True
 

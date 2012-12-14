@@ -19,6 +19,11 @@ class test(import_basic.test):
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
+        self.server0 = self.servers.get_server(0)
+        sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
+        if "NO_ENGINE_SUBSTITUTION" in sql_mode[1]:
+            raise MUTLibError("Test requires servers that do not have "
+                              "sql_mode = 'NO_ENGINE_SUBSTITUTION'.")
         # Need at least one server.
         self.server1 = None
         self.need_servers = False
@@ -80,7 +85,8 @@ class test(import_basic.test):
                                         (table_name, res[0][0]))
 
         self.res_fname = "result.txt"
-
+        import_basic.test.drop_all(self)
+        
         to_conn = "--server=" + self.build_connection_string(self.server1)
         
         import_file = os.path.normpath("./std_data/bad_engine.csv")

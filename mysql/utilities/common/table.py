@@ -22,7 +22,6 @@ This module contains abstractions of a MySQL table and an index.
 import multiprocessing
 import re
 import sys
-import mysql.connector
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -459,12 +458,15 @@ class Table(object):
                 blob_inserts.append(blob)
             values[col] = "NULL"
 
-        # Replace single quotes located in the value for a text field with
-        # a double single quote. This fixes SQL errors related to using
-        # single quotes in a string value that is single quoted. For example,
-        # we change 'this' is it' to 'this'' is it'
-        [values[col].replace("'", "''") for col in self.text_columns]
-        
+        # Replace single quotes located in the value for a text field with the
+        # correct special character escape sequence. This fixes SQL errors
+        # related to using single quotes in a string value that is single
+        # quoted. For example, 'this' is it' is changed to 'this\' is it'
+        for col in self.text_columns:
+            #Check if the value is not None before replacing quotes
+            if values[col]:
+                values[col] = values[col].replace("'", "\\'")
+
         # Build string
         val_str = self.column_format % tuple(values)
 
@@ -1063,7 +1065,7 @@ class Table(object):
                                          query_options)
         if rows:
             print "#"
-            print "# Showing the top 5 %s performing indexes from %s:\n#" % \
+            print "# Showing the top %s performing indexes from %s:\n#" % \
                   (type, self.table)
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")

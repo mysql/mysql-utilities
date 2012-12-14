@@ -20,8 +20,9 @@ This module contains an abstraction of a topolgy map object used to discover
 slaves and down-stream replicants for mapping topologies.
 """
 
-import os
 from mysql.utilities.exception import UtilError
+
+_START_PORT = 3306
 
 class TopologyMap(object):
     """The TopologyMap class can be used to connect to a running MySQL server
@@ -200,7 +201,7 @@ class TopologyMap(object):
                     host, port = slave.split(":", 1)
                 else:
                     host = slave
-                    port = START_PORT  # Use the default
+                    port = _START_PORT  # Use the default
                 slave_conn = self.seed_server.copy()
                 slave_conn['host'] = host
                 slave_conn['port'] = port

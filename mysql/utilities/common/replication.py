@@ -22,10 +22,8 @@ This module contains abstractions of MySQL replication functionality.
 import os
 import re
 import time
-from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.server import Server
-from mysql.utilities.exception import UtilError, UtilDBError, UtilRplWarn
-from mysql.utilities.exception import UtilRplError, UtilBinlogError
+from mysql.utilities.exception import UtilError, UtilRplWarn, UtilRplError
 
 _MASTER_INFO_COL = [
     'Master_Log_File', 'Read_Master_Log_Pos', 'Master_Host', 'Master_User',
@@ -60,8 +58,8 @@ _NO_RPL_USER = "No --rpl-user specified and multiple users found with " + \
 _RPL_USER_PASS = "No --rpl-user specified and the user found with " + \
                  "replication privileges requires a password."
 
-_GTID_DONE = "SELECT @@GLOBAL.GTID_DONE"
-_GTID_WAIT = "SELECT SQL_THREAD_WAIT_AFTER_GTIDS('%s', %s)"
+_GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
+_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 def _get_list(rows, cols):
     """Return a list of information in GRID format to stdout.
@@ -917,16 +915,19 @@ class Master(Server):
                   print "\t", row
             
         return slaves
-
-
-    def block_writes(block_timeout=3):
-        """Block writes for a specific period of time
-        """
-
     
-    def unblock_writes():
-        """Stop blocking writes
+    
+    def get_gtid_purged_statement(self):
+        """General the SET @@GTID_PURGED statement for backup
+        
+        Returns string - statement for slave if GTID=ON, else None
         """
+        if self.supports_gtid == "ON":
+            gtid_executed = self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0]
+            return 'SET @@GLOBAL.GTID_PURGED = "%s"' % gtid_executed
+        else:
+            return None
+
 
 class MasterInfo(object):
     """The MasterInfo is an abstraction of the mechanism for storing the
@@ -1076,8 +1077,8 @@ class MasterInfo(object):
 
         # Build dictionary for the information with column information
         rows = []
-        for i in range(0, len(res[0][2:])):
-            rows.append(res[0][i+2])
+        for i in range(0, len(res[0][1:])):
+            rows.append(res[0][i+1])
         self._build_dictionary(rows)
 
         return True
@@ -1413,11 +1414,11 @@ class Slave(Server):
     def num_gtid_behind(self, master_gtids):
         """Get the number of transactions the slave is behind the master.
         
-        master_gtids[in]  the master's GTID_DONE list
+        master_gtids[in]  the master's GTID_EXECUTED list
         
         Returns int - number of trans behind master
         """
-        slave_gtids = self.exec_query(_GTID_DONE)[0][0]
+        slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
         gtids = self.exec_query("SELECT GTID_SUBTRACT('%s','%s')" %
                                (master_gtids[0][0], slave_gtids))[0]
         if len(gtids) == 1 and len(gtids[0]) == 0:
@@ -1453,7 +1454,7 @@ class Slave(Server):
         This method requires that the server supports GTIDs.
         
         master_gtid[in]  the list of gtids from the master
-                         obtained via SELECT @@GLOBAL.GTID_DONE on master
+                         obtained via SELECT @@GLOBAL.GTID_EXECUTED on master
         timeout[in]      timeout for waiting for slave to catch up
                          Note: per GTID call. Default is 3.
         verbose[in]      if True, print query used.
@@ -1644,7 +1645,7 @@ class Slave(Server):
                     
             # Check GTID trans behind.
             elif self.supports_gtid() == "ON":
-                master_gtids = master.exec_query(_GTID_DONE)
+                master_gtids = master.exec_query(_GTID_EXECUTED)
                 num_gtids_behind = self.num_gtid_behind(master_gtids)
                 if num_gtids_behind > 0:
                     errors.append("Slave has %s transactions behind master." %

@@ -28,7 +28,7 @@ class test(export_basic.test):
         
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
         
-        cmd = "mysqldbexport.py %s util_test  " % from_conn
+        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn
        
         comment = "Test case 1 - bad --skip values"
         cmd += " --skip=events,wiki-waki,woo-woo "
@@ -42,53 +42,51 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py %s " % from_conn
+        cmd_str = "mysqldbexport.py %s --skip-gtid " % from_conn
         comment = "Test case 3 - no database specified"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py --server=rocks_rocks_rocks "
-        cmd_str += "util_test "
+        cmd_str = "mysqldbexport.py --server=rocks_rocks_rocks --skip-gtid " \
+                  "util_test "
         comment = "Test case 4 - cannot parse --server"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py "
-        cmd_str += "--server=nope:nada@localhost:%s util_test" % self.server0.port
+        cmd_str = "mysqldbexport.py --skip-gtid " \
+                  "--server=nope:nada@localhost:%s util_test" % self.server0.port
         comment = "Test case 5 - error: cannot connect to server"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        joe_conn = "--server=joe@localhost:3306 "
         # Watchout for Windows: it doesn't use sockets!
-        if os.name == "posix":
-            joe_conn = "--server=joe@localhost:%s" % self.server1.port
-            if self.server1.socket is not None:
-                joe_conn += ":%s" % self.server1.socket
+        joe_conn = "--server=joe@localhost:%s" % self.server1.port
+        if os.name == "posix" and self.server1.socket is not None:
+            joe_conn += ":%s" % self.server1.socket
 
-        cmd_str = "mysqldbexport.py %s util_test " % joe_conn
+        cmd_str = "mysqldbexport.py %s util_test --skip-gtid " % joe_conn
         comment = "Test case 6 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py %s notthereatall" % from_conn
+        cmd_str = "mysqldbexport.py %s notthereatall --skip-gtid " % from_conn 
         comment = "Test case 7 - database does not exist"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py %s util_test --export=definitions" % \
-                  joe_conn
+        cmd_str = "mysqldbexport.py %s util_test --export=definitions" \
+                  " --skip-gtid " % joe_conn
         comment = "Test case 8 - error: not enough privileges"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = "mysqldbexport.py %s util_test --all " % from_conn
+        cmd_str = "mysqldbexport.py %s util_test --all --skip-gtid" % from_conn
         comment = "Test case 9 - error: db list and --all"
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
@@ -96,6 +94,8 @@ class test(export_basic.test):
 
         self.replace_result("Error 1045", "Error 1045: Access denied for user "
                             "'nope'@'localhost' (using password: YES)\n")
+
+        self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
           

@@ -187,6 +187,7 @@ class test(mutlib.System_test):
         return True
     
     def do_replacements(self):
+        self.replace_substring(" (28000)", "")
         self.replace_substring("127.0.0.1", "localhost")
         i = 1
         for port in self.port_repl:
