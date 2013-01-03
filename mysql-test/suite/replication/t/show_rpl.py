@@ -193,6 +193,12 @@ class test(mutlib.System_test):
         for port in self.port_repl:
             self.replace_substring("%s" % port, "PORT%d" % i)
             i += 1
+        self.replace_result("Error connecting to a slave",
+                            "Error connecting to a slave ...\n")
+        self.replace_result("Error 2002: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server\n")
+        self.replace_result("Error 2003: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)
