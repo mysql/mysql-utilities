@@ -42,7 +42,7 @@ PRINT_WIDTH = 75
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE)
+                              DESCRIPTION, USAGE, server=False)
 
 # Connection information for the source server
 parser.add_option("--server1", action="store", dest="server1",
