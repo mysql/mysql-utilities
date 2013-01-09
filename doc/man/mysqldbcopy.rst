@@ -234,7 +234,12 @@ When copying data and including the GTID commands, you may encounter an error
 similar to "GTID_PURGED can only be set when GTID_EXECUTED is empty". This
 occurs because the destination server is not in a clean replication state.
 To aleviate this problem, you can issue a "RESET MASTER" command on the
-destination prior to executing the copy. 
+destination prior to executing the copy.
+
+Cloning databases that contain foreign key constraints does not change the
+constraint in the cloned table. For example, if table db1.t1 has a foreign
+key constraint on table db1.t2, when db1 is cloned to db2, table db2.t1 will
+have a foreign key constraint on db1.t2. 
 
 EXAMPLES
 --------

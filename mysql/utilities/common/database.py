@@ -20,8 +20,6 @@ This module contains abstractions of a MySQL Database object used by
 multiple utilities.
 """
 
-import datetime
-import os
 import re
 import mysql.connector
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -511,9 +509,6 @@ class Database(object):
             'quiet'    : quiet
         }
 
-        # Turn off foreign keys if they were on at the start
-        self.destination.disable_foreign_key_checks(True)
-
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
         for tblname in table_names:
             if not quiet:
@@ -523,11 +518,7 @@ class Database(object):
             if tbl is None:
                 raise UtilDBError("Cannot create table object before copy.",
                                   -1, self.db_name)
-                
             tbl.copy_data(self.destination, self.cloning, new_db, connections)
-
-        # Now, turn on foreign keys if they were on at the start
-        self.destination.disable_foreign_key_checks(False)
 
 
     def get_create_statement(self, db, name, obj_type):

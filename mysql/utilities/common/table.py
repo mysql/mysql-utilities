@@ -471,8 +471,8 @@ class Table(object):
         val_str = self.column_format % tuple(values)
 
         # Change 'None' occurrences with "NULL"
-        val_str.replace(", None", ", NULL")
-        val_str.replace("(None", "(NULL")
+        val_str = val_str.replace(", None", ", NULL")
+        val_str = val_str.replace("(None", "(NULL")
         
         return (val_str, blob_inserts)
 
