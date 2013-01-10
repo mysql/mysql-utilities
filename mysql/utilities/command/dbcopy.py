@@ -336,6 +336,8 @@ def copy_db(src_val, dest_val, db_list, options):
         gtid_info = None
     # if GTIDs enabled, write the GTID commands
     if gtid_info and dest_gtid:
+        # Check GTID version for complete feature support
+        destination.check_gtid_version()
         for cmd in gtid_info[0]:
             print "# GTID operation:", cmd
             destination.exec_query(cmd)

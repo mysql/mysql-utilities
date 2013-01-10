@@ -28,6 +28,8 @@ from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
 from mysql.utilities.common.options import parse_connection
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
+_GTID_ERROR = ("The server %s:%s does not comply to the latest GTID " 
+               "feature support. Errors:")
 
 def get_connection_dictionary(conn_info):
     """Get the connection dictionary.
@@ -769,8 +771,30 @@ class Server(object):
             res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
         except:
             return "NO"
-        
+
         return res[0][0]
+        
+        
+    def check_gtid_version(self):
+        """Determine if server supports latest GTID changes
+        
+        This method checks the server to ensure it contains the latest
+        changes to the GTID variables (from version 5.6.9).
+        
+        Raises UtilRplError when errors occur.
+        """
+        errors = []
+        if not self.supports_gtid() == "ON":
+            errors.append("    GTID is not enabled.")
+        if not self.check_version_compat(5, 6, 9):
+            errors.append("    Server version must be 5.6.9 or greater.")
+        res = self.exec_query("SHOW VARIABLES LIKE 'gtid_executed'")
+        if res == [] or not res[0][0] == "gtid_executed":
+            errors.append("    Missing gtid_executed system variable.")
+        if errors:
+            errors = "\n".join(errors)
+            errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
+            raise UtilRplError(errors)
 
 
     def get_gtid_status(self):

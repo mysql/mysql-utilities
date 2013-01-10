@@ -606,6 +606,8 @@ def export_databases(server_values, db_list, options):
         print _GTID_WARNING
         
     if not skip_gtids and supports_gtid == 'ON':
+        # Check GTID version for complete feature support
+        servers[0].check_gtid_version()
         warning_printed = False
         # Check to see if this is a full export (complete backup)
         all_dbs = servers[0].exec_query("SHOW DATABASES")

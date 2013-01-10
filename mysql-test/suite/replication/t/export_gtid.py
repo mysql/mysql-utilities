@@ -95,8 +95,8 @@ class test(mutlib.System_test):
         try:
             res = server1.read_and_exec_SQL(self.data_file, self.debug)
         except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            raise MUTLibError("Failed to read commands from file %s: %s" % 
+                              (self.data_file, e.errmsg))
 
         comment = "Test case %s (export phase) %s" % (test_num, test_case) 
         cmd_str = exp_cmd + conn1 + " > " + self.export_file

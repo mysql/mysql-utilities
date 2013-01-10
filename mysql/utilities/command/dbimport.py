@@ -900,6 +900,7 @@ def import_file(dest_val, file_name, options):
     gtid_command_found = False
     supports_gtid = servers[0].supports_gtid() == 'ON'
     skip_gtid_warning_printed = False
+    gtid_version_checked = False
 
     # Read the file one object/definition group at a time
     for row in read_next(file, format):
@@ -916,6 +917,10 @@ def import_file(dest_val, file_name, options):
                     print _GTID_SKIP_WARNING
                     skip_gtid_warning_printed = True
             elif not skip_gtid:
+                if not gtid_version_checked:
+                    gtid_version_checked = True
+                    # Check GTID version for complete feature support
+                    servers[0].check_gtid_version()
                 statements.append(row[1])
             continue
         # If this is the first pass, get the database name from the file
