@@ -96,6 +96,11 @@ add_rpl_user(parser, None)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
+# At least one of the options --discover-slaves-login or --slaves is required.
+if not opt.discover and not opt.slaves:
+    parser.error("One of these options is required to use the utility: "
+                 "--discover-slaves-login or --slaves.")
+
 # Check slaves list
 check_server_lists(parser, opt.master, opt.slaves)
 

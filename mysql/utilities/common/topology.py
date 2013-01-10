@@ -1214,7 +1214,6 @@ class Topology(Replication):
         
         Return bool - True = success, raises exception on error
         """
-        from mysql.utilities.common.server import get_connection_dictionary
 
         # Need instance of Master class for operation
         m_candidate = self.connect_candidate(candidate)
