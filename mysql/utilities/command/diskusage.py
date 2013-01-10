@@ -670,8 +670,22 @@ def show_log_usage(server, datadir, options):
         if not quiet:
             print "Current %s file = %s" % (log_type, current_log)
 
-        logs, total = _build_log_list(datadir,
-                                      os.path.splitext(current_log)[0])
+        # As of 5.6.2, users can specify location of binlog and relaylog.
+        if server.check_version_compat(5, 6, 2):
+            if log_type == 'binary log':
+                res = server.show_server_variable("log_bin_basename")[0]
+            else:
+                res = server.show_server_variable("relay_log_basename")[0]
+            parts = os.path.split(res[1])
+            log_path = os.path.join(parts[:len(parts) - 1])[0]
+            log_prefix = parts[len(parts) - 1]
+        else:
+            log_path = datadir
+            log_prefix = os.path.splitext(current_log)[0]
+        if log_path == '':
+            log_path = datadir
+            
+        logs, total = _build_log_list(log_path, log_prefix)
         if logs == []:
             raise UtilError("The %s are missing." % log_type)
 
