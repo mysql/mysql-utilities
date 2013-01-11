@@ -23,6 +23,8 @@ used to allow a client to provide auto type and option completion.
 
 import os
 import sys
+import re
+import subprocess
 
 from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.exception import UtilError
@@ -31,6 +33,7 @@ _MAX_WIDTH = 78
 
 # These utilities should not be used with the console
 _EXCLUDE_UTILS = ['mysqluc',]
+
 
 def get_util_path(default_path=''):
     """Find the path to the MySQL utilities
@@ -43,22 +46,46 @@ def get_util_path(default_path=''):
 
     Returns string - path to utilities or None if not found
     """
-    needle = 'mysqlreplicate.py'
-    
+    def _search_paths(needles, paths):
+        for path in paths:
+            norm_path = os.path.normpath(path)
+            hay_stack = [os.path.join(norm_path, n) for n in needles]
+            for needle in hay_stack:
+                if os.path.isfile(needle):
+                    return norm_path
+
+        return None
+
+    needle_name = 'mysqlreplicate'
+    needles = [needle_name + ".py"]
+    if os.name == "nt": 
+        needles.append(needle_name + ".exe")
+    else: 
+        needles.append(needle_name)
+
     # Try the default by itself
-    if os.path.isfile(os.path.join(default_path, needle)):
-        return default_path
+    path_found = _search_paths(needles, [default_path])
+    if path_found:
+        return path_found 
 
     # Try the pythonpath environment variable    
     pythonpath = os.getenv("PYTHONPATH")
-    if os.path.isfile(os.path.join(pythonpath+default_path, needle)):
-        return pythonpath+default_path
+    if pythonpath:
+        #This is needed on windows without a python setup, cause needs to
+        #find the executable scripts.
+        path = _search_paths(needles, [os.path.join(n, "../") 
+                                       for n in pythonpath.split(";", 1)])
+        if path:
+            return path
+        path = _search_paths(needles, pythonpath.split(";", 1))
+        if path:
+            return path
 
     # Try the system paths
-    for path in sys.path:
-        if os.path.isfile(os.path.join(path, needle)):
-            return path
-    
+    path_found = _search_paths(needles, sys.path)
+    if path_found:
+        return path_found
+
     return None
 
 
@@ -96,20 +123,50 @@ class Utilities(object):
         
         This method builds a list of utilities.
         """
-        files = os.listdir(self.util_path)
-        for file in files:
-            parts = os.path.splitext(file)
-            # Only accept python files - not .pyc and others
-            if (len(parts) == 2 and parts[1] == '.py' and \
-                parts[0] not in _EXCLUDE_UTILS) or \
-               (len(parts) ==1 and parts[0] not in _EXCLUDE_UTILS):
-                util_name = parts[0]
-                util_info = self._get_util_info(self.util_path, util_name)
-                self.util_list.append(util_info)
-        self.util_list.sort(key=lambda util_list:util_list['name'])
-        
+        pattern_usage = ("(?P<Usage>Usage:\s.*?)\w+\s\-\s" #this match first
+                         # section <Usage> matching all till find a " - "
+                         "(?P<Description>.*?)" # Description is the text next
+                         # to " - " and till next match.
+                         "(?P<O>\w*):"  # This is beginning of Options section
+                         "(?P<Options>.*)" # this match  the utility options
+                         )
+        self.program_usage = re.compile(pattern_usage, re.S)    
 
-    def _get_util_info(self, util_path, util_name):
+        pattern_options = ("^(?P<Alias>\s\s\-.*?)\s{2,}" # Option Alias
+                           # followed by 2 o more spaces is his description
+                           "(?P<Desc>.*?)(?=^\s\s\-)" # description is all
+                           # text till not found other alias in the form
+                           # <-|--Alias> at the begining of the line.
+                           )
+        self.program_options = re.compile(pattern_options, re.S|re.M)
+
+        pattern_option = "\s+\-\-(.*?)\s" # match Alias of the form <--Alias>
+        self.program_option = re.compile(pattern_option)
+        pattern_alias = "\s+\-(\w+)\s*" # match Alias of the form <-Alias>
+        self.program_name = re.compile(pattern_alias)
+
+        files = os.listdir(self.util_path)
+
+        working_utils = []
+        for file_name in files:
+            parts = os.path.splitext(file_name)
+            # Only accept python files - not .pyc and others
+            # Parts returns second as empty if does not have ext, so len is 2
+            exts = ['.py', '.exe', '']
+            if (parts[0] not in _EXCLUDE_UTILS and
+                (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
+                util_name = str(parts[0])
+                if util_name not in working_utils: 
+                    util_info = self._get_util_info(self.util_path, util_name, 
+                                                    file_name, parts[1])
+                    if util_info and util_info["usage"]:
+                        self.util_list.append(util_info)
+                        working_utils.append(util_name)
+
+        self.util_list.sort(key=lambda util_list:util_list['name'])
+    
+
+    def _get_util_info(self, util_path, util_name, file_name, file_ext):
         """Get information about utility
         
         util_path[in]  path to utilities
@@ -117,84 +174,62 @@ class Utilities(object):
         
         Returns dictionary - name, description, usage, options
         """
-        
-        import subprocess
-        import tempfile
-        
-        def _set_option_values(option, line, index, start, stop):
-            """Set the option values
-            """
-            if index == stop or index < 0:
-                option['name'] = line[start:].strip(' ').strip('--')
-            else:
-                option['name'] = line[start:index].strip(' ').strip('--')
-                option['description'] = line[index+1:].strip(' ').strip('\r')
-            option['long_name'] = option['name']
-            parts = option['name'].split('=')
-            option['req_value'] = len(parts) == 2
-            if option['req_value']:
-                option['name'] = parts[0]
-
         # Get the --help output for the utility
-        util_cmd = "python " + os.path.join(util_path,
-                                            util_name+'.py') + " --help"
-        file = tempfile.TemporaryFile()
-        proc = subprocess.Popen(util_cmd, shell=True,
-                                stdout=file, stderr=file)
-        proc.wait()
+        command = util_name + ".py"
+        if not os.path.exists(os.path.join(util_path, command)):
+            command = file_name 
+        cmd = []
+        if not file_ext == '.exe':
+            cmd.append('python ')
         
+        cmd += ['"', os.path.join(util_path, command), '"', " --help"]
+
+        # Hide errors from stderr output
+        out = open(os.devnull, 'w')
+        proc = subprocess.Popen("".join(cmd), shell=True,
+                                stdout=subprocess.PIPE, stderr=out)
+
+        stdout_temp = proc.communicate()[0]
         # Parse the help output and save the information found
         alias = None
         usage = None
         description = None
         options = []
         option = None
-        read_options = False
-        file.seek(0)
-        for line in file.readlines():
-            line = line.strip("\n")
-            if os.name == 'nt':
-                line = line.strip('\r')
-            stop = len(line)
-            if line[0:6] == "Usage:":
-                usage = line[0:stop]
-            elif line[0:len(util_name)] == util_name:
-                i = line.find('-')
-                description = line[i+1:].strip(' ')
-            elif line[0:8] == "Options:":
-                read_options = True
-                option = {}
-            elif read_options:
-                line = line.strip(" ")
-                # a option without an alias
-                if line[0:2] == '--':
-                    if not option == {}:
-                        options.append(option)
-                        option = {}
-                    i = line.find(' ', 5)
-                    option['alias'] = None
-                    _set_option_values(option, line, i, 0, stop)
-                # a option with an alias
-                elif line[0:1] == '-':
-                    if not option == {}:
-                        options.append(option)
-                        option = {}
-                    option['alias'] = line[1:2]
-                    # now find option name
-                    i = line.find('--')
-                    j = line.find(' ', i+1)
-                    _set_option_values(option, line, j, i, stop)
-                else:  # belongs to last option
-                    try:
-                        option['description'] += ' ' + line.strip('\r')
-                    except:                        
-                        option['description'] = line.strip('\r')
-            elif description is not None: # add to description
-                description += ' ' + line.strip('\n').strip(' ')
 
-        # Get last option
-        if not option == {}:
-            options.append(option)
+        res = self.program_usage.match(stdout_temp.replace("\r", ""))
+        Options = ""
+        if not res:
+            return None
+        else:
+            usage = res.group("Usage").replace("\n", "")
+            desc_clean = res.group("Description").replace("\n", " ").split()
+            description = (" ".join(desc_clean)) + " "
+            #standardize string. 
+            Options =  res.group("Options") + "\n  -"
+
+        res = self.program_options.findall(Options)
+
+        for opt in res:
+            option = {}          
+            name = self.program_option.search(opt[0] + " ")
+            if name:
+                option['name'] = str(name.group(1))
+            alias = self.program_name.search(opt[0] + " ")
+            if alias:
+                option['alias'] = str(alias.group(1))
+            else:
+                option['alias'] = None
+
+            desc_clean = opt[1].replace("\n"," ").split()
+            option['description'] = " ".join(desc_clean)
+            option['long_name'] = option['name']
+            parts = option['name'].split('=')
+            option['req_value'] = len(parts) == 2
+            if option['req_value']:
+                option['name'] = parts[0]
+            if option:
+                options.append(option)
 
         # Create dictionary for the information
         utility_data = {
@@ -241,6 +276,8 @@ class Utilities(object):
         
         stop = len(option_prefix)
         for option in util_info['options']:
+            if option is None:
+                continue
             name = option.get('name', None)
             if name is None:
                 continue

@@ -724,8 +724,12 @@ class Console(object):
                 if not self.is_valid_custom_command(cmd):
                     print "\n\nUnknown command: %s %s\n" % (cmd, parameters)
                 else:
-                    self.execute_custom_command(cmd, parameters)
-                    print
+                    try:
+                        self.execute_custom_command(cmd, parameters)
+                        print
+                    except UtilError, err:
+                        print err.errmg
+
         self.cmd_line.clear()
         self.tab_count = 0
         return False
