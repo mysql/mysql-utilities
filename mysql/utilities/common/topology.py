@@ -145,7 +145,7 @@ class Topology(Replication):
         self.force = self.options.get("force", False)
         self.before_script = self.options.get("before", None)
         self.after_script = self.options.get("after", None)
-        self.timeout = self.options.get("timeout", 3)
+        self.timeout = int(self.options.get("timeout", 300))
         self.logging = self.options.get("logging", False)
         self.rpl_user = self.options.get("rpl_user", None)
         

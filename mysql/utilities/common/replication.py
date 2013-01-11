@@ -1456,7 +1456,7 @@ class Slave(Server):
         return True
     
     
-    def wait_for_slave_gtid(self, master_gtid, timeout=3, verbose=False):
+    def wait_for_slave_gtid(self, master_gtid, timeout=300, verbose=False):
         """Wait for the slave to read the master's GTIDs.
         
         This method requires that the server supports GTIDs.
@@ -1464,7 +1464,7 @@ class Slave(Server):
         master_gtid[in]  the list of gtids from the master
                          obtained via SELECT @@GLOBAL.GTID_EXECUTED on master
         timeout[in]      timeout for waiting for slave to catch up
-                         Note: per GTID call. Default is 3.
+                         Note: per GTID call. Default is 300 seconds (5 min.).
         verbose[in]      if True, print query used.
                          Default is False
                        

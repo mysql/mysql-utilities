@@ -110,6 +110,13 @@ if len(args) > 1:
 elif len(args) == 0:
     parser.error("You must specify a command to execute.")
 
+# The value for --timeout needs to be an integer > 0.
+try:
+    if int(opt.timeout) <= 0:
+        parser.error("The --timeout option requires a value greater than 0.")
+except ValueError:
+    parser.error("The --timeout option requires an integer value.")
+
 # Check errors and warnings of options and combinations.
     
 command = args[0].lower()
@@ -196,7 +203,7 @@ options = {
     'max_position' : opt.max_position,
     'max_delay'    : opt.max_delay,
     'discover'     : opt.discover,
-    'timeout'      : opt.timeout,
+    'timeout'      : int(opt.timeout),
     'demote'       : opt.demote,
     'quiet'        : opt.quiet,
     'logging'      : opt.log_file is not None,
