@@ -96,6 +96,11 @@ add_rpl_user(parser, None)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
+# At least one of the options --discover-slaves-login or --slaves is required.
+if not opt.discover and not opt.slaves:
+    parser.error("One of these options is required to use the utility: "
+                 "--discover-slaves-login or --slaves.")
+
 # Check slaves list
 check_server_lists(parser, opt.master, opt.slaves)
 
@@ -104,6 +109,13 @@ if len(args) > 1:
     parser.error("You can only specify one command to execute at a time.")
 elif len(args) == 0:
     parser.error("You must specify a command to execute.")
+
+# The value for --timeout needs to be an integer > 0.
+try:
+    if int(opt.timeout) <= 0:
+        parser.error("The --timeout option requires a value greater than 0.")
+except ValueError:
+    parser.error("The --timeout option requires an integer value.")
 
 # Check errors and warnings of options and combinations.
     
@@ -191,7 +203,7 @@ options = {
     'max_position' : opt.max_position,
     'max_delay'    : opt.max_delay,
     'discover'     : opt.discover,
-    'timeout'      : opt.timeout,
+    'timeout'      : int(opt.timeout),
     'demote'       : opt.demote,
     'quiet'        : opt.quiet,
     'logging'      : opt.log_file is not None,

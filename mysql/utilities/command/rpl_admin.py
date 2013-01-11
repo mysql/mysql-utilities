@@ -559,7 +559,7 @@ class RplCommands(object):
         
         failover_mode = self.options.get("failover_mode", "auto")
         pingtime = self.options.get("pingtime", 3)
-        timeout = self.options.get("timeout", 3)
+        timeout = int(self.options.get("timeout", 3))
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
                 

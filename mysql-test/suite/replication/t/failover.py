@@ -40,17 +40,23 @@ class test(rpl_admin_gtid.test):
             print
         for log in ["1","2","3","4"]:
             try:
-                os.unlink(log+_FAILOVERLOG)
+                os.unlink(log + _FAILOVER_LOG)
             except:
                 pass
         return rpl_admin_gtid.test.check_prerequisites(self)
 
     def setup(self):
+        self.temp_files = []
         return rpl_admin_gtid.test.setup(self)
         
     def start_process(self, cmd):
-        file = os.devnull
-        f_out = open(file, 'w')
+        import tempfile
+        if self.debug:
+            f_out = tempfile.TemporaryFile()
+            self.temp_files.append(f_out)
+        else:
+            file = os.devnull
+            f_out = open(file, 'w')
         if os.name == "posix":
              proc = subprocess.Popen(cmd, shell=True, stdout=f_out, stderr=f_out)
         else:
@@ -79,7 +85,8 @@ class test(rpl_admin_gtid.test):
         else:
             if proc.poll() is None:
                 res = proc.wait()
-        f_out.close()
+        if not self.debug:
+            f_out.close()
         return res
     
     def is_process_alive(self, pid, start, end):
@@ -245,7 +252,7 @@ class test(rpl_admin_gtid.test):
         failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
                        " --discover-slaves-login=root:root %s --failover-" + \
                        'mode=%s --log=%s --exec-post-fail="mkdir ' + \
-                       self.failover_dir + '" '
+                       self.failover_dir + '" --timeout=5 '
         
         conn_str = " ".join([master_str, slaves_str])
         str = failover_cmd % (conn_str, 'auto', "1"+_FAILOVER_LOG)
@@ -270,7 +277,7 @@ class test(rpl_admin_gtid.test):
             if res is not None:
                 self.test_results.append(res)
             else:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("%s: failed" % test_case[4])
                 
                 
         # Now we must test the --force option. But first, ensure the master
@@ -344,9 +351,15 @@ class test(rpl_admin_gtid.test):
         return True # Not a comparative test
     
     def cleanup(self):
+        if self.debug:
+            for file in self.temp_files:
+                file.seek(0)
+                for row in file.readlines():
+                    if len(row.strip()):
+                        print row,
         for log in ["1","2","3","4"]:
             try:
-                os.unlink(log+_FAILOVERLOG)
+                os.unlink(log + _FAILOVER_LOG)
             except:
                 pass
         return rpl_admin_gtid.test.cleanup(self)

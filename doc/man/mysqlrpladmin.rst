@@ -155,7 +155,11 @@ health report and additional messages during switchover or failover.
 
 The options required for switchover include the :option:`--master` option to
 specify the existing master, the :option:`--new-master` option to specify the
-candidate slave (the slave to become the new master.
+candidate slave (the slave to become the new master), and either the
+:option:`--slaves` option to list the considered slaves in the topology or the
+:option:`--discover-slaves-login` option to provide the user name and password
+to discover any slaves in the topology that are registered to the master but
+are not listed in the :option:`--slaves` option.
 
 
 OPTIONS
