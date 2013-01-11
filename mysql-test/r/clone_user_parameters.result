@@ -1,6 +1,6 @@
 Test case 1 - show the grant statements
 # Source on localhost: ... connected.
-Dumping grants for user joe_nopass@user
+# Dumping grants for user joe_nopass@user
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 Test case 2 - show the help

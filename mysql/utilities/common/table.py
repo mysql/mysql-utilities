@@ -689,7 +689,7 @@ class Table(object):
         """
         query_str = "INSERT INTO %s.%s SELECT * FROM %s.%s" % \
                     (new_db, self.tbl_name, self.db_name, self.tbl_name)
-        if self.verbose and not self.vquiet:
+        if self.verbose and not self.quiet:
             print query_str
         self.server.exec_query(query_str)
 

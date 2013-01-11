@@ -38,6 +38,9 @@ control how to display list output, use one of the following values with the
 **vertical**
   Display output in single-column format like that of the ``\G`` command
   for the :command:`mysql` monitor.
+  
+To list all users and their grants, use both :option:`--list` and
+:option:`--dump` options.
 
 OPTIONS
 -------
@@ -121,6 +124,8 @@ For the :option:`--format` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value.  For example, :option:`--format=g` specifies the grid format.
 An error occurs if a prefix matches more than one valid value.
+
+The all users list does not include anonymous users.
 
 EXAMPLES
 --------

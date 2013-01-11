@@ -92,6 +92,10 @@ OPTIONS
 .. option:: --start-test=<prefix>
 
    Start executing tests that begin with *prefix*.
+   
+.. option:: --stop-test=<prefix>
+
+   Stop executing tests at the first test that begins with *prefix*.
 
 .. option:: --suite=<name>
 

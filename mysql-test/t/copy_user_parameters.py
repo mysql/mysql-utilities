@@ -42,6 +42,20 @@ class test(copy_user.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = "mysqluserclone.py --source=%s" % \
+                  self.build_connection_string(self.server2)
+        comment = "Test case 4 - use --dump and --list to show all users"
+        res = self.run_test_case(0, cmd_str + " --list --dump --format=csv",
+                                 comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+            
+        self.remove_result("root,")
+        self.remove_result("# Dumping grants for user 'root'")
+        self.remove_result("GRANT ALL PRIVILEGES ON *.* TO 'root'")
+        self.remove_result("GRANT PROXY ON ''@'' TO 'root'")
+        self.remove_result("# Cannot show grants for user")
+
         return True
 
     def get_result(self):

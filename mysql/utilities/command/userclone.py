@@ -25,7 +25,22 @@ to the new users.
 import sys
 from mysql.utilities.exception import UtilError
 
-def show_users(src_val, verbosity, format):
+def _show_user_grants(source, user_source, base_user, verbosity):
+    """Show grants for a specific user.
+    """
+    from mysql.utilities.common.user import User
+
+    try:
+        if not user_source:
+            user_source = User(source, base_user, verbosity)
+        print "# Dumping grants for user " + base_user
+        user_source.print_grants()
+    except UtilError, e:
+        print "# Cannot show grants for user %s." % base_user + \
+              "Please check user and host for valid names."
+
+
+def show_users(src_val, verbosity, format, dump=False):
     """Show all users except root and anonymous users on the server.
 
     src_val[in]        a dictionary containing connection information for the
@@ -33,6 +48,8 @@ def show_users(src_val, verbosity, format):
                        (user, password, host, port, socket)
     verbosty[in]       level of information to display
     format[in]         format of output
+    dump[in]           if True, dump the grants for all users
+                       default = False
     """
 
     from mysql.utilities.common.server import connect_servers
@@ -47,20 +64,23 @@ def show_users(src_val, verbosity, format):
     if verbosity <= 1:
         _QUERY = """
             SELECT user, host FROM mysql.user
-            WHERE user != 'root' and user != ''
+            WHERE user.user != ''
         """
         cols = ("user", "host")
     else:
         _QUERY = """
             SELECT user.user, user.host, db FROM mysql.user LEFT JOIN mysql.db
             ON user.user = db.user AND user.host = db.host
-            WHERE user.user != 'root' and user.user != ''
+            WHERE user.user != ''
         """
         cols = ("user", "host", "database")
 
     users = source.exec_query(_QUERY)
-
+    print "# All Users:"
     print_list(sys.stdout, format, cols, users)
+    if dump:
+        for user in users:
+            _show_user_grants(source, None, "'%s'@'%s'" % user[0:2], verbosity)
 
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
@@ -134,8 +154,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
 
     # Process dump operation
     if dump_sql and not quiet:
-        print "Dumping grants for user " + base_user
-        user_source.print_grants()
+        _show_user_grants(source, user_source, base_user, verbosity)
         return True
 
     # Check to ensure new users don't exist.
