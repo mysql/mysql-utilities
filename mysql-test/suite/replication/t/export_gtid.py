@@ -89,14 +89,16 @@ class test(mutlib.System_test):
         return True
     
     def exec_export_import(self, server1, server2, exp_cmd, imp_cmd,
-                           test_num, test_case):
+                           test_num, test_case, ret_val=True, reset=True,
+                           load_data=True):
         conn1 = "--server=" + self.build_connection_string(server1)
         conn2 = "--server=" + self.build_connection_string(server2)
-        try:
-            res = server1.read_and_exec_SQL(self.data_file, self.debug)
-        except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: %s" % 
-                              (self.data_file, e.errmsg))
+        if load_data:
+            try:
+                res = server1.read_and_exec_SQL(self.data_file, self.debug)
+            except UtilError, e:
+                raise MUTLibError("Failed to read commands from file %s: %s" % 
+                                  (self.data_file, e.errmsg))
 
         comment = "Test case %s (export phase) %s" % (test_num, test_case) 
         cmd_str = exp_cmd + conn1 + " > " + self.export_file
@@ -113,11 +115,12 @@ class test(mutlib.System_test):
                 print row,
             f.close()
 
-        comment = "Test case %s (import phase) %s" % (test_num, test_case) 
-        server2.exec_query("RESET MASTER") # reset GTID_EXECUTED
+        comment = "Test case %s (import phase) %s" % (test_num, test_case)
+        if reset:
+            server2.exec_query("RESET MASTER") # reset GTID_EXECUTED
         cmd_str = imp_cmd + conn2 + self.export_file
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
-        if not res:
+        if not res == ret_val:
             for row in self.results:
                 print row,
             raise MUTLibError("%s: failed" % comment)
@@ -158,7 +161,7 @@ class test(mutlib.System_test):
         # Now do the warnings for GTIDs:
         # - GTIDS but partial backup
         # - GTIDS on but --skip-gtid option present
-
+        
         # Need to test for all formats to exercise warning detection code
         for format in _FORMATS:
             self.server1.exec_query("CREATE DATABASE util_test2")
@@ -172,6 +175,20 @@ class test(mutlib.System_test):
                                 export_cmd_str % "sql --skip-gtid",
                                 import_cmd_str % "sql --skip-gtid",
                                 test_num, "skip gtids")
+        test_num += 1
+        
+        # Now test for the gtid_executed error
+        # Now show the error for gtid_executed not empty.
+        self.server1.exec_query("RESET MASTER")
+        self.server1.exec_query("CREATE DATABASE util_test")
+        self.server1.exec_query("CREATE TABLE util_test.t3 (a int)")
+        self.server2.exec_query("RESET MASTER")
+        self.server2.exec_query("CREATE DATABASE util_test")
+        self.exec_export_import(self.server1, self.server2,
+                                export_cmd_str % "sql ",
+                                import_cmd_str % "sql ",
+                                test_num, "gtid_executed error",
+                                False, False, False)
         test_num += 1
                     
         self.replace_result("# GTID operation: SET @@GLOBAL.GTID_PURGED",

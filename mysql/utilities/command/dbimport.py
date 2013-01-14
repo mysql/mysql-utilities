@@ -22,8 +22,6 @@ table data.
 """
 
 import csv
-import re
-import sys
 from itertools import imap
 from mysql.utilities.exception import UtilError
 
@@ -921,6 +919,8 @@ def import_file(dest_val, file_name, options):
                     gtid_version_checked = True
                     # Check GTID version for complete feature support
                     servers[0].check_gtid_version()
+                    # Check the gtid_purged value too
+                    servers[0].check_gtid_executed("import")
                 statements.append(row[1])
             continue
         # If this is the first pass, get the database name from the file

@@ -795,6 +795,28 @@ class Server(object):
             errors = "\n".join(errors)
             errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
             raise UtilRplError(errors)
+            
+            
+    def check_gtid_executed(self, operation="copy"):
+        """Check to see if the gtid_executed variable is clear
+        
+        If the value is not clear, raise an error with appropriate instructions
+        for the user to correct the issue.
+        
+        operation[in]  Name of the operation (copy, import, etc.)
+                       default = copy
+        """
+        res = self.exec_query("SHOW GLOBAL VARIABLES LIKE 'gtid_executed'")[0]
+        if res[1].strip() == '':
+            return
+        err = ("The {0} operation contains GTID statements "
+               "that require the global gtid_executed system variable on the "
+               "target to be empty (no value). The gtid_executed value must "
+               "be reset by issuing a RESET MASTER command on the target "
+               "prior to attempting the {0} operation. "
+               "Once the global gtid_executed value is cleared, you may "
+               "retry the {0}.").format(operation)
+        raise UtilRplError(err)
 
 
     def get_gtid_status(self):

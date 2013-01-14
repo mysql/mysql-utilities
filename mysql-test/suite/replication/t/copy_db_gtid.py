@@ -23,25 +23,28 @@ class test(export_gtid.test):
     def setup(self):
         return export_gtid.test.setup(self)
     
-    def exec_copy(self, server1, server2, copy_cmd, test_num, test_case):
+    def exec_copy(self, server1, server2, copy_cmd, test_num, test_case,
+                  reset=True, load_data=True, ret_val=True):
         conn1 = " --source=" + self.build_connection_string(server1)
         conn2 = " --destination=" + self.build_connection_string(server2)
-        try:
-            res = server1.read_and_exec_SQL(self.data_file, self.debug)
-        except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+        if load_data:
+            try:
+                res = server1.read_and_exec_SQL(self.data_file, self.debug)
+            except UtilError, e:
+                raise MUTLibError("Failed to read commands from file %s: %s" %
+                                  (self.data_file, e.errmsg))
 
         comment = "Test case %s %s" % (test_num, test_case) 
         cmd_str = copy_cmd + conn1 + conn2
-        server2.exec_query("RESET MASTER") # reset GTID_EXECUTED
+        if reset:
+            server2.exec_query("RESET MASTER") # reset GTID_EXECUTED
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
-        if not res:
+        if not res == ret_val:
             for row in self.results:
                 print row,
             raise MUTLibError("%s: failed" % comment)
             
-        export_gtid.test.drop_all(self)
+        self.drop_all()
 
     def run(self):
         self.res_fname = "result.txt"
@@ -80,7 +83,31 @@ class test(export_gtid.test):
                        copy_cmd_str + " --skip-gtid ",
                        test_num, "skip gtids")
         test_num += 1
-                   
+
+        # Now show the error for gtid_executed not empty.
+        self.server1.exec_query("RESET MASTER")
+        self.server1.exec_query("CREATE DATABASE util_test")
+        self.server1.exec_query("CREATE TABLE util_test.t3 (a int)")
+        self.server2.exec_query("RESET MASTER")
+        self.server2.exec_query("CREATE DATABASE util_test")
+        self.exec_copy(self.server1, self.server2,
+                       copy_cmd_str + " --force ",
+                       test_num, "gtid_executed error",
+                       False, False, False)
+        test_num += 1
+        
+        # Show the error for empty GTIDs is fixed.
+        self.server1.exec_query("RESET MASTER")
+        self.server1.exec_query("CREATE DATABASE util_test")
+        self.server1.exec_query("CREATE TABLE util_test.t3 (a int)")
+        self.server1.exec_query("RESET MASTER")
+        self.server2.exec_query("RESET MASTER")
+        self.exec_copy(self.server1, self.server2,
+                       copy_cmd_str + " --force ",
+                       test_num, "fixed empty gtid_executed error",
+                       False, False)
+        test_num += 1
+
         self.replace_result("# GTID operation: SET @@GLOBAL.GTID_PURGED",
                             "# GTID operation: SET @@GLOBAL.GTID_PURGED = ?\n")
         
