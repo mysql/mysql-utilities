@@ -20,10 +20,10 @@
 This file contains the reporting mechanisms for reporting disk usage.
 """
 
-import locale
 import os
 import subprocess
 import sys
+import re
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
@@ -362,32 +362,58 @@ def show_server_info(servers, options):
     get_defaults = True
     for server in servers:
         new_server = None
-        server_alive = True
-        server_started = False
-        if not test_connect(server):
-            if basedir is None or datadir is None:
-                raise UtilError("Server is offline. To connection, "
-                                     "you must provide basedir, datadir, "
-                                     "and the start option")
+        try:
+            test_connect(server, True)
+        except UtilError as util_error:
+            # If we got an exception it may means that the server is offline
+            # in that case we will try to turn a clone to extract the info
+            # if the user passed the necessary parameters.
+            pattern = ".*?: (.*?)\((.*)\)"
+            res = re.match(pattern, util_error.errmsg, re.S)
+            if not res:
+                er = ["error: <%s>" % util_error.errmsg]
             else:
-                if start:
+                er = res.groups()
+
+            if (re.search("refused", "".join(er)) or 
+                re.search("Can't connect to local MySQL server through socket",
+                           "".join(er))):
+                er = ["Server is offline. To connection, "
+                      "you must also provide "]
+            
+                opts = ["basedir", "datadir", "start"]
+                for opt in tuple(opts):
                     try:
-                        server_val = parse_connection(server)
-                    except:
-                        raise UtilError("Source connection values in"
-                                             "valid or cannot be parsed.")
-                    new_server = _start_server(server_val, basedir, datadir, options)
-                    server_started = True                    
-                else:
-                    server_alive = False
-        if server_alive:
-            info, defaults = _server_info(server, get_defaults, options)
-            if info is not None:
-                rows.append(info)
-            if defaults is not None and len(defaults_rows) == 0:
-                defaults_rows = defaults
-                get_defaults = False
-        if server_started and new_server is not None:
+                        if locals()[opt] is not None:
+                            opts.remove(opt)
+                    except KeyError:
+                        pass
+                if opts:
+                    er.append(", ".join(opts[0:-1]))
+                    if len(opts) > 1:
+                        er.append(" and the ")
+                    er.append(opts[-1])
+                    er.append(" option")
+                    raise UtilError("".join(er))
+
+            if not start:
+                raise UtilError("".join(er))
+            else:    
+                try:
+                    server_val = parse_connection(server)
+                except:
+                    raise UtilError("Source connection values invalid"
+                                    " or cannot be parsed.")
+                new_server = _start_server(server_val, basedir,
+                                           datadir, options)
+
+        info, defaults = _server_info(server, get_defaults, options)
+        if info:
+            rows.append(info)
+        if defaults and len(defaults_rows) == 0:
+            defaults_rows = defaults
+            get_defaults = False
+        if new_server:
             # Need to stop the server!
             new_server.disconnect()
             res = _stop_server(server_val, basedir, options)

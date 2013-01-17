@@ -4,6 +4,8 @@ import os
 import server_info
 
 from mysql.utilities.exception import MUTLibError
+from symbol import except_clause
+
 
 class test(server_info.test):
     """check errors for serverinfo
@@ -51,36 +53,54 @@ class test(server_info.test):
             raise MUTLibError("%s: failed" % comment)
         self.results.append("\n")
 
-        self.port = int(self.servers.get_next_port())
-        res = self.servers.start_new_server(self.server1, 
-                                            self.port,
-                                            self.servers.get_next_id(),
-                                            "root", "temp_server_info")
-        self.server3 = res[0]
-        if not self.server3:
-            raise MUTLibError("%s: Failed to create a new slave." % comment)
+        test_num += 1
+        cmd_opts = " --format=grid"
+        cmd_str_wrong = cmd_str.replace(":root", ":wrong")
+        comment = "Test case %d - wrong password" % test_num
+        res = self.run_test_case(1, cmd_str_wrong + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        self.results.append("\n")
 
-        from_conn3 = "--server=" + self.build_connection_string(self.server3)
-        cmd_str = "mysqlserverinfo.py %s " % from_conn3
+        test_num += 1
+        cmd_opts = " --format=grid"
+        cmd_str_wrong = cmd_str.replace(":root", ":")
+        comment = "Test case %d - no password" % test_num
+        res = self.run_test_case(1, cmd_str_wrong + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        self.results.append("\n")
 
-        # Now, stop the server then run verbose test again
-        res = self.server3.show_server_variable('basedir')
-        self.basedir = res[0][1]
-        res = self.server3.show_server_variable('datadir')
-        self.datadir3 = res[0][1]
-        
-        self.servers.stop_server(self.server3, 10, False)
-        self.servers.remove_server(self.server3.role)
-        
+        cmd_str = self.start_stop_newserver()
+
         test_num += 1
         cmd_opts = " --format=vertical "
-        comment = "Test case %d - offline server" % test_num
+        comment = ("Test case %d - offline server without %s option" %
+                   (test_num, "start, basedir, datadir"))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)        
+        self.results.append("\n")
+
+        test_num += 1
+        cmd_opts = " --format=vertical --basedir=/some/dir"
+        comment = ("Test case %d - offline server without %s option" %
+                   (test_num, "start, datadir"))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        self.results.append("\n")
+
+        test_num += 1
+        cmd_opts = " --format=vertical --basedir=/some/dir --datadir=/dara/dir"
+        comment = ("Test case %d - offline server without %s option" % 
+                   (test_num, "start"))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
 
         server_info.test.do_replacements(self)
-        
+
         self.replace_result("+---", "+---------+\n")
         self.replace_result("|", "| XXXX ...|\n")
         self.replace_result("localhost:", "localhost:XXXX [...]\n")

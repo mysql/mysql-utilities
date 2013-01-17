@@ -352,7 +352,7 @@ def connect_servers(src_val, dest_val, options={}):
     return (source, destination)
 
 
-def test_connect(conn_info):
+def test_connect(conn_info, throw_errors=False):
     """Test connection to a server.
     
     The method accepts one of the following types for conn_info:
@@ -363,7 +363,10 @@ def test_connect(conn_info):
         - an instance of the Server class
         
     conn_info[in]          Connection information
-
+    
+    throw_errors           throw any errors found during the test,
+                           false by default.
+    
     Returns True if connection success, False if error
     """
     # Parse source connection values
@@ -376,7 +379,9 @@ def test_connect(conn_info):
         }
         s = connect_servers(src_val, None, conn_options)
         s[0].disconnect()
-    except UtilError, e:
+    except UtilError:
+        if throw_errors:
+            raise
         return False
     return True
 
