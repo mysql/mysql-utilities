@@ -301,6 +301,12 @@ parser.add_option("--start-test", action="store", dest="start_test",
                   type = "string", help="start executing tests that begin "
                   "with this string", default=None)
 
+# Add start-test list option
+parser.add_option("--stop-test", action="store", dest="stop_test",
+                  type = "string", help="stop executing tests at first "
+                  "occurrence of test that begins with this string",
+                  default=None)
+
 # Add skip-long tests option
 parser.add_option("--skip-long", action="store_true", dest="skip_long",
                   default=False, help="exclude tests that require "
@@ -423,6 +429,9 @@ if opt.start_test:
 else:
     start_sequence = False
 
+if opt.stop_test:
+    print "  Stop test           = '%s%%'" % opt.stop_test
+
 server_list = Server_list([], opt.start_port, opt.utildir, verbose_mode)
 basedir = None
 
@@ -515,6 +524,17 @@ if start_sequence:
               "suite(s)" % opt.start_test
         start_sequence = False
 
+# Check for validity of --stop-test
+if opt.stop_test:
+    found = False
+    for test_tuple in test_files:
+        if opt.stop_test == test_tuple[2][0:len(opt.stop_test)]:
+            found = True
+    if not found:
+        print "\nWARNING: --stop-test=%s%% was not found. Running full " \
+              "suite(s)" % opt.stop_test
+        opt.stop_test = None
+
 # Get list of disabled tests
 disable_list = _read_disabled_tests()
 
@@ -533,6 +553,7 @@ if os.name == "posix":
 # Run the tests selected
 num_tests_run = 0
 last_test = None
+stop_testing = False
 for test_tuple in test_files:
 
     # Skip tests for start-test sequence
@@ -541,6 +562,12 @@ for test_tuple in test_files:
             start_sequence = False
         else:
             continue
+
+    # Skip tests for stop-test sequence
+    if opt.stop_test and not stop_testing:
+        stop_testing = (opt.stop_test == test_tuple[2][0:len(opt.stop_test)])
+    if stop_testing:
+        continue
 
     # Get test parts - directory not used
     test = test_tuple[2]

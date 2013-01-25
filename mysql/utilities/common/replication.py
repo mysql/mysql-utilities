@@ -857,8 +857,11 @@ class Master(Server):
             # to connect to the master
             if slave_conn.is_configured_for_master(self):
                 is_configured = True
-        except:
-            pass # if connect errors, ignore slave
+        except Exception, e:
+            print "Error connecting to a slave as %s@%s: %s" % \
+                  (conn_dict['conn_info']['user'],
+                   conn_dict['conn_info']['host'],
+                   e.errmsg)
         finally:
             slave_conn.disconnect()
 
@@ -886,6 +889,7 @@ class Master(Server):
         
         slaves = []
         no_host_slaves = []
+        connect_error_slaves = []
         res = self.exec_query("SHOW SLAVE HOSTS")
         if not res == []:
             res.sort()  # Sort for conformity
@@ -903,16 +907,20 @@ class Master(Server):
                 elif self._check_discovered_slave(conn_dict):
                     slaves.append(info)
                 else:
-                    # Ignore any slaves that appear in the SHOW SLAVE HOSTS
-                    # but are not configured to attach to this master.
-                    pass
+                    connect_error_slaves.append(info)
         
         if no_host_slaves:
             print "WARNING: There are slaves that have not been registered" + \
                   " with --report-host or --report-port."
             if self.options.get("verbosity", 0) > 0:
-              for row in no_host_slaves:
-                  print "\t", row
+                for row in no_host_slaves:
+                    print "\t", row
+
+        if connect_error_slaves:
+            print "\nWARNING: There are slaves that had connection errors."
+            if self.options.get("verbosity", 0) > 0:
+                for row in connect_error_slaves:
+                    print "\t", row
             
         return slaves
     
@@ -1448,7 +1456,7 @@ class Slave(Server):
         return True
     
     
-    def wait_for_slave_gtid(self, master_gtid, timeout=3, verbose=False):
+    def wait_for_slave_gtid(self, master_gtid, timeout=300, verbose=False):
         """Wait for the slave to read the master's GTIDs.
         
         This method requires that the server supports GTIDs.
@@ -1456,7 +1464,7 @@ class Slave(Server):
         master_gtid[in]  the list of gtids from the master
                          obtained via SELECT @@GLOBAL.GTID_EXECUTED on master
         timeout[in]      timeout for waiting for slave to catch up
-                         Note: per GTID call. Default is 3.
+                         Note: per GTID call. Default is 300 seconds (5 min.).
         verbose[in]      if True, print query used.
                          Default is False
                        

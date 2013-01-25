@@ -13,4 +13,25 @@ Test case 1 - basic serverinfo
   relay_log_pos: XXXX
 1 rows.
 #...done.
+
 Test case 2 - basic serverinfo with -d option
+
+Test case 3 - re-started server prints results 
+# Server is offline.
+# Checking server version ... done.
+# Starting read-only instance of the server ... done.
+# Source on localhost: ... connected.
+# Shutting down server ... done.
+*************************       1. row *************************
+         server: localhost: XXXX
+        version: XXXX
+        datadir: XXXX
+        basedir: XXXX
+     plugin_dir: XXXX
+    config_file: XXXX
+     binary_log: XXXX
+ binary_log_pos: XXXX
+      relay_log: XXXX
+  relay_log_pos: XXXX
+1 rows.
+#...done.

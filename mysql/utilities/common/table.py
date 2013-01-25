@@ -471,8 +471,8 @@ class Table(object):
         val_str = self.column_format % tuple(values)
 
         # Change 'None' occurrences with "NULL"
-        val_str.replace(", None", ", NULL")
-        val_str.replace("(None", "(NULL")
+        val_str = val_str.replace(", None", ", NULL")
+        val_str = val_str.replace("(None", "(NULL")
         
         return (val_str, blob_inserts)
 
@@ -689,7 +689,7 @@ class Table(object):
         """
         query_str = "INSERT INTO %s.%s SELECT * FROM %s.%s" % \
                     (new_db, self.tbl_name, self.db_name, self.tbl_name)
-        if self.verbose and not self.vquiet:
+        if self.verbose and not self.quiet:
             print query_str
         self.server.exec_query(query_str)
 

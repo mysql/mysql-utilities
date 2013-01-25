@@ -147,6 +147,13 @@ if int(opt.interval) < 5:
     parser.error("The --interval option requires a value greater than or "
                  "equal to 5.")
 
+# The value for --timeout needs to be an integer > 0.
+try:
+    if int(opt.timeout) <= 0:
+        parser.error("The --timeout option requires a value greater than 0.")
+except ValueError:
+    parser.error("The --timeout option requires an integer value.")
+
 if opt.master is None:
     parser.error("You must specify a master to monitor.")
     
@@ -183,7 +190,7 @@ options = {
     'max_position'  : opt.max_position,
     'max_delay'     : opt.max_delay,
     'discover'      : opt.discover,
-    'timeout'       : opt.timeout,
+    'timeout'       : int(opt.timeout),
     'interval'      : opt.interval,
     'failover_mode' : opt.failover_mode,
     'logging'       : opt.log_file is not None,

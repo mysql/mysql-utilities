@@ -1,6 +1,6 @@
 Test case 1 - show the grant statements
 # Source on localhost: ... connected.
-Dumping grants for user joe_nopass@user
+# Dumping grants for user joe_nopass@user
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 Test case 2 - show the help
@@ -32,3 +32,19 @@ Options:
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the quiet parameter
+Test case 4 - use --dump and --list to show all users
+# Source on localhost: ... connected.
+# All Users:
+user,host
+jack,user
+jill,user
+john,user
+# Dumping grants for user 'jack'@'user'
+GRANT USAGE ON *.* TO 'jack'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'jack'@'user'
+# Dumping grants for user 'jill'@'user'
+GRANT USAGE ON *.* TO 'jill'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'jill'@'user'
+# Dumping grants for user 'john'@'user'
+GRANT USAGE ON *.* TO 'john'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'john'@'user'

@@ -21,7 +21,6 @@ This file contains the export operations that will export object metadata or
 table data.
 """
 
-import os
 import re
 import sys
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -510,7 +509,7 @@ def get_gtid_commands(master, options):
     rows = master.exec_query(_GET_GTID_EXECUTED)
     master_gtids_list = ["%s" % row[0] for row in rows]
     master_gtids = ",".join(master_gtids_list)
-    if len(master_gtids_list) == 1 and master_gtids_list[0][0] == '':
+    if len(master_gtids_list) == 1 and rows[0][0] == '':
         return None
     return ([_SESSION_BINLOG_OFF1, _SESSION_BINLOG_OFF2,
              _SET_GTID_PURGED % master_gtids], _SESSION_BINLOG_ON)
@@ -606,6 +605,8 @@ def export_databases(server_values, db_list, options):
         print _GTID_WARNING
         
     if not skip_gtids and supports_gtid == 'ON':
+        # Check GTID version for complete feature support
+        servers[0].check_gtid_version()
         warning_printed = False
         # Check to see if this is a full export (complete backup)
         all_dbs = servers[0].exec_query("SHOW DATABASES")

@@ -1,0 +1,20 @@
+Test case 1 gtid->gtid
+# GTID operation: SET @MYSQLUTILS_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+# GTID operation: SET @@SESSION.SQL_LOG_BIN = 0;
+# GTID operation: SET @@GLOBAL.GTID_PURGED = ?
+# GTID operation: SET @@SESSION.SQL_LOG_BIN = @MYSQLUTILS_TEMP_LOG_BIN;
+Test case 2 gtid->non_gtid
+# WARNING: The destination server does not support GTIDs yet the source server does support GTIDs. To suppress this warning, use the --skip-gtid option when copying to a non-GTID enabled server.
+Test case 3 non_gtid->gtid
+# WARNING: The source server does not support GTIDs yet the destination server does support GTIDs. To suppress this warning, use the --skip-gtid option when copying from a non-GTID enabled server.
+Test case 4 partial backup
+# WARNING: A partial copy from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all option and do not specify a list of databases.
+# GTID operation: SET @MYSQLUTILS_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+# GTID operation: SET @@SESSION.SQL_LOG_BIN = 0;
+# GTID operation: SET @@GLOBAL.GTID_PURGED = ?
+# GTID operation: SET @@SESSION.SQL_LOG_BIN = @MYSQLUTILS_TEMP_LOG_BIN;
+Test case 5 skip gtids
+# WARNING: The server supports GTIDs but you have elected to skip exexcuting the GTID_EXECUTED statement. Please refer to the MySQL online reference manual for more information about how to handle GTID enabled servers with backup and restore operations.
+Test case 6 gtid_executed error
+ERROR: The copy operation contains GTID statements that require the global gtid_executed system variable on the target to be empty (no value). The gtid_executed value must be reset by issuing a RESET MASTER command on the target prior to attempting the copy operation. Once the global gtid_executed value is cleared, you may retry the copy.
+Test case 7 fixed empty gtid_executed error

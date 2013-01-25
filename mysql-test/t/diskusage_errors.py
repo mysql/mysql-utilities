@@ -12,8 +12,8 @@ class test(diskusage_basic.test):
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version prior to 5.6.5")
+        if self.servers.get_server(0).check_version_compat(5, 6, 2):
+            raise MUTLibError("Test requires server version prior to 5.6.2")
         return diskusage_basic.test.check_prerequisites(self)
 
     def setup(self):

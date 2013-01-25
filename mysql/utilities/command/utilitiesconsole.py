@@ -20,11 +20,9 @@
 This file contains the utilities console mechanism.
 """
 
-import cmd
-import locale
 import os
-import sys
 import tempfile
+import subprocess
 
 from mysql.utilities.common.console import Console
 from mysql.utilities.common.format import print_dictionary_list
@@ -249,7 +247,7 @@ class UtilitiesConsole(Console):
         """
         parts = command_text.split(' ')
         matches = self.utils.get_util_matches(parts[0])
-        return len(matches) == 1
+        return len(matches) >= 1
 
 
     def execute_custom_command(self, command, parameters):
@@ -261,22 +259,45 @@ class UtilitiesConsole(Console):
         command[in]        Name of the utility to execute
         parameters[in]     All options and parameters specified by the user
         """
-        import subprocess
-        
-        if not os.path.splitext(command.lower()) == '.py':
-            command += '.py'
         if not command.lower().startswith('mysql'):
             command = 'mysql' + command
-        cmd = 'python ' + os.path.join(self.utils.util_path, command)
-        cmd += ' ' + parameters
+        
+        # Search for the utility to execute (matching the command)
+        path = os.path.normpath(self.utils.util_path)
+        utility_path = os.path.join(path, command)
+        util_found = False
+        # If not exist without ext we try adding one.
+        if os.path.isfile(utility_path):
+            util_found = True
+        else:
+            parts = os.path.splitext(command)
+            if parts[1] == "":
+                exts = [command+'.py', command+'.exe']
+                for ext in exts:
+                    utility_path = os.path.join(path, ext)
+                    if os.path.isfile(utility_path):
+                        util_found = True
+                        break
+
+        if not util_found:
+            raise UtilError("The utility %s is not accessible (from the path: "
+                            "%s)." % (command, path))
+
+        cmd = []
+        # In cases where the utility does not have permissions to execute,
+        # the use of the interpreter is necessary
+        if '.py' in utility_path or not '.exe' in utility_path:
+            cmd.append('python ')
+
+        cmd += ['"', utility_path, '"', ' ', parameters]
+
         if self.quiet:
-            proc = subprocess.Popen(cmd, shell=True,
-                                    stdout = self.f_out, stderr = self.f_out)
+            proc = subprocess.Popen("".join(cmd), shell=True,
+                                    stdout=self.f_out, stderr=self.f_out)
         else:
             print
-            proc = subprocess.Popen(cmd, shell=True)
+            proc = subprocess.Popen("".join(cmd), shell=True)
         res = proc.wait()
-
 
     def show_custom_options(self):
         """Show all of the options for the mysqluc utility.

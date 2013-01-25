@@ -22,7 +22,6 @@ MySQL user to one or more new user accounts copying all grant statements
 to the new users.
 """
 
-import optparse
 import os.path
 import sys
 
@@ -109,7 +108,7 @@ except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 if opt.list_users:
-    userclone.show_users(source_values, opt.verbosity, opt.format)
+    userclone.show_users(source_values, opt.verbosity, opt.format, opt.dump)
 else:
     # Make sure we have the base user plus at least one new user
     if len(args) < 2 and not opt.dump:

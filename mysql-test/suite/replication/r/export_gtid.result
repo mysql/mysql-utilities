@@ -1,0 +1,133 @@
+Test case 1 (export phase) gtid->gtid, format=sql
+Test case 1 (import phase) gtid->gtid, format=sql
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+#...done.
+Test case 2 (export phase) gtid->gtid, format=csv
+Test case 2 (import phase) gtid->gtid, format=csv
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+#...done.
+Test case 3 (export phase) gtid->gtid, format=tab
+Test case 3 (import phase) gtid->gtid, format=tab
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+#...done.
+Test case 4 (export phase) gtid->gtid, format=grid
+Test case 4 (import phase) gtid->gtid, format=grid
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+#...done.
+Test case 5 (export phase) gtid->gtid, format=vertical
+Test case 5 (import phase) gtid->gtid, format=vertical
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+#...done.
+Test case 6 (export phase) gtid->non_gtid, format=sql
+Test case 6 (import phase) gtid->non_gtid, format=sql
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+#...done.
+Test case 7 (export phase) gtid->non_gtid, format=csv
+Test case 7 (import phase) gtid->non_gtid, format=csv
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+#...done.
+Test case 8 (export phase) gtid->non_gtid, format=tab
+Test case 8 (import phase) gtid->non_gtid, format=tab
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+#...done.
+Test case 9 (export phase) gtid->non_gtid, format=grid
+Test case 9 (import phase) gtid->non_gtid, format=grid
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+#...done.
+Test case 10 (export phase) gtid->non_gtid, format=vertical
+Test case 10 (import phase) gtid->non_gtid, format=vertical
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+#...done.
+Test case 11 (export phase) non_gtid->gtid, format=sql
+Test case 11 (import phase) non_gtid->gtid, format=sql
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 12 (export phase) non_gtid->gtid, format=csv
+Test case 12 (import phase) non_gtid->gtid, format=csv
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 13 (export phase) non_gtid->gtid, format=tab
+Test case 13 (import phase) non_gtid->gtid, format=tab
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 14 (export phase) non_gtid->gtid, format=grid
+Test case 14 (import phase) non_gtid->gtid, format=grid
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 15 (export phase) non_gtid->gtid, format=vertical
+Test case 15 (import phase) non_gtid->gtid, format=vertical
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 16 (export phase) partial backup w/sql
+Test case 16 (import phase) partial backup w/sql
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all and --export=both options.
+#...done.
+Test case 17 (export phase) partial backup w/csv
+Test case 17 (import phase) partial backup w/csv
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
+#...done.
+Test case 18 (export phase) partial backup w/tab
+Test case 18 (import phase) partial backup w/tab
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all and --export=both options.
+#...done.
+Test case 19 (export phase) partial backup w/grid
+Test case 19 (import phase) partial backup w/grid
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all and --export=both options.
+#...done.
+Test case 20 (export phase) partial backup w/vertical
+Test case 20 (import phase) partial backup w/vertical
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all and --export=both options.
+#...done.
+Test case 21 (export phase) skip gtids
+Test case 21 (import phase) skip gtids
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: The server supports GTIDs but you have elected to skip generating the GTID_EXECUTED statement. Please refer to the MySQL online reference manual for more information about how to handle GTID enabled servers with backup and restore operations.
+# WARNING: GTIDs are enabled on this server but the import file did not contain any GTID commands.
+#...done.
+Test case 22 (export phase) gtid_executed error
+Test case 22 (import phase) gtid_executed error
+# Source on localhost: ... connected.
+# Importing definitions and data from export.txt.
+ERROR: The import operation contains GTID statements that require the global gtid_executed system variable on the target to be empty (no value). The gtid_executed value must be reset by issuing a RESET MASTER command on the target prior to attempting the import operation. Once the global gtid_executed value is cleared, you may retry the import.

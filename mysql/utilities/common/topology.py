@@ -145,7 +145,7 @@ class Topology(Replication):
         self.force = self.options.get("force", False)
         self.before_script = self.options.get("before", None)
         self.after_script = self.options.get("after", None)
-        self.timeout = self.options.get("timeout", 3)
+        self.timeout = int(self.options.get("timeout", 300))
         self.logging = self.options.get("logging", False)
         self.rpl_user = self.options.get("rpl_user", None)
         
@@ -1214,7 +1214,6 @@ class Topology(Replication):
         
         Return bool - True = success, raises exception on error
         """
-        from mysql.utilities.common.server import get_connection_dictionary
 
         # Need instance of Master class for operation
         m_candidate = self.connect_candidate(candidate)
@@ -1504,6 +1503,17 @@ class Topology(Replication):
                       "slaves support GTIDs and GTID_MODE=ON"
                 self._report(msg, logging.CRITICAL)
                 raise UtilRplError(msg)
+
+        # We must also ensure the new master and all remaining slaves
+        # have the latest GTID support.
+        new_master.check_gtid_version()
+        for slave_dict in self.slaves:
+            # Ignore dead or offline slaves
+            slave = slave_dict['instance']
+            # skip dead or zombie slaves
+            if slave is None or not slave.is_alive():
+                continue
+            slave.check_gtid_version()
 
         host = new_master_dict['host']
         port = new_master_dict['port']

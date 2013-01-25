@@ -28,6 +28,8 @@ from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
 from mysql.utilities.common.options import parse_connection
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
+_GTID_ERROR = ("The server %s:%s does not comply to the latest GTID " 
+               "feature support. Errors:")
 
 def get_connection_dictionary(conn_info):
     """Get the connection dictionary.
@@ -350,7 +352,7 @@ def connect_servers(src_val, dest_val, options={}):
     return (source, destination)
 
 
-def test_connect(conn_info):
+def test_connect(conn_info, throw_errors=False):
     """Test connection to a server.
     
     The method accepts one of the following types for conn_info:
@@ -361,7 +363,10 @@ def test_connect(conn_info):
         - an instance of the Server class
         
     conn_info[in]          Connection information
-
+    
+    throw_errors           throw any errors found during the test,
+                           false by default.
+    
     Returns True if connection success, False if error
     """
     # Parse source connection values
@@ -374,7 +379,9 @@ def test_connect(conn_info):
         }
         s = connect_servers(src_val, None, conn_options)
         s[0].disconnect()
-    except UtilError, e:
+    except UtilError:
+        if throw_errors:
+            raise
         return False
     return True
 
@@ -769,8 +776,52 @@ class Server(object):
             res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
         except:
             return "NO"
-        
+
         return res[0][0]
+        
+        
+    def check_gtid_version(self):
+        """Determine if server supports latest GTID changes
+        
+        This method checks the server to ensure it contains the latest
+        changes to the GTID variables (from version 5.6.9).
+        
+        Raises UtilRplError when errors occur.
+        """
+        errors = []
+        if not self.supports_gtid() == "ON":
+            errors.append("    GTID is not enabled.")
+        if not self.check_version_compat(5, 6, 9):
+            errors.append("    Server version must be 5.6.9 or greater.")
+        res = self.exec_query("SHOW VARIABLES LIKE 'gtid_executed'")
+        if res == [] or not res[0][0] == "gtid_executed":
+            errors.append("    Missing gtid_executed system variable.")
+        if errors:
+            errors = "\n".join(errors)
+            errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
+            raise UtilRplError(errors)
+            
+            
+    def check_gtid_executed(self, operation="copy"):
+        """Check to see if the gtid_executed variable is clear
+        
+        If the value is not clear, raise an error with appropriate instructions
+        for the user to correct the issue.
+        
+        operation[in]  Name of the operation (copy, import, etc.)
+                       default = copy
+        """
+        res = self.exec_query("SHOW GLOBAL VARIABLES LIKE 'gtid_executed'")[0]
+        if res[1].strip() == '':
+            return
+        err = ("The {0} operation contains GTID statements "
+               "that require the global gtid_executed system variable on the "
+               "target to be empty (no value). The gtid_executed value must "
+               "be reset by issuing a RESET MASTER command on the target "
+               "prior to attempting the {0} operation. "
+               "Once the global gtid_executed value is cleared, you may "
+               "retry the {0}.").format(operation)
+        raise UtilRplError(err)
 
 
     def get_gtid_status(self):

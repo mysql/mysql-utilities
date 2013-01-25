@@ -6,8 +6,6 @@ mysqldbcompare - compare databases for consistency
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
-  --server=SERVER       connection information for the server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
   --server1=SERVER1     connection information for first server in the form:
                         <user>:<password>@<host>:<port>:<socket>
   --server2=SERVER2     connection information for second server in the form:

@@ -21,7 +21,6 @@ This file contains the copy database operation which ensures a database
 is exactly the same among two servers.
 """
 
-import sys
 from mysql.utilities.exception import UtilError
 
 _RPL_COMMANDS, _RPL_FILE = 0, 1
@@ -231,15 +230,17 @@ def copy_db(src_val, dest_val, db_list, options):
         'version'   : "5.1.30",
     }
     servers = connect_servers(src_val, dest_val, conn_options)
-
+    cloning = (src_val == dest_val) or dest_val is None
+    
     source = servers[0]
-    destination = servers[1]
+    if cloning:
+        destination = servers[0]
+    else:
+        destination = servers[1]
     
     src_gtid = source.supports_gtid() == 'ON'
     dest_gtid = destination.supports_gtid() == 'ON'if destination else False
 
-    cloning = (src_val == dest_val) or dest_val is None
-    
     # Get list of all databases from source if --all is specified.
     # Ignore system databases.
     if options.get("all", False):
@@ -314,6 +315,9 @@ def copy_db(src_val, dest_val, db_list, options):
     # if --rpl specified, dump replication initial commands
     rpl_info = None
 
+    # Turn off foreign keys if they were on at the start
+    destination.disable_foreign_key_checks(True)
+
     # Get GTID commands
     new_opts = options.copy()
     if not skip_gtid:
@@ -332,6 +336,10 @@ def copy_db(src_val, dest_val, db_list, options):
         gtid_info = None
     # if GTIDs enabled, write the GTID commands
     if gtid_info and dest_gtid:
+        # Check GTID version for complete feature support
+        destination.check_gtid_version()
+        # Check the gtid_purged value too
+        destination.check_gtid_executed()
         for cmd in gtid_info[0]:
             print "# GTID operation:", cmd
             destination.exec_query(cmd)
@@ -418,6 +426,9 @@ def copy_db(src_val, dest_val, db_list, options):
                     print cmd
                 destination.exec_query(cmd)
         destination.exec_query("START SLAVE;")
+
+    # Turn on foreign keys if they were on at the start
+    destination.disable_foreign_key_checks(False)
 
     if not quiet:
         print "#...done."

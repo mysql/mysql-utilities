@@ -1,0 +1,5 @@
+Test case 1 attempt failed gtid version check
+# Source on localhost: ... connected.
+ERROR: The server localhost:XXXXX does not comply to the latest GTID feature support. Errors:
+    Server version must be 5.6.9 or greater.
+    Missing gtid_executed system variable.
