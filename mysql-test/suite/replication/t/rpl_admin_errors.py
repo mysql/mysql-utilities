@@ -112,6 +112,29 @@ class test(rpl_admin.test):
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
 
+        self.replace_result("mysqlrpladmin.py: error: No login credentials",
+                            "mysqlrpladmin.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlrpladmin.py: error: .mylogin.cnf",
+                            "mysqlrpladmin.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlrpladmin.py: error: the used "
+                            "my_print_defaults",
+                            "mysqlrpladmin.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("ERROR: Master connection values invalid or "
+                            "cannot be parsed",
+                            "ERROR: Master connection values invalid or "
+                            "cannot be parsed\n")
+        self.replace_result("ERROR: Slave connection values invalid or "
+                            "cannot be parsed",
+                            "ERROR: Slave connection values invalid or "
+                            "cannot be parsed\n")
+        self.replace_result("ERROR: Candidate connection values invalid or "
+                            "cannot be parsed",
+                            "ERROR: Candidate connection values invalid or "
+                            "cannot be parsed\n")
+
         return True
 
     def get_result(self):

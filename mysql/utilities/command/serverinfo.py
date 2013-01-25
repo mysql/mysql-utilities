@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ def _server_info(server_val, get_defaults=False, options={}):
     verbosity = options.get("verbosity", 0)
 
     # Parse source connection values
-    source_values = parse_connection(server_val)
+    source_values = parse_connection(server_val, None, options)
 
     # Connect to the server
     conn_options = {
@@ -400,7 +400,7 @@ def show_server_info(servers, options):
                 raise UtilError("".join(er))
             else:    
                 try:
-                    server_val = parse_connection(server)
+                    server_val = parse_connection(server, None, options)
                 except:
                     raise UtilError("Source connection values invalid"
                                     " or cannot be parsed.")

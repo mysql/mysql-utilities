@@ -728,7 +728,7 @@ class Console(object):
                         self.execute_custom_command(cmd, parameters)
                         print
                     except UtilError, err:
-                        print err.errmg
+                        print err.errmsg
 
         self.cmd_line.clear()
         self.tab_count = 0

@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 This file contains the commands for checking consistency of two databases.
 """
 
-import sys
 
-from mysql.utilities.common.options import parse_connection
 from mysql.utilities.exception import UtilError, UtilDBError
 
 _PRINT_WIDTH = 75

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,17 +21,17 @@ This file contains the disk usage utility for showing the estimated disk
 storage of the databases and system files.
 """
 
-import optparse
+
 import os
-import re
 import sys
 import time
-from mysql.utilities import VERSION_FRM
+
 from mysql.utilities.command import diskusage
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -96,11 +96,9 @@ add_verbosity(parser, True)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-from mysql.utilities.common.server import connect_servers
-
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.server)
+    source_values = parse_connection(opt.server, None, opt)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
@@ -108,7 +106,7 @@ try:
     conn_options = {
         'version'   : "5.1.30",
     }
-    servers = connect_servers(source_values, None, conn_options)
+    servers = connect_servers(source_values, None)
 except UtilError, e:
     parser.error(e.errmsg)
 

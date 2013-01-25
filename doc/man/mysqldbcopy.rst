@@ -111,10 +111,10 @@ OPTIONS
 
 .. option:: --destination=<destination>
 
-   Connection information for the destination server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format,
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
+   Connection information for the destination server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>] (where <*passwd*> is optional and 
+   either <*port*> or <*socket*> must be provided).
 
 .. option:: --exclude=<exclude>, -x<exclude>
 
@@ -159,10 +159,11 @@ OPTIONS
    server's master information), and **both** (include the **master** and
    **slave** options where applicable).
 
-.. option:: --rpl-user=<user[:password]>
+.. option:: --rpl-user=<replication_user>
 
-   The user and password for the replication user requirement - e.g. rpl:passwd
-   - default = rpl:rpl.
+   The user and password for the replication user requirement, in the form:  
+   <*user*>[:<*password*>] or <*login-path*>. E.g. rpl:passwd
+   Default = None.
 
 .. option:: --skip-gtid
 
@@ -177,10 +178,10 @@ OPTIONS
 
 .. option:: --source=<source>
 
-   Connection information for the source server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format,
-   where <passwd> is
-   optional and either <port> or <socket> must be provided.
+   Connection information for the source server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>] (where <*passwd*> is optional and 
+   either <*port*> or <*socket*> must be provided).
 
 .. option:: --threads
 
@@ -240,6 +241,12 @@ Cloning databases that contain foreign key constraints does not change the
 constraint in the cloned table. For example, if table db1.t1 has a foreign
 key constraint on table db1.t2, when db1 is cloned to db2, table db2.t1 will
 have a foreign key constraint on db1.t2. 
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
 
 EXAMPLES
 --------
@@ -340,7 +347,7 @@ the destination::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

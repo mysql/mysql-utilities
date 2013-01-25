@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,12 +21,17 @@ This module contains abstractions of MySQL replication functionality.
 
 import logging
 import time
+
 from mysql.utilities.common.lock import Lock
+from mysql.utilities.common.my_print_defaults import MyDefaultsReader
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Master, Slave, Replication
-from mysql.utilities.common.server import Server, get_server_state
-from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.exception import UtilRplError, UtilBinlogError
-        
+from mysql.utilities.common.server import get_server_state
+
+from mysql.utilities.exception import FormatError
+from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilRplError
 
 _HEALTH_COLS = ["host", "port", "role", "state", "gtid_mode", "health"]
 _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
@@ -54,14 +59,25 @@ def parse_failover_connections(options):
     
     Returns tuple - (master, slaves, candidates) dictionaries
     """
-    from mysql.utilities.common.options import parse_connection
-    from mysql.utilities.exception import FormatError
+    # Create a basic configuration reader, without looking for the tool
+    # my_print_defaults to avoid raising exceptions. This is used for
+    # optimization purposes, to reuse data and avoid repeating the execution of
+    # some methods in the parse_connection method (e.g. searching for
+    # my_print_defaults).
+    config_reader = MyDefaultsReader(options, False)
 
     if options.master:
         try:
-            master_val = parse_connection(options.master)
+            master_val = parse_connection(options.master, config_reader,
+                                          options)
         except FormatError, e:
-            msg = "Master connection values invalid or cannot be parsed."
+            msg = ("Master connection values invalid or cannot be parsed: %s "
+                   "(%s)." % (options.master, e))
+            raise UtilRplError(msg)
+        except UtilError, e:
+            msg = ("Master connection values invalid or cannot be parsed: %s "
+                   "(using login-path authentication: %s)" % (options.master,
+                                                              e.errmsg))
             raise UtilRplError(msg)
     else:
         master_val = None
@@ -71,11 +87,15 @@ def parse_failover_connections(options):
         slaves = options.slaves.split(",")
         for slave in slaves:
             try:
-                s_values = parse_connection(slave)
+                s_values = parse_connection(slave, config_reader, options)
                 slaves_val.append(s_values)
             except FormatError, e:
-                msg = "Slave connection values invalid or " + \
-                      "cannot be parsed: %s" % slave
+                msg = ("Slave connection values invalid or cannot be parsed: "
+                       "%s (%s)" % (slave, e))
+                raise UtilRplError(msg)
+            except UtilError, e:
+                msg = ("Slave connection values invalid or cannot be parsed: "
+                       "%s (%s)" % (slave, e.errmsg))
                 raise UtilRplError(msg)
     
     candidates_val = []
@@ -83,11 +103,15 @@ def parse_failover_connections(options):
         candidates = options.candidates.split(",")
         for slave in candidates:
             try:
-                s_values = parse_connection(slave)
+                s_values = parse_connection(slave, config_reader, options)
                 candidates_val.append(s_values)
             except FormatError, e:
                 msg = "Candidate connection values invalid or " + \
                       "cannot be parsed: %s" % slave
+                raise UtilRplError(msg)
+            except UtilError, e:
+                msg = ("Candidate connection values invalid or cannot be "
+                       "parsed: %s (%s)" % (slave, e.errmsg))
                 raise UtilRplError(msg)
                 
     return (master_val, slaves_val, candidates_val)
@@ -311,13 +335,9 @@ class Topology(Replication):
         if discover is None:
             return
         
-        # Get user and password
-        try:
-            user, password = discover.split(":")
-        except ValueError:
-            user = discover
-            password = None
-            
+        # Get user and password (support login-path)
+        user, password = parse_user_password(discover, options=self.options)
+
         # Find discovered slaves
         new_slaves_found = False
         self._report("# Discovering slaves for master at %s:%s" %
@@ -494,12 +514,8 @@ class Topology(Replication):
             user, passwd = slave.get_rpl_user()
             return (user, passwd)
 
-        # Get user and password
-        try:
-            user, passwd =  self.rpl_user.split(":")
-        except ValueError:
-            user = self.rpl_user.strip(":")
-            passwd = None
+        # Get user and password (support login-path)
+        user, passwd = parse_user_password(self.rpl_user, options=self.options)
         return (user, passwd)
     
     

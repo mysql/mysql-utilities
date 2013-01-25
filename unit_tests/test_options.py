@@ -42,7 +42,7 @@ class TestParseConnection(unittest.TestCase):
 
     # These specifiers are invalid and should generate a FormatError.
     invalid_specificers = [
-        'mats', 'mats@', '@localhost', 'cbell@what:is::::this?',
+        'mats@', '@localhost', 'cbell@what:is::::this?',
         'cbell@1:2:3:4:5:6:192.168.1.110',
         'cbell@E3D7::51F4:9BC8:192.168.100.32',
         ]

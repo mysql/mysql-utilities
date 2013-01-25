@@ -27,9 +27,13 @@ Option                     Description
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
 --server1=SERVER1          connection information for first server in the  
-                           form: <user>:<password>@<host>:<port>:<socket>  
+                           form:                                           
+                           <user>[:<password>]@<host>[:<port>][:<socket>]  
+                           or <login-path>[:<port>][:<socket>].            
 --server2=SERVER2          connection information for second server in the 
-                           form: <user>:<password>@<host>:<port>:<socket>  
+                           form:                                           
+                           <user>[:<password>]@<host>[:<port>][:<socket>]  
+                           or <login-path>[:<port>][:<socket>].            
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
 -v, --verbose              control how much information is displayed. e.g.,
@@ -65,9 +69,13 @@ Option                     Description
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
 --server1=SERVER1          connection information for first server in the  
-                           form: <user>:<password>@<host>:<port>:<socket>  
+                           form:                                           
+                           <user>[:<password>]@<host>[:<port>][:<socket>]  
+                           or <login-path>[:<port>][:<socket>].            
 --server2=SERVER2          connection information for second server in the 
-                           form: <user>:<password>@<host>:<port>:<socket>  
+                           form:                                           
+                           <user>[:<password>]@<host>[:<port>][:<socket>]  
+                           or <login-path>[:<port>][:<socket>].            
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
 -v, --verbose              control how much information is displayed. e.g.,
@@ -106,12 +114,14 @@ Option                     Description
                            exit                        
 --server1=SERVER1          connection information for  
                            first server in the form: <u
-                           ser>:<password>@<host>:<port
-                           >:<socket>                  
+                           ser>[:<password>]@<host>[:<p
+                           ort>][:<socket>] or <login- 
+                           path>[:<port>][:<socket>].  
 --server2=SERVER2          connection information for  
                            second server in the form: <
-                           user>:<password>@<host>:<por
-                           t>:<socket>                 
+                           user>[:<password>]@<host>[:<
+                           port>][:<socket>] or <login-
+                           path>[:<port>][:<socket>].  
 --width=WIDTH              display width               
 --force                    do not abort when a diff    
                            test fails                  
@@ -160,11 +170,13 @@ Option                     Description
 --version                  show program's version number and exit 
 --help                     display a help message and exit        
 --server1=SERVER1          connection information for first server
-                           in the form: <user>:<password>@<host>:<
-                           port>:<socket>                         
+                           in the form: <user>[:<password>]@<host>
+                           [:<port>][:<socket>] or <login-        
+                           path>[:<port>][:<socket>].             
 --server2=SERVER2          connection information for second      
-                           server in the form: <user>:<password>@<
-                           host>:<port>:<socket>                  
+                           server in the form: <user>[:<password>]
+                           @<host>[:<port>][:<socket>] or <login- 
+                           path>[:<port>][:<socket>].             
 --width=WIDTH              display width                          
 --force                    do not abort when a diff test fails    
 -v, --verbose              control how much information is        

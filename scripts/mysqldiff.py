@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@ This file contains the object diff utility which allows users to compare the
 definitions of two objects and return the difference (like diff).
 """
 
-import optparse
+
 import os
 import re
 import sys
-from mysql.utilities import VERSION_FRM
+
 from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -48,14 +48,16 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Connection information for the source server
 parser.add_option("--server1", action="store", dest="server1",
                   type="string", default="root@localhost:3306",
-                  help="connection information for first server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  help="connection information for first server in "
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--server2", action="store", dest="server2",
                   type="string", default=None,
-                  help="connection information for second server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  help="connection information for second server in "
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
@@ -97,12 +99,12 @@ options = {
 
 # Parse server connection values
 try:
-    server1_values = parse_connection(opt.server1)
+    server1_values = parse_connection(opt.server1, None, options)
 except:
     parser.error("Server1 connection values invalid or cannot be parsed.")
 if opt.server2 is not None:
     try:
-        server2_values = parse_connection(opt.server2)
+        server2_values = parse_connection(opt.server2, None, options)
     except:
         parser.error("Server2 connection values invalid or cannot be parsed.")
 else:

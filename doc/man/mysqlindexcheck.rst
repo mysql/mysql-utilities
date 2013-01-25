@@ -101,8 +101,9 @@ OPTIONS
 
 .. option:: --server=<source>
 
-   Connection information for the server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --show-drops, -d
 
@@ -151,6 +152,12 @@ sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value.  For example, :option:`--format=g` specifies the grid format.
 An error occurs if a prefix matches more than one valid value.
 
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
+
 EXAMPLES
 --------
 
@@ -187,7 +194,7 @@ the possible redundant and duplicate indexes, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

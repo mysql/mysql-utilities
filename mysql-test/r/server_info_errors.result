@@ -4,7 +4,7 @@ Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
 mysqlserverinfo.py: error: You must specify at least one server.
 
 Test case 2 - bad server
-ERROR: Connection 'xewkjsdd:21' cannot be parsed as a connection
+ERROR: Unable to get login-path
 
 Test case 3 - bad format
 Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid

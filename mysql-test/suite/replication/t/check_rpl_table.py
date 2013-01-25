@@ -142,7 +142,9 @@ class test(replicate.test):
 
         self.remove_result("   Replicate_Ignore_Server_Ids :")
         self.remove_result("              Master_Server_Id :")
-    
+
+        self.remove_result("                 Auto_Position :")
+
     def get_result(self):
         return self.compare(__name__, self.results)
     

@@ -93,8 +93,9 @@ OPTIONS
 
 .. option:: --server=SERVER
 
-   Connection information for the server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the server in the format: 
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --show-options
 
@@ -124,6 +125,11 @@ This utility can only be applied to servers with the audit log plug-in enabled.
 
 This utility requires the use of Python version 2.7 or higher, but does not 
 support Python 3.
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
 
 
 LIMITATIONS
@@ -274,7 +280,7 @@ To copy a audit log file from a remote server/location to the current location
 COPYRIGHT
 ---------
 
-Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

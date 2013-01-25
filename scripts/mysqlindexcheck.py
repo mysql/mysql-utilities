@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,10 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
-import optparse
+
 import os.path
 import sys
 
-from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import indexcheck
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
@@ -127,7 +126,7 @@ if (worst is not None or best is not None) and not opt.stats:
 
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.server)
+    source_values = parse_connection(opt.server, None, opt)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
     

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -477,11 +477,11 @@ else:
         # Here we capture any exception and print the error message.
         # Since all util errors (exceptions) derive from Exception, this is
         # safe.
-        except Exception, e:
+        except Exception, err:
             print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
             if conn.connect_error is not None:
                 print conn.connect_error
-            print "ERROR:", e.errmsg
+            print "ERROR: %s" % str(err)
     if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
         exit(1)

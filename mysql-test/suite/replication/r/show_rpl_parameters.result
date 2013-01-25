@@ -55,7 +55,8 @@ Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --master=MASTER       connection information for master server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   -l, --show-list       print a list of the topology.
   -f FORMAT, --format=FORMAT
                         display the list in either grid (default), tab, csv,
@@ -77,9 +78,10 @@ Options:
                         at startup, query master for all registered slaves and
                         use the user name and password specified to connect.
                         Supply the user and password in the form
-                        user:password. For example, --discover-slaves-
-                        login=joe:secret will use 'joe' as the user and
-                        'secret' as the password for each discovered slave.
+                        <user>[:<password>] or <login-path>. For example,
+                        --discover-slaves-login=joe:secret will use 'joe' as
+                        the user and 'secret' as the password for each
+                        discovered slave.
 Test Case 6 : Testing show topology with CSV format 
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2

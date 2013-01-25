@@ -7,7 +7,8 @@ Options:
   --version             show program's version number and exit
   --help                display this help message and exit
   --server=SERVER       connection information for the server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   --audit-log-name=LOG_NAME
                         full path and file name for the audit log file. Used
                         for stats and copy options.

@@ -97,11 +97,11 @@ OPTIONS
 
    Display a help message and exit.
 
-.. option:: --discover-slaves-login=<user:password>
+.. option:: --discover-slaves-login=<slave_login>
 
-   Supply the user and password in the form <*user*>[:<*passwd*>] for
-   discovering slaves and relay slaves in the topology. For example,
-   --discover=joe:secret will use 'joe' as the user and 'secret' as
+   Supply the user and password in the form <*user*>[:<*passwd*>] or 
+   <*login-path*> for discovering slaves and relay slaves in the topology. 
+   For example, --discover=joe:secret will use 'joe' as the user and 'secret' as 
    the password for each discovered slave.
 
 .. option:: --format=<format>, -f<format>
@@ -112,8 +112,9 @@ OPTIONS
 
 .. option:: --master=<source>
 
-   Connection information for the master server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the master server in the format: 
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
    
 .. option:: --max-depth=<N>
 
@@ -178,6 +179,12 @@ specified as --master=192.168.0.6 using the valid IP address for ubuntu.net,
 you must have the ability to do a reverse name lookup to compare the IP
 (192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
 machine. 
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
 
 EXAMPLES
 --------
@@ -263,7 +270,7 @@ user name and password credentials as the master, use the following command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

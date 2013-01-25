@@ -135,13 +135,15 @@ OPTIONS
 
 .. option:: --server1=<source>
 
-   Connection information for the first server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the first server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --server2=<source>
 
-   Connection information for the second server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the second server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
    
 .. option:: --show-reverse
 
@@ -200,6 +202,12 @@ For the :option:`--difftype` option, the permitted values are not case
 sensitive. In addition, values may be specified as any unambiguous prefix of
 a valid value. For example, :option:`--difftype=d` specifies the differ
 type. An error occurs if a prefix matches more than one valid value.
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
 
 EXAMPLES
 --------
@@ -311,7 +319,7 @@ To generate a set of SQL statements that transform the definitions of
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

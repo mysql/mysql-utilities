@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ def show_topology(master_vals, options={}):
     show_list option is True, it will also print a list of the output
     (default = False).
     
-    master_vals[in]    Master connection in form user:passwd@host:port:sock
+    master_vals[in]    Master connection in form user:passwd@host:port:socket
+                       or login-path:port:socket.
     options[in]        dictionary of options
       recurse     If True, check each slave found for additional slaves
                        Default = False

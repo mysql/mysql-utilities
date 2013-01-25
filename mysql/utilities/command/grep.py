@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ import sys
 
 import mysql.connector
 
-from ..common.options import parse_connection
-from ..common.format import print_list
+from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.format import print_list
 
 # Mapping database object to information schema names and fields. I
 # wish that the tables would have had simple names and not qualify the

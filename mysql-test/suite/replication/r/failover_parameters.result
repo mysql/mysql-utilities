@@ -1,5 +1,5 @@
 Test case 1 - show help
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover - automatic replication health monitoring and failover
 
@@ -9,16 +9,18 @@ Options:
   --candidates=CANDIDATES
                         connection information for candidate slave servers for
                         failover in the form:
-                        <user>:<password>@<host>:<port>:<socket>. Valid only
-                        with failover command. List multiple slaves in comma-
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>]. Valid only with
+                        failover command. List multiple slaves in comma-
                         separated list.
   --discover-slaves-login=DISCOVER
                         at startup, query master for all registered slaves and
                         use the user name and password specified to connect.
                         Supply the user and password in the form
-                        user:password. For example, --discover-slaves-
-                        login=joe:secret will use 'joe' as the user and
-                        'secret' as the password for each discovered slave.
+                        <user>[:<password>] or <login-path>. For example,
+                        --discover-slaves-login=joe:secret will use 'joe' as
+                        the user and 'secret' as the password for each
+                        discovered slave.
   --exec-after=EXEC_AFTER
                         name of script to execute after failover or switchover
   --exec-before=EXEC_BEFORE
@@ -29,7 +31,8 @@ Options:
                         older than this will be purged on startup. Default = 7
                         days.
   --master=MASTER       connection information for master server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>]
   --max-position=MAX_POSITION
                         Used to detect slave delay. The maximum difference
                         between the master's log position and the slave's
@@ -42,8 +45,9 @@ Options:
                         seconds behind the master permitted before slave is
                         considered behind the master. Default is 0.
   --slaves=SLAVES       connection information for slave servers in the form:
-                        <user>:<password>@<host>:<port>:<socket>. List
-                        multiple slaves in comma-separated list.
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>]. List multiple slaves
+                        in comma-separated list.
   --timeout=TIMEOUT     Maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout
                         for slave waiting to catch up to master. Default = 3.
@@ -70,4 +74,5 @@ Options:
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user
-                        requirement - e.g. rpl:passwd - default = none
+                        requirement, in the form: <user>[:<password>] or
+                        <login-path>. E.g. rpl:passwd - By default = none

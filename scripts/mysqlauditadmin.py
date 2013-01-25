@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,8 @@ parser.add_option("--help", action="help", help="display this help message "
 parser.add_option("--server", action="store", dest="server",
                   type="string", default=None,
                   help="connection information for the server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Audit Log name (full path)
 parser.add_option("--audit-log-name", action="store", dest="log_name",
@@ -174,9 +175,11 @@ if opt.log_name and (not opt.file_stats
 server_values = None
 if opt.server:
     try:
-        server_values = parse_connection(opt.server)
+        server_values = parse_connection(opt.server, None, opt)
     except FormatError as details:
         parser.error(details)
+    except UtilError as err:
+        parser.error(err.errmsg)
 
 # Check for copy prerequisites
 if command and command == "COPY" and not opt.copy_location:

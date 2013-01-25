@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,9 +28,16 @@ import difflib
 import os
 import string
 import subprocess
-import sys
-import time
-from mysql.utilities.exception import UtilError, UtilDBError, MUTLibError
+import tempfile
+
+from mysql.utilities.common.my_print_defaults import MyDefaultsReader
+from mysql.utilities.common.my_print_defaults import my_login_config_path
+from mysql.utilities.common.tools import get_tool_path
+
+from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilDBError
+from mysql.utilities.exception import UtilError
+
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -609,6 +616,89 @@ class System_test(object):
 
         return False
 
+    def check_mylogin_requisites(self):
+        """ Check if the tools to manipulate mylogin.cnf are accessible.
+
+        This method verifies if the MySQL client tools my_print_defaults and
+        mysql_config_editor are accessible.
+
+        A MUTLibError exception is raised if the requisites are not met.
+        """
+        try:
+            self.login_reader = MyDefaultsReader(
+                                    find_my_print_defaults_tool=True)
+        except UtilError as err:
+            raise MUTLibError("MySQL client tools must be accessible to run "
+                              "this test (%s). E.g. Add the location of the "
+                              "MySQL client tools to your PATH." % err.errmsg)
+
+        if not self.login_reader.check_login_path_support():
+            raise MUTLibError("ERROR: the used my_print_defaults tool does not "
+                            "support login-path options. Used tool: %s"
+                            % self.login_reader.tool_path)
+
+        try:
+            self.edit_tool_path = get_tool_path(None, "mysql_config_editor",
+                                                search_PATH=True)
+        except UtilError as err:
+            raise MUTLibError("MySQL client tools must be accessible to run "
+                              "this test (%s). E.g. Add the location of the "
+                              "MySQL client tools to your PATH." % err.errmsg)
+
+    def create_login_path_data(self, login_path, user, host):
+        """Add the specified login-path data to .mylogin.cnf.
+
+        Execute mysql_config_editor tool to create a new login-path
+        entry to the .mylogin.cnf file.
+
+        Note: the use of password is not supported because it is not read from
+        the stdin by the tool (apparently for security reasons).
+        """
+
+        assert self.edit_tool_path, ("The tool mysql_config_editor is not "
+                                     "accessible. First, use method "
+                                     "check_mylogin_requisites.")
+
+        cmd = [self.edit_tool_path]
+        cmd.append('set')
+        cmd.append('--login-path=%s' % login_path)
+        cmd.append('--host=%s' % host)
+        cmd.append('--user=%s' % user)
+
+        # Create a temporary file to redirect stdout
+        out_file = tempfile.TemporaryFile()
+
+        # Execute command to create login-path data
+        proc = subprocess.Popen(cmd, stdout=out_file,
+                                stdin=subprocess.PIPE)
+        # Overwrite login-path if already exists (i.e. answer 'y' to question)
+        proc.communicate('y')
+
+    def remove_login_path_data(self, login_path):
+        """Remove the specified login-path data from .mylogin.cnf.
+
+        Execute mysql_config_editor tool to remove the specified login-path
+        entry from the .mylogin.cnf file.
+        """
+        assert self.edit_tool_path, ("The tool mysql_config_editor is not "
+                                     "accessible. First, use method "
+                                     "check_mylogin_requisites.")
+
+        cmd = [self.edit_tool_path]
+        cmd.append('remove')
+        cmd.append('--login-path=%s' % login_path)
+
+        # Create a temporary file to redirect stdout
+        out_file = tempfile.TemporaryFile()
+
+        # Execute command to remove login-path data
+        if self.verbose:
+            subprocess.call(cmd, stdout=out_file)
+        else:
+            # Redirect stderr to null
+            null_file = open(os.devnull, "w+b")
+            subprocess.call(cmd, stdout=out_file,
+                            stderr=null_file)
 
     def exec_util(self, cmd, file_out, abspath=False):
         """Execute Utility

@@ -1,17 +1,17 @@
 Test case 1 - No master
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: You must specify a master to monitor.
 Test case 2 - No slaves or discover-slaves-login
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: You must supply a list of slaves or the --discover-slaves-login option.
 Test case 3 - Low value for interval.
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The --interval option requires a value greater than or equal to 5.
 Test case 4 - elect mode but no candidates
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: Failover mode = 'elect' reqiures at least one candidate.
 Test case 5 - FILE/TABLE mix and missing --rpl-user
@@ -19,14 +19,14 @@ NOTE: Log file 'a.txt' does not exist. Will be created.
 # Checking privileges.
 ERROR: Failover requires --master-info-repository=TABLE for all slaves.
 Test case 6 - Master listed as a slave - literal
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The master and one of the slaves are the same host and port.
 Test case 7 - Master listed as a slave - alias
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The master and one of the slaves are the same host and port.
 Test case 8 - Master listed as a candiate - alias
-Usage: mysqlfailover.py --master=roo@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The master and one of the candidates are the same host and port.

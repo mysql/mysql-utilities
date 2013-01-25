@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ This module contains an abstraction of a topolgy map object used to discover
 slaves and down-stream replicants for mapping topologies.
 """
 
+from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.exception import UtilError
 
 _START_PORT = 3306
@@ -184,12 +185,8 @@ class TopologyMap(object):
         if discover is None:
             return
         
-        # Get user and password
-        try:
-            user, password = discover.split(":", 1)
-        except ValueError:
-            user = discover
-            password = None
+        # Get user and password (supports login-paths)
+        user, password = parse_user_password(discover, options=self.options)
 
         # Get replication topology
         slaves = master.get_slaves(user, password)

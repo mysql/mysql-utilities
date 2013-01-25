@@ -96,10 +96,11 @@ connection is lost and the master cannot be pinged or reconnected, the failover
 event occurs.
   
 For all commands that require specifying multiple servers, the options require
-a comma-separated list of connection parameters in the following form where the
-password, port, and socket are optional.::
+a comma-separated list of connection parameters in the following forms (where 
+the password, port, and socket are optional).::
 
-<*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>],
+<*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>], or
+<*login-path*>[:<*port*>][:<*socket*>]
 
 The utility permits users to discover slaves connected to the master. In
 order to use the discover slaves feature, all slaves must use the --report-host
@@ -174,19 +175,21 @@ OPTIONS
 .. option:: --candidates=<candidate slave connections>
 
    Connection information for candidate slave servers for failover in the form:
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>]. Valid only with
-   failover command. List multiple slaves in comma- separated list.
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>]. Valid only with
+   failover command. List multiple slaves in comma-separated list.
 
 .. option:: --demote-master
 
    Make master a slave after switchover.
 
-.. option:: --discover-slaves-login=<user:password>
+.. option:: --discover-slaves-login=<slave_login>
 
    At startup, query master for all registered slaves and use the user name and
    password specified to connect. Supply the user and password in the form
-   <*user*>[:<*passwd*>]. For example, --discover=joe:secret will use 'joe' as
-   the user and 'secret' as the password for each discovered slave.
+   <*user*>[:<*passwd*>] or <*login-path*>. For example, --discover=joe:secret 
+   will use 'joe' as the user and 'secret' as the password for each discovered 
+   slave.
 
 .. option:: --exec-after=<script>
 
@@ -218,8 +221,9 @@ OPTIONS
 
 .. option:: --master=<connection>
 
-   Connection information for the master server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the master server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --max-position=<position>
 
@@ -231,8 +235,8 @@ OPTIONS
 
    Connection information for the slave to be used to replace the master for
    switchover in the form:
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>]. Valid only with
-   switchover command.
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or
+   <*login-path*>[:<*port*>][:<*socket*>]. Valid only with switchover command.
    
 .. option:: --no-health
 
@@ -248,9 +252,10 @@ OPTIONS
 
    Turn off all messages for quiet execution.
 
-.. option:: --rpl-user=<user>[:<password>]
+.. option:: --rpl-user=<replication_user>
 
-   The user and password for the replication user requirement - e.g. rpl:passwd
+   The user and password for the replication user requirement, in the form:  
+   <*user*>[:<*password*>] or <*login-path*>. E.g. rpl:passwd
    Default = None.
 
 .. option:: --seconds-behind=<seconds>
@@ -261,7 +266,8 @@ OPTIONS
 .. option:: --slaves=<slave connections>
 
    Connection information for slave servers in the form:
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>]. List multiple slaves
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>]. List multiple slaves
    in comma-separated list. The list will be evaluated literally whereby each
    server is considered a slave to the master listed regardless if they are a
    slave of the master.
@@ -317,6 +323,11 @@ If the user does not specify the :option:`--rpl-user` and the user has
 specified the switchover or failover command, the utility will check to see if
 the slaves are using --master-info-repository=TABLE. If they are not, the
 utility will stop with an error.
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
 
 
 EXAMPLES
@@ -555,7 +566,7 @@ master.::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

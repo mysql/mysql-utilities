@@ -8,9 +8,11 @@ Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --server1=SERVER1     connection information for first server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   --server2=SERVER2     connection information for second server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   --width=WIDTH         display width
   --force               do not abort when a diff test fails
   -v, --verbose         control how much information is displayed. e.g., -v =

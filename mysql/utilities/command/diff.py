@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ This file contains the diff commands for finding the difference among
 the definitions of two databases.
 """
 
-from mysql.utilities.common.options import parse_connection
 
 def object_diff(server1_val, server2_val, object1, object2, options):
     """diff the definition of two objects

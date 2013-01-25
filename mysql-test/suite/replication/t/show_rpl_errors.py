@@ -123,6 +123,16 @@ class test(show_rpl.test):
         self.replace_result("Error 1045", "Error 1045: Access denied for "
                             "user 'wanda'@'localhost' (using password: "
                             "YES)\n")
+        self.replace_result("mysqlrplshow.py: error: No login credentials",
+                            "mysqlrplshow.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlrplshow.py: error: .mylogin.cnf",
+                            "mysqlrplshow.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlrplshow.py: error: the used "
+                            "my_print_defaults",
+                            "mysqlrplshow.py: error: Unable to get "
+                            "login-path\n")
 
         show_rpl.test.stop_replication(self, self.server_list[1])
 

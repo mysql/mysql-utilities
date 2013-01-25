@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import userclone
-from mysql.utilities import VERSION_FRM
+
 
 # Constants
 NAME = "MySQL Utilities - mysqluserclone "
@@ -51,13 +51,15 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 parser.add_option("--source", action="store", dest="source",
                   type = "string", default="root@localhost:3306",
                   help="connection information for source server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
                   type = "string",
                   help="connection information for destination server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Dump mode
 parser.add_option("-d", "--dump", action="store_true",
@@ -103,7 +105,7 @@ if (len(args) == 0 or opt is None) and not opt.list_users:
 
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.source)
+    source_values = parse_connection(opt.source, None, opt)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
@@ -120,7 +122,7 @@ else:
     # Parse destination connection values if not dumping
     if not opt.dump and opt.destination is not None:
         try:
-            dest_values = parse_connection(opt.destination)
+            dest_values = parse_connection(opt.destination, None, opt)
         except:
             parser.error("Destination connection values invalid or cannot "
                          "be parsed.")

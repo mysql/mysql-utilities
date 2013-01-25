@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import time
 import subprocess
 
 from mysql.utilities.common.format import print_list
+from mysql.utilities.exception import UtilError
 
 
 def _add_basedir(search_paths, path_str):
@@ -47,7 +48,8 @@ def _add_basedir(search_paths, path_str):
     search_paths.append(os.path.join(path_str, "mysql"))    
 
 
-def get_tool_path(basedir, tool, fix_ext=True, required=True):
+def get_tool_path(basedir, tool, fix_ext=True, required=True,
+                  defaults_paths=[], search_PATH=False):
     """Search for a MySQL tool and return the full path
 
     basedir[in]         The initial basedir to search (from mysql server)
@@ -57,17 +59,35 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True):
     required[in]        If True (default is True), and error will be
                         generated and the utility aborted if the tool is
                         not found.
-                        
+    defaults_paths[in]  Default list of paths to search for the tool.
+                        By default an empty list is assumed, i.e. [].
+    search_PATH[in]     Boolean value that indicates if the paths specified by
+                        the PATH environment variable will be used to search
+                        for the tool. By default the PATH will not be searched,
+                        i.e. search_PATH=False.
     Returns (string) full path to tool
     """
 
-    from mysql.utilities.exception import UtilError
-
     search_paths = []
-    _add_basedir(search_paths, basedir)
-    _add_basedir(search_paths, "/usr/local/mysql/")
-    _add_basedir(search_paths, "/usr/sbin/")
-    _add_basedir(search_paths, "/usr/share/")
+
+    if basedir:
+        # Add specified basedir path to search paths
+        _add_basedir(search_paths, basedir)
+    if defaults_paths and len(defaults_paths):
+        # Add specified default paths to search paths
+        for path in defaults_paths:
+            search_paths.append(path)
+    else:
+        # Add default basedir paths to search paths
+        _add_basedir(search_paths, "/usr/local/mysql/")
+        _add_basedir(search_paths, "/usr/sbin/")
+        _add_basedir(search_paths, "/usr/share/")
+
+    # Search in path from the PATH environment variable
+    if search_PATH:
+        for path in os.environ['PATH'].split(os.pathsep):
+            search_paths.append(path)
+
     if os.name == "nt" and fix_ext:
         tool = tool + ".exe"
     # Search for the tool

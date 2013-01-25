@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ def get_connection_dictionary(conn_info):
     
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
-        - connection string in the form: user:pass@host:port:socket
+        - connection string in the form: user:pass@host:port:socket or 
+                                         login-path:port:socket
         - an instance of the Server class
         
     conn_info[in]          Connection information
@@ -55,7 +56,7 @@ def get_connection_dictionary(conn_info):
         conn_val = conn_info.get_connection_values()
     elif isinstance(conn_info, basestring):
         # parse the string
-        conn_val = parse_connection(conn_info)
+        conn_val = parse_connection(conn_info, None)
     else:
         raise UtilError("Cannot determine connection information type.")
 
@@ -69,7 +70,8 @@ def _print_connection(prefix, conn_info):
     
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
-        - connection string in the form: user:pass@host:port:socket
+        - connection string in the form: user:pass@host:port:socket or
+                                         login-path:port:socket
         - an instance of the Server class
         
     conn_info[in]          Connection information
@@ -269,7 +271,8 @@ def connect_servers(src_val, dest_val, options={}):
     
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
-        - connection string in the form: user:pass@host:port:socket
+        - connection string in the form: user:pass@host:port:socket or
+                                         login-path:port:socket
         - an instance of the Server class
 
     src_val[in]        source connection information
@@ -359,7 +362,8 @@ def test_connect(conn_info, throw_errors=False):
     
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
-        - connection string in the form: user:pass@host:port:socket
+        - connection string in the form: user:pass@host:port:socket or
+                                         login-path:port:socket
         - an instance of the Server class
         
     conn_info[in]          Connection information
@@ -422,7 +426,8 @@ class Server(object):
         
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
-            - connection string in the form: user:pass@host:port:socket
+            - connection string in the form: user:pass@host:port:socket or
+                                             login-path:port:socket
             - an instance of the Server class
              
         options[in]        options for controlling behavior:

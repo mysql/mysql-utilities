@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ of an existing server.
 import os.path
 import sys
 
+from mysql.utilities.common.options import add_basedir_option
+from mysql.utilities.common.options import check_basedir_option
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
@@ -74,8 +76,7 @@ parser.add_option("--write-command", "-w", action="store", dest='cmd_file',
 add_verbosity(parser, True)
 
 # Add --basedir option
-parser.add_option("--basedir", action="store", dest="basedir", default=None,
-                  type="string", help="the base directory for the server")
+add_basedir_option(parser)
 
 # Add --delete-data
 parser.add_option("--delete-data", action="store_true", dest="delete",
@@ -84,6 +85,9 @@ parser.add_option("--delete-data", action="store_true", dest="delete",
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# Check the basedir option for errors (e.g., invalid path)
+check_basedir_option(parser, opt.basedir)
 
 # Can only use --basedir and --datadir if --server is missing
 if opt.basedir is not None and opt.server is not None:

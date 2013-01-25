@@ -65,8 +65,9 @@ OPTIONS
 
 .. option:: --master=<master>
 
-   Connection information for the master server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the master server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --master-log-file=<master_log_file>
 
@@ -84,13 +85,15 @@ OPTIONS
 
 .. option:: --rpl-user=<replication_user>
 
-   The user and password for the replication user, in *name:passwd* format.
+   The user and password for the replication user, in the format:
+   <*user*>[:<*password*>] or <*login-path*>.
    The default is ``rpl:rpl``.
 
 .. option:: --slave=<slave>
 
-   Connection information for the slave server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the slave server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --start-from-beginning, -b
 
@@ -140,6 +143,12 @@ specified as --master=192.168.0.6 using the valid IP address for ubuntu.net,
 you must have the ability to do a reverse name lookup to compare the IP
 (192.168.0.6) and the hostname (ubuntu.net) to determine if they are the same
 machine. 
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
 
 EXAMPLES
 --------
@@ -242,7 +251,7 @@ storage engines.
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
-import optparse
+
 import os.path
 import sys
 
@@ -49,13 +49,15 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 parser.add_option("--master", action="store", dest="master",
                   type = "string", default="root@localhost:3306",
                   help="connection information for master server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>] or"
+                  " <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--slave", action="store", dest="slave",
                   type = "string", default=None,
                   help="connection information for slave server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>] or"
+                  " <login-path>[:<port>][:<socket>].")
 
 # Replication user and password
 add_rpl_user(parser)
@@ -95,13 +97,13 @@ opt, args = parser.parse_args()
 
 # Parse source connection values
 try:
-    m_values = parse_connection(opt.master)
+    m_values = parse_connection(opt.master, None, opt)
 except:
     parser.error("Master connection values invalid or cannot be parsed.")
 
 # Parse source connection values
 try:
-    s_values = parse_connection(opt.slave)
+    s_values = parse_connection(opt.slave, None, opt)
 except:
     parser.error("Slave connection values invalid or cannot be parsed.")
     

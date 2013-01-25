@@ -1,0 +1,24 @@
+Test case 1 - Clone one user to another (using login-path)
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user jill:duh@user 
+# ...done.
+GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
+GRANT SELECT ON `util_test`.* TO 'jill'@'user'
+Test case 2 - Clone a user to multiple users (using login-path)
+# Source on localhost: ... connected.
+# Destination on localhost: ... connected.
+# Cloning 2 users...
+# Cloning amy_nopass@user to user jack:duh@user 
+# Cloning amy_nopass@user to user john@user 
+# ...done.
+GRANT USAGE ON *.* TO 'jack'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
+GRANT INSERT ON `util_test`.* TO 'jack'@'user'
+GRANT USAGE ON *.* TO 'john'@'user'
+GRANT INSERT ON `util_test`.* TO 'john'@'user'
+Test case 3 - Clone one user to another (using login-path) with only source specified
+# Source on localhost: ... connected.
+# Cloning 1 users...
+# Cloning joe_pass@user to user jill:duh@user 
+# ...done.

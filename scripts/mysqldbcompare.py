@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@ This file contains the operations to perform database consistency checking
 on two databases.
 """
 
-import optparse
+
 import os
 import sys
-from mysql.utilities import VERSION_FRM
+
 from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -47,14 +47,16 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Connection information for the source server
 parser.add_option("--server1", action="store", dest="server1",
                   type="string", default="root@localhost:3306",
-                  help="connection information for first server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  help="connection information for first server in "
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--server2", action="store", dest="server2",
                   type="string", default=None,
-                  help="connection information for second server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  help="connection information for second server in "
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
@@ -133,11 +135,13 @@ options = {
 # Parse server connection values
 server2_values = None
 try:
-    server1_values = parse_connection(opt.server1)
+    server1_values = parse_connection(opt.server1, None, options)
     if opt.server2 is not None:
-        server2_values = parse_connection(opt.server2)
+        server2_values = parse_connection(opt.server2, None, options)
 except FormatError as details:
     parser.error(details)
+except UtilError as err:
+    parser.error(err.errmsg)
 
 # Operations to perform:
 # 1) databases exist
@@ -157,7 +161,7 @@ for db in args:
                      "Format should be: db1:db2 or db.")
     try:
         res = database_compare(server1_values, server2_values,
-                             parts[0], parts[1], options)
+                               parts[0], parts[1], options)
         print
     except UtilError, e:
         print "ERROR:", e.errmsg

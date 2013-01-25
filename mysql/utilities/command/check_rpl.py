@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,8 +51,10 @@ def _get_replication_tests(rpl, options):
 def check_replication(master_vals, slave_vals, options):
     """Check replication among a master and a slave.
     
-    master_vals[in]    Master connection in form user:passwd@host:port:sock
-    slave_vals[in]     Slave connection in form user:passwd@host:port:sock
+    master_vals[in]    Master connection in form: user:passwd@host:port:socket
+                       or login-path:port:socket
+    slave_vals[in]     Slave connection in form user:passwd@host:port:socket
+                       or login-path:port:socket
     options[in]        dictionary of options (verbosity, quiet, pedantic)
     
     Returns bool - True if all tests pass, False if errors, warnings, failures

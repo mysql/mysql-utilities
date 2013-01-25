@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -67,9 +67,10 @@ add_failover_options(parser)
 # Connect information for candidate server for switchover
 parser.add_option("--new-master", action="store", dest="new_master", default=None,
                   type="string", help="connection information for the "
-                  "slave to be used to replace the master for switchover "
-                  "in the form: <user>:<password>@<host>:<port>:<socket>. "
-                  "Valid only with switchover command.")
+                  "slave to be used to replace the master for switchover, "
+                  "in the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>]. Valid only with "
+                  "switchover command.")
 
 # Force
 parser.add_option("--force", action="store_true", dest="force",
@@ -168,9 +169,11 @@ if opt.format and command not in ['health', 'gtid']:
         
 if opt.new_master:
     try:
-        new_master_val = parse_connection(opt.new_master)
+        new_master_val = parse_connection(opt.new_master, None, opt)
     except FormatError, e:
         parser.error("New master connection values invalid or cannot be parsed.")
+    except UtilError as err:
+        parser.error(err.errmsg)
 else:
     new_master_val = None
 

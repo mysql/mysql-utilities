@@ -196,6 +196,16 @@ class test(audit_log_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        self.replace_result("mysqlauditadmin.py: error: No login credentials",
+                            "mysqlauditadmin.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlauditadmin.py: error: .mylogin.cnf",
+                            "mysqlauditadmin.py: error: Unable to get "
+                            "login-path\n")
+        self.replace_result("mysqlauditadmin.py: error: the used my_print_defaults",
+                            "mysqlauditadmin.py: error: Unable to get "
+                            "login-path\n")
+
         return True
     
     def get_result(self):

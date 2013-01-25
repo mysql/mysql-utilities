@@ -82,7 +82,9 @@ OPTIONS
 .. option:: --basedir=<basedir>
 
    The base directory for the server. This option is required for starting an
-   offline server.
+   offline server. Is also used to access server tools, such as my_print_defaults 
+   that is required to read the login-path values from the login configuration 
+   file (.mylogin.cnf).
   
 .. option:: --datadir=<datadir>
 
@@ -107,8 +109,9 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for a server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for a server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
    Use this option multiple times to see information for multiple servers.
 
 .. option:: --show-defaults, -d
@@ -180,7 +183,7 @@ list, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

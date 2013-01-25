@@ -1,7 +1,6 @@
 #!/usr/bin/python
-
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,17 +16,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import optparse
 import os.path
 import re
 import sys
 
-from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
-from mysql.utilities.common.options import parse_connection, add_regexp
+from mysql.utilities.common.options import add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_format_option
-from mysql.utilities.exception import UtilError
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),

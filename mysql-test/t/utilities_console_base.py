@@ -84,6 +84,8 @@ class test(mutlib.System_test):
 
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.remove_result("Launching console ...")
+        self.replace_result("The utility mysqla is not accessible (from the",
+                            "The utility mysqla is not accessible (...)\n")
             
         return True    
             

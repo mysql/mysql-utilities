@@ -116,8 +116,9 @@ OPTIONS
 
 .. option:: --server=<server>
 
-   Connection information for the server in
-   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] format.
+   Connection information for the server in the format:
+   <*user*>[:<*passwd*>]@<*host*>[:<*port*>][:<*socket*>] or 
+   <*login-path*>[:<*port*>][:<*socket*>].
 
 .. option:: --verbose, -v
 
@@ -143,6 +144,12 @@ NOTES
 You must provide connection parameters (user, host, password, and
 so forth) for an account that has the appropriate privileges for
 all objects accessed during the operation.
+
+The path to the MySQL client tools should be included in the PATH environment
+variable in order to use the authentication mechanism with login-paths. This
+will allow the utility to use the my_print_defaults tools which is required to
+read the login-path values from the login configuration file (.mylogin.cnf).
+
 
 EXAMPLES
 --------
@@ -221,7 +228,7 @@ To see all disk usage for the server in CSV format, use this command::
 COPYRIGHT
 ---------
 
-Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

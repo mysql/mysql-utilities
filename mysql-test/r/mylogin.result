@@ -1,0 +1,13 @@
+{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+('test_user', None)
+('test_user', None)
+('test_user', '')
+('user_x', '')
+('user_x', 'pass_y')

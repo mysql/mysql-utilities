@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,14 +21,13 @@ This file contains the copy database utility which ensures a database
 is exactly the same among two servers.
 """
 
-import optparse
 import os
 import re
 import sys
 import time
 
-from mysql.utilities import VERSION_FRM
 from mysql.utilities.command import dbcopy
+from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -65,13 +64,15 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 parser.add_option("--source", action="store", dest="source",
                   type = "string", default="root@localhost:3306",
                   help="connection information for source server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
                   type = "string",
                   help="connection information for destination server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Overwrite mode
 parser.add_option("-f", "--force", action="store_true", dest="force",
@@ -175,13 +176,17 @@ options = {
 
 # Parse source connection values
 try:
-    source_values = parse_connection(opt.source)
+    # Create a basic configuration reader first for optimization purposes.
+    # I.e., to avoid repeating the execution of some methods in further
+    # parse_connection methods (like, searching my_print_defaults tool).
+    config_reader = MyDefaultsReader(options, False)
+    source_values = parse_connection(opt.source, config_reader, options)
 except:
     parser.error("Source connection values invalid or cannot be parsed.")
 
 # Parse destination connection values
 try:
-    dest_values = parse_connection(opt.destination)
+    dest_values = parse_connection(opt.destination, config_reader, options)
 except:
     parser.error("Destination connection values invalid or cannot be parsed.")
 

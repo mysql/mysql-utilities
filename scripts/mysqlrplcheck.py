@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
-import optparse
+
 import os.path
 import sys
 
@@ -32,7 +32,7 @@ from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.command.check_rpl import check_replication
 from mysql.utilities.exception import FormatError
-from mysql.utilities import VERSION_FRM
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlrplcheck "
@@ -51,13 +51,15 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 parser.add_option("--master", action="store", dest="master",
                   type = "string", default="root@localhost:3306",
                   help="connection information for master server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--slave", action="store", dest="slave",
                   type = "string", default=None,
                   help="connection information for slave server in " + \
-                  "the form: <user>:<password>@<host>:<port>:<socket>")
+                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                  " or <login-path>[:<port>][:<socket>]")
 
 # Add --master-info-file
 parser.add_option("--master-info-file", action="store", dest="master_info",
@@ -92,12 +94,16 @@ try:
     m_values = parse_connection(opt.master)
 except FormatError, e:
     parser.error("Master connection values invalid or cannot be parsed.")
+except UtilError as err:
+    parser.error(err.errmsg)
 
 # Parse source connection values
 try:
     s_values = parse_connection(opt.slave)
 except FormatError, e:
     parser.error("Slave connection values invalid or cannot be parsed.")
+except UtilError as err:
+    parser.error(err.errmsg)
 
 # Check hostname alias
 if check_hostname_alias(m_values, s_values):

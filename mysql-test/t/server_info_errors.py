@@ -82,7 +82,7 @@ class test(server_info.test):
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=vertical --basedir=/some/dir"
+        cmd_opts = " --format=vertical --basedir=."
         comment = ("Test case %d - offline server without %s option" %
                    (test_num, "start, datadir"))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -91,7 +91,7 @@ class test(server_info.test):
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=vertical --basedir=/some/dir --datadir=/dara/dir"
+        cmd_opts = " --format=vertical --basedir=. --datadir=."
         comment = ("Test case %d - offline server without %s option" % 
                    (test_num, "start"))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -100,9 +100,14 @@ class test(server_info.test):
 
         server_info.test.do_replacements(self)
 
-        self.replace_result("+---", "+---------+\n")
-        self.replace_result("|", "| XXXX ...|\n")
-        self.replace_result("localhost:", "localhost:XXXX [...]\n")
+        self.replace_result("ERROR: No login credentials",
+                            "ERROR: Unable to get login-path\n")
+        self.replace_result("ERROR: .mylogin.cnf",
+                            "ERROR: Unable to get login-path\n")
+        self.replace_result("ERROR: the used my_print_defaults",
+                            "ERROR: Unable to get login-path\n")
+        self.replace_result("ERROR: error: <the used my_print_defaults",
+                            "ERROR: Unable to get login-path\n")
 
         return True
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,12 +21,11 @@ This file contains the import database utility which allows users to import
 metadata for objects in a database and data for tables.
 """
 
-import optparse
+
 import os
-import re
 import sys
 import time
-from mysql.utilities import VERSION_FRM
+
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options, add_engines
@@ -171,7 +170,7 @@ options = {
 
 # Parse server connection values
 try:
-    server_values = parse_connection(opt.server)
+    server_values = parse_connection(opt.server, None, options)
 except:
     parser.error("Server connection values invalid or cannot be parsed.")
 

@@ -7,7 +7,8 @@ Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --server=SERVER       connection information for the server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   -d, --show-drops      display DROP statements for dropping indexes
   -i, --show-indexes    display indexes for each table
   -s, --skip            skip tables that do not exist

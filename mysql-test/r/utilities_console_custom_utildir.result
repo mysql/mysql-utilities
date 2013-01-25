@@ -20,11 +20,14 @@ Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --master=MASTER       connection information for master server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   --slave=SLAVE         connection information for slave server in the form:
-                        <user>:<password>@<host>:<port>:<socket>
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
   --rpl-user=RPL_USER   the user and password for the replication user
-                        requirement - e.g. rpl:passwd - default = rpl:rpl
+                        requirement, in the form: <user>[:<password>] or
+                        <login-path>. E.g. rpl:passwd - By default = rpl:rpl
   -p, --pedantic        fail if storage engines differ among master and slave.
   --test-db=TEST_DB     database name to use in testing  replication setup
                         (optional)

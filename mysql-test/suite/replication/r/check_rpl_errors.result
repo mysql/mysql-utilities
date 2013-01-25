@@ -1,11 +1,11 @@
 Test case 1 - master parameter invalid
 Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
 
-mysqlrplcheck.py: error: Master connection values invalid or cannot be parsed.
+mysqlrplcheck.py: error: Unable to get login-path
 Test case 2 - slave parameter invalid
 Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
 
-mysqlrplcheck.py: error: Slave connection values invalid or cannot be parsed.
+mysqlrplcheck.py: error: Unable to get login-path
 Test case 3 - same server literal specification
 Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
 

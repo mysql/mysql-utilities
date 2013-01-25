@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,11 +26,17 @@ Methods:
 
 import copy
 import optparse
+import os.path
 import re
 
-from .. import VERSION_FRM
+from mysql.utilities import VERSION_FRM
+from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 from optparse import Option as CustomOption, OptionValueError as ValueError
+
+from mysql.utilities.common.my_print_defaults import MyDefaultsReader
+from mysql.utilities.common.my_print_defaults import my_login_config_exists
+from mysql.utilities.common.my_print_defaults import my_login_config_path
 
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
@@ -119,14 +125,16 @@ def setup_common_options(program_name, desc_str, usage_str,
         if append:
             parser.add_option("--server", action="append", dest="server",
                               help="connection information for the server in "
-                              "the form: <user>:<password>@<host>:<port>:"
-                              "<socket>")
+                              "the form: <user>[:<password>]@<host>[:<port>]"
+                              "[:<socket>] or <login-path>[:<port>]"
+                              "[:<socket>].")
         else:
             parser.add_option("--server", action="store", dest="server",
-                              type = "string", default=server_default,
+                              type="string", default=server_default,
                               help="connection information for the server in "
-                              "the form: <user>:<password>@<host>:<port>:"
-                              "<socket>")
+                              "the form: <user>[:<password>]@<host>[:<port>]"
+                              "[:<socket>] or <login-path>[:<port>]"
+                              "[:<socket>].")
 
     return parser
 
@@ -398,10 +406,11 @@ def add_rpl_user(parser, default_val="rpl:rpl"):
                       Default = rpl, rpl
     """
     parser.add_option("--rpl-user", action="store", dest="rpl_user",
-                      type = "string", default=default_val,
-                      help="the user and password for the replication " 
-                           "user requirement - e.g. rpl:passwd " 
-                           "- default = %default")
+                      type="string", default=default_val,
+                      help="the user and password for the replication "
+                           "user requirement, in the form: <user>[:<password>]"
+                           " or <login-path>. E.g. rpl:passwd - By default = "
+                           "%default")
 
 
 def add_rpl_mode(parser, do_both=True, add_file=True):
@@ -422,7 +431,7 @@ def add_rpl_mode(parser, do_both=True, add_file=True):
     parser.add_option("--rpl", "--replication", dest="rpl_mode", action="store",
                       help="include replication information. Choices = 'master'"
                       " = include the CHANGE MASTER command using source "
-                      "server as the mastert, 'slave' = include the CHANGE "
+                      "server as the master, 'slave' = include the CHANGE "
                       "MASTER command using the destination server's master "
                       "information%s." % rpl_mode_both,
                       choices=rpl_mode_options)
@@ -487,19 +496,20 @@ def add_failover_options(parser):
     """
     parser.add_option("--candidates", action="store", dest="candidates",
                       type="string", default=None,
-                      help="connection information for candidate slave servers "
-                      "for failover in the form: <user>:<password>@<host>:"
-                      "<port>:<socket>. Valid only with failover command. "
-                      "List multiple slaves in comma-separated list.")
+                      help="connection information for candidate slave servers"
+                      " for failover in the form: <user>[:<password>]@<host>[:"
+                      "<port>][:<socket>] or <login-path>[:<port>][:<socket>]."
+                      " Valid only with failover command. List multiple slaves"
+                      " in comma-separated list.")
 
     parser.add_option("--discover-slaves-login", action="store", dest="discover",
                       default=None, type="string", help="at startup, query "
                       "master for all registered slaves and use the user name "
                       "and password specified to connect. Supply the user and "
-                      "password in the form user:password. For example, "
-                      "--discover-slaves-login=joe:secret will use 'joe' as "
-                      "the user and 'secret' as the password for each "
-                      "discovered slave.")
+                      "password in the form <user>[:<password>] or "
+                      "<login-path>. For example, --discover-slaves-login="
+                      "joe:secret will use 'joe' as the user and 'secret' as "
+                      "the password for each discovered slave.")
 
     parser.add_option("--exec-after", action="store", dest="exec_after",
                       default=None, type="string", help="name of script to "
@@ -520,8 +530,8 @@ def add_failover_options(parser):
 
     parser.add_option("--master", action="store", dest="master", default=None,
                       type="string", help="connection information for master "
-                      "server in the form: <user>:<password>@<host>:<port>:"
-                      "<socket>")
+                      "server in the form: <user>[:<password>]@<host>[:<port>]"
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]")
     
     parser.add_option("--max-position", action="store", dest="max_position",
                       default=0, type="int", help="Used to detect slave "
@@ -542,8 +552,9 @@ def add_failover_options(parser):
 
     parser.add_option("--slaves", action="store", dest="slaves",
                       type="string", default=None,
-                      help="connection information for slave servers in " 
-                      "the form: <user>:<password>@<host>:<port>:<socket>. "
+                      help="connection information for slave servers in "
+                      "the form: <user>[:<password>]@<host>[:<port>]"
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]. "
                       "List multiple slaves in comma-separated list.")
     
     parser.add_option("--timeout", action="store", dest="timeout", default=3,
@@ -577,6 +588,12 @@ def obj2sql(obj):
 _CONN_USERPASS = re.compile(
     r"(\w+)"                     # User name
     r"(?:\:(\w+))?"              # Optional password
+    )
+
+_CONN_LOGINPATH = re.compile(
+    r"(\w+)"                     # login-path
+    r"(?:\:(\d+))?"              # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
 _CONN_QUOTEDHOST = re.compile(
@@ -639,12 +656,13 @@ def hostname_is_ip(hostname):
     return True
 
 
-def parse_connection(connection_values):
+def parse_connection(connection_values, my_defaults_reader=None, options={}):
     """Parse connection values.
 
-    The function parses a connection specification of the form::
+    The function parses a connection specification of one of the forms::
 
-      user[:password]@host[:port[:socket]]
+      - user[:password]@host[:port][:socket]
+      - login-path[:port][:socket]
 
     A dictionary is returned containing the connection parameters. The
     function is designed so that it shall be possible to use it with a
@@ -653,54 +671,103 @@ def parse_connection(connection_values):
       options = parse_connection(spec)
       conn = mysql.connector.connect(**options)
 
-    conn_values[in]     Connection values in the form:
-                        user:password@host:port:socket
-                        
+    conn_values[in]         Connection values in the form:
+                            user:password@host:port:socket
+                            or login-path:port:socket
+    my_defaults_reader[in]  Instance of MyDefaultsReader to read the
+                            information of the login-path from configuration
+                            files. By default, the value is None.
+    options[in]             Dictionary of options (e.g. basedir), from the used
+                            utility. By default, it set with an empty
+                            dictionary. Note: also supports options values
+                            from optparse.
+
     Notes:
-    
+
     This method validates IPv4 addresses and standard IPv6 addresses.
-    
+
     This method accepts quoted host portion strings. If the host is marked
     with quotes, the code extracts this without validation and assigns it to
     the host variable in the returned tuple. This allows users to specify host
     names and IP addresses that are outside of the supported validation.
 
     Returns dictionary (user, passwd, host, port, socket)
-            or None if parsing error
+            or raise an exception if parsing error
     """
-    import os
-    from mysql.utilities.exception import FormatError
-    
+
     def _match(pattern, search_str):
         grp = pattern.match(search_str)
         if not grp:
             raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
         return grp.groups()
 
-    # Split on the '@'
-    try:
-        userpass, hostportsock = connection_values.split('@')
-    except:
-        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+    # Split on the '@' to determine the connection string format.
+    conn_format = connection_values.split('@')
 
-    # Get user, password    
-    user, passwd = _match(_CONN_USERPASS, userpass)
+    if len(conn_format) == 1:
+        # No '@' then handle has in the format: login-path[:port][:socket]
+        login_path, port, socket = _match(_CONN_LOGINPATH, conn_format[0])
 
-    if len(hostportsock) <= 0:
-        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+        #Check if the login configuration file (.mylogin.cnf) exists
+        if login_path and not my_login_config_exists():
+            raise UtilError(".mylogin.cnf was not found at is default "
+                            "location: %s" % my_login_config_path())
 
-    if hostportsock[0] in ['"', "'"]:
-        # need to strip the quotes
-        host, port, socket = _match(_CONN_QUOTEDHOST, hostportsock)
-        if host[0] == '"':
-            host = host.strip('"')
-        if host[0] == "'":
-            host = host.strip("'")
-    elif len(hostportsock.split(":")) <= 3:  # if fewer colons, must be IPv4
-        host, port, socket = _match(_CONN_IPv4, hostportsock)
+        # If needed, create a MyDefaultsReader and search for my_print_defaults
+        # tool.
+        if not my_defaults_reader:
+            my_defaults_reader = MyDefaultsReader(options)
+        elif not my_defaults_reader.tool_path:
+            my_defaults_reader.search_my_print_defaults_tool()
+
+        # Check if the my_print_default tool is able to read a login-path from
+        # the mylogin configuration file
+        if not my_defaults_reader.check_login_path_support():
+            raise UtilError("the used my_print_defaults tool does not "
+                            "support login-path options: %s"
+                            % my_defaults_reader.tool_path)
+
+        # Read and parse the login-path data (i.e., user, password and host)
+        login_path_data = my_defaults_reader.get_group_data(login_path)
+
+        if login_path_data:
+            user = login_path_data.get('user', None)
+            passwd = login_path_data.get('password', None)
+            host = login_path_data.get('host', None)
+        else:
+            raise UtilError("No login credentials found for login-path: %s. "
+                            "Please review the used connection string: %s"
+                            % (login_path, connection_values))
+
+    elif len(conn_format) == 2:
+
+        # Handle as in the format: user[:password]@host[:port][:socket]
+        userpass, hostportsock = conn_format
+
+        # Get user, password
+        user, passwd = _match(_CONN_USERPASS, userpass)
+
+        # Handle host, port and socket
+        if len(hostportsock) <= 0:
+            raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+
+        if hostportsock[0] in ['"', "'"]:
+            # need to strip the quotes
+            host, port, socket = _match(_CONN_QUOTEDHOST, hostportsock)
+            if host[0] == '"':
+                host = host.strip('"')
+            if host[0] == "'":
+                host = host.strip("'")
+        elif len(hostportsock.split(":")) <= 3:  # if fewer colons, must be IPv4
+            host, port, socket = _match(_CONN_IPv4, hostportsock)
+        else:
+            host, port, socket = _match(_CONN_IPv6, hostportsock)
+
     else:
-        host, port, socket = _match(_CONN_IPv6, hostportsock)
+        # Unrecognized format
+        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
 
+    # Set parsed connection values
     connection = {
         "user"   : user,
         "host"   : host,
@@ -714,3 +781,97 @@ def parse_connection(connection_values):
         connection['unix_socket'] = socket
 
     return connection
+
+
+def parse_user_password(userpass_values, my_defaults_reader=None, options={}):
+    """ This function parses a string with the user/password credentials.
+
+    This function parses the login string, determines the used format, i.e.
+    user[:password] or login-path. If the ':' (colon) is not in the login
+    string, the it can refer to a login-path or to a username (without a
+    password). In this case, first it is assumed that the specified value is a
+    login-path and the function attempts to retrieve the associated username
+    and password, in a quiet way (i.e., without raising exceptions). If it
+    fails to retrieve the login-path data, then the value is assumed to be a
+    username.
+
+    userpass_values[in]     String indicating the user/password credentials. It
+                            must be in the form: user[:password] or login-path.
+    my_defaults_reader[in]  Instance of MyDefaultsReader to read the
+                            information of the login-path from configuration
+                            files. By default, the value is None.
+    options[in]             Dictionary of options (e.g. basedir), from the used
+                            utility. By default, it set with an empty
+                            dictionary. Note: also supports options values
+                            from optparse.
+
+    Returns a tuple with the username and password.
+    """
+    # Split on the ':' to determine if a login-path is used.
+    login_values = userpass_values.split(':')
+    if len(login_values) == 1:
+        # Format is login-path or user (without a password): First, assume it
+        # is a login-path and quietly try to retrieve the user and password.
+        # If it fails, assume a user name is being specified.
+
+        #Check if the login configuration file (.mylogin.cnf) exists
+        if login_values[0] and not my_login_config_exists():
+            return login_values[0], None
+
+        if not my_defaults_reader:
+            # Attempt to create the MyDefaultsReader
+            try:
+                my_defaults_reader = MyDefaultsReader(options)
+            except UtilError:
+                # Raise an UtilError when my_print_defaults tool is not found.
+                return login_values[0], None
+        elif not my_defaults_reader.tool_path:
+            # Try to find the my_print_defaults tool
+            try:
+                my_defaults_reader.search_my_print_defaults_tool()
+            except UtilError:
+                # Raise an UtilError when my_print_defaults tool is not found.
+                return login_values[0], None
+
+        # Check if the my_print_default tool is able to read a login-path from
+        # the mylogin configuration file
+        if not my_defaults_reader.check_login_path_support():
+            return login_values[0], None
+
+        # Read and parse the login-path data (i.e., user and password)
+        try:
+            loginpath_data = my_defaults_reader.get_group_data(login_values[0])
+            if loginpath_data:
+                user = loginpath_data.get('user', None)
+                passwd = loginpath_data.get('password', None)
+                return user, passwd
+            else:
+                return login_values[0], None
+        except UtilError:
+            # Raise an UtilError if unable to get the login-path group data
+            return login_values[0], None
+
+    elif len(login_values) == 2:
+        # Format is user:password; return a tuple with the user and password
+        return login_values[0], login_values[1]
+    else:
+        # Invalid user credentials format
+        return FormatError("Unable to parse the specified user credentials "
+                           "(accepted formats: user[:password] or login-path):"
+                           " %s" % userpass_values)
+
+
+def add_basedir_option(parser):
+    """ Add the --basedir option.
+    """
+    parser.add_option("--basedir", action="store", dest="basedir",
+                      default=None, type="string",
+                      help="the base directory for the server")
+
+
+def check_basedir_option(parser, opt_basedir):
+    """ Check if the specified --basedir option is valid.
+    """
+    if opt_basedir and not os.path.isdir(opt_basedir):
+        parser.error("The specified path for --basedir option is not a "
+                     "directory: %s" % opt_basedir)

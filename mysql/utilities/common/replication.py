@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@ This module contains abstractions of MySQL replication functionality.
 """
 
 import os
-import re
 import time
+
+from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, UtilRplWarn, UtilRplError
 
@@ -156,12 +157,11 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
                             change_master.append(_WARNING % _RPL_USER_PASS)
                     passwd = res[0][1]
             else:
-                try:
-                    uname, passwd = rpl_user.split(":")
-                except:
-                    uname = rpl_user
+                # Parse username and password (supports login-paths)
+                uname, passwd = parse_user_password(rpl_user, options=options)
+                if not passwd:
                     passwd = ''
-                    
+
                 # Check replication user privileges
                 errors = master.check_rpl_user(uname, master.host)
                 if errors != []:
@@ -542,7 +542,8 @@ class Replication(object):
         
         result = True
         
-        r_user, r_pass = re.match("(\w+)(?:\:(\w+))?", rpl_user).groups()
+        # Parse user and password (support login-paths)
+        r_user, r_pass = parse_user_password(rpl_user)
         
         # Check to see if rpl_user is present, else create her
         if not self.create_rpl_user(r_user, r_pass):

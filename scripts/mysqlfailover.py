@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import signal
 import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
-from mysql.utilities.common.options import parse_connection, add_verbosity
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.server import check_hostname_alias
@@ -39,7 +39,7 @@ from mysql.utilities import VERSION_FRM
 # Constants
 NAME = "MySQL Utilities - mysqlfailover "
 DESCRIPTION = "mysqlfailover - automatic replication health monitoring and failover"
-USAGE = "%prog --master=roo@localhost --discover-slaves-login=root " + \
+USAGE = "%prog --master=root@localhost --discover-slaves-login=root " + \
         "--candidates=root@host123:3306,root@host456:3306 " 
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 _DATE_LEN = 22

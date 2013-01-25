@@ -1,6 +1,6 @@
 
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,13 @@ import re
 import sys
 
 import mysql.connector
+
+from mysql.utilities.common.format import print_list
+from mysql.utilities.common.options import parse_connection
+
+from mysql.utilities.exception import EmptyResultError
+from mysql.utilities.exception import FormatError
+
 
 KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
 
@@ -186,9 +193,6 @@ class ProcessGrep(object):
           format           format for display
                            default = GRID
         """
-        from mysql.utilities.exception import EmptyResultError, FormatError
-        from ..common.options import parse_connection
-        from ..common.format import print_list
 
         output = kwrds.get('output', sys.stdout)
         connector = kwrds.get('connector', mysql.connector)
