@@ -1,3 +1,18 @@
+Release 1.1.2 (Released January 17, 2013)
+-----------------------------------------
+
+- BUG#13931340: mysqluserclone should dump all users
+- BUG#14712211: mysqluc fails to look for the utilities for a given utildir path
+- BUG#15867353: Add GTID handling to mysqldbcopy, mysqldbexport
+- BUG#16010766: gtid enabled utilities need to check version of the server
+- BUG#16016887: mysqldiskusage reports missing binlog
+- BUG#16020953: --timeout option in mysqlfailover throws error
+- BUG#16023646: mysqldbcopy cannot copy world_innodb sample database
+- BUG#16023781: switchover can fail to complete if there are errors in slaves
+- BUG#16035934: unused --server option in mysqldbcompare
+- BUG#16037123: mysqlrplshow fails to report connection errors
+- BUG#16072863: gtid-enabled utilities need better error handling
+
 Release 1.1.1 (Released December 14, 2012)
 ------------------------------------------
 
