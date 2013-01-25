@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 import os
 import check_index_parameters

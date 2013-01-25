@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import t2
 
 class test(t2.test):

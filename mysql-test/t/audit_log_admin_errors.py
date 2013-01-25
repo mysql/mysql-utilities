@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import audit_log_admin
 import os
 from mysql.utilities.exception import MUTLibError

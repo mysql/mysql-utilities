@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import mutlib
 
 class test(mutlib.System_test):

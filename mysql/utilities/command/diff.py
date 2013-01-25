@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 #
 # Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
 #

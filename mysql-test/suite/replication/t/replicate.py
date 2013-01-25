@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import mutlib
 from mysql.utilities.exception import MUTLibError, UtilDBError

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import export_rpl_errors
 import mutlib

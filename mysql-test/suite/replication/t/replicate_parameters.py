@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import replicate
 from mysql.utilities.exception import MUTLibError
