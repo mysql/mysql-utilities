@@ -18,10 +18,10 @@ Test case 5 - no password
 ERROR: Access denied for user 'root'@'localhost' using password: NO
 
 Test case 6 - offline server without start, basedir, datadir option
-ERROR: Server is offline. To connection, you must also provide basedir, datadir and the start option
+ERROR: Server is offline. To connect, you must also provide basedir, datadir and the start option
 
 Test case 7 - offline server without start, datadir option
-ERROR: Server is offline. To connection, you must also provide datadir and the start option
+ERROR: Server is offline. To connect, you must also provide datadir and the start option
 
 Test case 8 - offline server without start option
-ERROR: Server is offline. To connection, you must also provide start option
+ERROR: Server is offline. To connect, you must also provide start option
