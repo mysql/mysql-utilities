@@ -26,4 +26,3 @@ Command-Line Utilities
    mysqluserclone
    mysqlauditadmin
    mysqlauditgrep
-   mut

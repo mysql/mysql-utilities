@@ -84,8 +84,3 @@ respective manual pages for further details and examples:
   * Clone a user account, to the same or different server
   * Show user grants
 
-`mut`
-  * Tests for all utilities
-  * Similar to MTR
-  * Comparative and value result support
-  * Tests written as Python classes

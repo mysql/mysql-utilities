@@ -273,9 +273,6 @@ man_pages = [
     ('man/mysqlauditgrep', 'mysqlauditgrep',
      u'Searching utility for Audit Log files',
      [u'MySQL Utilities Team'], 1),
-    ('man/mut', 'mut',
-     u'Testing environment for MySQL utilities',
-     [u'MySQL Utilities Team'], 1),
 ]
 
 
