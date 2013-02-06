@@ -32,6 +32,7 @@ from mysql.utilities.common.options import setup_common_options, add_engines
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -171,8 +172,10 @@ options = {
 # Parse server connection values
 try:
     server_values = parse_connection(opt.server, None, options)
-except:
-    parser.error("Server connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Server connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Build list of files to import
 file_list = []

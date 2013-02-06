@@ -246,6 +246,16 @@ class test(copy_db.test):
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
 
+        # Replace connection errors
+        self.replace_result("mysqldbcopy.py: error: Source connection "
+                            "values invalid",
+                            "mysqldbcopy.py: error: Source connection "
+                            "values invalid\n")
+        self.replace_result("mysqldbcopy.py: error: Destination connection "
+                            "values invalid",
+                            "mysqldbcopy.py: error: Destination connection "
+                            "values invalid\n")
+
         return True
   
     def get_result(self):

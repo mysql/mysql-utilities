@@ -99,16 +99,14 @@ class test(check_rpl.test):
                             "Error ####: Can't connect to local MySQL server "
                             "####...\n")
 
-        self.replace_result("mysqlrplcheck.py: error: No login credentials",
-                            "mysqlrplcheck.py: error: Unable to get "
-                            "login-path\n")
-        self.replace_result("mysqlrplcheck.py: error: .mylogin.cnf",
-                            "mysqlrplcheck.py: error: Unable to get "
-                            "login-path\n")
-        self.replace_result("mysqlrplcheck.py: error: the used "
-                            "my_print_defaults",
-                            "mysqlrplcheck.py: error: Unable to get "
-                            "login-path\n")
+        self.replace_result("mysqlrplcheck.py: error: Master connection "
+                            "values invalid",
+                            "mysqlrplcheck.py: error: Master connection "
+                            "values invalid\n")
+        self.replace_result("mysqlrplcheck.py: error: Slave connection "
+                            "values invalid",
+                            "mysqlrplcheck.py: error: Slave connection "
+                            "values invalid\n")
 
         return True
 

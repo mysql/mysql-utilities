@@ -114,10 +114,10 @@ if opt.recurse and opt.max_depth is not None:
 # Parse master connection values
 try:
     m_values = parse_connection(opt.master, None, opt)
-except FormatError:
-    parser.error("Master connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Master connection values invalid: %s." % err)
 except UtilError as err:
-    parser.error(err.errmsg)
+    parser.error("Master connection values invalid: %s." % err.errmsg)
 
 # Create dictionary of options
 options = {

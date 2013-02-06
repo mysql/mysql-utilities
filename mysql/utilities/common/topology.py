@@ -70,14 +70,14 @@ def parse_failover_connections(options):
         try:
             master_val = parse_connection(options.master, config_reader,
                                           options)
-        except FormatError, e:
+        except FormatError as err:
             msg = ("Master connection values invalid or cannot be parsed: %s "
-                   "(%s)." % (options.master, e))
+                   "(%s)." % (options.master, err))
             raise UtilRplError(msg)
-        except UtilError, e:
+        except UtilError as err:
             msg = ("Master connection values invalid or cannot be parsed: %s "
                    "(using login-path authentication: %s)" % (options.master,
-                                                              e.errmsg))
+                                                              err.errmsg))
             raise UtilRplError(msg)
     else:
         master_val = None
@@ -89,13 +89,13 @@ def parse_failover_connections(options):
             try:
                 s_values = parse_connection(slave, config_reader, options)
                 slaves_val.append(s_values)
-            except FormatError, e:
+            except FormatError as err:
                 msg = ("Slave connection values invalid or cannot be parsed: "
-                       "%s (%s)" % (slave, e))
+                       "%s (%s)" % (slave, err))
                 raise UtilRplError(msg)
-            except UtilError, e:
+            except UtilError as err:
                 msg = ("Slave connection values invalid or cannot be parsed: "
-                       "%s (%s)" % (slave, e.errmsg))
+                       "%s (%s)" % (slave, err.errmsg))
                 raise UtilRplError(msg)
     
     candidates_val = []
@@ -105,13 +105,13 @@ def parse_failover_connections(options):
             try:
                 s_values = parse_connection(slave, config_reader, options)
                 candidates_val.append(s_values)
-            except FormatError, e:
+            except FormatError as err:
                 msg = "Candidate connection values invalid or " + \
-                      "cannot be parsed: %s" % slave
+                      "cannot be parsed: %s (%s)" % (slave, err)
                 raise UtilRplError(msg)
-            except UtilError, e:
+            except UtilError as err:
                 msg = ("Candidate connection values invalid or cannot be "
-                       "parsed: %s (%s)" % (slave, e.errmsg))
+                       "parsed: %s (%s)" % (slave, err.errmsg))
                 raise UtilRplError(msg)
                 
     return (master_val, slaves_val, candidates_val)

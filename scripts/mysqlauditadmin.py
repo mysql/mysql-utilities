@@ -176,10 +176,10 @@ server_values = None
 if opt.server:
     try:
         server_values = parse_connection(opt.server, None, opt)
-    except FormatError as details:
-        parser.error(details)
+    except FormatError as err:
+        parser.error("Server connection values invalid: %s." % err)
     except UtilError as err:
-        parser.error(err.errmsg)
+        parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Check for copy prerequisites
 if command and command == "COPY" and not opt.copy_location:

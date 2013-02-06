@@ -102,11 +102,11 @@ Test case 15 - dest user has privileges needed
 Test case 16 - cannot parse --source
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: Source connection values invalid or cannot be parsed.
+mysqldbcopy.py: error: Source connection values invalid
 Test case 17 - cannot parse --destination
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: Destination connection values invalid or cannot be parsed.
+mysqldbcopy.py: error: Destination connection values invalid
 Test case 18 - no destination specified
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 

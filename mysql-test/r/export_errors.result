@@ -9,7 +9,7 @@ mysqldbexport.py: error: You must specify at least one database to export or use
 Test case 4 - cannot parse --server
 Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: Server connection values invalid or cannot be parsed.
+mysqldbexport.py: error: Server connection values invalid
 Test case 5 - error: cannot connect to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)

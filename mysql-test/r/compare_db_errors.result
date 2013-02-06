@@ -1,11 +1,11 @@
 Test case 1 - Invalid --server1 
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Connection 'joeunk:@:dooer' cannot be parsed as a connection
+mysqldbcompare.py: error: Server1 connection values invalid
 Test case 2 - Invalid --server2 
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Connection 'joeunk:@:dooer' cannot be parsed as a connection
+mysqldbcompare.py: error: Server2 connection values invalid
 Test case 3 - malformed argument inventory.inventory 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

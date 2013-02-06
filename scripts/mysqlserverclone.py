@@ -140,8 +140,10 @@ if opt.basedir and opt.basedir[0] == '.':
 if opt.basedir is None:
     try:
         conn = parse_connection(opt.server)
-    except:
-        parser.error("Source connection values invalid or cannot be parsed.")
+    except exception.FormatError as err:
+        parser.error("Server connection values invalid: %s." % err)
+    except exception.UtilError as err:
+        parser.error("Server connection values invalid: %s." % err.errmsg)
 else:
     conn = None
 

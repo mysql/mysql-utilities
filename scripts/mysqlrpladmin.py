@@ -170,10 +170,10 @@ if opt.format and command not in ['health', 'gtid']:
 if opt.new_master:
     try:
         new_master_val = parse_connection(opt.new_master, None, opt)
-    except FormatError, e:
-        parser.error("New master connection values invalid or cannot be parsed.")
+    except FormatError as err:
+        parser.error("New master connection values invalid: %s." % err)
     except UtilError as err:
-        parser.error(err.errmsg)
+        parser.error("New master connection values invalid: %s." % err.errmsg)
 else:
     new_master_val = None
 

@@ -50,7 +50,16 @@ class test(compare_db.test):
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
+        self.replace_result("mysqldbcompare.py: error: Server1 connection "
+                            "values invalid",
+                            "mysqldbcompare.py: error: Server1 connection "
+                            "values invalid\n")
+        self.replace_result("mysqldbcompare.py: error: Server2 connection "
+                            "values invalid",
+                            "mysqldbcompare.py: error: Server2 connection "
+                            "values invalid\n")
+
         return True
 
     def get_result(self):

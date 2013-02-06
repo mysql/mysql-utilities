@@ -35,6 +35,7 @@ from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.common.options import add_regexp, add_rpl_mode
 from mysql.utilities.common.options import check_rpl_options, add_rpl_user
+from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -181,14 +182,19 @@ try:
     # parse_connection methods (like, searching my_print_defaults tool).
     config_reader = MyDefaultsReader(options, False)
     source_values = parse_connection(opt.source, config_reader, options)
-except:
-    parser.error("Source connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Source connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Source connection values invalid: %s." % err.errmsg)
 
 # Parse destination connection values
 try:
     dest_values = parse_connection(opt.destination, config_reader, options)
-except:
-    parser.error("Destination connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Destination connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Destination connection values invalid: %s."
+                 % err.errmsg)
 
 # Check to see if attempting to use --rpl on the same server
 if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:

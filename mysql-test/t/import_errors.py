@@ -174,6 +174,13 @@ class test(import_basic.test):
             
         self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
 
+        self.replace_substring("1045 (28000)", "1045")
+
+        self.replace_result("mysqldbimport.py: error: Server connection "
+                            "values invalid",
+                            "mysqldbimport.py: error: Server connection "
+                            "values invalid\n")
+
         return True
 
     def get_result(self):

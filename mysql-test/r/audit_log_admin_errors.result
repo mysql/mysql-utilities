@@ -5,7 +5,7 @@ mysqlauditadmin.py: error: The --server option is required for --show-options.
 Test case 2 - Server connection parse error
 Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: Unable to get login-path
+mysqlauditadmin.py: error: Server connection values invalid
 Test case 3 - Server connection empty
 Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
 

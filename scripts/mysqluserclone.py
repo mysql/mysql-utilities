@@ -29,6 +29,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import userclone
 
@@ -106,8 +107,11 @@ if (len(args) == 0 or opt is None) and not opt.list_users:
 # Parse source connection values
 try:
     source_values = parse_connection(opt.source, None, opt)
-except:
-    parser.error("Source connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Source connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Source connection values invalid: %s." % err.errmsg)
+
 
 if opt.list_users:
     userclone.show_users(source_values, opt.verbosity, opt.format, opt.dump)
@@ -123,9 +127,11 @@ else:
     if not opt.dump and opt.destination is not None:
         try:
             dest_values = parse_connection(opt.destination, None, opt)
-        except:
-            parser.error("Destination connection values invalid or cannot "
-                         "be parsed.")
+        except FormatError as err:
+            parser.error("Destination connection values invalid: %s." % err)
+        except UtilError as err:
+            parser.error("Destination connection values invalid: %s."
+                         % err.errmsg)
     else:
         dest_values = None
 

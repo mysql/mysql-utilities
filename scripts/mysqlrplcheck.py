@@ -92,18 +92,18 @@ opt, args = parser.parse_args()
 # Parse source connection values
 try:
     m_values = parse_connection(opt.master)
-except FormatError, e:
-    parser.error("Master connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Master connection values invalid: %s." % err)
 except UtilError as err:
-    parser.error(err.errmsg)
+    parser.error("Master connection values invalid: %s." % err.errmsg)
 
 # Parse source connection values
 try:
     s_values = parse_connection(opt.slave)
-except FormatError, e:
-    parser.error("Slave connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Slave connection values invalid: %s." % err)
 except UtilError as err:
-    parser.error(err.errmsg)
+    parser.error("Slave connection values invalid: %s." % err.errmsg)
 
 # Check hostname alias
 if check_hostname_alias(m_values, s_values):

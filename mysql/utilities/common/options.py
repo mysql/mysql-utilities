@@ -638,7 +638,10 @@ _CONN_IPv6 = re.compile(
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )
 
-_BAD_CONN_FORMAT = "Connection '{0}' cannot be parsed as a connection"
+_BAD_CONN_FORMAT = ("Connection '{0}' cannot be parsed. Please review the "
+                    "used connection string (accepted formats: "
+                    "<user>[:<password>]@<host>[:<port>][:<socket>] or "
+                    "<login-path>[:<port>][:<socket>])")
 _BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
 
 
@@ -711,7 +714,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         #Check if the login configuration file (.mylogin.cnf) exists
         if login_path and not my_login_config_exists():
             raise UtilError(".mylogin.cnf was not found at is default "
-                            "location: %s" % my_login_config_path())
+                            "location: %s."
+                            "Please configure your login-path data before "
+                            "using it (use the mysql_config_editor tool)."
+                            % my_login_config_path())
 
         # If needed, create a MyDefaultsReader and search for my_print_defaults
         # tool.
@@ -724,7 +730,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         # the mylogin configuration file
         if not my_defaults_reader.check_login_path_support():
             raise UtilError("the used my_print_defaults tool does not "
-                            "support login-path options: %s"
+                            "support login-path options: %s. "
+                            "Please confirm that the location to a tool with "
+                            "login-path support is included in the PATH "
+                            "(at the beginning)."
                             % my_defaults_reader.tool_path)
 
         # Read and parse the login-path data (i.e., user, password and host)
@@ -857,8 +866,8 @@ def parse_user_password(userpass_values, my_defaults_reader=None, options={}):
     else:
         # Invalid user credentials format
         return FormatError("Unable to parse the specified user credentials "
-                           "(accepted formats: user[:password] or login-path):"
-                           " %s" % userpass_values)
+                           "(accepted formats: <user>[:<password> or "
+                           "<login-path>): %s" % userpass_values)
 
 
 def add_basedir_option(parser):

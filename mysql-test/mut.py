@@ -477,7 +477,7 @@ else:
         # Here we capture any exception and print the error message.
         # Since all util errors (exceptions) derive from Exception, this is
         # safe.
-        except Exception, err:
+        except Exception as err:
             print "%sFAILED%s" % (BOLD_ON, BOLD_OFF)
             if conn.connect_error is not None:
                 print conn.connect_error

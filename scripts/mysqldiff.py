@@ -31,6 +31,7 @@ from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -100,13 +101,17 @@ options = {
 # Parse server connection values
 try:
     server1_values = parse_connection(opt.server1, None, options)
-except:
-    parser.error("Server1 connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Server1 connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Server1 connection values invalid: %s." % err.errmsg)
 if opt.server2 is not None:
     try:
         server2_values = parse_connection(opt.server2, None, options)
-    except:
-        parser.error("Server2 connection values invalid or cannot be parsed.")
+    except FormatError as err:
+        parser.error("Server2 connection values invalid: %s." % err)
+    except UtilError as err:
+        parser.error("Server2 connection values invalid: %s." % err.errmsg)
 else:
     server2_values = None
     

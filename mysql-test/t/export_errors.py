@@ -91,10 +91,14 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        self.replace_result("Error 1045", "Error 1045: Access denied for user "
-                            "'nope'@'localhost' (using password: YES)\n")
+        self.replace_substring("1045 (28000)", "1045")
 
         self.remove_result("# WARNING: The server supports GTIDs")
+
+        self.replace_result("mysqldbexport.py: error: Server connection "
+                            "values invalid",
+                            "mysqldbexport.py: error: Server connection "
+                            "values invalid\n")
 
         return True
           

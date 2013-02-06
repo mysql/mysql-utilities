@@ -1,7 +1,7 @@
 Test case 1 - error: cannot parse master string
 Usage: mysqlrplshow.py --master=root@localhost:3306 
 
-mysqlrplshow.py: error: Unable to get login-path
+mysqlrplshow.py: error: Master connection values invalid
 Test case 2 - error: invalid login to master
 # master on localhost: ... FAILED.
 

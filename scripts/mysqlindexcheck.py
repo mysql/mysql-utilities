@@ -28,11 +28,12 @@ import os.path
 import sys
 
 from mysql.utilities.command import indexcheck
-from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity, check_verbosity
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.exception import FormatError
+from mysql.utilities.exception import UtilError
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
@@ -90,8 +91,10 @@ if len(args) == 0:
 # Parse source connection values
 try:
     source_values = parse_connection(opt.server)
-except:
-    parser.error("Source connection values invalid or cannot be parsed.")
+except FormatError as err:
+    parser.error("Server connection values invalid: %s." % err)
+except UtilError as err:
+    parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Check best, worst for validity
 best = None
@@ -124,12 +127,6 @@ if (worst is not None or best is not None) and not opt.stats:
     parser.error("You must specify --stats for --best or --worst to take " \
                  "effect.")
 
-# Parse source connection values
-try:
-    source_values = parse_connection(opt.server, None, opt)
-except:
-    parser.error("Source connection values invalid or cannot be parsed.")
-    
 # Build dictionary of options
 options = {
     "show-drops"    : opt.show_drops,

@@ -136,12 +136,18 @@ options = {
 server2_values = None
 try:
     server1_values = parse_connection(opt.server1, None, options)
-    if opt.server2 is not None:
-        server2_values = parse_connection(opt.server2, None, options)
-except FormatError as details:
-    parser.error(details)
+except FormatError as err:
+    parser.error("Server1 connection values invalid: %s." % err)
 except UtilError as err:
-    parser.error(err.errmsg)
+    parser.error("Server1 connection values invalid: %s." % err.errmsg)
+
+if opt.server2:
+    try:
+        server2_values = parse_connection(opt.server2, None, options)
+    except FormatError as err:
+        parser.error("Server2 connection values invalid: %s." % err)
+    except UtilError as err:
+        parser.error("Server2 connection values invalid: %s." % err.errmsg)
 
 # Operations to perform:
 # 1) databases exist
