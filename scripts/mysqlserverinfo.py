@@ -115,11 +115,11 @@ try:
     show_server_info(opt.server, options)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 except Exception, e:
     print "ERROR:", e
-    exit(1)
+    sys.exit(1)
 
 print "#...done."
 
-exit()
+sys.exit()

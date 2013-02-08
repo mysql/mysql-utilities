@@ -103,4 +103,4 @@ try:
 except Exception as details:
     print >>sys.stderr, 'ERROR:', details
 
-exit()
+sys.exit()

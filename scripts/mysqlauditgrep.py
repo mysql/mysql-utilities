@@ -279,6 +279,6 @@ try:
 
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit(0)
+sys.exit(0)

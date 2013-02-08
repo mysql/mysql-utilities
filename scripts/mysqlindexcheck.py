@@ -143,6 +143,6 @@ try:
     res = indexcheck.check_index(source_values, args, options)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()

@@ -29,7 +29,7 @@ try:
 except:
     print "ERROR: The Connector/Python module is not installed or " + \
           "is not accessible from this terminal."
-    exit(2)
+    sys.exit(2)
 
 try:
     from mysql.utilities.command.utilitiesconsole import UtilitiesConsole
@@ -39,7 +39,7 @@ try:
 except:
     print "ERROR: MySQL Utilities are either not installed or are not " + \
           "accessible from this terminal."
-    exit(2)
+    sys.exit(2)
 
 # Constants
 NAME = "MySQL Utilities Client - mysqluc "

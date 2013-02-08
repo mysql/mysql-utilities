@@ -169,7 +169,7 @@ try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
 # Check hostname alias
 for slave_val in slaves_val:
@@ -217,7 +217,7 @@ except UtilError, e:
     # log the error in case it was an usual exception
     logging.log(logging.CRITICAL, e.errmsg.strip(' '))  
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
     
-exit(0)
+sys.exit(0)
 

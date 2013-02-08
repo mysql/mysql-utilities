@@ -124,7 +124,7 @@ try:
     skips = check_skip_options(opt.skip_objects)
 except UtilError, e:
     print "ERROR: %s" % e.errmsg
-    exit(1)
+    sys.exit(1)
 
 # Fail if no arguments
 if len(args) == 0:
@@ -136,7 +136,7 @@ if opt.skip_blobs and not opt.import_type == "data":
 if "data" in skips and opt.import_type == "data":
     print "ERROR: You cannot use --import=data and --skip-data when " \
           "importing table data."
-    exit(1)
+    sys.exit(1)
 
 if "create_db" in skips and opt.do_drop:
     print "ERROR: You cannot combine --drop-first and --skip=create_db."
@@ -195,6 +195,6 @@ try:
 
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()

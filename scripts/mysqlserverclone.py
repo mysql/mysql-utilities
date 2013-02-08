@@ -151,6 +151,6 @@ try:
     res = serverclone.clone_server(conn, options)
 except exception.UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
     
-exit()
+sys.exit()

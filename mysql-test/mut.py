@@ -484,7 +484,7 @@ else:
             print "ERROR: %s" % str(err)
     if server_list.num_servers() == 0:
         print "ERROR: Failed to connect to any servers listed."
-        exit(1)
+        sys.exit(1)
 
 # Check for running servers
 processes = []
@@ -757,4 +757,4 @@ if os.name == "posix":
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
                       old_terminal_settings)
 
-exit(0)
+sys.exit(0)

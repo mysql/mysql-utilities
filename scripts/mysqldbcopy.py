@@ -130,7 +130,7 @@ try:
     skips = check_skip_options(opt.skip_objects)
 except UtilError, e:
     print "ERROR: %s" % e.errmsg
-    exit(1)
+    sys.exit(1)
 
 # Fail if no options listed.
 if opt.destination is None:
@@ -222,6 +222,6 @@ try:
         print_elapsed_time(start_test)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()

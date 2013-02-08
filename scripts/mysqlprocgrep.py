@@ -116,9 +116,9 @@ try:
         command.execute(options.server, format=options.format)
 except EmptyResultError as details:
     print >>sys.stderr, "No matches"
-    exit(1)
+    sys.exit(1)
 except Exception as details:
     print >>sys.stderr, 'ERROR:', details
-    exit(2)
+    sys.exit(2)
 
-exit()
+sys.exit()

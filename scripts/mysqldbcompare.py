@@ -193,7 +193,7 @@ if not opt.quiet:
     print "#\n# ...done"
 
 if check_failed:
-    exit(1)
+    sys.exit(1)
     
-exit()
+sys.exit()
 

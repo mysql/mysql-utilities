@@ -150,7 +150,7 @@ try:
     skips = check_skip_options(opt.skip_objects)
 except UtilError, e:
     print "ERROR: %s" % e.errmsg
-    exit(1)
+    sys.exit(1)
 
 # Fail if no db arguments or all
 if len(args) == 0 and not opt.all:
@@ -172,7 +172,7 @@ if opt.file_per_tbl and opt.export in ("definitions", "both"):
 if "data" in skips and opt.export == "data":
     print "ERROR: You cannot use --export=data and --skip-data when exporting " \
           "table data."
-    exit(1)
+    sys.exit(1)
 
 # Set options for database operations.
 options = {
@@ -233,6 +233,6 @@ try:
 
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()

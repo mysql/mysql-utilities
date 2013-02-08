@@ -140,7 +140,7 @@ for argument in args:
                                "%s.%s" % (db2, obj2), options)
         except UtilError, e:
             print "ERROR:", e.errmsg
-            exit(1)
+            sys.exit(1)
         if diff is not None:
             diff_failed = True
             
@@ -151,17 +151,17 @@ for argument in args:
                                 db1, db2, options)
         except UtilError, e:
             print "ERROR:", e.errmsg
-            exit(1)
+            sys.exit(1)
         if not res:
             diff_failed = True
 
 if diff_failed:
     if not opt.quiet:
         print "Compare failed. One or more differences found."
-    exit(1)            
+    sys.exit(1)            
 
 if not opt.quiet:
     print "Success. All objects are the same."
     
-exit()
+sys.exit()
 

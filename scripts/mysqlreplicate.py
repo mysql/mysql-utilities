@@ -141,6 +141,6 @@ try:
                             options, opt.test_db)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()

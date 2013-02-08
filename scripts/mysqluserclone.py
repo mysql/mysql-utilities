@@ -149,6 +149,6 @@ else:
                                    new_user_list, options)
     except UtilError, e:
         print "ERROR:", e.errmsg
-        exit(1)
+        sys.exit(1)
 
-exit()
+sys.exit()

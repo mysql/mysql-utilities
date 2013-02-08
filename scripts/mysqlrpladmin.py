@@ -182,7 +182,7 @@ try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
 # Check hostname alias
 if master_val:
@@ -236,8 +236,8 @@ try:
     rpl_cmds.execute_command(command)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
     
-exit(0)
+sys.exit(0)
 
 

@@ -123,9 +123,9 @@ options = {
 try:
     res = check_replication(m_values, s_values, options)
     if res:
-        exit(1)
+        sys.exit(1)
 except UtilError, e:
     print "ERROR:", e.errmsg
-    exit(1)
+    sys.exit(1)
 
-exit()
+sys.exit()
