@@ -20,8 +20,8 @@ mysqluserclone.py: error: You cannot use --quiet and --dump together.
 Test case 6 - error: cannot parser source connection
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
-mysqluserclone.py: error: Source connection values invalid or cannot be parsed.
+mysqluserclone.py: error: Source connection values invalid
 Test case 7 - error: cannot parser destination connection
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
-mysqluserclone.py: error: Destination connection values invalid or cannot be parsed.
+mysqluserclone.py: error: Destination connection values invalid

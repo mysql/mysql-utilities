@@ -117,12 +117,8 @@ class test(server_info.test):
 
         server_info.test.do_replacements(self)
 
-        self.replace_result("ERROR: error: <No login credentials",
-                            "ERROR: Unable to get login-path\n")
-        self.replace_result("ERROR: error: <.mylogin.cnf",
-                            "ERROR: Unable to get login-path\n")
-        self.replace_result("ERROR: error: <the used my_print_defaults",
-                            "ERROR: Unable to get login-path\n")
+        self.replace_result("ERROR: Server connection values invalid:",
+                            "ERROR: Server connection values invalid\n")
 
         return True
 

@@ -364,6 +364,8 @@ def show_server_info(servers, options):
         try:
             test_connect(server, True)
         except UtilError as util_error:
+            if util_error.errmsg.startswith("Server connection values invalid:"):
+                raise util_error
             # If we got an exception it may means that the server is offline
             # in that case we will try to turn a clone to extract the info
             # if the user passed the necessary parameters.

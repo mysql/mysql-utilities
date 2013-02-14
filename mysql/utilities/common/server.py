@@ -374,7 +374,10 @@ def test_connect(conn_info, throw_errors=False):
     Returns True if connection success, False if error
     """
     # Parse source connection values
-    src_val = get_connection_dictionary(conn_info)
+    try:
+        src_val = get_connection_dictionary(conn_info)
+    except Exception as err:
+        raise UtilError("Server connection values invalid: %s." % err.errmsg)
     try:
         conn_options = {
             'quiet'     : True,
