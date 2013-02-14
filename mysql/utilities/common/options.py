@@ -743,6 +743,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
             user = login_path_data.get('user', None)
             passwd = login_path_data.get('password', None)
             host = login_path_data.get('host', None)
+            if not port:
+                port = login_path_data.get('port', 3306)
+            if not socket:
+                socket = login_path_data.get('socket', None)
         else:
             raise UtilError("No login credentials found for login-path: %s. "
                             "Please review the used connection string: %s"
