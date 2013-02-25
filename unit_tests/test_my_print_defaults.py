@@ -36,6 +36,17 @@ _TEST_HOST = 'localuser'
 _TEST_UNKNOWN_LOGIN_PATH = 'test_unknown_group_data'
 
 
+def mysql_tools_found():
+    # mysql_config_editor needs to be accessible to run the tests
+    try:
+        return get_tool_path(None, "mysql_config_editor", search_PATH=True)
+    except Exception:
+        return None
+
+
+@unittest.skipUnless(mysql_tools_found(),
+                     "MySQL client tools (e.g. mysql_config_editor) must be "
+                     "accessible to run this test.")
 class TestMyPrintDefaults(unittest.TestCase):
     # NOTE: MySQL client tools (e.g., my_print_defaults) must be accessible,
     # for example by including their location in the PATH.
@@ -46,10 +57,10 @@ class TestMyPrintDefaults(unittest.TestCase):
         try:
             cls.edit_tool_path = get_tool_path(None, "mysql_config_editor",
                                                search_PATH=True)
-        except Exception as err:
+        except UtilError as err:
             raise UtilError("MySQL client tools must be accessible to run "
-                            "this tests (%s). E.g. Add the location of the "
-                            "MySQL client tools to your PATH." % str(err))
+                            "this test (%s). Please add the location of the "
+                            "MySQL client tools to your PATH." % err.errmsg)
 
         # Create login-path data
         cmd = ("{mysql_config_editor} set --login-path={login_path} "
