@@ -149,7 +149,7 @@ try:
     diskusage.show_database_usage(servers[0], datadir, args, options)
 except UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Look for the general and query logs and report
@@ -158,7 +158,7 @@ if opt.do_logs or opt.do_all:
         diskusage.show_logfile_usage(servers[0], options)
     except UtilError:
         _, e, _ = sys.exc_info()
-        print("ERROR:", e.errmsg)
+        print("ERROR: %s" % e.errmsg)
         sys.exit(1)
 
 # Look for the binary logs and report
@@ -168,7 +168,7 @@ if opt.do_binlog or opt.do_all:
         diskusage.show_log_usage(servers[0], datadir, options)
     except UtilError:
         _, e, _ = sys.exc_info()
-        print("ERROR:", e.errmsg)
+        print("ERROR: %s" % e.errmsg)
         sys.exit(1)
 
 # Look for the relay logs and report
@@ -178,7 +178,7 @@ if opt.do_relaylog or opt.do_all:
         diskusage.show_log_usage(servers[0], datadir, options)
     except UtilError:
         _, e, _ = sys.exc_info()
-        print("ERROR:", e.errmsg)
+        print("ERROR: %s" % e.errmsg)
         sys.exit(1)
 
 # Look at the inoodb tablespace information are report
@@ -187,7 +187,7 @@ if opt.do_innodb or opt.do_all:
         diskusage.show_innodb_usage(servers[0], datadir, options)
     except UtilError:
         _, e, _ = sys.exc_info()
-        print("ERROR:", e.errmsg)
+        print("ERROR: %s" % e.errmsg)
         sys.exit(1)
 
 if not opt.quiet:

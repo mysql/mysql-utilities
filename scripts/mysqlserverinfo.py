@@ -119,11 +119,11 @@ try:
     show_server_info(opt.server, options)
 except UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 except Exception:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e)
+    print("ERROR: %s" % e)
     sys.exit(1)
 
 print("#...done.")

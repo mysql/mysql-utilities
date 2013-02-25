@@ -259,7 +259,7 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
     if os.name == "posix":  # use scp
         run_cmd = "scp %s@%s:%s %s" % (user, host, filepath, local_path)
         if verbosity > 1:
-            print("# Command =", run_cmd)
+            print("# Command =%s" % run_cmd)
         print("# Copying file from %s:%s to %s:" % (host, filepath, local_path))
         proc = subprocess.Popen(run_cmd, shell=True)
         ret_val = proc.wait()

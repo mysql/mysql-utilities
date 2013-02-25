@@ -209,7 +209,7 @@ for db in args:
         print
     except UtilError:
         _, e, _ = sys.exc_info()
-        print("ERROR:", e.errmsg)
+        print("ERROR: %s" % e.errmsg)
         check_failed = True
         if not opt.run_all_tests:
             break

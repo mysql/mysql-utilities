@@ -107,6 +107,6 @@ try:
         command.execute(options.server, format=options.format)
 except Exception:
     _, details, _ = sys.exc_info()
-    print >>sys.stderr, 'ERROR:', details
+    sys.stderr.write('ERROR: %s' % details)
 
 sys.exit()

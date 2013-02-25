@@ -199,7 +199,7 @@ for argument in args:
                                "%s.%s" % (db2, obj2), options)
         except UtilError:
             _, e, _ = sys.exc_info()
-            print("ERROR:", e.errmsg)
+            print("ERROR: %s" % e.errmsg)
             sys.exit(1)
         if diff is not None:
             diff_failed = True
@@ -211,7 +211,7 @@ for argument in args:
                                 db1, db2, options)
         except UtilError:
             _, e, _ = sys.exc_info()
-            print("ERROR:", e.errmsg)
+            print("ERROR: %s" % e.errmsg)
             sys.exit(1)
         if not res:
             diff_failed = True

@@ -149,7 +149,7 @@ try:
     res = indexcheck.check_index(source_values, args, options)
 except UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 sys.exit()

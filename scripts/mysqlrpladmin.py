@@ -190,7 +190,7 @@ try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Check hostname alias
@@ -246,7 +246,7 @@ try:
     rpl_cmds.execute_command(command)
 except UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
     
 sys.exit(0)

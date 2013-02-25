@@ -158,7 +158,7 @@ try:
     res = serverclone.clone_server(conn, options)
 except exception.UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
     
 sys.exit()

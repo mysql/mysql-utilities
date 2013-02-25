@@ -121,11 +121,11 @@ try:
         command.execute(options.server, format=options.format)
 except EmptyResultError:
     _, details, _ = sys.exc_info()
-    print >>sys.stderr, "No matches"
+    sys.stderr.write("No matches")
     sys.exit(1)
 except Exception:
     _, details, _ = sys.exc_info()
-    print >>sys.stderr, 'ERROR:', details
+    sys.stderr.write('ERROR: %s' % details)
     sys.exit(2)
 
 sys.exit()

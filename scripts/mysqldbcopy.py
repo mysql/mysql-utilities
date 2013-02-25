@@ -263,7 +263,7 @@ try:
         print_elapsed_time(start_test)
 except UtilError:
     _, e, _ = sys.exc_info()
-    print("ERROR:", e.errmsg)
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 sys.exit()
