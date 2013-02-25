@@ -37,8 +37,11 @@ WARNING: The master and slave have differing storage engine configurations!
 # Setting up replication...
 # Connecting slave to master...
 # Starting slave from master's last position...
-# status: Waiting for master to send event
-# error: 0:
+# IO status: Waiting for master to send event
+# IO thread running: Yes
+# IO error: None
+# SQL thread running: Yes
+# SQL error: None
 # ...done.
 Test case 2 - use pedantic to fail if innodb different
 # master on localhost: ... connected.

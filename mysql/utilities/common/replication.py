@@ -622,27 +622,47 @@ class Replication(object):
 
         # Add commit because C/Py are auto_commit=0 by default        
         self.slave.exec_query("COMMIT")
-    
+
         # Check slave status
         i = 0
         while i < num_tries:
             time.sleep(1)
-            res = self.slave.get_io_error()
+            res = self.slave.get_slaves_errors()
             status = res[0]
+            sql_running = res[4]
             if self.verbosity > 0:
-                errorno = res[1]
-                error = res[2]
-                print "# status: %s" % status
-                print "# error: %s:%s" % (errorno, error)
-            if status == "Waiting for master to send event":
+                io_errorno = res[1]
+                io_error = res[2]
+                io_running = res[3]
+                sql_errorno = res[5]
+                sql_error = res[6]
+                print "# IO status: %s" % status
+                print "# IO thread running: %s" % io_running
+                # if io_errorno = 0 and error = '' -> no error
+                if not io_errorno and not io_error:
+                    print "# IO error: None"
+                else:
+                    print "# IO error: %s:%s" % (io_errorno, io_error)
+                # if io_errorno = 0 and error = '' -> no error
+                print "# SQL thread running: %s" % sql_running
+                if not sql_errorno and not sql_error:
+                    print "# SQL error: None"
+                else:
+                    print "# SQL error: %s:%s" % (io_errorno, io_error)
+            if status == "Waiting for master to send event" and sql_running:
                 break
+            elif not sql_running:
+                if self.verbosity > 0:
+                    print "# Retry to start the slave SQL thread..."
+                #SQL thread is not running, retry to start it
+                res = self.slave.start_sql_thread(self.query_options)
             if self.verbosity > 0:
                 print "# Waiting for slave to synchronize with master"
             i += 1
         if i == num_tries:
             print "ERROR: failed to synch slave with master."
             result = False
-            
+
         if result is True:
             self.replicating = True
 
@@ -1363,6 +1383,28 @@ class Slave(Server):
         
         return (state, io_errorno, io_error)
 
+    def get_slaves_errors(self):
+        """Return the slave slave io and sql error status
+
+        Returns tuple - (slave_io_state, io_errorno, io_error, io_running,
+                         sql_running, sql_errorno, sql_error)
+                        or None if not connected
+        """
+        res = self.get_status()
+        if not res:
+            return None
+
+        state = res[0][_SLAVE_IO_STATE]
+        io_errorno = int(res[0][_SLAVE_IO_ERRORNO])
+        io_error = res[0][_SLAVE_IO_ERROR]
+        io_running = res[0][_SLAVE_IO_RUNNING]
+        sql_running = res[0][_SLAVE_SQL_RUNNING]
+        sql_errorno = int(res[0][_SLAVE_SQL_ERRORNO])
+        sql_error = res[0][_SLAVE_SQL_ERROR]
+
+        return (state, io_errorno, io_error, io_running, sql_running,
+                sql_errorno, sql_error)
+
 
     def show_status(self):
         """Display the slave status from the slave server
@@ -1402,8 +1444,14 @@ class Slave(Server):
         options[in]    query options
         """
         return self.exec_query("START SLAVE", options)
-        
-        
+
+    def start_sql_thread(self, options={}):
+        """Start the slave SQL thread
+
+        options[in]    query options
+        """
+        return self.exec_query("START SLAVE SQL_THREAD", options)
+
     def stop(self, options={}):
         """Stop the slave
         

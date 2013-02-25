@@ -51,6 +51,11 @@ Test case 3 - use the verbose feature
 # Setting up replication...
 # Connecting slave to master...
 # Starting slave from master's last position...
+# IO status: Waiting for master to send event
+# IO thread running: Yes
+# IO error: None
+# SQL thread running: Yes
+# SQL error: None
 # ...done.
 Test case 4 - use the start-from-beginning feature
 # master on localhost: ... connected.
