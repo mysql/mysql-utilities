@@ -205,36 +205,36 @@ def find_tests(path):
                     continue
             if directory == "":
                 directory = "main"
-    
+
             if not directory == "main" and not directory in suites_found:
                 suites_found.append(directory)
-                
+
             # Get file and extension
             fname, ext = os.path.splitext(f)
-            
+
             # Skip template tests
             if fname.endswith('_template'):
                 continue
-    
+
             # Check for suite.test as well as simply test
             if args and fname not in args and directory + "." + fname not in args:
                 continue
-    
+
             # See if test is to be skipped
             if opt.skip_test:
                 if fname in opt.skip_test or \
                    directory + "." + fname in opt.skip_test:
                     continue
-    
+
             # See if suite is to be skipped
             if opt.skip_suites:
                 if directory in opt.skip_suites:
                     continue
-    
+
             # Include only tests that are .py files and ignore mut library files
             if ext == ".py" and fname != "__init__" and fname != "mutlib":
                 test_ref = (directory, root, fname)
-    
+
                 # Do selective tests based on matches for --do-test=
                 # Don't execute performance tests unless specifically
                 # told to do so.
@@ -502,7 +502,7 @@ test_files = []
 failed_tests = []
 skipped_tests = []
 
-test_files.extend(find_tests(SUITE_PATH))                    
+test_files.extend(find_tests(SUITE_PATH))
 test_files.extend(find_tests(opt.testdir))
 
 # If no tests, there's nothing to do!
@@ -570,13 +570,13 @@ for test_tuple in test_files:
 
     # Get test parts - directory not used
     test = test_tuple[2]
-    
+
     # Add path to suite
     test_name = "%s.%s" % (test_tuple[0], test)
 
     # record start time
     start_test = time.time()
-    
+
     # Get result file location
     if test_tuple[0] == "main":
         result_loc = RESULT_PATH
@@ -741,7 +741,7 @@ if not opt.skip_cleanup:
     if server_list.num_spawned_servers():
         print "\nShutting down spawned servers "
         server_list.shutdown_spawned_servers()
-    
+
     if (server_list.cleanup_list) > 0:
         sys.stdout.write("\nDeleting temporary files...")
         server_list.remove_files()

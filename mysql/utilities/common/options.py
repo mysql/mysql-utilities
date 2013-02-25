@@ -44,29 +44,29 @@ _PERMITTED_RPL_DUMP = ["master", "slave"]
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
-    
+
     This method checks to see if the value specified is a prefix of one of the
     choices. It converts the string provided by the user (value) to lower case
     to permit case insensitive comparison of the user input. If multiple
     choices are found for a prefix, an error is thrown. If the value being
     compared does not match the list of choices, an error is thrown.
-    
+
     option[in]             Option class instance
     opt[in]                option name
     value[in]              the value provided by the user
-    
+
     Returns string - valid option chosen
     """
     choices = ", ".join(map(repr, option.choices)) # String of choices
 
     # Get matches for prefix given
     alts = [alt for alt in option.choices if alt.startswith(value.lower())]
-    if len(alts) == 1:   # only 1 match 
+    if len(alts) == 1:   # only 1 match
        return alts[0]
     elif len(alts) > 1:  # multiple matches
         raise ValueError(("option %s: there are multiple prefixes matching: "
                           "%r (choose from %s)") % (opt, value, choices))
-        
+
     # Doesn't match. Show user possible choices.
     raise ValueError("option %s: invalid choice: %r (choose from %s)"
                      % (opt, value, choices))
@@ -74,7 +74,7 @@ def prefix_check_choice(option, opt, value):
 
 class CaseInsensitiveChoicesOption(CustomOption):
     """Case insensitive choices option class
-    
+
     This is an extension of the Option class. It replaces the check_choice
     method with the prefix_check_choice() method above to provide
     shortcut aware choice selection. It also ensures the choice compare is
@@ -182,13 +182,13 @@ def check_skip_options(skip_list):
 
 def add_format_option(parser, help_text, default_val, sql=False):
     """Add the format option.
-    
+
     parser[in]        the parser instance
     help_text[in]     help text
     default_val[in]   default value
     sql[in]           if True, add 'sql' format
                       default=False
-    
+
     Returns corrected format value
     """
     formats = _PERMITTED_FORMATS
@@ -275,7 +275,7 @@ def add_reverse(parser):
 
 def add_difftype(parser, allow_sql=False, default="unified"):
     """Add the difftype option.
-    
+
     parser[in]        the parser instance
     allow_sql[in]     if True, allow sql as a valid option
                       (default is False)
@@ -294,7 +294,7 @@ def add_difftype(parser, allow_sql=False, default="unified"):
 
 def add_engines(parser):
     """Add the engine and default-storage-engine options.
-    
+
     parser[in]        the parser instance
     """
     # Add engine
@@ -311,15 +311,15 @@ def add_engines(parser):
 def check_engine_options(server, new_engine, def_engine,
                          fail=False, quiet=False):
     """Check to see if storage engines specified in options exist.
-    
+
     This method will check to see if the storage engine in new exists on the
     server. If new_engine is None, the check is skipped. If the storage engine
     does not exist and fail is True, an exception is thrown else if quiet is
     False, a warning message is printed.
-    
+
     Similarly, def_engine will be checked and if not present and fail is True,
     an exception is thrown else if quiet is False a warning is printed.
-    
+
     server[in]         server instance to be checked
     new_engine[in]     new storage engine
     def_engine[in]     default storage engine
@@ -335,16 +335,16 @@ def check_engine_options(server, new_engine, def_engine,
                 raise UtilError(message)
             elif not found and not quiet:
                 print message
-        
+
     engines = server.get_storage_engines()
     message = "WARNING: %s storage engine %s is not supported on the server."
-              
+
     _find_engine(server, new_engine,
                  message % ("New", new_engine),
-                 fail, quiet)    
+                 fail, quiet)
     _find_engine(server, def_engine,
                  message % ("Default", def_engine),
-                 fail, quiet)    
+                 fail, quiet)
 
 
 def add_all(parser, objects):
@@ -359,7 +359,7 @@ def add_all(parser, objects):
 
 def check_all(parser, options, args, objects):
     """Check to see if both all and specific arguments are used.
-    
+
     This method will throw an exception if there are arguments listed and
     the all option has been turned on.
 
@@ -371,15 +371,15 @@ def check_all(parser, options, args, objects):
     if options.all and len(args) > 0:
         parser.error("You cannot use the --all option with a list of "
                      "%s." % objects)
-        
-        
+
+
 def add_locking(parser):
     """Add the --locking option.
 
     parser[in]        the parser instance
     """
     parser.add_option("--locking", action="store", dest="locking",
-                      type="choice", default="snapshot", 
+                      type="choice", default="snapshot",
                       choices=['no-locks', 'lock-all', 'snapshot'],
                       help="choose the lock type for the operation: no-locks "
                       "= do not use any table locks, lock-all = use table "
@@ -387,7 +387,7 @@ def add_locking(parser):
                       "snaphot (default): consistent read using a single "
                       "transaction.")
 
-    
+
 def add_regexp(parser):
     """Add the --regexp option.
 
@@ -440,14 +440,14 @@ def add_rpl_mode(parser, do_both=True, add_file=True):
                           action="store", help="path and file name to place the "
                           "replication information generated. Valid on if the "
                           "--rpl option is specified.")
-    
-    
+
+
 def check_rpl_options(parser, options):
     """Check replication dump options for validity
-    
+
     This method ensures the optional --rpl-* options are valid only when
     --rpl is specified.
-    
+
     parser[in]        the parser instance
     options[in]       command options
     """
@@ -458,11 +458,11 @@ def check_rpl_options(parser, options):
 
         if options.rpl_user is not None:
             errors.append("--rpl-user")
-                    
+
         # It's Ok if the options do not include --comment-rpl
         if parser.has_option("--comment-rpl") and options.comment_rpl:
             errors.append("--comment-rpl")
-        
+
         if len(errors) > 1:
             num_opt_str = "s"
         else:
@@ -471,14 +471,14 @@ def check_rpl_options(parser, options):
         if len(errors) > 0:
             parser.error("The %s option%s must be used with the --rpl "
                          "option." % (", ".join(errors), num_opt_str))
-            
 
-    
+
+
 def add_failover_options(parser):
     """Add the common failover options.
-    
+
     This adds the following options:
-    
+
       --candidates
       --discover-slaves-login
       --exec-after
@@ -491,7 +491,7 @@ def add_failover_options(parser):
       --seconds-behind
       --slaves
       --timeout
-      
+
     parser[in]        the parser instance
     """
     parser.add_option("--candidates", action="store", dest="candidates",
@@ -514,7 +514,7 @@ def add_failover_options(parser):
     parser.add_option("--exec-after", action="store", dest="exec_after",
                       default=None, type="string", help="name of script to "
                       "execute after failover or switchover")
-    
+
     parser.add_option("--exec-before", action="store", dest="exec_before",
                       default=None, type="string", help="name of script to "
                       "execute before failover or switchover")
@@ -522,7 +522,7 @@ def add_failover_options(parser):
     parser.add_option("--log", action="store", dest="log_file", default=None,
                       type="string", help="specify a log file to use for "
                       "logging messages")
-    
+
     parser.add_option("--log-age", action="store", dest="log_age", default=7,
                       type="int", help="specify maximum age of log entries in "
                       "days. Entries older than this will be purged on startup. "
@@ -532,18 +532,18 @@ def add_failover_options(parser):
                       type="string", help="connection information for master "
                       "server in the form: <user>[:<password>]@<host>[:<port>]"
                       "[:<socket>] or <login-path>[:<port>][:<socket>]")
-    
+
     parser.add_option("--max-position", action="store", dest="max_position",
                       default=0, type="int", help="Used to detect slave "
                       "delay. The maximum difference between the master's "
                       "log position and the slave's reported read position of "
                       "the master. A value greater than this means the slave "
                       "is too far behind the master. Default is 0.")
-    
+
     parser.add_option("--ping", action="store", dest="ping", default=None,
                       help="Number of ping attempts for detecting downed "
                       "server.")
-    
+
     parser.add_option("--seconds-behind", action="store", dest="max_delay",
                       default=0, type="int", help="Used to detect slave "
                       "delay. The maximum number of seconds behind the master "
@@ -556,7 +556,7 @@ def add_failover_options(parser):
                       "the form: <user>[:<password>]@<host>[:<port>]"
                       "[:<socket>] or <login-path>[:<port>][:<socket>]. "
                       "List multiple slaves in comma-separated list.")
-    
+
     parser.add_option("--timeout", action="store", dest="timeout", default=3,
                       help="Maximum timeout in seconds to wait for each "
                       "replication command to complete. For example, timeout "
@@ -565,7 +565,7 @@ def add_failover_options(parser):
 
 def check_server_lists(parser, master, slaves):
     """Check to see if master is listed in slaves list
-    
+
     Returns bool - True = master not in slaves, issue error if it appears
     """
     if slaves:
@@ -608,7 +608,7 @@ _CONN_IPv4 = re.compile(
     # it is missing a RE for IPv6
     r"((?:(?:(?:(?!-)(?:[\w\d-])*[A-Za-z](?:[\w\d-])*(?:(?<!-))){1,63})"
      "(?:(?:\.)?(?:(?!-)[\w\d-]{1,63}(?<!-)))*|"
-     "(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))))"  
+     "(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))))"
                                  # Domain name or IP address
     r"(?:\:(\d+))?"              # Optional port number
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
@@ -616,7 +616,7 @@ _CONN_IPv4 = re.compile(
 
 _CONN_IPv4_NUM_ONLY = re.compile(
     # we match IPv4 addresses only
-    r"(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))"  
+    r"(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))"
     )
 
 _CONN_IPv6 = re.compile(
@@ -631,7 +631,7 @@ _CONN_IPv6 = re.compile(
      "[0-9a-f]{0,4}"             #   Last group
      "(?:(?<=::)"                #   Colon iff preceded by exacly one colon
      "|(?<!:)|(?<=:)(?<!::) :)"  # OR
-     "|"                         #   A v4 address with NO leading zeros 
+     "|"                         #   A v4 address with NO leading zeros
      "(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)"
      "(?: \.(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))"
     r"(?:\:(\d+))?"              # Optional port number
@@ -647,7 +647,7 @@ _BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
 
 def hostname_is_ip(hostname):
     """Determine hostname is an IP address.
-    
+
     Return bool - True = is IP address
     """
     if len(hostname.split(":")) <= 3:  # if fewer colons, must be IPv4

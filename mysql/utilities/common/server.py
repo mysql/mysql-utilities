@@ -24,24 +24,34 @@ server operations used in multiple utilities.
 import os
 import re
 import mysql.connector
+import socket
+import string
+import subprocess
+import tempfile
+
 from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
+from mysql.utilities.common.options import hostname_is_ip
 from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.tools import delete_directory
+from mysql.utilities.common.tools import execute_script
+from mysql.utilities.common.tools import ping_host
+from mysql.utilities.common.user import User
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
-_GTID_ERROR = ("The server %s:%s does not comply to the latest GTID " 
+_GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
 
 def get_connection_dictionary(conn_info):
     """Get the connection dictionary.
 
     The method accepts one of the following types for conn_info:
-    
+
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
-        - connection string in the form: user:pass@host:port:socket or 
+        - connection string in the form: user:pass@host:port:socket or
                                          login-path:port:socket
         - an instance of the Server class
-        
+
     conn_info[in]          Connection information
 
     Returns dict - dictionary for connection (user, passwd, host, port, socket)
@@ -65,15 +75,15 @@ def get_connection_dictionary(conn_info):
 
 def _print_connection(prefix, conn_info):
     """Print connection information
-    
+
     The method accepts one of the following types for conn_info:
-    
+
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
         - connection string in the form: user:pass@host:port:socket or
                                          login-path:port:socket
         - an instance of the Server class
-        
+
     conn_info[in]          Connection information
     """
     conn_val = get_connection_dictionary(conn_info)
@@ -85,7 +95,7 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
 
     This method attempts to locate all running servers. If provided, it will
     also limit the search to specific ports of datadirectory prefixes.
-    
+
     This method uses ps for posix systems and netstat for Windows machines
     to determine the list of running servers.
 
@@ -105,11 +115,6 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
 
     Returns list - tuples of the form: (process_id, [datadir|port])
     """
-    import string
-    import subprocess
-    import tempfile
-    from mysql.utilities.common.tools import execute_script
-
     processes = []
     if os.name == "posix":
         file = tempfile.TemporaryFile()
@@ -172,21 +177,21 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     return processes
 
 
-def get_server(name, values, quiet):        
+def get_server(name, values, quiet):
     """Connect to a server and return Server instance
-    
+
     If the name is 'master' or 'slave', the connection will be made via the
     Master or Slave class else a normal Server class shall be used.
-    
+
     name[in]           name of the server
     values[in]         dictionary of connection values
     quiet[in]          if True, do not print messages
-    
+
     Returns Server class instance
     """
     from mysql.utilities.common.replication import Master
     from mysql.utilities.common.replication import Slave
-    
+
     server_conn = None
 
     # Try to connect to the MySQL database server.
@@ -210,10 +215,10 @@ def get_server(name, values, quiet):
 
 def _require_version(server, version):
     """Check version of server
-    
+
     server[in]         Server instance
     version[in]        minimal version of the server required
-    
+
     Returns boolean - True = version Ok, False = version < required
     """
     if version is not None and server is not None:
@@ -221,14 +226,14 @@ def _require_version(server, version):
         if not server.check_version_compat(major, minor, rel):
             return False
     return True
-        
+
 
 def get_server_state(server, host, pingtime=3, verbose=False):
     """Return the state of the server.
-    
+
     This method returns one of the following states based on the
     criteria shown.
-    
+
       UP   - server is connected
       WARN - server is not connected but can be pinged
       DOWN - server cannot be pinged nor is connected
@@ -242,8 +247,6 @@ def get_server_state(server, host, pingtime=3, verbose=False):
 
     Returns string - state
     """
-    from mysql.utilities.common.tools import ping_host
-
     if verbose:
         print "# Attempting to contact %s ..." % host,
     if server is not None and server.is_alive():
@@ -266,9 +269,9 @@ def connect_servers(src_val, dest_val, options={}):
     values and attempts to connect one as a source connection and the other
     as the destination connection. If the source and destination are the
     same server and the unique parameter is False, destination is set to None.
-     
+
     The method accepts one of the following types for the src_val and dest_val:
-    
+
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
         - connection string in the form: user:pass@host:port:socket or
@@ -296,7 +299,7 @@ def connect_servers(src_val, dest_val, options={}):
                           if source and destination are same server
             if error, returns (None, None)
     """
-    
+
     quiet = options.get("quiet", False)
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
@@ -309,7 +312,7 @@ def connect_servers(src_val, dest_val, options={}):
     src_dict = get_connection_dictionary(src_val)
     dest_dict = get_connection_dictionary(dest_val)
 
-    # Check for uniqueness - dictionary 
+    # Check for uniqueness - dictionary
     if options.get("unique", False) and dest_dict is not None:
         dupes = False
         if "unix_socket" in src_dict and "unix_socket" in dest_dict:
@@ -357,20 +360,20 @@ def connect_servers(src_val, dest_val, options={}):
 
 def test_connect(conn_info, throw_errors=False):
     """Test connection to a server.
-    
+
     The method accepts one of the following types for conn_info:
-    
+
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
         - connection string in the form: user:pass@host:port:socket or
                                          login-path:port:socket
         - an instance of the Server class
-        
+
     conn_info[in]          Connection information
-    
+
     throw_errors           throw any errors found during the test,
                            false by default.
-    
+
     Returns True if connection success, False if error
     """
     # Parse source connection values
@@ -395,10 +398,10 @@ def test_connect(conn_info, throw_errors=False):
 
 def check_hostname_alias(server1_vals, server2_vals):
     """Check to see if the servers are the same machine by host name.
-    
+
     server1_vals[in]   connection dictionary for server1
     server2_vals[in]   connection dictionary for server2
-    
+
     Returns bool - true = server1 and server2 are the same host
     """
     server1 = Server({'conn_info' : server1_vals})
@@ -406,6 +409,90 @@ def check_hostname_alias(server1_vals, server2_vals):
 
     return (server1.is_alias(server2.host) and
             int(server1.port) == int(server2.port))
+
+
+def stop_running_server(server, wait=10, drop=True):
+    """Stop a running server.
+
+    This method will stop a server using the mysqladmin utility to
+    shutdown the server. It also destroys the datadir.
+
+    server[in]          Server instance to clone
+    wait[in]            Number of wait cycles for shutdown
+                        default = 10
+    drop[in]            If True, drop datadir
+
+    Returns - True = server shutdown, False - unknown state or error
+    """
+    # Nothing to do if server is None
+    if server is None:
+        return True
+
+    # Build the shutdown command
+    cmd = ""
+    res = server.show_server_variable("basedir")
+    mysqladmin_client = "mysqladmin"
+    if not os.name == "posix":
+        mysqladmin_client = "mysqladmin.exe"
+    mysqladmin_path= os.path.normpath(os.path.join(res[0][1], "bin",
+                                               mysqladmin_client))
+    if not os.path.exists(mysqladmin_path):
+        mysqladmin_path= os.path.normpath(os.path.join(res[0][1], "client",
+                                                   mysqladmin_client))
+    if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
+        mysqladmin_path= os.path.normpath(os.path.join(res[0][1],
+                                                   "client/debug",
+                                                   mysqladmin_client))
+    if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
+        mysqladmin_path= os.path.normpath(os.path.join(res[0][1],
+                                                   "client/release",
+                                                   mysqladmin_client))
+    cmd += mysqladmin_path
+    cmd += " shutdown --user=%s --host=%s " % (server.user, server.host)
+    if server.passwd:
+        cmd += "--password=%s " % server.passwd
+    if server.socket:
+        cmd += "--socket=%s " % (server.socket)
+    else:
+        cmd += "--port=%s " % (server.port)
+    res = server.show_server_variable("datadir")
+    datadir = res[0][1]
+
+    # Kill all connections so shutdown will work correctly
+    res = server.exec_query("SHOW PROCESSLIST")
+    for row in res:
+        if not row[7] or not row[7].upper().startswith("SHOW PROCESS"):
+            try:
+                server.exec_query("KILL CONNECTION %s" % row[0])
+            except UtilDBError: # Ok to ignore KILL failures
+                pass
+
+    # disconnect user
+    server.disconnect()
+
+    # Stop the server
+    file = os.devnull
+    f_out = open(file, 'w')
+    proc = subprocess.Popen(cmd, shell=True,
+                            stdout = f_out, stderr = f_out)
+    ret_val = proc.wait()
+    f_out.close()
+
+    # if shutdown doesn't work, exit.
+    if int(ret_val) != 0:
+        return False
+
+    # If datadir exists, delete it
+    if drop:
+        delete_directory(datadir)
+
+    if os.path.exists("cmd.txt"):
+        try:
+            os.unlink("cmd.txt")
+        except:
+            pass
+
+    return True
 
 
 class Server(object):
@@ -426,13 +513,13 @@ class Server(object):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
-        
+
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
             - connection string in the form: user:pass@host:port:socket or
                                              login-path:port:socket
             - an instance of the Server class
-             
+
         options[in]        options for controlling behavior:
             conn_info      a dictionary containing connection information
                            (user, passwd, host, port, socket)
@@ -443,7 +530,7 @@ class Server(object):
                            (default latin1)
         """
         assert not options.get("conn_info") == None
-        
+
         self.verbose = options.get("verbose", False)
         self.db_conn = None
         self.host = None
@@ -469,11 +556,11 @@ class Server(object):
         self.read_only = False
         self.aliases = []
         self.is_alias("")
-        
+
 
     def is_alive(self):
         """Determine if connection to server is still alive.
-        
+
         Returns bool - True = alive, False = error or cannot connect.
         """
         res = True
@@ -495,14 +582,11 @@ class Server(object):
 
     def is_alias(self, host_or_ip):
         """Determine if host_or_ip is an alias for this host
-        
+
         host_or_ip[in] host or IP number to check
-        
+
         Returns bool - True = host_or_ip is an alias
         """
-        from mysql.utilities.common.options import hostname_is_ip
-        import socket
-        
         if self.aliases:
             return host_or_ip.lower() in self.aliases
 
@@ -520,7 +604,7 @@ class Server(object):
             local_aliases.extend(local_info[2])
         except (socket.herror, socket.gaierror):
             local_aliases = []
-        
+
         # Check for local
         if self.host in local_aliases:
             self.aliases.extend(local_aliases)
@@ -552,14 +636,14 @@ class Server(object):
 
     def user_host_exists(self, user, host_or_ip):
         """Check to see if a user, host exists
-        
+
         This method attempts to see if a user name matches the users on the
         server and that any user, host pair can match the host or IP address
         specified. This attempts to resolve wildcard matches.
-        
+
         user[in]       user name
         host_or_ip[in] host or IP address
-        
+
         Returns string - host from server that matches the host_or_ip or
                          None if no match.
         """
@@ -567,11 +651,11 @@ class Server(object):
         if res:
             return res[0][0]
         return None
-        
+
 
     def get_connection_values(self):
         """Return a dictionary of connection values for the server.
-        
+
         Returns dictionary
         """
         conn_vals = {
@@ -620,7 +704,7 @@ class Server(object):
                             "Error %s" % (self.role, e.msg), e.errno)
         self.connect_error = None
         self.read_only = self.show_server_variable("READ_ONLY")[0][1]
-        
+
 
     def disconnect(self):
         """Disconnect from the server.
@@ -643,7 +727,7 @@ class Server(object):
                 version_str = res[0][1]
         except:
             pass
-            
+
         return version_str
 
 
@@ -760,18 +844,18 @@ class Server(object):
 
     def get_uuid(self):
         """Return the uuid for this server if it is GTID aware.
-        
+
         Returns uuid or None if server is not GTID aware.
         """
         if self.supports_gtid() != "NO":
             res = self.show_server_variable("server_uuid")
             return res[0][1]
         return None
-    
+
 
     def supports_gtid(self):
         """Determine if server supports GTIDs
-        
+
         Returns string - 'ON' = gtid supported and turned on,
                          'OFF' = supported but not enabled,
                          'NO' = not supported
@@ -786,14 +870,14 @@ class Server(object):
             return "NO"
 
         return res[0][0]
-        
-        
+
+
     def check_gtid_version(self):
         """Determine if server supports latest GTID changes
-        
+
         This method checks the server to ensure it contains the latest
         changes to the GTID variables (from version 5.6.9).
-        
+
         Raises UtilRplError when errors occur.
         """
         errors = []
@@ -808,14 +892,14 @@ class Server(object):
             errors = "\n".join(errors)
             errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
             raise UtilRplError(errors)
-            
-            
+
+
     def check_gtid_executed(self, operation="copy"):
         """Check to see if the gtid_executed variable is clear
-        
+
         If the value is not clear, raise an error with appropriate instructions
         for the user to correct the issue.
-        
+
         operation[in]  Name of the operation (copy, import, etc.)
                        default = copy
         """
@@ -834,17 +918,17 @@ class Server(object):
 
     def get_gtid_status(self):
         """Get the GTID information for the server.
-        
+
         This method attempts to retrieve the GTID lists. If the server
         does not have GTID turned on or does not support GTID, the method
         will throw and exception.
-        
+
         Returns [list, list, list]
         """
         # Check servers for GTID support
         if not self.supports_gtid():
             raise UtilError("Global Transaction IDs are not supported.")
-            
+
         res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
         if res[0][0].upper() == 'OFF':
             raise UtilError("Global Transaction IDs are not enabled.")
@@ -852,21 +936,18 @@ class Server(object):
         gtid_data = [self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0],
                      self.exec_query("SELECT @@GLOBAL.GTID_PURGED")[0],
                      self.exec_query("SELECT @@GLOBAL.GTID_OWNED")[0]]
-            
+
         return gtid_data
 
 
     def check_rpl_user(self, user, host):
         """Check replication user exists and has the correct privileges.
-        
+
         user[in]      user name of rpl_user
         host[in]      host name of rpl_user
 
         Returns [] - no exceptions, list if exceptions found
         """
-        
-        from mysql.utilities.common.user import User
-        
         errors = []
         if host == '127.0.0.1':
             host = 'localhost'
@@ -906,7 +987,7 @@ class Server(object):
             return False
         return True
 
-    
+
     def get_all_databases(self):
         """Return a result set containing all databases on the server
         except for internal databases (mysql, INFORMATION_SCHEMA,
@@ -983,9 +1064,9 @@ class Server(object):
 
     def has_storage_engine(self, target):
         """Check to see if an engine exists and is supported.
-        
+
         target[in]     name of engine to find
-        
+
         Returns bool True - engine exists and is active, false = does not
                      exist or is not supported/not active/disabled
         """
@@ -1003,20 +1084,20 @@ class Server(object):
     def substitute_engine(self, tbl_name, create_str,
                           new_engine, def_engine, quiet=False):
         """Replace storage engine in CREATE TABLE
-        
+
         This method will replace the storage engine in the CREATE statement
         under the following conditions:
             - If new_engine is specified and it exists on destination, use it.
             - Else if existing engine does not exist and def_engine is specfied
               and it exists on destination, use it. Also, don't substitute if
               the existing engine will not be changed.
-              
+
         tbl_name[in]       table name
         create_str[in]     CREATE statement
         new_engine[in]     name of storage engine to substitute (convert to)
         def_engine[in]     name of storage engine to use if existing engines
                            does not exist
-                           
+
         Returns string CREATE string with replacements if found, else return
                        original string
         """
@@ -1063,7 +1144,7 @@ class Server(object):
             if len(exist_engine) == 0:
                 i = create_str.find(";")
                 create_str = create_str[0:i] + " ENGINE=%s;"  % new_engine
-            else:                
+            else:
                 create_str = create_str.replace("ENGINE=%s" % exist_engine,
                                                 "ENGINE=%s" % new_engine)
             if not quiet:
@@ -1071,7 +1152,7 @@ class Server(object):
                     print replace_msg % (exist_engine, new_engine, tbl_name)
                 else:
                     print add_msg % (new_engine, tbl_name)
-        
+
         return create_str
 
 
@@ -1167,7 +1248,7 @@ class Server(object):
 
     def binlog_enabled(self):
         """Check binary logging status for the client.
-        
+
         Returns bool - True - binary logging is ON, False = OFF
         """
         res = self.show_server_variable("log_bin")
@@ -1180,23 +1261,23 @@ class Server(object):
 
     def toggle_binlog(self, action="disable"):
         """Enable or disable binary logging for the client.
-        
+
         Note: user must have SUPER privilege
-        
+
         action[in]         if 'disable', turn off the binary log
                            elif 'enable' turn binary log on
                            do nothing if action != 'enable' or 'disable'
         """
-        
+
         if action.lower() == 'disable':
             self.exec_query("SET SQL_LOG_BIN=0")
         elif action.lower() == 'enable':
             self.exec_query("SET SQL_LOG_BIN=1")
 
-   
+
     def foreign_key_checks_enabled(self):
         """Check foreign key status for the connection.
-        
+
         Returns bool - True - foreign keys are enabled
         """
         if self.fkeys is None:
@@ -1207,7 +1288,7 @@ class Server(object):
 
     def disable_foreign_key_checks(self, disable=True):
         """Enable or disable foreign key checks for the connection.
-        
+
         disable[in]        if True, turn off foreign key checks
                            elif False turn foreign key checks on
         """
@@ -1224,7 +1305,7 @@ class Server(object):
 
     def get_server_id(self):
         """Retrieve the server id.
-        
+
         Returns int - server id.
         """
         try:
@@ -1232,13 +1313,13 @@ class Server(object):
         except:
             raise UtilRplError("Cannot retrieve server id from "
                                "%s." % self.role)
-        
+
         return int(res[0][1])
 
 
     def get_server_uuid(self):
         """Retrieve the server uuid.
-        
+
         Returns string - server uuid.
         """
         try:
@@ -1248,13 +1329,13 @@ class Server(object):
         except:
             raise UtilRplError("Cannot retrieve server_uuid from "
                                "%s." % self.role)
-        
+
         return res[0][1]
 
 
     def get_lctn(self):
         """Get lower_case_table_name setting.
-        
+
         Returns lctn value or None if cannot get value
         """
         res = self.show_server_variable("lower_case_table_names")
@@ -1262,23 +1343,23 @@ class Server(object):
             return res[0][1]
         return None
 
-    
+
     def get_binary_logs(self, options={}):
         """Return a list of the binary logs.
-        
+
         options[in]        query options
-        
+
         Returns list - binlogs or None if binary logging turned off
         """
         if self.binlog_enabled():
             return self.exec_query("SHOW BINARY LOGS", options)
-            
+
         return None
-    
+
 
     def set_read_only(self, on=False):
         """Turn read only mode on/off
-        
+
         on[in]         if True, turn read_only ON
                        Default is False
         """
@@ -1287,4 +1368,3 @@ class Server(object):
             return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
                                    "ON" if on else "OFF")
         return None
-

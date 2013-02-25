@@ -42,7 +42,7 @@ _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
     _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR = \
     0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37
 
-_PRINT_WIDTH = 75    
+_PRINT_WIDTH = 75
 
 _MASTER_DO_DB, _MASTER_IGNORE_DB = 2, 3
 
@@ -64,11 +64,11 @@ _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 def _get_list(rows, cols):
     """Return a list of information in GRID format to stdout.
-    
+
     rows[in]          rows of data
     cols[in]          column headings
-    
-    Returns list of strings 
+
+    Returns list of strings
     """
     import StringIO
     from mysql.utilities.common.format import format_tabular_list
@@ -76,35 +76,35 @@ def _get_list(rows, cols):
     ostream = StringIO.StringIO()
     format_tabular_list(ostream, cols, rows)
     return ostream.getvalue().splitlines()
-    
-    
+
+
 def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
     """Determine replication connection
-    
+
     This method attempts to determine if it is possible to build a CHANGE
     MASTER command based on the server passed. If it is possible, the method
     will return a CHANGE MASTER command. If there are errors and the strict
     option is turned on, it will throw errors if there is something missing.
     Otherwise, it will return the CHANGE MASTER command with warnings.
-        
+
     If the server is a master, the following error checks will be performed.
-    
+
       - if binary log is turned OFF, and strict = False, a warning message
         is added to the strings returned else an error is thrown
-        
+
       - if the rpl_user option is missing, the method attempts to find a
         replication user. If more than one user is found or none are found, and
         strict = False, a warning message is added to the strings returned else
         an error is thrown
-        
+
       - if a replication user is found but the user requires a password,
         the MASTER_USER and MASTER_PASSWORD options are commented out
-    
+
     Note: the CHANGE MASTER command is formatted whereby each option is
           separated by a newline and indented two spaces
-          
+
     Note: the make_change_master method does not support SSL connections
-    
+
     server[in]        a Server class instance
     is_master[in]     if True, the server is acting as a master
                       Default = True
@@ -119,18 +119,18 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
     rpl_user = options.get("rpl_user", None)
     quiet = options.get("quiet", False)
 
-    # Copy options and add connected server    
+    # Copy options and add connected server
     new_opts = options.copy()
     new_opts["conn_info"] = server
 
     master_values = {}
     change_master = []
-    
+
     # If server is a master, perform error checking
-    if is_master:    
+    if is_master:
         master = Master(new_opts)
         master.connect()
-    
+
         # Check master for binlog
         if not master.binlog_enabled():
             raise UtilError("Master must have binary logging turned on.")
@@ -166,11 +166,11 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
                 errors = master.check_rpl_user(uname, master.host)
                 if errors != []:
                     raise UtilError(errors[0])
-                
+
             res = master.get_status()
             if not res:
                raise UtilError("Cannot retrieve master status.")
-                   
+
             # Need to get the master values for the make_change_master command
             master_values = {
                 'Master_Host'          : master.host,
@@ -181,7 +181,7 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
                 'Read_Master_Log_Pos'  : res[0][1],
             }
 
-    # Use slave class to get change master command 
+    # Use slave class to get change master command
     slave = Slave(new_opts)
     slave.connect()
     cm_cmd = slave.make_change_master(False, master_values)
@@ -189,13 +189,13 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
     if rpl_user is None and uname == "" and not quiet:
         cm_cmd = cm_cmd.replace("MASTER_PORT", "# MASTER_USER = '', "
                                 "# MASTER_PASSWORD = '', MASTER_PORT")
-    
+
     if options.get("multiline", False):
         cm_cmd = cm_cmd.replace(", ", ", \n  ") + ";"
         change_master.extend(cm_cmd.split("\n"))
     else:
         change_master.append(cm_cmd + ";")
-        
+
     return change_master
 
 
@@ -203,7 +203,7 @@ class Replication(object):
     """
     The Replication class can be used to establish a replication connection
     between a master and a slave with the following utilities:
-    
+
         - Create the replication user
         - Setup replication
         - Test prerequisites for replication
@@ -216,16 +216,16 @@ class Replication(object):
             - lower case table name compatibility
             - slave connection to master
             - slave delay
-        
+
     Replication prerequisite tests shall be constructed so that they return
     None if the check passes (no errors) or a list of strings containing the
     errors or warnings. They shall accept a dictionary of options set to
     options={}. This will allow for reduced code needed to call multiple tests.
-    """  
-    
+    """
+
     def __init__(self, master, slave, options):
         """Constructor
-        
+
         master[in]         Master Server object
         slave[in]          Slave Server object
         options[in]        Options for class
@@ -248,47 +248,47 @@ class Replication(object):
         self.query_options = {
             'fetch' : False
         }
-        
-        
+
+
     def check_server_ids(self):
         """Check server ids on master and slave
-        
+
         This method will check the server ids on the master and slave. It will
         raise exceptions for error conditions.
-        
+
         Returns [] if compatible, list of errors if not compatible
         """
         master_server_id = self.master.get_server_id()
         slave_server_id = self.slave.get_server_id()
         if master_server_id == 0:
             raise UtilRplError("Master server_id is set to 0.")
-        
+
         if slave_server_id == 0:
             raise UtilRplError("Slave server_id is set to 0.")
-            
+
         # Check for server_id uniqueness
         if master_server_id == slave_server_id:
             raise UtilRplError("The slave's server_id is the same as the "
                                  "master.")
-        
+
         return []
-        
-        
+
+
     def check_server_uuids(self):
         """Check UUIDs on master and slave
-        
+
         This method will check the UUIDs on the master and slave. It will
-        raise exceptions for error conditions. 
-        
+        raise exceptions for error conditions.
+
         Returns [] if compatible or no UUIDs used, list of errors if not
         """
         master_uuid = self.master.get_uuid()
         slave_uuid = self.slave.get_uuid()
-        
+
         # Check for both not supporting UUIDs.
         if master_uuid is None and slave_uuid is None:
             return []
-        
+
         # Check for unbalanced servers - one with UUID, one without
         if master_uuid is None or slave_uuid is None:
             raise UtilRplError("%s does not support UUIDs." %
@@ -298,31 +298,31 @@ class Replication(object):
         if master_uuid == slave_uuid:
             raise UtilRplError("The slave's UUID is the same as the "
                                  "master.")
-        
+
         return []
 
 
     def check_innodb_compatibility(self, options):
         """Check InnoDB compatibility
-        
+
         This method checks the master and slave to ensure they have compatible
         installations of InnoDB. It will print the InnoDB settings on the
         master and slave if quiet is not set. If pedantic is set, method
         will raise an error.
 
         options[in]   dictionary of options (verbose, pedantic)
-                
+
         Returns [] if compatible, list of errors if not compatible
         """
-        
+
         pedantic = options.get("pedantic", False)
         verbose = options.get("verbosity", 0) > 0
-        
+
         errors = []
-        
+
         master_innodb_stats = self.master.get_innodb_stats()
         slave_innodb_stats = self.slave.get_innodb_stats()
-        
+
         if master_innodb_stats != slave_innodb_stats:
             if not pedantic:
                 errors.append("WARNING: Innodb settings differ between master "
@@ -343,25 +343,25 @@ class Replication(object):
                     print line
                 raise UtilRplError("Innodb settings differ between master "
                                      "and slave.")
-        
+
         return errors
-    
-    
+
+
     def check_storage_engines(self, options):
         """Check compatibility of storage engines on master and slave
-        
+
         This method checks that the master and slave have compatible storage
         engines. It will print the InnoDB settings on the master and slave if
         quiet is not set. If pedantic is set, method will raise an error.
-        
+
         options[in]   dictionary of options (verbose, pedantic)
-                
+
         Returns [] if compatible, list of errors if not compatible
         """
 
         pedantic = options.get("pedantic", False)
         verbose = options.get("verbosity", 0) > 0
-        
+
         errors = []
         slave_engines = self.slave.get_storage_engines()
         results = self.master.check_storage_engines(slave_engines)
@@ -380,26 +380,26 @@ class Replication(object):
             if pedantic:
                 for line in errors:
                     print line
-                raise UtilRplError("The master and slave have differing " 
+                raise UtilRplError("The master and slave have differing "
                                      "storage engine configurations!")
-    
+
         return errors
 
 
     def check_master_binlog(self):
         """Check prerequisites for master for replication
-        
+
         Returns [] if master ok, list of errors if binary logging turned off.
         """
         errors = []
         if not self.master.binlog_enabled():
             errors.append("Master must have binary logging turned on.")
         return errors
-    
-    
+
+
     def check_lctn(self):
         """Check lower_case_table_name setting
-        
+
         Returns [] - no exceptions, list if exceptions found
         """
         errors = []
@@ -412,17 +412,17 @@ class Replication(object):
                   "when lower_case_table_names = 1 on the slave and " + \
                   "the master has a different value."
             errors.append(msg)
-        
+
         return errors
 
 
     def get_binlog_exceptions(self):
         """Get any binary logging exceptions
-        
+
         This method queries the master and slave status for the *-do-db and
         *-ignore-db settings. It returns the values of either of these for
         the master and slave.
-        
+
         Returns [] - no exceptions, list if exceptions found
         """
         binlog_ex = []
@@ -438,7 +438,7 @@ class Replication(object):
 
     def check_slave_connection(self):
         """Check to see if slave is connected to master
-        
+
         This method will check the slave specified at instantiation to see if
         it is connected to the master specified. If the slave is connected
         to a different master, an error is returned. It will also raise an
@@ -454,11 +454,11 @@ class Replication(object):
            state.upper() != "YES":
             return False
         return True
-    
-    
+
+
     def check_slave_delay(self):
         """Check to see if slave is behind master.
-        
+
         This method checks slave_behind_master returning None if 0 or a
         message containing the value if non-zero. Also includes the slave's
         position as related to the master.
@@ -478,8 +478,8 @@ class Replication(object):
         if delay_info is None:
             raise UtilRplError("The server specified as the slave is "
                                  "not configured as a replication slave.")
-            
-        
+
+
         state, sec_behind, delay_remaining, \
             read_log_file, read_log_pos = delay_info
 
@@ -505,16 +505,16 @@ class Replication(object):
         else:
             errors.append("Slave is % seconds behind master." %
                           sec_behind)
-        
+
         return errors
-    
-    
+
+
     def create_rpl_user(self, r_user, r_pass=None):
         """Create the replication user and grant privileges
-        
+
         If the user exists, check privileges and add privileges as needed.
         Calls Master class method to execute.
-        
+
         r_user[in]     user to create
         r_pass[in]     password for user to create (optional)
 
@@ -523,28 +523,28 @@ class Replication(object):
         return self.master.create_rpl_user(self.slave.host, self.slave.port,
                                            r_user, r_pass, self.verbosity)
 
-    
+
     def setup(self, rpl_user, num_tries):
         """Setup replication among a slave and master.
-        
+
         Note: Must have connected to a master and slave before calling this
         method.
 
         rpl_user[in]       Replication user in form user:passwd
         num_tries[in]      Number of attempts to wait for slave synch
-        
+
         Returns True if success, False if error
         """
         if self.master is None or self.slave is None:
             print "ERROR: Must connect to master and slave before " \
                   "calling replicate()"
             return False
-        
+
         result = True
-        
+
         # Parse user and password (support login-paths)
         r_user, r_pass = parse_user_password(rpl_user)
-        
+
         # Check to see if rpl_user is present, else create her
         if not self.create_rpl_user(r_user, r_pass):
             return False
@@ -554,7 +554,7 @@ class Replication(object):
         if not res:
             print "ERROR: Cannot retrieve master status."
             return False
-            
+
         # If master log file, pos not specified, read master log file info
         read_master_info = False
         if self.master_log_file is None:
@@ -577,16 +577,16 @@ class Replication(object):
             if not found:
                 raise UtilError("Master binary log file not listed as a "
                                 "valid binary log file on the master.")
-                
+
         if self.master_log_file is None:
             raise UtilError("No master log file specified.")
-         
+
         # Stop slave first
         res = self.slave.get_thread_status()
         if res is not None:
             if res[1] == "Yes" or res[2] == "Yes":
                 res = self.slave.stop(self.query_options)
-        
+
         # Connect slave to master
         if self.verbosity > 0:
             print "# Connecting slave to master..."
@@ -603,7 +603,7 @@ class Replication(object):
         res = self.slave.exec_query(change_master, self.query_options)
         if self.verbosity > 0:
             print "# %s" % change_master
-        
+
         # Start slave
         if self.verbosity > 0:
             if not self.from_beginning:
@@ -615,12 +615,12 @@ class Replication(object):
                     if self.master_log_pos >= 0:
                         msg += " using position %s" % self.master_log_pos
                     msg += "..."
-                    print msg 
+                    print msg
             else:
                 print "# Starting slave from the beginning..."
         res = self.slave.start(self.query_options)
 
-        # Add commit because C/Py are auto_commit=0 by default        
+        # Add commit because C/Py are auto_commit=0 by default
         self.slave.exec_query("COMMIT")
 
         # Check slave status
@@ -668,17 +668,17 @@ class Replication(object):
 
         return result
 
-        
+
     def test(self, db, num_tries):
         """Test the replication setup.
 
         Requires a database name which is created on the master then
         verified it appears on the slave.
-        
+
         db[in]             Name of a database to use in test
         num_tries[in]      Number of attempts to wait for slave synch
         """
-        
+
         if not self.replicating:
             print "ERROR: Replication is not running among master and slave."
         print "# Testing replication setup..."
@@ -702,30 +702,30 @@ class Replication(object):
                 print "# Waiting for slave to synchronize with master"
         if i == num_tries:
             print "ERROR: Unable to complete testing."
-        
+
 
 class Master(Server):
     """The Slave class is a subclass of the Server class. It represents a
     MySQL server performing the role of a slave in a replication topology.
     The following utilities are provide in addition to the Server utilities:
-    
+
         - check to see if replication user is defined and has privileges
         - get binary log exceptions
         - get master status
         - reset master
-        
+
     """
 
     def __init__(self, options={}):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
-        
+
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
             - connection string in the form: user:pass@host:port:socket
             - an instance of the Server class
-             
+
         options[in]        options for controlling behavior:
             conn_info      a dictionary containing connection information
                            (user, passwd, host, port, socket)
@@ -735,16 +735,16 @@ class Master(Server):
             charset        Default character set for the connection.
                            (default latin1)
         """
-        
+
         assert not options.get("conn_info") == None
-        
+
         self.options = options
         Server.__init__(self, options)
-        
+
 
     def get_status(self):
         """Return the master status
-        
+
         Returns result set
         """
         return self.exec_query("SHOW MASTER STATUS")
@@ -752,10 +752,10 @@ class Master(Server):
 
     def get_binlog_exceptions(self):
         """Get any binary logging exceptions
-        
+
         This method queries the server status for the *-do-db and
-        *-ignore-db settings. 
-        
+        *-ignore-db settings.
+
         Returns [] - no exceptions, list if exceptions found
         """
         rows = []
@@ -767,11 +767,11 @@ class Master(Server):
                 rows.append(('master', do_db, ignore_db))
 
         return rows
-    
-    
+
+
     def get_rpl_users(self, options={}):
         """Attempts to find the users who have the REPLICATION SLAVE privilege
-        
+
         options[in]    query options
 
         Returns tuple list - (string, string, bool) = (user, host, has_password)
@@ -781,19 +781,19 @@ class Master(Server):
 
     def create_rpl_user(self, host, port, r_user, r_pass=None, verbosity=0):
         """Create the replication user and grant privileges
-        
+
         If the user exists, check privileges and add privileges as needed.
-        
+
         host[in]       host of the slave
         port[in]       port of the slave
         r_user[in]     user to create
         r_pass[in]     password for user to create (optional)
         verbosity[in]  verbosity of output
                        Default = 0
-        
+
         Returns bool - True = success, False = errors
         """
-        
+
         from mysql.utilities.common.user import User
 
         # Create user class instance
@@ -812,13 +812,13 @@ class Master(Server):
                 print "ERROR: Cannot grant replication slave to " + \
                       "replication user."
                 return False
-            
+
         return True
 
 
     def reset(self, options={}):
         """Reset the master
-        
+
         options[in]    query options
         """
         return self.exec_query("RESET MASTER", options)
@@ -826,23 +826,23 @@ class Master(Server):
 
     def check_rpl_health(self):
         """Check replication health of the master.
-        
+
         This method checks to see if the master is setup correctly to
-        operate in a replication environment. It returns a tuple with a 
+        operate in a replication environment. It returns a tuple with a
         bool to indicate if health is Ok (True), and a list to contain any
         errors encountered during the checks.
-        
+
         Returns tuple (bool, []) - (True, []) = Ok,
                                    (False, error_list) = not setup correctly
         """
         errors = []
         rpl_ok = True
-        
+
         if not self.is_alive():
             return (False, ["Cannot connect to server"])
 
         gtid_enabled = self.supports_gtid() == "ON"
-        
+
         # Check for binlogging
         if not gtid_enabled and not self.binlog_enabled():
             errors.append("No binlog on master.")
@@ -853,18 +853,18 @@ class Master(Server):
         if len(res) == 0:
             errors.append("There are no users with replication privileges.")
             rpl_ok = False
-            
+
         return (rpl_ok, errors)
 
 
     def _check_discovered_slave(self, conn_dict):
         """ Check discovered slave is configured to this master
-        
+
         This method attempts to determine if the slave specified is
         configured to connect to this master.
-        
+
         conn_dict[in]  dictionary of connection information
-        
+
         Returns bool - True - is configured, False - not configured
         """
         if conn_dict['conn_info']['host'] == '127.0.0.1':
@@ -891,13 +891,13 @@ class Master(Server):
 
     def get_slaves(self, user, password):
         """Return the slaves registered for this master.
-        
+
         This method returns a list of slaves (host, port) if this server is
         a master in a replication topology and has slaves registered.
 
         user[in]       user login
         password[in]   user password
-        
+
         Returns list - [host:port, ...]
         """
         def _get_slave_info(host, port):
@@ -907,7 +907,7 @@ class Master(Server):
                 slave_info = "unknown host"
             slave_info += ":%s" % port
             return slave_info
-        
+
         slaves = []
         no_host_slaves = []
         connect_error_slaves = []
@@ -929,7 +929,7 @@ class Master(Server):
                     slaves.append(info)
                 else:
                     connect_error_slaves.append(info)
-        
+
         if no_host_slaves:
             print "WARNING: There are slaves that have not been registered" + \
                   " with --report-host or --report-port."
@@ -942,13 +942,13 @@ class Master(Server):
             if self.options.get("verbosity", 0) > 0:
                 for row in connect_error_slaves:
                     print "\t", row
-            
+
         return slaves
-    
-    
+
+
     def get_gtid_purged_statement(self):
         """General the SET @@GTID_PURGED statement for backup
-        
+
         Returns string - statement for slave if GTID=ON, else None
         """
         if self.supports_gtid == "ON":
@@ -965,17 +965,17 @@ class MasterInfo(object):
     newer servers that use a table to store the information as well as
     older servers that use a file to store the information.
     """
-    
+
     def __init__(self, slave, options):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
-        
+
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
             - connection string in the form: user:pass@host:port:socket
             - an instance of the Server class
-             
+
         options[in]        options for controlling behavior:
           filename         filename for master info file - valid only for
                            servers with master-info-repository=FILE or
@@ -984,7 +984,7 @@ class MasterInfo(object):
           quiet            turns off all messages except errors.
                            Default is False.
         """
-        
+
         assert slave is not None, "MasterInfo requires an instance of Slave."
         self.slave = slave
         self.filename = options.get("master_info", "master.info")
@@ -998,22 +998,22 @@ class MasterInfo(object):
                res[0][1].upper() == "TABLE":
                 self.repo = "TABLE"
 
-    
+
     def read(self):
         """Read the master information
-        
+
         This method reads the master information either from a file or a
         table depending on the availability of and setting for
         master-info-repository. If missing (server version < 5.6.5), it
         defaults to reading from a file.
-        
+
         Returns bool - True = success
         """
         if self.verbosity > 2:
             print "# Reading master information from a %s." % self.repo.lower()
         if self.repo == "FILE":
             import socket
-            
+
             # Check host name of this host. If not the same, issue error.
             if self.slave.is_alias(socket.gethostname()):
                 return self._read_master_info_file()
@@ -1026,10 +1026,10 @@ class MasterInfo(object):
 
     def _check_read(self, refresh=False):
         """Check if master information has been read
-        
+
         refresh[in]    if True, re-read the master information.
                        Default is False.
-        
+
         If the master information has not been read, read it and populate
         the dictionary.
         """
@@ -1040,19 +1040,19 @@ class MasterInfo(object):
 
     def _build_dictionary(self, rows):
         """Build the internal dictionary of values.
-        
+
         rows[in]       Rows as read from the file or table
         """
         for i in range(0, len(rows)):
             self.values[_MASTER_INFO_COL[i]] = rows[i]
-            
-    
+
+
     def _read_master_info_file(self):
         """Read the contents of the master.info file.
-        
+
         This method will raise an error if the file is missing or cannot be
         read by the user.
-        
+
         Returns bool - success = True
         """
         contents = []
@@ -1077,24 +1077,24 @@ class MasterInfo(object):
             raise UtilRplError("Cannot read master information file: "
                                "%s.\nUser needs to have read access to "
                                "the file." % self.filename)
-        # Build the dictionary 
+        # Build the dictionary
         for i in range(1, num):
             contents.append(mfile.readline().strip('\n'))
         self._build_dictionary(contents)
         mfile.close()
 
         return True
-        
-        
+
+
     def _read_master_info_table(self):
         """Read the contents of the slave_master_info table.
-        
+
         This method will raise an error if the file is missing or cannot be
         read by the user.
-        
+
         Returns bool - success = True
         """
-        res = None        
+        res = None
         try:
             res = self.slave.exec_query("SELECT * FROM "
                                         "mysql.slave_master_info")
@@ -1111,8 +1111,8 @@ class MasterInfo(object):
         self._build_dictionary(rows)
 
         return True
-        
-        
+
+
     def show_master_info(self, refresh=False):
         """Display the contents of the master information.
 
@@ -1125,18 +1125,18 @@ class MasterInfo(object):
         for i in range(0, stop):
             print "{0:>30} : {1}".format(_MASTER_INFO_COL[i],
                                          self.values[_MASTER_INFO_COL[i]])
-        
-    
+
+
     def check_master_info(self, refresh=False):
         """Check to see if master info file matches slave status
-        
+
         This method will return a list of discrepancies if the master.info
         file does not match slave status. It will also raise errors if there
         are problem accessing the master.info file.
-        
+
         refresh[in]    if True, re-read the master information.
                        Default is False.
-        
+
         Returns [] - no exceptions, list if exceptions found
         """
         # Check to see if we need to read the information
@@ -1162,41 +1162,41 @@ class MasterInfo(object):
                                self.values['Master_Port']))
 
         return errors
-   
+
 
     def get_value(self, key, refresh=False):
         """Returns the value found for the key or None if key not found.
 
         refresh[in]    if True, re-read the master information.
                        Default is False.
-        
+
         Returns value - Value found for the key or None if key missing
         """
-        # Check to see if we need to read the information        
+        # Check to see if we need to read the information
         self._check_read(refresh)
         try:
             return self.values[key]
         except:
             return None
-    
+
     def get_master_info(self, refresh=False):
         """Returns the master information dictionary.
 
         refresh[in]    if True, re-read the master information.
                        Default is False.
-        
+
         Returns dict - master information
         """
         # Check to see if we need to read the information
         self._check_read(refresh)
         return self.values
-        
+
 
 class Slave(Server):
     """The Slave class is a subclass of the Server class. It represents a
     MySQL server performing the role of a slave in a replication topology.
     The following utilities are provide in addition to the Server utilities:
-    
+
         - get methods to return status, binary log exceptions, slave delay,
           thread status, io error, and master information
         - form the change master command with either known master or user-
@@ -1206,19 +1206,19 @@ class Slave(Server):
         - show master information
         - verify master information matches currently connected master
         - start, stop, and reset slave
-        
+
     """
 
     def __init__(self, options={}):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
-        
+
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
             - connection string in the form: user:pass@host:port:socket
             - an instance of the Server class
-             
+
         options[in]        options for controlling behavior:
             conn_info      a dictionary containing connection information
                            (user, passwd, host, port, socket)
@@ -1228,18 +1228,18 @@ class Slave(Server):
             charset        Default character set for the connection.
                            (default latin1)
         """
-        
+
         assert not options.get("conn_info") == None
         self.options = options
         Server.__init__(self, options)
         self.master_info = None
-        
+
 
     def get_status(self, col_options={}):
         """Return the slave status
-        
+
         col_options[in]    options for displaying columns (optional)
-        
+
         Returns result set
         """
         return self.exec_query("SHOW SLAVE STATUS", col_options)
@@ -1247,10 +1247,10 @@ class Slave(Server):
 
     def get_binlog_exceptions(self):
         """Get any binary logging exceptions
-        
+
         This method queries the server status for the *-do-db and
-        *-ignore-db settings. 
-        
+        *-ignore-db settings.
+
         Returns [] - no exceptions, list if exceptions found
         """
         rows = []
@@ -1281,7 +1281,7 @@ class Slave(Server):
 
     def is_connected(self):
         """Check to see if slave is connected to master
-        
+
         This method will check the slave to see if it is connected to a master.
 
         Returns bool - True = slave is connected
@@ -1294,7 +1294,7 @@ class Slave(Server):
 
     def get_state(self):
         """Get the slave's connection state
-        
+
         Returns state or None if not acting as slave
         """
         res = self.get_status()
@@ -1307,7 +1307,7 @@ class Slave(Server):
 
     def get_io_running(self):
         """Get the slave's IO thread status
-        
+
         Returns IO_THREAD state or None if not acting as slave
         """
         res = self.get_status()
@@ -1320,7 +1320,7 @@ class Slave(Server):
 
     def get_delay(self):
         """Return slave delay values
-        
+
         This method retrieves the slave's delay parameters.
 
         Returns tuple - slave delay values or None if not connected
@@ -1342,10 +1342,10 @@ class Slave(Server):
         read_log_file = res[0][_SLAVE_MASTER_LOG_FILE]
         # position in master's binlog
         read_log_pos = res[0][_SLAVE_MASTER_LOG_FILE_POS]
-        
+
         return (state, sec_behind, delay_remaining,
                 read_log_file, read_log_pos)
-        
+
 
     def get_thread_status(self):
         """Return the slave threads status
@@ -1363,7 +1363,7 @@ class Slave(Server):
         io_running = res[0][_SLAVE_IO_RUNNING]
         # slave_sql_running
         sql_running = res[0][_SLAVE_SQL_RUNNING]
-        
+
         return (state, io_running, sql_running)
 
 
@@ -1380,7 +1380,7 @@ class Slave(Server):
         state = res[0][_SLAVE_IO_STATE]
         io_errorno = int(res[0][_SLAVE_IO_ERRORNO])
         io_error = res[0][_SLAVE_IO_ERROR]
-        
+
         return (state, io_errorno, io_error)
 
     def get_slaves_errors(self):
@@ -1423,11 +1423,11 @@ class Slave(Server):
             raise UtilRplError("Cannot get slave status or slave is "
                                  "not configured as a slave or not "
                                  "started.")
-    
+
 
     def get_rpl_user(self):
         """Return the master user from the master info record.
-        
+
         Returns - tuple = (user, password) or (None, None) if errors
         """
         self.master_info = MasterInfo(self, self.options)
@@ -1440,7 +1440,7 @@ class Slave(Server):
 
     def start(self, options={}):
         """Start the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("START SLAVE", options)
@@ -1454,25 +1454,25 @@ class Slave(Server):
 
     def stop(self, options={}):
         """Stop the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("STOP SLAVE", options)
-        
-        
+
+
     def reset(self, options={}):
         """Reset the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("RESET SLAVE", options)
-        
-        
+
+
     def num_gtid_behind(self, master_gtids):
         """Get the number of transactions the slave is behind the master.
-        
+
         master_gtids[in]  the master's GTID_EXECUTED list
-        
+
         Returns int - number of trans behind master
         """
         slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
@@ -1484,15 +1484,15 @@ class Slave(Server):
             gtids = gtids[0].split("\n")
             gtid_behind = len(gtids)
         return gtid_behind
-        
-        
+
+
     def wait_for_slave(self, binlog_file, binlog_pos, timeout=3):
         """Wait for the slave to read the master's binlog to specified position
-        
+
         binlog_file[in]  master's binlog file
         binlog_pos[in]   master's binlog file position
         timeout[in]     maximum number of seconds to wait for event to occur
-        
+
         Returns bool - True = slave has read to the file and pos,
                        False = slave is behind.
         """
@@ -1503,20 +1503,20 @@ class Slave(Server):
         if res is None or (res[0][0] is not None and int(res[0][0]) != 0):
             return False
         return True
-    
-    
+
+
     def wait_for_slave_gtid(self, master_gtid, timeout=300, verbose=False):
         """Wait for the slave to read the master's GTIDs.
-        
+
         This method requires that the server supports GTIDs.
-        
+
         master_gtid[in]  the list of gtids from the master
                          obtained via SELECT @@GLOBAL.GTID_EXECUTED on master
         timeout[in]      timeout for waiting for slave to catch up
                          Note: per GTID call. Default is 300 seconds (5 min.).
         verbose[in]      if True, print query used.
                          Default is False
-                       
+
         Returns bool - True = slave has read all GTIDs
                        False = slave is behind
         """
@@ -1540,21 +1540,21 @@ class Slave(Server):
                                    e.errmsg))
         return slave_wait_ok
 
-   
+
     def make_change_master(self, from_beginning=False, master_values={}):
         """Make the CHANGE MASTER command.
-        
+
         This method forms the CHANGE MASTER command based on the current
         settings of the slave. If the user supplies a dictionary of options,
         the method will use those values provided by the user if present
         otherwise it will use current settings.
-        
+
         Note: the keys used in the dictionary are defined in the
               _MASTER_INFO_COL list defined above.
-        
+
         from_beginning[in] if True, omit specification of master's binlog info
         master_values[in] if provided, use values in the dictionary
-            
+
         Returns string - CHANGE MASTER command
         """
         if master_values == {} and not self.is_connected():
@@ -1568,7 +1568,7 @@ class Slave(Server):
                 raise UtilRplError("Cannot create CHANGE MASTER command.")
         else:
             master_info = None
-        
+
         # Form values for command.
         # If we cannot get the master info information, try the values passed
         if master_info is None:
@@ -1591,7 +1591,7 @@ class Slave(Server):
                                                 master_info['Master_Log_File'])
             master_log_pos = master_values.get('Read_Master_Log_Pos',
                                             master_info['Read_Master_Log_Pos'])
-            
+
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % master_host
         if master_user:
             change_master += "MASTER_USER = '%s', " % master_user
@@ -1599,20 +1599,20 @@ class Slave(Server):
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
         if self.supports_gtid() == "ON":
-            change_master += ", MASTER_AUTO_POSITION=1"   
+            change_master += ", MASTER_AUTO_POSITION=1"
         elif not from_beginning:
             change_master += ", MASTER_LOG_FILE = '%s'" % master_log_file
             if master_log_pos >= 0:
                 change_master += ", MASTER_LOG_POS = %s" % master_log_pos
-            
+
         return change_master
-    
-    
+
+
     def is_configured_for_master(self, master):
         """Check that slave is connected to the master at host, port.
-        
+
         master[in]     instance of the master
-        
+
         Returns bool - True = is connected
         """
         res = self.get_status()
@@ -1628,12 +1628,12 @@ class Slave(Server):
     def check_rpl_health(self, master, master_log, master_log_pos,
                          max_delay, max_pos, verbosity):
         """Check replication health of the slave.
-        
+
         This method checks to see if the slave is setup correctly to
-        operate in a replication environment. It returns a tuple with a 
+        operate in a replication environment. It returns a tuple with a
         bool to indicate if health is Ok (True), and a list to contain any
         errors encountered during the checks.
-        
+
         master[in]         Master class instance
         master_log[in]     master's log file
         master_log_pos[in] master's log file position
@@ -1643,16 +1643,16 @@ class Slave(Server):
                            determine if slave health is not Ok
         verbosity[in]      if > 1, return detailed errors else return only
                            short phrases
-        
+
         Returns tuple (bool, []) - (True, []) = Ok,
                                    (False, error_list) = not setup correctly
         """
         errors = []
         rpl_ok = True
-        
+
         if not self.is_alive():
             return (False, ["Cannot connect to server"])
-        
+
         res = self.get_status()
         if res != [] and res[0] != []:
             res = res[0]
@@ -1667,7 +1667,7 @@ class Slave(Server):
             remaining_delay = res[_SLAVE_REMAINING_DELAY]
             io_error_num = res[_SLAVE_IO_ERRORNO]
             io_error_text = res[_SLAVE_IO_ERROR]
-            
+
             # Check to see that slave is connected to the right master
             if not self.is_configured_for_master(master):
                 return (False, ["Not connected to correct master."])
@@ -1682,7 +1682,7 @@ class Slave(Server):
             if int(io_error_num) > 0:
                 errors.append(io_error_text)
                 rpl_ok = False
-    
+
             # Check slave delay with threshhold of SBM, and master's log pos
             if int(delay) > int(max_delay):
                 errors.append("Slave delay is %s seconds behind master." %
@@ -1690,7 +1690,7 @@ class Slave(Server):
                 if len(remaining_delay):
                     errors.append(remaining_delay)
                 rpl_ok = False
-                
+
             # Check master position
             if self.supports_gtid() != "ON":
                 if m_log != master_log:
@@ -1699,7 +1699,7 @@ class Slave(Server):
                 elif (int(m_log_pos) + int(max_pos)) < int(master_log_pos):
                     errors.append("Slave's master position exceeds maximum.")
                     rpl_ok = False
-                    
+
             # Check GTID trans behind.
             elif self.supports_gtid() == "ON":
                 master_gtids = master.exec_query(_GTID_EXECUTED)
@@ -1707,21 +1707,21 @@ class Slave(Server):
                 if num_gtids_behind > 0:
                     errors.append("Slave has %s transactions behind master." %
                                   num_gtids_behind)
-                    rpl_ok = False    
-            
+                    rpl_ok = False
+
         else:
             errors.append("Not connected")
             rpl_ok = False
-        
+
         if len(errors) > 1:
             errors = [", ".join(errors)]
-        
+
         return (rpl_ok, errors)
 
-    
+
     def get_rpl_details(self):
         """Return slave status variables for health reporting
-        
+
         This method retrieves the slave's parameters for checking relationship
         with master.
 
@@ -1752,13 +1752,13 @@ class Slave(Server):
         return (read_log_file, read_log_pos, io_thread, sql_thread, sec_behind,
                 delay_remaining, io_error_num, io_error_text, sql_error_num,
                 sql_error_text)
-        
-    
+
+
     def switch_master(self, master, user, passwd="", from_beginning=False,
                       master_log_file=None, master_log_pos=None,
                       show_command=False):
         """Switch slave to a new master
-        
+
         This method stops the slave and issues a new change master command
         to the master specified then starts the slave. No prerequisites are
         checked and it does not wait to see if slave catches up to the master.
@@ -1772,7 +1772,7 @@ class Slave(Server):
         master_log_pos[in]   master's log file position (not needed for GTID)
         show_command[in]     if True, display the change master command
                              Default = False
-                             
+
         returns bool - True = success
         """
         hostport = "%s:%s" % (self.host, self.port)
@@ -1794,5 +1794,3 @@ class Slave(Server):
             raise UtilRplError("Slave %s:%s change master failed.",
                                (hostport, res[0]))
         return True
-
-

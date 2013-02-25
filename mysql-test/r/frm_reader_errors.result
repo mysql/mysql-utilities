@@ -1,0 +1,27 @@
+Test case 1: - Not path or files
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: Nothing to do. You must specify a list of paths or files to read. See --help for more information and examples.
+Test case 2: - Option --port required
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: The --port option is required for reading .frm files in the default mode.
+Test case 3: - Option --port requires int
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: The --port option requires an integer value.
+Test case 4: - No server and no access
+ERROR: Cannot read XXXXXX
+ERROR: Method requires basedir or server and port options.
+Test case 5: - Connection errors
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: Cannot connect to the Source server.
+Error ####: Can't connect to MySQL server on XXXXXXXXXXXXXXXXXXXX
+# Source on local: ...
+Test case 6: - Connection errors
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: Cannot connect to the Source server.
+Error ####: Can't connect to MySQL server on XXXXXXXXXXXXXXXXXXXX
+# Source on localhost: ...

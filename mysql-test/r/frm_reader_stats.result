@@ -1,0 +1,525 @@
+Test case 1: - Check .frm files in a db folder
+# Source on localhost: ... connected.
+# CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_test`.`orig` (
+  `num_1` tinyint(4) DEFAULT NULL, 
+  `num_2` tinyint(3) unsigned DEFAULT NULL, 
+  `num_3` tinyint(3) unsigned zerofill DEFAULT NULL, 
+  `num_4` tinyint(3) unsigned zerofill DEFAULT NULL, 
+  `num_5` tinyint(4) NOT NULL, 
+  `num_6` tinyint(3) unsigned NOT NULL, 
+  `num_7` tinyint(3) unsigned zerofill NOT NULL, 
+  `num_8` tinyint(3) unsigned zerofill NOT NULL, 
+  `num_9` tinyint(4) DEFAULT NULL, 
+  `num_10` tinyint(3) unsigned DEFAULT NULL, 
+  `num_11` tinyint(3) unsigned zerofill DEFAULT NULL, 
+  `num_12` tinyint(3) unsigned zerofill DEFAULT NULL, 
+  `num_13` tinyint(4) NOT NULL, 
+  `num_14` tinyint(3) unsigned NOT NULL, 
+  `num_15` tinyint(3) unsigned zerofill NOT NULL, 
+  `num_16` tinyint(3) unsigned zerofill NOT NULL, 
+  `num_17` tinyint(50) DEFAULT NULL, 
+  `num_18` tinyint(50) unsigned DEFAULT NULL, 
+  `num_19` tinyint(50) unsigned zerofill DEFAULT NULL, 
+  `num_20` tinyint(50) unsigned zerofill DEFAULT NULL, 
+  `num_21` tinyint(50) NOT NULL, 
+  `num_22` tinyint(50) unsigned NOT NULL, 
+  `num_23` tinyint(50) unsigned zerofill NOT NULL, 
+  `num_24` tinyint(50) unsigned zerofill NOT NULL, 
+  `num_25` tinyint(50) DEFAULT NULL, 
+  `num_26` tinyint(50) unsigned DEFAULT NULL, 
+  `num_27` tinyint(50) unsigned zerofill DEFAULT NULL, 
+  `num_28` tinyint(50) unsigned zerofill DEFAULT NULL, 
+  `num_29` tinyint(50) NOT NULL, 
+  `num_30` tinyint(50) unsigned NOT NULL, 
+  `num_31` tinyint(50) unsigned zerofill NOT NULL, 
+  `num_32` tinyint(50) unsigned zerofill NOT NULL, 
+  `num_33` smallint(6) DEFAULT NULL, 
+  `num_34` smallint(5) unsigned DEFAULT NULL, 
+  `num_35` smallint(5) unsigned zerofill DEFAULT NULL, 
+  `num_36` smallint(5) unsigned zerofill DEFAULT NULL, 
+  `num_37` smallint(6) NOT NULL, 
+  `num_38` smallint(5) unsigned NOT NULL, 
+  `num_39` smallint(5) unsigned zerofill NOT NULL, 
+  `num_40` smallint(5) unsigned zerofill NOT NULL, 
+  `num_41` smallint(6) DEFAULT NULL, 
+  `num_42` smallint(5) unsigned DEFAULT NULL, 
+  `num_43` smallint(5) unsigned zerofill DEFAULT NULL, 
+  `num_44` smallint(5) unsigned zerofill DEFAULT NULL, 
+  `num_45` smallint(6) NOT NULL, 
+  `num_46` smallint(5) unsigned NOT NULL, 
+  `num_47` smallint(5) unsigned zerofill NOT NULL, 
+  `num_48` smallint(5) unsigned zerofill NOT NULL, 
+  `num_49` smallint(50) DEFAULT NULL, 
+  `num_50` smallint(50) unsigned DEFAULT NULL, 
+  `num_51` smallint(50) unsigned zerofill DEFAULT NULL, 
+  `num_52` smallint(50) unsigned zerofill DEFAULT NULL, 
+  `num_53` smallint(50) NOT NULL, 
+  `num_54` smallint(50) unsigned NOT NULL, 
+  `num_55` smallint(50) unsigned zerofill NOT NULL, 
+  `num_56` smallint(50) unsigned zerofill NOT NULL, 
+  `num_57` smallint(50) DEFAULT NULL, 
+  `num_58` smallint(50) unsigned DEFAULT NULL, 
+  `num_59` smallint(50) unsigned zerofill DEFAULT NULL, 
+  `num_60` smallint(50) unsigned zerofill DEFAULT NULL, 
+  `num_61` smallint(50) NOT NULL, 
+  `num_62` smallint(50) unsigned NOT NULL, 
+  `num_63` smallint(50) unsigned zerofill NOT NULL, 
+  `num_64` smallint(50) unsigned zerofill NOT NULL, 
+  `num_65` int(11) DEFAULT NULL, 
+  `num_66` int(10) unsigned DEFAULT NULL, 
+  `num_67` int(10) unsigned zerofill DEFAULT NULL, 
+  `num_68` int(10) unsigned zerofill DEFAULT NULL, 
+  `num_69` int(11) NOT NULL, 
+  `num_70` int(10) unsigned NOT NULL, 
+  `num_71` int(10) unsigned zerofill NOT NULL, 
+  `num_72` int(10) unsigned zerofill NOT NULL, 
+  `num_73` int(11) DEFAULT NULL, 
+  `num_74` int(10) unsigned DEFAULT NULL, 
+  `num_75` int(10) unsigned zerofill DEFAULT NULL, 
+  `num_76` int(10) unsigned zerofill DEFAULT NULL, 
+  `num_77` int(11) NOT NULL, 
+  `num_78` int(10) unsigned NOT NULL, 
+  `num_79` int(10) unsigned zerofill NOT NULL, 
+  `num_80` int(10) unsigned zerofill NOT NULL, 
+  `num_81` int(50) DEFAULT NULL, 
+  `num_82` int(50) unsigned DEFAULT NULL, 
+  `num_83` int(50) unsigned zerofill DEFAULT NULL, 
+  `num_84` int(50) unsigned zerofill DEFAULT NULL, 
+  `num_85` int(50) NOT NULL, 
+  `num_86` int(50) unsigned NOT NULL, 
+  `num_87` int(50) unsigned zerofill NOT NULL, 
+  `num_88` int(50) unsigned zerofill NOT NULL, 
+  `num_89` int(50) DEFAULT NULL, 
+  `num_90` int(50) unsigned DEFAULT NULL, 
+  `num_91` int(50) unsigned zerofill DEFAULT NULL, 
+  `num_92` int(50) unsigned zerofill DEFAULT NULL, 
+  `num_93` int(50) NOT NULL, 
+  `num_94` int(50) unsigned NOT NULL, 
+  `num_95` int(50) unsigned zerofill NOT NULL, 
+  `num_96` int(50) unsigned zerofill NOT NULL, 
+  `num_97` mediumint(9) DEFAULT NULL, 
+  `num_98` mediumint(8) unsigned DEFAULT NULL, 
+  `num_99` mediumint(8) unsigned zerofill DEFAULT NULL, 
+  `num_100` mediumint(8) unsigned zerofill DEFAULT NULL, 
+  `num_101` mediumint(9) NOT NULL, 
+  `num_102` mediumint(8) unsigned NOT NULL, 
+  `num_103` mediumint(8) unsigned zerofill NOT NULL, 
+  `num_104` mediumint(8) unsigned zerofill NOT NULL, 
+  `num_105` mediumint(9) DEFAULT NULL, 
+  `num_106` mediumint(8) unsigned DEFAULT NULL, 
+  `num_107` mediumint(8) unsigned zerofill DEFAULT NULL, 
+  `num_108` mediumint(8) unsigned zerofill DEFAULT NULL, 
+  `num_109` mediumint(9) NOT NULL, 
+  `num_110` mediumint(8) unsigned NOT NULL, 
+  `num_111` mediumint(8) unsigned zerofill NOT NULL, 
+  `num_112` mediumint(8) unsigned zerofill NOT NULL, 
+  `num_113` mediumint(50) DEFAULT NULL, 
+  `num_114` mediumint(50) unsigned DEFAULT NULL, 
+  `num_115` mediumint(50) unsigned zerofill DEFAULT NULL, 
+  `num_116` mediumint(50) unsigned zerofill DEFAULT NULL, 
+  `num_117` mediumint(50) NOT NULL, 
+  `num_118` mediumint(50) unsigned NOT NULL, 
+  `num_119` mediumint(50) unsigned zerofill NOT NULL, 
+  `num_120` mediumint(50) unsigned zerofill NOT NULL, 
+  `num_121` mediumint(50) DEFAULT NULL, 
+  `num_122` mediumint(50) unsigned DEFAULT NULL, 
+  `num_123` mediumint(50) unsigned zerofill DEFAULT NULL, 
+  `num_124` mediumint(50) unsigned zerofill DEFAULT NULL, 
+  `num_125` mediumint(50) NOT NULL, 
+  `num_126` mediumint(50) unsigned NOT NULL, 
+  `num_127` mediumint(50) unsigned zerofill NOT NULL, 
+  `num_128` mediumint(50) unsigned zerofill NOT NULL, 
+  `num_129` bigint(20) DEFAULT NULL, 
+  `num_130` bigint(20) unsigned DEFAULT NULL, 
+  `num_131` bigint(20) unsigned zerofill DEFAULT NULL, 
+  `num_132` bigint(20) unsigned zerofill DEFAULT NULL, 
+  `num_133` bigint(20) NOT NULL, 
+  `num_134` bigint(20) unsigned NOT NULL, 
+  `num_135` bigint(20) unsigned zerofill NOT NULL, 
+  `num_136` bigint(20) unsigned zerofill NOT NULL, 
+  `num_137` bigint(20) DEFAULT NULL, 
+  `num_138` bigint(20) unsigned DEFAULT NULL, 
+  `num_139` bigint(20) unsigned zerofill DEFAULT NULL, 
+  `num_140` bigint(20) unsigned zerofill DEFAULT NULL, 
+  `num_141` bigint(20) NOT NULL, 
+  `num_142` bigint(20) unsigned NOT NULL, 
+  `num_143` bigint(20) unsigned zerofill NOT NULL, 
+  `num_144` bigint(20) unsigned zerofill NOT NULL, 
+  `num_145` bigint(50) DEFAULT NULL, 
+  `num_146` bigint(50) unsigned DEFAULT NULL, 
+  `num_147` bigint(50) unsigned zerofill DEFAULT NULL, 
+  `num_148` bigint(50) unsigned zerofill DEFAULT NULL, 
+  `num_149` bigint(50) NOT NULL, 
+  `num_150` bigint(50) unsigned NOT NULL, 
+  `num_151` bigint(50) unsigned zerofill NOT NULL, 
+  `num_152` bigint(50) unsigned zerofill NOT NULL, 
+  `num_153` bigint(50) DEFAULT NULL, 
+  `num_154` bigint(50) unsigned DEFAULT NULL, 
+  `num_155` bigint(50) unsigned zerofill DEFAULT NULL, 
+  `num_156` bigint(50) unsigned zerofill DEFAULT NULL, 
+  `num_157` bigint(50) NOT NULL, 
+  `num_158` bigint(50) unsigned NOT NULL, 
+  `num_159` bigint(50) unsigned zerofill NOT NULL, 
+  `num_160` bigint(50) unsigned zerofill NOT NULL, 
+  `num_161` decimal(10,0) DEFAULT NULL, 
+  `num_162` decimal(10,0) unsigned DEFAULT NULL, 
+  `num_163` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_164` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_165` decimal(10,0) NOT NULL, 
+  `num_166` decimal(10,0) unsigned NOT NULL, 
+  `num_167` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_168` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_169` decimal(10,0) DEFAULT NULL, 
+  `num_170` decimal(10,0) unsigned DEFAULT NULL, 
+  `num_171` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_172` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_173` decimal(10,0) NOT NULL, 
+  `num_174` decimal(10,0) unsigned NOT NULL, 
+  `num_175` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_176` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_177` decimal(5,2) DEFAULT NULL, 
+  `num_178` decimal(5,2) unsigned DEFAULT NULL, 
+  `num_179` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_180` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_181` decimal(5,2) NOT NULL, 
+  `num_182` decimal(5,2) unsigned NOT NULL, 
+  `num_183` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_184` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_185` decimal(5,2) DEFAULT NULL, 
+  `num_186` decimal(5,2) unsigned DEFAULT NULL, 
+  `num_187` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_188` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_189` decimal(5,2) NOT NULL, 
+  `num_190` decimal(5,2) unsigned NOT NULL, 
+  `num_191` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_192` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_193` decimal(10,0) DEFAULT NULL, 
+  `num_194` decimal(10,0) unsigned DEFAULT NULL, 
+  `num_195` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_196` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_197` decimal(10,0) NOT NULL, 
+  `num_198` decimal(10,0) unsigned NOT NULL, 
+  `num_199` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_200` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_201` decimal(10,0) DEFAULT NULL, 
+  `num_202` decimal(10,0) unsigned DEFAULT NULL, 
+  `num_203` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_204` decimal(10,0) unsigned zerofill DEFAULT NULL, 
+  `num_205` decimal(10,0) NOT NULL, 
+  `num_206` decimal(10,0) unsigned NOT NULL, 
+  `num_207` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_208` decimal(10,0) unsigned zerofill NOT NULL, 
+  `num_209` decimal(5,2) DEFAULT NULL, 
+  `num_210` decimal(5,2) unsigned DEFAULT NULL, 
+  `num_211` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_212` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_213` decimal(5,2) NOT NULL, 
+  `num_214` decimal(5,2) unsigned NOT NULL, 
+  `num_215` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_216` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_217` decimal(5,2) DEFAULT NULL, 
+  `num_218` decimal(5,2) unsigned DEFAULT NULL, 
+  `num_219` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_220` decimal(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_221` decimal(5,2) NOT NULL, 
+  `num_222` decimal(5,2) unsigned NOT NULL, 
+  `num_223` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_224` decimal(5,2) unsigned zerofill NOT NULL, 
+  `num_225` float DEFAULT NULL, 
+  `num_226` float unsigned DEFAULT NULL, 
+  `num_227` float unsigned zerofill DEFAULT NULL, 
+  `num_228` float unsigned zerofill DEFAULT NULL, 
+  `num_229` float NOT NULL, 
+  `num_230` float unsigned NOT NULL, 
+  `num_231` float unsigned zerofill NOT NULL, 
+  `num_232` float unsigned zerofill NOT NULL, 
+  `num_233` float DEFAULT NULL, 
+  `num_234` float unsigned DEFAULT NULL, 
+  `num_235` float unsigned zerofill DEFAULT NULL, 
+  `num_236` float unsigned zerofill DEFAULT NULL, 
+  `num_237` float NOT NULL, 
+  `num_238` float unsigned NOT NULL, 
+  `num_239` float unsigned zerofill NOT NULL, 
+  `num_240` float unsigned zerofill NOT NULL, 
+  `num_241` float(5,2) DEFAULT NULL, 
+  `num_242` float(5,2) unsigned DEFAULT NULL, 
+  `num_243` float(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_244` float(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_245` float(5,2) NOT NULL, 
+  `num_246` float(5,2) unsigned NOT NULL, 
+  `num_247` float(5,2) unsigned zerofill NOT NULL, 
+  `num_248` float(5,2) unsigned zerofill NOT NULL, 
+  `num_249` float(5,2) DEFAULT NULL, 
+  `num_250` float(5,2) unsigned DEFAULT NULL, 
+  `num_251` float(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_252` float(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_253` float(5,2) NOT NULL, 
+  `num_254` float(5,2) unsigned NOT NULL, 
+  `num_255` float(5,2) unsigned zerofill NOT NULL, 
+  `num_256` float(5,2) unsigned zerofill NOT NULL, 
+  `num_257` double DEFAULT NULL, 
+  `num_258` double unsigned DEFAULT NULL, 
+  `num_259` double unsigned zerofill DEFAULT NULL, 
+  `num_260` double unsigned zerofill DEFAULT NULL, 
+  `num_261` double NOT NULL, 
+  `num_262` double unsigned NOT NULL, 
+  `num_263` double unsigned zerofill NOT NULL, 
+  `num_264` double unsigned zerofill NOT NULL, 
+  `num_265` double DEFAULT NULL, 
+  `num_266` double unsigned DEFAULT NULL, 
+  `num_267` double unsigned zerofill DEFAULT NULL, 
+  `num_268` double unsigned zerofill DEFAULT NULL, 
+  `num_269` double NOT NULL, 
+  `num_270` double unsigned NOT NULL, 
+  `num_271` double unsigned zerofill NOT NULL, 
+  `num_272` double unsigned zerofill NOT NULL, 
+  `num_273` double(5,2) DEFAULT NULL, 
+  `num_274` double(5,2) unsigned DEFAULT NULL, 
+  `num_275` double(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_276` double(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_277` double(5,2) NOT NULL, 
+  `num_278` double(5,2) unsigned NOT NULL, 
+  `num_279` double(5,2) unsigned zerofill NOT NULL, 
+  `num_280` double(5,2) unsigned zerofill NOT NULL, 
+  `num_281` double(5,2) DEFAULT NULL, 
+  `num_282` double(5,2) unsigned DEFAULT NULL, 
+  `num_283` double(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_284` double(5,2) unsigned zerofill DEFAULT NULL, 
+  `num_285` double(5,2) NOT NULL, 
+  `num_286` double(5,2) unsigned NOT NULL, 
+  `num_287` double(5,2) unsigned zerofill NOT NULL, 
+  `num_288` double(5,2) unsigned zerofill NOT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 19402
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+#...done.
+Test case 2: - Check .frm files in a db folder
+# Source on localhost: ... connected.
+# CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t1` (
+  `a` int(11) DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t2` (
+  `a` int(11) DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t3` (
+  `a` int(11) DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t4` (
+  `a` int(11) DEFAULT NULL 
+) ENGINE=BLACKHOLE DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : BLACKHOLE
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t5` (
+  `a` int(11) NOT NULL 
+) ENGINE=CSV DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : CSV
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t6` (
+  `a` int(11) NOT NULL 
+) ENGINE=ARCHIVE DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : ARCHIVE
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t7` (
+  `a` int(11) NOT NULL 
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : INNODB
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t8` (
+  `a` int(11) DEFAULT NULL 
+) ENGINE=MRG_MYISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : MERGE
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`t9` (
+  `a` int(11) NOT NULL 
+) ENGINE=INNODB  PARTITION BY HASH (a), DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8554
+
+# Table Statistics:
+#                Engine : PARTITION
+#           frm Version : 9
+#         MySQL Version : 5.6.11
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : INNODB
+
+#...done.
