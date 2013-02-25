@@ -24,7 +24,9 @@ import sys
 import shutil
 import time
 import subprocess
+import inspect
 
+from mysql.utilities import PYTHON_MIN_VERSION, PYTHON_MAX_VERSION
 from mysql.utilities.common.format import print_list
 from mysql.utilities.exception import UtilError
 
@@ -257,11 +259,80 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
     if os.name == "posix":  # use scp
         run_cmd = "scp %s@%s:%s %s" % (user, host, filepath, local_path)
         if verbosity > 1:
-            print "# Command =", run_cmd
-        print "# Copying file from %s:%s to %s:" % (host, filepath, local_path)
+            print("# Command =", run_cmd)
+        print("# Copying file from %s:%s to %s:" % (host, filepath, local_path))
         proc = subprocess.Popen(run_cmd, shell=True)
         ret_val = proc.wait()
     else:
-        print "Remote copy not supported. Please use UNC paths and omit " + \
-              "the --remote-login option to use a local copy operation."
+        print("Remote copy not supported. Please use UNC paths and omit " 
+              "the --remote-login option to use a local copy operation.")
     return True
+
+
+def check_python_version(min_version=PYTHON_MIN_VERSION,
+                         max_version=PYTHON_MAX_VERSION,
+                         raise_exception_on_fail=False,
+                         name=None):
+    """Check the Python version compatibility.
+
+    By default this method uses constants to define the minimum and maximum
+    Python versions required. It's possible to override this by passing new
+    values on ``min_version`` and ``max_version`` parameters.
+    It will run a ``sys.exit`` or raise a ``UtilError`` if the version of
+    Python detected it not compatible.
+
+    min_version[in]               Tuple with the minimum Python version
+                                  required (inclusive).
+    max_version[in]               Tuple with the maximum Python version
+                                  required (exclusive).
+    raise_exception_on_fail[in]   Boolean, it will raise a ``UtilError`` if
+                                  True and Python detected is not compatible.
+    name[in]                      String for a custom name, if not provided
+                                  will get the module name from where this
+                                  function was called.
+    """
+
+    # Only use the fields: major, minor and micro
+    sys_version = sys.version_info[:3]
+
+    # Test min version compatibility
+    is_compat = min_version <= sys_version
+
+    # Test max version compatibility if it's defined
+    if is_compat and max_version:
+        is_compat = sys_version < max_version
+
+    if not is_compat:
+        if not name:
+            # Get the utility name by finding the module
+            # name from where this function was called
+            frm = inspect.stack()[1]
+            mod = inspect.getmodule(frm[0])
+            mod_name, ext = os.path.basename(mod.__file__).split('.')
+            name = '%s utility' % mod_name
+
+        # Build the error message
+        if max_version:
+            max_version_error_msg = 'or higher and lower than %s' % \
+                                    '.'.join(map(str, max_version))
+        else:
+            max_version_error_msg = 'or higher'
+
+        error_msg = (
+            'The %(name)s requires Python version %(min_version)s '
+            '%(max_version_error_msg)s. The version of Python detected was '
+            '%(sys_version)s. You may need to install or redirect the '
+            'execution of this utility to an environment that includes a '
+            'compatible Python version.'
+        ) % {
+            'name': name,
+            'sys_version': '.'.join(map(str, sys_version)),
+            'min_version': '.'.join(map(str, min_version)),
+            'max_version_error_msg': max_version_error_msg
+        }
+
+        if raise_exception_on_fail:
+            raise UtilError(error_msg)
+
+        print('ERROR: %s' % error_msg)
+        sys.exit(1)

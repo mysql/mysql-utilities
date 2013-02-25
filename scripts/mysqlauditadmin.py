@@ -22,6 +22,11 @@ manage the audit log (i.e., view/edit control variables; perform on-demand
 log file rotation, and copy log files to other locations).
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version(min_version=(2, 7, 0), max_version=(3, 0, 0))
+
 import optparse
 import os.path
 import sys
@@ -36,11 +41,6 @@ from mysql.utilities.command.audit_log import command_requires_value
 from mysql.utilities.command.audit_log import command_requires_log_name
 from mysql.utilities.command.audit_log import command_requires_server
 from mysql.utilities import VERSION_FRM
-
-# Check Python version requisites to run this utility
-if sys.version_info < (2, 7) or sys.version_info > (3, 0):
-    sys.exit("ERROR: Python version 2.7 or higher, but less than 3.0, "
-             "must be used to run this utility.")
 
 
 class MyParser(optparse.OptionParser):
@@ -176,9 +176,11 @@ server_values = None
 if opt.server:
     try:
         server_values = parse_connection(opt.server, None, opt)
-    except FormatError as err:
+    except FormatError:
+        _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err)
-    except UtilError as err:
+    except UtilError:
+        _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Check for copy prerequisites
@@ -249,7 +251,7 @@ try:
     if opt.show_options:
         # if some other command has run
         if len(args):
-            print "#\n# Showing options before command."
+            print("#\n# Showing options before command.")
         log.show_options()
 
     # Execute the command specified
@@ -259,15 +261,16 @@ try:
     # Show audit log options after command if appropriate
     if opt.show_options and len(args):
         # if some other command has run
-        print "#\n# Showing options after command."
+        print("#\n# Showing options after command.")
         log.show_options()
 
     # Do file stats
     if opt.file_stats:
         show_file_statistics(opt.log_name, True)
 
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit(0)

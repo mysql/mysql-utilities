@@ -23,6 +23,10 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os.path
 import sys
@@ -91,9 +95,11 @@ if len(args) == 0:
 # Parse source connection values
 try:
     source_values = parse_connection(opt.server)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Check best, worst for validity
@@ -141,8 +147,9 @@ options = {
 
 try:
     res = indexcheck.check_index(source_values, args, options)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

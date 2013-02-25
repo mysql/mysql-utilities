@@ -20,6 +20,11 @@
 This file contains the mysql utilities client.
 """
 
+from mysql.utilities.common.tools import check_python_version    
+
+# Check Python version compatibility
+check_python_version()
+
 import optparse
 import os
 import sys
@@ -27,8 +32,8 @@ import sys
 try:
     import mysql.connector
 except:
-    print "ERROR: The Connector/Python module is not installed or " + \
-          "is not accessible from this terminal."
+    print("ERROR: The Connector/Python module is not installed or "
+          "is not accessible from this terminal.")
     sys.exit(2)
 
 try:
@@ -37,8 +42,8 @@ try:
     from mysql.utilities.common.options import add_verbosity, check_verbosity
     from mysql.utilities.exception import UtilError
 except:
-    print "ERROR: MySQL Utilities are either not installed or are not " + \
-          "accessible from this terminal."
+    print("ERROR: MySQL Utilities are either not installed or are not "
+          "accessible from this terminal.")
     sys.exit(2)
 
 # Constants
@@ -133,12 +138,13 @@ options = {
 }
 
 try:
-    print "Launching console ..."
+    print("Launching console ...")
     util_con = UtilitiesConsole(options)
     util_con.run_console()
 except KeyboardInterrupt:
-    print options['goodbye']
-except UtilError, e:
-    print "ERROR:", e.errmsg
+    print(options['goodbye'])
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
 
 sys.exit()

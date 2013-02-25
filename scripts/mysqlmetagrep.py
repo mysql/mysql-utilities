@@ -16,6 +16,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os.path
 import re
 import sys
@@ -97,10 +102,11 @@ command = ObjectGrep(options.pattern, options.database_pattern, object_types,
 
 try:
     if options.print_sql:
-        print command.sql()
+        print(command.sql())
     else:
         command.execute(options.server, format=options.format)
-except Exception as details:
+except Exception:
+    _, details, _ = sys.exc_info()
     print >>sys.stderr, 'ERROR:', details
 
 sys.exit()

@@ -21,6 +21,10 @@ This file contains the import database utility which allows users to import
 metadata for objects in a database and data for tables.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os
 import sys
@@ -122,8 +126,9 @@ check_verbosity(opt)
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except UtilError, e:
-    print "ERROR: %s" % e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Fail if no arguments
@@ -131,15 +136,15 @@ if len(args) == 0:
     parser.error("You must specify at least one file to import.")
 
 if opt.skip_blobs and not opt.import_type == "data":
-    print "# WARNING: --skip-blobs option ignored for metadata import."
+    print("# WARNING: --skip-blobs option ignored for metadata import.")
 
 if "data" in skips and opt.import_type == "data":
-    print "ERROR: You cannot use --import=data and --skip-data when " \
-          "importing table data."
+    print("ERROR: You cannot use --import=data and --skip-data when "
+          "importing table data.")
     sys.exit(1)
 
 if "create_db" in skips and opt.do_drop:
-    print "ERROR: You cannot combine --drop-first and --skip=create_db."
+    print("ERROR: You cannot combine --drop-first and --skip=create_db.")
     exit (1)
 
 # Set options for database operations.
@@ -172,9 +177,11 @@ options = {
 # Parse server connection values
 try:
     server_values = parse_connection(opt.server, None, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Build list of files to import
@@ -193,8 +200,9 @@ try:
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
 
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

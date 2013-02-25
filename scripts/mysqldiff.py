@@ -21,6 +21,10 @@ This file contains the object diff utility which allows users to compare the
 definitions of two objects and return the difference (like diff).
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os
 import re
@@ -101,16 +105,20 @@ options = {
 # Parse server connection values
 try:
     server1_values = parse_connection(opt.server1, None, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Server1 connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Server1 connection values invalid: %s." % err.errmsg)
 if opt.server2 is not None:
     try:
         server2_values = parse_connection(opt.server2, None, options)
-    except FormatError as err:
+    except FormatError:
+        _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err)
-    except UtilError as err:
+    except UtilError:
+        _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
 else:
     server2_values = None
@@ -138,8 +146,9 @@ for argument in args:
             diff = object_diff(server1_values, server2_values,
                                "%s.%s" % (db1, obj1),
                                "%s.%s" % (db2, obj2), options)
-        except UtilError, e:
-            print "ERROR:", e.errmsg
+        except UtilError:
+            _, e, _ = sys.exc_info()
+            print("ERROR:", e.errmsg)
             sys.exit(1)
         if diff is not None:
             diff_failed = True
@@ -149,19 +158,20 @@ for argument in args:
         try:
             res = database_diff(server1_values, server2_values,
                                 db1, db2, options)
-        except UtilError, e:
-            print "ERROR:", e.errmsg
+        except UtilError:
+            _, e, _ = sys.exc_info()
+            print("ERROR:", e.errmsg)
             sys.exit(1)
         if not res:
             diff_failed = True
 
 if diff_failed:
     if not opt.quiet:
-        print "Compare failed. One or more differences found."
+        print("Compare failed. One or more differences found.")
     sys.exit(1)            
 
 if not opt.quiet:
-    print "Success. All objects are the same."
+    print("Success. All objects are the same.")
     
 sys.exit()
 

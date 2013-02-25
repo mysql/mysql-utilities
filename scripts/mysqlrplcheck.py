@@ -21,6 +21,10 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os.path
 import sys
@@ -32,7 +36,6 @@ from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.command.check_rpl import check_replication
 from mysql.utilities.exception import FormatError
-
 
 # Constants
 NAME = "MySQL Utilities - mysqlrplcheck "
@@ -92,17 +95,21 @@ opt, args = parser.parse_args()
 # Parse source connection values
 try:
     m_values = parse_connection(opt.master)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err.errmsg)
 
 # Parse source connection values
 try:
     s_values = parse_connection(opt.slave)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Slave connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Slave connection values invalid: %s." % err.errmsg)
 
 # Check hostname alias
@@ -124,8 +131,9 @@ try:
     res = check_replication(m_values, s_values, options)
     if res:
         sys.exit(1)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

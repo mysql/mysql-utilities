@@ -21,6 +21,11 @@ This file contains the export database utility which allows users to export
 metadata for objects in a database and data for tables.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os
 import sys
 import time
@@ -148,8 +153,9 @@ check_verbosity(opt)
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except UtilError, e:
-    print "ERROR: %s" % e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Fail if no db arguments or all
@@ -164,14 +170,14 @@ check_rpl_options(parser, opt)
 check_all(parser, opt, args, "databases")
 
 if opt.skip_blobs and not opt.export == "data":
-    print "# WARNING: --skip-blobs option ignored for metadata export."
+    print("# WARNING: --skip-blobs option ignored for metadata export.")
 
 if opt.file_per_tbl and opt.export in ("definitions", "both"):
-    print "# WARNING: --file-per-table option ignored for metadata export."
+    print("# WARNING: --file-per-table option ignored for metadata export.")
 
 if "data" in skips and opt.export == "data":
-    print "ERROR: You cannot use --export=data and --skip-data when exporting " \
-          "table data."
+    print("ERROR: You cannot use --export=data and --skip-data when exporting "
+          "table data.")
     sys.exit(1)
 
 # Set options for database operations.
@@ -209,9 +215,11 @@ options = {
 # Parse server connection values
 try:
     server_values = parse_connection(opt.server, None, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err.errmsg)
 
 # Build list of databases to copy
@@ -231,8 +239,9 @@ try:
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
 
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

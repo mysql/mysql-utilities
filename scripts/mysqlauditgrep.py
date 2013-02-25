@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,11 @@ retrieve log entries according to the specified search criteria (i.e.,
 from specific users, search patterns, date ranges, or query types).
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version(min_version=(2, 7, 0), max_version=(3, 0, 0))
+
 import optparse
 import os.path
 import sys
@@ -38,12 +43,6 @@ from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.command import audit_log
 from mysql.utilities.command.audit_log import AuditLog
 from mysql.utilities import VERSION_FRM
-
-
-# Check Python version requisites to run this utility
-if sys.version_info < (2, 7) or sys.version_info > (3, 0):
-    sys.exit("ERROR: Python version 2.7 or higher, but less than 3.0, "
-             "must be used to run this utility.")
 
 
 class MyParser(optparse.OptionParser):
@@ -256,7 +255,7 @@ options = {
 
 try:
     if not exist_search_criteria() and not (opt.format or opt.stats):
-        print "#\n# No search criteria defined.\n#"
+        print("#\n# No search criteria defined.\n#")
     else:
         # Create and init the AuditLog obj with the provided options
         log = AuditLog(options)
@@ -277,8 +276,9 @@ try:
             # Print the resulting data (to the sdtout) in the specified format
             log.output_formatted_log()
 
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit(0)

@@ -21,6 +21,11 @@ This file contains the clone server utility which launches a new instance
 of an existing server.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os.path
 import sys
 
@@ -99,7 +104,7 @@ if opt.new_data is None:
 
 # Warn if root-password is left off.
 if opt.root_pass is None or opt.root_pass == '':
-    print "# WARNING: Root password for new instance has not been set."
+    print("# WARNING: Root password for new instance has not been set.")
 
 # Fail if user does not have access to new data dir.
 if os.path.exists(opt.new_data):
@@ -140,17 +145,20 @@ if opt.basedir and opt.basedir[0] == '.':
 if opt.basedir is None:
     try:
         conn = parse_connection(opt.server)
-    except exception.FormatError as err:
+    except exception.FormatError:
+        _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err)
-    except exception.UtilError as err:
+    except exception.UtilError:
+        _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err.errmsg)
 else:
     conn = None
 
 try:
     res = serverclone.clone_server(conn, options)
-except exception.UtilError, e:
-    print "ERROR:", e.errmsg
+except exception.UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
     
 sys.exit()

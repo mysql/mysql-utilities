@@ -22,6 +22,11 @@ find the slaves for a given master and can traverse the list of slaves
 checking for additional master/slave connections.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os.path
 import sys
 
@@ -114,9 +119,11 @@ if opt.recurse and opt.max_depth is not None:
 # Parse master connection values
 try:
     m_values = parse_connection(opt.master, None, opt)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err.errmsg)
 
 # Create dictionary of options
@@ -135,8 +142,9 @@ try:
     res = show_topology(m_values, options)
     if res:
         sys.exit(1)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

@@ -22,6 +22,11 @@ MySQL user to one or more new user accounts copying all grant statements
 to the new users.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os.path
 import sys
 
@@ -32,7 +37,6 @@ from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import userclone
-
 
 # Constants
 NAME = "MySQL Utilities - mysqluserclone "
@@ -107,9 +111,11 @@ if (len(args) == 0 or opt is None) and not opt.list_users:
 # Parse source connection values
 try:
     source_values = parse_connection(opt.source, None, opt)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err.errmsg)
 
 
@@ -127,9 +133,11 @@ else:
     if not opt.dump and opt.destination is not None:
         try:
             dest_values = parse_connection(opt.destination, None, opt)
-        except FormatError as err:
+        except FormatError:
+            _, err, _ = sys.exc_info()
             parser.error("Destination connection values invalid: %s." % err)
-        except UtilError as err:
+        except UtilError:
+            _, err, _ = sys.exc_info()
             parser.error("Destination connection values invalid: %s."
                          % err.errmsg)
     else:
@@ -147,8 +155,9 @@ else:
     try:
         res = userclone.clone_user(source_values, dest_values, base_user,
                                    new_user_list, options)
-    except UtilError, e:
-        print "ERROR:", e.errmsg
+    except UtilError:
+        _, e, _ = sys.exc_info()
+        print("ERROR:", e.errmsg)
         sys.exit(1)
 
 sys.exit()

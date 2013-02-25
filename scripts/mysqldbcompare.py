@@ -21,6 +21,10 @@ This file contains the operations to perform database consistency checking
 on two databases.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os
 import sys
@@ -136,17 +140,21 @@ options = {
 server2_values = None
 try:
     server1_values = parse_connection(opt.server1, None, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Server1 connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Server1 connection values invalid: %s." % err.errmsg)
 
 if opt.server2:
     try:
         server2_values = parse_connection(opt.server2, None, options)
-    except FormatError as err:
+    except FormatError:
+        _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err)
-    except UtilError as err:
+    except UtilError:
+        _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
 
 # Operations to perform:
@@ -169,8 +177,9 @@ for db in args:
         res = database_compare(server1_values, server2_values,
                                parts[0], parts[1], options)
         print
-    except UtilError, e:
-        print "ERROR:", e.errmsg
+    except UtilError:
+        _, e, _ = sys.exc_info()
+        print("ERROR:", e.errmsg)
         check_failed = True
         if not opt.run_all_tests:
             break
@@ -183,14 +192,14 @@ for db in args:
 if not opt.quiet:
     print
     if check_failed:
-        print "# Database consistency check failed."
+        print("# Database consistency check failed.")
     else:
         sys.stdout.write("Databases are consistent")
         if opt.no_object_check or opt.no_diff or \
            opt.no_row_count or opt.no_data:
             sys.stdout.write(" given skip options specified")
-        print "."
-    print "#\n# ...done"
+        print(".")
+    print("#\n# ...done")
 
 if check_failed:
     sys.exit(1)

@@ -16,6 +16,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os.path
 import sys
 
@@ -111,13 +116,15 @@ try:
     command = ProcessGrep(options.matches, options.actions, options.use_regexp,
                           age=options.age)
     if options.print_sql:
-        print command.sql(options.sql_body).strip()
+        print(command.sql(options.sql_body).strip())
     else:
         command.execute(options.server, format=options.format)
-except EmptyResultError as details:
+except EmptyResultError:
+    _, details, _ = sys.exc_info()
     print >>sys.stderr, "No matches"
     sys.exit(1)
-except Exception as details:
+except Exception:
+    _, details, _ = sys.exc_info()
     print >>sys.stderr, 'ERROR:', details
     sys.exit(2)
 

@@ -21,6 +21,11 @@ This file contains the copy database utility which ensures a database
 is exactly the same among two servers.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os
 import re
 import sys
@@ -128,8 +133,9 @@ opt, args = parser.parse_args()
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except UtilError, e:
-    print "ERROR: %s" % e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Fail if no options listed.
@@ -182,17 +188,21 @@ try:
     # parse_connection methods (like, searching my_print_defaults tool).
     config_reader = MyDefaultsReader(options, False)
     source_values = parse_connection(opt.source, config_reader, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err.errmsg)
 
 # Parse destination connection values
 try:
     dest_values = parse_connection(opt.destination, config_reader, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Destination connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Destination connection values invalid: %s."
                  % err.errmsg)
 
@@ -220,8 +230,9 @@ try:
     dbcopy.copy_db(source_values, dest_values, db_list, options)
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR:", e.errmsg)
     sys.exit(1)
 
 sys.exit()

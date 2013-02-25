@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -231,10 +231,10 @@ def print_dictionary_list(column_names, keys, dictionary_list,
         max_name = len(column_names[0])
     max_value = (max_width - 2 - max_name) or 25
     if show_header:
-        print _TWO_COLUMN_DISPLAY.format(column_names[0], max_name,
-                                         column_names[1], max_value)
-        print _TWO_COLUMN_DISPLAY.format('-'*(max_name), max_name,
-                                         '-'*max_value, max_value)
+        print(_TWO_COLUMN_DISPLAY.format(column_names[0], max_name,
+                                         column_names[1], max_value))
+        print(_TWO_COLUMN_DISPLAY.format('-'*(max_name), max_name,
+                                         '-'*max_value, max_value))
     for item in dictionary_list:
         name = item[keys[0]]
         value = item[keys[1]]
@@ -247,11 +247,11 @@ def print_dictionary_list(column_names, keys, dictionary_list,
         
         if use_alias and len(keys) > 2 and len(item[keys[2]]) > 0:
             name += ' | ' + item[keys[2]]
-        print _TWO_COLUMN_DISPLAY.format(name, max_name,
-                                         description[0], max_value)
+        print(_TWO_COLUMN_DISPLAY.format(name, max_name,
+                                         description[0], max_value))
         for i in range(1, len(description)):
-            print _TWO_COLUMN_DISPLAY.format('', max_name, description[i],
-                                             max_value)
+            print(_TWO_COLUMN_DISPLAY.format('', max_name, description[i],
+                                             max_value))
 
 
 def convert_dictionary_list(dict_list):

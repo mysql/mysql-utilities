@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.common.tools import check_python_version
 
 
 class test(mutlib.System_test):
@@ -26,6 +27,15 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
+        # Check Python version compatibility
+        try:
+            check_python_version(min_version=(2, 7, 0),
+                                 max_version=(3, 0, 0),
+                                 raise_exception_on_fail=True,
+                                 name='audit_log_grep')
+        except UtilError as e:
+            raise MUTLibError(e.errmsg)
+
         # First, make sure the server to be clone has the audit log included.
         if not self.servers.get_server(0).supports_plugin("audit"):
             raise MUTLibError("Test requires a server with the audit log "
