@@ -37,6 +37,10 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option, add_rpl_mode
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.common.options import add_rpl_user, check_rpl_options
+
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -225,6 +229,8 @@ except UtilError:
 # Build list of databases to copy
 db_list = []
 for db in args:
+    # Remove backtick quotes (handled later)
+    db = remove_backtick_quoting(db) if is_quoted_with_backticks(db) else db
     db_list.append(db)
 
 try:

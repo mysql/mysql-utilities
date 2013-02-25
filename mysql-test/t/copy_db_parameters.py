@@ -17,6 +17,7 @@
 import os
 import copy_db
 from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilError
 
 _SYSTEM_DATABASES = ['MYSQL', 'INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA']
 
@@ -45,17 +46,26 @@ class test(copy_db.test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(3)
-            except MUTLibError, e:
+            except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+                                   err.errmsg)
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file %s: %s"
+                              % (data_file, err.errmsg))
+
+        # Create backtick database (with weird names)
+        data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
+        try:
+            res = self.server1.read_and_exec_SQL(data_file_backticks,
+                                                 self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file %s: %s"
+                              % (data_file_backticks, err.errmsg))
 
         self.server3 = self.servers.get_server(2)
         # Drop all databases on server3
@@ -65,14 +75,14 @@ class test(copy_db.test):
                 if not row[0].upper() in _SYSTEM_DATABASES:
                     self.server3.exec_query("DROP DATABASE %s" % row[0])
             self.server3.exec_query("CREATE DATABASE wesaysocorp")
-        except Exception, e:
-            raise MUTLibError("Failed to drop databases. %s" % e.errmsg)
+        except Exception as err:
+            raise MUTLibError("Failed to drop databases. %s" % err.errmsg)
 
         try:
             res = self.server3.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file %s: %s"
+                              % (data_file, err.errmsg))
 
         return True
 

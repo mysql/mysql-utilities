@@ -16,7 +16,11 @@
 #
 import os
 import mutlib
+
+from mysql.utilities.common.table import quote_with_backticks
+
 from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilError
 
 class test(mutlib.System_test):
     """Import Data
@@ -87,24 +91,38 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file %s: %s"
+                              % (data_file, err.errmsg))
+
+        # Create backtick database (with weird names)
+        data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
+        try:
+            res = self.server1.read_and_exec_SQL(data_file_backticks,
+                                                 self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file %s: %s"
+                              % (data_file_backticks, err.errmsg))
+
         return True
     
-    def run_import_test(self, expected_res, from_conn, to_conn, format, type,
-                        comment, export_options=None, import_options=None):
-    
-        export_cmd = "mysqldbexport.py  --skip-gtid " + \
-                     "%s util_test --export=" % from_conn
-        export_cmd += type + " --format=%s " % format
+    def run_import_test(self, expected_res, from_conn, to_conn, db, frmt,
+                        imp_type, comment, export_options=None,
+                        import_options=None):
+
+        # Set command with appropriate quotes for the OS
+        if os.name == 'posix':
+            export_cmd = ("mysqldbexport.py  --skip-gtid %s '%s' --export=%s"
+                          " --format=%s " % (from_conn, db, imp_type, frmt))
+        else:
+            export_cmd = ('mysqldbexport.py  --skip-gtid %s "%s" --export=%s'
+                          ' --format=%s ' % (from_conn, db, imp_type, frmt))
         if export_options is not None:
             export_cmd += export_options
         export_cmd += " > %s" % self.export_import_file
-        
-        import_cmd = "mysqldbimport.py %s " % to_conn
-        import_cmd += "%s --import=" % self.export_import_file
-        import_cmd += type + " --format=%s " % format
+
+        import_cmd = ("mysqldbimport.py %s %s --import=%s --format=%s "
+                      % (to_conn, self.export_import_file, imp_type, frmt))
         if import_options is not None:
             import_cmd += import_options
             
@@ -112,7 +130,7 @@ class test(mutlib.System_test):
         
         # Precheck: check db and save the results.
         self.results.append("BEFORE:\n")
-        self.results.append(self.check_objects(self.server2, "util_test"))
+        self.results.append(self.check_objects(self.server2, db))
 
         # First run the export to a file.
         res = self.run_test_case(0, export_cmd, "Running export...")
@@ -126,30 +144,51 @@ class test(mutlib.System_test):
         
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
-        self.results.append(self.check_objects(self.server2, "util_test"))
-            
+        self.results.append(self.check_objects(self.server2, db))
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         from_conn = "--server=%s" % self.build_connection_string(self.server1)
         to_conn = "--server=%s" % self.build_connection_string(self.server2)
 
         _FORMATS = ("SQL", "CSV", "TAB", "GRID", "VERTICAL")
-        _DISPLAYS = ("BRIEF", "FULL") #  We will do "NAMES" in import_errors
+        _FORMATS_BACKTICKS = ("SQL", "CSV", "TAB")
+        _DISPLAYS = ("BRIEF", "FULL")  # We will do "NAMES" in import_errors
         test_num = 1
         for display in _DISPLAYS:
-            for format in _FORMATS:
-                comment = "Test Case %d : Testing import with " % test_num
-                comment += "%s format " % format
-                comment += "and %s display" % display
+            for frmt in _FORMATS:
+                comment = ("Test Case %d : Testing import with %s format and "
+                          "%s display" % (test_num, frmt, display))
                 # We test DEFINITIONS and DATA only in other tests
-                self.run_import_test(0, from_conn, to_conn,
-                                     format, "BOTH", comment,
+                self.run_import_test(0, from_conn, to_conn, 'util_test',
+                                     frmt, "BOTH", comment,
                                      " --display=%s" % display)
                 self.drop_db(self.server2, "util_test")
                 test_num += 1
+
+        # Test database with backticks
+        for display in _DISPLAYS:
+            for frmt in _FORMATS_BACKTICKS:
+                comment = ("Test Case %d : Testing import with %s format and "
+                          "%s display (using backticks)"
+                          % (test_num, frmt, display))
+                self.run_import_test(0, from_conn, to_conn, '`db``:db`',
+                                     frmt, "BOTH", comment,
+                                     " --display=%s" % display)
+                self.drop_db(self.server2, 'db`:db')
+                test_num += 1
+
+        display = 'NAMES'
+        frmt = 'SQL'
+        comment = ("Test Case %d : Testing import with %s format and "
+                   "%s display (using backticks)" % (test_num, frmt, display))
+        self.run_import_test(0, from_conn, to_conn, '`db``:db`',
+                             frmt, "BOTH", comment, " --display=%s" % display)
+        self.drop_db(self.server2, 'db`:db')
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
     
@@ -159,11 +198,12 @@ class test(mutlib.System_test):
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
+            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
         except:
             return True # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            q_db = quote_with_backticks(db)
+            res = server.exec_query("DROP DATABASE %s" % q_db)
         except:
             return False
         return True
@@ -174,9 +214,17 @@ class test(mutlib.System_test):
         except:
             return False
         try:
+            self.drop_db(self.server1, 'db`:db')
+        except:
+            return False
+        try:
             self.drop_db(self.server2, "util_test")
         except:
-            pass # ok if this fails - it is a spawned server 
+            pass  # ok if this fails - it is a spawned server
+        try:
+            self.drop_db(self.server2, 'db`:db')
+        except:
+            pass  # ok if this fails - it is a spawned server
         return True
 
     def cleanup(self):

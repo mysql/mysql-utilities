@@ -32,6 +32,8 @@ import sys
 import time
 
 from mysql.utilities.command import dbcopy
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_skip_options
@@ -40,6 +42,9 @@ from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.common.options import add_regexp, add_rpl_mode
 from mysql.utilities.common.options import check_rpl_options, add_rpl_user
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
+
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -213,14 +218,40 @@ if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:
 
 # Check replication options
 check_rpl_options(parser, opt)
-    
+
 # Build list of databases to copy
 db_list = []
 for db in args:
-    grp = re.match("(\w+)(?:\:(\w+))?", db)
+    # Split the database names considering backtick quotes
+    grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\:)(`(?:[^`]|``)+`|\w+))?", db)
     if not grp:
-        parser.error("Cannot parse database list. Error on '%s'." % db)
+        parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
+                                              db1_label='orig_db',
+                                              db2_label='new_db'))
     db_entry = grp.groups()
+    orig_db, new_db = db_entry
+
+    # Verify if the size of the databases matched by the REGEX is equal to the
+    # initial specified string. In general, this identifies the missing use
+    # of backticks.
+    matched_size = len(orig_db)
+    if new_db:
+        # add 1 for the separator ':'
+        matched_size = matched_size + 1
+        matched_size = matched_size + len(new_db)
+    if matched_size != len(db):
+        parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+                                                  db1_label='orig_db',
+                                                  db2_label='new_db',
+                                                  db1_value=orig_db,
+                                                  db2_value=new_db))
+
+    # Remove backtick quotes (handled later)
+    orig_db = remove_backtick_quoting(orig_db) \
+                if is_quoted_with_backticks(orig_db) else orig_db
+    new_db = remove_backtick_quoting(new_db) \
+                if new_db and is_quoted_with_backticks(new_db) else new_db
+    db_entry = (orig_db, new_db)
     db_list.append(db_entry)
 
 try:

@@ -14,6 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
 
 """
 This file contains the methods for checking consistency among two databases.
@@ -24,12 +27,14 @@ from mysql.utilities.exception import UtilError, UtilDBError
 # The following are the queries needed to perform table data consistency
 # checking.
 
+_COMPARE_TABLE_NAME = 'compare_{tbl}'
+
 _COMPARE_TABLE_DROP = """
-    DROP TABLE {db}.compare_{table};
+    DROP TABLE {db}.{compare_tbl};
 """
 
 _COMPARE_TABLE = """
-    CREATE TEMPORARY TABLE {db}.compare_{table} (
+    CREATE TEMPORARY TABLE {db}.{compare_tbl} (
         compare_sign char(32) NOT NULL PRIMARY KEY,
         pk_hash char(32) NOT NULL,
         {pkdef}
@@ -38,7 +43,7 @@ _COMPARE_TABLE = """
 """
 
 _COMPARE_INSERT = """
-    INSERT INTO {db}.compare_{table}
+    INSERT INTO {db}.{compare_tbl}
         (compare_sign, pk_hash, {pkstr}, span)
     SELECT
         MD5(CONCAT_WS('/', {colstr})),
@@ -54,12 +59,12 @@ _COMPARE_SUM = """
         SUM(CONV(SUBSTRING(compare_sign,9,8),16,10)),
         SUM(CONV(SUBSTRING(compare_sign,17,8),16,10)),
         SUM(CONV(SUBSTRING(compare_sign,25,8),16,10))) as sig
-    FROM {db}.compare_{table}
+    FROM {db}.{compare_tbl}
     GROUP BY span
 """
 
 _COMPARE_DIFF = """
-    SELECT * FROM {db}.compare_{table}
+    SELECT * FROM {db}.{compare_tbl}
     WHERE span = '{span}'
 """
 
@@ -106,18 +111,20 @@ def get_create_object(server, object_name, options):
     verbosity = options.get("verbosity", 0)
     quiet = options.get("quiet", False)
 
-    object = object_name.split(".")
-    
+    db_name, sep, obj_name = object_name.partition(".")
+    object = [db_name]
+
     db = Database(server, object[0], options)
 
     # Error if atabase does not exist
     if not db.exists():
         raise UtilDBError("The database does not exist: {0}".format(object[0]))
-    
-    if len(object) == 1:        
+
+    if not obj_name:
         object.append(object[0])
         obj_type = "DATABASE"
     else:
+        object.append(obj_name)
         obj_type = db.get_object_type(object[1])
         if obj_type is None:
             raise UtilDBError("The object {0} does not exist.".
@@ -542,9 +549,19 @@ def _drop_compare_object(server, db_name, tbl_name):
     db_name[in]            database name
     tbl_name[in]           table name
     """
+    # Quote compare table appropriately with backticks
+    q_db_name = db_name if is_quoted_with_backticks(db_name) \
+                        else quote_with_backticks(db_name)
+    if is_quoted_with_backticks(tbl_name):
+        q_tbl_name = remove_backtick_quoting(tbl_name)
+    else:
+        q_tbl_name = tbl_name
+    q_tbl_name = quote_with_backticks(
+                                _COMPARE_TABLE_NAME.format(tbl=q_tbl_name))
+
     try:
-        server.exec_query(_COMPARE_TABLE_DROP.format(db=db_name,
-                                                     table=tbl_name))
+        server.exec_query(_COMPARE_TABLE_DROP.format(db=q_db_name,
+                                                     compare_tbl=q_tbl_name))
     except:
         pass
 
@@ -563,19 +580,23 @@ def _get_compare_objects(index_cols, table1):
     Returns tuple (table create statement, concatenated string of the
                    primary index columns)
     """
-    index_defn = ""
-    index_str = ""
     table = None
 
     # build primary key col definition
-    index_str = ''.join("{0}, ".format(col[0]) for col in index_cols)
+    index_str = ''.join("{0}, ".format(quote_with_backticks(col[0])) \
+                        for col in index_cols)
     index_defn = ''.join("{0} {1}, ".
-                         format(col[0], col[1]) for col in index_cols)
+                         format(quote_with_backticks(col[0]), col[1]) \
+                         for col in index_cols)
     if index_defn == "":
         raise UtilError("Cannot generate index definition")
     else:
-        table = _COMPARE_TABLE.format(db=table1.db_name, table=table1.tbl_name,
-                                      pkdef=index_defn)
+        # Quote compare table appropriately with backticks
+        q_tbl_name = quote_with_backticks(
+                            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name))
+
+        table = _COMPARE_TABLE.format(db=table1.q_db_name,
+                                      compare_tbl=q_tbl_name, pkdef=index_defn)
 
     return (table, index_str)
 
@@ -641,7 +662,7 @@ def _make_sum_rows(table, idx_str):
     """
     from mysql.utilities.common.lock import Lock
 
-    col_str = ", ".join(table.get_col_names())
+    col_str = ", ".join(table.get_col_names(True))
         
     # Lock table first
     tbl_lock_list = [
@@ -650,13 +671,18 @@ def _make_sum_rows(table, idx_str):
     ]
     my_lock = Lock(table.server, tbl_lock_list)
 
+    # Quote compare table appropriately with backticks
+    q_tbl_name = quote_with_backticks(
+                            _COMPARE_TABLE_NAME.format(tbl=table.tbl_name))
+
     table.server.exec_query(
-        _COMPARE_INSERT.format(db=table.db_name, table=table.tbl_name,
+        _COMPARE_INSERT.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                colstr=col_str.strip(", "),
-                               pkstr=idx_str.strip(", ")))
+                               pkstr=idx_str.strip(", "),
+                               table=table.q_tbl_name))
 
     res = table.server.exec_query(
-        _COMPARE_SUM.format(db=table.db_name, table=table.tbl_name))
+        _COMPARE_SUM.format(db=table.q_db_name, compare_tbl=q_tbl_name))
 
     # Unlock table
     my_lock.unlock()
@@ -683,8 +709,12 @@ def _get_rows_span(table, span):
     rows = []
     # build WHERE clause
     for row in span:
+        # Quote compare table appropriately with backticks
+        q_tbl_name = quote_with_backticks(
+                            _COMPARE_TABLE_NAME.format(tbl=table.tbl_name))
+
         res1 = server.exec_query(
-            _COMPARE_DIFF.format(db=table.db_name, table=table.tbl_name,
+            _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                  span=row))
         pk = res1[0][2:len(res1[0])-1]
         pkeys = [col[0] for col in table.get_primary_index()]
@@ -692,7 +722,8 @@ def _get_rows_span(table, span):
                                     format(key, col)
                                     for key, col in zip(pkeys, pk))
         res2 = server.exec_query(
-            _COMPARE_SPAN_QUERY.format(db=table.db_name, table=table.tbl_name,
+            _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
+                                       table=table.q_tbl_name,
                                        where=where_clause))
         rows.append(res2[0])
         

@@ -67,7 +67,7 @@ Test case 1 - GRID format with BRIEF display
 +---------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -79,7 +79,7 @@ Test case 1 - GRID format with BRIEF display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -87,7 +87,7 @@ Test case 1 - GRID format with BRIEF display
 | 12 Test Basic database example  |
 | 13 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -95,7 +95,7 @@ Test case 1 - GRID format with BRIEF display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -130,19 +130,19 @@ Test case 2 - GRID format with FULL display
 +------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
 # PROCEDURES in util_test:
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
-| db         | name  | type       | specific_name  | language  | sql_data_access  | is_deterministic  | security_type  | param_list   | returns  | body                                    | definer         | created              | modified             | sql_mode  | comment  | character_set_client  | collation_connection  | db_collation       | body_utf8                               |
+| DB         | NAME  | TYPE       | SPECIFIC_NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | PARAM_LIST   | RETURNS  | BODY                                    | DEFINER         | CREATED              | MODIFIED             | SQL_MODE  | COMMENT  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                               |
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
 | util_test  | p1    | PROCEDURE  | p1             | SQL       | CONTAINS_SQL     | NO                | DEFINER        | p1 CHAR(20)  |          | INSERT INTO util_test.t1 VALUES ("50")  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | INSERT INTO util_test.t1 VALUES ("50")  |
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
 # FUNCTIONS in util_test:
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
-| db         | name  | type      | specific_name  | language  | sql_data_access  | is_deterministic  | security_type  | param_list  | returns  | body               | definer         | created              | modified             | sql_mode  | comment  | character_set_client  | collation_connection  | db_collation       | body_utf8          |
+| DB         | NAME  | TYPE      | SPECIFIC_NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | PARAM_LIST  | RETURNS  | BODY               | DEFINER         | CREATED              | MODIFIED             | SQL_MODE  | COMMENT  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8          |
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
 | util_test  | f1    | FUNCTION  | f1             | SQL       | CONTAINS_SQL     | YES               | DEFINER        |             | int(11)  | RETURN (SELECT 1)  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | RETURN (SELECT 1)  |
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+-------------+----------+--------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+--------------------+
 # EVENTS in util_test:
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
-| db         | name  | body                                            | definer         | execute_at  | interval_value  | interval_field  | created              | modified             | last_executed  | starts               | ends  | status    | on_completion  | sql_mode  | comment  | originator  | time_zone  | character_set_client  | collation_connection  | db_collation       | body_utf8                                       |
+| DB         | NAME  | BODY                                            | DEFINER         | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | CREATED              | MODIFIED             | LAST_EXECUTED  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | SQL_MODE  | COMMENT  | ORIGINATOR  | TIME_ZONE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                                       |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 | util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | X           | SYSTEM     | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
@@ -172,7 +172,7 @@ Test case 2 - GRID format with FULL display
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -184,7 +184,7 @@ Test case 2 - GRID format with FULL display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -192,7 +192,7 @@ Test case 2 - GRID format with FULL display
 | 12 Test Basic database example  |
 | 13 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -200,7 +200,7 @@ Test case 2 - GRID format with FULL display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -275,7 +275,7 @@ Test case 3 - GRID format with NAMES display
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -287,7 +287,7 @@ Test case 3 - GRID format with NAMES display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -295,7 +295,7 @@ Test case 3 - GRID format with NAMES display
 | 12 Test Basic database example  |
 | 13 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -303,7 +303,7 @@ Test case 3 - GRID format with NAMES display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -315,27 +315,27 @@ Test case 4 - CSV format with BRIEF display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
-util_test,t1,MEMORY,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
-util_test,t2,MyISAM,1,a,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
-util_test,t3,InnoDB,1,a,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,PRIMARY,a,,
-util_test,t3,InnoDB,2,b,char(30),YES,,,latin1_swedish_ci,,,,,,,PRIMARY,a,,
-util_test,t4,InnoDB,1,c,int(11),NO,,MUL,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
-util_test,t4,InnoDB,2,d,int(11),NO,,,latin1_swedish_ci,,ref_t3,t3,PRIMARY,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+`util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+`util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+`util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
+`util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-util_test,v1,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-trg,root@localhost,INSERT,util_test,t1,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
+`trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # PROCEDURES in util_test:
 NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-p1,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
+`p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,latin1,latin1_swedish_ci,latin1_swedish_ci
 # FUNCTIONS in util_test:
 NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-f1,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
+`f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,latin1,latin1_swedish_ci,latin1_swedish_ci
 # EVENTS in util_test:
 NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
-e1,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
+`e1`,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,latin1,latin1_swedish_ci,latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -358,8 +358,8 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',UPDATE,util_test,,,
 #...done.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -367,18 +367,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 5 - CSV format with FULL display
@@ -386,27 +386,27 @@ Test case 5 - CSV format with FULL display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
-,util_test,t1,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,char(30),YES,,,,,,,,,,,,
-,util_test,t2,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,char(30),YES,,,,,,,,,,,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,a,int(11),NO,,PRI,,,,,,,PRIMARY,a,,
-,util_test,t3,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,b,char(30),YES,,,,,,,,,PRIMARY,a,,
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,c,int(11),NO,,MUL,ref_t3,t3,PRIMARY,util_test,RESTRICT,RESTRICT,ref_t3,c,util_test,a
-,util_test,t4,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,d,int(11),NO,,,ref_t3,t3,PRIMARY,util_test,RESTRICT,RESTRICT,ref_t3,c,util_test,a
+,`util_test`,`t1`,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
+,`util_test`,`t2`,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
+,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,int(11),NO,,PRI,,,,,,,`PRIMARY`,`a`,,
+,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`b`,char(30),YES,,,,,,,,,`PRIMARY`,`a`,,
+,`util_test`,`t4`,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`c`,int(11),NO,,MUL,`ref_t3`,`t3`,`PRIMARY`,`util_test`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
+,`util_test`,`t4`,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`d`,int(11),NO,,,`ref_t3`,`t3`,`PRIMARY`,`util_test`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-,util_test,v1,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
+,`util_test`,`v1`,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,latin1,latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-,util_test,trg,INSERT,,util_test,t1,0,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
+,`util_test`,`trg`,INSERT,,`util_test`,`t1`,0,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,latin1,latin1_swedish_ci,latin1_swedish_ci
 # PROCEDURES in util_test:
-db,name,type,specific_name,language,sql_data_access,is_deterministic,security_type,param_list,returns,body,definer,created,modified,sql_mode,comment,character_set_client,collation_connection,db_collation,body_utf8
-util_test,p1,PROCEDURE,p1,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
+DB,NAME,TYPE,SPECIFIC_NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,PARAM_LIST,RETURNS,BODY,DEFINER,CREATED,MODIFIED,SQL_MODE,COMMENT,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
+`util_test`,`p1`,PROCEDURE,`p1`,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
 # FUNCTIONS in util_test:
-db,name,type,specific_name,language,sql_data_access,is_deterministic,security_type,param_list,returns,body,definer,created,modified,sql_mode,comment,character_set_client,collation_connection,db_collation,body_utf8
-util_test,f1,FUNCTION,f1,SQL,CONTAINS_SQL,YES,DEFINER,,int(11),RETURN (SELECT 1),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,RETURN (SELECT 1)
+DB,NAME,TYPE,SPECIFIC_NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,PARAM_LIST,RETURNS,BODY,DEFINER,CREATED,MODIFIED,SQL_MODE,COMMENT,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
+`util_test`,`f1`,FUNCTION,`f1`,SQL,CONTAINS_SQL,YES,DEFINER,,int(11),RETURN (SELECT 1),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,latin1,latin1_swedish_ci,latin1_swedish_ci,RETURN (SELECT 1)
 # EVENTS in util_test:
-db,name,body,definer,execute_at,interval_value,interval_field,created,modified,last_executed,starts,ends,status,on_completion,sql_mode,comment,originator,time_zone,character_set_client,collation_connection,db_collation,body_utf8
-util_test,e1,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,XX,SYSTEM,latin1,latin1_swedish_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
+DB,NAME,BODY,DEFINER,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,CREATED,MODIFIED,LAST_EXECUTED,STARTS,ENDS,STATUS,ON_COMPLETION,SQL_MODE,COMMENT,ORIGINATOR,TIME_ZONE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
+`util_test`,`e1`,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,XX,SYSTEM,latin1,latin1_swedish_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -430,8 +430,8 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -439,18 +439,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 6 - CSV format with NAMES display
@@ -458,25 +458,25 @@ Test case 6 - CSV format with NAMES display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 # FUNCTIONS in util_test:
 NAME
-f1
+`f1`
 # EVENTS in util_test:
 NAME
-e1
+`e1`
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -500,8 +500,8 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -509,18 +509,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 7 - TAB format with BRIEF display
@@ -528,27 +528,27 @@ Test case 7 - TAB format with BRIEF display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
-util_test	t1	MEMORY	1	a	char(30)	YES			latin1_swedish_ci										
-util_test	t2	MyISAM	1	a	char(30)	YES			latin1_swedish_ci										
-util_test	t3	InnoDB	1	a	int(11)	NO		PRI	latin1_swedish_ci							PRIMARY	a		
-util_test	t3	InnoDB	2	b	char(30)	YES			latin1_swedish_ci							PRIMARY	a		
-util_test	t4	InnoDB	1	c	int(11)	NO		MUL	latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT	RESTRICT	ref_t3	c	util_test	a
-util_test	t4	InnoDB	2	d	int(11)	NO			latin1_swedish_ci		ref_t3	t3	PRIMARY	RESTRICT	RESTRICT	ref_t3	c	util_test	a
+`util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
+`util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
+`util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t3`	InnoDB	2	`b`	char(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t4`	InnoDB	1	`c`	int(11)	NO		MUL	latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
+`util_test`	`t4`	InnoDB	2	`d`	int(11)	NO			latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-util_test	v1	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
+`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	latin1	latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-trg	root@localhost	INSERT	util_test	t1	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
+`trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		latin1	latin1_swedish_ci	latin1_swedish_ci
 # PROCEDURES in util_test:
 NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-p1	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		latin1	latin1_swedish_ci	latin1_swedish_ci
+`p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		latin1	latin1_swedish_ci	latin1_swedish_ci
 # FUNCTIONS in util_test:
 NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-f1	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
+`f1`	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		latin1	latin1_swedish_ci	latin1_swedish_ci
 # EVENTS in util_test:
 NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
-e1	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
+`e1`	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	latin1	latin1_swedish_ci	latin1_swedish_ci
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -571,8 +571,8 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	UPDATE	util_test			
 #...done.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -580,18 +580,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 8 - TAB format with FULL display
@@ -599,27 +599,27 @@ Test case 8 - TAB format with FULL display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
-	util_test	t1	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	char(30)	YES												
-	util_test	t2	BASE TABLE	MyISAM	10	Fixed	3	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	char(30)	YES												
-	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	a	int(11)	NO		PRI							PRIMARY	a		
-	util_test	t3	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	b	char(30)	YES									PRIMARY	a		
-	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	c	int(11)	NO		MUL	ref_t3	t3	PRIMARY	util_test	RESTRICT	RESTRICT	ref_t3	c	util_test	a
-	util_test	t4	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	d	int(11)	NO			ref_t3	t3	PRIMARY	util_test	RESTRICT	RESTRICT	ref_t3	c	util_test	a
+	`util_test`	`t1`	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
+	`util_test`	`t2`	BASE TABLE	MyISAM	10	Fixed	3	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
+	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	int(11)	NO		PRI							`PRIMARY`	`a`		
+	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`b`	char(30)	YES									`PRIMARY`	`a`		
+	`util_test`	`t4`	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`c`	int(11)	NO		MUL	`ref_t3`	`t3`	`PRIMARY`	`util_test`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
+	`util_test`	`t4`	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`d`	int(11)	NO			`ref_t3`	`t3`	`PRIMARY`	`util_test`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	DEFINER	SECURITY_TYPE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-	util_test	v1	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	latin1	latin1_swedish_ci
+	`util_test`	`v1`	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	latin1	latin1_swedish_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-	util_test	trg	INSERT		util_test	t1	0		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
+	`util_test`	`trg`	INSERT		`util_test`	`t1`	0		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	latin1	latin1_swedish_ci	latin1_swedish_ci
 # PROCEDURES in util_test:
-db	name	type	specific_name	language	sql_data_access	is_deterministic	security_type	param_list	returns	body	definer	created	modified	sql_mode	comment	character_set_client	collation_connection	db_collation	body_utf8
-util_test	p1	PROCEDURE	p1	SQL	CONTAINS_SQL	NO	DEFINER	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	"INSERT INTO util_test.t1 VALUES (""50"")"
+DB	NAME	TYPE	SPECIFIC_NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	PARAM_LIST	RETURNS	BODY	DEFINER	CREATED	MODIFIED	SQL_MODE	COMMENT	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
+`util_test`	`p1`	PROCEDURE	`p1`	SQL	CONTAINS_SQL	NO	DEFINER	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	"INSERT INTO util_test.t1 VALUES (""50"")"
 # FUNCTIONS in util_test:
-db	name	type	specific_name	language	sql_data_access	is_deterministic	security_type	param_list	returns	body	definer	created	modified	sql_mode	comment	character_set_client	collation_connection	db_collation	body_utf8
-util_test	f1	FUNCTION	f1	SQL	CONTAINS_SQL	YES	DEFINER		int(11)	RETURN (SELECT 1)	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	RETURN (SELECT 1)
+DB	NAME	TYPE	SPECIFIC_NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	PARAM_LIST	RETURNS	BODY	DEFINER	CREATED	MODIFIED	SQL_MODE	COMMENT	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
+`util_test`	`f1`	FUNCTION	`f1`	SQL	CONTAINS_SQL	YES	DEFINER		int(11)	RETURN (SELECT 1)	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			latin1	latin1_swedish_ci	latin1_swedish_ci	RETURN (SELECT 1)
 # EVENTS in util_test:
-db	name	body	definer	execute_at	interval_value	interval_field	created	modified	last_executed	starts	ends	status	on_completion	sql_mode	comment	originator	time_zone	character_set_client	collation_connection	db_collation	body_utf8
-util_test	e1	"DELETE FROM util_test.t1 WHERE a = ""not there"""	root@localhost		1	YEAR	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		XXXX-XX-XX XX:XX:XX		DISABLED	DROP			XX	SYSTEM	latin1	latin1_swedish_ci	latin1_swedish_ci	"DELETE FROM util_test.t1 WHERE a = ""not there"""
+DB	NAME	BODY	DEFINER	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	CREATED	MODIFIED	LAST_EXECUTED	STARTS	ENDS	STATUS	ON_COMPLETION	SQL_MODE	COMMENT	ORIGINATOR	TIME_ZONE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
+`util_test`	`e1`	"DELETE FROM util_test.t1 WHERE a = ""not there"""	root@localhost		1	YEAR	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		XXXX-XX-XX XX:XX:XX		DISABLED	DROP			XX	SYSTEM	latin1	latin1_swedish_ci	latin1_swedish_ci	"DELETE FROM util_test.t1 WHERE a = ""not there"""
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -643,8 +643,8 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -652,18 +652,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 9 - TAB format with NAMES display
@@ -671,25 +671,25 @@ Test case 9 - TAB format with NAMES display
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 # FUNCTIONS in util_test:
 NAME
-f1
+`f1`
 # EVENTS in util_test:
 NAME
-e1
+`e1`
 # GRANTS in util_test:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
@@ -713,8 +713,8 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -722,18 +722,18 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a
+# Data for table `util_test`.`t2`: 
+`a`
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 10 - VERTICAL format with BRIEF display
@@ -937,7 +937,7 @@ Test case 10 - VERTICAL format with BRIEF display
        INTERVAL_FIELD: YEAR
              SQL_MODE: 
                STARTS: XXXX-XX-XX XX:XX:XX
-                 ENDS: None
+                 ENDS: XXXX-XX-XX XX:XX:XX
                STATUS: DISABLED
         ON_COMPLETION: DROP
            ORIGINATOR: XX
@@ -1075,7 +1075,7 @@ Test case 10 - VERTICAL format with BRIEF display
 18 rows.
 #...done.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -1091,7 +1091,7 @@ Test case 10 - VERTICAL format with BRIEF display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
  a: 11 Test Basic database example
 *************************       2. row *************************
@@ -1099,7 +1099,7 @@ Test case 10 - VERTICAL format with BRIEF display
 *************************       3. row *************************
  a: 13 Test Basic database example
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1110,7 +1110,7 @@ Test case 10 - VERTICAL format with BRIEF display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -1389,74 +1389,74 @@ Test case 11 - VERTICAL format with FULL display
 1 rows.
 # PROCEDURES in util_test:
 *************************       1. row *************************
-                   db: util_test
-                 name: p1
-                 type: PROCEDURE
-        specific_name: p1
-             language: SQL
-      sql_data_access: CONTAINS_SQL
-     is_deterministic: NO
-        security_type: DEFINER
-           param_list: p1 CHAR(20)
-              returns: 
-                 body: INSERT INTO util_test.t1 VALUES ("50")
-              definer: root@localhost
+                   DB: util_test
+                 NAME: p1
+                 TYPE: PROCEDURE
+        SPECIFIC_NAME: p1
+             LANGUAGE: SQL
+      SQL_DATA_ACCESS: CONTAINS_SQL
+     IS_DETERMINISTIC: NO
+        SECURITY_TYPE: DEFINER
+           PARAM_LIST: p1 CHAR(20)
+              RETURNS: 
+                 BODY: INSERT INTO util_test.t1 VALUES ("50")
+              DEFINER: root@localhost
               CREATED: XXXX-XX-XX XX:XX:XX
              MODIFIED: XXXX-XX-XX XX:XX:XX
-             sql_mode: 
-              comment: 
- character_set_client: latin1
- collation_connection: latin1_swedish_ci
-         db_collation: latin1_swedish_ci
-            body_utf8: INSERT INTO util_test.t1 VALUES ("50")
+             SQL_MODE: 
+              COMMENT: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
+            BODY_UTF8: INSERT INTO util_test.t1 VALUES ("50")
 1 rows.
 # FUNCTIONS in util_test:
 *************************       1. row *************************
-                   db: util_test
-                 name: f1
-                 type: FUNCTION
-        specific_name: f1
-             language: SQL
-      sql_data_access: CONTAINS_SQL
-     is_deterministic: YES
-        security_type: DEFINER
-           param_list: 
-              returns: int(11)
-                 body: RETURN (SELECT 1)
-              definer: root@localhost
+                   DB: util_test
+                 NAME: f1
+                 TYPE: FUNCTION
+        SPECIFIC_NAME: f1
+             LANGUAGE: SQL
+      SQL_DATA_ACCESS: CONTAINS_SQL
+     IS_DETERMINISTIC: YES
+        SECURITY_TYPE: DEFINER
+           PARAM_LIST: 
+              RETURNS: int(11)
+                 BODY: RETURN (SELECT 1)
+              DEFINER: root@localhost
               CREATED: XXXX-XX-XX XX:XX:XX
              MODIFIED: XXXX-XX-XX XX:XX:XX
-             sql_mode: 
-              comment: 
- character_set_client: latin1
- collation_connection: latin1_swedish_ci
-         db_collation: latin1_swedish_ci
-            body_utf8: RETURN (SELECT 1)
+             SQL_MODE: 
+              COMMENT: 
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
+            BODY_UTF8: RETURN (SELECT 1)
 1 rows.
 # EVENTS in util_test:
 *************************       1. row *************************
-                   db: util_test
-                 name: e1
-                 body: DELETE FROM util_test.t1 WHERE a = "not there"
-              definer: root@localhost
-           execute_at: None
-       interval_value: 1
-       interval_field: YEAR
+                   DB: util_test
+                 NAME: e1
+                 BODY: DELETE FROM util_test.t1 WHERE a = "not there"
+              DEFINER: root@localhost
+           EXECUTE_AT: None
+       INTERVAL_VALUE: 1
+       INTERVAL_FIELD: YEAR
               CREATED: XXXX-XX-XX XX:XX:XX
              MODIFIED: XXXX-XX-XX XX:XX:XX
-        last_executed: None
+        LAST_EXECUTED: None
                STARTS: XXXX-XX-XX XX:XX:XX
                  ENDS: XXXX-XX-XX XX:XX:XX
-               status: DISABLED
-        on_completion: DROP
-             sql_mode: 
-              comment: 
+               STATUS: DISABLED
+        ON_COMPLETION: DROP
+             SQL_MODE: 
+              COMMENT: 
            ORIGINATOR: XX
-            time_zone: SYSTEM
- character_set_client: latin1
- collation_connection: latin1_swedish_ci
-         db_collation: latin1_swedish_ci
-            body_utf8: DELETE FROM util_test.t1 WHERE a = "not there"
+            TIME_ZONE: SYSTEM
+ CHARACTER_SET_CLIENT: latin1
+ COLLATION_CONNECTION: latin1_swedish_ci
+         DB_COLLATION: latin1_swedish_ci
+            BODY_UTF8: DELETE FROM util_test.t1 WHERE a = "not there"
 1 rows.
 # GRANTS in util_test:
 *************************       1. row *************************
@@ -1589,7 +1589,7 @@ Test case 11 - VERTICAL format with FULL display
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -1605,7 +1605,7 @@ Test case 11 - VERTICAL format with FULL display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
  a: 11 Test Basic database example
 *************************       2. row *************************
@@ -1613,7 +1613,7 @@ Test case 11 - VERTICAL format with FULL display
 *************************       3. row *************************
  a: 13 Test Basic database example
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1624,7 +1624,7 @@ Test case 11 - VERTICAL format with FULL display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -1794,7 +1794,7 @@ Test case 12 - VERTICAL format with NAMES display
 #...done.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -1810,7 +1810,7 @@ Test case 12 - VERTICAL format with NAMES display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
  a: 11 Test Basic database example
 *************************       2. row *************************
@@ -1818,7 +1818,7 @@ Test case 12 - VERTICAL format with NAMES display
 *************************       3. row *************************
  a: 13 Test Basic database example
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1829,7 +1829,7 @@ Test case 12 - VERTICAL format with NAMES display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -1838,9 +1838,9 @@ Test case 12 - VERTICAL format with NAMES display
 Test case 13 - copy all databases
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 # TABLE: util_test.t1
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
@@ -1883,28 +1883,28 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 # Exporting metadata from wesaysocorp
-DROP DATABASE IF EXISTS wesaysocorp;
-CREATE DATABASE wesaysocorp;
-USE wesaysocorp;
+DROP DATABASE IF EXISTS `wesaysocorp`;
+CREATE DATABASE `wesaysocorp`;
+USE `wesaysocorp`;
 #...done.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.

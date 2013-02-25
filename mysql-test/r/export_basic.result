@@ -1,9 +1,9 @@
 Test case 1 - export metadata only
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 # TABLE: util_test.t1
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
@@ -46,84 +46,84 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 # Grant:
-GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 #...done.
 Test case 2 - export data only - single rows
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 3 - export data only - bulk insert
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES  (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES  (3, 2);
 #...done.
 Test case 4 - export data and metadata
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 # TABLE: util_test.t1
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
@@ -166,67 +166,67 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 # Grant:
-GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 #...done.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 5 - export data and metadata with quiet
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
@@ -260,48 +260,48 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
 RETURN (SELECT 1);
 ||
 DELIMITER ;
-GRANT ALTER ON util_test.* TO 'joe'@'user'
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
-GRANT DELETE ON util_test.* TO 'joe'@'user'
-GRANT DROP ON util_test.* TO 'joe'@'user'
-GRANT EVENT ON util_test.* TO 'joe'@'user'
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
-GRANT INDEX ON util_test.* TO 'joe'@'user'
-GRANT INSERT ON util_test.* TO 'joe'@'user'
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
-GRANT SELECT ON util_test.* TO 'joe'@'user'
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 Test case 6 - export data and metadata with debug
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 # TABLE: util_test.t1
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
@@ -344,62 +344,144 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 # Grant:
-GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 #...done.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Time:       XXXXXX
 
+Test case 7 - export database with weird names (backticks)
+# Source on localhost: ... connected.
+# Exporting metadata from db`:db
+DROP DATABASE IF EXISTS `db``:db`;
+CREATE DATABASE `db``:db`;
+USE `db``:db`;
+# TABLE: db`:db.`t`.`export_2
+CREATE TABLE ```t``.``export_2` (
+  `id``` int(11) NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+# TABLE: db`:db.`t`export_1
+CREATE TABLE ```t``export_1` (
+  `id``` int(11) NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+# VIEW: db`:db.`v`export_1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `db``:db`.```v``export_1` AS select `db``:db`.```t``export_1`.`id``` AS `id```,`db``:db`.```t``export_1`.`other` AS `other` from `db``:db`.```t``export_1`;
+# PROCEDURE: db`:db.pr``oc
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `pr````oc`()
+INSERT INTO `db``:db`.```t``export_1` (other) VALUES ("proc->trigger->func");
+||
+DELIMITER ;
+# FUNCTION: db`:db.fu`nc
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET latin1
+    DETERMINISTIC
+RETURN `a```;
+||
+DELIMITER ;
+# EVENT: db`:db.`e`export_1
+DELIMITER ||
+CREATE EVENT ```e``export_1` ON SCHEDULE EVERY 1 YEAR STARTS [...]
+||
+DELIMITER ;
+# Grant:
+GRANT ALTER ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ROUTINE ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ROUTINE ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE VIEW ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT DELETE ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT DROP ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT EVENT ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT EXECUTE ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT INDEX ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT INSERT ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT LOCK TABLES ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT REFERENCES ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT SELECT ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT SHOW VIEW ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT TRIGGER ON `db``:db`.* TO 'joe'@'user';
+# Grant:
+GRANT UPDATE ON `db``:db`.* TO 'joe'@'user';
+#...done.
+USE `db``:db`;
+# Exporting data from db`:db
+# Data for table `db``:db`.```t``.``export_2`: 
+INSERT INTO `db``:db`.```t``.``export_2` VALUES (1, '@`var`.`var`');
+# Data for table `db``:db`.```t``export_1`: 
+INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
+#...done.

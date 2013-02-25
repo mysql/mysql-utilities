@@ -27,14 +27,20 @@ from mysql.utilities.common.tools import check_python_version
 check_python_version()
 
 import os
+import re
 import sys
 
 from mysql.utilities.command.dbcompare import database_compare
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
 from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
+
 from mysql.utilities.exception import UtilError, FormatError
 
 # Constants
@@ -167,15 +173,39 @@ if opt.server2:
 res = True
 check_failed = False
 for db in args:
-    parts = db.split(":")
-    if len(parts) == 1:
-        parts.append(parts[0])
-    elif len(parts) != 2:
-        parser.error("Invalid format for database compare argument. "
-                     "Format should be: db1:db2 or db.")
+    # Split the database names considering backtick quotes
+    grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\:)(`(?:[^`]|``)+`|\w+))?", db)
+    if not grp:
+        parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
+                                              db1_label='db1',
+                                              db2_label='db2'))
+    parts = grp.groups()
+    matched_size = len(parts[0])
+    if not parts[1]:
+        parts = (parts[0], parts[0])
+    else:
+        # add 1 for the separator ':'
+        matched_size = matched_size + 1
+        matched_size = matched_size + len(parts[1])
+    # Verify if the size of the databases matched by the REGEX is equal to the
+    # initial specified string. In general, this identifies the missing use
+    # of backticks.
+    if matched_size != len(db):
+        parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+                                                  db1_label='db1',
+                                                  db2_label='db2',
+                                                  db1_value=parts[0],
+                                                  db2_value=parts[1]))
+
+    # Remove backtick quotes (handled later)
+    db1 = remove_backtick_quoting(parts[0]) \
+                if is_quoted_with_backticks(parts[0]) else parts[0]
+    db2 = remove_backtick_quoting(parts[1]) \
+                if is_quoted_with_backticks(parts[1]) else parts[1]
+
     try:
         res = database_compare(server1_values, server2_values,
-                               parts[0], parts[1], options)
+                               db1, db2, options)
         print
     except UtilError:
         _, e, _ = sys.exc_info()

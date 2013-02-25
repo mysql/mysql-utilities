@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,6 +80,41 @@ def to_sql(obj):
     """
     from mysql.connector.conversion import MySQLConverter
     return MySQLConverter().quote(obj)
+
+
+def quote_with_backticks(identifier):
+    """Quote the given identifier with backticks, converting backticks (`) in
+    the identifier name with the correct escape sequence (``).
+
+    identifier[in] identifier to quote.
+
+    Returns string with the identifier quoted with backticks.
+    """
+    return "`" + identifier.replace("`", "``") + "`"
+
+
+def remove_backtick_quoting(identifier):
+    """Remove backtick quoting from the given identifier, reverting the
+    escape sequence (``) to a backtick (`) in the identifier name.
+
+    identifier[in] identifier to remove backtick quotes.
+
+    Returns string with the identifier without backtick quotes.
+    """
+    # remove backtick quotes
+    identifier = identifier[1:-1]
+    # Revert backtick escape sequence
+    return identifier.replace("``", "`")
+
+
+def is_quoted_with_backticks(identifier):
+    """Check if the given identifier is quoted with backticks.
+
+    identifier[in] identifier to check.
+
+    Returns True if the identifier has backtick quotes, and False otherwise.
+    """
+    return (identifier[0] == "`" and identifier[-1] == "`")
 
 
 def build_pkey_where_clause(table, row):

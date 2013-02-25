@@ -3,25 +3,25 @@ Test case 1 - baseline
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 # FUNCTIONS in util_test:
 NAME
-f1
+`f1`
 # EVENTS in util_test:
 NAME
-e1
+`e1`
 # GRANTS in util_test:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
@@ -48,105 +48,105 @@ Test case 2 - no data,,grants
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 # FUNCTIONS in util_test:
 NAME
-f1
+`f1`
 # EVENTS in util_test:
 NAME
-e1
+`e1`
 #...done.
 Test case 3 - no data,,grants,events
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 # FUNCTIONS in util_test:
 NAME
-f1
+`f1`
 #...done.
 Test case 4 - no data,,grants,events,functions
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 # PROCEDURES in util_test:
 NAME
-p1
+`p1`
 #...done.
 Test case 5 - no data,,grants,events,functions,procedures
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
-trg
+`trg`
 #...done.
 Test case 6 - no data,,grants,events,functions,procedures,triggers
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 # VIEWS in util_test:
 TABLE_NAME
-v1
+`v1`
 #...done.
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
-t1
-t2
-t3
-t4
+`t1`
+`t2`
+`t3`
+`t4`
 #...done.
 Test case 8 - no data,,grants,events,functions,procedures,triggers,views,tables
 # Source on localhost: ... connected.

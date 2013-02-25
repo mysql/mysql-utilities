@@ -8,27 +8,27 @@ Test case 1 -  --skip-object-compare --format=csv -a
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,9.99,other,,1
@@ -38,7 +38,7 @@ code,name
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -47,7 +47,7 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
@@ -83,22 +83,22 @@ Test case 2 -  --skip-row-count --format=csv -a
 # TABLE     supplier                                pass    SKIP    FAIL    
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # TABLE     supplies                                pass    SKIP    FAIL    
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,9.99,other,,1
@@ -108,7 +108,7 @@ code,name
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -117,7 +117,7 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
@@ -152,27 +152,27 @@ Test case 3 -  --skip-diff --format=csv -a
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                SKIP    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # TABLE     supplies                                SKIP    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,9.99,other,,1
@@ -182,7 +182,7 @@ code,name
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -191,7 +191,7 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
@@ -216,12 +216,12 @@ Test case 4 -  --skip-data-check --format=csv -a
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    SKIP    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 
 # TABLE     supplies                                pass    FAIL    SKIP    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 
 # VIEW      tools                                   FAIL    -       -       

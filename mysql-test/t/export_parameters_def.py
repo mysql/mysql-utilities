@@ -235,87 +235,85 @@ class test(export_basic.test):
         self.mask_column_result("| util_test  | f1", "|",
                                 15, " XXXX-XX-XX XX:XX:XX  ")
 
-
     def _mask_csv(self):
-        self.mask_column_result("e1,root@localhost,", ",",
+        self.mask_column_result("`e1`,root@localhost,", ",",
                                 5, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1,root@localhost,", ",",
+        self.mask_column_result("`e1`,root@localhost,", ",",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1,root@localhost,", ",",
+        self.mask_column_result("`e1`,root@localhost,", ",",
                                 10, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1,root@localhost,", ",",
+        self.mask_column_result("`e1`,root@localhost,", ",",
                                 13, "XX")
-        self.mask_column_result("def,util_test,", ",", 1, "")
-        self.mask_column_result(",util_test,trg", ",", 5, "")
-        self.mask_column_result(",util_test,t", ",",
+        self.mask_column_result("def,`util_test`,", ",", 1, "")
+        self.mask_column_result(",`util_test`,`trg`", ",", 5, "")
+        self.mask_column_result(",`util_test`,`t", ",",
                                 10, "XXXXXXXXXX")
-        self.mask_column_result(",util_test,t", ",",
+        self.mask_column_result(",`util_test`,`t", ",",
                                 11, "XXXXXXXXXX")
-        self.mask_column_result(",util_test,t", ",",
+        self.mask_column_result(",`util_test`,`t", ",",
                                 13, "XXXXXXXXXX")
-        self.mask_column_result(",util_test,t", ",",
+        self.mask_column_result(",`util_test`,`t", ",",
                                 15, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",util_test,t", ",",
+        self.mask_column_result(",`util_test`,`t", ",",
                                 16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,p1,PROCEDURE", ",",
+        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",",
                                 13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,p1,PROCEDURE", ",",
+        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",",
                                 14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,f1,FUNCTION", ",",
+        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",",
                                 13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,f1,FUNCTION", ",",
+        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",",
                                 14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,e1", ",",
+        self.mask_column_result("`util_test`,`e1`", ",",
                                 8, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",util_test,e1", ",",
+        self.mask_column_result(",`util_test`,`e1`", ",",
                                 17, "XX")
-        self.mask_column_result("util_test,e1", ",",
+        self.mask_column_result("`util_test`,`e1`", ",",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,e1", ",",
+        self.mask_column_result("`util_test`,`e1`", ",",
                                 11, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test,e1", ",",
+        self.mask_column_result("`util_test`,`e1`", ",",
                                 17, "XX")
-                                
 
     def _mask_tab(self):
-        self.mask_column_result("e1	root@localhost", "\t",
+        self.mask_column_result("`e1`	root@localhost", "\t",
                                 5, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1	root@localhost", "\t",
+        self.mask_column_result("`e1`	root@localhost", "\t",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1	root@localhost", "\t",
+        self.mask_column_result("`e1`	root@localhost", "\t",
                                 10, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("e1	root@localhost", "\t",
+        self.mask_column_result("`e1`	root@localhost", "\t",
                                 13, "XX")
-        self.mask_column_result("def	util_test	t", "\t", 1, "")
-        self.mask_column_result("def	util_test	v", "\t", 1, "")
-        self.mask_column_result("	util_test	trg", "\t", 5, "")
-        self.mask_column_result("	util_test	t", "\t",
+        self.mask_column_result("def	`util_test`	`t", "\t", 1, "")
+        self.mask_column_result("def	`util_test`	`v", "\t", 1, "")
+        self.mask_column_result("	`util_test`	`trg`", "\t", 5, "")
+        self.mask_column_result("	`util_test`	`t", "\t",
                                 10, "XXXXXX")
-        self.mask_column_result("	util_test	t", "\t",
+        self.mask_column_result("	`util_test`	`t", "\t",
                                 11, "XXXXXXXX")
-        self.mask_column_result("	util_test	t", "\t",
+        self.mask_column_result("	`util_test`	`t", "\t",
                                 13, "XX")
-        self.mask_column_result("	util_test	t", "\t",
+        self.mask_column_result("	`util_test`	`t", "\t",
                                 15, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("	util_test	t", "\t",
+        self.mask_column_result("	`util_test`	`t", "\t",
                                 16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	p1	PROCEDURE", "\t",
+        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t",
                                 13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	p1	PROCEDURE", "\t",
+        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t",
                                 14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	f1	FUNCTION", "\t",
+        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t",
                                 13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	f1	FUNCTION", "\t",
+        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t",
                                 14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	e1", "\t",
+        self.mask_column_result("`util_test`	`e1`", "\t",
                                 8, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	e1", "\t",
+        self.mask_column_result("`util_test`	`e1`", "\t",
                                 17, "XX")
-        self.mask_column_result("util_test	e1", "\t",
+        self.mask_column_result("`util_test`	`e1`", "\t",
                                 9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("util_test	e1", "\t",
+        self.mask_column_result("`util_test`	`e1`", "\t",
                                 11, "XXXX-XX-XX XX:XX:XX")
-    
+
     def _mask_vertical(self):
         self.replace_result("                   UPDATE_TIME:",
                             "                   UPDATE_TIME: "
@@ -334,6 +332,8 @@ class test(export_basic.test):
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("              created:",
                             "              CREATED: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("             MODIFIED:",
+                            "             MODIFIED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("             modified:",
                             "             MODIFIED: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("         LAST_ALTERED:",
@@ -342,6 +342,8 @@ class test(export_basic.test):
                             "               STARTS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("               starts:",
                             "               STARTS: XXXX-XX-XX XX:XX:XX\n")
+        self.replace_result("                 ENDS:",
+                            "                 ENDS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("                 ends:",
                             "                 ENDS: XXXX-XX-XX XX:XX:XX\n")
         self.replace_result("           ORIGINATOR:",

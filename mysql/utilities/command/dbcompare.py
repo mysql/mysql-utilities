@@ -19,8 +19,9 @@
 This file contains the commands for checking consistency of two databases.
 """
 
-
-from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.exception import UtilDBError
+from mysql.utilities.exception import UtilError
 
 _PRINT_WIDTH = 75
 _ROW_FORMAT = "# {0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
@@ -437,9 +438,13 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     for item in in_both:
         error_list = []
         obj_type = db1_conn.get_object_type(item[1][0])
-        
+
         obj1 = "{0}.{1}".format(db1, item[1][0])
         obj2 = "{0}.{1}".format(db2, item[1][0])
+        q_obj1 = "{0}.{1}".format(quote_with_backticks(db1),
+                                  quote_with_backticks(item[1][0]))
+        q_obj2 = "{0}.{1}".format(quote_with_backticks(db2),
+                                  quote_with_backticks(item[1][0]))
 
         reporter.report_object(obj_type, item[1][0])
 
@@ -450,7 +455,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         
         # Check row counts
         if obj_type == 'TABLE':
-            errors = _check_row_counts(server1, server2, obj1, obj2,
+            errors = _check_row_counts(server1, server2, q_obj1, q_obj2,
                                        reporter, options)
             if len(errors) != 0:
                 success = False
@@ -460,7 +465,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
             
         # Check data consistency for tables
         if obj_type == 'TABLE':
-            errors = _check_data_consistency(server1, server2, obj1, obj2,
+            errors = _check_data_consistency(server1, server2, q_obj1, q_obj2,
                                              reporter, options)
             if len(errors) != 0:
                 success = False

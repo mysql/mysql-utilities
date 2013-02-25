@@ -60,9 +60,27 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
-        cmd_opts = " inventory.inventory" 
-        comment = "Test case 3 - malformed argument%s " % cmd_opts
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        cmd_opts = " inventory.inventory"
+        comment = "Test case 3 - missing backticks%s " % cmd_opts
+        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        # Set input parameter with appropriate quotes for the OS
+        if os.name == 'posix':
+            cmd_opts = "'`inventory.inventory`'"
+        else:
+            cmd_opts = '"`inventory.inventory`"'
+        cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_opts)
+        comment = "Test case 4 - non existing database '`inventory.inventory`'"
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
+        cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
+        cmd_opts = " :inventory"
+        comment = "Test case 5 - invalid format%s " % cmd_opts
+        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 

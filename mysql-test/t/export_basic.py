@@ -17,7 +17,10 @@
 import os
 import mutlib
 import copy_db_parameters
+
+from mysql.utilities.common.table import quote_with_backticks
 from mysql.utilities.exception import MUTLibError
+
 
 class test(copy_db_parameters.test):
     """Export Data
@@ -74,6 +77,17 @@ class test(copy_db_parameters.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Set input parameter with appropriate quotes for the OS
+        if os.name == 'posix':
+            cmd_arg = "'`db``:db`' --export=both"
+        else:
+            cmd_arg = '"`db``:db`" --export=both'
+        cmd_str = "mysqldbexport.py %s %s --skip-gtid" % (from_conn, cmd_arg)
+        comment = "Test case 7 - export database with weird names (backticks)"
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         self.replace_result("Time:", "Time:       XXXXXX\n")
 
         _REPLACEMENTS = ("PROCEDURE", "FUNCTION", "TRIGGER", "SQL")
@@ -83,6 +97,18 @@ class test(copy_db_parameters.test):
                                      "DEFINER=`XXXX`@`XXXXXXXXX` ")
 
         self.remove_result("# WARNING: The server supports GTIDs")
+
+        # Mask event
+        self.replace_result("CREATE DEFINER=`root`@`localhost` "
+                            "EVENT ```e``export_1` "
+                            "ON SCHEDULE EVERY 1 YEAR STARTS",
+                            "CREATE EVENT ```e``export_1` "
+                            "ON SCHEDULE EVERY 1 YEAR STARTS [...]\n")
+        # Mask event for 5.1 servers
+        self.replace_result("CREATE EVENT ```e``export_1` "
+                            "ON SCHEDULE EVERY 1 YEAR STARTS",
+                            "CREATE EVENT ```e``export_1` "
+                            "ON SCHEDULE EVERY 1 YEAR STARTS [...]\n")
 
         return True
 
@@ -95,11 +121,12 @@ class test(copy_db_parameters.test):
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
+            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
         except:
             return True # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            q_db = quote_with_backticks(db)
+            res = server.exec_query("DROP DATABASE %s" % q_db)
         except:
             return False
         return True
@@ -107,6 +134,10 @@ class test(copy_db_parameters.test):
     def drop_all(self):
         try:
             self.drop_db(self.server1, "util_test")
+        except:
+            return False
+        try:
+            self.drop_db(self.server1, 'db`:db')
         except:
             return False
         return True

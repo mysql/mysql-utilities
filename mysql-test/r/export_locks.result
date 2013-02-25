@@ -1,9 +1,9 @@
 Test case 1 - export with default locking
 # Source on localhost: ... connected.
 # Exporting metadata from util_test
-DROP DATABASE IF EXISTS util_test;
-CREATE DATABASE util_test;
-USE util_test;
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
 # TABLE: util_test.t1
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
@@ -46,129 +46,129 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 # Grant:
-GRANT ALTER ON util_test.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DELETE ON util_test.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT DROP ON util_test.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EVENT ON util_test.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INDEX ON util_test.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT INSERT ON util_test.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SELECT ON util_test.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 #...done.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 2 - export data with no-locks locking
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 3 - export data with lock-all locking
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 4 - export data with snapshot locking
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example');
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example');
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.

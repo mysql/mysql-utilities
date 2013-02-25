@@ -98,3 +98,73 @@ Running import...
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+Test Case 11 : Testing import with SQL format and BRIEF display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 12 : Testing import with CSV format and BRIEF display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 13 : Testing import with TAB format and BRIEF display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 14 : Testing import with SQL format and FULL display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 15 : Testing import with CSV format and FULL display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 16 : Testing import with TAB format and FULL display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 17 : Testing import with SQL format and NAMES display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
