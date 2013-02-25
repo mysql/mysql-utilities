@@ -32,15 +32,15 @@ Available Commands:
   failover    - conduct failover from master to best slave
   gtid        - show status of global transaction id variables
                 also displays uuids for all servers
-  health      - display the replication health 
+  health      - display the replication health
   reset       - stop and reset all slaves
   start       - start all slaves
   stop        - stop all slaves
   switchover  - perform slave promotion
-  
+
   Note: elect, failover, gtid, and health require --master and either
         --slaves or --discover-slave-login
-  
+
 """
 
 _VALID_COMMANDS = ["elect", "failover", "gtid", "health", "reset", "start",
@@ -76,22 +76,22 @@ def get_valid_rpl_commands():
 
 def purge_log(filename, age):
     """Purge old log entries
-    
+
     This method deletes rows from the log file older than the age specified
     in days.
-    
+
     filename[in]       filename of log fil
     age[in]            age in days
-    
+
     Returns bool - True = success, Fail = error reading/writing log file
     """
     import time
     from datetime import datetime, timedelta
-    
+
     if not os.path.exists(filename):
         print "NOTE: Log file '%s' does not exist. Will be created." % filename
         return True
-    
+
     # Read a row, check age. If > today + age, delete row.
     # Ignore user markups and other miscellaneous entries.
     try:
@@ -123,14 +123,14 @@ def purge_log(filename, age):
 
 class RplCommands(object):
     """Replication commands.
-    
+
     This class supports the following replication commands.
-    
+
     elect       - perform best slave election and report best slave
     failover    - conduct failover from master to best slave as specified
                   by the user. This option performs best slave election.
     gtid        - show status of global transaction id variables
-    health      - display the replication health 
+    health      - display the replication health
     reset       - stop and reset all slaves
     start       - start all slaves
     stop        - stop all slaves
@@ -138,7 +138,7 @@ class RplCommands(object):
                   specific slave. Requires --master and the --candidate
                   options.
     """
-    
+
     def __init__(self, master_vals, slave_vals, options,
                  skip_conn_err=True):
         """Constructor
@@ -146,11 +146,11 @@ class RplCommands(object):
         master_vals[in]    master server connection dictionary
         slave_vals[in]     list of slave server connection dictionaries
         options[in]        options dictionary
-        skip_conn_err[in]  if True, do not fail on connection failure 
-                           Default = True                           
+        skip_conn_err[in]  if True, do not fail on connection failure
+                           Default = True
         """
         from mysql.utilities.common.topology import Topology
-        
+
         self.master_vals = master_vals
         self.options = options
         self.quiet = self.options.get("quiet", False)
@@ -164,19 +164,19 @@ class RplCommands(object):
         for slave in slave_vals:
             if slave['host'] == '127.0.0.1':
                 slave['host'] = 'localhost'
-        
+
         self.rpl_user = self.options.get("rpl_user", None)
         self.topology = Topology(master_vals, slave_vals, self.options,
                                  skip_conn_err)
-        
-    
+
+
     def _report(self, message, level=logging.INFO, print_msg=True):
         """Log message if logging is on
-        
+
         This method will log the message presented if the log is turned on.
         Specifically, if options['log_file'] is not None. It will also
         print the message to stdout.
-        
+
         message[in]    message to be printed
         level[in]      level of message to log. Default = INFO
         print_msg[in]  if True, print the message to stdout. Default = True
@@ -191,10 +191,10 @@ class RplCommands(object):
 
     def _show_health(self):
         """Run a command on a list of slaves.
-        
+
         This method will display the replication health of the topology. This
         includes the following for each server.
-        
+
           - host       : host name
           - port       : connection port
           - role       : "MASTER" or "SLAVE"
@@ -209,48 +209,48 @@ class RplCommands(object):
                          Note: Will show 'ERROR' if there are multiple
                          errors encountered otherwise will display the
                          health check that failed.
-        
+
         If verbosity is set, it will show the following additional information.
-        
+
           (master)
             - server version, binary log file, position
-           
+
           (slaves)
             - server version, master's binary log file, master's log position,
               IO_Thread, SQL_Thread, Secs_Behind, Remaining_Delay,
               IO_Error_Num, IO_Error
         """
         from mysql.utilities.common.format import print_list
-        
+
         format = self.options.get("format", "grid")
         quiet = self.options.get("quiet", False)
 
-        cols, rows = self.topology.get_health()    
-    
+        cols, rows = self.topology.get_health()
+
         if not quiet:
             print "#"
             print "# Replication Topology Health:"
-    
+
         # Print health report
         print_list(sys.stdout, format, cols, rows)
-    
+
         return
-    
-    
+
+
     def _show_gtid_data(self):
         """Display the GTID lists from the servers.
-        
+
         This method displays the three GTID lists for all of the servers. Each
         server is listed with its entries in each list. If a list has no
         entries, that list is not printed.
         """
         from mysql.utilities.common.format import print_list
-        
+
         if not self.topology.gtid_enabled():
             self._report("# WARNING: GTIDs are not supported on this topology.",
                          logging.WARN)
             return
-    
+
         format = self.options.get("format", "grid")
 
         # Get UUIDs
@@ -260,7 +260,7 @@ class RplCommands(object):
             print "# UUIDS for all servers:"
             print_list(sys.stdout, format, ['host','port','role','uuid'], uuids)
 
-        # Get GTID lists    
+        # Get GTID lists
         executed, purged, owned = self.topology.get_gtid_data()
         if len(executed):
             print "#"
@@ -278,11 +278,11 @@ class RplCommands(object):
 
     def _check_host_references(self):
         """Check to see if using all host or all IP addresses
-        
+
         Returns bool - True = all references are consistent
         """
         from mysql.utilities.common.options import hostname_is_ip
-        
+
         uses_ip = hostname_is_ip(self.topology.master.host)
         for slave_dict in self.topology.slaves:
             slave = slave_dict['instance']
@@ -292,14 +292,14 @@ class RplCommands(object):
                    uses_ip != hostname_is_ip(host):
                     return False
         return True
-                
+
 
     def _switchover(self):
         """Perform switchover from master to candidate slave
-        
+
         This method switches the role of master to a candidate slave. The
         candidate is specified via the --candidate option.
-        
+
         Returns bool - True = no errors, False = errors reported.
         """
         # Check for --master-info-repository=TABLE if rpl_user is None
@@ -317,7 +317,7 @@ class RplCommands(object):
             msg = "No candidate specified."
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
-            
+
         self._report(" ".join(["# Performing switchover from master at",
                      "%s:%s" % (self.master_vals['host'],
                      self.master_vals['port']), "to slave at %s:%s." %
@@ -325,13 +325,13 @@ class RplCommands(object):
         if not self.topology.switchover(candidate):
             self._report("# Errors found. Switchover aborted.", logging.ERROR)
             return False
-        
+
         return True
 
 
     def _elect_slave(self):
         """Perform best slave election
-        
+
         This method determines which slave is the best candidate for
         GTID-enabled failover. If called for a non-GTID topology, a warning
         is issued.
@@ -357,28 +357,28 @@ class RplCommands(object):
             self._report("ERROR: No slave found that meets eligilibility "
                          "requirements.", logging.ERROR)
             return
-        
+
         self._report("# Best slave found is located on %s:%s." %
                      (best_slave['host'], best_slave['port']))
 
 
     def _failover(self, strict=False):
         """Perform failover
-        
+
         This method executes GTID-enabled failover. If called for a non-GTID
         topology, a warning is issued.
-        
+
         strict[in]     if True, use only the candidate list for slave
                        election and fail if no candidates are viable.
                        Default = False
-                       
+
         Returns bool - True = failover succeeded, False = errors found
         """
         if not self.topology.gtid_enabled():
             self._report("# WARNING: slave election requires GTID_MODE=ON "
                          "for all servers.", logging.WARN)
             return
-        
+
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
@@ -392,9 +392,9 @@ class RplCommands(object):
 
     def _check_master_info_type(self, halt=True):
         """Check for master information set to TABLE if rpl_user not provided
-        
+
         halt[in]       if True, raise error on failure. Default is True
-        
+
         Returns bool - True if rpl_user is specified or False if rpl_user not
                        specified and at least one slave does not have
                        --master-info-repository=TABLE.
@@ -413,20 +413,20 @@ class RplCommands(object):
 
     def execute_command(self, command):
         """Execute a replication admin command
-        
+
         This method executes one of the valid replication administration
         commands as described above.
-        
+
         command[in]        command to execute
-    
+
         Returns bool - True = success, raise error on failure
-        """    
+        """
         # Raise error if command is not valid
         if not command in _VALID_COMMANDS:
             msg = "'%s' is not a valid command." % command
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
-            
+
         # Check privileges
         self._report("# Checking privileges.")
         full_check = command in ['failover', 'elect', 'switchover']
@@ -438,7 +438,7 @@ class RplCommands(object):
                 self._report(msg % (error[0], error[1], command),
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
-   
+
         self._report("Executing %s command..." % command, logging.INFO, False)
 
         # Execute the command
@@ -460,27 +460,27 @@ class RplCommands(object):
             msg = "Command '%s' is not implemented." % command
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
-            
+
         if command in ['switchover', 'failover'] and \
            not self.options.get("no_health", False):
             self._show_health()
-        
+
         self._report("# ...done.")
-    
+
         return True
 
 
     def auto_failover(self, interval):
         """Automatic failover
-        
+
         Wrapper class for running automatic failover. See
         run_automatic_failover for details on implementation.
-        
+
         This method ensures the registration/deregistration occurs
         regardless of exception or errors.
 
         interval[in]   time in seconds to wait to check status of servers
-        
+
         Returns bool - True = success, raises exception on error
         """
         import time
@@ -495,7 +495,7 @@ class RplCommands(object):
                                   self.topology.get_gtid_data,
                                   self.topology.get_server_uuids,
                                   self.options)
-        
+
         # Register instance
         self._report("Registering instance on master.", logging.INFO, False)
         old_mode = failover_mode
@@ -515,7 +515,7 @@ class RplCommands(object):
                 sys.stdout.flush()
             print "starting Console."
             time.sleep(1)
-        
+
         try:
             res = self.run_auto_failover(console, interval);
         except:
@@ -531,37 +531,37 @@ class RplCommands(object):
                 pass
 
         return res
-        
+
 
     def run_auto_failover(self, console, interval):
         """Run automatic failover
-        
+
         This method implements the automatic failover facility. It uses the
         FailoverConsole class from the failover_console.py to implement all
         user interface commands and uses the existing failover() method of
         this class to conduct failover.
-        
+
         When the master goes down, the method can perform one of three actions:
-        
+
         1) failover to list of candidates first then slaves
         2) failover to list of candidates only
         3) fail
-            
+
         console[in]    instance of the failover console class
         interval[in]   time in seconds to wait to check status of servers
-        
+
         Returns bool - True = success, raises exception on error
         """
         import time
         from mysql.utilities.common.tools import ping_host
         from mysql.utilities.common.tools import execute_script
-        
+
         failover_mode = self.options.get("failover_mode", "auto")
         pingtime = self.options.get("pingtime", 3)
-        timeout = int(self.options.get("timeout", 3))
+        timeout = int(self.options.get("timeout", 300))
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
-                
+
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
             msg = "Topology must support global transaction ids " + \
@@ -579,14 +579,14 @@ class RplCommands(object):
                 self._report(msg % (error[0], error[1], 'failover'),
                                     logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
-            
+
         # Require --master-info-repository=TABLE for all slaves
         if not self.topology.check_master_info_type("TABLE"):
             msg = "Failover requires --master-info-repository=TABLE for " + \
                   "all slaves."
             self._report(msg, logging.ERROR, False)
             raise UtilRplError(msg)
-        
+
         # Check for mixing IP and hostnames
         if not self._check_host_references():
             print "# WARNING: %s" % _HOST_IP_WARNING
@@ -601,10 +601,10 @@ class RplCommands(object):
         if exec_fail is not None and not os.path.exists(exec_fail):
             self._report(no_exec_fail_msg, logging.CRITICAL, False)
             raise UtilRplError(no_exec_fail_msg)
-               
+
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
-       
+
         # Main loop - loop and fire on interval.
         done = False
         first_pass = True
@@ -642,15 +642,15 @@ class RplCommands(object):
                     except:
                         self._report("Cannot reconnect to master.",
                                      logging.INFO, False)
-                        
-                # Check the master again. If no connection or lost connection, 
+
+                # Check the master again. If no connection or lost connection,
                 # try ping and if still not alive, failover. This performs the
                 # timeout threshold for detecting a down master.
                 if self.topology.master is None or \
                    not ping_host(self.topology.master.host, pingtime) or \
                    not self.topology.master.is_alive():
                     failover = True
-            
+
             if failover:
                 self._report("Master is confirmed to be down or unreachable.",
                              logging.CRITICAL, False)
