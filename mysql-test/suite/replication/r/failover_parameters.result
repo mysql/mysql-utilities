@@ -50,7 +50,8 @@ Options:
                         in comma-separated list.
   --timeout=TIMEOUT     Maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout
-                        for slave waiting to catch up to master. Default = 3.
+                        for slave waiting to catch up to master. Default =
+                        300.
   -i INTERVAL, --interval=INTERVAL
                         interval in seconds for polling the master for failure
                         and reporting health. Default = 15 seconds. Lowest

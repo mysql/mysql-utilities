@@ -519,7 +519,7 @@ class Topology(Replication):
         return (user, passwd)
 
 
-    def run_script(self, script, quiet):
+    def run_script(self, script, quiet, options=[]):
         """Run an external script
 
         This method executes an external script. Result is checked for
@@ -527,6 +527,8 @@ class Topology(Replication):
 
         script[in]     script to execute
         quiet[in]      if True, do not print messages
+        options[in]    options for script
+                       Default is none (no options)
 
         Returns bool - True = success
         """
@@ -535,7 +537,7 @@ class Topology(Replication):
         if script is None:
             return
         self._report("# Spawning external script.")
-        res = execute_script(script)
+        res = execute_script(script, None, options, self.verbose)
         if res == 0:
             self._report("# Script completed Ok.")
         elif not quiet:
@@ -1335,7 +1337,9 @@ class Topology(Replication):
                                           user, passwd)
 
         # Call exec_before script - display output if verbose on
-        self.run_script(self.before_script, False)
+        self.run_script(self.before_script, False,
+                        [self.master.host, self.master.port,
+                         m_candidate.host, m_candidate.port])
 
         if self.verbose:
             self._report("# Blocking writes on master.")
@@ -1433,7 +1437,8 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
 
         # Call exec_after script - display output if verbose on
-        self.run_script(self.after_script, False)
+        self.run_script(self.after_script, False,
+                        [self.master.host, self.master.port])
 
         # Check all slaves for status, errors
         self._report("# Checking slaves for errors.")
@@ -1616,6 +1621,15 @@ class Topology(Replication):
 
         host = new_master_dict['host']
         port = new_master_dict['port']
+        # Use try block in case master class has gone away.
+        try:
+            old_host = self.master.host
+            old_port = self.master.port
+        except:
+            pass
+            old_host = "UNKNOWN"
+            old_port = "UNKNOWN"
+
         self._report("# Candidate slave %s:%s will become the new master." %
                      (host, port))
 
@@ -1633,7 +1647,8 @@ class Topology(Replication):
         res = self.master.create_rpl_user(host, port, user, passwd)
 
         # Call exec_before script - display output if verbose on
-        self.run_script(self.before_script, False)
+        self.run_script(self.before_script, False,
+                        [old_host, old_port, host, port])
 
         # Stop all slaves
         self._report("# Stopping slaves.")
@@ -1656,7 +1671,8 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
 
         # Call exec_after script - display output if verbose on
-        self.run_script(self.after_script, False)
+        self.run_script(self.after_script, False,
+                        [old_host, old_port, host, port])
 
         # Check slaves for errors
         self._report("# Checking slaves for errors.")

@@ -610,6 +610,15 @@ class RplCommands(object):
         first_pass = True
         failover = False
         while not done:
+            # Use try block in case master class has gone away.
+            try:
+                old_host = self.master.host
+                old_port = self.master.port
+            except:
+                pass
+                old_host = "UNKNOWN"
+                old_port = "UNKNOWN"
+
             # If a failover script is provided, check it else check master
             # using connectivity checks.
             if exec_fail is not None:
@@ -620,7 +629,8 @@ class RplCommands(object):
                 else:
                     self._report("# Spawning external script for failover "
                                  "checking.")
-                    res = execute_script(exec_fail)
+                    res = execute_script(exec_fail, None,
+                                         [old_host, old_port], self.verbose)
                     if res == 0:
                         self._report("# Failover check script completed Ok. "
                                      "Failover averted.")
@@ -670,14 +680,16 @@ class RplCommands(object):
                           "Master has failed and automatic failover is not enabled. "
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
-                    self.topology.run_script(post_fail, False)
+                    self.topology.run_script(post_fail, False,
+                                             [old_host, old_port])
                     raise UtilRplError(msg, _FAILOVER_ERRNO)
                 if not res:
                     msg = _FAILOVER_ERROR % "An error was encountered " + \
                           "during failover. "
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
-                    self.topology.run_script(post_fail, False)
+                    self.topology.run_script(post_fail, False,
+                                             [old_host, old_port])
                     raise UtilRplError(msg)
                 self.master = self.topology.master
                 console.master = self.master
@@ -689,7 +701,9 @@ class RplCommands(object):
                 console.clear()
                 failover = False
                 # Execute post failover script
-                self.topology.run_script(post_fail, False)
+                self.topology.run_script(post_fail, False,
+                                         [old_host, old_port,
+                                          self.master.host, self.master.port])
 
             # discover slaves if option was specified at startup
             elif self.options.get("discover", None) is not None and \

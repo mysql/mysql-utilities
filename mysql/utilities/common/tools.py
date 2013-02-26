@@ -33,7 +33,7 @@ from mysql.utilities.exception import UtilError
 
 def _add_basedir(search_paths, path_str):
     """Add a basedir and all known sub directories
-    
+
     This method builds a list of possible paths for a basedir for locating
     special MySQL files like mysqld (mysqld.exe), etc.
 
@@ -46,8 +46,8 @@ def _add_basedir(search_paths, path_str):
     search_paths.append(os.path.join(path_str, "share"))
     search_paths.append(os.path.join(path_str, "scripts"))
     search_paths.append(os.path.join(path_str, "bin"))
-    search_paths.append(os.path.join(path_str, "libexec"))    
-    search_paths.append(os.path.join(path_str, "mysql"))    
+    search_paths.append(os.path.join(path_str, "libexec"))
+    search_paths.append(os.path.join(path_str, "mysql"))
 
 
 def get_tool_path(basedir, tool, fix_ext=True, required=True,
@@ -106,17 +106,17 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
                         return toolpath
     if required:
         raise UtilError("Cannot find location of %s." % tool)
-        
+
     return None
 
 
 def delete_directory(dir):
     """Remove a directory (folder) and its contents.
-    
+
     dir[in]           target directory
     """
     import time
-    
+
     if os.path.exists(dir):
         # It can take up to 10 seconds for Windows to 'release' a directory
         # once a process has terminated. We wait...
@@ -131,36 +131,51 @@ def delete_directory(dir):
             shutil.rmtree(dir, True)
 
 
-def execute_script(run_cmd, file=None):
+def execute_script(run_cmd, file=None, options=[], verbosity=False):
     """Execute a script.
-    
+
     This method spawns a subprocess to execute a script. If a file is
     specified, it will direct output to that file else it will suppress
     all output from the script.
-    
+
     run_cmd[in]        command/script to execute
     file[in]           file path name to file, os.stdout, etc.
                        Default is None (do not log/write output)
-    
+    options[in]        arguments for script
+                       Default is no arguments ([])
+    verbosity[in]      show result of script
+                       Default is False
+
     Returns int - result from process execution
     """
-    import subprocess
+    if verbosity:
+        f_out = sys.stdout
+    else:
+        if not file:
+            file = os.devnull
+        f_out = open(file, 'w')
 
-    if file is None:
-        file = os.devnull
-    f_out = open(file, 'w')
-    proc = subprocess.Popen(run_cmd, shell=True, stdout=f_out, stderr=f_out)
+    str_opts = [str(opt) for opt in options]
+    cmd_opts = " ".join(str_opts)
+    command = " ".join([run_cmd, cmd_opts])
+
+    if verbosity:
+        print "# SCRIPT EXECUTED:", command
+
+    proc = subprocess.Popen(command, shell=True,
+                            stdout=f_out, stderr=f_out)
     ret_val = proc.wait()
-    f_out.close()
+    if not verbosity:
+        f_out.close()
     return ret_val
 
 
 def ping_host(host, timeout):
     """Execute 'ping' against host to see if it is alive.
-    
+
     host[in]           hostname or IP to ping
     timeout[in]        timeout in seconds to wait
-                       
+
     returns bool - True = host is reachable via ping
     """
     if sys.platform == "darwin":
@@ -179,11 +194,11 @@ def get_mysqld_version(mysqld_path):
     """Return the version number for a mysqld executable.
 
     mysqld_path[in]    location of the mysqld executable
-    
+
     Returns tuple - (major, minor, release), or None if error
     """
     import subprocess
-    
+
     args = [
         " --version",
     ]
@@ -198,12 +213,12 @@ def get_mysqld_version(mysqld_path):
         if "Ver" in line:
             break
     out.close()
-    
+
     try:
         os.unlink('version_check')
     except:
         pass
-    
+
     if line is None:
         return None
     version = line.split(' ', 5)[3]
@@ -213,7 +228,7 @@ def get_mysqld_version(mysqld_path):
         return (maj, min, rel[0])
     except:
         return None
-        
+
     return None
 
 

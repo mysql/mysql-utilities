@@ -50,7 +50,8 @@ Options:
                         in comma-separated list.
   --timeout=TIMEOUT     Maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout
-                        for slave waiting to catch up to master. Default = 3.
+                        for slave waiting to catch up to master. Default =
+                        300.
   --new-master=NEW_MASTER
                         connection information for the slave to be used to
                         replace the master for switchover, in the form:
@@ -76,15 +77,15 @@ Available Commands:
   failover    - conduct failover from master to best slave
   gtid        - show status of global transaction id variables
                 also displays uuids for all servers
-  health      - display the replication health 
+  health      - display the replication health
   reset       - stop and reset all slaves
   start       - start all slaves
   stop        - stop all slaves
   switchover  - perform slave promotion
-  
+
   Note: elect, failover, gtid, and health require --master and either
         --slaves or --discover-slave-login
-  
+
 Test case 2 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
 # Checking privileges.
