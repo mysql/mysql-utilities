@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -235,6 +235,11 @@ SLOW_LOG_ENTRIES = [
      'select c1',
      'from t1',
      'where c1 like "%a%";'),
+    ('# User@Host: a[b] @ c.d [127.0.0.1]',
+     '# Query_time: 0.000059  Lock_time: 0.000019'
+        'Rows_sent: 3  Rows_examined: 3',
+     'SET timestamp=1338440410;',
+     'SELECT 1;')
 ]
 SLOW_LOG_ENTRIES_EXP = [
     {'query_time': decimal.Decimal('0.000333'),
@@ -266,6 +271,15 @@ SLOW_LOG_ENTRIES_EXP = [
       'user': 'root',
       'query': ('SET timestamp=1322218605;\n'
                 'select c1\nfrom t1\nwhere c1 like "%a%";')},
+    {'query_time': decimal.Decimal('0.000059'),
+     'rows_examined': 3,
+     'rows_sent': 3,
+     'database': None,
+     'lock_time': decimal.Decimal('0.000019'),
+     'datetime': datetime.datetime.fromtimestamp(1338440410),
+     'host': 'c.d',
+     'user': 'a',
+     'query': 'SET timestamp=1338440410;\nSELECT 1;'}
 ]
 
 class BaseParserTestCase(unittest.TestCase):
