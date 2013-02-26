@@ -75,7 +75,9 @@ uses multi-byte characters. Use this mode when the default mode cannot read
 the file or if there is no server installed on the host.
 
 To read .frm files, list each file as a separate argument for the utility as
-shown in the following examples.
+shown in the following examples. You will need to specify the path for each
+.frm file you want to read or supply a path to a directory and all of the
+.frm files in that directory will be read.
 
   # Read a single .frm file in the default mode using the server installed
   # in /usr/local/bin/mysql where the .frm file is in the current folder.
@@ -120,6 +122,18 @@ Helpful Hints
     output from the spawned server and repair any errors in launching the
     server. If mysqlfrm fails in the middle, you may need to manually
     shutdown the server on the port specified with --port.
+
+  - You can specify the database name to be used in the resulting CREATE
+    statement by prepending the .frm file with the name of the database
+    followed by a colon. For example, oltp:t1.frm will use 'oltp' for the
+    database name in the CREATE statement. The optional database name can
+    also be used with paths. For example, /home/me/oltp:t1.frm will use
+    'oltp' as the database name. If you leave off the optional database
+    name and include a path, the last folder will be the database name.
+    For example /home/me/data1/t1.frm will use 'data1' as the database
+    name. If you do not want to use the last folder as the database name,
+    simply specify the colon like this: /home/me/data1/:t1.frm. In this
+    case, the database will be omitted from the CREATE statement.
 
 Enjoy!
 
@@ -195,8 +209,6 @@ if not opt.diagnostic and opt.port:
 
 # Check for access to basedir if specified
 if opt.basedir:
-    if opt.basedir.startswith('~'):
-        print "expanding!", opt.basedir, os.path.expanduser(opt.basedir)
     opt.basedir = os.path.expanduser(opt.basedir)
     if not os.access(opt.basedir, os.R_OK):
         parser.error("You must have read access to the base directory "
@@ -230,6 +242,11 @@ if opt.server is not None and not opt.basedir:
     except UtilError as error:
         parser.error(error.errmsg)
     server = servers[0]
+
+    if use_port == int(server.port):
+        parser.error("You must specify a different port to use for the "
+                     "spawned server.")
+
     basedir = server.show_server_variable("basedir")[0][1]
 else:
     basedir = opt.basedir

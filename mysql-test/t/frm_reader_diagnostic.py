@@ -60,6 +60,15 @@ class test(frm_reader_base.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        # Perform test of database option
+        frm_file_path = os.path.normpath("./std_data/frm_files/oltp")
+        frm_file_path += ":t1.frm"
+        comment = "Test case %s: - Check .frm files with db option" % test_num
+        res = self.run_test_case(0, self.cmd + frm_file_path, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
         self.replace_result("# CREATE statement",
                             "# CREATE statement for [...]\n")
         self.replace_result("# Reading .frm file",

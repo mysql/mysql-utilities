@@ -114,6 +114,14 @@ class test(frm_reader_base.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        comment = "Test case %s: - Invalid port" % test_num
+        res = self.run_test_case(2, self.cmd + frm_file_path +
+                                 " --port=%s" % self.server1.port,
+                                 comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
         self.mask_result("Error 2003:", "2003", "####")
         self.replace_result("Error ####: Can't connect to MySQL server",
                             "Error ####: Can't connect to MySQL server"

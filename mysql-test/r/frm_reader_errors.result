@@ -25,3 +25,8 @@ Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>
 mysqlfrm.py: error: Cannot connect to the Source server.
 Error ####: Can't connect to MySQL server on XXXXXXXXXXXXXXXXXXXX
 # Source on localhost: ...
+Test case 7: - Invalid port
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: You must specify a different port to use for the spawned server.
+# Source on localhost: ... connected.

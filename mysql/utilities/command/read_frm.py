@@ -61,6 +61,9 @@ def _get_frm_path(dbtablename, datadir, new_db=None):
         if datadir is None:
             datadir = ""
         frm_path = os.path.join(datadir, table)
+    elif len(path_parts) == 2 and ":" in path_parts[1]:
+        db, table = path_parts[1].split(":", 1)
+        frm_path = os.path.join(path_parts[0], table)
     else:
         # here we decipher the last folder as the database name
         frm_path = dbtablename
