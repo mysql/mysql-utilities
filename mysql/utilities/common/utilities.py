@@ -32,7 +32,8 @@ from mysql.utilities.exception import UtilError
 _MAX_WIDTH = 78
 
 # These utilities should not be used with the console
-_EXCLUDE_UTILS = ['mysqluc',]
+# Note: mysqlfrm can be removed once BUG#16238411 is implemented.
+_EXCLUDE_UTILS = ['mysqluc','mysqlfrm',]
 
 
 def get_util_path(default_path=''):
