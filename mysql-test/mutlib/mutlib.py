@@ -855,7 +855,28 @@ class System_test(object):
         for linenum in range(len(linenums)-1, -1, -1):
             self.results.pop(linenums[linenum])
 
+    def remove_result_and_lines_before(self, prefix, lines=1):
+        """Remove lines in the results.
     
+        prefix[in]         starting prefix of string to mask
+        lines[in]          number of lines to remove previously
+                           to the prefix line.
+        """
+        linenums = []
+        linenum = 0
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                linenums.append(int(linenum))
+                for line2rm in range(linenum-lines,linenum):
+                    if line2rm > - 1:
+                        linenums.append(int(line2rm))
+            linenum += 1
+        linenums.sort()
+        # Must remove lines in reverse order
+        for linenum in range(len(linenums) - 1, - 1, - 1):
+            self.results.pop(linenums[linenum])
+
     def replace_substring(self, target, replacement):
         """Replace a target substring in the entire result file.
         
