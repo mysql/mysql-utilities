@@ -42,6 +42,9 @@ _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
 _GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
+_UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
+                          'SET password = PASSWORD("%s")'
+                          'where user ="%s";')
 
 def parse_failover_connections(options):
     """Parse the --master, --slaves, and --candidates options
@@ -676,8 +679,34 @@ class Topology(Replication):
             elif self.verbose and not quiet:
                 self._report(msg % "Ok")
 
+        # If no GTIDs, we need binary logging enabled on candidate.
+        if not gtid_enabled:
+            msg = "#   Binary logging turned on ... %s"
+            if not slave.binlog_enabled():
+                if self.verbose and not quiet:
+                    self._report(msg % "FAIL", logging.WARN)
+                return (False, "BINLOG",
+                        "Binary logging is not enabled on the candidate.")
+            if self.verbose and not quiet:
+                self._report(msg % "Ok")
+
         # Check replication user - must exist with correct privileges
-        user, passwd = slave.get_rpl_user()
+        try:
+            user, passwd = slave.get_rpl_user()
+        except UtilError, e:
+            if not self.rpl_user:
+                raise
+
+            # Get user and password (support login-path)
+            user, passwd = parse_user_password(self.rpl_user)
+
+            # Make new master forget was a slave using slave methods
+            s_candidate = self._change_role(slave, slave=False)
+            res = s_candidate.get_rpl_users()
+            l = len(res)
+            user, host, passwd = res[l-1]
+            #raise
+
         msg = "#   Replication user exists ... %s"
         if user is None or slave.check_rpl_user(user, slave.host) != []:
             if not self.force:
@@ -690,17 +719,6 @@ class Topology(Replication):
                              logging.WARN)
         elif self.verbose and not quiet:
             self._report(msg % "Ok")
-
-        # If no GTIDs, we need binary logging enabled on candidate.
-        if not gtid_enabled:
-            msg = "#   Binary logging turned on ... %s"
-            if not slave.binlog_enabled():
-                if self.verbose and not quiet:
-                    self._report(msg % "FAIL", logging.WARN)
-                return (False, "BINLOG",
-                        "Binary logging is not enabled on the candidate.")
-            if self.verbose and not quiet:
-                self._report(msg % "Ok")
 
         return (True, "", "")
 
@@ -1245,29 +1263,51 @@ class Topology(Replication):
             slave = slave_dict['instance']
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
-                self._report(msg + "WARN - cannot connect to slave",
-                             logging.WARN)
+                message = "{0}WARN - cannot connect to slave".format(msg)
+                self.report(message, logging.WARN)
             elif command == 'reset':
-                res = slave.reset()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to reset",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.reset()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to reset".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'start':
-                res = slave.start()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to start",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.start()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to start".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'stop':
-                res = slave.stop()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to stop",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                elif not slave.is_connected() and not quiet:
+                    message = ("{0}WARN - slave is not connected to "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.stop()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to stop".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
 
 
     def connect_candidate(self, candidate, master=True):
@@ -1325,15 +1365,44 @@ class Topology(Replication):
             self._check_switchover_prerequisites(m_candidate)
         except UtilError, e:
             self._report("ERROR: %s" % e.errmsg, logging.ERROR)
-            # If user wants to force the issue, we do so.
             if not self.force:
                 return
 
+        if (self.verbose and self.rpl_user):
+            if self.check_master_info_type("TABLE"):
+                msg = ("# When the master_info_repository variable is set to"
+                       " TABLE, the --rpl-user option is ignored and the"
+                       " existing replication user values are retained.")
+                self._report(msg, logging.INFO)
+                self.rpl_user = None
+            else:
+                msg = ("# When the master_info_repository variable is set to"
+                       " FILE, the --rpl-user option may be used only if the"
+                       " user specified matches what is shown in the SLAVE"
+                       " STATUS output unless the --force option is used.")
+                self._report(msg, logging.INFO)
+
         user, passwd = self._get_rpl_user(m_candidate)
-        # Create user on m_candidate.
+
+        if not self.check_master_info_type("TABLE"):
+            slave_candidate = self._change_role(m_candidate, slave=True)
+            rpl_master_user = slave_candidate.get_rpl_master_user()
+
+            if user != rpl_master_user and not self.force:
+                msg = ("The replication user specified with --rpl-user does"
+                       " not match the existing replication user values. Use"
+                       " the --force option to use the replication user"
+                       " specified with --rpl-user.")
+                self._report("ERROR: %s" % msg, logging.ERROR)
+                return
+            self.master.exec_query(_UPDATE_RPL_USER_QUERY % (passwd, user))
+            self.master.exec_query("FLUSH PRIVILEGES;")
+
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
-        res = m_candidate.create_rpl_user(m_candidate.host, m_candidate.port,
+        #user, passwd = self._get_rpl_user(m_candidate)
+        res = m_candidate.create_rpl_user(m_candidate.host,
+                                          m_candidate.port,
                                           user, passwd)
 
         # Call exec_before script - display output if verbose on
@@ -1390,8 +1459,10 @@ class Topology(Replication):
         if self.options.get("demote", False):
             self._report("# Demoting old master to be a slave to the "
                          "new master.")
+            
             slave = self._change_role(self.master)
             slave.stop()
+            
             slave_dict = {
               'host'     : self.master.host,  # host name for slave
               'port'     : self.master.port,  # port for slave
@@ -1407,6 +1478,10 @@ class Topology(Replication):
         self._remove_slave({'host':m_candidate.host,
                             'port':m_candidate.port,
                             'instance':m_candidate})
+
+        # Make new master forget was an slave using slave methods
+        s_candidate = self._change_role(m_candidate)
+        s_candidate.reset_all()
 
         # Switch all slaves to new master
         self._report("# Switching slaves to new master.")

@@ -138,7 +138,12 @@ if command in ['health', 'gtid'] and opt.discover is None and \
    (opt.slaves is None or opt.master is None):
     parser.error("The health and gtid commands requires the --master and "
                  "--slaves options.")
-    
+
+if command in ['start', 'stop', 'reset'] and \
+   (not opt.slaves or not opt.master):
+    parser.error("The start, stop and reset commands require the --master "
+                 "and --slaves options.")
+
 if command in ['elect', 'failover', 'start', 'stop', 'reset'] and \
     not opt.discover and not opt.slaves:
     parser.error("You must supply a list of slaves or the "

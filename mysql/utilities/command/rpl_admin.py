@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ Available Commands:
 
   Note: elect, failover, gtid, and health require --master and either
         --slaves or --discover-slave-login
+
+  Note: start, stop and reset require --master and --slaves
 
 """
 
