@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ table data.
 import re
 import sys
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
 
 _RPL_COMMANDS, _RPL_FILE = 0, 1
 _RPL_PREFIX = "-- "
@@ -116,21 +118,24 @@ def export_metadata(source, src_val, db_list, options):
         # Perform the extraction
         if format == "sql":
             db.init()
+            # quote database name with backticks
+            q_db_name = quote_with_backticks(db_name)
             if not skip_create:
-                print "DROP DATABASE IF EXISTS %s;" % db_name
-                print "CREATE DATABASE %s;" % db_name
-            print "USE %s;" % db_name
+                print "DROP DATABASE IF EXISTS %s;" % q_db_name
+                print "CREATE DATABASE %s;" % q_db_name
+            print "USE %s;" % q_db_name
             for dbobj in db.get_next_object():
                 if dbobj[0] == "GRANT" and not skip_grants:
                     if not quiet:
                         print "# Grant:"
                     if dbobj[1][3]:
-                        create_str = "GRANT %s ON %s.%s TO %s" % \
-                                     (dbobj[1][1], db_name,
-                                      dbobj[1][3], dbobj[1][0])
+                        create_str = "GRANT %s ON %s.%s TO %s;" % \
+                                     (dbobj[1][1], q_db_name,
+                                      quote_with_backticks(dbobj[1][3]), 
+                                      dbobj[1][0])
                     else:
-                        create_str = "GRANT %s ON %s.* TO %s" % \
-                                     (dbobj[1][1], db_name, dbobj[1][0])
+                        create_str = "GRANT %s ON %s.* TO %s;" % \
+                                     (dbobj[1][1], q_db_name, dbobj[1][0])
                     if create_str.find("%"):
                         create_str = re.sub("%", "%%", create_str)
                     print create_str
@@ -170,7 +175,10 @@ def export_metadata(source, src_val, db_list, options):
                 objects.append("GRANT")
             for obj_type in objects:
                 sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
-                rows = db.get_db_objects(obj_type, column_type, True)
+                if format in ('grid', 'vertical'):
+                    rows = db.get_db_objects(obj_type, column_type, True)
+                else:
+                    rows = db.get_db_objects(obj_type, column_type, True, True)
                 if len(rows[1]) < 1:
                     print " (none found)"
                 else:
@@ -221,8 +229,8 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
     from mysql.utilities.common.format import format_vertical_list
 
     tbl_name = cur_table.tbl_name
-    db_name = cur_table.db_name
-    full_name = "%s.%s" % (db_name, tbl_name)
+    q_db_name = cur_table.q_db_name
+    full_name = cur_table.q_table
     list_options = {}
     # if outfile is not set, use stdout.
     if outfile is None:
@@ -235,14 +243,14 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
                 data = data_rows[1]
             blob_rows = []
             for row in data:
-                columns = cur_table.get_column_string(row, full_name)
+                columns = cur_table.get_column_string(row, q_db_name)
                 if len(columns[1]) > 0:
                     blob_rows.extend(columns[1])
                 row_str = "INSERT INTO %s VALUES%s;" % (full_name, columns[0])
                 outfile.write(row_str + "\n")
         else:
             # Generate bulk insert statements
-            data_lists = cur_table.make_bulk_insert(data_rows, db_name)
+            data_lists = cur_table.make_bulk_insert(data_rows, q_db_name)
             rows = data_lists[0]
             blob_rows = data_lists[1]
 
@@ -271,13 +279,13 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
         list_options['print_header'] = first
         list_options['separator'] = '\t'
         list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(),
+        format_tabular_list(outfile, cur_table.get_col_names(True),
                             data_rows, list_options)
     elif format == "csv":
         list_options['print_header'] = first
         list_options['separator'] = ','
         list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(),
+        format_tabular_list(outfile, cur_table.get_col_names(True),
                             data_rows, list_options)
     else:  # default to table format - header is always printed
         format_tabular_list(outfile, cur_table.get_col_names(),
@@ -359,10 +367,13 @@ def export_data(source, src_val, db_list, options):
     for table in table_list:
         db_name = table[0]
         tbl_name = "%s.%s" % (db_name, table[1])
+        # quote database and table name with backticks
+        q_db_name = quote_with_backticks(db_name)
+        q_tbl_name = "%s.%s" % (q_db_name, quote_with_backticks(table[1]))
         if not quiet and old_db != db_name:
             old_db = db_name
             if format == "sql":
-               print "USE %s;" % db_name
+               print "USE %s;" % q_db_name
             print "# Exporting data from %s" % db_name
             if file_per_table:
                 print "# Writing table data to files."
@@ -372,7 +383,7 @@ def export_data(source, src_val, db_list, options):
             'get_cols' : True,
             'quiet'    : quiet
         }
-        cur_table = Table(source, tbl_name, tbl_options)
+        cur_table = Table(source, q_tbl_name, tbl_options)
         if single and format not in ("sql", "grid", "vertical"):
             retrieval_mode = -1
             first = True
@@ -380,7 +391,7 @@ def export_data(source, src_val, db_list, options):
             retrieval_mode = 1
             first = False
 
-        message = "# Data for table %s: " % tbl_name
+        message = "# Data for table %s: " % q_tbl_name
 
         # switch for writing to files
         if file_per_table:

@@ -1,103 +1,103 @@
 Test case 1 - SQL single rows
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 2 - SQL bulk insert
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example', NULL),  ('12 Test Basic database example', NULL),  ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', NULL),  ('12 Test Basic database example', NULL),  ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES  (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES  (3, 2);
 #...done.
 Test case 3 - skip blobs
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 # WARNING : Table t2 has blob data that has been excluded by --skip-blobs.
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 4 - sql format
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 5 - csv format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -105,25 +105,25 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 6 - tab format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -131,24 +131,24 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 7 - GRID format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -160,7 +160,7 @@ Test case 7 - GRID format
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -168,7 +168,7 @@ Test case 7 - GRID format
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -176,7 +176,7 @@ Test case 7 - GRID format
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -186,7 +186,7 @@ Test case 7 - GRID format
 Test case 8 - VERTICAL format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -202,7 +202,7 @@ Test case 8 - VERTICAL format
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -213,7 +213,7 @@ Test case 8 - VERTICAL format
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -224,7 +224,7 @@ Test case 8 - VERTICAL format
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -232,36 +232,36 @@ Test case 8 - VERTICAL format
 #...done.
 Test case 9 - sql format no headers
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 10 - csv format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -269,25 +269,25 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 11 - tab format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -295,24 +295,24 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 12 - GRID format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -324,7 +324,7 @@ Test case 12 - GRID format no headers
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -332,7 +332,7 @@ Test case 12 - GRID format no headers
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -340,7 +340,7 @@ Test case 12 - GRID format no headers
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -350,7 +350,7 @@ Test case 12 - GRID format no headers
 Test case 13 - VERTICAL format no headers
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -366,7 +366,7 @@ Test case 13 - VERTICAL format no headers
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -377,7 +377,7 @@ Test case 13 - VERTICAL format no headers
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -388,7 +388,7 @@ Test case 13 - VERTICAL format no headers
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -396,36 +396,36 @@ Test case 13 - VERTICAL format no headers
 #...done.
 Test case 14 - SQ format
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
 Test case 15 - CS format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -433,25 +433,25 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 16 - ta format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -459,24 +459,24 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 17 - g format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -488,7 +488,7 @@ Test case 17 - g format
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -496,7 +496,7 @@ Test case 17 - g format
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -504,7 +504,7 @@ Test case 17 - g format
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -514,7 +514,7 @@ Test case 17 - g format
 Test case 18 - v format
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -530,7 +530,7 @@ Test case 18 - v format
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -541,7 +541,7 @@ Test case 18 - v format
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -552,7 +552,7 @@ Test case 18 - v format
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -561,7 +561,7 @@ Test case 18 - v format
 Test case 19 - GRID format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -573,7 +573,7 @@ Test case 19 - GRID format with BRIEF display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -581,7 +581,7 @@ Test case 19 - GRID format with BRIEF display
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -589,7 +589,7 @@ Test case 19 - GRID format with BRIEF display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -600,7 +600,7 @@ Test case 20 - GRID format with FULL display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -612,7 +612,7 @@ Test case 20 - GRID format with FULL display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -620,7 +620,7 @@ Test case 20 - GRID format with FULL display
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -628,7 +628,7 @@ Test case 20 - GRID format with FULL display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -639,7 +639,7 @@ Test case 21 - GRID format with NAMES display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -651,7 +651,7 @@ Test case 21 - GRID format with NAMES display
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -659,7 +659,7 @@ Test case 21 - GRID format with NAMES display
 | 12 Test Basic database example  | This is a blob.  |
 | 13 Test Basic database example  | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -667,7 +667,7 @@ Test case 21 - GRID format with NAMES display
 | 2  | 15 test fkeys  |
 | 3  | 16 test fkeys  |
 +----+----------------+
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 +----+----+
 | c  | d  |
 +----+----+
@@ -677,8 +677,8 @@ Test case 21 - GRID format with NAMES display
 Test case 22 - CSV format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -686,26 +686,26 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 23 - CSV format with FULL display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -713,26 +713,26 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 24 - CSV format with NAMES display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -740,25 +740,25 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a,x_blob
+# Data for table `util_test`.`t2`: 
+`a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
-# Data for table util_test.t3: 
-a,b
+# Data for table `util_test`.`t3`: 
+`a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
-# Data for table util_test.t4: 
-c,d
+# Data for table `util_test`.`t4`: 
+`c`,`d`
 3,2
 #...done.
 Test case 25 - TAB format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -766,26 +766,26 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 26 - TAB format with FULL display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -793,26 +793,26 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 27 - TAB format with NAMES display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
-a
+# Data for table `util_test`.`t1`: 
+`a`
 01 Test Basic database example
 02 Test Basic database example
 03 Test Basic database example
@@ -820,24 +820,24 @@ a
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table util_test.t2: 
-a	x_blob
+# Data for table `util_test`.`t2`: 
+`a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
-# Data for table util_test.t3: 
-a	b
+# Data for table `util_test`.`t3`: 
+`a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
-# Data for table util_test.t4: 
-c	d
+# Data for table `util_test`.`t4`: 
+`c`	`d`
 3	2
 #...done.
 Test case 28 - VERTICAL format with BRIEF display
 # Source on localhost: ... connected.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -853,7 +853,7 @@ Test case 28 - VERTICAL format with BRIEF display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -864,7 +864,7 @@ Test case 28 - VERTICAL format with BRIEF display
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -875,7 +875,7 @@ Test case 28 - VERTICAL format with BRIEF display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -885,7 +885,7 @@ Test case 29 - VERTICAL format with FULL display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -901,7 +901,7 @@ Test case 29 - VERTICAL format with FULL display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -912,7 +912,7 @@ Test case 29 - VERTICAL format with FULL display
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -923,7 +923,7 @@ Test case 29 - VERTICAL format with FULL display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -933,7 +933,7 @@ Test case 30 - VERTICAL format with NAMES display
 # Source on localhost: ... connected.
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table util_test.t1: 
+# Data for table `util_test`.`t1`: 
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -949,7 +949,7 @@ Test case 30 - VERTICAL format with NAMES display
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table util_test.t2: 
+# Data for table `util_test`.`t2`: 
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -960,7 +960,7 @@ Test case 30 - VERTICAL format with NAMES display
       a: 13 Test Basic database example
  x_blob: This is a blob.
 3 rows.
-# Data for table util_test.t3: 
+# Data for table `util_test`.`t3`: 
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -971,7 +971,7 @@ Test case 30 - VERTICAL format with NAMES display
  a: 3
  b: 16 test fkeys
 3 rows.
-# Data for table util_test.t4: 
+# Data for table `util_test`.`t4`: 
 *************************       1. row *************************
  c: 3
  d: 2
@@ -979,31 +979,31 @@ Test case 30 - VERTICAL format with NAMES display
 #...done.
 Test case 31 - multiple blobs
 # Source on localhost: ... connected.
-USE util_test;
+USE `util_test`;
 # Exporting data from util_test
-# Data for table util_test.t1: 
-INSERT INTO util_test.t1 VALUES ('01 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('02 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('03 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('04 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('05 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('06 Test Basic database example');
-INSERT INTO util_test.t1 VALUES ('07 Test Basic database example');
-# Data for table util_test.t2: 
-INSERT INTO util_test.t2 VALUES ('11 Test Basic database example', NULL, NULL);
-INSERT INTO util_test.t2 VALUES ('12 Test Basic database example', NULL, NULL);
-INSERT INTO util_test.t2 VALUES ('13 Test Basic database example', NULL, NULL);
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL, NULL);
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL, NULL);
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL, NULL);
 # Blob data for table t2:
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
-UPDATE util_test.t2.t2 SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
-# Data for table util_test.t3: 
-INSERT INTO util_test.t3 VALUES (1, '14 test fkeys');
-INSERT INTO util_test.t3 VALUES (2, '15 test fkeys');
-INSERT INTO util_test.t3 VALUES (3, '16 test fkeys');
-# Data for table util_test.t4: 
-INSERT INTO util_test.t4 VALUES (3, 2);
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '11 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '12 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
+UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example' ;
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.

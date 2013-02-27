@@ -2,9 +2,9 @@ Test case 1 - warning: def only with --file-per-table
 # WARNING: --file-per-table option ignored for metadata export.
 # Source on localhost: ... connected.
 # Exporting metadata from util_test_mt
-DROP DATABASE IF EXISTS util_test_mt;
-CREATE DATABASE util_test_mt;
-USE util_test_mt;
+DROP DATABASE IF EXISTS `util_test_mt`;
+CREATE DATABASE `util_test_mt`;
+USE `util_test_mt`;
 #...done.
 Test case 2 - sql format with --file-per-table
 # Checking for file-per-table creation:

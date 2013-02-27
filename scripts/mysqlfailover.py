@@ -21,6 +21,11 @@ This file contains the replication slave administration utility. It is used to
 perform replication operations on one or more slaves.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import logging
 import optparse
 import os.path
@@ -167,8 +172,9 @@ if opt.failover_mode == 'elect' and opt.candidates is None:
 # Parse the master, slaves, and candidates connection parameters
 try: 
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
-except UtilRplError, e:
-    print "ERROR:", e.errmsg
+except UtilRplError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Check hostname alias
@@ -213,10 +219,11 @@ logging.basicConfig(filename=opt.log_file, level=logging.INFO,
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
     rpl_cmds.auto_failover(opt.interval)
-except UtilError, e:
+except UtilError:
+    _, e, _ = sys.exc_info()
     # log the error in case it was an usual exception
     logging.log(logging.CRITICAL, e.errmsg.strip(' '))  
-    print "ERROR:", e.errmsg
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
     
 sys.exit(0)

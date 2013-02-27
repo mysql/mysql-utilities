@@ -19,6 +19,10 @@
 """
 This file contains the server information utility.
 """
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os
 import sys
@@ -90,8 +94,8 @@ check_basedir_option(parser, opt.basedir)
 if os.name == 'nt':
     parts = opt.ports.split(":")
     if len(parts) != 2:
-        print "# WARNING : %s is not a valid port range. Using default." % \
-              opt.ports
+        print("# WARNING : %s is not a valid port range. Using default." % 
+              opt.ports)
         opt.ports = "3306:3333"
 
 # Set options for database operations.
@@ -113,13 +117,15 @@ if opt.server is None:
 
 try:
     show_server_info(opt.server, options)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
-except Exception, e:
-    print "ERROR:", e
+except Exception:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e)
     sys.exit(1)
 
-print "#...done."
+print("#...done.")
 
 sys.exit()

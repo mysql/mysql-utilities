@@ -21,12 +21,19 @@ This file contains the copy database utility which ensures a database
 is exactly the same among two servers.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import os
 import re
 import sys
 import time
 
 from mysql.utilities.command import dbcopy
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
+from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import parse_connection, add_skip_options
@@ -35,6 +42,9 @@ from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.common.options import add_regexp, add_rpl_mode
 from mysql.utilities.common.options import check_rpl_options, add_rpl_user
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
+
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -128,8 +138,9 @@ opt, args = parser.parse_args()
 
 try:
     skips = check_skip_options(opt.skip_objects)
-except UtilError, e:
-    print "ERROR: %s" % e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Fail if no options listed.
@@ -182,17 +193,21 @@ try:
     # parse_connection methods (like, searching my_print_defaults tool).
     config_reader = MyDefaultsReader(options, False)
     source_values = parse_connection(opt.source, config_reader, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err.errmsg)
 
 # Parse destination connection values
 try:
     dest_values = parse_connection(opt.destination, config_reader, options)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Destination connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Destination connection values invalid: %s."
                  % err.errmsg)
 
@@ -203,14 +218,40 @@ if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:
 
 # Check replication options
 check_rpl_options(parser, opt)
-    
+
 # Build list of databases to copy
 db_list = []
 for db in args:
-    grp = re.match("(\w+)(?:\:(\w+))?", db)
+    # Split the database names considering backtick quotes
+    grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\:)(`(?:[^`]|``)+`|\w+))?", db)
     if not grp:
-        parser.error("Cannot parse database list. Error on '%s'." % db)
+        parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
+                                              db1_label='orig_db',
+                                              db2_label='new_db'))
     db_entry = grp.groups()
+    orig_db, new_db = db_entry
+
+    # Verify if the size of the databases matched by the REGEX is equal to the
+    # initial specified string. In general, this identifies the missing use
+    # of backticks.
+    matched_size = len(orig_db)
+    if new_db:
+        # add 1 for the separator ':'
+        matched_size = matched_size + 1
+        matched_size = matched_size + len(new_db)
+    if matched_size != len(db):
+        parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+                                                  db1_label='orig_db',
+                                                  db2_label='new_db',
+                                                  db1_value=orig_db,
+                                                  db2_value=new_db))
+
+    # Remove backtick quotes (handled later)
+    orig_db = remove_backtick_quoting(orig_db) \
+                if is_quoted_with_backticks(orig_db) else orig_db
+    new_db = remove_backtick_quoting(new_db) \
+                if new_db and is_quoted_with_backticks(new_db) else new_db
+    db_entry = (orig_db, new_db)
     db_list.append(db_entry)
 
 try:
@@ -220,8 +261,9 @@ try:
     dbcopy.copy_db(source_values, dest_values, db_list, options)
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 sys.exit()

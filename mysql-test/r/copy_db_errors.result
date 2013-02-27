@@ -9,7 +9,7 @@ mysqldbcopy.py: error: You must specify at least one database to copy or use the
 Test case 3 - error: cannot parse database list
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: Cannot parse database list. Error on '::sad'.
+mysqldbcopy.py: error: Cannot parse the specified database(s): '::sad'. Please verify that the database(s) are specified in a valid format (i.e., orig_db[:new_db]) and that backtick quotes are properly used when required.
 Test case 4 - error: old database doesn't exist
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.

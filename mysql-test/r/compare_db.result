@@ -29,27 +29,27 @@ Test case 2 - check database with known differences direction = server1 (default
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,9.99,other,,1
@@ -59,7 +59,7 @@ code,name
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -68,7 +68,7 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
@@ -103,27 +103,27 @@ Test case 3 - check database with known differences direction = server2
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Wesayso Corporation
 +2,Never Enough Inc.
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,10.00,other,,1
@@ -133,13 +133,13 @@ code,name
 +11186,Plastic polish,1,9.99,polishing,,1
 +11146,Speed shine,1,9.99,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -177,29 +177,29 @@ Test case 4 - check database with known differences direction = server1 and reve
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Never Enough Inc.
 +2,Wesayso Corporation
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # # Data differences found among rows:
-# --- inventory.supplier
-# +++ inventory.supplier
+# --- `inventory`.`supplier`
+# +++ `inventory`.`supplier`
 # @@ -1,2 +1,2 @@
 #  code,name
 # -2,Wesayso Corporation
 # +2,Never Enough Inc.
 # 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 # code,name
 # 3,Never Enough Inc.
 #
@@ -207,11 +207,11 @@ code,name
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,9.99,other,,1
@@ -221,7 +221,7 @@ code,name
 +11186,Plastic polish,1,10.00,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -230,15 +230,15 @@ stock_number,description,qty,cost,type,notes,supplier
 11106,Wheel cleaner,1,9.99,cleaning,,1
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
 # # Data differences found among rows:
-# --- inventory.supplies
-# +++ inventory.supplies
+# --- `inventory`.`supplies`
+# +++ `inventory`.`supplies`
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
 # -11040,Leather care,1,10.00,other,,1
@@ -248,13 +248,13 @@ stock_number,description,qty,cost,type,notes,supplier
 # +11186,Plastic polish,1,9.99,polishing,,1
 # +11146,Speed shine,1,9.99,repair,,1
 # 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
 # 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 # 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 # 10665,Glass polish pad,3,10.00,polishing,,1
 # 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
 # 11104,Interior cleaner,1,9.99,cleaning,,1
 # 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -305,29 +305,29 @@ Test case 5 - check database with known differences direction = server2 and reve
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
---- inventory.supplier
-+++ inventory.supplier
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
 @@ -1,2 +1,2 @@
  code,name
 -2,Wesayso Corporation
 +2,Never Enough Inc.
 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 3,Never Enough Inc.
 
 # # Data differences found among rows:
-# --- inventory.supplier
-# +++ inventory.supplier
+# --- `inventory`.`supplier`
+# +++ `inventory`.`supplier`
 # @@ -1,2 +1,2 @@
 #  code,name
 # -2,Never Enough Inc.
 # +2,Wesayso Corporation
 # 
-# Rows in inventory.supplier not in inventory.supplier
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 # code,name
 # 3,Never Enough Inc.
 #
@@ -335,11 +335,11 @@ code,name
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
---- inventory.supplies
-+++ inventory.supplies
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11040,Leather care,1,10.00,other,,1
@@ -349,13 +349,13 @@ code,name
 +11186,Plastic polish,1,9.99,polishing,,1
 +11146,Speed shine,1,9.99,repair,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11104,Interior cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -365,8 +365,8 @@ stock_number,description,qty,cost,type,notes,supplier
 11270,Carpet cleaner,1,9.99,cleaning,,1
 
 # # Data differences found among rows:
-# --- inventory.supplies
-# +++ inventory.supplies
+# --- `inventory`.`supplies`
+# +++ `inventory`.`supplies`
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
 # -11040,Leather care,1,9.99,other,,1
@@ -376,7 +376,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # +11186,Plastic polish,1,10.00,polishing,,1
 # +11146,Speed shine,1,10.00,repair,,1
 # 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
 # 11104,Interior cleaner,1,9.99,cleaning,,1
 # 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
@@ -385,7 +385,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # 11106,Wheel cleaner,1,9.99,cleaning,,1
 # 11270,Carpet cleaner,1,9.99,cleaning,,1
 # 
-# Rows in inventory.supplies not in inventory.supplies
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
 # 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 # 11116,Microfiber wax removal towel,3,16.99,waxing,,1
@@ -472,5 +472,20 @@ Test case 7 - compare two databases on same server
 # -------------------------------------------------------------------------
 
 # Database consistency check failed.
+#
+# ...done
+Test case 8 - compare a database with weird names (backticks)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db`:db on server1 and db`:db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     `t`.`export_2                           pass    pass    pass    
+# TABLE     `t`export_1                             pass    pass    pass    
+# VIEW      `v`export_1                             pass    -       -      
+
+Databases are consistent.
 #
 # ...done

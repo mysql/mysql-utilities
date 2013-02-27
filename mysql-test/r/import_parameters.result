@@ -213,32 +213,32 @@ CREATE TABLE `util_test`.`t4` (
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
-GRANT ALTER ON util_test.* TO 'joe'@'user'
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
-GRANT DELETE ON util_test.* TO 'joe'@'user'
-GRANT DROP ON util_test.* TO 'joe'@'user'
-GRANT EVENT ON util_test.* TO 'joe'@'user'
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
-GRANT INDEX ON util_test.* TO 'joe'@'user'
-GRANT INSERT ON util_test.* TO 'joe'@'user'
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
-GRANT SELECT ON util_test.* TO 'joe'@'user'
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
-INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
-INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
-INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' ;
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' ;
-UPDATE util_test.t3 SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' ;
-INSERT INTO util_test.t4 VALUES  (3, 2)
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+GRANT ALTER ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
+INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' ;
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' ;
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' ;
+INSERT INTO `util_test`.`t4` VALUES  (3, 2)
 #...done.
 Test case 19 - no data
 # Source on localhost: ... connected.
@@ -265,25 +265,25 @@ CREATE TABLE `util_test`.`t4` (
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
-GRANT ALTER ON util_test.* TO 'joe'@'user'
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
-GRANT DELETE ON util_test.* TO 'joe'@'user'
-GRANT DROP ON util_test.* TO 'joe'@'user'
-GRANT EVENT ON util_test.* TO 'joe'@'user'
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
-GRANT INDEX ON util_test.* TO 'joe'@'user'
-GRANT INSERT ON util_test.* TO 'joe'@'user'
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
-GRANT SELECT ON util_test.* TO 'joe'@'user'
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+GRANT ALTER ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
 #...done.
 Test case 20 - no blobs
 # WARNING: --skip-blobs option ignored for metadata import.
@@ -311,28 +311,28 @@ CREATE TABLE `util_test`.`t4` (
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) RETURN (SELECT 1);
-GRANT ALTER ON util_test.* TO 'joe'@'user'
-GRANT ALTER ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ON util_test.* TO 'joe'@'user'
-GRANT CREATE ROUTINE ON util_test.* TO 'joe'@'user'
-GRANT CREATE TEMPORARY TABLES ON util_test.* TO 'joe'@'user'
-GRANT CREATE VIEW ON util_test.* TO 'joe'@'user'
-GRANT DELETE ON util_test.* TO 'joe'@'user'
-GRANT DROP ON util_test.* TO 'joe'@'user'
-GRANT EVENT ON util_test.* TO 'joe'@'user'
-GRANT EXECUTE ON util_test.* TO 'joe'@'user'
-GRANT INDEX ON util_test.* TO 'joe'@'user'
-GRANT INSERT ON util_test.* TO 'joe'@'user'
-GRANT LOCK TABLES ON util_test.* TO 'joe'@'user'
-GRANT REFERENCES ON util_test.* TO 'joe'@'user'
-GRANT SELECT ON util_test.* TO 'joe'@'user'
-GRANT SHOW VIEW ON util_test.* TO 'joe'@'user'
-GRANT TRIGGER ON util_test.* TO 'joe'@'user'
-GRANT UPDATE ON util_test.* TO 'joe'@'user'
-INSERT INTO util_test.t1 VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
-INSERT INTO util_test.t2 VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
-INSERT INTO util_test.t3 VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
-INSERT INTO util_test.t4 VALUES  (3, 2)
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+GRANT ALTER ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT DELETE ON `util_test`.* TO 'joe'@'user'
+GRANT DROP ON `util_test`.* TO 'joe'@'user'
+GRANT EVENT ON `util_test`.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user'
+GRANT INDEX ON `util_test`.* TO 'joe'@'user'
+GRANT INSERT ON `util_test`.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user'
+GRANT SELECT ON `util_test`.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
+INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
+INSERT INTO `util_test`.`t4` VALUES  (3, 2)
 #...done.
 Test case 21 - no messages (quiet)

@@ -21,6 +21,11 @@ This file contains the replication slave administration utility. It is used to
 perform replication operations on one or more slaves.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
+
 import logging
 import optparse
 import os.path
@@ -39,6 +44,7 @@ from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
 from mysql.utilities.command.rpl_admin import get_valid_rpl_command_text
 from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
+
 
 class MyParser(optparse.OptionParser):
     def format_epilog(self, formatter):
@@ -142,37 +148,39 @@ if command == 'failover' and opt.force:
     parser.error("You cannot use the --force option with failover.")
 
 if opt.ping and not command == 'health':
-    print "WARNING: The --ping option is used only with the health command."
+    print("WARNING: The --ping option is used only with the health command.")
     
 if command not in ['switchover', 'failover'] and \
    (opt.exec_after or opt.exec_before):
-    print "WARNING: The --exec-* options are used only with the failover" + \
-          " and switchover commands."
+    print("WARNING: The --exec-* options are used only with the failover"
+          " and switchover commands.")
 
 if opt.new_master and command != 'switchover':
-    print "WARNING: The --new-master option is used only with the " + \
-          "switchover command."
+    print("WARNING: The --new-master option is used only with the "
+          "switchover command.")
 
 if opt.candidates and command not in ['elect', 'failover']:
-    print "WARNING: The --candidates option is used only with the " + \
-          "failover and elect commands."
+    print("WARNING: The --candidates option is used only with the "
+          "failover and elect commands.")
     opt.candidates = None
 
 if (opt.candidates or opt.new_master) and command in ['stop', 'start', 'reset']:
-    print "WARNING: The --new-master and --candidates options are not " + \
-          "used with the stop, start, and reset commands."
+    print("WARNING: The --new-master and --candidates options are not "
+          "used with the stop, start, and reset commands.")
     opt.candidates = None
     
 if opt.format and command not in ['health', 'gtid']:
-    print "WARNING: The --format option is used only with the health " + \
-          "and gtid commands."
+    print("WARNING: The --format option is used only with the health "
+          "and gtid commands.")
         
 if opt.new_master:
     try:
         new_master_val = parse_connection(opt.new_master, None, opt)
-    except FormatError as err:
+    except FormatError:
+        _, err, _ = sys.exc_info()
         parser.error("New master connection values invalid: %s." % err)
-    except UtilError as err:
+    except UtilError:
+        _, err, _ = sys.exc_info()
         parser.error("New master connection values invalid: %s." % err.errmsg)
 else:
     new_master_val = None
@@ -180,8 +188,9 @@ else:
 # Parse the master, slaves, and candidates connection parameters
 try: 
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
-except UtilRplError, e:
-    print "ERROR:", e.errmsg
+except UtilRplError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 # Check hostname alias
@@ -228,14 +237,16 @@ try:
     logging.basicConfig(filename=opt.log_file, level=logging.INFO,
                         format='%(asctime)s %(levelname)s %(message)s',
                         datefmt=_DATE_FORMAT)
-except IOError, e:
+except IOError:
+    _, e, _ = sys.exc_info()
     parser.error("Error opening log file: %s" % str(e.args[1]))
 
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
     rpl_cmds.execute_command(command)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
     
 sys.exit(0)

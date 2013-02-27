@@ -11,3 +11,5 @@ MySQL Utilities is brought to you by Oracle.
 """
 VERSION_FRM = ("MySQL Utilities {program} version " + RELEASE_STRING
                + "\n" + COPYRIGHT_FULL)
+PYTHON_MIN_VERSION = (2, 6, 0)
+PYTHON_MAX_VERSION = (3, 0, 0)

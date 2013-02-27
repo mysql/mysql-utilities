@@ -21,6 +21,10 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
+from mysql.utilities.common.tools import check_python_version
+
+# Check Python version compatibility
+check_python_version()
 
 import os.path
 import sys
@@ -98,18 +102,22 @@ opt, args = parser.parse_args()
 # Parse source connection values
 try:
     m_values = parse_connection(opt.master, None, opt)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Master connection values invalid: %s." % err.errmsg)
 
 
 # Parse source connection values
 try:
     s_values = parse_connection(opt.slave, None, opt)
-except FormatError as err:
+except FormatError:
+    _, err, _ = sys.exc_info()
     parser.error("Slave connection values invalid: %s." % err)
-except UtilError as err:
+except UtilError:
+    _, err, _ = sys.exc_info()
     parser.error("Slave connection values invalid: %s." % err.errmsg)
 
 # Check hostname alias
@@ -139,8 +147,9 @@ options = {
 try:
     res = setup_replication(m_values, s_values, opt.rpl_user,
                             options, opt.test_db)
-except UtilError, e:
-    print "ERROR:", e.errmsg
+except UtilError:
+    _, e, _ = sys.exc_info()
+    print("ERROR: %s" % e.errmsg)
     sys.exit(1)
 
 sys.exit()

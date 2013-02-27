@@ -29,7 +29,7 @@ Test case 2 - check database with known differences generate SQL direction = ser
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Transformation for --changes-for=server1:
 #
@@ -41,7 +41,7 @@ INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Transformation for --changes-for=server1:
 #
@@ -88,7 +88,7 @@ Test case 3 - check database with known differences generate SQL direction = ser
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Transformation for --changes-for=server2:
 #
@@ -100,7 +100,7 @@ DELETE FROM inventory.supplier WHERE code = '3';
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Transformation for --changes-for=server2:
 #
@@ -147,7 +147,7 @@ Test case 4 - check database with known differences generate SQL direction = ser
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Transformation for --changes-for=server1:
 #
@@ -167,7 +167,7 @@ INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Transformation for --changes-for=server1:
 #
@@ -239,7 +239,7 @@ Test case 5 - check database with known differences generate SQL direction = ser
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplier and inventory.supplier.
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Transformation for --changes-for=server2:
 #
@@ -259,7 +259,7 @@ DELETE FROM inventory.supplier WHERE code = '3';
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
-# Row counts are not the same among inventory.supplies and inventory.supplies.
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Transformation for --changes-for=server2:
 #

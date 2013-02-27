@@ -20,6 +20,9 @@ This file contains the diff commands for finding the difference among
 the definitions of two databases.
 """
 
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.sql_transform import quote_with_backticks
+
 
 def object_diff(server1_val, server2_val, object1, object2, options):
     """diff the definition of two objects
@@ -95,8 +98,12 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     # For each that match, do object diff
     success = True
     for item in in_both:
-        object1 = "%s.%s" % (db1, item[1][0])
-        object2 = "%s.%s" % (db2, item[1][0])
+        obj_name1 = quote_with_backticks(item[1][0]) \
+                        if is_quoted_with_backticks(db1) else item[1][0]
+        obj_name2 = quote_with_backticks(item[1][0]) \
+                        if is_quoted_with_backticks(db2) else item[1][0]
+        object1 = "%s.%s" % (db1, obj_name1)
+        object2 = "%s.%s" % (db2, obj_name2)
         result = object_diff(server1, server2, object1, object2, options)
         if result is not None:
             success = False

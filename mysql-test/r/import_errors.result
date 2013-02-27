@@ -1,4 +1,4 @@
-Test Case 1 : Testing import with %s format and NAMES display
+Test Case 1 : Testing import with CSV format and NAMES display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
@@ -8,7 +8,7 @@ Running import...
 ERROR: Cannot read an import file generated with --display=NAMES
 AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test Case 2 : Testing import with %s format and NAMES display
+Test Case 2 : Testing import with TAB format and NAMES display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
@@ -18,7 +18,7 @@ Running import...
 ERROR: Cannot read an import file generated with --display=NAMES
 AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test Case 3 : Testing import with %s format and NAMES display
+Test Case 3 : Testing import with GRID format and NAMES display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
@@ -28,7 +28,7 @@ Running import...
 ERROR: Cannot read an import file generated with --display=NAMES
 AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test Case 4 : Testing import with %s format and NAMES display
+Test Case 4 : Testing import with VERTICAL format and NAMES display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
@@ -81,3 +81,23 @@ Test case 16 - error: bad object definition
 # Source on localhost: ... connected.
 # Importing definitions and data from std_data/bad_object.csv.
 ERROR: Object data invalid: GRANT : ['NAME', 'ORIGIN', 'COLOUR']
+Test Case 17 : Testing import with CSV format and NAMES display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 18 : Testing import with TAB format and NAMES display (using backticks)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+ERROR: Cannot read an import file generated with --display=NAMES
+AFTER:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 

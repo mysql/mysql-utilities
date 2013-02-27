@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@ multiple utilities.
 """
 
 import re
-import mysql.connector
+
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -100,7 +103,13 @@ class Database(object):
                            and how operations perform (e.g., verbose)
         """
         self.source = source
-        self.db_name = name
+        # Keep database identifier considering backtick quotes
+        if is_quoted_with_backticks(name):
+            self.q_db_name = name
+            self.db_name = remove_backtick_quoting(self.q_db_name)
+        else:
+            self.db_name = name
+            self.q_db_name = quote_with_backticks(self.db_name)
         self.verbose = options.get("verbose", False)
         self.skip_tables = options.get("skip_tables", False)
         self.skip_views = options.get("skip_views", False)
@@ -114,6 +123,7 @@ class Database(object):
         self.exclude_patterns = options.get("exclude_patterns", None)
         self.use_regexp = options.get("use_regexp", False)
         self.new_db = None
+        self.q_new_db = None
         self.init_called = False
         self.destination = None # Used for copy mode
         self.cloning = False    # Used for clone mode
@@ -167,21 +177,23 @@ class Database(object):
 
         db = None
         if db_name:
-            db = db_name
+            db = db_name if is_quoted_with_backticks(db_name) \
+                    else quote_with_backticks(db_name)
         else:
-            db = self.db_name
+            db = self.q_db_name
         op_ok = False
         if quiet:
             try:
                 res = server.exec_query("DROP DATABASE %s" % (db),
                                         self.query_options)
+                op_ok = True
             except:
                 pass
         else:
             res = server.exec_query("DROP DATABASE %s" % (db),
                                     self.query_options)
             op_ok = True
-
+        return op_ok
 
     def create(self, server, db_name=None):
         """Create the database
@@ -196,9 +208,10 @@ class Database(object):
 
         db = None
         if db_name:
-            db = db_name
+            db = db_name if is_quoted_with_backticks(db_name) \
+                    else quote_with_backticks(db_name)
         else:
-            db = self.db_name
+            db = self.q_db_name
         op_ok = False
         res = server.exec_query("CREATE DATABASE %s" % (db),
                                 self.query_options)
@@ -223,6 +236,7 @@ class Database(object):
 
         if not self.new_db:
             self.new_db = self.db_name
+            self.q_new_db = self.q_db_name
         create_str = None
         # Tables are not supported
         if obj_type == _TABLE and self.cloning:
@@ -231,19 +245,25 @@ class Database(object):
         if obj_type == _GRANT:
             if obj[3]:
                 create_str = "GRANT %s ON %s.%s TO %s" % \
-                             (obj[1], self.new_db, obj[3], obj[0])
+                             (obj[1], self.q_new_db, obj[3], obj[0])
             else:
                 create_str = "GRANT %s ON %s.* TO %s" % \
-                             (obj[1], self.new_db, obj[0])
+                             (obj[1], self.q_new_db, obj[0])
         else:
             create_str = self.get_create_statement(self.db_name,
                                                    obj[0], obj_type)
             if self.new_db != self.db_name:
+                create_str = re.sub(r" %s\." % self.q_db_name,
+                                    r" %s." % self.q_new_db,
+                                    create_str)
+                create_str = re.sub(r",%s\." % self.q_db_name,
+                                    r",%s." % self.q_new_db,
+                                    create_str)
                 create_str = re.sub(r" %s\." % self.db_name,
                                     r" %s." % self.new_db,
                                     create_str)
-                create_str = re.sub(r" `%s`\." % self.db_name,
-                                    r" `%s`." % self.new_db,
+                create_str = re.sub(r",%s\." % self.db_name,
+                                    r",%s." % self.new_db,
                                     create_str)
                 create_str = re.sub(r" '%s'\." % self.db_name,
                                     r" '%s'." % self.new_db,
@@ -251,7 +271,6 @@ class Database(object):
                 create_str = re.sub(r' "%s"\.' % self.db_name,
                                     r' "%s".' % self.new_db,
                                     create_str)
-                create_str = create_str
         return create_str
 
 
@@ -319,7 +338,7 @@ class Database(object):
             print "# Dropping new object %s %s.%s" % \
                   (obj_type, self.new_db, name)
         drop_str = "DROP %s %s.%s" % \
-                   (obj_type, self.new_db, name)
+                   (obj_type, self.q_new_db, name)
         # Suppress the error on drop
         if self.cloning:
             try:
@@ -352,11 +371,11 @@ class Database(object):
         create_str = None
         if obj_type == _TABLE and self.cloning:
             create_str = "CREATE TABLE %s.%s LIKE %s.%s" % \
-                         (self.new_db, obj[0], self.db_name, obj[0])
+                         (self.q_new_db, obj[0], self.q_db_name, obj[0])
         else:
             create_str = self.__make_create_statement(obj_type, obj)
         if obj_type == _TABLE:
-            tbl_name = "%s.%s" % (self.new_db, obj[0])
+            tbl_name = "%s.%s" % (self.q_new_db, obj[0])
             create_str = self.destination.substitute_engine(tbl_name,
                                                             create_str,
                                                             new_engine,
@@ -374,7 +393,7 @@ class Database(object):
                 print create_str
         res = None
         try:
-            res = self.destination.exec_query("USE %s" % self.new_db,
+            res = self.destination.exec_query("USE %s" % self.q_new_db,
                                               self.query_options)
         except:
             pass
@@ -416,7 +435,20 @@ class Database(object):
                                  "db.copy_objects()."
 
         grant_msg_displayed = False
-        self.new_db = new_db
+
+        if new_db:
+            # Assign new database identifier considering backtick quotes.
+            if is_quoted_with_backticks(new_db):
+                self.q_new_db = new_db
+                self.new_db = remove_backtick_quoting(new_db)
+            else:
+                self.new_db = new_db
+                self.q_new_db = quote_with_backticks(new_db)
+        else:
+            # If new_db is not defined use the same as source database.
+            self.new_db = self.db_name
+            self.q_new_db = self.q_db_name
+
         self.destination = new_server
 
         # We know we're cloning if there is no new connection.
@@ -512,8 +544,10 @@ class Database(object):
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
         for tblname in table_names:
             if not quiet:
-                print "# Copying data for TABLE %s.%s" % (self.db_name, tblname)
-            tbl = Table(self.source, "%s.%s" % (self.db_name, tblname),
+                print "# Copying data for TABLE %s.%s" % (self.db_name, 
+                                                          tblname)
+            tbl = Table(self.source, "%s.%s" % (self.q_db_name,
+                                                quote_with_backticks(tblname)),
                         tbl_options)
             if tbl is None:
                 raise UtilDBError("Cannot create table object before copy.",
@@ -533,12 +567,16 @@ class Database(object):
         """
 
         row = None
+        q_name = name if is_quoted_with_backticks(name) \
+                                    else quote_with_backticks(name)
         if obj_type == _DATABASE:
-            name_str = name
+            name_str = q_name
         else:
-            name_str = db + "." + name
-        row = self.source.exec_query("SHOW CREATE %s %s" % \
-                                     (obj_type, name_str))
+            q_db = db if is_quoted_with_backticks(db) \
+                                    else quote_with_backticks(db)
+            name_str = q_db + "." + q_name
+        row = self.source.exec_query("SHOW CREATE %s %s" % (obj_type,
+                                                            name_str))
 
         create_statement = None
         if row:
@@ -705,10 +743,14 @@ class Database(object):
         Returns (string) object type or None if not found
         """
         object_type = None
-                
+
+        # Remove object backticks if needed
+        obj_name = remove_backtick_quoting(object_name) \
+                    if is_quoted_with_backticks(object_name) else object_name
+
         res = self.source.exec_query(_OBJTYPE_QUERY %
                                      { 'db_name'  : self.db_name,
-                                       'obj_name' : object_name })
+                                       'obj_name' : obj_name })
         
         if res != [] and res is not None and len(res) > 0:
             object_type = res[0][0]
@@ -718,7 +760,8 @@ class Database(object):
         return object_type
 
 
-    def get_db_objects(self, obj_type, columns='names', get_columns=False):
+    def get_db_objects(self, obj_type, columns='names', get_columns=False, 
+                       need_backtick=False):
         """Return a result set containing a list of objects for a given
         database based on type.
 
@@ -733,22 +776,31 @@ class Database(object):
         get_columns[in]    If True, return column names as first element
                            and result set as second element. If False,
                            return only the result set.
+        need_backtick[in]  If True, it returns any identifiers, e.g. table and
+                           column names, quoted with backticks.
+                           By default, False.
 
         TODO: Change implementation to return classes instead of a result set.
 
         Returns mysql.connector result set
         """
 
-        _FULL = """
-        SELECT *
-        """
         exclude_param = ""
         if obj_type == _TABLE:
             _NAMES = """
             SELECT DISTINCT TABLES.TABLE_NAME
             """
+            names_pos_to_quote = (0,)
             _FULL = """
-            SELECT TABLES.*, COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
+            SELECT TABLES.TABLE_CATALOG, TABLES.TABLE_SCHEMA,
+                TABLES.TABLE_NAME, TABLES.TABLE_TYPE,
+                TABLES.ENGINE, TABLES.VERSION, TABLES.ROW_FORMAT,
+                TABLES.TABLE_ROWS, TABLES.AVG_ROW_LENGTH, TABLES.DATA_LENGTH,
+                TABLES.MAX_DATA_LENGTH, TABLES.INDEX_LENGTH, TABLES.DATA_FREE,
+                TABLES.AUTO_INCREMENT, TABLES.CREATE_TIME, TABLES.UPDATE_TIME,
+                TABLES.CHECK_TIME, TABLES.TABLE_COLLATION, TABLES.CHECKSUM,
+                TABLES.CREATE_OPTIONS, TABLES.TABLE_COMMENT,
+                COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
                 COLUMNS.COLUMN_TYPE, COLUMNS.IS_NULLABLE,
                 COLUMNS.COLUMN_DEFAULT, COLUMNS.COLUMN_KEY,
                 REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME,
@@ -762,8 +814,9 @@ class Database(object):
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
             """
+            full_pos_to_quote = (1, 2, 22, 27, 28, 29, 30, 33, 34, 35, 36)
             _MINIMAL = """
-            SELECT TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME, ENGINE,
+            SELECT TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME, TABLES.ENGINE,
                 COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
                 COLUMNS.COLUMN_TYPE, COLUMNS.IS_NULLABLE,
                 COLUMNS.COLUMN_DEFAULT, COLUMNS.COLUMN_KEY,
@@ -779,6 +832,7 @@ class Database(object):
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
             """
+            minimal_pos_to_quote = (0, 1, 4, 11, 12, 13, 16, 17, 18, 19)
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TABLES JOIN INFORMATION_SCHEMA.COLUMNS ON
                 TABLES.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA AND
@@ -796,15 +850,24 @@ class Database(object):
                      COLUMNS.ORDINAL_POSITION
             """
             exclude_param = "TABLES.TABLE_NAME"
+            
         elif obj_type == _VIEW:
             _NAMES = """
             SELECT TABLE_NAME
             """
+            names_pos_to_quote = (0,)
+            _FULL = """
+            SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION,
+                   CHECK_OPTION, IS_UPDATABLE, DEFINER, SECURITY_TYPE,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION
+            """
+            full_pos_to_quote = (1, 2)
             _MINIMAL = """
             SELECT TABLE_SCHEMA, TABLE_NAME, DEFINER, SECURITY_TYPE,
                    VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION
             """
+            minimal_pos_to_quote = (0, 1)
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.VIEWS
             WHERE TABLE_SCHEMA = '%s' %s
@@ -814,6 +877,19 @@ class Database(object):
             _NAMES = """
             SELECT TRIGGER_NAME
             """
+            names_pos_to_quote = (0,)
+            _FULL = """
+            SELECT TRIGGER_CATALOG, TRIGGER_SCHEMA, TRIGGER_NAME,
+                   EVENT_MANIPULATION, EVENT_OBJECT_CATALOG,
+                   EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE, ACTION_ORDER,
+                   ACTION_CONDITION, ACTION_STATEMENT, ACTION_ORIENTATION,
+                   ACTION_TIMING, ACTION_REFERENCE_OLD_TABLE, 
+                   ACTION_REFERENCE_NEW_TABLE, ACTION_REFERENCE_OLD_ROW,
+                   ACTION_REFERENCE_NEW_ROW, CREATED, SQL_MODE, DEFINER,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DATABASE_COLLATION
+            """
+            full_pos_to_quote = (1, 2, 5, 6)  # 9 ?
             _MINIMAL = """
             SELECT TRIGGER_NAME, DEFINER, EVENT_MANIPULATION,
                    EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE,
@@ -822,6 +898,8 @@ class Database(object):
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DATABASE_COLLATION
             """
+            # Note: 7 (ACTION_STATEMENT) might require special handling
+            minimal_pos_to_quote = (0, 3, 4)
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TRIGGERS
             WHERE TRIGGER_SCHEMA = '%s' %s
@@ -831,6 +909,15 @@ class Database(object):
             _NAMES = """
             SELECT NAME
             """
+            names_pos_to_quote = (0,)
+            _FULL = """
+            SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
+                   IS_DETERMINISTIC, SECURITY_TYPE, PARAM_LIST, RETURNS, BODY,
+                   DEFINER, CREATED, MODIFIED, SQL_MODE, COMMENT,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION, DB_COLLATION,
+                   BODY_UTF8
+            """
+            full_pos_to_quote = (0, 1, 3)
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
@@ -838,6 +925,7 @@ class Database(object):
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
             """
+            minimal_pos_to_quote = (0,)
             _OBJECT_QUERY = """
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
@@ -847,6 +935,15 @@ class Database(object):
             _NAMES = """
             SELECT NAME
             """
+            names_pos_to_quote = (0,)
+            _FULL = """
+            SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
+                   IS_DETERMINISTIC, SECURITY_TYPE, PARAM_LIST, RETURNS, BODY,
+                   DEFINER, CREATED, MODIFIED, SQL_MODE, COMMENT,
+                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION, DB_COLLATION,
+                   BODY_UTF8
+            """
+            full_pos_to_quote = (0, 1, 3)
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
@@ -854,6 +951,7 @@ class Database(object):
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
             """
+            minimal_pos_to_quote = (0,)
             _OBJECT_QUERY = """
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
@@ -863,6 +961,15 @@ class Database(object):
             _NAMES = """
             SELECT NAME
             """
+            names_pos_to_quote = (0,)
+            _FULL = """
+            SELECT DB, NAME, BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
+                   INTERVAL_FIELD, CREATED, MODIFIED, LAST_EXECUTED, STARTS,
+                   ENDS, STATUS, ON_COMPLETION, SQL_MODE, COMMENT, ORIGINATOR,
+                   TIME_ZONE, CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                   DB_COLLATION, BODY_UTF8
+            """
+            full_pos_to_quote = (0, 1)
             _MINIMAL = """
             SELECT NAME, DEFINER, BODY, STATUS,
                    EXECUTE_AT, INTERVAL_VALUE, INTERVAL_FIELD, SQL_MODE,
@@ -870,6 +977,7 @@ class Database(object):
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
             """
+            minimal_pos_to_quote = (0,)
             _OBJECT_QUERY = """
             FROM mysql.event
             WHERE DB = '%s' %s
@@ -906,6 +1014,7 @@ class Database(object):
         col_options = {
             'columns' : get_columns
         }
+        pos_to_quote = ()
         if obj_type == _GRANT:
             query = _OBJECT_QUERY % (self.db_name, self.db_name,
                                      self.db_name, self.db_name)
@@ -913,16 +1022,40 @@ class Database(object):
         else:
             if columns == "names":
                 prefix = _NAMES
+                if need_backtick:
+                    pos_to_quote = names_pos_to_quote
             elif columns == "full":
                 prefix = _FULL
+                if need_backtick:
+                    pos_to_quote = full_pos_to_quote
             else:
                 prefix = _MINIMAL
+                if need_backtick:
+                    pos_to_quote = minimal_pos_to_quote
             # Form exclusion string
             exclude_str = ""
             if self.exclude_patterns is not None:
                 exclude_str += self.__build_exclude_patterns(exclude_param)
             query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
             res = self.source.exec_query(query, col_options)
+
+            # Quote required identifiers with backticks
+            if need_backtick:
+                # function to quote row elements at a given positions
+                #quote = lambda pos, obj: quote_with_backticks(obj) \
+                #                        if obj and pos in pos_to_quote else obj
+                new_rows = []
+                for row in res[1]:
+                    # recreate row tuple quoting needed elements with backticks
+                    #r = tuple([quote(i, data) for i, data in enumerate(row)])
+                    r = tuple([quote_with_backticks(data)
+                               if data and i in pos_to_quote else data
+                               for i, data in enumerate(row)])
+                    new_rows.append(r)
+
+                # set new result with with required data quoted with backticks
+                res = (res[0], new_rows)
+
             return res
 
 

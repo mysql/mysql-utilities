@@ -557,10 +557,11 @@ def add_failover_options(parser):
                       "[:<socket>] or <login-path>[:<port>][:<socket>]. "
                       "List multiple slaves in comma-separated list.")
 
-    parser.add_option("--timeout", action="store", dest="timeout", default=3,
+    parser.add_option("--timeout", action="store", dest="timeout", default=300,
                       help="Maximum timeout in seconds to wait for each "
                       "replication command to complete. For example, timeout "
-                      "for slave waiting to catch up to master. Default = 3.")
+                      "for slave waiting to catch up to master. "
+                      "Default = 300.")
 
 
 def check_server_lists(parser, master, slaves):

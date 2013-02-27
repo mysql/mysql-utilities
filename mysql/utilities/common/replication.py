@@ -39,8 +39,9 @@ _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
     _SLAVE_MASTER_LOG_FILE, _SLAVE_MASTER_LOG_FILE_POS, _SLAVE_IO_RUNNING, \
     _SLAVE_SQL_RUNNING, _SLAVE_DO_DB, _SLAVE_IGNORE_DB, _SLAVE_DELAY, \
     _SLAVE_REMAINING_DELAY, _SLAVE_IO_ERRORNO, _SLAVE_IO_ERROR, \
-    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR = \
-    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37
+    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _RETRIEVED_GTID_SET, \
+    _EXECUTED_GTID_SET = \
+    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 51, 52
 
 _PRINT_WIDTH = 75
 
@@ -1245,6 +1246,29 @@ class Slave(Server):
         return self.exec_query("SHOW SLAVE STATUS", col_options)
 
 
+    def get_retrieved_gtid_set(self):
+        """Get any events (gtids) read but not executed
+
+        Returns list - gtids in retrieved_gtid_set
+        """
+        res = self.get_status()
+        if res != []:
+            return res[0][_RETRIEVED_GTID_SET]
+        return []
+
+
+    def get_executed_gtid_set(self):
+        """Get any events (gtids) executed
+
+        Returns list - gtids in retrieved_gtid_set
+        """
+        res = self.get_status()
+        if res != []:
+            return res[0][_EXECUTED_GTID_SET]
+
+        return []
+
+
     def get_binlog_exceptions(self):
         """Get any binary logging exceptions
 
@@ -1486,7 +1510,7 @@ class Slave(Server):
         return gtid_behind
 
 
-    def wait_for_slave(self, binlog_file, binlog_pos, timeout=3):
+    def wait_for_slave(self, binlog_file, binlog_pos, timeout=300):
         """Wait for the slave to read the master's binlog to specified position
 
         binlog_file[in]  master's binlog file

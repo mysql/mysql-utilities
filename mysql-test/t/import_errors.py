@@ -39,13 +39,12 @@ class test(import_basic.test):
 
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
         test_num = 1
-        for format in _FORMATS:
-            comment = "Test Case %d : Testing import with " % test_num
-            comment += "%s format and NAMES display"
+        for frmt in _FORMATS:
+            comment = ("Test Case %d : Testing import with "
+                       "%s format and NAMES display" % (test_num, frmt))
             # We test DEFINITIONS and DATA only in other tests
-            self.run_import_test(1, from_conn, to_conn,
-                                 format, "BOTH", comment,
-                                 " --display=NAMES")
+            self.run_import_test(1, from_conn, to_conn, 'util_test',
+                                 frmt, "BOTH", comment, " --display=NAMES")
             self.drop_db(self.server2, "util_test")
             test_num += 1
 
@@ -176,7 +175,17 @@ class test(import_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
+        # Test database with backticks
+        _FORMATS_BACKTICKS = ("CSV", "TAB")
+        for frmt in _FORMATS_BACKTICKS:
+            comment = ("Test Case %d : Testing import with %s format and "
+                       "NAMES display (using backticks)" % (test_num, frmt))
+            self.run_import_test(1, from_conn, to_conn, '`db``:db`',
+                                 frmt, "BOTH", comment, " --display=NAMES")
+            self.drop_db(self.server2, '`db``:db`')
+            test_num += 1
+
         if os.name != "posix":
             self.replace_result("# Importing definitions and data from "
                                 "std_data\\bad_object.csv",
@@ -186,7 +195,8 @@ class test(import_basic.test):
                                 "std_data\\bad_sql.sql",
                                 "# Importing definitions from "
                                 "std_data/bad_sql.sql.\n")
-            
+
+        self.replace_substring(" (28000)", "")
         self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
 
         self.replace_substring("1045 (28000)", "1045")
