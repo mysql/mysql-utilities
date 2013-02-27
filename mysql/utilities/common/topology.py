@@ -1245,29 +1245,51 @@ class Topology(Replication):
             slave = slave_dict['instance']
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
-                self._report(msg + "WARN - cannot connect to slave",
-                             logging.WARN)
+                message = "{0}WARN - cannot connect to slave".format(msg)
+                self.report(message, logging.WARN)
             elif command == 'reset':
-                res = slave.reset()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to reset",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.reset()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to reset".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'start':
-                res = slave.start()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to start",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.start()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to start".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'stop':
-                res = slave.stop()
-                if res is None or res != () and not quiet:
-                    self._report(msg + "WARN - slave failed to stop",
-                                 logging.WARN)
-                elif not quiet:
-                    self._report(msg + "Ok")
+                if not slave.is_configured_for_master(self.master) and \
+                   not quiet:
+                    message = ("{0}WARN - slave is not configured with this "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                elif not slave.is_connected() and not quiet:
+                    message = ("{0}WARN - slave is not connected to "
+                               "master").format(msg)
+                    self._report(message, logging.WARN)
+                else:
+                    res = slave.stop()
+                    if res is None or res != () and not quiet:
+                        message = "{0}WARN - slave failed to stop".format(msg)
+                        self._report(message, logging.WARN)
+                    elif not quiet:
+                        self._report("{0}Ok".format(msg))
 
 
     def connect_candidate(self, candidate, master=True):

@@ -86,6 +86,8 @@ Available Commands:
   Note: elect, failover, gtid, and health require --master and either
         --slaves or --discover-slave-login
 
+  Note: start, stop and reset require --master and --slaves
+
 Test case 2 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
 # Checking privileges.
