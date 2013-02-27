@@ -877,7 +877,7 @@ class Master(Server):
             slave_conn.connect()
             # Skip discovered slaves that are not configured
             # to connect to the master
-            if slave_conn.is_configured_for_master(self):
+            if slave_conn.is_configured_for_master(self, verify_state=False):
                 is_configured = True
         except Exception, e:
             print "Error connecting to a slave as %s@%s: %s" % \
@@ -1315,6 +1315,16 @@ class Slave(Server):
             return False
         return res[0][10].upper() == "YES"
 
+    def get_rpl_master_user(self):
+        """Get the rpl master user from the slave status
+
+        Returns the slave_master_user as string or False if there is
+        no slave status.
+        """
+        res = self.get_status()
+        if not res:
+            return False
+        return res[0][_SLAVE_MASTER_USER]
 
     def get_state(self):
         """Get the slave's connection state
@@ -1490,8 +1500,16 @@ class Slave(Server):
         options[in]    query options
         """
         return self.exec_query("RESET SLAVE", options)
+
+
+    def reset_all(self, options={}):
+        """Reset all information on this slave.
         
-        
+        options[in]    query options
+        """
+        return self.exec_query("RESET SLAVE ALL", options)
+
+
     def num_gtid_behind(self, master_gtids):
         """Get the number of transactions the slave is behind the master.
         
@@ -1632,7 +1650,7 @@ class Slave(Server):
         return change_master
 
 
-    def is_configured_for_master(self, master):
+    def is_configured_for_master(self, master, verify_state=False):
         """Check that slave is connected to the master at host, port.
 
         master[in]     instance of the master
@@ -1640,11 +1658,17 @@ class Slave(Server):
         Returns bool - True = is connected
         """
         res = self.get_status()
-        if res == [] or res[0] == []:
+        if res == [] or not res[0]:
             return False
         res = res[0]
         m_host, m_port = self.get_master_host_port()
-        if not master.is_alias(m_host) or int(m_port) != int(master.port):
+        # Suppose the state is True for "Waiting for master to send event"
+        # so we can ignore it if verify_state is not given as True.  
+        state = True
+        if verify_state:
+            state = self.get_state() == "Waiting for master to send event"
+        if (not master.is_alias(m_host) or int(m_port) != int(master.port)
+            or not state):
             return False
         return True
 

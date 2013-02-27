@@ -1,0 +1,272 @@
+Test case 1 - mysqlrplshow OLD Master before demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT3
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT2 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+Test case 2 - mysqlrplshow not yet NEW Master Before switchover demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 3 - demote-master switchover -vvv using actual rpl user
+# Discovering slaves for master at XXXXXXXXX:PORT1
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
+# Checking candidate slave prerequisites.
+# GTID_MODE=ON is set for all servers.
+# Checking eligibility of slave XXXXXXXXX:PORT2 for candidate.
+#   Slave connected to master ... Ok
+#   GTID_MODE=ON ... Ok
+#   Logging filters agree ... Ok
+#   Replication user exists ... Ok
+# When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
+# Creating replication user if it does not exist.
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Waiting for slaves to catch up to old master.
+# Slave XXXXXXXXX:PORT2:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave XXXXXXXXX:PORT2 Ok
+#   Executing stop on slave XXXXXXXXX:PORT3 Ok
+#   Executing stop on slave XXXXXXXXX:PORT4 Ok
+# UNLOCK STRING: UNLOCK TABLES
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Executing CHANGE MASTER on XXXXXXXXX:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on XXXXXXXXX:PORT4.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on XXXXXXXXX:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave XXXXXXXXX:PORT3 Ok
+#   Executing start on slave XXXXXXXXX:PORT4 Ok
+#   Executing start on slave XXXXXXXXX:PORT1 Ok
+# Checking slaves for errors.
+# XXXXXXXXX:PORT3 status: Ok 
+# XXXXXXXXX:PORT4 status: Ok 
+# XXXXXXXXX:PORT1 status: Ok 
+# Switchover complete.
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| host       | port  | role    | state  | gtid_mode  | health  | version     | master_log_file   | master_log_pos  | IO_Thread  | SQL_Thread  | Secs_Behind  | Remaining_Delay  | IO_Error_Num  | IO_Error  | SQL_Error_Num  | SQL_Error  | Trans_Behind  |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| XXXXXXXXX  | PORT2  | MASTER  | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        |            |             |              |                  |               |           |                |            |               |
+| XXXXXXXXX  | PORT1  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
+| XXXXXXXXX  | PORT3  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
+| XXXXXXXXX  | PORT4  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+# ...done.
+
+Test case 4 - mysqlrplshow OLD Master after demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 5 - mysqlrplshow NEW Master
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT3
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+
+# Replication Topology Graph
+localhost:PORT2 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+Test case 6 - demote-master switchover -vvv Using a different rpl user and no --force
+# Discovering slaves for master at XXXXXXXXX:PORT2
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT4.
+# Checking candidate slave prerequisites.
+# GTID_MODE=ON is set for all servers.
+# Checking eligibility of slave XXXXXXXXX:PORT4 for candidate.
+#   Slave connected to master ... Ok
+#   GTID_MODE=ON ... Ok
+#   Logging filters agree ... Ok
+#   Replication user exists ... Ok
+# When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
+ERROR: The replication user specified with --rpl-user does not match the existing replication user values. Use the --force option to use the replication user specified with --rpl-user.
+# Errors found. Switchover aborted.
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| host       | port  | role    | state  | gtid_mode  | health  | version     | master_log_file   | master_log_pos  | IO_Thread  | SQL_Thread  | Secs_Behind  | Remaining_Delay  | IO_Error_Num  | IO_Error  | SQL_Error_Num  | SQL_Error  | Trans_Behind  |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| XXXXXXXXX  | PORT2  | MASTER  | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        |            |             |              |                  |               |           |                |            |               |
+| XXXXXXXXX  | PORT1  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
+| XXXXXXXXX  | PORT3  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
+| XXXXXXXXX  | PORT4  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+# ...done.
+
+Test case 7 - mysqlrplshow still OLD Master after failed switchover demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT3
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+
+# Replication Topology Graph
+localhost:PORT2 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+Test case 8 - mysqlrplshow not yet NEW Master after failed switchover demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 9 - demote-master switchover -vvv Using a different rpl user and using the --force
+# Discovering slaves for master at XXXXXXXXX:PORT2
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT4.
+# Checking candidate slave prerequisites.
+# GTID_MODE=ON is set for all servers.
+# Checking eligibility of slave XXXXXXXXX:PORT4 for candidate.
+#   Slave connected to master ... Ok
+#   GTID_MODE=ON ... Ok
+#   Replication user exists ... Ok
+# When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
+# Creating replication user if it does not exist.
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Waiting for slaves to catch up to old master.
+# Slave XXXXXXXXX:PORT1:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT1:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Slave XXXXXXXXX:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
+# Return Code = 0
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave XXXXXXXXX:PORT1 Ok
+#   Executing stop on slave XXXXXXXXX:PORT3 Ok
+#   Executing stop on slave XXXXXXXXX:PORT4 Ok
+# UNLOCK STRING: UNLOCK TABLES
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Executing CHANGE MASTER on XXXXXXXXX:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpluser', MASTER_PASSWORD = 'hispassword', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on XXXXXXXXX:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpluser', MASTER_PASSWORD = 'hispassword', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on XXXXXXXXX:PORT2.
+# CHANGE MASTER TO MASTER_HOST = 'XXXXXXXXX', MASTER_USER = 'rpluser', MASTER_PASSWORD = 'hispassword', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave XXXXXXXXX:PORT1 Ok
+#   Executing start on slave XXXXXXXXX:PORT3 Ok
+#   Executing start on slave XXXXXXXXX:PORT2 Ok
+# Checking slaves for errors.
+# XXXXXXXXX:PORT1 status: Ok 
+# XXXXXXXXX:PORT3 status: Ok 
+# XXXXXXXXX:PORT2 status: Ok 
+# Switchover complete.
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+# Attempting to contact XXXXXXXXX ... Success
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| host       | port  | role    | state  | gtid_mode  | health  | version     | master_log_file   | master_log_pos  | IO_Thread  | SQL_Thread  | Secs_Behind  | Remaining_Delay  | IO_Error_Num  | IO_Error  | SQL_Error_Num  | SQL_Error  | Trans_Behind  |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+| XXXXXXXXX  | PORT4  | MASTER  | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        |            |             |              |                  |               |           |                |            |               |
+| XXXXXXXXX  | PORT2  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        |            |             |              |                  |               |           |                |            |               |
+| XXXXXXXXX  | PORT1  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
+| XXXXXXXXX  | PORT3  | SLAVE   | UP     | ON         | OK      | XXXXXXXX    | XXXXXXXX          | XXXXXXXX        | Yes        | Yes         | 0            | No               | 0             |           | 0              |            | 0             |
++------------+-------+---------+--------+------------+---------+-------------+-------------------+-----------------+------------+-------------+--------------+------------------+---------------+-----------+----------------+------------+---------------+
+# ...done.
+
+Test case 10 - mysqlrplshow OLD Master after demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 11 - mysqlrplshow NEW Master after demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT3
+
+# Replication Topology Graph
+localhost:PORT4 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT2 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+
