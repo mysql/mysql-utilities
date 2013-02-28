@@ -1271,26 +1271,24 @@ class Topology(Replication):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                else:
-                    res = slave.reset()
-                    if res is None or res != () and not quiet:
-                        message = "{0}WARN - slave failed to reset".format(msg)
-                        self._report(message, logging.WARN)
-                    elif not quiet:
-                        self._report("{0}Ok".format(msg))
+                res = slave.reset()
+                if res is None or res != () and not quiet:
+                    message = "{0}WARN - slave failed to reset".format(msg)
+                    self._report(message, logging.WARN)
+                elif not quiet:
+                    self._report("{0}Ok".format(msg))
             elif command == 'start':
                 if not slave.is_configured_for_master(self.master) and \
                    not quiet:
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                else:
-                    res = slave.start()
-                    if res is None or res != () and not quiet:
-                        message = "{0}WARN - slave failed to start".format(msg)
-                        self._report(message, logging.WARN)
-                    elif not quiet:
-                        self._report("{0}Ok".format(msg))
+                res = slave.start()
+                if res is None or res != () and not quiet:
+                    message = "{0}WARN - slave failed to start".format(msg)
+                    self._report(message, logging.WARN)
+                elif not quiet:
+                    self._report("{0}Ok".format(msg))
             elif command == 'stop':
                 if not slave.is_configured_for_master(self.master) and \
                    not quiet:
@@ -1301,13 +1299,12 @@ class Topology(Replication):
                     message = ("{0}WARN - slave is not connected to "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                else:
-                    res = slave.stop()
-                    if res is None or res != () and not quiet:
-                        message = "{0}WARN - slave failed to stop".format(msg)
-                        self._report(message, logging.WARN)
-                    elif not quiet:
-                        self._report("{0}Ok".format(msg))
+                res = slave.stop()
+                if res is None or res != () and not quiet:
+                    message = "{0}WARN - slave failed to stop".format(msg)
+                    self._report(message, logging.WARN)
+                elif not quiet:
+                    self._report("{0}Ok".format(msg))
 
 
     def connect_candidate(self, candidate, master=True):

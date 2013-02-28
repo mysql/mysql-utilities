@@ -81,9 +81,9 @@ class test(mutlib.System_test):
         cmd_opt = ' -e "set SERVER=%s;show variables;' % \
                   self.build_connection_string(self.server0)
         if os.name == 'posix':
-            cmd_opt += 'mysqlmetagrep -e NOTTHERE% --server=\$SERVER"'
+            cmd_opt += 'mysqldiff --server1=\$SERVER"'
         else:
-            cmd_opt += 'mysqlmetagrep -e NOTTHERE% --server=$SERVER"'
+            cmd_opt += 'mysqldiff --server1=$SERVER"'
         self.do_test(test_num, "Replacement", cmd_str % cmd_opt)
         test_num += 1
         
