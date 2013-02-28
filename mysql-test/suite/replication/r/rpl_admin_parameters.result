@@ -112,8 +112,9 @@ WARNING: The --ping option is used only with the health command.
 #   Slave connected to master ... Ok
 #   Slave not behind master ... Ok
 #   Logging filters agree ... Ok
-#   Replication user exists ... Ok
 #   Binary logging turned on ... Ok
+#   Replication user exists ... Ok
+# When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
 # Creating replication user if it does not exist.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK

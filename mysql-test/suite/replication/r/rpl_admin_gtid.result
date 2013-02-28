@@ -304,8 +304,11 @@ Test case 14 - run command reset
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT4 Ok
 # Performing RESET on all slaves.
 #   Executing reset on slave localhost:PORT2 Ok
 #   Executing reset on slave localhost:PORT3 Ok

@@ -1507,6 +1507,11 @@ class Slave(Server):
         
         options[in]    query options
         """
+        # Must be sure to do stop first
+        self.stop()
+        # RESET SLAVE ALL was implemented in version 5.5.16 and later     
+        if not self.check_version_compat(5, 5, 16):
+            return self.reset()
         return self.exec_query("RESET SLAVE ALL", options)
 
 

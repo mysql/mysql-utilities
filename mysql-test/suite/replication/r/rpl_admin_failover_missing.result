@@ -74,8 +74,11 @@ Test case 1 - failover to localhost:PORT2 with relay log entries
 # Creating replication user if it does not exist.
 # Stopping slaves.
 # Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave localhost:PORT5 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT5 Ok
 # Switching slaves to new master.
 # Change master command for localhost:PORT3
@@ -147,7 +150,9 @@ Test case 2 - failover to localhost:PORT3 with skipping slaves
 # Creating replication user if it does not exist.
 # Stopping slaves.
 # Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave localhost:PORT5 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT5 Ok
 # Switching slaves to new master.
 # Change master command for localhost:PORT4
