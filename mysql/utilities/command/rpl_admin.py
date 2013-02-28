@@ -641,14 +641,14 @@ class RplCommands(object):
                                      "Failover initiated", logging.WARN)
                         failover = True
             else:
-                # Check the master. If not alive, wait for timeout seconds
+                # Check the master. If not alive, wait for pingtime seconds
                 # and try again.
                 if self.topology.master is not None and \
                    not self.topology.master.is_alive():
                     msg = "Master may be down. Waiting for %s seconds." % \
-                          timeout
+                          pingtime
                     self._report(msg, logging.INFO, False)
-                    time.sleep(timeout)
+                    time.sleep(pingtime)
                     try:
                         self.topology.master.connect()
                     except:
