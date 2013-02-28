@@ -205,7 +205,9 @@ Option                     Description
                            annotated and marked as comments.      
 
 Test Case 7: Replacement
-ERROR: Nothing matches 'NOTTHERE%' in any database, trigger, user, routine, column, table, partition, event, or view
+Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff.py: error: No objects specified to compare.
 
 
 
