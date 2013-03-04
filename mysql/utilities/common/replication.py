@@ -616,12 +616,12 @@ class Replication(object):
                     if self.master_log_pos >= 0:
                         msg += " using position %s" % self.master_log_pos
                     msg += "..."
-                    print msg 
+                    print msg
             else:
                 print "# Starting slave from the beginning..."
         res = self.slave.start(self.query_options)
 
-        # Add commit because C/Py are auto_commit=0 by default        
+        # Add commit because C/Py are auto_commit=0 by default
         self.slave.exec_query("COMMIT")
 
         # Check slave status
@@ -669,17 +669,17 @@ class Replication(object):
 
         return result
 
-        
+
     def test(self, db, num_tries):
         """Test the replication setup.
 
         Requires a database name which is created on the master then
         verified it appears on the slave.
-        
+
         db[in]             Name of a database to use in test
         num_tries[in]      Number of attempts to wait for slave synch
         """
-        
+
         if not self.replicating:
             print "ERROR: Replication is not running among master and slave."
         print "# Testing replication setup..."
@@ -1474,7 +1474,7 @@ class Slave(Server):
 
     def start(self, options={}):
         """Start the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("START SLAVE", options)
@@ -1488,15 +1488,15 @@ class Slave(Server):
 
     def stop(self, options={}):
         """Stop the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("STOP SLAVE", options)
-        
-        
+
+
     def reset(self, options={}):
         """Reset the slave
-        
+
         options[in]    query options
         """
         return self.exec_query("RESET SLAVE", options)
@@ -1504,12 +1504,12 @@ class Slave(Server):
 
     def reset_all(self, options={}):
         """Reset all information on this slave.
-        
+
         options[in]    query options
         """
         # Must be sure to do stop first
         self.stop()
-        # RESET SLAVE ALL was implemented in version 5.5.16 and later     
+        # RESET SLAVE ALL was implemented in version 5.5.16 and later
         if not self.check_version_compat(5, 5, 16):
             return self.reset()
         return self.exec_query("RESET SLAVE ALL", options)
@@ -1517,9 +1517,9 @@ class Slave(Server):
 
     def num_gtid_behind(self, master_gtids):
         """Get the number of transactions the slave is behind the master.
-        
+
         master_gtids[in]  the master's GTID_EXECUTED list
-        
+
         Returns int - number of trans behind master
         """
         slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
@@ -1538,7 +1538,7 @@ class Slave(Server):
 
         binlog_file[in]  master's binlog file
         binlog_pos[in]   master's binlog file position
-        timeout[in]     maximum number of seconds to wait for event to occur
+        timeout[in]      maximum number of seconds to wait for event to occur
 
         Returns bool - True = slave has read to the file and pos,
                        False = slave is behind.
@@ -1547,7 +1547,7 @@ class Slave(Server):
         _MASTER_POS_WAIT = "SELECT MASTER_POS_WAIT('%s', %s, %s)"
         res = self.exec_query(_MASTER_POS_WAIT % (binlog_file,
                                                   binlog_pos, timeout))
-        if res is None or (res[0][0] is not None and int(res[0][0]) != 0):
+        if res is None or (res[0][0] is not None and int(res[0][0]) < 0):
             return False
         return True
 
@@ -1668,7 +1668,7 @@ class Slave(Server):
         res = res[0]
         m_host, m_port = self.get_master_host_port()
         # Suppose the state is True for "Waiting for master to send event"
-        # so we can ignore it if verify_state is not given as True.  
+        # so we can ignore it if verify_state is not given as True.
         state = True
         if verify_state:
             state = self.get_state() == "Waiting for master to send event"
