@@ -1509,7 +1509,7 @@ class Slave(Server):
         """
         # Must be sure to do stop first
         self.stop()
-        # RESET SLAVE ALL was implemented in version 5.5.16 and later     
+        # RESET SLAVE ALL was implemented in version 5.5.16 and later
         if not self.check_version_compat(5, 5, 16):
             return self.reset()
         return self.exec_query("RESET SLAVE ALL", options)
@@ -1538,7 +1538,7 @@ class Slave(Server):
 
         binlog_file[in]  master's binlog file
         binlog_pos[in]   master's binlog file position
-        timeout[in]     maximum number of seconds to wait for event to occur
+        timeout[in]      maximum number of seconds to wait for event to occur
 
         Returns bool - True = slave has read to the file and pos,
                        False = slave is behind.
@@ -1547,7 +1547,7 @@ class Slave(Server):
         _MASTER_POS_WAIT = "SELECT MASTER_POS_WAIT('%s', %s, %s)"
         res = self.exec_query(_MASTER_POS_WAIT % (binlog_file,
                                                   binlog_pos, timeout))
-        if res is None or (res[0][0] is not None and int(res[0][0]) != 0):
+        if res is None or (res[0][0] is not None and int(res[0][0]) < 0):
             return False
         return True
 
