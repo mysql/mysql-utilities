@@ -122,6 +122,16 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        for command in ('start', 'stop', 'reset'):
+            comment = ("Test case {0} - {1} without --master and "
+                       "--slaves").format(test_num, command.capitalize())
+            cmd_str = ("{0} {1} --discover-slaves-login="
+                       "root:root").format(base_cmd, command)
+            res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
+            test_num += 1
+
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 

@@ -65,3 +65,15 @@ Test case 16 - Master listed as a candiate - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
+Test case 17 - Start without --master and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
+Test case 18 - Stop without --master and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
+Test case 19 - Reset without --master and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
