@@ -58,7 +58,9 @@ Options:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>]. Valid only with
                         switchover command.
-  --force               ignore prerequsite check results and execute action
+  --force               ignore prerequisite check results or some
+                        inconsistencies found (e.g. errant transactions on
+                        slaves) and execute action
   -f FORMAT, --format=FORMAT
                         display the output in either grid (default), tab, csv,
                         or vertical format

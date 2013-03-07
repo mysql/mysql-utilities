@@ -61,8 +61,6 @@ class test(rpl_admin.test):
             ("Invalid command.", 2, "NOTACOMMAND"),
             ("Switchover but no --master, --new-master,", 2, "switchover"),
             ("No slaves or discover-slaves-login", 2, "switchover", master_str),
-            ("Force used with failover", 2, "failover", "--force", master_str,
-             slaves_str),
             ("Bad --new-master connection string", 2, "switchover", master_str,
              slaves_str, "--new-master=whatmeworry?"),
             ("Bad --master connection string", 1, "switchover", slaves_str,

@@ -18,25 +18,21 @@ Test case 5 - No slaves or discover-slaves-login
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
-Test case 6 - Force used with failover
-Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
-
-mysqlrpladmin.py: error: You cannot use the --force option with failover.
-Test case 7 - Bad --new-master connection string
+Test case 6 - Bad --new-master connection string
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: New master connection values invalid
-Test case 8 - Bad --master connection string
+Test case 7 - Bad --master connection string
 ERROR: Master connection values invalid or cannot be parsed
-Test case 9 - Bad --slaves connection string
+Test case 8 - Bad --slaves connection string
 ERROR: Slave connection values invalid or cannot be parsed
-Test case 10 - Bad --candidates connection string
+Test case 9 - Bad --candidates connection string
 ERROR: Candidate connection values invalid or cannot be parsed
-Test case 11 - Not enough privileges - health joe
+Test case 10 - Not enough privileges - health joe
 # Checking privileges.
 User joe on localhost does not have sufficient privileges to execute the health command.
 ERROR: Not enough privileges to execute command.
-Test case 12 - Not enough privileges - health jane
+Test case 11 - Not enough privileges - health jane
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -49,31 +45,31 @@ Test case 12 - Not enough privileges - health jane
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 13 - Not enough privileges - switchover jane
+Test case 12 - Not enough privileges - switchover jane
 # Checking privileges.
 User jane on localhost does not have sufficient privileges to execute the switchover command.
 ERROR: Not enough privileges to execute command.
-Test case 14 - Master listed as a slave - literal
+Test case 13 - Master listed as a slave - literal
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 15 - Master listed as a slave - alias
+Test case 14 - Master listed as a slave - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 16 - Master listed as a candiate - alias
+Test case 15 - Master listed as a candiate - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
-Test case 17 - Start without --master and --slaves
+Test case 16 - Start without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
-Test case 18 - Stop without --master and --slaves
+Test case 17 - Stop without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
-Test case 19 - Reset without --master and --slaves
+Test case 18 - Reset without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.

@@ -18,33 +18,9 @@ Test case 1 - test failover scripts
 # Candidate slave localhost:PORT4 will become the new master.
 # Preparing candidate for failover.
 # Reading events in relay log for slave localhost:PORT2
-# Missing transactions found on localhost:PORT2. SELECT gtid_subset() = 0
-# LOCK STRING: FLUSH TABLES WITH READ LOCK
-# Connecting candidate to localhost:PORT2 as a temporary slave to retrieve unprocessed GTIDs.
-# Change master command for localhost:PORT4
-# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
-# UNLOCK STRING: UNLOCK TABLES
-# Waiting for candidate to catch up to slave localhost:PORT2.
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
+# No missing transactions found on localhost:PORT2. Skipping connection of candidate as slave.
 # Reading events in relay log for slave localhost:PORT3
-# Missing transactions found on localhost:PORT3. SELECT gtid_subset() = 0
-# LOCK STRING: FLUSH TABLES WITH READ LOCK
-# Connecting candidate to localhost:PORT3 as a temporary slave to retrieve unprocessed GTIDs.
-# Change master command for localhost:PORT4
-# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT3, MASTER_AUTO_POSITION=1
-# UNLOCK STRING: UNLOCK TABLES
-# Waiting for candidate to catch up to slave localhost:PORT3.
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Reading events in relay log for slave localhost:PORT4
 # Creating replication user if it does not exist.
 # Spawning external script.

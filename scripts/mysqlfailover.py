@@ -118,7 +118,7 @@ parser.add_option("--exec-fail-check", action="store", dest="exec_fail",
                       "execute on each interval to invoke failover")
 
 # Add force to override registry entry
-parser.add_option("--force", action="store_true", dest="force",
+parser.add_option("--force", action="store_true", dest="force", default=False,
                   help="override the registration check on master for "
                   "multiple instances of the console monitoring the same "
                   "master.")
@@ -134,6 +134,11 @@ parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
 parser.add_option("--rediscover", action="store_true", dest="rediscover",
                   help="Rediscover slaves on interval. Allows console to "
                   "detect when slaves have been removed or added.")
+
+# Pedantic mode for failing if some inconsistencies are found
+parser.add_option("-p", "--pedantic", action="store_true", default=False,
+                  dest="pedantic", help="fail if some inconsistencies are "
+                  "found (e.g. errant transactions on slaves).")
 
 # Add verbosity mode
 add_verbosity(parser, False)
@@ -205,6 +210,7 @@ options = {
     'post_fail'     : opt.exec_post_fail,
     'rpl_user'      : opt.rpl_user,
     'rediscover'    : opt.rediscover,
+    'pedantic'      : opt.pedantic
 }
 
 # Purge log file of old data

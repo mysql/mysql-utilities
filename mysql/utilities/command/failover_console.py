@@ -172,7 +172,10 @@ class FailoverConsole(object):
         self.comment = _HEALTH_LIST
         self.scroll_on = False
         self.old_mode = None
-        
+
+        # Dictionary that holds the current warning messages
+        self.warnings_dic = {}
+
         # Callback methods for reading data
         self.master = master
         self.get_health_data = get_health_data
@@ -496,8 +499,35 @@ class FailoverConsole(object):
             print
         print
         self.rows_printed += 7
-    
-    
+
+    def _print_warnings(self):
+        """Print current warning messages
+
+        This method displays current warning messages if they exist.
+        """
+        # Only do something if warnings exist.
+        if self.warnings_dic:
+            for msg in self.warnings_dic.itervalues():
+                print("WARNING: {0}".format(msg))
+                self.rows_printed += 1
+
+    def add_warning(self, warning_key, warning_msg):
+        """Add a warning message to the current dictionary of warnings.
+
+        warning_key[in]    key associated with the warning message to add.
+        warning_msg[in]    warning message to add to the current dictionary of
+                           warnings.
+        """
+        self.warnings_dic[warning_key] = warning_msg
+
+    def del_warning(self, warning_key):
+        """Remove a warning message from the current dictionary of warnings.
+
+        warning_key[in]    key associated with the warning message to remove.
+        """
+        if warning_key in self.warnings_dic:
+            del self.warnings_dic[warning_key]
+
     def _scroll(self, key):
         """Scroll the list view
         
@@ -613,6 +643,7 @@ class FailoverConsole(object):
         self._reset_screen_size()
         self._print_header()
         self._print_master_status()
+        self._print_warnings()
         # refresh health if already displayed
         if self.report_mode == 'H':
             self.list_data = self._format_health_data()

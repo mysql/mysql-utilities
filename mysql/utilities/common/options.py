@@ -651,6 +651,8 @@ def hostname_is_ip(hostname):
 
     Return bool - True = is IP address
     """
+    if not hostname:
+        return False
     if len(hostname.split(":")) <= 3:  # if fewer colons, must be IPv4
         grp = _CONN_IPv4_NUM_ONLY.match(hostname)
     else:

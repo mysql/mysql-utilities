@@ -30,6 +30,7 @@ _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin --skip-slave-start',
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 _GRANT_QUERY = "GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'"
+_SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
 
 
 class test(rpl_admin.test):
@@ -59,6 +60,10 @@ class test(rpl_admin.test):
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master([self.server1, self.server2, self.server3,
+                           self.server4, self.server5])
 
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
@@ -121,10 +126,18 @@ class test(rpl_admin.test):
 
         test_num = 1
 
+        self.server2.exec_query(_SET_SQL_LOG_BIN.format('0'))
         self.server2.exec_query(_GRANT_QUERY)
+        self.server2.exec_query(_SET_SQL_LOG_BIN.format('1'))
+        self.server3.exec_query(_SET_SQL_LOG_BIN.format('0'))
         self.server3.exec_query(_GRANT_QUERY)
+        self.server3.exec_query(_SET_SQL_LOG_BIN.format('1'))
+        self.server4.exec_query(_SET_SQL_LOG_BIN.format('0'))
         self.server4.exec_query(_GRANT_QUERY)
+        self.server4.exec_query(_SET_SQL_LOG_BIN.format('1'))
+        self.server5.exec_query(_SET_SQL_LOG_BIN.format('0'))
         self.server5.exec_query(_GRANT_QUERY)
+        self.server5.exec_query(_SET_SQL_LOG_BIN.format('1'))
 
         # create a database then add data shutting down slaves to create
         # a scenario where the candidate slave has fewer transactions than

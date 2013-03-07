@@ -71,7 +71,7 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.res_fname = "result.txt"
-        
+
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         self.server1 = self.spawn_server("rep_master")
@@ -79,14 +79,19 @@ class test(mutlib.System_test):
         self.server3 = self.spawn_server("rep_slave2")
         self.server4 = self.spawn_server("rep_slave3")
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master()
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
-        
+
         for slave in [self.server2, self.server3, self.server4]:
+            slave.exec_query("SET SQL_LOG_BIN= 0")
             slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
                               "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+            slave.exec_query("SET SQL_LOG_BIN= 1")
 
         # Form replication topology - 1 master, 3 slaves
         return self.reset_topology()
@@ -186,7 +191,21 @@ class test(mutlib.System_test):
         self.replace_substring(str(self.s1_port), "PORT2")
         self.replace_substring(str(self.s2_port), "PORT3")
         self.replace_substring(str(self.s3_port), "PORT4")
-        
+
+    def reset_master(self, servers_list=[]):
+        # Clear binary log and GTID_EXECUTED of given servers
+        if servers_list:
+            servers = servers_list
+        else:
+            servers = [self.server1, self.server2, self.server3, self.server4]
+        for srv in servers:
+            try:
+                srv.exec_query("RESET MASTER")
+            except Exception as err:
+                raise MUTLibError("Unexpected error performing RESET MASTER "
+                                  "for server %s:%s: %s"
+                                  % (srv.host, srv.port, err))
+
     def reset_topology(self):
         # Form replication topology - 1 master, 3 slaves
         self.master_str = " --master=%s" % \

@@ -78,9 +78,11 @@ parser.add_option("--new-master", action="store", dest="new_master", default=Non
                   " or <login-path>[:<port>][:<socket>]. Valid only with "
                   "switchover command.")
 
-# Force
+# Force the execution of the command, ignoring some errors
 parser.add_option("--force", action="store_true", dest="force",
-                  help="ignore prerequsite check results and execute action")
+                  help="ignore prerequisite check results or some "
+                  "inconsistencies found (e.g. errant transactions on slaves) "
+                  "and execute action")
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
@@ -148,9 +150,6 @@ if command in ['elect', 'failover', 'start', 'stop', 'reset'] and \
     not opt.discover and not opt.slaves:
     parser.error("You must supply a list of slaves or the "
                  "--discover-slaves-login option.")
-    
-if command == 'failover' and opt.force:
-    parser.error("You cannot use the --force option with failover.")
 
 if opt.ping and not command == 'health':
     print("WARNING: The --ping option is used only with the health command.")
@@ -248,7 +247,7 @@ except IOError:
 
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
-    rpl_cmds.execute_command(command)
+    rpl_cmds.execute_command(command, options)
 except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

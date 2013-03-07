@@ -60,6 +60,10 @@ class test(rpl_admin.test):
         mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
         self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master([self.server1, self.server2, self.server3,
+                           self.server4, self.server5])
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port

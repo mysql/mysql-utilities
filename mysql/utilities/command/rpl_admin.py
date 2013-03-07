@@ -64,6 +64,8 @@ _HOST_IP_WARNING = "You may be mixing host names and IP " + \
                    "reporting if your DNS services do not support " + \
                    "reverse name lookup."
 
+_ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
+
 def get_valid_rpl_command_text():
     """Provide list of valid command descriptions to caller.
     """
@@ -289,7 +291,12 @@ class RplCommands(object):
         for slave_dict in self.topology.slaves:
             slave = slave_dict['instance']
             if slave is not None:
-                host, port = slave.get_master_host_port()
+                host_port = slave.get_master_host_port()
+                if host_port:
+                    host = host_port[0]
+                else:
+                    # Not an acting slave (use None to fail IP match)
+                    host = None
                 if uses_ip != hostname_is_ip(slave.host) or \
                    uses_ip != hostname_is_ip(host):
                     return False
@@ -364,7 +371,7 @@ class RplCommands(object):
                      (best_slave['host'], best_slave['port']))
 
 
-    def _failover(self, strict=False):
+    def _failover(self, strict=False, options={}):
         """Perform failover
 
         This method executes GTID-enabled failover. If called for a non-GTID
@@ -373,6 +380,7 @@ class RplCommands(object):
         strict[in]     if True, use only the candidate list for slave
                        election and fail if no candidates are viable.
                        Default = False
+        options[in]    options dictionary.
 
         Returns bool - True = failover succeeded, False = errors found
         """
@@ -384,6 +392,24 @@ class RplCommands(object):
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
+
+        # Check existence of errant transactions on slaves
+        errant_tnx = self.topology.find_errant_transactions()
+        if errant_tnx:
+            force = options.get('force')
+            print("# ERROR: {0}".format(_ERRANT_TNX_ERROR))
+            self._report(_ERRANT_TNX_ERROR, logging.ERROR, False)
+            for host, port, tnx_set in errant_tnx:
+                errant_msg = (" - For slave '{0}@{1}': "
+                              "{2}".format(host, port, ", ".join(tnx_set)))
+                print("# {0}".format(errant_msg))
+                self._report(errant_msg, logging.ERROR, False)
+            # Raise an exception (to stop) if tolerant mode is OFF
+            if not force:
+                raise UtilRplError("%s Note: If you want to ignore this issue,"
+                                   " although not advised, please use the "
+                                   "utility with the --force option."
+                                   % _ERRANT_TNX_ERROR)
 
         self._report("# Performing failover.")
         if not self.topology.failover(self.candidates, strict):
@@ -413,13 +439,14 @@ class RplCommands(object):
         return True
 
 
-    def execute_command(self, command):
+    def execute_command(self, command, options={}):
         """Execute a replication admin command
 
         This method executes one of the valid replication administration
         commands as described above.
 
         command[in]        command to execute
+        options[in]        options dictionary.
 
         Returns bool - True = success, raise error on failure
         """
@@ -457,7 +484,7 @@ class RplCommands(object):
         elif command == 'elect':
             self._elect_slave()
         elif command == 'failover':
-            self._failover()
+            self._failover(options=options)
         else:
             msg = "Command '%s' is not implemented." % command
             self._report(msg, logging.CRITICAL)
@@ -519,7 +546,7 @@ class RplCommands(object):
             time.sleep(1)
 
         try:
-            res = self.run_auto_failover(console, interval);
+            res = self.run_auto_failover(console, interval)
         except:
             raise
         finally:
@@ -563,6 +590,7 @@ class RplCommands(object):
         timeout = int(self.options.get("timeout", 300))
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
+        pedantic = self.options.get('pedantic', False)
 
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
@@ -603,6 +631,22 @@ class RplCommands(object):
         if exec_fail is not None and not os.path.exists(exec_fail):
             self._report(no_exec_fail_msg, logging.CRITICAL, False)
             raise UtilRplError(no_exec_fail_msg)
+
+        # Check existence of errant transactions on slaves
+        errant_tnx = self.topology.find_errant_transactions()
+        if errant_tnx:
+            print("# WARNING: {0}".format(_ERRANT_TNX_ERROR))
+            self._report(_ERRANT_TNX_ERROR, logging.WARN, False)
+            for host, port, tnx_set in errant_tnx:
+                errant_msg = (" - For slave '{0}@{1}': "
+                              "{2}".format(host, port, ", ".join(tnx_set)))
+                print("# {0}".format(errant_msg))
+                self._report(errant_msg, logging.WARN, False)
+            # Raise an exception (to stop) if pedantic mode is ON
+            if pedantic:
+                raise UtilRplError("{0} Note: If you want to ignore this "
+                                   "issue, please do not use the --pedantic "
+                                   "option.".format(_ERRANT_TNX_ERROR))
 
         self._report("Failover console started.", logging.INFO, False)
         self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
@@ -713,6 +757,40 @@ class RplCommands(object):
                 # Force refresh of health list if new slaves found
                 if self.topology.discover_slaves():
                     console.list_data = None
+
+            # Check existence of errant transactions on slaves
+            errant_tnx = self.topology.find_errant_transactions()
+            if errant_tnx:
+                if pedantic:
+                    print("# WARNING: {0}".format(_ERRANT_TNX_ERROR))
+                    self._report(_ERRANT_TNX_ERROR, logging.WARN, False)
+                    for host, port, tnx_set in errant_tnx:
+                        errant_msg = (" - For slave '{0}@{1}': "
+                                      "{2}".format(host, port,
+                                                   ", ".join(tnx_set)))
+                        print("# {0}".format(errant_msg))
+                        self._report(errant_msg, logging.WARN, False)
+
+                    # Raise an exception (to stop) if pedantic mode is ON
+                    raise UtilRplError("{0} Note: If you want to ignore this "
+                                       "issue, please do not use the "
+                                       "--pedantic "
+                                       "option.".format(_ERRANT_TNX_ERROR))
+                else:
+                    if self.logging:
+                        warn_msg = ("{0} Check log for more "
+                                    "details.".format(_ERRANT_TNX_ERROR))
+                    else:
+                        warn_msg = _ERRANT_TNX_ERROR
+                    console.add_warning('errant_tnx', warn_msg)
+                    self._report(_ERRANT_TNX_ERROR, logging.WARN, False)
+                    for host, port, tnx_set in errant_tnx:
+                        errant_msg = (" - For slave '{0}@%{1}': "
+                                      "{2}".format(host, port,
+                                                   ", ".join(tnx_set)))
+                        self._report(errant_msg, logging.WARN, False)
+            else:
+                console.del_warning('errant_tnx')
 
             res = console.display_console()
             if res is not None:    # None = normal timeout, keep going

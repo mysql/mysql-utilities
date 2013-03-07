@@ -41,6 +41,8 @@ _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
 
 _GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
+_GTID_SUBTRACT_TO_EXECUTED = ("SELECT GTID_SUBTRACT('{0}', "
+                              "@@GLOBAL.GTID_EXECUTED)")
 
 _UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
                           'SET password = PASSWORD("%s")'
@@ -901,6 +903,53 @@ class Topology(Replication):
 
         return True
 
+    def find_errant_transactions(self):
+        """Check all slaves for the existence of errant transactions.
+
+        In particular, for all slaves it search for executed transactions that
+        are not found on the other slaves (only on one slave) and not from the
+        current master.
+
+        Returns a list of tuples, each tuple containing the slave host, port
+        and set of corresponding errant transactions, i.e.:
+        [(host1, port1, set1), ..., (hostn, portn, setn)]. If no errant
+        transactions are found an empty list is returned.
+        """
+        # Get master UUID
+        master_uuid = self.master.get_uuid()
+        res = []
+
+        # Check all slaves for executed transactions not in other slaves
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            tnx_set = slave.get_executed_gtid_set()
+            slave_set = set()
+            for others_slave_dic in self.slaves:
+                if (slave_dict['host'] != others_slave_dic['host'] or
+                    slave_dict['port'] != others_slave_dic['port']):
+                    other_slave = others_slave_dic['instance']
+                    errant_res = other_slave.exec_query(
+                                    _GTID_SUBTRACT_TO_EXECUTED.format(tnx_set))
+
+                    # Only consider the transaction as errant if not from the
+                    # current master
+                    errant_set = set()
+                    for tnx in errant_res:
+                        if tnx[0] and not tnx[0].startswith(master_uuid):
+                            errant_set.update(tnx[0].split(',\n'))
+
+                    # Errant transactions exist on only one slave, therefore if
+                    # the returned set is empty the loop can be break
+                    # (no need to check the remaining slaves).
+                    if not errant_set:
+                        break
+
+                    slave_set = slave_set.union(errant_set)
+            # Store result
+            if slave_set:
+                res.append((slave_dict['host'], slave_dict['port'], slave_set))
+
+        return res
 
     def _check_all_slaves(self, new_master):
         """Check all slaves for errors.
