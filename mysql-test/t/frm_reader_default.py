@@ -61,6 +61,24 @@ class test(frm_reader_base.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        # Perform a test using the --user option for the current user
+        user = None
+        try:
+            user = os.environ['USERNAME']
+        except KeyError:
+            user = os.environ['LOGNAME']
+        finally:
+            if not user:
+                raise MUTLibError("Cannot obtain user name for test case.")
+
+        comment = "Test case %s: - User the --user option" % test_num
+        frm_file_path = os.path.join(frm_file_path, "t1.frm")
+        cmd_str = " ".join([self.cmd, frm_file_path, "--user=%s" % user])
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
         self.replace_result("# Starting the spawned server on port",
                             "# Starting the spawned server on port XXXXXXX\n")
         self.replace_result("# CREATE statement",

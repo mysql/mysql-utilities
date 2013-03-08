@@ -94,10 +94,17 @@ shown in the following examples. You will need to specify the path for each
   $ mysqlfrm --server=root:pass@localhost:3306 /mysql/data/temp1/t1.frm \\
              /mysql/data/temp2/g1.frm --port=3310
 
+  # Execute the spawned server under a different user name and read
+  # all of the .frm files in a particular folder in default mode.
+
+  $ mysqlfrm --server=root:pass@localhost:3306 /mysql/data/temp1/t1.frm \\
+             /mysql/data/temp2/g1.frm --port=3310 --user=joeuser
+
   # Read all of the .frm files in a particular folder using the diagnostic
   # mode.
 
   $ mysqlfrm --diagnostic /mysql/data/database1
+
 
 
 Helpful Hints
@@ -122,6 +129,9 @@ Helpful Hints
     output from the spawned server and repair any errors in launching the
     server. If mysqlfrm fails in the middle, you may need to manually
     shutdown the server on the port specified with --port.
+
+  - If you need to run the utility with elevated privileges, use the --user
+    option to execute the spawned server using a normal user account.
 
   - You can specify the database name to be used in the resulting CREATE
     statement by prepending the .frm file with the name of the database
@@ -181,6 +191,12 @@ parser.add_option("--server", action="store", dest="server", type="string",
                   "(optional) - if provided, the storage engine and character "
                   "set information will be validated against this server.")
 
+# Add user option
+parser.add_option("--user", action="store", dest="user", type="string",
+                  default=None, help="user account to launch spawned server. "
+                  "Required if running as root user. Used only in the "
+                  "default mode.")
+
 # Add verbosity mode
 add_verbosity(parser, True)
 
@@ -218,6 +234,10 @@ if opt.basedir:
 if opt.server and opt.basedir:
     print ("# WARNING: The --server option is not needed when the --basedir "
            "option is used.")
+
+# Warn if --diagnostic and --user
+if opt.diagnostic and opt.user:
+    print ("# WARNING: The --user option is only used for the default mode.")
 
 server = None
 if opt.server is None and opt.diagnostic:
@@ -260,6 +280,7 @@ options = {
     "quiet"        : opt.quiet,
     "server"       : server,
     "verbosity"    : opt.verbosity if opt.verbosity else 0,
+    "user"         : opt.user,
 }
 
 # Print disclaimer banner for diagnostic mode
@@ -271,10 +292,11 @@ if opt.diagnostic:
            "and the resulting statement may not be syntactically correct.")
 
 if os.name == "posix":
-    if os.getuid() == 0 and not opt.diagnostic:
-        parser.error("Running a spawned server as root is not advised. "
-                     "Rather than run with sudo or su, grant the user read "
-                     "access to the files you need to read instead.")
+    if os.getuid() == 0 and not opt.diagnostic and not opt.user:
+        parser.error("Running a spawned server as root is not advised. If "
+                     "you want to run the utility as root, please provide "
+                     "the --user option to specify a user to use to launch "
+                     "the server. Example: --user=mysql.")
 
 all_frm_files = []
 for arg in args:
@@ -305,6 +327,7 @@ for arg in args:
 
 # For each file specified, attempt to read the .frm file
 try:
+    all_frm_files.sort()
     if opt.diagnostic:
         read_frm_files_diagnostic(all_frm_files, options)
     else:
