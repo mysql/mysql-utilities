@@ -1,4 +1,4 @@
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 
 # MySQL Connector/Python is licensed under the terms of the GPLv2
 # <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most
@@ -138,7 +138,7 @@ class WiX(object):
             raise DistutilsError("%s exited with return code %d" % (
                                  cmdname, prc.returncode))
 
-    def compile(self, wxs=None, out=None, parameters=None):
+    def compile(self, wxs=None, out=None, parameters=None, ui=False):
         wxs = wxs or self._wxs
         log.info("WiX: Compiling %s" % wxs)
         out = out or self._out
@@ -158,23 +158,35 @@ class WiX(object):
         for parameter, value in params.items():
             cmdargs.append('-d%s="%s"' % (parameter, value))
 
+        if ui:
+            cmdargs.append(r'-ext WixUIExtension')
+        cmdargs.append(r'-ext WixUtilExtension')
+
         self._run_tool('candle.exe', cmdargs)
 
-    def link(self, wixobj=None, base_path=None):
+    def link(self, wixobj=None, base_path=None, ui=False, wxlloc=None):
         wixobj = wixobj or self._out
         base_path = base_path or self._base_path
         msi_out = self._msi_out or wixobj.replace('.wixobj','.msi')
         log.info("WiX: Linking %s" % wixobj)
 
-        # light.exe -b option does not seem to work, we change to buld dir
+        # light.exe -b option does not seem to work, we change to build dir
         cwd = os.getcwd()
+        wxlfile = os.path.join(cwd, 'support', 'MSWindows', 'WixUI_en-us.wxl')
         os.chdir(base_path)
         cmdargs = [
+            r'-loc {0}'.format(wxlfile),
+            r'-cultures:en-us',
             r'-nologo',
             r'-sw1076',
-            r'-out %s' % msi_out,
-            wixobj,
+            r'-out {0}'.format(msi_out),
         ]
+
+        if ui:
+            cmdargs.append(r'-ext WixUIExtension')
+        cmdargs.append(r'-ext WixUtilExtension')
+
+        cmdargs.append(wixobj)
 
         self._run_tool('light.exe', cmdargs)
         os.chdir(cwd)

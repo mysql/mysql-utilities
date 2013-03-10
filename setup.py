@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
@@ -15,26 +15,46 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+"""Setup script for MySQL Utilities"""
+from __future__ import absolute_import
 
-# Keep the imports sorted (alphabetically) in each group. Makes
-# merging easier.
-
-import distutils.core
 import os
+import re
+from glob import glob
 import sys
 
-# Setup function to use
+import distutils.core
 from distutils.core import setup
-
 from distutils.command.build_scripts import build_scripts as _build_scripts
 from distutils.command.install import install as _install
-from distutils.command.install_scripts import install_scripts as _install_scripts
+from distutils.command.install_scripts import \
+    install_scripts as _install_scripts
+from distutils.util import change_root
+from distutils.file_util import write_file
+from distutils import log, dir_util
+
 from info import META_INFO, INSTALL
+
+# Check required Python version
+if sys.version_info[0:2] not in [(2, 6), (2, 7)]:
+    log.error("MySQL Utilities requires Python v2.6 or v2.7")
+    sys.exit(1)
 
 COMMANDS = {
     'cmdclass': {
         },
     }
+
+# Custom bdist_rpm DistUtils command
+try:
+    from support.dist_rpm import BuiltDistRPM, SourceRPM
+except ImportError:
+    pass # Use default when not available
+else:
+    COMMANDS['cmdclass'].update({
+        'bdist_rpm': BuiltDistRPM,
+        'sdist_rpm': SourceRPM,
+    })
 
 ARGS = {
 }
@@ -53,103 +73,9 @@ prepend_path () (
 PATH=`prepend_path %s`
 '''
 
-class install_scripts(_install_scripts):
-    description = (_install_scripts.description
-                   + " and add path to /etc/profile.d")
 
-    user_options = _install_scripts.user_options + [
-        ("skip-profile", None, "Skip installing a profile script"),
-        ]
-
-    boolean_options = _install_scripts.boolean_options + ['skip-profile']
-
-    profile_file = "/etc/profile.d/mysql-utilities.sh"
-
-    def initialize_options(self):
-        _install_scripts.initialize_options(self)
-        self.skip_profile = None
-
-    def finalize_options(self):
-        _install_scripts.finalize_options(self)
-        self.set_undefined_options('install',
-                                   ('skip_profile', 'skip_profile'))
-
-    def run(self):
-        from distutils import log, dir_util
-        # We should probably use distutils.dist.execute here to allow
-        # --dry-run to work properly.
-        if not self.skip_profile:
-            if os.path.exists(os.path.dirname(self.profile_file)):
-                outfile = self.profile_file
-                if os.path.isdir(outfile) and not os.path.islink(outfile):
-                    dir_util.remove_tree(outfile)
-                elif os.path.exists(outfile):
-                    log.info("Removing %s", outfile)
-                    os.unlink(outfile)
-                script = PROFILE_SCRIPT % (self.install_dir,)
-                log.info("Writing %s", outfile)
-                open(outfile, "w+").write(script)
-            else:
-                log.info("Not adding %s%s", self.profile_file,
-                         " (skipped)" if self.skip_profile else "")
-        _install_scripts.run(self)
-
-    def get_outputs(self):
-        outputs = _install_scripts.get_outputs(self)
-        if not self.skip_profile:
-            outputs.append(self.profile_file)
-        return outputs
-
-class install_man(distutils.core.Command):
-    description = "install (Unix) manual pages"
-
-    user_options = [
-        ('install-base=', None, "base installation directory"),
-        ('force', 'f', 'force installation (overwrite existing files)'),
-        ('build-dir=', 'b', 'Build directory'),
-        ('skip-build', None, "skip the build steps"),
-    ]
-
-    boolean_options = ['force']
-
-    def initialize_options(self):
-        self.install_base = None
-        self.build_dir = None
-        self.force = None
-        self.skip_build = None
-
-    def finalize_options(self):
-        self.set_undefined_options('install',
-                                   ('install_data', 'install_base'),
-                                   ('force', 'force'),
-                                   )
-        self.set_undefined_options('build_sphinx',
-                                   ('build_dir', 'build_dir'),
-                                   )
-        self.target_dir = os.path.join(self.install_base, 'man')
-        self.source_dir = os.path.join(self.build_dir, 'man')
-
-    def run(self):
-        from glob import glob
-        from distutils import log
-
-        outfiles = []
-        man_files = glob(os.path.join(self.source_dir, '*.[12345678]'))
-        for man_file in man_files:
-            man_dir = 'man' + os.path.splitext(man_file)[1][1:]
-            man_page = os.path.basename(man_file)
-            self.mkpath(man_dir)
-            man_install = os.path.join(self.target_dir, man_dir, man_page)
-            self.copy_file(man_file, man_install)
-            outfiles.append(man_install)
-        self.outfiles = outfiles
-
-    def get_outputs(self):
-        return self.outfiles or []
-
-# See if we have Sphinx installed, otherwise, just ignore building
-# documentation.
 class install(_install):
+    """Install MySQL Utilities"""
     user_options = _install.user_options + [
         ("skip-profile", None, "Skip installing a profile script"),
         ]
@@ -157,35 +83,163 @@ class install(_install):
     boolean_options = _install.boolean_options + ['skip-profile']
 
     def initialize_options(self):
+        """Initialize options"""
         _install.initialize_options(self)
         self.skip_profile = False
 
     def finalize_options(self):
+        """Finalize options"""
         _install.finalize_options(self)
 
-COMMANDS['cmdclass'].update({
-        'install': install,
-        })
+    def run(self):
+        _install.run(self)
 
-try:
-    import sphinx.setup_command
 
-    # Add install_man command if we have Sphinx
-    install.sub_commands = _install.sub_commands + [
-        ('install_man', lambda self: True),
+class install_man(distutils.core.Command):
+    description = "Install Unix manual pages"
+
+    user_options = [
+        ('prefix=', None, 'installation prefix (default /usr/share/man)'),
+        ('root=', None,
+         "install everything relative to this alternate root directory"),
+        ('record=', None,
+         "filename in which to record list of installed files"),
+    ]
+
+    def initialize_options(self):
+        """Initialize options"""
+        self.root = None
+        self.prefix = None
+        self.record = None
+
+    def finalize_options(self):
+        """Finalize options"""
+        self.set_undefined_options('install',
+                                   ('root', 'root'),
+                                   ('record', 'record')
+                                   )
+        if not self.prefix:
+            self.prefix = '/usr/share/man'
+
+        if self.root:
+            self.prefix = change_root(self.root, self.prefix)
+
+    def run(self):
+        """Run the command"""
+        srcdir = os.path.join('docs', 'man')
+        manpages = os.listdir(srcdir)
+        self._outfiles = []
+        for man in manpages:
+            src_man = os.path.join(srcdir, man)
+            section = os.path.splitext(man)[1][1:]
+            dest_dir = os.path.join(self.prefix, 'man' + section)
+            self.mkpath(dest_dir) # Could be different section
+            dest_man = os.path.join(dest_dir, man)
+            self.copy_file(src_man, dest_man)
+            self._outfiles.append(dest_man)
+
+        # Disabled, done in the RPM spec
+        #self._write_record()
+
+    def _write_record(self):
+        """Write list of installed files"""
+        if self.record:
+            outputs = self.get_outputs()
+            if self.root:               # strip any package prefix
+                root_len = len(self.root)
+                for counter in xrange(len(outputs)):
+                    outputs[counter] = outputs[counter][root_len:]
+
+            log.info("writing list of installed files to '{0}'".format(
+                self.record))
+            f = open(self.record, "a")
+            for line in outputs:
+                f.write(line + "\n")
+
+    def get_outputs(self):
+        return self._outfiles
+
+
+class install_scripts(_install):
+    """Install MySQL Utilities scripts"""
+    description = "Install the Shell Profile (Linux/Unix)"
+
+    user_options = _install.user_options + [
+        ('root=', None,
+         "install everything relative to this alternate root directory"),
         ]
 
-    COMMANDS['cmdclass'].update({
-            'install_man': install_man,
-            'build_sphinx': sphinx.setup_command.BuildDoc,
-            'build_man': sphinx.setup_command.BuildDoc,
-            })
+    boolean_options = _install.boolean_options + ['skip-profile']
+    profile_filename = 'mysql-utilities.sh'
+    profile_d_dir = '/etc/profile.d/'
 
-    COMMANDS.setdefault('options',{}).update({
-            'build_man': { 'builder': 'man' },
-            })
-except ImportError:
-    pass
+    def initialize_options(self):
+        """initialize options"""
+        _install.initialize_options(self)
+        self.skip_profile = False
+        self.root = None
+        self.install_dir = None
+
+    def finalize_options(self):
+        """Finalize options"""
+        _install.finalize_options(self)
+        self.set_undefined_options('install',
+                                   ('install_dir', 'install_dir'),
+                                   ('root', 'root'))
+
+    def _create_shell_profile(self):
+        """Creates and installes the shell profile
+
+        This method will create and try to install the shell
+        profile file under /etc/profile.d/. It will skip this
+        step when the --skip-profile install option has been
+        given, or when the user installing MySQL Utilities
+        has no permission.
+        """
+        if self.skip_profile:
+            log.info("Not adding shell profile %s (skipped)" % (
+                     os.path.join(self.profile_d_dir, self.profile_filename)))
+            return
+
+        if self.root:
+            profile_dir = change_root(self.root, self.profile_d_dir)
+        else:
+            profile_dir = self.profile_d_dir
+
+        try:
+            dir_util.mkpath(profile_dir)
+        except DistutilsFileError as err:
+            log.info("Not installing mysql-utilities.sh: {0}".format(err))
+            self.skip_profile = True
+            return
+
+        destfile = os.path.join(profile_dir, self.profile_filename)
+        if not os.access(os.path.dirname(destfile), os.X_OK | os.W_OK):
+            log.info("Not installing mysql-utilities.sh in "
+                     "{folder} (no permission)".format(folder=destfile))
+            self.skip_profile = True
+            return
+
+        if os.path.exists(os.path.dirname(destfile)):
+            if os.path.isdir(destfile) and not os.path.islink(destfile):
+                dir_util.remove_tree(destfile)
+            elif os.path.exists(destfile):
+                log.info("Removing {filename}".format(filename=destfile))
+                os.unlink(destfile)
+
+        script = PROFILE_SCRIPT % (self.install_dir,)
+        log.info("Writing {filename}".format(filename=destfile))
+        open(destfile, "w+").write(script)
+
+    def run(self):
+        """Run the command"""
+        self._create_shell_profile()
+
+    def get_outputs(self):
+        """Get installed files"""
+        outputs = _install.get_outputs(self)
+        return outputs
+
 
 class build_scripts(_build_scripts):
     """Class for providing a customized version of build_scripts.
@@ -201,8 +255,6 @@ class build_scripts(_build_scripts):
        to use."""
 
     def run(self):
-        from distutils import log
-
         if not self.scripts:
             return
 
@@ -213,9 +265,11 @@ class build_scripts(_build_scripts):
             script_copy, script_ext = os.path.splitext(script)
 
             if script_ext != '.py':
-                log.debug("Not removing extension from %s since it's not '.py'", script)
+                log.debug("Not removing extension from {script} "
+                          "since it's not '.py'".format(script=script))
             else:
-                log.debug("Copying %s -> %s", script, script_copy)
+                log.debug("Copying {orig} -> {dest}".format(
+                    orig=script, dest=script_copy))
                 self.copy_file(script, script_copy)
                 self.scripts.append(script_copy)
         # distutils is compatible with 2.1 so we cannot use super() to
@@ -223,13 +277,18 @@ class build_scripts(_build_scripts):
         _build_scripts.run(self)
         self.scripts = saved_scripts
 
+COMMANDS['cmdclass'].update({
+        'install': install,
+        })
+
 if os.name != "nt":
     COMMANDS['cmdclass'].update({
         'build_scripts': build_scripts,
-        'install_scripts': install_scripts,
+        'install_man': install_man,
         })
 
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
 setup(**ARGS)
+
