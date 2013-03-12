@@ -108,8 +108,10 @@ class test(frm_reader_base.test):
         test_num += 1
 
         comment = "Test case %s: - Connection errors" % test_num
-        res = self.run_test_case(2, "mysqlfrm.py --server=XXXX@localhost " +
-                                 frm_file_path + " --port=3333", comment)
+        cmd = " ".join(["mysqlfrm.py",
+                        "--server=root:toor@localhost:%s" % self.server0.port,
+                        frm_file_path, "--port=3333"])
+        res = self.run_test_case(2, cmd, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
@@ -133,6 +135,10 @@ class test(frm_reader_base.test):
                             "ERROR: Cannot read XXXXXX\n")
         self.replace_result("#                  Mode :",
                             "#                  Mode : XXXXX\n")
+
+        # Must remove these lines because on Windows they are not printed
+        # in the same order as other systems.
+        self.remove_result("# Source on")
 
         return True
 

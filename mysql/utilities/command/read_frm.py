@@ -89,7 +89,7 @@ def _get_frm_path(dbtablename, datadir, new_db=None):
 
     # Strip the .frm from table
     if table.lower().endswith('.frm'):
-        table = table.split('.', 1)[0]
+        table = os.path.splitext(table)[0]
 
     if not os.access(frm_path, os.R_OK):
         raise UtilError("Cannot read .frm file from %s." % frm_path)
@@ -207,10 +207,29 @@ def _get_create_statement(server, temp_datadir,
         new_path = os.path.normpath(os.path.join(temp_datadir, db_name))
         if not os.path.exists(new_path):
             os.mkdir(new_path)
-        copy(frm_file[2], new_path)
+
+        new_frm = os.path.join(new_path, frm_file[1] + ".frm")
+
+        # Decipher unicode file names
+        if '@' in frm_file[1]:
+            parts = frm_file[1].split('@')
+            new_parts = [parts[0]]
+            for part in parts[1:]:
+                # take first four positions and convert to ascii
+                new_parts.append(chr(int(part[0:4], 16)))
+                new_parts.append(part[4:])
+            frm_file = (frm_file[0], "".join(new_parts), frm_file[2])
+            copy(frm_file[2], new_path)
+        # Special case for files with periods in the name
+        elif "." in frm_file[1]:
+            dot_parts = frm_file[1].split('.')
+            new_frm_file = "@002e".join(dot_parts) + ".frm"
+            new_frm = os.path.join(new_path, new_frm_file)
+            copy(frm_file[2], new_frm)
+        else:
+            copy(frm_file[2], new_path)
 
         server.exec_query("CREATE DATABASE IF NOT EXISTS %s" % db_name)
-        new_frm = os.path.join(new_path, frm_file[1] + ".frm")
 
         frm = FrmReader(db_name, frm_file[1], new_frm, options)
         frm_type = frm.get_type()
@@ -250,7 +269,7 @@ def _get_create_statement(server, temp_datadir,
                     return frm_file[2]
 
             # 3) show CREATE TABLE
-            res = server.exec_query("SHOW CREATE TABLE %s.%s" %
+            res = server.exec_query("SHOW CREATE TABLE `%s`.`%s`" %
                                     (db_name, frm_file[1]))
             create_str = res[0][1]
             if new_engine:
@@ -366,7 +385,6 @@ def read_frm_files(file_names, options):
     if not quiet:
         print "# Reading .frm files"
     try:
-        frm_files.sort()
         for frm_file in frm_files:
             # 3) For each .frm file, get the CREATE statement
             frm_err = _get_create_statement(server, temp_datadir,

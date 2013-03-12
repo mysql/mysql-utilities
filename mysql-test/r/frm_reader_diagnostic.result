@@ -304,6 +304,15 @@ Test case 2: - Check .frm files in a db folder
 # The .frm file is a TABLE.
 # CREATE TABLE Statement:
 
+CREATE TABLE `frm_files`.`me@002etoo@002eperiods` (
+  `a` int(11) DEFAULT NULL, 
+  `b` char(33) COLLATE `latin1_swedish_ci` DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
 CREATE TABLE `frm_files`.`t1` (
   `a` int(11) DEFAULT NULL 
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -371,6 +380,15 @@ CREATE TABLE `frm_files`.`t8` (
 CREATE TABLE `frm_files`.`t9` (
   `a` int(11) NOT NULL 
 ) ENGINE=INNODB  PARTITION BY HASH (a), DEFAULT CHARSET=latin1;
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`this.has.periods` (
+  `a` int(11) DEFAULT NULL, 
+  `b` char(33) COLLATE `latin1_swedish_ci` DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 #...done.
 Test case 3: - Check .frm files with db option

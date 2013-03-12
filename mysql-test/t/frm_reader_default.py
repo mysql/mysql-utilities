@@ -65,6 +65,8 @@ class test(frm_reader_base.test):
                             "# Starting the spawned server on port XXXXXXX\n")
         self.replace_result("# CREATE statement",
                             "# CREATE statement for [...]\n")
+        self.replace_result("# std_data",
+                            "# std_data/frm_files/t9.frm\n")
 
         return True
 

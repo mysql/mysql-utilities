@@ -793,6 +793,17 @@ Test case 2: - Check .frm files in a db folder
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
+# Reading the me@002etoo@002eperiods.frm file.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`me.too.periods` (
+  `a` int(11) DEFAULT NULL,
+  `b` char(33) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+#
 # Reading the t1.frm file.
 #
 # CREATE statement for [...]
@@ -875,6 +886,17 @@ CREATE TABLE `frm_files`.`t8` (
 #
 # Reading the t9.frm file.
 ERROR: Cannot process tables with the PARTITION storage engine. Please use the diagnostic mode to read the t9 file.
+#
+# Reading the this.has.periods.frm file.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`this.has.periods` (
+  `a` int(11) DEFAULT NULL,
+  `b` char(33) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
 #
 # WARNING: The following files could not be read. You can try the --diagnostic mode to read these files.
 #

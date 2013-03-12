@@ -281,8 +281,9 @@ for arg in args:
     frm_files_found = []
 
     # check to see if we have access iff it is not in the form of
-    # db:table.frm
-    if ":" not in arg:
+    # db:table.frm, but watchout for Windows paths!
+    if (os.name != "nt" and ":" not in arg) or \
+       (os.name == "nt" and len(arg) >= 2 and ":" not in arg[2:]):
         if not os.access(arg, os.R_OK):
             print ("ERROR: Cannot read %s. You must have read privileges"
                    " to the file or path and it must exist. Skipping "
@@ -305,6 +306,7 @@ for arg in args:
 
 # For each file specified, attempt to read the .frm file
 try:
+    all_frm_files.sort()
     if opt.diagnostic:
         read_frm_files_diagnostic(all_frm_files, options)
     else:

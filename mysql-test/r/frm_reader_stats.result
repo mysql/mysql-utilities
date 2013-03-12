@@ -319,6 +319,30 @@ Test case 2: - Check .frm files in a db folder
 # The .frm file is a TABLE.
 # CREATE TABLE Statement:
 
+CREATE TABLE `frm_files`.`me@002etoo@002eperiods` (
+  `a` int(11) DEFAULT NULL, 
+  `b` char(33) COLLATE `latin1_swedish_ci` DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8578
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.1.50
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
 CREATE TABLE `frm_files`.`t1` (
   `a` int(11) DEFAULT NULL 
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -521,5 +545,29 @@ CREATE TABLE `frm_files`.`t9` (
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : INNODB
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `frm_files`.`this.has.periods` (
+  `a` int(11) DEFAULT NULL, 
+  `b` char(33) COLLATE `latin1_swedish_ci` DEFAULT NULL 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 8578
+
+# Table Statistics:
+#                Engine : MYISAM
+#           frm Version : 9
+#         MySQL Version : 5.1.50
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
 
 #...done.
