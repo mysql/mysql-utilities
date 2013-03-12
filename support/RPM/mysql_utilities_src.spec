@@ -4,18 +4,14 @@
 %define summary         MySQL Utilities contain a collection of scripts useful for managing and administering MySQL servers
 %define vendor          Oracle
 %define packager        Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com>
-%define copyright       Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+%define copyright       Copyright (c) 2010, 2012, Oracle and/or its affiliates. All rights reserved.
 
 # Following are given defined from the environment/command line:
 #  version
 #  release_info
 #  _topdir
 
-# Hack to use a pattern using %P in the find command
-%define findpat %( echo "/%""P" )
-
-# Prevent manual pages to be compressed (also does not strip binaries, etc.)
-%global __os_install_post %{nil}
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           %{name}
 Version:        %{version}
@@ -27,11 +23,13 @@ License:        %{copyright} Use is subject to license terms.  Under %{mysql_lic
 Vendor:         %{vendor}
 Packager:       %{packager}
 URL:            http://dev.mysql.com/downloads/
-Source0:		%{name}-%{version}.linux-%{_arch}.tar.gz
-BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-Conflicts:      mysql-utilities-com
 
-Prefix:			/usr
+BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+BuildArch:      noarch
+Source0:		%{name}-%{version}.tar.gz
+BuildRequires:  python >= 2.6
+Requires:       python >= 2.6, mysql-connector-python >= 1.0.9
+Conflicts:      mysql-utilities-com
 
 %description
 %{release_info}
@@ -78,19 +76,74 @@ that GPLv2 or any later version may be used, or where a choice
 of which version of the GPL is applied is otherwise unspecified.
 
 %prep
-%setup -q -n %{name}-%{version}.linux-%{_arch}
+%setup -n %{name}-%{version}
+
+%build
+python setup.py build
+python setup.py build_scripts
+python setup.py install_egg_info -d .
 
 %install
-rm -Rf $RPM_BUILD_ROOT
-cp -a . $RPM_BUILD_ROOT
-(cd $RPM_BUILD_ROOT ; find -follow -type f -printf "%{findpat}\n") > INSTALLED_FILES
+python setup.py install -O1 --root=$RPM_BUILD_ROOT --prefix=%{_prefix} \
+	--record=INSTALLED_FILES \
+	install_man --prefix=%{_mandir}
+
+# Removing the shared __init__.py[c] file(s), recreated in %post
+TMP=`grep 'mysql/__init__.py' INSTALLED_FILES | head -n1`
+PKGLOC=`dirname $TMP`
+sed -i '/mysql\/__init__.py/d' INSTALLED_FILES
+rm $RPM_BUILD_ROOT$PKGLOC/__init__.py* 2>/dev/null 1>&2
 
 %clean
+rm -rf ${buildroot}
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
+%{_mandir}/man1/mysqlauditadmin.1*
+%{_mandir}/man1/mysqlauditgrep.1*
+%{_mandir}/man1/mysqldbcompare.1*
+%{_mandir}/man1/mysqldbcopy.1*
+%{_mandir}/man1/mysqldbexport.1*
+%{_mandir}/man1/mysqldbimport.1*
+%{_mandir}/man1/mysqldiff.1*
+%{_mandir}/man1/mysqldiskusage.1*
+%{_mandir}/man1/mysqlfailover.1*
+%{_mandir}/man1/mysqlindexcheck.1*
+%{_mandir}/man1/mysqlmetagrep.1*
+%{_mandir}/man1/mysqlprocgrep.1*
+%{_mandir}/man1/mysqlreplicate.1*
+%{_mandir}/man1/mysqlrpladmin.1*
+%{_mandir}/man1/mysqlrplcheck.1*
+%{_mandir}/man1/mysqlrplshow.1*
+%{_mandir}/man1/mysqlserverclone.1*
+%{_mandir}/man1/mysqlserverinfo.1*
+%{_mandir}/man1/mysqluc.1*
+%{_mandir}/man1/mysqluserclone.1*
+
+%post
+touch %{python_sitelib}/mysql/__init__.py
+
+%postun
+if [ $1 == 0 ];
+then
+    # Non empty directories will be left alone
+    rmdir %{python_sitelib}/mysql/utilities/common
+    rmdir %{python_sitelib}/mysql/utilities/command
+    rmdir %{python_sitelib}/mysql/utilities
+
+    # Try to remove the MySQL top package mysql/
+    SUBPKGS=`ls --ignore=*.py{c,o} -m %{python_sitelib}/mysql`
+    if [ "$SUBPKGS" == "__init__.py" ];
+    then
+        rm %{python_sitelib}/mysql/__init__.py* 2>/dev/null 1>&2
+        # This should not fail, but show error if any
+        rmdir %{python_sitelib}/mysql/
+    fi
+
+    exit 0
+fi
 
 %changelog
-* Fri Feb  1 2013 Geert Vanderkelen <geert.vanderkelen@oracle.com> - 1.3.0
+* Fri Oct 12 2012 Geert Vanderkelen <geert.vanderkelen@oracle.com> - 1.2.0
 
 - Initial implementation.

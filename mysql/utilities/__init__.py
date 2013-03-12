@@ -1,7 +1,12 @@
 # Major, Minor, Patch, Status
-VERSION = (1, 3, 0, "", 5, 2, 47)
-VERSION_STRING = "%s.%s.%s%s - MySQL Workbench Distribution %s.%s.%s" % VERSION
-RELEASE_STRING = "%s.%s.%s%s - MySQL Workbench Distribution %s.%s.%s" % VERSION
+VERSION = (1, 3, 0, 'a', 0)
+WORKBENCH_VERSION = (5, 2, 47)
+
+VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
+RELEASE_STRING = (
+    VERSION_STRING +
+    " (part of MySQL Workbench Distribution %s.%s.%s)" % WORKBENCH_VERSION)
+
 COPYRIGHT = "2010, 2013 Oracle and/or its affiliates. All rights reserved."
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of

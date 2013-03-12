@@ -1,4 +1,4 @@
 include *.txt
 recursive-include unit_tests *.py
-recursive-include doc *.py *.rst
+recursive-include docs/man *.1
 include info.py

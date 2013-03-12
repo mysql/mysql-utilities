@@ -1,16 +1,9 @@
-# MySQL Connector/Python - MySQL driver written in Python.
-# Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
-
-# MySQL Connector/Python is licensed under the terms of the GPLv2
-# <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most
-# MySQL Connectors. There are special exceptions to the terms and
-# conditions of the GPLv2 as it is applied to this software, see the
-# FLOSS License Exception
-# <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
+#
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation.
+# the Free Software Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
 
-"""Implements the Distutils command 'bdist_com_msi'
+"""Implements custom DistUtils commands for the MS Windows platform
 
-Implements the Distutils command 'bdist_com_msi' which creates a built
-commercial distribution Windows Installer using Windows Installer XML 3.5.
-The WiX file is available in the folder '/support/MSWindows/' of the
-Connector/Python source.
+This module implements custom DistUtils commands for the Microsoft
+Windows platform. WiX 3.5 and py2exe are required.
 """
 
 import sys
@@ -41,14 +33,53 @@ from distutils.sysconfig import get_python_version
 from distutils.command.bdist_dumb import bdist_dumb
 from distutils.command.install_data import install_data
 from distutils.command.bdist import bdist
+from distutils.util import get_platform
+from distutils.file_util import copy_file
 
 from mysql.utilities import RELEASE_STRING, COPYRIGHT
 from support import wix
 
 WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
 
+
 class _MSIDist(bdist):
-    """"Create a MSI distribution"""
+    """Create a Windows Installer with Windows Executables"""
+    user_options = [
+        ('bdist-base=', 'b',
+         "temporary directory for creating built distributions"),
+        ('plat-name=', 'p',
+         "platform name to embed in generated filenames "
+         "(default: %s)" % get_platform()),
+        ('dist-dir=', 'd',
+         "directory to put final built distributions in "
+         "[default: dist]"),
+        ('keep-temp', 'k',
+         "keep the pseudo-installation tree around after " +
+         "creating the distribution"),
+        ]
+
+    boolean_options = ['keep-temp']
+
+    def initialize_options(self):
+        """Initialize options"""
+        self.bdist_base = None
+        self.plat_name = None
+        self.dist_dir = None
+        self.keep_temp = False
+
+    def finalize_options(self):
+        """Finalize opitons"""
+        if self.plat_name is None:
+            self.plat_name = self.get_finalized_command('build').plat_name
+
+        if self.bdist_base is None:
+            build_base = self.get_finalized_command('build').build_base
+            self.bdist_base = os.path.join(build_base,
+                                           'bdist.' + self.plat_name)
+
+        if self.dist_dir is None:
+            self.dist_dir = "dist"
+
     def _get_wixobj_name(self, myc_version=None, python_version=None):
         """Get the name for the wixobj-file
 
@@ -71,23 +102,27 @@ class _MSIDist(bdist):
         upgrade_codes = json.load(fp)
         fp.close()
         
-        # version variables for Connector/Python and Python
-        mycver = self.distribution.metadata.version
-        match = re.match("(\d+)\.(\d+).(\d+).*", mycver)
+        # Version of the application being packaged
+        appver = self.distribution.metadata.version
+        match = re.match(r"(\d+)\.(\d+).(\d+).*", appver)
         if not match:
-            raise ValueError("Failed parsing version from %s" % mycver)
+            raise ValueError("Failed parsing version from %s" % appver)
         (major, minor, patch) = match.groups()
+
+        # Python version
         pyver = self.python_version
-        pymajor = pyver[0]
+        pymajor, pyminor = pyver.split('.')[0:2]
         
-        # check whether we have an upgrade code
+        # Check whether we have an upgrade code
         try:
-            upgrade_code = upgrade_codes[mycver[0:3]][pyver]
+            upgrade_code = upgrade_codes[appver[0:3]][pyver]
         except KeyError:
-            raise DistutilsError("No upgrade code found for version v%s, "
-                                 "Python v%s" % mycver, pyver)
-        log.info("upgrade code for v%s, Python v%s: %s" % (
-                 mycver, pyver, upgrade_code))
+            raise DistutilsError(
+                "No upgrade code found for version v{appver}, "
+                "Python v{pyver}".format(appver=appver, pyver=pyver))
+        log.info("upgrade code for v{appver},"
+                 " Python v{pyver}: {upgrade}".format(
+                    appver=appver, pyver=pyver, upgrade=upgrade_code))
         
         # wixobj's basename is the name of the installer
         wixobj = self._get_wixobj_name()
@@ -96,7 +131,7 @@ class _MSIDist(bdist):
         wixer = wix.WiX(self.wxs,
                         out=wixobj,
                         msi_out=msi,
-                        base_path=self.build_base,
+                        base_path=self.dist_dir,
                         install=self.wix_install)
         
         # WiX preprocessor variables
@@ -105,52 +140,55 @@ class _MSIDist(bdist):
             'ReleaseString': RELEASE_STRING,
             'Copyright': COPYRIGHT,
             'Version': '.'.join([major, minor, patch]),
-            'FullVersion': mycver,
+            'FullVersion': appver,
             'PythonVersion': pyver,
             'PythonMajor': pymajor,
+            'PythonMinor': pyminor,
             'Major_Version': major,
             'Minor_Version': minor,
             'Patch_Version': patch,
             'PythonInstallDir': 'Python%s' % pyver.replace('.', ''),
-            'BaseDist': os.path.abspath(self.base_dist),
-            'SitePkgDist': os.path.abspath(os.path.join(
-                self.base_dist, 'Lib', 'site-packages')),
-            'ScriptsDist': os.path.abspath(os.path.join(
-                self.base_dist, 'Scripts')),
+            'BuildDir': os.path.abspath(self.bdist_base),
+            'BitmapDir': os.path.join(os.getcwd(), 'support', 'MSWindows'),
             'UpgradeCode': upgrade_code,
-            'ManualPDF': os.path.abspath(os.path.join('docs', 'mysql-utilities.pdf')),
-            'ManualHTML': os.path.abspath(os.path.join('docs', 'mysql-utilities.html')),
+            'ManualPDF': os.path.abspath(os.path.join('docs',
+                                                      'mysql-utilities.pdf')),
+            'ManualHTML': os.path.abspath(os.path.join('docs',
+                                                       'mysql-utilities.html')),
+            'LicenseRtf': os.path.abspath(
+                os.path.join('support', 'MSWindows', 'License.rtf')),
         }
         
         wixer.set_parameters(params)
         
         if not dry_run:
             try:
-                wixer.compile()
-                wixer.link()
+                wixer.compile(ui=True)
+                wixer.link(ui=True)
             except DistutilsError:
                 raise
 
-        if not self.keep_temp and not dry_run:
-            log.info('WiX: cleaning up')
+        if not self.keep_temp:
+            log.info('Cleaning up')
+            os.unlink(msi.replace('.msi', '.wixobj'))
             os.unlink(msi.replace('.msi', '.wixpdb'))
+            remove_tree(self.bdist_base)
         
         return msi
 
     def _prepare_distribution(self):
-        raise NotImplemented
+        """Prepare the distribution
+
+        This method should be overloaded.
+        """
+        raise NotImplementedError
 
     def run(self):
         """Run the distutils command"""
-        # build command: just to get the build_base
-        cmdbuild = self.get_finalized_command("build")
-        self.build_base = cmdbuild.build_base
-        
-        # Some checks
         if os.name != 'nt':
-            log.info("This command is only useful on Windows. "
-                     "Forcing dry run.")
-            self.dry_run = True
+            log.info("This command is only useful on Windows.")
+            sys.exit(1)
+
         wix.check_wix_install(wix_install_path=self.wix_install,
                               dry_run=self.dry_run)
         
@@ -159,74 +197,54 @@ class _MSIDist(bdist):
         # create the Windows Installer
         msi_file = self._create_msi(dry_run=self.dry_run)
         log.info("created MSI as %s" % msi_file)
-        
-        if not self.keep_temp:
-            remove_tree(self.build_base, dry_run=self.dry_run)
 
-class SourceMSI(_MSIDist):
-    """Create a Source MSI distribution"""
-    description = 'create a source MSI distribution'
-    user_options = [
-        ('bdist-dir=', 'd',
-         "temporary directory for creating the distribution"),
-        ('keep-temp', 'k',
-         "keep the pseudo-installation tree around after " +
-         "creating the distribution archive"),
-        ('dist-dir=', 'd',
-         "directory to put final source distributions in"),
+
+class MSIBuiltDist(_MSIDist):
+    """Create a Built MSI distribution with executables"""
+    description = 'create a Built MSI distribution with executables'
+    user_options = _MSIDist.user_options + [
         ('wix-install', None,
-         "location of the Windows Installer XML installation"
-         "(default: %s)" % WIX_INSTALL),
-    ]
+         "location of the Windows Installer XML installation\n"
+         "[default: %s]" % WIX_INSTALL),
+        ]
 
-    boolean_options = [
-        'keep-temp', 'include-sources'
-    ]
+    python_version = get_python_version()
+    wxs = 'support/MSWindows/mysql_utilities.xml'
+    fix_txtfiles = ['README.txt', 'LICENSE.txt']
     
-    def initialize_options (self):
+    def initialize_options(self):
         """Initialize the options"""
-        self.bdist_dir = None
-        self.keep_temp = 0
-        self.dist_dir = None
-        self.wix_install = WIX_INSTALL
-        self.python_version = get_python_version()
+        _MSIDist.initialize_options(self)
+        self.wix_install = None
     
     def finalize_options(self):
         """Finalize the options"""
-        if self.bdist_dir is None:
-            bdist_base = self.get_finalized_command('bdist').bdist_base
-            self.bdist_dir = os.path.join(bdist_base, 'dist')
+        _MSIDist.finalize_options(self)
+        if not self.wix_install:
+            self.wix_install = WIX_INSTALL
 
-        self.set_undefined_options('bdist',
-                                   ('dist_dir', 'dist_dir'))
-
-        self.wxs = 'support/MSWindows/mysql_utilities.xml'
-        self.fix_txtfiles = ['README.txt', 'LICENSE.txt']
-
-    def _get_wixobj_name(self, myc_version=None, python_version=None):
+    def _get_wixobj_name(self, app_version=None, python_version=None):
         """Get the name for the wixobj-file
 
         Return string
         """
-        mycver = myc_version or self.distribution.metadata.version
+        appver = app_version or self.distribution.metadata.version
         pyver = python_version or self.python_version
-        return "mysql-utilities-%s-py%s.wixobj" % (
-            mycver, pyver)
+        if self.plat_name:
+            platform = '-' + self.plat_name
+        return "mysql-utilities-{app_version}{platform}.wixobj".format(
+            app_version=appver, python_version=pyver, platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
-        cmd = self.reinitialize_command('install', reinit_subcommands=0)
-        cmd.compile = False
-        cmd.dry_run = self.dry_run
-        cmd.keep_temp = True
-        cmd.prefix = os.path.join('dist', self.distribution.get_fullname())
-        self.run_command('install')
-        self.base_dist = cmd.prefix
+        buildexe = self.get_finalized_command('build_exe')
+        buildexe.build_exe = self.bdist_base 
+        buildexe.run()
 
         # copy text files and correct newlines
         for txtfile in self.fix_txtfiles:
             log.info("creating and fixing text file %s", txtfile)
-            builttxt = os.path.join(self.base_dist, txtfile)
+            builttxt = os.path.join(self.bdist_base, txtfile)
             open(builttxt, 'w').write(open(txtfile).read())
 
 
