@@ -903,3 +903,18 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 # std_data/frm_files/t9.frm
 #
 #...done.
+Test case 3: - User the --user option
+# Source on localhost: ... connected.
+# Starting the spawned server on port XXXXXXX
+# Reading .frm files
+#
+# Reading the t1.frm file.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t1` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+#...done.

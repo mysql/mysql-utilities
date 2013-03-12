@@ -112,6 +112,7 @@ def _spawn_server(options):
     verbosity = int(options.get("verbosity", 0))
     quiet = options.get("quiet", False)
     new_port = options.get("port", 3310)
+    user = options.get("user", None)
 
     # 1) create a directory to use for new datadir
     temp_datadir = tempfile.mkdtemp()
@@ -304,7 +305,6 @@ def _get_create_statement(server, temp_datadir,
     except:
         print ("ERROR: Failed to correctly read the .frm file. Please try "
                "reading the file with the --diagnostic mode.")
-        print_exc()
         return frm_file[2]
 
     return None
