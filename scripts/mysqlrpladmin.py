@@ -37,6 +37,11 @@ from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
+from mysql.utilities.common.messages import PARSE_ERR_OPT_INVALID_CMD_TIP
+from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ_BY_CMD
+from mysql.utilities.common.messages import PARSE_ERR_SLAVE_DISCO_REQ
+from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED
+from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED_ONLY_FOR
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -105,19 +110,18 @@ add_rpl_user(parser, None)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# At least one of the options --discover-slaves-login or --slaves is required.
-if not opt.discover and not opt.slaves:
-    parser.error("One of these options is required to use the utility: "
-                 "--discover-slaves-login or --slaves.")
-
-# Check slaves list
-check_server_lists(parser, opt.master, opt.slaves)
-
 # Check for invalid command
 if len(args) > 1:
     parser.error("You can only specify one command to execute at a time.")
 elif len(args) == 0:
     parser.error("You must specify a command to execute.")
+
+# At least one of the options --discover-slaves-login or --slaves is required.
+if not opt.discover and not opt.slaves:
+    parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
+
+# Check slaves list
+check_server_lists(parser, opt.master, opt.slaves)
 
 # The value for --timeout needs to be an integer > 0.
 try:
@@ -132,51 +136,84 @@ command = args[0].lower()
 if not command in get_valid_rpl_commands():
     parser.error("'%s' is not a valid command." % command)
 
-if command == 'switchover' and (opt.new_master is None or opt.master is None):
-    parser.error("The switchover command requires the --master and "
-                 "--new-master options.")
-    
-if command in ['health', 'gtid'] and opt.discover is None and \
-   (opt.slaves is None or opt.master is None):
-    parser.error("The health and gtid commands requires the --master and "
-                 "--slaves options.")
+# --master and --new-master options are required by 'switchover'
+if command == 'switchover' and (not opt.new_master or not opt.master):
+    req_opts = '--master and --new-master'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
+# --master and either --slaves or --discover-slaves-login options are required 
+# by 'elect', 'health' and 'gtid'
+if command in ['elect', 'health', 'gtid'] and not opt.master and \
+   (not opt.slaves or not opt.discover):
+    req_opts = '--master and either --slaves or --discover-slaves-login'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
+
+# --master and --slaves options are required by 'start', 'stop' and 'reset'
 if command in ['start', 'stop', 'reset'] and \
    (not opt.slaves or not opt.master):
-    parser.error("The start, stop and reset commands require the --master "
-                 "and --slaves options.")
+    req_opts = '--master and --slaves'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
-if command in ['elect', 'failover', 'start', 'stop', 'reset'] and \
-    not opt.discover and not opt.slaves:
-    parser.error("You must supply a list of slaves or the "
-                 "--discover-slaves-login option.")
+# Validate the required options for the failover command
+if command == 'failover':
+    # --discover-slaves-login is invalid (as it will require a master)
+    # instead --slaves needs to be used.
+    if opt.discover:
+        invalid_opt = '--discover-slaves-login'
+        parser.error(PARSE_ERR_OPT_INVALID_CMD_TIP.format(opt=invalid_opt,
+                                                          cmd=command,
+                                                          opt_tip='--slaves'))
+    # --master will be ignored
+    if opt.master:
+        print(WARN_OPT_NOT_REQUIRED.format(opt='--master', cmd=command))
+        opt.master = None
 
+# --ping only used by 'health' command
 if opt.ping and not command == 'health':
-    print("WARNING: The --ping option is used only with the health command.")
-    
-if command not in ['switchover', 'failover'] and \
-   (opt.exec_after or opt.exec_before):
-    print("WARNING: The --exec-* options are used only with the failover"
-          " and switchover commands.")
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--ping', cmd=command,
+                                                only_cmd='health'))
+    opt.ping = None
 
+# --exec-after only used by 'failover' or 'switchover' command
+if opt.exec_after and command not in ['switchover', 'failover']:
+    only_used_cmds = 'failover or switchover'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--exec-after',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.exec_after = None
+
+# --exec-before only used by 'failover' or 'switchover' command
+if opt.exec_before and command not in ['switchover', 'failover']:
+    only_used_cmds = 'failover or switchover'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--exec-before',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.exec_before = None
+
+# --new-master only required for 'health' command
 if opt.new_master and command != 'switchover':
-    print("WARNING: The --new-master option is used only with the "
-          "switchover command.")
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--new-master',
+                                                cmd=command,
+                                                only_cmd='switchover'))
+    opt.new_master = None
 
+# --candidates only used by 'failover' or 'elect' command
 if opt.candidates and command not in ['elect', 'failover']:
-    print("WARNING: The --candidates option is used only with the "
-          "failover and elect commands.")
+    only_used_cmds = 'failover or elect'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--candidates',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
     opt.candidates = None
 
-if (opt.candidates or opt.new_master) and command in ['stop', 'start', 'reset']:
-    print("WARNING: The --new-master and --candidates options are not "
-          "used with the stop, start, and reset commands.")
-    opt.candidates = None
-    
+# --format only used by 'health' or 'gtid' command
 if opt.format and command not in ['health', 'gtid']:
-    print("WARNING: The --format option is used only with the health "
-          "and gtid commands.")
-        
+    only_used_cmds = 'health or gtid'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--format',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.format = None
+
+# Parse the --new-master connection string
 if opt.new_master:
     try:
         new_master_val = parse_connection(opt.new_master, None, opt)

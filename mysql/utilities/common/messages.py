@@ -57,3 +57,20 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
                             "{db_no_obj_label} '{db_no_obj_value}', while "
                             "object '{only_obj_value}' was specified for "
                             "{db_obj_label} '{db_obj_value}'.")
+
+PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
+
+PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
+                                 % PARSE_ERR_OPT_INVALID_CMD)
+
+PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
+                             "{opts}.")
+
+PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
+                             "required.")
+
+WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
+                         "'{cmd}' (option ignored).")
+
+WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
+                                   % WARN_OPT_NOT_REQUIRED)

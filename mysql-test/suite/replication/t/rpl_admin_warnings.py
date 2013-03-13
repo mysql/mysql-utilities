@@ -14,10 +14,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
-import mutlib
+
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
+
+_DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
+                                '--log-slave-updates',
+                                '--gtid-mode=on',
+                                '--enforce-gtid-consistency',
+                                '--report-host=localhost',
+                                '--report-port={report_port}',
+                                '--sync-master-info=1',
+                                '--master-info-repository=table"'])
+
+_MYSQL_OPTS_NO_REPORT = ' '.join(['"--log-bin=mysql-bin',
+                                  '--log-slave-updates',
+                                  '--gtid-mode=on',
+                                  '--enforce-gtid-consistency',
+                                  '--sync-master-info=1',
+                                  '--master-info-repository=table"'])
+
+_GRANT_QUERY = ("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'localhost' "
+                "IDENTIFIED BY 'rpl'")
+_SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
+
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -31,112 +51,137 @@ class test(rpl_admin.test):
         return self.check_num_servers(1)
 
     def setup(self):
-        res = rpl_admin.test.setup(self)
-    
-        self.server5 = rpl_admin.test.spawn_server(self, "rep_slave4",
-                                                   "--log-bin")
-    
-        self.s4_port = self.server5.port
-        
-        self.server5.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+        self.res_fname = "result.txt"
 
-        self.master_str = " --master=%s" % \
-                          self.build_connection_string(self.server1)
-        try:
-            self.server5.exec_query("STOP SLAVE")
-            self.server5.exec_query("RESET SLAVE")
-        except:
-            pass
-        
-        slave_str = " --slave=%s" % self.build_connection_string(self.server5)
-        conn_str = self.master_str + slave_str
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
-        res1 = self.exec_util(cmd, self.res_fname)
+        # Spawn servers
+        self.server0 = self.servers.get_server(0)
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
+        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
+        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
+        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
+        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        # Server without --report-host and --report-port
+        mysqld = _MYSQL_OPTS_NO_REPORT
+        self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
 
-        return res
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master([self.server1, self.server2, self.server3,
+                           self.server4, self.server5])
+
+        self.m_port = self.server1.port
+        self.s1_port = self.server2.port
+        self.s2_port = self.server3.port
+        self.s3_port = self.server4.port
+
+        # Create replication user
+        for slave in [self.server2, self.server3, self.server4, self.server5]:
+            slave.exec_query(_SET_SQL_LOG_BIN.format('0'))
+            slave.exec_query(_GRANT_QUERY)
+            slave.exec_query(_SET_SQL_LOG_BIN.format('1'))
+
+        # Set the initial replication topology
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5])
+
+        self.servers = [self.server1, self.server2, self.server3,
+                        self.server4, self.server5]
+
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
-        
+
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        slave4_conn = self.build_connection_string(self.server5).strip(' ')
-        
-        master_str = "--master=" + master_conn
-        slaves_str = "--slaves=" + \
-                     ",".join([slave1_conn, slave2_conn, slave3_conn])
-        candidates_str = "--candidates=" + \
-                         ",".join([slave1_conn, slave2_conn, slave3_conn])
-        
-        comment = "Test case 1 - warning for --exec* and not switchover or failover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=csv " % slaves_str
-        cmd_opts += " --exec-before=dummy --exec-after=dummy"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 2 - warning for --candidate and not switchover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=csv " % slaves_str
-        cmd_opts += " %s " % candidates_str
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+        master_str = "--master={0}".format(master_conn)
+        slaves_str = "--slaves={0}".format(
+                            ",".join([slave1_conn, slave2_conn, slave3_conn]))
+        candidates_str = "--candidates={0}".format(
+                            ",".join([slave1_conn, slave2_conn, slave3_conn]))
 
-        comment = "Test case 3 - warning for --new-master and not switchover"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s health --quiet --format=tab " % slaves_str
-        cmd_opts += " --new-master=%s " % slave2_conn
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        test_num = 1
+        comment = ("Test case {0} - warning for --exec* and not switchover or "
+                   "failover").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=csv "
+                   " --exec-before=dummy "
+                   "--exec-after=dummy").format(master_str, slaves_str)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - warning for missing --report-host"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --disco=root:root health --format=csv "
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        test_num += 1
+        comment = ("Test case {0} - warning for --candidate and not "
+                   "switchover").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=csv "
+                   "{2}").format(master_str, slaves_str, candidates_str)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        try:
-            self.server5.exec_query("STOP SLAVE")
-            self.server5.exec_query("RESET SLAVE")
-        except:
-            pass
-
-        comment = "Test case 5 - warning for --format and not health or gtid"
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " %s stop --quiet --format=tab " % slaves_str
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        test_num += 1
+        comment = ("Test case {0} - warning for --new-master and not "
+                   "switchover").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=tab "
+                   " --new-master={2} ").format(master_str, slaves_str,
+                                                slave2_conn)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - warning for missing "
+                   "--report-host").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} --disco=root:root health "
+                   "--format=csv ").format(master_str)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - warning for --format and not health or "
+                   "gtid").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} {1} stop --quiet "
+                   "--format=tab ").format(master_str, slaves_str)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Reset the topology to its original state
+        rpl_admin.test.reset_topology(self)
+
+        test_num += 1
+        comment = ("Test case {0} - warning for --master and "
+                   "failover").format(test_num)
+        cmd_str = ("mysqlrpladmin.py {0} {1} "
+                   "failover").format(master_str, slaves_str)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now we return the topology to its original state for other tests
-        rpl_admin.test.reset_topology(self)
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5])
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
-        self.replace_substring(str(self.s4_port), "PORT5")
 
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return rpl_admin.test.cleanup(self)
-
-
-

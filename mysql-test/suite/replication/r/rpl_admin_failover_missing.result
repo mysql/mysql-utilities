@@ -21,6 +21,7 @@ a,b
 3,three
 4,four
 Test case 1 - failover to localhost:PORT2 with relay log entries
+WARNING: The --master option is not required for 'failover' (option ignored).
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
@@ -117,6 +118,7 @@ a,b
 3,three
 4,four
 Test case 2 - failover to localhost:PORT3 with skipping slaves
+WARNING: The --master option is not required for 'failover' (option ignored).
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.

@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import mutlib
+
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
@@ -24,11 +24,9 @@ _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--gtid-mode=on',
                                 '--enforce-gtid-consistency',
                                 '--report-host=localhost',
-                                '--report-port=%s',
+                                '--report-port={report_port}',
                                 '--sync-master-info=1',
                                 '--master-info-repository=table"'])
-
-_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 
 
 class test(rpl_admin.test):
@@ -49,13 +47,17 @@ class test(rpl_admin.test):
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
         self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
         self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        srv_port = self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
@@ -67,7 +69,7 @@ class test(rpl_admin.test):
         self.s3_port = self.server4.port
 
         # Set the initial replication topology
-        rpl_admin.test.reset_topology(self)
+        self.reset_topology()
 
         build_str = self.build_connection_string
         self.master_conn = build_str(self.server1).strip(' ')
@@ -88,31 +90,31 @@ class test(rpl_admin.test):
         self.server2.exec_query("CREATE DATABASE `errant_tnx2`")
         self.server4.exec_query("CREATE DATABASE `errant_tnx4`")
 
-        comment = ("Test case %s - failover to %s:%s with errant transactions."
-                   % (test_num, self.server2.host, self.server2.port))
+        comment = ("Test case {0} - failover to {1}:{2} with errant "
+                   "transactions.").format(test_num, self.server2.host,
+                                           self.server2.port)
         slaves = ",".join([self.slave1_conn, self.slave2_conn,
                            self.slave3_conn])
-        cmd_str = ("mysqlrpladmin.py --master=%s --candidates=%s --slaves=%s "
-                   "failover -vvv"
-                   % (self.master_conn, self.slave1_conn, slaves))
+        cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
+                   "failover -vvv").format(self.slave1_conn, slaves)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
 
-        comment = ("Test case %s - failover to %s:%s with errant transactions "
-                   "using --force option."
-                   % (test_num, self.server2.host, self.server2.port))
-        cmd_str = ("mysqlrpladmin.py --master=%s --candidates=%s --slaves=%s "
-                   "--force failover -vvv"
-                   % (self.master_conn, self.slave1_conn, slaves))
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
+        comment = ("Test case {0} - failover to {1}:{2} with errant "
+                   "transactions using --force "
+                   "option.").format(test_num, self.server2.host,
+                                     self.server2.port)
+        cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
+                   "--force failover -vvv").format(self.slave1_conn, slaves)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask out non-deterministic data
-        rpl_admin.test.do_masks(self)
+        self.do_masks()
 
         # Strip health report - not needed.
         self.remove_result("+-")

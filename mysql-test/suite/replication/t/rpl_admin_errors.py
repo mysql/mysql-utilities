@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import mutlib
 import rpl_admin
 import socket
@@ -27,7 +27,7 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
-        return rpl_admin.test.check_prerequisites(self)
+        return self.check_num_servers(1)
 
     def setup(self):
         return rpl_admin.test.setup(self)
@@ -58,8 +58,10 @@ class test(rpl_admin.test):
             # (comment, ret_val, option1, ...),
             ("Multiple commands issued.", 2, "switchover", "start"),
             ("No commands.", 2, ""),
-            ("Invalid command.", 2, "NOTACOMMAND"),
-            ("Switchover but no --master, --new-master,", 2, "switchover"),
+            ("Invalid command.", 2, "NOTACOMMAND",
+             "--discover-slaves-login=root"),
+            ("Switchover but no --master, --new-master,", 2, "switchover",
+             "--discover-slaves-login=root"),
             ("No slaves or discover-slaves-login", 2, "switchover", master_str),
             ("Bad --new-master connection string", 2, "switchover", master_str,
              slaves_str, "--new-master=whatmeworry?"),
@@ -67,7 +69,7 @@ class test(rpl_admin.test):
              "--new-master=%s" % master_conn, "--master=whatmeworry?"),
             ("Bad --slaves connection string", 1, "switchover", master_str,
              "--new-master=%s" % master_conn, "--slaves=what,me,worry?"),
-            ("Bad --candidates connection string", 1, "failover", master_str,
+            ("Bad --candidates connection string", 1, "failover",
              slaves_str, "--candidates=what,me,worry?"),
             ("Not enough privileges - health joe", 1, "health", mock_master1,
              slaves_str),
@@ -75,6 +77,9 @@ class test(rpl_admin.test):
              slaves_str),
             ("Not enough privileges - switchover jane", 1, "switchover",
              mock_master2, slaves_str, "--new-master=%s" % slave3_conn),
+            ("Failover command requires --slaves", 2, "failover"),
+            ("Failover command cannot be used with --discover-slaves-login", 2,
+             "--discover-slaves-login=root", "failover",)
         ]
 
         test_num = 1
@@ -152,6 +157,23 @@ class test(rpl_admin.test):
                             "cannot be parsed",
                             "ERROR: Candidate connection values invalid or "
                             "cannot be parsed\n")
+
+        self.replace_result("| localhost  | PORT1  | MASTER  | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT1  | MASTER  | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT2  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT2  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT3  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT3  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT4  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT4  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
 
         return True
 

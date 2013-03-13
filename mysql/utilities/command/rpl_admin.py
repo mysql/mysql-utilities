@@ -38,7 +38,7 @@ Available Commands:
   stop        - stop all slaves
   switchover  - perform slave promotion
 
-  Note: elect, failover, gtid, and health require --master and either
+  Note: elect, gtid and health require --master and either
         --slaves or --discover-slave-login
 
   Note: start, stop and reset require --master and --slaves

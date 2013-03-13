@@ -39,9 +39,9 @@ _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
     _SLAVE_MASTER_LOG_FILE, _SLAVE_MASTER_LOG_FILE_POS, _SLAVE_IO_RUNNING, \
     _SLAVE_SQL_RUNNING, _SLAVE_DO_DB, _SLAVE_IGNORE_DB, _SLAVE_DELAY, \
     _SLAVE_REMAINING_DELAY, _SLAVE_IO_ERRORNO, _SLAVE_IO_ERROR, \
-    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _RETRIEVED_GTID_SET, \
+    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _MASTER_UUID, _RETRIEVED_GTID_SET, \
     _EXECUTED_GTID_SET = \
-    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 51, 52
+    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 40, 51, 52
 
 _PRINT_WIDTH = 75
 
@@ -1325,6 +1325,16 @@ class Slave(Server):
         if not res:
             return False
         return res[0][_SLAVE_MASTER_USER]
+
+    def get_master_uuid(self):
+        """Get the master_uuid from the slave status.
+
+        Return the master UUID or None if not an acting slave.
+        """
+        res = self.get_status()
+        if not res:
+            return None
+        return res[0][_MASTER_UUID]
 
     def get_state(self):
         """Get the slave's connection state

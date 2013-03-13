@@ -85,7 +85,7 @@ Available Commands:
   stop        - stop all slaves
   switchover  - perform slave promotion
 
-  Note: elect, failover, gtid, and health require --master and either
+  Note: elect, gtid and health require --master and either
         --slaves or --discover-slave-login
 
   Note: start, stop and reset require --master and --slaves
@@ -105,7 +105,7 @@ Test case 2 - test slave discovery
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - switchover with verbosity
-WARNING: The --ping option is used only with the health command.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
@@ -147,7 +147,7 @@ WARNING: The --ping option is used only with the health command.
 # Switchover complete.
 # ...done.
 Test case 4 - switchover with quiet
-WARNING: The --ping option is used only with the health command.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
@@ -160,7 +160,7 @@ NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 Switchover has written to the log.
 There are (before) 2 entries in the log.
 Test case 5 - switchover with logs
-WARNING: The --ping option is used only with the health command.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
@@ -187,7 +187,7 @@ WARNING: The --ping option is used only with the health command.
 # ...done.
 There are additional entries in the log.
 Test case 6 - attempt risky switchover without force
-WARNING: The --ping option is used only with the health command.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
 # Checking candidate slave prerequisites.
@@ -206,7 +206,7 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
 Test case 7 - attempt risky switchover with --force
-WARNING: The --ping option is used only with the health command.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
 # Checking candidate slave prerequisites.

@@ -1,23 +1,23 @@
 Test case 1 - Multiple commands issued.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: You can only specify one command to execute at a time.
 Test case 2 - No commands.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: You must specify a command to execute.
 Test case 3 - Invalid command.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: 'notacommand' is not a valid command.
 Test case 4 - Switchover but no --master, --new-master,
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: 'switchover' requires the following option(s): --master and --new-master.
 Test case 5 - No slaves or discover-slaves-login
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: Option --discover-slaves-login or --slaves is required.
 Test case 6 - Bad --new-master connection string
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
@@ -39,37 +39,45 @@ Test case 11 - Not enough privileges - health jane
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | OFF        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | OFF        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | OFF        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | OFF        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 12 - Not enough privileges - switchover jane
 # Checking privileges.
 User jane on localhost does not have sufficient privileges to execute the switchover command.
 ERROR: Not enough privileges to execute command.
-Test case 13 - Master listed as a slave - literal
+Test case 13 - Failover command requires --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Option --discover-slaves-login or --slaves is required.
+Test case 14 - Failover command cannot be used with --discover-slaves-login
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Invalid --discover-slaves-login option for 'failover'. Use --slaves instead.
+Test case 15 - Master listed as a slave - literal
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 14 - Master listed as a slave - alias
+Test case 16 - Master listed as a slave - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 15 - Master listed as a candiate - alias
+Test case 17 - Master listed as a candiate - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
-Test case 16 - Start without --master and --slaves
+Test case 18 - Start without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
-Test case 17 - Stop without --master and --slaves
+mysqlrpladmin.py: error: 'start' requires the following option(s): --master and --slaves.
+Test case 19 - Stop without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
-Test case 18 - Reset without --master and --slaves
+mysqlrpladmin.py: error: 'stop' requires the following option(s): --master and --slaves.
+Test case 20 - Reset without --master and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The start, stop and reset commands require the --master and --slaves options.
+mysqlrpladmin.py: error: 'reset' requires the following option(s): --master and --slaves.

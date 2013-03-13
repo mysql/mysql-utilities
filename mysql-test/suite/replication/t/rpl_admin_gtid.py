@@ -133,7 +133,7 @@ class test(rpl_admin.test):
                   (test_num, self.server4.host, self.server4.port)
         slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
                            slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_str = "mysqlrpladmin.py "
         cmd_opts = " --candidates=%s  " % slave3_conn
         cmd_opts += " --slaves=%s failover" % slaves
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,

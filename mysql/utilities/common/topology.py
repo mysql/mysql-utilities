@@ -915,14 +915,23 @@ class Topology(Replication):
         [(host1, port1, set1), ..., (hostn, portn, setn)]. If no errant
         transactions are found an empty list is returned.
         """
-        # Get master UUID
-        master_uuid = self.master.get_uuid()
         res = []
+
+        # Get master UUID (if master is available otherwise get it from slaves)
+        use_master_uuid_from_slave = True
+        if self.master:
+            master_uuid = self.master.get_uuid()
+            use_master_uuid_from_slave = False
 
         # Check all slaves for executed transactions not in other slaves
         for slave_dict in self.slaves:
             slave = slave_dict['instance']
             tnx_set = slave.get_executed_gtid_set()
+
+            # Get master UUID from salve if master is not available
+            if use_master_uuid_from_slave:
+                master_uuid = slave.get_master_uuid()
+
             slave_set = set()
             for others_slave_dic in self.slaves:
                 if (slave_dict['host'] != others_slave_dic['host'] or

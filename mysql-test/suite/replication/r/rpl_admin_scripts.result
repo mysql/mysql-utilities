@@ -1,12 +1,12 @@
 Test case 1 - test failover scripts
 # ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
 # new master host:  localhost
 # new master port:  PORT4
 # ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
 # new master host:  localhost
 # new master port:  PORT4
 # Checking privileges.

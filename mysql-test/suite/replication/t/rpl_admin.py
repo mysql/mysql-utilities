@@ -206,18 +206,25 @@ class test(mutlib.System_test):
                                   "for server %s:%s: %s"
                                   % (srv.host, srv.port, err))
 
-    def reset_topology(self):
-        # Form replication topology - 1 master, 3 slaves
+    def reset_topology(self, slaves_list=[]):
+        if slaves_list:
+            slaves = slaves_list
+        else:
+            # Default replication topology - 1 master, 3 slaves
+            slaves = [self.server2, self.server3, self.server4]
         self.master_str = " --master=%s" % \
                           self.build_connection_string(self.server1)
-        for slave in [self.server1, self.server2, self.server3, self.server4]:
+
+        servers = [self.server1]
+        servers.extend(slaves)
+        for slave in servers:
             try:
                 slave.exec_query("STOP SLAVE")
                 slave.exec_query("RESET SLAVE")
             except:
                 pass
-        
-        for slave in [self.server2, self.server3, self.server4]:
+
+        for slave in slaves:
             slave_str = " --slave=%s" % self.build_connection_string(slave)
             conn_str = self.master_str + slave_str
             cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
