@@ -19,12 +19,13 @@
 This module contains methods for working with mysql server tools.
 """
 
+import inspect
 import os
 import sys
 import shutil
-import time
+import socket
 import subprocess
-import inspect
+import time
 
 from mysql.utilities import PYTHON_MIN_VERSION, PYTHON_MAX_VERSION
 from mysql.utilities.common.format import print_list
@@ -279,7 +280,7 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
         proc = subprocess.Popen(run_cmd, shell=True)
         ret_val = proc.wait()
     else:
-        print("Remote copy not supported. Please use UNC paths and omit " 
+        print("Remote copy not supported. Please use UNC paths and omit "
               "the --remote-login option to use a local copy operation.")
     return True
 
@@ -351,3 +352,19 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
 
         print('ERROR: %s' % error_msg)
         sys.exit(1)
+
+
+def check_port_in_use(host, port):
+    """Check to see if port is in use.
+
+    host[in]            Hostname or IP to check
+    port[in]            Port number to check
+
+    Returns bool - True = port is available, False is not available
+    """
+    try:
+        sock = socket.create_connection((host, port))
+    except socket.error as error:
+        return True
+    sock.close()
+    return False

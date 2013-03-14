@@ -20,3 +20,5 @@ mysqlserverclone.py: error: Target data directory exists and is not empty. Use -
 Test case 6 - --new-data does not exist (but cannot connect)
 ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
+Test case 7 - attempt to use existing port
+ERROR: Port in use. Please choose an available port.

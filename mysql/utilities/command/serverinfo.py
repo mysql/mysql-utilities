@@ -33,9 +33,9 @@ _COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
 
 def _get_binlog(server):
     """Retrieve binary log and binary log position
-    
+
     server[in]        Server instance
-    
+
     Returns tuple (binary log, binary log position)
     """
     binlog = None
@@ -45,13 +45,13 @@ def _get_binlog(server):
         binlog = res[0][0]
         binlog_pos = res[0][1]
     return (binlog, binlog_pos)
-    
+
 
 def _get_relay_log(server):
     """Retrieve relay log and relay log position
-    
+
     server[in]        Server instance
-    
+
     Returns tuple (relay log, relay log position)
     """
     relay_log = None
@@ -61,15 +61,15 @@ def _get_relay_log(server):
         relay_log = res[0][7]
         relay_log_pos = res[0][8]
     return (relay_log, relay_log_pos)
-    
+
 
 def _server_info(server_val, get_defaults=False, options={}):
     """Show information about a running server
-    
+
     This method gathers information from a running server. This information is
     returned as a tuple to be displayed to the user in a format specified. The
     information returned includes the following:
-    
+
     * server connection information
     * version number of the server
     * data directory path
@@ -80,15 +80,15 @@ def _server_info(server_val, get_defaults=False, options={}):
     * current binary log position
     * current relay log file
     * current relay log position
-    
+
     server_val[in]    the server connection values or a connected server
     get_defaults[in]  if True, get the default settings for the server
     options[in]       options for connecting to the server
-    
+
     Return tuple - information about server
     """
     import tempfile
-    
+
     from mysql.utilities.common.server import connect_servers
     from mysql.utilities.common.tools import get_tool_path
 
@@ -173,12 +173,12 @@ def _server_info(server_val, get_defaults=False, options={}):
 
 def _start_server(server_val, basedir, datadir, options={}):
     """Start an instance of a server in read only mode
-    
+
     This method is used to start the server in read only mode. It will launch
     the server with --skip-grant-tables and --read_only options set.
-    
+
     Caller must stop the server with _stop_server().
-    
+
     server_val[in]    dictionary of server connection values
     basedir[in]       the base directory for the server
     datadir[in]       the data directory for the server
@@ -187,30 +187,36 @@ def _start_server(server_val, basedir, datadir, options={}):
     from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
     from mysql.utilities.common.server import Server
     import time
-    
+
     verbosity = options.get("verbosity", 0)
-    
+
     mysqld_path = get_tool_path(basedir, "mysqld")
-    
+
     print "# Server is offline."
 
     # Check server version
     print "# Checking server version ...",
     version = get_mysqld_version(mysqld_path)
     print "done."
+    post_5_5 = version is not None and \
+               int(version[0]) >= 5 and int(version[1]) >= 5
     post_5_6 = version is not None and \
                int(version[0]) >= 5 and int(version[1]) >= 6
-    
+
     # Start the instance
     print "# Starting read-only instance of the server ...",
     args = [
-        " -uroot",
         "--skip-grant-tables",
         "--read_only",
         "--port=%(port)s" % server_val,
         "--basedir=" + basedir,
         "--datadir=" + datadir,
     ]
+
+    # If the server is 5.5 or later, add --no-defaults.
+    if post_5_5:
+        args.insert(0, "--no-defaults")
+
     # It the server is 5.6 or later, we must use additional parameters
     if post_5_6:
         args_5_6 = [
@@ -221,15 +227,16 @@ def _start_server(server_val, basedir, datadir, options={}):
             "--server-id=0",
         ]
         args.extend(args_5_6)
+    args.insert(0, mysqld_path)
 
     socket = server_val.get('unix_socket', None)
     if socket is not None:
         args.append("--socket=%(unix_socket)s" % server_val)
     if verbosity > 0:
-        proc = subprocess.Popen(args, executable=mysqld_path)
+        proc = subprocess.Popen(args, shell=False)
     else:
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen(args, executable=mysqld_path,
+        proc = subprocess.Popen(args, shell=False,
                                 stdout=out, stderr=out)
 
     server_options = {
@@ -246,16 +253,16 @@ def _start_server(server_val, basedir, datadir, options={}):
     server.connect()
     print "done."
     return server
-    
+
 
 def _stop_server(server_val, basedir, options={}):
     """Stop an instance of a server started in read only mode
-    
+
     This method is used to stop the server started in read only mode. It will
     launch mysqladmin to stop the server.
-    
+
     Caller must start the server with _start_server().
-    
+
     server_val[in]    dictionary of server connection values
     basedir[in]       the base directory for the server
     options[in]       dictionary of options (verbosity)
@@ -287,7 +294,7 @@ def _stop_server(server_val, basedir, options={}):
 
 def _show_running_servers(start=3306, end=3333):
     """Display a list of running MySQL servers.
-    
+
     start[in]         starting port for Windows servers
     end[in]           ending port for Windows servers
     """
@@ -307,37 +314,37 @@ def _show_running_servers(start=3306, end=3333):
     else:
         print "# No active MySQL servers found."
     print "# "
-    
+
 
 def show_server_info(servers, options):
     """Show server information for a list of servers
-    
+
     This method will gather information about a running server. If the
     show_defaults option is specified, the method will also read the
     configuration file and return a list of the server default settings.
-    
+
     If the format option is set, the output will be in the format specified.
-    
+
     If the no_headers option is set, the output will not have a header row (no
     column names) except for format = vertical.
-    
+
     If the basedir and start options are set, the method will attempt to start
     the server in read only mode to get the information. Specifying only
     basedir will not start the server. The extra start option is designed to
     make sure the user wants to start the offline server. The user may not wish
     to do this if there are certain error conditions and/or logs in place that
     may be overwritten.
-    
+
     servers[in]       list of server connections in the form
                       <user>:<password>@<host>:<port>:<socket>
     options[in]       dictionary of options (no_headers, format, basedir,
                       start, show_defaults)
-    
-    Returns tuple ((server information), defaults) 
+
+    Returns tuple ((server information), defaults)
     """
     from mysql.utilities.common.server import test_connect
     from mysql.utilities.common.format import print_list
-    
+
     no_headers = options.get("no_headers", False)
     format = options.get("format", "grid")
     show_defaults = options.get("show_defaults", False)
@@ -346,7 +353,7 @@ def show_server_info(servers, options):
     start = options.get("start", False)
     verbosity = options.get("verbosity", 0)
     show_servers = options.get("show_servers", 0)
-    
+
     if show_servers:
         if os.name == 'nt':
             ports = options.get("ports", "3306:3333")
@@ -376,12 +383,12 @@ def show_server_info(servers, options):
             else:
                 er = res.groups()
 
-            if (re.search("refused", "".join(er)) or 
+            if (re.search("refused", "".join(er)) or
                 re.search("Can't connect to local MySQL server through socket",
                            "".join(er))):
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
-            
+
                 opts = ["basedir", "datadir", "start"]
                 for opt in tuple(opts):
                     try:
@@ -399,7 +406,7 @@ def show_server_info(servers, options):
 
             if not start:
                 raise UtilError("".join(er))
-            else:    
+            else:
                 try:
                     server_val = parse_connection(server, None, options)
                 except:

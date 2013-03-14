@@ -47,7 +47,7 @@ class test(mutlib.System_test):
                 self.results.append(line)
         if res:
             raise MUTLibError("%s: failed" % comment)
-       
+
         # Create a new instance
         conn = {
             "user"   : "root",
@@ -58,7 +58,7 @@ class test(mutlib.System_test):
         }
         if os.name != "posix":
             conn["unix_socket"] = None
-        
+
         server_options = {
             'conn_info' : conn,
             'role'      : "cloned_server_2",
@@ -66,7 +66,7 @@ class test(mutlib.System_test):
         self.new_server = Server(server_options)
         if self.new_server is None:
             return False
-        
+
         if kill:
             # Connect to the new instance
             try:
@@ -76,15 +76,13 @@ class test(mutlib.System_test):
                 raise MUTLibError("Cannot connect to spawned server.")
             self.servers.stop_server(self.new_server)
 
-        self.servers.clear_last_port()
-
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
         base_cmd = "mysqlserverclone.py --server=%s --root-password=root " % \
                     self.build_connection_string(self.servers.get_server(0))
-       
+
         test_cases = [
             # (comment, command options, kill running server)
             ("show help", " --help ", False, True),
@@ -97,7 +95,7 @@ class test(mutlib.System_test):
             ("-vvv and write command to file shortcut",
              " -vvv -w startme.sh ", True, False),
         ]
-        
+
         test_num = 1
         for row in test_cases:
             new_comment = "Test case %d : %s" % (test_num, row[0])
@@ -105,6 +103,22 @@ class test(mutlib.System_test):
                                            new_comment, row[2], row[3]):
                 raise MUTLibError("%s: failed" % new_comment)
             test_num += 1
+
+        # Perform a test using the --user option for the current user
+        user = None
+        try:
+            user = os.environ['USERNAME']
+        except KeyError:
+            user = os.environ['LOGNAME']
+        finally:
+            if not user:
+                raise MUTLibError("Cannot obtain user name for test case.")
+
+        comment = "Test case %s: - User the --user option" % test_num
+        if not self._test_server_clone(base_cmd + "--user=%s" % user,
+                                       comment, True, False):
+            raise MUTLibError("%s: failed" % new_comment)
+        test_num += 1
 
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
         self.replace_result("#                       mysqld:",
@@ -119,14 +133,14 @@ class test(mutlib.System_test):
                             "# mysql_test_data_timezone.sql: XXXXXXXXXXXX\n")
         self.replace_result("#         fill_help_tables.sql:",
                             "#         fill_help_tables.sql: XXXXXXXXXXXX\n")
-        
+
         self.remove_result("# trying again...")
-        
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
 
@@ -135,7 +149,7 @@ class test(mutlib.System_test):
             os.unlink(filename)
         except:
             pass
-    
+
     def cleanup(self):
         files = [self.res_fname, "start.txt", "startme.sh"]
         for file in files:

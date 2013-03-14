@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import subprocess
 import sys
 import time
 import shutil
+
+from mysql.utilities.common.tools import check_port_in_use
 
 def clone_server(conn_val, options):
     """Clone an existing server
@@ -71,6 +73,9 @@ def clone_server(conn_val, options):
     user = options.get('user', 'root')
     quiet = options.get('quiet', False)
     cmd_file = options.get('cmd_file', None)
+
+    if not check_port_in_use('localhost', int(new_port)):
+       raise UtilError("Port in use. Please choose an available port.")
 
     # Clone running server
     if conn_val is not None:
