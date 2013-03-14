@@ -88,6 +88,11 @@ parser.add_option("--delete-data", action="store_true", dest="delete",
                   help="delete the folder specified by --new-data if it "
                   "exists and is not empty.")
 
+# Add user option
+parser.add_option("--user", action="store", dest="user", type="string",
+                  default=None, help="user account to launch cloned server. "
+                  "Default is current user.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -111,7 +116,7 @@ if os.path.exists(opt.new_data):
     if not os.access(opt.new_data, os.R_OK|os.W_OK):
         parser.error("You do not have enough privileges to access the folder "
                      "specified by --new-data.")
-    
+
     # Fail if new data is not empty and delete not specified
     if os.listdir(opt.new_data) and not opt.delete:
         parser.error("Target data directory exists and is not empty. Use "
@@ -129,6 +134,7 @@ options = {
     'cmd_file'       : opt.cmd_file,
     'basedir'        : opt.basedir,
     'delete'         : opt.delete,
+    'user'           : opt.user,
 }
 
 # Expand user paths and resolve relative paths
@@ -160,5 +166,5 @@ except exception.UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)
     sys.exit(1)
-    
+
 sys.exit()

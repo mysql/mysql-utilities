@@ -32,12 +32,12 @@ class test(mutlib.System_test):
     def setup(self):
         # No setup needed
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        cmd_str = "mysqlserverclone.py --server=%s " % \
-                  self.build_connection_string(self.servers.get_server(0))
-       
+        s0_conn = self.build_connection_string(self.servers.get_server(0))
+        cmd_str = "mysqlserverclone.py --server=%s " % s0_conn
+
         port1 = int(self.servers.get_next_port())
         newport = "--new-port=%d " % port1
         comment = "Test case 1 - error: no --new-data option"
@@ -51,7 +51,7 @@ class test(mutlib.System_test):
                                  "--new-id=7 " + newport, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         comment = "Test case 3 - error: cannot connect"
         res = self.run_test_case(1, "mysqlserverclone.py --server=root:nope@" +
                                  "nothere --new-data=/nada --new-id=7 " +
@@ -67,7 +67,7 @@ class test(mutlib.System_test):
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         # Make the directory and put a file in it
         new_dir = os.path.join(os.getcwd(), "test123")
         shutil.rmtree(new_dir, True)
@@ -93,24 +93,32 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = " ".join(["mysqlserverclone.py", "--server=%s" % s0_conn,
+                            "--new-port=%s" %  self.servers.get_server(0).port,
+                            "--new-data=%s" % new_dir, "--root=root"])
+
+        comment = "Test case 7 - attempt to use existing port"
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+
         # Mask known platform-dependent lines
         self.mask_result("Error 2003:", "2003", "####")
         self.replace_result("Error ####: Can't connect to MySQL server",
                             "Error ####: Can't connect to MySQL server"
                             " on 'nothere:####'\n")
-       
+
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
-        
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return True
-
