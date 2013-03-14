@@ -124,6 +124,16 @@ class test(frm_reader_base.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        frm_file_path = os.path.normpath("./std_data/frm_files")
+        cmd_str = " ".join([self.cmd, "--port=%s" % self.server0.port,
+                            frm_file_path])
+        comment = "Test case %s: - attempt to use existing port" % test_num
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
+
         self.mask_result("Error 2003:", "2003", "####")
         self.replace_result("Error ####: Can't connect to MySQL server",
                             "Error ####: Can't connect to MySQL server"

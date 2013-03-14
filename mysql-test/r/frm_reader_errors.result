@@ -27,3 +27,5 @@ Test case 7: - Invalid port
 Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm.py: error: You must specify a different port to use for the spawned server.
+Test case 8: - attempt to use existing port
+# Starting the spawned server on port 13001 ... ERROR: Port in use. Please choose an available port.
