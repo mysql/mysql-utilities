@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -663,7 +663,7 @@ class FailoverConsole(object):
         
         Returns bool - True = user exit no errors, False = errors
         """
-        self._reset_interval()
+        self._reset_interval(self.interval)
 
         # Get the data for first printing of the screen
         if self.list_data is None:
