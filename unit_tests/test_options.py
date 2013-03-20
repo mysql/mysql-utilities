@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+import os
 import unittest
 
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.options import parse_connection, get_absolute_path
 from mysql.utilities.exception import FormatError
 
 def _spec(info):
@@ -86,6 +87,35 @@ class TestParseConnection(unittest.TestCase):
                 self.fail("Unexpected exception thrown.")
             else:
                 self.fail("Exception not thrown for: '%s'." % spec)
- 
+
+
+@unittest.skipUnless(os.name == 'posix', 'Requires POSIX')
+class TestPosixPath(unittest.TestCase):
+    """Test posix paths.
+    """
+
+    paths = [
+        ('/home/user/a/', '/home/user/a'),
+        ('/home/user/b/../a', '/home/user/a')
+    ]
+
+    def setUp(self):
+        env_home = os.environ.get('HOME', '')
+        abs_path = os.path.abspath('.')
+        self.paths.extend([
+            ('a//b/../c', '{0}/a/c'.format(abs_path)),
+            ('a/./b', '{0}/a/b'.format(abs_path)),
+            ('{0}/a/d/../b/c'.format(env_home), '{0}/a/b/c'.format(env_home)),
+            ('~/a/b', '{0}/a/b'.format(env_home)),
+            ('~/a/../b', '{0}/b'.format(env_home)),
+        ])
+
+    def test_paths(self):
+        """Test POSIX paths.
+        """
+        for source, expected in self.paths:
+            self.assertEqual(get_absolute_path(source), expected)
+
+
 if __name__ == '__main__':
     unittest.main()

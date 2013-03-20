@@ -888,6 +888,12 @@ def add_basedir_option(parser):
 def check_basedir_option(parser, opt_basedir):
     """ Check if the specified --basedir option is valid.
     """
-    if opt_basedir and not os.path.isdir(opt_basedir):
+    if opt_basedir and not os.path.isdir(get_absolute_path(opt_basedir)):
         parser.error("The specified path for --basedir option is not a "
                      "directory: %s" % opt_basedir)
+
+
+def get_absolute_path(path):
+    """ Returns the absolute path.
+    """
+    return os.path.abspath(os.path.expanduser(os.path.normpath(path)))
