@@ -38,6 +38,7 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 
@@ -172,9 +173,10 @@ if opt.server2:
 
 res = True
 check_failed = False
+arg_regexp = re.compile('{0}(?:(?:\:){0})?'.format(REGEXP_OBJ_NAME))
 for db in args:
     # Split the database names considering backtick quotes
-    grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\:)(`(?:[^`]|``)+`|\w+))?", db)
+    grp = arg_regexp.match(db)
     if not grp:
         parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
                                               db1_label='db1',

@@ -101,7 +101,7 @@ class test(mutlib.System_test):
                   (s1_conn, s2_conn)
         cmd_str += " --force --difftype=sql "
         
-        self.server2.exec_query("CREATE TABLE util_test.t6 AS "
+        self.server2.exec_query("CREATE TABLE util_test.t6 ENGINE=MyISAM AS "
                                 "SELECT * FROM util_test.t1")
         
         comment = "Test case 5 - create transform for renamed table "

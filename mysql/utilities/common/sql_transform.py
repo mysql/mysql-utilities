@@ -119,10 +119,10 @@ def is_quoted_with_backticks(identifier):
 
 def build_pkey_where_clause(table, row):
     """Build the WHERE clause based on the primary keys
-    
+
     table[in]              instance of Table class for table
     row[in]                row of data
-    
+
     Returns string - WHERE clause or "" if no keys
     """
     where_str = ""
@@ -133,8 +133,10 @@ def build_pkey_where_clause(table, row):
         for pkey in pkeys:
             key_col = pkey[0]                         # get the column name
             col_data = row[col_names.index(key_col)]  # get column value
-            where_str += "%s = %s" % (key_col, to_sql(col_data))
-    
+            # quote key column with backticks
+            q_key_col = quote_with_backticks(key_col)
+            where_str += "%s = %s" % (q_key_col, to_sql(col_data))
+
     return where_str
 
 
@@ -172,10 +174,10 @@ def build_set_clauses(table, table_cols, dest_row, src_row):
 
 def transform_data(destination, source, operation, rows):
     """Transform data for tables.
-    
+
     This method will generate INSERT, UPDATE, and DELETE statements for
     transforming data found to differ among tables.
-    
+
     destination[in]    Table class instance of the destination
     source[in]         Table class instance of the source
     operation[in]      specify if INSERT, UPDATE, or DELETE
@@ -183,14 +185,16 @@ def transform_data(destination, source, operation, rows):
                        UPDATE - tuple (old, new)
                        DELETE - list to delete
                        INSERT - list to insert
-    
+
     Returns list - SQL statement(s) for transforming the data or a warning
                    if the columns differ between the tables
     """
     statements = []
-    dest_cols = destination.get_col_names()
-    src_cols = source.get_col_names()
-    
+
+    # Get column names quoted with backticks
+    dest_cols = destination.get_col_names(quote_backticks=True)
+    src_cols = source.get_col_names(quote_backticks=True)
+
     # We cannot do the data changes if the columns are different in the
     # destination and source!
     if dest_cols != src_cols:
@@ -204,24 +208,24 @@ def transform_data(destination, source, operation, rows):
             for col in row:
                 formatted_row.append(to_sql(col))
             statements.append("INSERT INTO %s (%s) VALUES(%s);" %
-                              (destination.table, ', '.join(dest_cols),
+                              (destination.q_table, ', '.join(dest_cols),
                                ', '.join(formatted_row)))
     elif data_op == "UPDATE":
-        for i in range(0,len(rows[0])):
+        for i in range(0, len(rows[0])):
             row1 = rows[0][i]
             row2 = rows[1][i]
-            sql_str = "UPDATE %s" % destination.table
+            sql_str = "UPDATE %s" % destination.q_table
             sql_str += " %s" % build_set_clauses(source, src_cols, row1, row2)
             sql_str += " %s" % build_pkey_where_clause(source, row2)
-            statements.append("%s;" % sql_str)                
+            statements.append("%s;" % sql_str)
     elif data_op == "DELETE":
         for row in rows:
-            sql_str = "DELETE FROM %s " % destination.table
+            sql_str = "DELETE FROM %s " % destination.q_table
             sql_str += build_pkey_where_clause(source, row)
             statements.append("%s;" % sql_str)
     else:
         raise UtilError("Unknown data transformation option: %s." % data_op)
-    
+
     return statements
 
 
@@ -855,7 +859,8 @@ class SQLTransformer(object):
             unique_setting = None
             for key in rows:
                 if key[2] == 'PRIMARY':
-                    pri_key_cols.append(key[4])
+                    q_key = quote_with_backticks(key[4])
+                    pri_key_cols.append(q_key)
                 else:
                     if unique_name is None:
                         unique_name = key[2]
@@ -1000,18 +1005,6 @@ class SQLTransformer(object):
         """        
         statements = []
 
-        # build a list of the parts
-        statement_parts = [
-            # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "ALTER TABLE" },
-            # object name
-            { 'fmt' : " %s.%s", 'col' : _IGNORE_COLUMN,
-              'val' : (self.destination[_TABLE_DEF][_TABLE_DB],
-                       self.destination[_TABLE_DEF][_TABLE_NAME]) },
-            # alter clauses - will be completed later
-            { 'fmt' : " \n%s", 'col' : _IGNORE_COLUMN, 'val' : "" },
-        ]
-        
         # Collect a list of all of the ALTER clauses. Order is important in
         # building an ALTER TABLE statement. For safety (and correct execution)
         # we must order the clauses as follows:
@@ -1030,16 +1023,33 @@ class SQLTransformer(object):
         src_tbl_name = self.source[_TABLE_DEF][_TABLE_NAME]
         dest_db_name = self.destination[_TABLE_DEF][_TABLE_DB]
         dest_tbl_name = self.destination[_TABLE_DEF][_TABLE_NAME]
-        
+
+        # Quote identifiers with bacticks
+        q_src_db_name = quote_with_backticks(src_db_name)
+        q_src_tbl_name = quote_with_backticks(src_tbl_name)
+        q_dest_db_name = quote_with_backticks(dest_db_name)
+        q_dest_tbl_name = quote_with_backticks(dest_tbl_name)
+
+        # build a list of the parts
+        statement_parts = [
+            # preamble
+            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "ALTER TABLE" },
+            # object name
+            { 'fmt' : " %s.%s", 'col' : _IGNORE_COLUMN,
+              'val' : (q_dest_db_name, q_dest_tbl_name) },
+            # alter clauses - will be completed later
+            { 'fmt' : " \n%s", 'col' : _IGNORE_COLUMN, 'val' : "" },
+        ]
+
         # For foreign key changes, we need two collections: drop statements,
         # add and change statements. Method returns tuple of (drop, add).
-        fkeys = self._get_foreign_keys(src_db_name, src_tbl_name,
-                                       dest_db_name, dest_tbl_name)
+        fkeys = self._get_foreign_keys(q_src_db_name, q_src_tbl_name,
+                                       q_dest_db_name, q_dest_tbl_name)
 
         # For index changes, we need two collections: drop statements, add and
         # change statements. Method returns tuple of (drop, add).
-        indexes = self._get_indexes(src_db_name, src_tbl_name,
-                                    dest_db_name, dest_tbl_name)
+        indexes = self._get_indexes(q_src_db_name, q_src_tbl_name,
+                                    q_dest_db_name, q_dest_tbl_name)
 
 
         # For column changes, we need two collections: drop statements, add and

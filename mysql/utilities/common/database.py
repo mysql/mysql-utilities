@@ -607,7 +607,13 @@ class Database(object):
         definition = []
         from_name = None
         condition = None
-        
+
+        # Remove objects backticks if needed
+        db = remove_backtick_quoting(db) \
+                    if is_quoted_with_backticks(db) else db
+        name = remove_backtick_quoting(name) \
+                    if is_quoted_with_backticks(name) else name
+
         if obj_type == _DATABASE:
             columns = 'SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, ' + \
                       'DEFAULT_COLLATION_NAME, SQL_PATH'

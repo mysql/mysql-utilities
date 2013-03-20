@@ -39,6 +39,7 @@ from mysql.utilities.common.options import parse_connection, add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -133,11 +134,9 @@ if len(args) == 0:
 
 # run the diff
 diff_failed = False
+arg_regexp = re.compile('{0}(?:\:){0}'.format(REGEXP_QUALIFIED_OBJ_NAME))
 for argument in args:
-    m_obj = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\.)(`(?:[^`]|``)+`|\w+))?"
-                     "(?:\:)"
-                     "(`(?:[^`]|``)+`|\w+)(?:(?:\.)(`(?:[^`]|``)+`|\w+))?",
-                     argument)
+    m_obj = arg_regexp.match(argument)
     if not m_obj:
         parser.error(PARSE_ERR_DB_OBJ_PAIR.format(db_obj_pair=argument,
                                                   db1_label='db1',

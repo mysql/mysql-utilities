@@ -35,8 +35,8 @@ Test case 2 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplier SET name = 'Wesayso Corporation' WHERE code = '2';
-INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
+UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 
 
 # TABLE     supplies                                pass    FAIL    FAIL    
@@ -47,18 +47,18 @@ INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11040';
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11186';
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11146';
-DELETE FROM inventory.supplies WHERE stock_number = '11104';
-DELETE FROM inventory.supplies WHERE stock_number = '11056';
-DELETE FROM inventory.supplies WHERE stock_number = '11136';
-DELETE FROM inventory.supplies WHERE stock_number = '11173';
-DELETE FROM inventory.supplies WHERE stock_number = '11106';
-DELETE FROM inventory.supplies WHERE stock_number = '11270';
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11040';
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11186';
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11146';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11104';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11056';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11136';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11173';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11106';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11270';
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
 
 
 # VIEW      tools                                   FAIL    -       -       
@@ -94,8 +94,8 @@ Test case 3 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplier SET name = 'Never Enough Inc.' WHERE code = '2';
-DELETE FROM inventory.supplier WHERE code = '3';
+UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 
 # TABLE     supplies                                pass    FAIL    FAIL    
@@ -106,18 +106,18 @@ DELETE FROM inventory.supplier WHERE code = '3';
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11040';
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11186';
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11146';
-DELETE FROM inventory.supplies WHERE stock_number = '11269';
-DELETE FROM inventory.supplies WHERE stock_number = '11116';
-DELETE FROM inventory.supplies WHERE stock_number = '10665';
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11040';
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11186';
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11146';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11269';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11116';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '10665';
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
 
 
 # VIEW      tools                                   FAIL    -       -       
@@ -153,15 +153,15 @@ Test case 4 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplier SET name = 'Wesayso Corporation' WHERE code = '2';
-INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
+UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
 # # Data differences found among rows:
-# UPDATE inventory.supplier SET name = 'Never Enough Inc.' WHERE code = '2';
-# DELETE FROM inventory.supplier WHERE code = '3';
+# UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+# DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 #
 
 
@@ -173,35 +173,35 @@ INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11040';
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11186';
-UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11146';
-DELETE FROM inventory.supplies WHERE stock_number = '11104';
-DELETE FROM inventory.supplies WHERE stock_number = '11056';
-DELETE FROM inventory.supplies WHERE stock_number = '11136';
-DELETE FROM inventory.supplies WHERE stock_number = '11173';
-DELETE FROM inventory.supplies WHERE stock_number = '11106';
-DELETE FROM inventory.supplies WHERE stock_number = '11270';
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11040';
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11186';
+UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11146';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11104';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11056';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11136';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11173';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11106';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11270';
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
 
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
 # # Data differences found among rows:
-# UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11040';
-# UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11186';
-# UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11146';
-# DELETE FROM inventory.supplies WHERE stock_number = '11269';
-# DELETE FROM inventory.supplies WHERE stock_number = '11116';
-# DELETE FROM inventory.supplies WHERE stock_number = '10665';
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
+# UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11040';
+# UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11186';
+# UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11146';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11269';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11116';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '10665';
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
 #
 
 
@@ -245,15 +245,15 @@ Test case 5 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplier SET name = 'Never Enough Inc.' WHERE code = '2';
-DELETE FROM inventory.supplier WHERE code = '3';
+UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
 # # Data differences found among rows:
-# UPDATE inventory.supplier SET name = 'Wesayso Corporation' WHERE code = '2';
-# INSERT INTO inventory.supplier (code, name) VALUES('3', 'Never Enough Inc.');
+# UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+# INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 #
 
 
@@ -265,35 +265,35 @@ DELETE FROM inventory.supplier WHERE code = '3';
 #
 
 # Data differences found among rows:
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11040';
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11186';
-UPDATE inventory.supplies SET cost = '9.99' WHERE stock_number = '11146';
-DELETE FROM inventory.supplies WHERE stock_number = '11269';
-DELETE FROM inventory.supplies WHERE stock_number = '11116';
-DELETE FROM inventory.supplies WHERE stock_number = '10665';
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
-INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11040';
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11186';
+UPDATE `inventory`.`supplies` SET `cost` = '9.99' WHERE `stock_number` = '11146';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11269';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11116';
+DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '10665';
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11104', 'Interior cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11056', 'Microfiber and foam pad cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11136', 'Rubber cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11173', 'Vinyl and rubber dressing', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11106', 'Wheel cleaner', '1', '9.99', 'cleaning', '', '1');
+INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11270', 'Carpet cleaner', '1', '9.99', 'cleaning', '', '1');
 
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
 # # Data differences found among rows:
-# UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11040';
-# UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11186';
-# UPDATE inventory.supplies SET cost = '10.00' WHERE stock_number = '11146';
-# DELETE FROM inventory.supplies WHERE stock_number = '11104';
-# DELETE FROM inventory.supplies WHERE stock_number = '11056';
-# DELETE FROM inventory.supplies WHERE stock_number = '11136';
-# DELETE FROM inventory.supplies WHERE stock_number = '11173';
-# DELETE FROM inventory.supplies WHERE stock_number = '11106';
-# DELETE FROM inventory.supplies WHERE stock_number = '11270';
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
-# INSERT INTO inventory.supplies (stock_number, description, qty, cost, type, notes, supplier) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
+# UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11040';
+# UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11186';
+# UPDATE `inventory`.`supplies` SET `cost` = '10.00' WHERE `stock_number` = '11146';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11104';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11056';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11136';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11173';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11106';
+# DELETE FROM `inventory`.`supplies` WHERE `stock_number` = '11270';
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11269', 'Microfiber spray on car wash towel', '3', '16.99', 'cleaning', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('11116', 'Microfiber wax removal towel', '3', '16.99', 'waxing', '', '1');
+# INSERT INTO `inventory`.`supplies` (`stock_number`, `description`, `qty`, `cost`, `type`, `notes`, `supplier`) VALUES('10665', 'Glass polish pad', '3', '10.00', 'polishing', '', '1');
 #
 
 

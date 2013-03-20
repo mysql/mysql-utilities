@@ -21,6 +21,13 @@ This file contains auxiliary functions to handle pattern matching.
 
 import re
 
+# Regular expression to match a database object identifier (support backticks)
+REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+)'
+
+# Regular expression to match a qualified object identifier (with multiple
+# parts). Example: db.obj, db or obj
+REGEXP_QUALIFIED_OBJ_NAME = r'{0}(?:(?:\.){0})?'.format(REGEXP_OBJ_NAME)
+
 
 def convertSQL_LIKE2REGEXP(sql_like_pattern):
     """Convert a standard SQL LIKE pattern to a REGEXP pattern.

@@ -18,7 +18,7 @@ import os
 import test_sql_template
 from mysql.utilities.exception import MUTLibError, UtilDBError
 
-_DIFF_TABLE = "CREATE TABLE `diff_event`.`t1` (a char(30))"
+_DIFF_TABLE = "CREATE TABLE `diff_event`.`t1` (a char(30)) ENGINE=InnoDB"
 
 # interval, on completion, status, body
 # (comment, def1, def2, expected result)

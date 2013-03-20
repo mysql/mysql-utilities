@@ -25,40 +25,42 @@ _TABLE_TESTS = [
      "CREATE TABLE diff_table.t1(a int) ENGINE=INNODB;",
      0, None),
     ("Table auto_increment",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, " + \
+     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
      "b CHAR(10)) AUTO_INCREMENT=5;",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, " + \
+     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
      "b CHAR(10)) AUTO_INCREMENT=10;",
      0, None),
     ("Table multiple options",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, " + \
+     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
      "b CHAR(10)) AUTO_INCREMENT=5 ENGINE=INNODB;",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, " + \
+     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
      "b CHAR(10)) AUTO_INCREMENT=10 ENGINE=MYISAM;",
      0, None),
     ("Table average row length",
-     "CREATE TABLE diff_table.t1(a int) AVG_ROW_LENGTH=32;",
-     "CREATE TABLE diff_table.t1(a int) AVG_ROW_LENGTH=128;",
+     "CREATE TABLE diff_table.t1(a int) AVG_ROW_LENGTH=32 ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a int) AVG_ROW_LENGTH=128 ENGINE=INNODB;",
      0, None),
     ("Table checksum",
-     "CREATE TABLE diff_table.t1(a int) CHECKSUM=1;",
-     "CREATE TABLE diff_table.t1(a int) CHECKSUM=0;",
-     0, [1,0,1,1,0,0,1,1]), # Throws warning on direction=server1
+     "CREATE TABLE diff_table.t1(a int) CHECKSUM=1 ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a int) CHECKSUM=0 ENGINE=INNODB;",
+     0, [1, 0, 1, 1, 0, 0, 1, 1]),  # Throws warning on direction=server1
     ("Table collation",
      "CREATE TABLE diff_table.t1(a int) COLLATE=latin1_swedish_ci;",
      "CREATE TABLE diff_table.t1(a int) COLLATE=latin1_bin;",
      0, None),
     ("Table comment",
-     "CREATE TABLE diff_table.t1(a int) COMMENT='WHAT?';",
-     "CREATE TABLE diff_table.t1(a int) COMMENT='WHO?';",
+     "CREATE TABLE diff_table.t1(a int) COMMENT='WHAT?' ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a int) COMMENT='WHO?' ENGINE=INNODB;",
      0, None),
     ("Table comment only one table.",
-     "CREATE TABLE diff_table.t1(a int) COMMENT='Doctor Who';",
-     "CREATE TABLE diff_table.t1(a int);",
+     "CREATE TABLE diff_table.t1(a int) COMMENT='Doctor Who' ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a int) ENGINE=INNODB;",
      0, None),
     ("Table other options",
-     "CREATE TABLE diff_table.t1(a int) INSERT_METHOD=FIRST, PACK_KEYS=1;",
-     "CREATE TABLE diff_table.t1(a int) INSERT_METHOD=LAST, PACK_KEYS=0;",
+     "CREATE TABLE diff_table.t1(a int) INSERT_METHOD=FIRST, PACK_KEYS=1 "
+     "ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a int) INSERT_METHOD=LAST, PACK_KEYS=0 "
+     "ENGINE=INNODB;",
      0, None),
 ]
 

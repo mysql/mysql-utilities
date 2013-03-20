@@ -168,9 +168,9 @@ class test(mutlib.System_test):
 
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db``:db`:`db``:db`' -a"
+            cmd_arg = "'`db.``:db`:`db.``:db`' -a"
         else:
-            cmd_arg = '"`db``:db`:`db``:db`" -a'
+            cmd_arg = '"`db.``:db`:`db.``:db`" -a'
         cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_arg)
         comment = ("Test case 8 - compare a database with weird names "
                    "(backticks)")
@@ -220,8 +220,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server1, "inventory1")
         self.drop_db(self.server1, "inventory2")
         self.drop_db(self.server2, "inventory")
-        self.drop_db(self.server1, 'db`:db')
-        self.drop_db(self.server2, 'db`:db')
+        self.drop_db(self.server1, 'db.`:db')
+        self.drop_db(self.server2, 'db.`:db')
         return True
 
     def cleanup(self):

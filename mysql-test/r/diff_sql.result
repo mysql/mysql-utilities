@@ -24,7 +24,7 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 # Transformation for --changes-for=server1:
 #
 
-ALTER TABLE util_test.t3 
+ALTER TABLE `util_test`.`t3` 
   DROP COLUMN b, 
   ADD COLUMN d char(30) NULL AFTER a, 
 ENGINE=MyISAM;
@@ -33,7 +33,7 @@ ENGINE=MyISAM;
 # Transformation for --changes-for=server1:
 #
 
-ALTER TABLE util_test.t4 
+ALTER TABLE `util_test`.`t4` 
   DROP FOREIGN KEY ref_t3, 
   DROP INDEX ref_t3, 
 ENGINE=MyISAM;
@@ -79,7 +79,7 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 # Transformation for --changes-for=server2:
 #
 
-ALTER TABLE util_test.t3 
+ALTER TABLE `util_test`.`t3` 
   DROP COLUMN d, 
   ADD COLUMN b char(30) NULL AFTER a, 
 ENGINE=InnoDB;
@@ -88,7 +88,7 @@ ENGINE=InnoDB;
 # Transformation for --changes-for=server2:
 #
 
-ALTER TABLE util_test.t4 
+ALTER TABLE `util_test`.`t4` 
 ADD CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES `util_test`.`t3`(a), 
   ADD INDEX ref_t3 (c), 
 ENGINE=InnoDB;
@@ -148,7 +148,7 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 # Transformation for --changes-for=server1:
 #
 
-ALTER TABLE util_test.t3 
+ALTER TABLE `util_test`.`t3` 
   DROP COLUMN b, 
   ADD COLUMN d char(30) NULL AFTER a, 
 ENGINE=MyISAM;
@@ -156,7 +156,7 @@ ENGINE=MyISAM;
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
-# ALTER TABLE util_test.t3 
+# ALTER TABLE `util_test`.`t3` 
 #   DROP COLUMN d, 
 #   ADD COLUMN b char(30) NULL AFTER a, 
 # ENGINE=InnoDB;
@@ -166,7 +166,7 @@ ENGINE=MyISAM;
 # Transformation for --changes-for=server1:
 #
 
-ALTER TABLE util_test.t4 
+ALTER TABLE `util_test`.`t4` 
   DROP FOREIGN KEY ref_t3, 
   DROP INDEX ref_t3, 
 ENGINE=MyISAM;
@@ -174,7 +174,7 @@ ENGINE=MyISAM;
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
-# ALTER TABLE util_test.t4 
+# ALTER TABLE `util_test`.`t4` 
 # ADD CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES `util_test`.`t3`(a), 
 #   ADD INDEX ref_t3 (c), 
 # ENGINE=InnoDB;
@@ -249,7 +249,7 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 # Transformation for --changes-for=server2:
 #
 
-ALTER TABLE util_test.t3 
+ALTER TABLE `util_test`.`t3` 
   DROP COLUMN d, 
   ADD COLUMN b char(30) NULL AFTER a, 
 ENGINE=InnoDB;
@@ -257,7 +257,7 @@ ENGINE=InnoDB;
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
-# ALTER TABLE util_test.t3 
+# ALTER TABLE `util_test`.`t3` 
 #   DROP COLUMN b, 
 #   ADD COLUMN d char(30) NULL AFTER a, 
 # ENGINE=MyISAM;
@@ -267,7 +267,7 @@ ENGINE=InnoDB;
 # Transformation for --changes-for=server2:
 #
 
-ALTER TABLE util_test.t4 
+ALTER TABLE `util_test`.`t4` 
 ADD CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES `util_test`.`t3`(a), 
   ADD INDEX ref_t3 (c), 
 ENGINE=InnoDB;
@@ -275,7 +275,7 @@ ENGINE=InnoDB;
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
-# ALTER TABLE util_test.t4 
+# ALTER TABLE `util_test`.`t4` 
 #   DROP FOREIGN KEY ref_t3, 
 #   DROP INDEX ref_t3, 
 # ENGINE=MyISAM;
@@ -317,7 +317,7 @@ Test case 5 - create transform for renamed table
 # Transformation for --changes-for=server1:
 #
 
-ALTER TABLE util_test.t1 
+ALTER TABLE `util_test`.`t1` 
 RENAME TO util_test.t6 
 , ENGINE=MyISAM;
 
