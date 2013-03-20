@@ -412,7 +412,8 @@ class RplCommands(object):
                                    % _ERRANT_TNX_ERROR)
 
         self._report("# Performing failover.")
-        if not self.topology.failover(self.candidates, strict):
+        if not self.topology.failover(self.candidates, strict,
+                                      stop_on_error=True):
             self._report("# Errors found.", logging.ERROR)
             return False
         return True
@@ -785,7 +786,7 @@ class RplCommands(object):
                     console.add_warning('errant_tnx', warn_msg)
                     self._report(_ERRANT_TNX_ERROR, logging.WARN, False)
                     for host, port, tnx_set in errant_tnx:
-                        errant_msg = (" - For slave '{0}@%{1}': "
+                        errant_msg = (" - For slave '{0}@{1}': "
                                       "{2}".format(host, port,
                                                    ", ".join(tnx_set)))
                         self._report(errant_msg, logging.WARN, False)

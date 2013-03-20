@@ -16,6 +16,7 @@ Test case 1 - test failover scripts
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
 # Candidate slave localhost:PORT4 will become the new master.
+# Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Reading events in relay log for slave localhost:PORT2
 # No missing transactions found on localhost:PORT2. Skipping connection of candidate as slave.

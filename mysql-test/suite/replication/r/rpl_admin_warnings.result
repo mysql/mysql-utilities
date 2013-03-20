@@ -39,6 +39,7 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 # Checking privileges.
 # Performing failover.
 # Candidate slave localhost:PORT2 will become the new master.
+# Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Creating replication user if it does not exist.
 # Stopping slaves.

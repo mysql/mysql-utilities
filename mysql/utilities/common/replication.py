@@ -1427,6 +1427,22 @@ class Slave(Server):
 
         return (state, io_errorno, io_error)
 
+    def get_sql_error(self):
+        """Return the slave slave sql error status
+
+        Returns tuple - (sql_running, sql_errorno, sql_error)
+                        or None if not connected
+        """
+        res = self.get_status()
+        if not res:
+            return None
+
+        sql_running = res[0][_SLAVE_SQL_RUNNING]
+        sql_errorno = int(res[0][_SLAVE_SQL_ERRORNO])
+        sql_error = res[0][_SLAVE_SQL_ERROR]
+
+        return (sql_running, sql_errorno, sql_error)
+
     def get_slaves_errors(self):
         """Return the slave slave io and sql error status
 

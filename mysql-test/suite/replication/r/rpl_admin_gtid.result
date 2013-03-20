@@ -345,6 +345,7 @@ Test case 17 - failover to localhost:PORT4
 # Checking privileges on candidates.
 # Performing failover.
 # Candidate slave localhost:PORT4 will become the new master.
+# Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Creating replication user if it does not exist.
 # Stopping slaves.

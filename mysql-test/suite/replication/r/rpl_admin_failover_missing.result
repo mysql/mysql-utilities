@@ -29,6 +29,15 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
 # Candidate slave localhost:PORT2 will become the new master.
+# Checking slaves status (before failover).
+# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT3' that can result on a unstable topology.
+#  - SQL thread running: No
+#  - SQL error: None
+#  Tip: Check the slave server log to identify the problem and fix it. For more information, see: http://dev.mysql.com/doc/refman/5.6/en/replication-problems.html
+# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT4' that can result on a unstable topology.
+#  - SQL thread running: No
+#  - SQL error: None
+#  Tip: Check the slave server log to identify the problem and fix it. For more information, see: http://dev.mysql.com/doc/refman/5.6/en/replication-problems.html
 # Preparing candidate for failover.
 # Reading events in relay log for slave localhost:PORT3
 # No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
@@ -126,6 +135,7 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
 # Candidate slave localhost:PORT3 will become the new master.
+# Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Reading events in relay log for slave localhost:PORT4
 # No missing transactions found on localhost:PORT4. Skipping connection of candidate as slave.

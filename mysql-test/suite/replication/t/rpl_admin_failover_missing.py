@@ -181,7 +181,7 @@ class test(rpl_admin.test):
                            self.slave4_conn])
         cmd_str = "mysqlrpladmin.py --master=%s " % self.master_conn
         cmd_opts = " --candidates=%s  " % self.slave1_conn
-        cmd_opts += " --slaves=%s failover -vvv" % slaves
+        cmd_opts += " --slaves=%s failover -vvv --force" % slaves
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
