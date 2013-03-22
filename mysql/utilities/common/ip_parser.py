@@ -35,19 +35,27 @@ from mysql.utilities.exception import UtilError
 
 log = logging.getLogger('ip_parser')
 
-_BAD_CONN_FORMAT = ("Connection '{0}' cannot be parsed. Please review the "
-                    "used connection string (accepted formats: "
-                    "<user>[:<password>]@<host>[:<port>][:<socket>] or "
-                    "<login-path>[:<port>][:<socket>])")
+_BAD_CONN_FORMAT = (u"Connection '{0}' cannot be parsed. Please review the "
+                    u"used connection string (accepted formats: "
+                    u"<user>[:<password>]@<host>[:<port>][:<socket>] or "
+                    u"<login-path>[:<port>][:<socket>])")
 
-_BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
+_BAD_QUOTED_HOST = u"Connection '{0}' has a malformed quoted host"
 
 _UNPARSED_CONN_FORMAT = ("Connection '{0}' not parsed completely. Parsed "
                          "elements '{1}', unparsed elements '{2}'")
 
 _CONN_USERPASS = re.compile(
-    r"(\w+)"                     # User name
-    r"(?:\:(\w+))?"              # Optional password
+    r"(?P<fquote>[\'\"]?)"    # First quote
+    r"(?P<user>.+?)"          # User name
+    r"(?:(?P=fquote))"        # First quote match
+    r"(?:\:"                  # Optional :
+    r"(?P<squote>[\'\"]?)"    # Second quote
+    r"(?P<passwd>.+)"         # Password
+    r"(?P=squote))"           # Second quote match
+    r"|(?P<sfquote>[\'\"]?)"  # Quote on single user name
+    r"(?P<suser>.+)"          # Single user name
+    r"(?:(?P=sfquote))"       # Quote match on single user name
     )
 
 _CONN_QUOTEDHOST = re.compile(
@@ -239,7 +247,8 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         return grp.groups()
 
     # Split on the '@' to determine the connection string format.
-    conn_format = connection_values.split('@')
+    # The user/password may have the '@' character, split by last occurrence.
+    conn_format = connection_values.rsplit('@', 1)
 
     if len(conn_format) == 1:
         # No '@' then handle has in the format: login-path[:port][:socket]
@@ -282,7 +291,14 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         userpass, hostportsock = conn_format
 
         # Get user, password
-        user, passwd = _match(_CONN_USERPASS, userpass)
+        match = _CONN_USERPASS.match(userpass)
+        if not match:
+            raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
+        user = match.group('user')
+        if user is None:
+            # No password provided
+            user = match.group('suser').rstrip(':')
+        passwd = match.group('passwd')
 
         # Handle host, port and socket
         if len(hostportsock) <= 0:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
@@ -22,16 +23,31 @@ from mysql.utilities.common.options import get_absolute_path
 from mysql.utilities.exception import FormatError
 
 def _spec(info):
-    """Create a server specification string from an info structure."""
-    result = [info['user']]
-    if info.get('passwd', None):
-        result.append(':' + info['passwd'])
-    result.append('@' + info['host'])
-    if 'port' in info:
-        result.append(':' + str(info['port']))
-    if "unix_socket" in info:
-        result.append(":" + info["unix_socket"])
+    result = []
+
+    user = info['user']
+    if ':' in user or '@' in user:
+        user = u"'{0}'".format(user)
+    result.append(user)
+
+    passwd = info.get('passwd')
+    if passwd:
+        result.append(':')
+        if ':' in passwd or '@' in passwd:
+            passwd = u"'{0}'".format(passwd)
+        result.append(passwd)
+
+    result.append('@')
+    result.append(info['host'])
+    if info.get('port'):
+        result.append(':')
+        result.append(str(info['port']))
+    if info.get('unix_socket'):
+        result.append(':')
+        result.append(info['unix_socket'])
+        
     return ''.join(result)
+
 
 class TestParseConnection(unittest.TestCase):
     """Test that parsing connection strings work correctly.
@@ -46,6 +62,15 @@ class TestParseConnection(unittest.TestCase):
         ('mats:foo@localhost:3308', 'mats:foo@localhost:3308'),
         ('mats@localhost:3308:/usr/var/mysqld.sock', 'mats@localhost:3308:/usr/var/mysqld.sock'),
         ('mats:@localhost', 'mats@localhost:3306'),
+        ('mysql-user:!#$-%&@localhost', 'mysql-user:!#$-%&@localhost:3306'),
+        ('"nuno:mariz":foo@localhost', "'nuno:mariz':foo@localhost:3306"),
+        ("nmariz:'foo:bar'@localhost", "nmariz:'foo:bar'@localhost:3306"),
+        ("nmariz:'foo@bar'@localhost", "nmariz:'foo@bar'@localhost:3306"),
+        ("nmariz:foo'bar@localhost", "nmariz:foo'bar@localhost:3306"),
+        ("foo'bar:nmariz@localhost", "foo'bar:nmariz@localhost:3306"),
+        ('nmariz:foo"bar@localhost', 'nmariz:foo"bar@localhost:3306'),
+        ('foo"bar:nmariz@localhost', 'foo"bar:nmariz@localhost:3306'),
+        (u'ɱysql:unicode@localhost', u'ɱysql:unicode@localhost:3306'),
         # IPv6 strings
         ("cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf", "cbell@[3ffe:1900:4545:3:200:f8ff:fe21:67cf]:3306"),
         ("cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "cbell@[fe80:0000:0000:0000:0202:b3ff:fe1e:8329]:3306"),
@@ -70,7 +95,7 @@ class TestParseConnection(unittest.TestCase):
         """
         for source, expected in self.valid_specifiers:
             result = _spec(parse_connection(source))
-            frm = "{0}: was {1}, expected {2}"
+            frm = u"{0}: was {1}, expected {2}"
             msg = frm.format(source, result, expected)
             self.assertEqual(expected, result, msg)
 

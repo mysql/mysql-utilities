@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
@@ -14,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import mutlib
 from mysql.utilities.exception import MUTLibError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
@@ -118,6 +118,81 @@ _TEST_RESULTS = [
     #   - collapsed IPv6 but can be quoted.
 ]
 
+_TEST_RESULTS_WITH_CREDENTIALS = [
+    ('check valid with credentials #1',
+     'mats@localhost', 'mats@localhost:3306', False),
+
+    ('check valid with credentials #2',
+     'mats@localhost:3307', 'mats@localhost:3307', False),
+
+    ('check valid with credentials #3',
+     'mats:foo@localhost', 'mats:foo@localhost:3306', False),
+
+    ('check valid with credentials #4',
+     'mats:foo@localhost:3308', 'mats:foo@localhost:3308', False),
+
+    ('check valid with credentials #5',
+     'mats@localhost:3308:/usr/var/mysqld.sock',
+     'mats@localhost:3308:/usr/var/mysqld.sock', False),
+
+    ('check valid with credentials #6',
+     'mats:@localhost', 'mats@localhost:3306', False),
+
+    ('check valid with credentials #7',
+     'mysql-user:!#$-%&@localhost', 'mysql-user:!#$-%&@localhost:3306', False),
+
+    ('check valid with credentials #8',
+     '"nuno:mariz":foo@localhost', "'nuno:mariz':foo@localhost:3306", False),
+
+    ('check valid with credentials #9',
+     "nmariz:'foo:bar'@localhost", "nmariz:'foo:bar'@localhost:3306", False),
+
+    ('check valid with credentials #10',
+     "nmariz:'foo@bar'@localhost", "nmariz:'foo@bar'@localhost:3306", False),
+
+    ('check valid with credentials #11',
+     "nmariz:foo'bar@localhost", "nmariz:foo'bar@localhost:3306", False),
+
+    ('check valid with credentials #12',
+     "foo'bar:nmariz@localhost", "foo'bar:nmariz@localhost:3306", False),
+
+    ('check valid with credentials #13',
+     'nmariz:foo"bar@localhost', 'nmariz:foo"bar@localhost:3306', False),
+
+    ('check valid with credentials #14',
+     'foo"bar:nmariz@localhost', 'foo"bar:nmariz@localhost:3306', False),
+
+    ('check valid with credentials #15',
+     u'ɱysql:unicode@localhost', u'ɱysql:unicode@localhost:3306', False),
+]
+
+
+def _spec(info):
+    """Create a server specification string from an info structure."""
+    result = []
+
+    user = info['user']
+    if ':' in user or '@' in user:
+        user = u"'{0}'".format(user.replace("'", "\'"))
+    result.append(user)
+
+    passwd = info.get('passwd')
+    if passwd:
+        result.append(':')
+        if ':' in passwd or '@' in passwd:
+            passwd = u"'{0}'".format(passwd.replace("'", "\'"))
+        result.append(passwd)
+
+    result.append('@')
+    result.append(info['host'])
+    result.append(':')
+    result.append(str(info.get('port', 3306)))
+    if info.get('unix_socket'):
+        result.append(':')
+        result.append(info['unix_socket'])
+    return ''.join(result)
+
+
 class test(mutlib.System_test):
     """check parse_connection()
     This test attempts to use parse_connection method for correctly parsing
@@ -130,13 +205,17 @@ class test(mutlib.System_test):
     def setup(self):
         return True
     
-    def test_connection(self, test_num, test_data):
+    def test_connection(self, test_num, test_data, with_credentials=False):
     
         if self.debug:
           print "\nTest case %s - %s" % (test_num+1, test_data[0])
       
         try:
-            self.conn_vals = parse_connection("root@%s:3306" % test_data[1])
+            if with_credentials:
+                conn_string = test_data[1]
+            else:
+                conn_string = "root@{0}:3306".format(test_data[1])
+            self.conn_vals = parse_connection(conn_string)
         except FormatError, e:
             if test_data[3]:
                 # This expected. 
@@ -149,6 +228,8 @@ class test(mutlib.System_test):
                 raise MUTLibError("Test Case %s: Parse should have failed. " \
                                    "Got this instead: %s" % \
                                    (test_num+1, self.conn_vals['host']))
+            elif with_credentials:
+                self.results.append(_spec(self.conn_vals))
             else:
                 self.results.append(self.conn_vals['host'])
         
@@ -160,25 +241,34 @@ class test(mutlib.System_test):
                       (i+1, _TEST_RESULTS[i][2], self.results[i])
                 if _TEST_RESULTS[i][3]:
                     print "Test case is expected to fail."
-        #try:
-        #    self.conn_vals = parse_connection("root:pass@'mysql.com':3306:/socketfile")
-        #    print "HERE:", self.conn_vals
-        #except FormatError, e:
-        #    raise MUTLibError("Test Case XX: Parse failed! Error: %s" % \
-        #                       (99, e))
-        #
+
+        for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
+            i += 1
+            self.test_connection(i, test_case, with_credentials=True)
+            if self.debug:
+                msg = u"Comparing result for test case {0}: {1} == {2}"
+                print(msg.format(i + 1, test_case[2], self.results[i]))
+                if test_case[3]:
+                    print("Test case is expected to fail.")
         return True
-    
+
     def get_result(self):
-        if len(self.results) != len(_TEST_RESULTS):
+        total_tests = len(_TEST_RESULTS) + len(_TEST_RESULTS_WITH_CREDENTIALS)
+        if len(self.results) != total_tests:
             return (False, ("Invalid number of test case results."))
-    
+
         for i in range(0, len(_TEST_RESULTS)):
             if not self.results[i] == _TEST_RESULTS[i][2]:
                 return (False, ("Got wrong result for test case %s." % (i+1) + \
                                 " Expected: %s, got: %s." % \
                                 (_TEST_RESULTS[i][2], self.results[i])))
-        
+
+        for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
+            i += 1
+            if not self.results[i] == test_case[2]:
+                msg = (u"Got wrong result for test case {0}. "
+                       u"Expected: {1}, got: {2}.")
+                return (False, msg.format(i + 1, test_case[2], self.results[i]))
         return (True, None)
     
     def record(self):
