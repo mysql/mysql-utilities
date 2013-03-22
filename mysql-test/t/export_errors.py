@@ -108,6 +108,8 @@ class test(export_basic.test):
 
         self.replace_substring("1045 (28000)", "1045")
 
+        self.replace_substring("on [::1]", "on localhost")
+
         self.remove_result("# WARNING: The server supports GTIDs")
 
         self.replace_result("mysqldbexport.py: error: Server connection "

@@ -25,7 +25,7 @@ import os
 import re
 import mysql.connector
 from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip)
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID " 
@@ -500,7 +500,6 @@ class Server(object):
         
         Returns bool - True = host_or_ip is an alias
         """
-        from mysql.utilities.common.options import hostname_is_ip
         import socket
         
         if self.aliases:
@@ -530,14 +529,28 @@ class Server(object):
                 try:
                     my_host = socket.gethostbyaddr(self.host)
                     self.aliases.append(my_host[0])
-                    host_ip = socket.gethostbyname_ex(my_host[0])
+                    # socket.gethostbyname_ex() does not work with ipv6
+                    if not my_host[0].count(":") < 1:
+                        host_ip = socket.gethostbyname_ex(my_host[0])
+                    else:
+                        addrinfo = socket.getaddrinfo(my_host[0],None)
+                        host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
+                                   [fiveple[4][0] for fiveple in addrinfo],
+                                   [addrinfo[0][4][0]])
                 except Exception, e:
                     host_ip = ([],[],[])
                     if self.verbose:
                         print "WARNING: IP lookup failed", e
             else:
                 try:
-                    host_ip = socket.gethostbyname_ex(self.host)
+                    # socket.gethostbyname_ex() does not work with ipv6
+                    if not my_host[0].count(":") > 1:
+                        host_ip = socket.gethostbyname_ex(self.host)
+                    else:
+                        addrinfo = socket.getaddrinfo(my_host[0],None)
+                        host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
+                                   [fiveple[4][0] for fiveple in addrinfo],
+                                   [addrinfo[0][4][0]])
                     self.aliases.append(host_ip[0])
                 except Exception, e:
                     host_ip = ([],[],[])
@@ -610,6 +623,8 @@ class Server(object):
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
             parameters['charset'] = self.charset
+            parameters['host'] = parameters['host'].replace("[", "")
+            parameters['host'] = parameters['host'].replace("]", "") 
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
             # Reset any previous value if the connection cannot be established,

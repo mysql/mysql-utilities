@@ -108,6 +108,10 @@ class test(mutlib.System_test):
                             "Error ####: Can't connect to MySQL server"
                             " on 'nothere:####'\n")
 
+        self.replace_result("# Cloning the MySQL server running on ",
+                            "# Cloning the MySQL server running on "
+                            "XXXXX-XXXXX.\n")
+
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
 
         return True

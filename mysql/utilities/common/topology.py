@@ -24,7 +24,7 @@ import time
 
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Master, Slave, Replication
 from mysql.utilities.common.server import get_server_state

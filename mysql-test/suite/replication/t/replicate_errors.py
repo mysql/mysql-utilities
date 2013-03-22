@@ -58,7 +58,7 @@ class test(replicate.test):
 
         comment = "Test case 3 - error: invalid login to server (master)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        slave_str + " --master=nope@nada:localhost:5510 " +
+                        slave_str + " --master=nope:nada@localhost:5510 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -67,7 +67,7 @@ class test(replicate.test):
         
         comment = "Test case 4 - error: invalid login to server (slave)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        master_str + " --slave=nope@nada:localhost:5511 " +
+                        master_str + " --slave=nope:nada@localhost:5511 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

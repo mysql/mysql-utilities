@@ -256,7 +256,11 @@ class test(mutlib.System_test):
                         if conn_val[2] != "localhost":
                             command += "-h %s " % conn_val[2]
                         else:
-                            command += "-h 127.0.0.1 " 
+                            command += "-h 127.0.0.1 "
+                        if ']' in conn_val[2]:
+                            host = conn_val[2].replace('[', '')
+                            host = host.replace(']', '')
+                            command += "-h %s " % host
                     if conn_val[3] is not None:
                         command += "--port=%s " % conn_val[3]
                     if conn_val[4] is not None:

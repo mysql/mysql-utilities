@@ -20,8 +20,10 @@ This module contains and abstraction of a MySQL user object.
 """
 
 import re
-import mysql.connector
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.exception import FormatError
+
 
 def parse_user_host(user_name):
     """Parse user, passwd, host, port from user:passwd@host
@@ -29,18 +31,14 @@ def parse_user_host(user_name):
     user_name[in]      MySQL user string (user:passwd@host)
     """
 
-    user_tuple = (None, None, None)
     no_ticks = user_name.replace("'", "")
-    user_credentials = re.match("(\w+)(?:\:(\w+))?@([\w-]+(?:%)?(?:\.[\w-]+)*|%)",
-                                no_ticks)
-    if user_credentials:
-        user_tuple = user_credentials.groups()
-    else:
+    try:
+        conn_values = parse_connection(no_ticks)
+    except FormatError:
         raise UtilError("Cannot parse user:pass@host : %s." %
-                              no_ticks)
-    extraneous = no_ticks[user_credentials.end():]
-    return user_tuple
-            
+                        no_ticks)
+    return (conn_values['user'], conn_values['passwd'], conn_values['host']) 
+
 
 class User(object):
     """
@@ -52,8 +50,7 @@ class User(object):
         - Check to see if user exists
         - Retrieving and printing grants for user
     """   
-    
-        
+
     def __init__(self, server1, user, verbosity=0):
         """Constructor
         
@@ -62,7 +59,7 @@ class User(object):
         verbose[in]        print extra data during operations (optional)
                            default value = False
         """
-        
+
         self.server1 = server1
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbosity = verbosity
@@ -81,7 +78,7 @@ class User(object):
                            (optional) If omitted, operation is performed
                            on the class instance user name.
         """
-        
+
         query_str = "CREATE USER "
         user, passwd, host = None, None, None
         if new_user:
@@ -90,14 +87,14 @@ class User(object):
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
             passwd = self.passwd
-            
+
         if passwd:
             query_str += "IDENTIFIED BY '%s'" % (passwd)
         if self.verbosity > 0:
             print query_str
 
         res = self.server1.exec_query(query_str, self.query_options)
-        
+
     def drop(self, new_user=None):
         """Drop user from the server
 
@@ -117,7 +114,7 @@ class User(object):
             
         if self.verbosity > 0:
             print query_str
-            
+
         res = self.server1.exec_query(query_str, self.query_options)
 
     def exists(self, user_name=None):
@@ -129,7 +126,7 @@ class User(object):
 
         return True = user exists, False = user does not exist
         """
-        
+
         user, host, passwd = self.user, self.host, self.passwd
         if user_name:
             user, passwd, host = parse_user_host(user_name)
@@ -195,7 +192,7 @@ class User(object):
 
     def print_grants(self):
         """Display grants for the current user"""
-        
+
         res = self.get_grants(True)
         for grant_tuple in res:
             print grant_tuple[0]
@@ -214,7 +211,7 @@ class User(object):
         
         Note: Caller must ensure the new user account does not exist.
         """
-        
+
         res = self.get_grants(globals)
         server = self.server1
         if destination is not None:
@@ -229,14 +226,14 @@ class User(object):
             user, passwd, host = parse_user_host(new_user)
             new_user_ticks = "'" + user + "'@'" + host + "'"
             grant = row[0].replace(base_user_ticks, new_user_ticks, 1)
-            
+
             # Need to remove the IDENTIFIED BY clause for the base user.
             search_str = "IDENTIFIED BY PASSWORD"
             try:
                 start = grant.index(search_str)
             except:
                 start = 0
-            
+
             if start > 0:
                 end = grant.index("'", start + len(search_str) + 2) + 2
                 grant = grant[0:start] + grant[end:]
@@ -245,4 +242,3 @@ class User(object):
                 print grant
                 
             res = server.exec_query(grant, self.query_options)
-

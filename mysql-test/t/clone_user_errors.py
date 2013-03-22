@@ -93,6 +93,12 @@ class test(clone_user.test):
                             "mysqluserclone.py: error: Destination connection "
                             "values invalid\n")
 
+        # Mask known source and destination host name.
+        self.replace_substring("on localhost",
+                               "on XXXX-XXXX")
+        self.replace_substring("on [::1]",
+                               "on XXXX-XXXX")
+
         return True
 
     def get_result(self):

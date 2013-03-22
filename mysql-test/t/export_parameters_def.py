@@ -185,7 +185,12 @@ class test(export_basic.test):
         self.replace_result("CREATE DEFINER=`root`@`localhost` EVENT `e1`",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
- 
+
+        ## Mask known source.
+        self.replace_result("# Source on localhost: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Source on [::1]: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
 
         self.remove_result("# WARNING: The server supports GTIDs")
         self._mask_grid()

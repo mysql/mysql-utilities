@@ -31,7 +31,7 @@ import os.path
 import sys
 
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.exception import FormatError

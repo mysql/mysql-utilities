@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 from mysql.utilities.exception import UtilRplError
+from mysql.utilities.common.ip_parser import hostname_is_ip
 
 _VALID_COMMANDS_TEXT = """
 Available Commands:
@@ -285,20 +286,17 @@ class RplCommands(object):
 
         Returns bool - True = all references are consistent
         """
-        from mysql.utilities.common.options import hostname_is_ip
 
         uses_ip = hostname_is_ip(self.topology.master.host)
         for slave_dict in self.topology.slaves:
             slave = slave_dict['instance']
             if slave is not None:
                 host_port = slave.get_master_host_port()
+                host = None
                 if host_port:
                     host = host_port[0]
-                else:
-                    # Not an acting slave (use None to fail IP match)
-                    host = None
-                if uses_ip != hostname_is_ip(slave.host) or \
-                   uses_ip != hostname_is_ip(host):
+                if (not host or uses_ip != hostname_is_ip(slave.host) or
+                    uses_ip != hostname_is_ip(host)):
                     return False
         return True
 

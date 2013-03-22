@@ -1,5 +1,5 @@
 Test Case 1: Help
-Usage: mysqluc.py 
+Usage: mysqluc 
 
 mysqluc - Command line client for running MySQL Utilities
 
@@ -17,7 +17,7 @@ Options:
   -q, --quiet           turn off all messages for quiet execution.
 Test Case 2: Normal
 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
 
@@ -59,7 +59,7 @@ Test Case 3: Verbosity
 
 Executing command: help mysqldiff
 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
 
@@ -101,7 +101,7 @@ Test Case 4: Quiet
 Quiet mode, saving output to XXXXXXXXXXXXXX
 Test Case 5: Normal - width 55
 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
 
@@ -160,7 +160,7 @@ Option                     Description
 
 Test Case 6: Normal - width 66
 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
 
@@ -205,9 +205,9 @@ Option                     Description
                            annotated and marked as comments.      
 
 Test Case 7: Replacement
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: No objects specified to compare.
+mysqldiff: error: No objects specified to compare.
 
 
 

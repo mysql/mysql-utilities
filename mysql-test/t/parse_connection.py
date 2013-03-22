@@ -17,7 +17,7 @@
 import os
 import mutlib
 from mysql.utilities.exception import MUTLibError, FormatError
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 
 _TEST_RESULTS = [
     # (comment, input, expected result, fail_ok)
@@ -42,7 +42,7 @@ _TEST_RESULTS = [
     ('check a FQDN address 3 parts', 'm1.m2.m3', 'm1.m2.m3', False),
     ('check a FQDN address 4 parts', 'm1.m2.m3.m4', 'm1.m2.m3.m4', False),
     ('check a host name with hyphen', 'host-hyphen', 'host-hyphen', False),
-    ('check a host name with extra characters', 'a!(*%(*$*', 'a', False),
+    ('check a host name with extra characters', 'a!(*%(*$*', 'FAIL', True),
     ('check valid host name #1', '1m23','1m23', False),
     ('check valid host name #2',
         'label1.2label.label-3.label--4.LaBeL5.com',
@@ -64,17 +64,17 @@ _TEST_RESULTS = [
     # IPv6 positive tests
     ('check valid IPv6 #1',
         "3ffe:1900:4545:3:200:f8ff:fe21:67cf",
-        "3ffe:1900:4545:3:200:f8ff:fe21:67cf", False),
+        "[3ffe:1900:4545:3:200:f8ff:fe21:67cf]", False),
 
     # normal
     ('check valid IPv6 #2',
         "fe80:0000:0000:0000:0202:b3ff:fe1e:8329",
-        "fe80:0000:0000:0000:0202:b3ff:fe1e:8329", False),
+        "[fe80:0000:0000:0000:0202:b3ff:fe1e:8329]", False),
 
     # removing leading zeros
     ('check valid IPv6 #3',
         "fe80:0:0:0:202:b3ff:fe1e:8329",
-        "fe80:0:0:0:202:b3ff:fe1e:8329", False),
+        "[fe80:0:0:0:202:b3ff:fe1e:8329]", False),
 
     # collapsed - need to quote these
     ('check valid IPv6 #4',
@@ -87,16 +87,16 @@ _TEST_RESULTS = [
         '"FE80::0202:B3FF:FE1E:8329"', "FE80::0202:B3FF:FE1E:8329", False),
     
     ('check valid IPv6 #7',
-        '1:2:3:4:5:6:7:8', '1:2:3:4:5:6:7:8', False),
+        '1:2:3:4:5:6:7:8', '[1:2:3:4:5:6:7:8]', False),
 
     # IPv6 negative tests
-    ('check invalid IPv6 #1', '::192.0.2.128', '::192', False), # truncation
+    ('check invalid IPv6 #1', '::192.0.2.128', 'FAIL', True), # truncation
 
     ('check invalid IPv6 #2',
         'what:is::::this?', 'FAIL', True),
 
     ('check invalid IPv6 #3',
-        '::0:WHAT:1.2.3.4', '::0', False), # truncation
+        '::0:WHAT:1.2.3.4', 'FAIL', True), # truncation
     
     ('check invalid IPv6 #4',
         '1:2:3:4:5:6:192.168.1.110', 'FAIL', True),

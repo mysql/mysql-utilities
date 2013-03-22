@@ -34,7 +34,8 @@ import re
 import time
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.tools import get_tool_path
-from mysql.utilities.common.options import parse_connection, add_verbosity
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import MUTLibError
 from mutlib.mutlib import Server_list

@@ -83,6 +83,9 @@ class test(check_index.test):
         if not res:
             return False
 
+        # Mask known source host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
 
         return True
 

@@ -189,6 +189,7 @@ There are additional entries in the log.
 Test case 6 - attempt risky switchover without force
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
@@ -208,6 +209,7 @@ ERROR: Candidate is not connected to the correct master.
 Test case 7 - attempt risky switchover with --force
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.

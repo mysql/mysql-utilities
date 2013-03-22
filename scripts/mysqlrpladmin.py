@@ -32,8 +32,8 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
-from mysql.utilities.common.options import parse_connection, add_verbosity
-from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_format_option, add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption

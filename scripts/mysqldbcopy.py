@@ -36,7 +36,8 @@ from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
 from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection, add_skip_options
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import check_skip_options, add_engines
 from mysql.utilities.common.options import add_all, check_all, add_locking

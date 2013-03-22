@@ -30,9 +30,9 @@ import os.path
 import sys
 
 from mysql.utilities.command.setup_rpl import setup_replication
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection, add_rpl_user
-from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.options import add_verbosity, add_rpl_user
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError

@@ -142,6 +142,12 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Mask known source and destination host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
+
         return True
 
     def get_result(self):

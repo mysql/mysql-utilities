@@ -93,6 +93,8 @@ class test(compare_db.test):
                             "mysqldbcompare.py: error: Server2 connection "
                             "values invalid\n")
 
+        self.replace_substring("on [::1]", "on localhost")
+
         return True
 
     def get_result(self):

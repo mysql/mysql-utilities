@@ -32,7 +32,7 @@ import sys
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.exception import FormatError

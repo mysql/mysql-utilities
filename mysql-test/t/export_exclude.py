@@ -66,6 +66,12 @@ class test(export_parameters_def.test):
 
         export_parameters_def.test._mask_csv(self)
 
+        ## Mask known source.
+        self.replace_result("# Source on localhost: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Source on [::1]: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+
         return True
 
     def get_result(self):

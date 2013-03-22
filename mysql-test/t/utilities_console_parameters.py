@@ -92,7 +92,9 @@ class test(mutlib.System_test):
         self.replace_result("Quiet mode, saving output to",
                             "Quiet mode, saving output to XXXXXXXXXXXXXX\n")
         self.remove_result("Launching console ...")
-         
+
+        self.replace_substring(".py", "")
+
         return True    
           
     def get_result(self):

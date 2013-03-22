@@ -66,6 +66,12 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Mask known source and destination host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
+
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
 

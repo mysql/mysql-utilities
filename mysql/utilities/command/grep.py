@@ -19,7 +19,7 @@ import sys
 
 import mysql.connector
 
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.format import print_list
 
 # Mapping database object to information schema names and fields. I
@@ -257,6 +257,8 @@ class ObjectGrep(object):
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
             info = conn
+            conn['host'] = conn['host'].replace("[","")
+            conn['host'] = conn['host'].replace("]","")
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)

@@ -198,6 +198,8 @@ class test(mutlib.System_test):
         # Mask inconsistent Python 2.7 behavior
         self.replace_result("@@ -1 +1 @@", "@@ -1,1 +1,1 @@\n")
         self.replace_result("# @@ -1 +1 @@", "# @@ -1,1 +1,1 @@\n")
+        
+        self.replace_substring("on [::1]", "on localhost")
     
     def record(self):
         return self.save_result_file(__name__, self.results)

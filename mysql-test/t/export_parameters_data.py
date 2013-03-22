@@ -87,6 +87,12 @@ class test(export_parameters_def.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        ## Mask known source.
+        self.replace_result("# Source on localhost: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Source on [::1]: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+
         return True
   
     def get_result(self):

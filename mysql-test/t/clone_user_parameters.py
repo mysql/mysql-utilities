@@ -55,6 +55,8 @@ class test(clone_user.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        self.replace_substring("on [::1]", "on localhost")
+
         return True
 
     def get_result(self):

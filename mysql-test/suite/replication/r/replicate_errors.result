@@ -7,11 +7,11 @@ Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:331
 
 mysqlreplicate.py: error: Master connection values invalid
 Test case 3 - error: invalid login to server (master)
-# master on nada: ... ERROR: Cannot connect to the master server.
+# master on localhost: ... ERROR: Cannot connect to the master server.
 Error ####: Can't connect to local MySQL server ####...
 Test case 4 - error: invalid login to server (slave)
 # master on localhost: ... connected.
-# slave on nada: ... ERROR: Cannot connect to the slave server.
+# slave on localhost: ... ERROR: Cannot connect to the slave server.
 Error ####: Can't connect to local MySQL server ####...
 Test case 5a - error: slave and master same machine
 Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 

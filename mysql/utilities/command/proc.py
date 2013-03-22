@@ -21,7 +21,7 @@ import sys
 import mysql.connector
 
 from mysql.utilities.common.format import print_list
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 
 from mysql.utilities.exception import EmptyResultError
 from mysql.utilities.exception import FormatError

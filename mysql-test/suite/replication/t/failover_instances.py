@@ -49,6 +49,7 @@ class test(failover.test):
         return rpl_admin_gtid.test.check_prerequisites(self)
 
     def setup(self):
+        self.temp_files = []
         return rpl_admin_gtid.test.setup(self)
         
     def _poll_console(self, start, name, proc, comment):

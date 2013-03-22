@@ -254,6 +254,12 @@ class test(copy_db.test):
         self.replace_result("# Destination: sam@localhost:",
                             "# Destination: sam@localhost:[] ... connected\n")
 
+        # Mask known source and destination host name.
+        self.replace_substring("on localhost",
+                               "on XXXX-XXXX")
+        self.replace_substring("on [::1]",
+                               "on XXXX-XXXX")
+
         # Replace error code.
         self.replace_result("Error 1045", "Error XXXX: Access denied\n")
         self.replace_result("Error 2003", "Error XXXX: Access denied\n")

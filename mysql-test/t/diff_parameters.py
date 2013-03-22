@@ -120,6 +120,8 @@ class test(diff.test):
         self.replace_result("*** util_test.t1", "*** util_test.t1\n")
         self.replace_result("*** util_test.t2", "*** util_test.t2\n")
 
+        self.replace_substring("on [::1]", "on localhost")
+
         return True
 
     def get_result(self):

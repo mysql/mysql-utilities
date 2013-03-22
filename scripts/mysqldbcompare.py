@@ -33,7 +33,8 @@ import sys
 from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
 from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
-from mysql.utilities.common.options import parse_connection, add_difftype
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import add_format_option

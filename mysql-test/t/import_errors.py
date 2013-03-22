@@ -196,6 +196,16 @@ class test(import_basic.test):
                                 "# Importing definitions from "
                                 "std_data/bad_sql.sql.\n")
 
+        # Mask known source and destination host name.
+        self.replace_substring("on localhost",
+                               "on XXXX-XXXX")
+        self.replace_substring("on [::1]",
+                               "on XXXX-XXXX")
+
+        self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
+ 
+        self.replace_substring("1045 (28000)", "1045")
+
         self.replace_substring(" (28000)", "")
         self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
 

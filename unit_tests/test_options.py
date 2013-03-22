@@ -17,7 +17,8 @@
 import os
 import unittest
 
-from mysql.utilities.common.options import parse_connection, get_absolute_path
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import get_absolute_path
 from mysql.utilities.exception import FormatError
 
 def _spec(info):
@@ -46,13 +47,13 @@ class TestParseConnection(unittest.TestCase):
         ('mats@localhost:3308:/usr/var/mysqld.sock', 'mats@localhost:3308:/usr/var/mysqld.sock'),
         ('mats:@localhost', 'mats@localhost:3306'),
         # IPv6 strings
-        ("cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf", "cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf:3306"),
-        ("cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329:3306"),
-        ("cbell@fe80:0:0:0:202:b3ff:fe1e:8329", "cbell@fe80:0:0:0:202:b3ff:fe1e:8329:3306"),
+        ("cbell@3ffe:1900:4545:3:200:f8ff:fe21:67cf", "cbell@[3ffe:1900:4545:3:200:f8ff:fe21:67cf]:3306"),
+        ("cbell@fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "cbell@[fe80:0000:0000:0000:0202:b3ff:fe1e:8329]:3306"),
+        ("cbell@fe80:0:0:0:202:b3ff:fe1e:8329", "cbell@[fe80:0:0:0:202:b3ff:fe1e:8329]:3306"),
         ("cbell@'fe80::202:b3ff:fe1e:8329'", "cbell@fe80::202:b3ff:fe1e:8329:3306"),
         ("cbell@'fe80::0202:b3ff:fe1e:8329'", "cbell@fe80::0202:b3ff:fe1e:8329:3306"),
         ('cbell@"FE80::0202:B3FF:FE1E:8329"', "cbell@FE80::0202:B3FF:FE1E:8329:3306"),
-        ('cbell@1:2:3:4:5:6:7:8', 'cbell@1:2:3:4:5:6:7:8:3306'),
+        ('cbell@1:2:3:4:5:6:7:8', 'cbell@[1:2:3:4:5:6:7:8]:3306'),
         ("cbell@'E3D7::51F4:9BC8:192.168.100.32'", 'cbell@E3D7::51F4:9BC8:192.168.100.32:3306'),
         ("cbell@'E3D7::51F4:9BC8'", 'cbell@E3D7::51F4:9BC8:3306'),
         ]

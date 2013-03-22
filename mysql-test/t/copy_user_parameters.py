@@ -70,6 +70,8 @@ class test(copy_user.test):
         self.remove_result("GRANT PROXY ON ''@'' TO 'root'")
         self.remove_result("# Cannot show grants for user")
 
+        self.replace_substring("on [::1]", "on localhost")
+
         return True
 
     def get_result(self):

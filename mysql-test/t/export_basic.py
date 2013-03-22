@@ -96,6 +96,8 @@ class test(copy_db_parameters.test):
             self.mask_result_portion("CREATE", "DEFINER=", replace,
                                      "DEFINER=`XXXX`@`XXXXXXXXX` ")
 
+        self.replace_substring("on [::1]", "on localhost")
+
         self.remove_result("# WARNING: The server supports GTIDs")
 
         # Mask event

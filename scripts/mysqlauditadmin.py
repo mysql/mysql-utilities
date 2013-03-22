@@ -32,7 +32,8 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError, FormatError
-from mysql.utilities.common.options import parse_connection, add_verbosity
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.tools import show_file_statistics
 from mysql.utilities.command import audit_log
