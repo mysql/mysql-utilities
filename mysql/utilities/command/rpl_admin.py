@@ -67,6 +67,9 @@ _HOST_IP_WARNING = "You may be mixing host names and IP " + \
 
 _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
+_GTID_ON_REQ = "Slave election requires GTID_MODE=ON for all servers."
+
+
 def get_valid_rpl_command_text():
     """Provide list of valid command descriptions to caller.
     """
@@ -344,8 +347,8 @@ class RplCommands(object):
         is issued.
         """
         if not self.topology.gtid_enabled():
-            self._report("# WARNING: slave election requires GTID_MODE=ON "
-                         "for all servers.", logging.WARN)
+            print("# WARNING: {0}".format(_GTID_ON_REQ))
+            self._report(_GTID_ON_REQ, logging.WARN, False)
             return
 
         # Check for mixing IP and hostnames
@@ -382,10 +385,17 @@ class RplCommands(object):
 
         Returns bool - True = failover succeeded, False = errors found
         """
-        if not self.topology.gtid_enabled():
-            self._report("# WARNING: slave election requires GTID_MODE=ON "
-                         "for all servers.", logging.WARN)
-            return
+        srv_list = self.topology.get_servers_with_gtid_not_on()
+        if srv_list:
+            print("# ERROR: {0}".format(_GTID_ON_REQ))
+            self._report(_GTID_ON_REQ, logging.ERROR, False)
+            for srv in srv_list:
+                msg = "#  - GTID_MODE={0} on {1}:{2}".format(srv[2], srv[0],
+                                                             srv[1])
+                self._report(msg, logging.ERROR)
+
+            self._report(_GTID_ON_REQ, logging.CRITICAL, False)
+            raise UtilRplError(_GTID_ON_REQ)
 
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():

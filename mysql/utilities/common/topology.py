@@ -1143,6 +1143,32 @@ class Topology(Replication):
             return slave.supports_gtid() == "ON"
         return False
 
+    def get_servers_with_gtid_not_on(self):
+        """Get the list of servers from the topology with GTID turned off.
+
+        Note: not connected slaves will be ignored
+
+        Returns a list of tuples identifying the slaves (host, port, gtid_mode)
+                with GTID_MODE=OFF or GTID_MODE=NO (i.e., not available).
+        """
+        res = []
+        # Check master GTID_MODE
+        if self.master:
+            gtid_mode = self.master.supports_gtid()
+            if gtid_mode != "ON":
+                res.append((self.master.host, self.master.port, gtid_mode))
+
+        # Check slaves GTID_MODE
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            # skip not available or not alive slaves
+            if not slave or not slave.is_alive():
+                continue
+            gtid_mode = slave.supports_gtid()
+            if gtid_mode != "ON":
+                res.append((slave_dict['host'], slave_dict['port'], gtid_mode))
+
+        return res
 
     def get_health(self):
         """Retrieve the replication health for the master and slaves.

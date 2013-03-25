@@ -29,6 +29,16 @@ _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--sync-master-info=1',
                                 '--master-info-repository=table"'])
 
+_MYSQL_OPTS_GTID_OFF = ' '.join(['"--log-bin=mysql-bin',
+                                 '--skip-slave-start',
+                                 '--log-slave-updates',
+                                 '--gtid-mode=off',
+                                 '--enforce-gtid-consistency',
+                                 '--report-host=localhost',
+                                 '--report-port={0}',
+                                 '--sync-master-info=1',
+                                 '--master-info-repository=table"'])
+
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('{0}', {1})"
 
 _SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
@@ -38,7 +48,7 @@ class test(rpl_admin.test):
     """Test replication administration command - failover
     This test runs the mysqlrpladmin utility on a known topology, and check
     the slaves status for the existence of SQL errors (prior to the failover
-    operation).
+    operation). It also test other errors for the failover command.
 
     Note: this test requires GTID enabled servers.
     """
@@ -61,6 +71,8 @@ class test(rpl_admin.test):
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        mysqld = _MYSQL_OPTS_GTID_OFF.format(self.servers.view_next_port())
+        self.server5 = self.spawn_server("rep_slave4_gtid_off", mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()
@@ -69,18 +81,21 @@ class test(rpl_admin.test):
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
+        self.s4_port = self.server5.port
 
         # Set the initial replication topology
-        rpl_admin.test.reset_topology(self)
+        rpl_admin.test.reset_topology(self, [self.server2, self.server3,
+                                             self.server4, self.server5])
 
         build_str = self.build_connection_string
         self.master_conn = build_str(self.server1).strip(' ')
         self.slave1_conn = build_str(self.server2).strip(' ')
         self.slave2_conn = build_str(self.server3).strip(' ')
         self.slave3_conn = build_str(self.server4).strip(' ')
+        self.slave4_conn = build_str(self.server5).strip(' ')
 
         self.servers = [self.server1, self.server2, self.server3,
-                        self.server4]
+                        self.server4, self.server5]
 
         return True
 
@@ -126,8 +141,20 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+
+        slaves = ",".join([self.slave1_conn, self.slave2_conn,
+                           self.slave4_conn, self.slave3_conn])
+        comment = ("Test case {0} - failover with a slave with "
+                   "GTID_MODE=OFF.".format(test_num))
+        cmd_str = ("mysqlrpladmin.py --slaves={0} failover".format(slaves))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
+        self.replace_substring(str(self.s4_port), "PORT5")
 
         # Strip health report - not needed.
         self.remove_result("+-")
