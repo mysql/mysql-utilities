@@ -1071,12 +1071,12 @@ class Topology(Replication):
             if slave is None or not slave.is_alive():
                 continue
             rpl = Replication(new_master, slave, self.options)
-            # Use timeout to check slave status
+            # Use pingtime to check slave status
             iteration = 0
             slave_ok = True
-            while iteration < int(self.timeout):
+            while iteration < int(self.pingtime):
                 res = rpl.check_slave_connection()
-                if not res and iteration >= self.timeout:
+                if not res and iteration >= self.pingtime:
                     slave_error = None
                     if self.verbose:
                         res = slave.get_io_error()
@@ -1090,7 +1090,7 @@ class Topology(Replication):
                                      (slave_dict['host'],
                                       slave_dict['port']), logging.WARN)
                 elif res:
-                    iteration = int(self.timeout) + 1
+                    iteration = int(self.pingtime) + 1
                 else:
                     time.sleep(1)
                     iteration += 1
