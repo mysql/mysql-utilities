@@ -37,11 +37,12 @@ from mysql.utilities.common.options import add_format_option, add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
-from mysql.utilities.common.messages import PARSE_ERR_OPT_INVALID_CMD_TIP
-from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ_BY_CMD
-from mysql.utilities.common.messages import PARSE_ERR_SLAVE_DISCO_REQ
-from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED
-from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED_ONLY_FOR
+from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
+                                             PARSE_ERR_OPTS_REQ_BY_CMD,
+                                             PARSE_ERR_SLAVE_DISCO_REQ,
+                                             PARSE_ERR_SLAVE_DISCO_EXC,
+                                             WARN_OPT_NOT_REQUIRED,
+                                             WARN_OPT_NOT_REQUIRED_ONLY_FOR)
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -120,6 +121,10 @@ elif len(args) == 0:
 if not opt.discover and not opt.slaves:
     parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
 
+# --discover-slaves-login and --slaves cannot be used simultaneously (only one)
+if opt.discover and opt.slaves:
+    parser.error(PARSE_ERR_SLAVE_DISCO_EXC)
+
 # Check slaves list
 check_server_lists(parser, opt.master, opt.slaves)
 
@@ -148,10 +153,10 @@ if command in ['elect', 'health', 'gtid'] and not opt.master and \
     req_opts = '--master and either --slaves or --discover-slaves-login'
     parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
-# --master and --slaves options are required by 'start', 'stop' and 'reset'
-if command in ['start', 'stop', 'reset'] and \
-   (not opt.slaves or not opt.master):
-    req_opts = '--master and --slaves'
+# --slaves options are required by 'start', 'stop' and 'reset'
+# --master is optional
+if command in ['start', 'stop', 'reset'] and not opt.slaves:
+    req_opts = '--slaves'
     parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
 # Validate the required options for the failover command
@@ -190,7 +195,7 @@ if opt.exec_before and command not in ['switchover', 'failover']:
                                                 only_cmd=only_used_cmds))
     opt.exec_before = None
 
-# --new-master only required for 'health' command
+# --new-master only required for 'switchover' command
 if opt.new_master and command != 'switchover':
     print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--new-master',
                                                 cmd=command,

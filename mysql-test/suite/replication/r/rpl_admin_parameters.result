@@ -85,13 +85,25 @@ Available Commands:
   stop        - stop all slaves
   switchover  - perform slave promotion
 
-  Note: elect, gtid and health require --master and either
-        --slaves or --discover-slave-login
+  Note:
+        elect, gtid and health require --master and either
+        --slaves or --discover-slaves-login;
 
-  Note: start, stop and reset require --master and --slaves
+        failover requires --slaves;
+
+        switchover requires --master, --new-master and either
+        --slaves or --discover-slaves-login;
+
+        start, stop and reset require --slaves (and --master is optional)
 
 Test case 2 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -107,6 +119,12 @@ Test case 2 - test slave discovery
 Test case 3 - switchover with verbosity
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
@@ -149,6 +167,12 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 Test case 4 - switchover with quiet
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 NOTE: Log file 'temp_log.txt' does not exist. Will be created.
+# Discovering slave at localhost:PORT1
+# Found slave: localhost:PORT1
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
@@ -162,6 +186,12 @@ There are (before) 2 entries in the log.
 Test case 5 - switchover with logs
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.

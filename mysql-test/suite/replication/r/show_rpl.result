@@ -79,7 +79,36 @@ localhost:PORT2 (MASTER)
 | localhost:PORT3  | localhost:PORT4  |
 | localhost:PORT4  | localhost:PORT2  |
 +-----------------+-----------------+
-Test case 5 - show topology with master:master replication
+Test case 5 - show circular topology with verbose option
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT3
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT4
+
+# Replication Topology Graph
+localhost:PORT2 (MASTER)
+   |
+   +--- localhost:PORT1 [IO running: Yes] - (SLAVE)
+   |
+   +--- localhost:PORT3 [IO running: Yes] - (SLAVE + MASTER)
+       |
+       +--- localhost:PORT4 [IO running: Yes] - (SLAVE + MASTER)
+           |
+           +--- localhost:PORT2 [IO running: Yes] <--> (SLAVE + MASTER)
+
++-----------------+-----------------+
+| Master          | Slave           |
++-----------------+-----------------+
+| localhost:PORT2  | localhost:PORT1  |
+| localhost:PORT2  | localhost:PORT3  |
+| localhost:PORT3  | localhost:PORT4  |
+| localhost:PORT4  | localhost:PORT2  |
++-----------------+-----------------+
+Test case 6 - show topology with master:master replication
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT5
 # master on localhost: ... connected.
@@ -98,8 +127,8 @@ localhost:PORT5 (MASTER)
 | localhost:PORT5  | localhost:PORT6  |
 | localhost:PORT6  | localhost:PORT5  |
 +-----------------+-----------------+
-Test case 6 : SHOW SLAVE HOSTS contains 1 row.
-Test case 6 - show topology with phantom slave
+Test case 7 : SHOW SLAVE HOSTS contains 1 row.
+Test case 7 - show topology with phantom slave
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT3
 Error connecting to a slave ...

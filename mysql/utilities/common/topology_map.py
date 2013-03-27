@@ -21,6 +21,7 @@ slaves and down-stream replicants for mapping topologies.
 """
 
 from mysql.utilities.common.options import parse_user_password
+from mysql.utilities.common.replication import Slave
 from mysql.utilities.exception import UtilError
 
 _START_PORT = 3306
@@ -64,6 +65,7 @@ class TopologyMap(object):
         self.prompt_user = options.get("prompt", False)
         self.num_retries = options.get("num_retries", 0)
         self.socket_path = options.get("socket_path", None)
+        self.verbose = options.get('verbosity', 0) > 0
         self.seed_server = seed_server
         self.topology = []
         self.options = options
@@ -144,14 +146,13 @@ class TopologyMap(object):
         if not user.has_privilege("*", "*", priv):
             raise UtilError("Not enough permissions. The user must have the "
                             "%s privilege." % priv)
-    
 
     def _get_slaves(self, max_depth, seed_conn=None, masters_found=[]):
         """Find the attached slaves for a list of server connections.
-        
-        This method connects to each server in the list and retrieves its slaves.
-        It can be called recursively if the recurse option is True.
-    
+
+        This method connects to each server in the list and retrieves its
+        slaves. It can be called recursively if the recurse option is True.
+
         max_depth[in]       Maximum depth of recursive search
         seed_conn[in]       Current master connection dictionary. Initially,
                             this is the seed server (original master defined
@@ -160,31 +161,31 @@ class TopologyMap(object):
                             detect a circular replication topology. Initially,
                             this is an empty list as the master detection must
                             occur as the topology is traversed.
-    
+
         Returns list - list of slaves connected to each server in list
         """
         topology = []
         if seed_conn is None:
             seed_conn = self.seed_server
-    
+
         master, master_info = self._connect(seed_conn)
         if master is None:
             return []
-   
+
         # Check user permissions 
         self._check_permissions(master, "REPLICATION SLAVE")
 
         # Save the master for circular replication identification
         masters_found.append(master_info)
-        
+
         if not self.quiet:
             print "# Finding slaves for master: %s" % master_info
-    
+
         # See if the user wants us to discover slaves.
         discover = self.options.get("discover", None)
         if discover is None:
             return
-        
+
         # Get user and password (supports login-paths)
         user, password = parse_user_password(discover, options=self.options)
 
@@ -202,7 +203,27 @@ class TopologyMap(object):
                 slave_conn = self.seed_server.copy()
                 slave_conn['host'] = host
                 slave_conn['port'] = port
-                
+
+                io_running = None
+                # If verbose then get slave IO status
+                if self.verbose:
+                    # Create slave instance
+                    conn_dict = {
+                        'conn_info': {'user': user, 'passwd': password,
+                                      'host': host, 'port': port,
+                                      'socket': None},
+                        'role': slave,
+                        'verbose': self.verbose
+                    }
+                    slave_obj = Slave(conn_dict)
+                    # Get IO status
+                    try:
+                        slave_obj.connect()
+                        io_running = slave_obj.get_io_running()
+                    except UtilError:
+                        # Connection error
+                        io_running = 'ERROR'
+
                 # Now check for circular replication topology - do not recurse
                 # if slave is also a master.
                 if self.recurse and not slave in masters_found and \
@@ -210,14 +231,18 @@ class TopologyMap(object):
                     new_list = self._get_slaves(max_depth, slave_conn,
                                                 masters_found)
                     if new_list == []:
-                        slave_list.append((slave, []))
+                        slave_list.append((slave, [], io_running))
                     else:
+                        # Add IO state to slave from recursion
+                        if io_running:
+                            new_list = [(new_list[0][0], new_list[0][1],
+                                         io_running)]
                         slave_list.append(new_list)
                     depth += 1
                 else:
-                    slave_list.append((slave, []))
+                    slave_list.append((slave, [], io_running))
         topology.append((master_info, slave_list))
-    
+
         return topology
 
 
@@ -247,21 +272,20 @@ class TopologyMap(object):
         """
         return not (len(self.topology) and self.topology[0][1] == [])
 
-
     def print_graph(self, topology_list=[], masters_found=[],
                     level=0, preamble=""):
         """Prints a graph of the topology map to standard output.
-        
+
         This method traverses a list of the topology and prints a graph. The
         method is designed to be recursive traversing the list to print the
         slaves for each master in the topology. It will also detect a circular
         replication segment and indicate it on the graph.
-        
+
         topology_list[in]   a list in the form (master, slave) of server
         masters_found[in]   a list of all servers in master roles - used to
                             detect a circular replication topology. Initially,
                             this is an empty list as the master detection must
-                            occur as the toplogy is traversed.
+                            occur as the topology is traversed.
         level[in]           the level of indentation - increases with each
                             set of slaves found in topology
         preamble[in]        prefix calculated during recursion to indent text
@@ -277,7 +301,7 @@ class TopologyMap(object):
         if len(topology_list) == 1:
             topology_list = topology_list[0]
         master = topology_list[0]
-        
+
         # Save the master for circular replication identification
         masters_found.append(master)
 
@@ -287,34 +311,44 @@ class TopologyMap(object):
         if stop > 0:
             # Level 0 is always the first master in the topology.
             if level == 0:
-                print "%s (MASTER)" % master
-            for i in range(0,stop):
+                print("{0} (MASTER)".format(master))
+            for i in range(0, stop):
                 if len(slaves[i]) == 1:
                     slave = slaves[i][0]
                 else:
                     slave = slaves[i]
-                new_preamble = preamble + "   "
-                print new_preamble+"|"
+                new_preamble = "{0}   ".format(preamble)
+                print("{0}|".format(new_preamble))
                 role = "(SLAVE"
                 if not slave[1] == [] or slave[0] in masters_found:
-                    role += " + MASTER"
-                role += ")"
-                print "%s+--- %s" % (new_preamble, slave[0]),
-                
+                    role = "{0} + MASTER".format(role)
+                role = "{0})".format(role)
+
+                # Print IO status if verbose
+                io_status = ''
+                if self.verbose:
+                    try:
+                        io_status = " [IO running: {0}]".format(slave[2])
+                    except IndexError:
+                        # This should never happened... (done to avoid crash)
+                        io_status = " [IO running: ??]"
+
+                print "{0}+--- {1}{2}".format(new_preamble, slave[0],
+                                              io_status),
+
                 if (slave[0] in masters_found):
                     print "<-->",
                 else:
                     print "-",
-                print "%s" % role
-                    
-                if not slave[1] == []:
-                    if i < stop-1:
-                        new_preamble += "|"
-                    else:
-                        new_preamble += " "
-                    self.print_graph(slave, masters_found,
-                                     level+1, new_preamble)
+                print role
 
+                if not slave[1] == []:
+                    if i < stop - 1:
+                        new_preamble = "{0}|".format(new_preamble)
+                    else:
+                        new_preamble = "{0} ".format(new_preamble)
+                    self.print_graph(slave, masters_found,
+                                     level + 1, new_preamble)
 
     def _get_row(self, topology_list):
         """Get a row (master, slave) for the topology map.

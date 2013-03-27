@@ -156,28 +156,46 @@ class test(mutlib.System_test):
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
 
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " health --disc=root:root "
-        cmd_opts += "--slaves=%s" % slaves_loopback
-        comment= "Test case %s - health with loopback and discovery" % test_num
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        cmd_str = ("mysqlrpladmin.py --master={0} health "
+                   "--slaves={1}").format(master_conn, slaves_loopback)
+        comment = "Test case {0} - health with loopback".format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        # Perform stop, start, and reset
+        cmd_str = ("mysqlrpladmin.py --master={0} health "
+                   "--disc=root:root").format(master_conn)
+        comment = "Test case {0} - health with discovery".format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Perform stop, start, and reset (with --master option)
         commands = ['stop', 'start', 'stop', 'reset']
         for cmd in commands:
-            comment = "Test case %s - run command %s" % (test_num, cmd)
-            cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-            cmd_opts = " --slaves=%s %s" % (slaves_str, cmd)
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                                   comment)
+            comment = ("Test case {0} - run command {1} with "
+                       "--master").format(test_num, cmd)
+            cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} "
+                       "{2}").format(master_conn, slaves_str, cmd)
+            res = self.run_test_case(0, cmd_str, comment)
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
-            
+
+        # Perform stop, start, and reset (without --master option)
+        commands = ['start', 'stop', 'reset']
+        for cmd in commands:
+            comment = ("Test case {0} - run command {1} without "
+                       "--master").format(test_num, cmd)
+            cmd_str = ("mysqlrpladmin.py --slaves={0} "
+                       "{1}").format(slaves_str, cmd)
+            res = self.run_test_case(0, cmd_str, comment)
+            if not res:
+                raise MUTLibError("%s: failed" % comment)
+            test_num += 1
+
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 

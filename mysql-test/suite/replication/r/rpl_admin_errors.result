@@ -65,19 +65,43 @@ Test case 16 - Master listed as a slave - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 17 - Master listed as a candiate - alias
+Test case 17 - Master listed as a candidate - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
-Test case 18 - Start without --master and --slaves
+Test case 18 - Start without --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: 'start' requires the following option(s): --master and --slaves.
-Test case 19 - Stop without --master and --slaves
+mysqlrpladmin.py: error: 'start' requires the following option(s): --slaves.
+Test case 19 - Stop without --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: 'stop' requires the following option(s): --master and --slaves.
-Test case 20 - Reset without --master and --slaves
+mysqlrpladmin.py: error: 'stop' requires the following option(s): --slaves.
+Test case 20 - Reset without --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: 'reset' requires the following option(s): --master and --slaves.
+mysqlrpladmin.py: error: 'reset' requires the following option(s): --slaves.
+Test case 21 - Start using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 22 - Stop using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 23 - Reset using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 24 - Health using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 25 - Failover using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 26 - Switchover using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.

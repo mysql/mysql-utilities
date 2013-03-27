@@ -73,6 +73,8 @@ Options:
   -n NUM_RETRIES, --num-retries=NUM_RETRIES
                         number of retries allowed for failed slave login
                         attempt. Valid with --prompt only.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
   --discover-slaves-login=DISCOVER
                         at startup, query master for all registered slaves and

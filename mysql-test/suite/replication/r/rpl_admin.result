@@ -265,8 +265,7 @@ Test case 9 - show health after switchover
     health: OK
 4 rows.
 # ...done.
-Test case 10 - health with loopback and discovery
-# Discovering slaves for master at localhost:PORT1
+Test case 10 - health with loopback
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -279,28 +278,76 @@ Test case 10 - health with loopback and discovery
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 11 - run command stop
+Test case 11 - health with discovery
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 12 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 12 - run command start
+Test case 13 - run command start with --master
 # Checking privileges.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
-Test case 13 - run command stop
+Test case 14 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 14 - run command reset
+Test case 15 - run command reset with --master
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT4 Ok
+# Performing RESET on all slaves.
+#   Executing reset on slave localhost:PORT2 Ok
+#   Executing reset on slave localhost:PORT3 Ok
+#   Executing reset on slave localhost:PORT4 Ok
+# ...done.
+Test case 16 - run command start without --master
+# Checking privileges.
+# Performing START on all slaves.
+#   Executing start on slave localhost:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
+# ...done.
+Test case 17 - run command stop without --master
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# ...done.
+Test case 18 - run command reset without --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master

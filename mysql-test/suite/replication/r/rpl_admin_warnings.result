@@ -23,6 +23,12 @@ localhost	PORT4	SLAVE	UP	ON	OK
 Test case 4 - warning for missing --report-host
 # Discovering slaves for master at localhost:PORT1
 WARNING: There are slaves that have not been registered with --report-host or --report-port.
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 # Checking privileges.
 #
 # Replication Topology Health:

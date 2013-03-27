@@ -265,8 +265,7 @@ Test case 9 - show health after switchover
     health: OK
 4 rows.
 # ...done.
-Test case 10 - health with loopback and discovery
-# Discovering slaves for master at localhost:PORT1
+Test case 10 - health with loopback
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -279,28 +278,48 @@ Test case 10 - health with loopback and discovery
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 11 - run command stop
+Test case 11 - health with discovery
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 12 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 12 - run command start
+Test case 13 - run command start with --master
 # Checking privileges.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
-Test case 13 - run command stop
+Test case 14 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
-Test case 14 - run command reset
+Test case 15 - run command reset with --master
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
@@ -314,13 +333,41 @@ Test case 14 - run command reset
 #   Executing reset on slave localhost:PORT3 Ok
 #   Executing reset on slave localhost:PORT4 Ok
 # ...done.
-Test case 14 - elect
+Test case 16 - run command start without --master
+# Checking privileges.
+# Performing START on all slaves.
+#   Executing start on slave localhost:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
+# ...done.
+Test case 17 - run command stop without --master
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# ...done.
+Test case 18 - run command reset without --master
+# Checking privileges.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not connected to master
+#   Executing stop on slave localhost:PORT4 Ok
+# Performing RESET on all slaves.
+#   Executing reset on slave localhost:PORT2 Ok
+#   Executing reset on slave localhost:PORT3 Ok
+#   Executing reset on slave localhost:PORT4 Ok
+# ...done.
+Test case 19 - elect
 # Checking privileges.
 # Checking privileges on candidates.
 # Electing candidate slave from candidate list then slaves list.
 # Best slave found is located on localhost:PORT2.
 # ...done.
-Test case 15 - gtid
+Test case 20 - gtid
 # Checking privileges.
 #
 # UUIDS for all servers:
@@ -329,8 +376,14 @@ host,port,role,uuid
 # Transactions executed on the server:
 host,port,role,gtid
 # ...done.
-Test case 16 - heatlh with discover
+Test case 21 - heatlh with discover
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -340,7 +393,7 @@ localhost,PORT2,SLAVE,UP,ON,OK
 localhost,PORT3,SLAVE,UP,ON,OK
 localhost,PORT4,SLAVE,UP,ON,OK
 # ...done.
-Test case 17 - failover to localhost:PORT4
+Test case 22 - failover to localhost:PORT4
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
@@ -365,7 +418,7 @@ Test case 17 - failover to localhost:PORT4
 | localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 18 - show health after failover
+Test case 23 - show health after failover
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -392,7 +445,7 @@ Test case 18 - show health after failover
     health: OK
 3 rows.
 # ...done.
-Test case 19 - elect with missing rpl user
+Test case 24 - elect with missing rpl user
 # Checking privileges.
 # Checking privileges on candidates.
 # Electing candidate slave from candidate list then slaves list.
@@ -403,12 +456,28 @@ Test case 19 - elect with missing rpl user
 #   Replication user exists ... Ok
 # Best slave found is located on localhost:PORT2.
 # ...done.
-Test case 20 - mix FILE/TABLE and missing --rpl-user
+Test case 25 - mix FILE/TABLE and missing --rpl-user
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Discovering slave at localhost:PORT5
+# Found slave: localhost:PORT5
 # Checking privileges.
 ERROR: You must specify either the --rpl-user or set all slaves to use --master-info-repository=TABLE.
-Test case 21 - mix FILE/TABLE and --rpl-user
+Test case 26 - mix FILE/TABLE and --rpl-user
 # Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Discovering slave at localhost:PORT5
+# Found slave: localhost:PORT5
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.

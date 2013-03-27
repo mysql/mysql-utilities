@@ -1313,7 +1313,7 @@ class Slave(Server):
         res = self.get_status()
         if res == []:
             return False
-        return res[0][10].upper() == "YES"
+        return res[0][_SLAVE_IO_RUNNING].upper() == "YES"
 
     def get_rpl_master_user(self):
         """Get the rpl master user from the slave status

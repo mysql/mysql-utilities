@@ -184,7 +184,7 @@ class Topology(Replication):
                                                             slave_vals,
                                                             self.options,
                                                             skip_conn_err)
-        self.discover_slaves()
+        self.discover_slaves(output_log=True)
 
 
     def _report(self, message, level=logging.INFO, print_msg=True):
@@ -328,14 +328,18 @@ class Topology(Replication):
                     return False
         return True
 
-
-    def discover_slaves(self, skip_conn_err=True):
+    def discover_slaves(self, skip_conn_err=True, output_log=False):
         """Discover slaves connected to the master
+
+        skip_conn_err[in]   Skip connection errors to the slaves (i.e. log the
+                            errors but do not raise an exception),
+                            by default True.
+        output_log[in]      Output the logged information (i.e. print the
+                            information of discovered slave to the output),
+                            by default False.
 
         Returns bool - True if new slaves found
         """
-        from mysql.utilities.common.replication import Slave
-
         # See if the user wants us to discover slaves.
         discover = self.options.get("discover", None)
         if not discover or not self.master:
@@ -346,13 +350,15 @@ class Topology(Replication):
 
         # Find discovered slaves
         new_slaves_found = False
-        self._report("# Discovering slaves for master at %s:%s" %
-                     (self.master.host, self.master.port))
+        self._report("# Discovering slaves for master at "
+                     "{0}:{1}".format(self.master.host, self.master.port))
         discovered_slaves = self.master.get_slaves(user, password)
         for slave in discovered_slaves:
             host, port = slave.split(":")
-            self._report("Discovering slave at %s:%s" % (host, port),
-                         logging.INFO, False)
+            msg = "Discovering slave at {0}:{1}".format(host, port)
+            self._report(msg, logging.INFO, False)
+            if output_log:
+                print("# {0}".format(msg))
             # Convert local IP to localhost
             if host == '127.0.0.1':
                 host = 'localhost'
@@ -381,26 +387,34 @@ class Topology(Replication):
                     try:
                         slave_conn.connect()
                         # Skip discovered slaves that are not connected
-                        # to the master
+                        # to the master (i.e. IO thread is not running)
                         if slave_conn.is_connected():
                             self.slaves.append({ 'host' : host, 'port' : port,
                                                  'instance' : slave_conn,
                                                  'discovered' : True})
-                            self._report("Found slave: %s:%s" %
-                                         (host, port), logging.INFO, False)
+                            msg = "Found slave: {0}:{1}".format(host, port)
+                            self._report(msg, logging.INFO, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                             new_slaves_found = True
                         else:
-                            self._report("Not found.", logging.WARN, False)
+                            msg = ("Slave skipped (IO not running): "
+                                   "{0}:{1}").format(host, port)
+                            self._report(msg, logging.WARN, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                     except UtilError, e:
-                        msg = ("Cannot connect to slave %s:%s as user '%s'. "
-                               % (host, port, user))
+                        msg = ("Cannot connect to slave {0}:{1} as user "
+                               "'{2}'.").format(host, port, user)
                         if skip_conn_err:
-                            self._report(msg + e.errmsg, logging.WARN, False)
+                            msg = "{0} {1}".format(msg, e.errmsg)
+                            self._report(msg, logging.WARN, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                         else:
                             raise UtilRplError(msg)
 
         return new_slaves_found
-
 
     def _get_server_gtid_data(self, server, role):
         """Retrieve the GTID information from the server.
@@ -1429,6 +1443,8 @@ class Topology(Replication):
         command[in]        command to execute
         quiet[in]          If True, do not print messges
                            Default is False
+        :param command:
+        :param quiet:
         """
 
         assert (self.slaves is not None), \
@@ -1446,8 +1462,9 @@ class Topology(Replication):
                 message = "{0}WARN - cannot connect to slave".format(msg)
                 self.report(message, logging.WARN)
             elif command == 'reset':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
@@ -1458,8 +1475,9 @@ class Topology(Replication):
                 elif not quiet:
                     self._report("{0}Ok".format(msg))
             elif command == 'start':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
@@ -1470,8 +1488,9 @@ class Topology(Replication):
                 elif not quiet:
                     self._report("{0}Ok".format(msg))
             elif command == 'stop':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)

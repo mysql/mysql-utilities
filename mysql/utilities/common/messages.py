@@ -69,6 +69,9 @@ PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
 PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
                              "required.")
 
+PARSE_ERR_SLAVE_DISCO_EXC = ("Options --discover-slaves-login and --slaves "
+                             "cannot be used simultaneously.")
+
 WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
                          "'{cmd}' (option ignored).")
 

@@ -114,7 +114,7 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
-        comment = "Test case %s - Master listed as a candiate - alias" % test_num
+        comment = "Test case %s - Master listed as a candidate - alias" % test_num
         cmd_str = "%s elect %s %s %s" % (base_cmd, master_str,
                   "--candidates=root:root@%s:%s" % \
                     (socket.gethostname().split('.', 1)[0], self.server1.port),
@@ -126,10 +126,22 @@ class test(rpl_admin.test):
         test_num += 1
 
         for command in ('start', 'stop', 'reset'):
-            comment = ("Test case {0} - {1} without --master and "
+            comment = ("Test case {0} - {1} without "
                        "--slaves").format(test_num, command.capitalize())
             cmd_str = ("{0} {1} --discover-slaves-login="
                        "root:root").format(base_cmd, command)
+            res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
+            test_num += 1
+
+        # Test error using --discover and --slaves at the same time
+        for command in ('start', 'stop', 'reset', 'health', 'failover',
+                        'switchover'):
+            comment = ("Test case {0} - {1} using --discover-slaves-login and "
+                       "--slaves").format(test_num, command.capitalize())
+            cmd_str = ("{0} {1} {2} --discover-slaves-login="
+                       "root:root").format(base_cmd, command, slaves_str)
             res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -179,10 +191,10 @@ class test(rpl_admin.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         try:
             self.server1.exec_query("DROP USER 'joe'@'localhost'")
@@ -193,6 +205,3 @@ class test(rpl_admin.test):
         except:
             pass
         return rpl_admin.test.cleanup(self)
-
-
-

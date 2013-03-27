@@ -19,6 +19,12 @@ localhost:PORT1 (MASTER)
 
 Test case 2 - demote-master after switchover -vvv
 # Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.

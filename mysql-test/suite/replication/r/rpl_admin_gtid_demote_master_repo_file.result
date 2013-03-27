@@ -26,6 +26,12 @@ No slaves found.
 
 Test case 3 - demote-master switchover -vvv using actual rpl user
 # Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
@@ -117,6 +123,12 @@ localhost:PORT2 (MASTER)
 
 Test case 6 - demote-master switchover -vvv Using a different rpl user and no --force
 # Discovering slaves for master at XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT1
+# Found slave: XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT4.
 # Checking candidate slave prerequisites.
@@ -173,6 +185,12 @@ No slaves found.
 
 Test case 9 - demote-master switchover -vvv Using a different rpl user and using the --force
 # Discovering slaves for master at XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT1
+# Found slave: XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT4.
 # Checking candidate slave prerequisites.

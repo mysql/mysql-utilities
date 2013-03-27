@@ -31,7 +31,7 @@ import os.path
 import sys
 
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import add_verbosity, setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.command.show_rpl import show_topology
@@ -90,9 +90,8 @@ parser.add_option("-n", "--num-retries", action="store", dest="num_retries",
                   "slave login attempt. Valid with --prompt only.",
                   default=0)
 
-# Add quiet
-parser.add_option("-q", "--quiet", action="store_true", dest="quiet",
-                  help="turn off all messages for quiet execution.")
+# Add verbosity mode and quiet option
+add_verbosity(parser, True)
 
 parser.add_option("--discover-slaves-login", action="store", dest="discover",
                   default=None, type="string", help="at startup, query "
@@ -136,8 +135,9 @@ options = {
     'format'         : opt.format,
     'max_depth'      : opt.max_depth,
     'discover'       : opt.discover,
+    'verbosity'      : opt.verbosity
 }
-  
+
 try:
     res = show_topology(m_values, options)
     if res:

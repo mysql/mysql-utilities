@@ -80,9 +80,9 @@ class test(rpl_admin.test):
         phase1 =  rpl_admin.test.run(self)
         if not phase1:
             return False
-        
-        test_num = 14
-        
+
+        test_num = 19
+
         rpl_admin.test.reset_topology(self)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
