@@ -40,7 +40,7 @@ class test(compare_db.test):
 
         s1_conn = "--server1=" + self.build_connection_string(self.server1)
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
+
         cmd_str = "mysqldbcompare.py %s %s inventory:inventory " % \
                   (s1_conn, s2_conn)
 
@@ -50,6 +50,10 @@ class test(compare_db.test):
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbcompare.py "
+                                           "version", 6)
 
         compare_db.test.alter_data(self)
         self.server1.exec_query("DROP VIEW inventory.tools")
@@ -78,37 +82,37 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -a" 
-        cmd_opts += " --width=65" 
+        cmd_opts = " --format=csv -a"
+        cmd_opts += " --width=65"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -a" 
-        cmd_opts += " --width=55" 
+        cmd_opts = " --format=csv -a"
+        cmd_opts += " --width=55"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a" 
+        cmd_opts = " --format=csv -vvv -a"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a --disable-binary-logging" 
+        cmd_opts = " --format=csv -vvv -a --disable-binary-logging"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         compare_db.test.do_replacements(self)
-        
+
         return True
 
     def get_result(self):

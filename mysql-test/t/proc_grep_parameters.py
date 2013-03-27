@@ -30,18 +30,22 @@ class test(proc_grep.test):
 
     def setup(self):
         return proc_grep.test.setup(self)
-        
+
     def run(self):
         self.res_fname = "result.txt"
         from_conn = self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server1)
 
         cmd_str = "mysqlprocgrep.py --server=%s " % from_conn
-       
+
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlprocgrep.py "
+                                           "version", 6)
 
         comment = "Test case 2 - do the SQL for a simple search"
         cmd_str = "mysqlprocgrep.py --sql "
@@ -52,20 +56,18 @@ class test(proc_grep.test):
 
         self.mask_result("    USER LIKE 'root'", "    USER LIKE 'root'",
                          "    USER LIKE 'XXXX'")
-        
+
         # Mask funny output on Windows
         if os.name != "posix":
             self.replace_result("    USER LIKE ", "    USER LIKE 'XXXX'\n")
-        
+
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return proc_grep.test.cleanup(self)
-
-

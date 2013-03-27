@@ -30,7 +30,7 @@ class test(meta_grep.test):
 
     def setup(self):
         return meta_grep.test.setup(self)
-        
+
     def run(self):
         self.res_fname = "result.txt"
         from_conn = self.build_connection_string(self.server1)
@@ -38,11 +38,15 @@ class test(meta_grep.test):
 
         cmd_str = "mysqlmetagrep.py --server=%s " % from_conn + \
                   "--database=util_test --format=CSV "
-       
+
         comment = "Test case 1 - do the help"
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlmetagrep.py "
+                                           "version", 6)
 
         comment = "Test case 2 - do the SQL for a simple search"
         cmd_str = "mysqlmetagrep.py --sql "
@@ -59,16 +63,14 @@ class test(meta_grep.test):
             raise MUTLibError("%s: failed" % comment)
 
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
-        
+
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return meta_grep.test.cleanup(self)
-
-

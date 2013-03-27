@@ -37,7 +37,7 @@ class test(show_rpl.test):
         self.server_list[2] = self.get_server("rep_master_show")
         if self.server_list[2] is None:
             return False
-            
+
         self.port_repl = []
         self.port_repl.append(self.server_list[1].port)
         self.port_repl.append(self.server_list[2].port)
@@ -51,7 +51,7 @@ class test(show_rpl.test):
         slave_str = " --slave=%s" % \
                     self.build_connection_string(self.server_list[1])
         conn_str = master_str + slave_str
-        
+
         show_rpl.test.stop_replication(self, self.server_list[4])
         show_rpl.test.stop_replication(self, self.server_list[3])
         show_rpl.test.stop_replication(self, self.server_list[2])
@@ -65,20 +65,20 @@ class test(show_rpl.test):
                     self.server_list[2].exec_query("KILL CONNECTION %s" % \
                                                    row[0])
 
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl " 
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl "
         try:
             res = self.exec_util(cmd+master_str+slave_str,
-                                 self.res_fname)            
+                                 self.res_fname)
         except UtilError, e:
             raise MUTLibError(e.errmsg)
-            
-        cmd = "mysqlshow_rpl.py --rpl-user=rpl:rpl " 
+
+        cmd = "mysqlshow_rpl.py --rpl-user=rpl:rpl "
         try:
             res = self.exec_util(cmd+master_str+slave_str,
-                                 self.res_fname)            
+                                 self.res_fname)
         except UtilError, e:
             raise MUTLibError(e.errmsg)
-        
+
         cmd_str = "mysqlrplshow.py --disco=root:root " + master_str
 
         comment = "Test case 1 - show topology - without list"
@@ -87,34 +87,38 @@ class test(show_rpl.test):
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-   
+
         comment = "Test case 2 - show topology - with list"
         cmd_opts = "  --recurse --show-list"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-   
+
         comment = "Test case 3 - show topology - with list and quiet"
         cmd_opts = "  --recurse --quiet --show-list"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-   
+
         comment = "Test case 4 - show topology - with format and without list"
         cmd_opts = "  --recurse --format=CSV"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-   
+
         comment = "Test case 5 - show topology - help"
         cmd_opts = " --help"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrplshow.py "
+                                           "version", 6)
 
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
         test_num = 6
@@ -128,7 +132,7 @@ class test(show_rpl.test):
                 raise MUTLibError("%s: failed" % comment)
 
             test_num += 1
-            
+
         show_rpl.test.stop_replication(self, self.server_list[1])
 
         show_rpl.test.do_replacements(self)
@@ -137,12 +141,9 @@ class test(show_rpl.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return show_rpl.test.cleanup(self)
-
-
-

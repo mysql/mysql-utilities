@@ -26,6 +26,7 @@ Methods:
 import copy
 import optparse
 import os.path
+import re
 
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import FormatError
@@ -38,6 +39,19 @@ from mysql.utilities.common.my_print_defaults import my_login_config_exists
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
 _PERMITTED_RPL_DUMP = ["master", "slave"]
+
+
+class UtilitiesParser(optparse.OptionParser):
+    """Special subclass of parser that allows showing of version information
+       when --help is used.
+    """
+
+    def print_help(self):
+        """Show version information before help
+        """
+        print self.version
+        optparse.OptionParser.print_help(self)
+
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -108,7 +122,7 @@ def setup_common_options(program_name, desc_str, usage_str,
     Returns parser object
     """
 
-    parser = optparse.OptionParser(
+    parser = UtilitiesParser(
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,

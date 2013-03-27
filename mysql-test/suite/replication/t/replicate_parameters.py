@@ -32,7 +32,7 @@ class test(replicate.test):
 
     def run(self):
         self.res_fname = "result.txt"
-                      
+
         comment = "Test case 1 - use the test feature"
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, "--test-db=db_not_there_yet", True)
@@ -50,6 +50,10 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlreplicate.py "
+                                           "version", 6)
+
         comment = "Test case 3 - use the verbose feature"
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, " --verbose", True)
@@ -60,7 +64,7 @@ class test(replicate.test):
             res = self.server2.exec_query("STOP SLAVE")
         except:
             pass
-        
+
         comment = "Test case 4 - use the start-from-beginning feature"
         res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
                                  comment, " --start-from-beginning", True)
@@ -81,11 +85,9 @@ class test(replicate.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return replicate.test.cleanup(self)
-
-

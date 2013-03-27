@@ -27,7 +27,6 @@ from mysql.utilities.common.tools import check_python_version
 check_python_version()
 
 import logging
-import optparse
 import os.path
 import signal
 import sys
@@ -36,6 +35,7 @@ from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
+from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -45,7 +45,7 @@ from mysql.utilities import VERSION_FRM
 NAME = "MySQL Utilities - mysqlfailover "
 DESCRIPTION = "mysqlfailover - automatic replication health monitoring and failover"
 USAGE = "%prog --master=root@localhost --discover-slaves-login=root " + \
-        "--candidates=root@host123:3306,root@host456:3306 " 
+        "--candidates=root@host123:3306,root@host456:3306 "
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 _DATE_LEN = 22
 
@@ -87,7 +87,7 @@ except:
 set_signal_handler(on_exit)
 
 # Setup the command parser
-parser = optparse.OptionParser(
+parser = UtilitiesParser(
     version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
     description=DESCRIPTION,
     usage=USAGE,
@@ -166,16 +166,16 @@ except ValueError:
 
 if opt.master is None:
     parser.error("You must specify a master to monitor.")
-    
+
 if opt.slaves is None and opt.discover is None:
     parser.error("You must supply a list of slaves or the "
                  "--discover-slaves-login option.")
-    
+
 if opt.failover_mode == 'elect' and opt.candidates is None:
     parser.error("Failover mode = 'elect' reqiures at least one candidate.")
-    
+
 # Parse the master, slaves, and candidates connection parameters
-try: 
+try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError:
     _, e, _ = sys.exc_info()
@@ -228,9 +228,8 @@ try:
 except UtilError:
     _, e, _ = sys.exc_info()
     # log the error in case it was an usual exception
-    logging.log(logging.CRITICAL, e.errmsg.strip(' '))  
+    logging.log(logging.CRITICAL, e.errmsg.strip(' '))
     print("ERROR: %s" % e.errmsg)
     sys.exit(1)
-    
-sys.exit(0)
 
+sys.exit(0)

@@ -27,7 +27,6 @@ from mysql.utilities.common.tools import check_python_version
 # Check Python version compatibility
 check_python_version(min_version=(2, 7, 0), max_version=(3, 0, 0))
 
-import optparse
 import os.path
 import sys
 
@@ -35,6 +34,7 @@ from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
+from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.tools import show_file_statistics
 from mysql.utilities.command import audit_log
 from mysql.utilities.command.audit_log import AuditLog
@@ -44,7 +44,7 @@ from mysql.utilities.command.audit_log import command_requires_server
 from mysql.utilities import VERSION_FRM
 
 
-class MyParser(optparse.OptionParser):
+class MyParser(UtilitiesParser):
     def format_epilog(self, formatter):
         return self.epilog
 

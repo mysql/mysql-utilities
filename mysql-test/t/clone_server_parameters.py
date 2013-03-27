@@ -140,6 +140,10 @@ class test(mutlib.System_test):
 
         self.remove_result("# trying again...")
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlserverclone"
+                                           ".py version", 6)
+
         return True
 
     def get_result(self):

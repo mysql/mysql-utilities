@@ -65,6 +65,10 @@ class test(clone_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbcopy.py "
+                                           "version", 6)
+
         # We exercise --force here to ensure skips don't interfere
         cmd_opts = "--force --skip=data util_test:util_db_clone"
         comment = "Test case 4 - no data"

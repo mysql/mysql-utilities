@@ -51,6 +51,13 @@ class test(server_info.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Mask version information
+        self.replace_result("MySQL Utilities mysqlserverinfo.py version",
+                            "MySQL Utilities mysqlserverinfo.py version XXX\n")
+        # Mask copyright date
+        self.replace_result("Copyright (c)", "Copyright (c) YYYY Oracle "
+                            "and/or its affiliates. All rights reserved.\n")
+
         test_num += 1
         cmd_opts = " --format=csv --no-headers"
         comment = "Test case %d - no headers" % test_num
@@ -66,7 +73,7 @@ class test(server_info.test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
 
-        cmd_str = self.start_stop_newserver(delete_log=False, 
+        cmd_str = self.start_stop_newserver(delete_log=False,
                                             stop_server=False)
 
         test_num += 1
@@ -102,7 +109,7 @@ class test(server_info.test):
         comment = "Test case %d - run against offline server" % test_num
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)
 
         server_info.test.do_replacements(self)
 

@@ -27,7 +27,7 @@ _BASE_COMMENT = "Test Case %d: "
 class test(utilities_console_base.test):
     """mysql utilities console - piped commands
     This test executes tests of commands piped into mysqluc. It uses the
-    utilities_console_base for test execution. 
+    utilities_console_base for test execution.
     """
 
     def check_prerequisites(self):
@@ -41,14 +41,14 @@ class test(utilities_console_base.test):
             self.util_file = self.util_test + ".py"
         if not os.path.isdir(self.tmp_dir):
             os.makedirs(self.tmp_dir)
-        shutil.copyfile(os.path.join(self.utildir, self.util_test + ".py"), 
-                        os.path.join(self.tmp_dir, self.util_file)) 
+        shutil.copyfile(os.path.join(self.utildir, self.util_test + ".py"),
+                        os.path.join(self.tmp_dir, self.util_file))
         self.write_filtered_script("hello.py")
         self.write_filtered_script("mysqlhello.py")
         return True
 
     def write_filtered_script(self, file_name):
-        """ Writes a script to be filtered. 
+        """ Writes a script to be filtered.
         """
         f = open(os.path.join(self.tmp_dir, file_name), "w")
         f.write("pass")
@@ -61,8 +61,12 @@ class test(utilities_console_base.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        self.replace_result("Usage: mysqlreplicate", 
+        self.replace_result("Usage: mysqlreplicate",
                             "Usage: mysqlreplicate XXXXXXXXXXXXXXXXXXXXX \n")
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlreplica", 6)
+
         return True
 
     def run(self):
@@ -73,7 +77,7 @@ class test(utilities_console_base.test):
         self.results.append("-----\n")
         self.results.append("Custom util path: %s\n" % self.tmp_dir)
         new_util_path = utils.get_util_path(self.tmp_dir)
-        self.results.append("returned path from get_util_path: %s\n" % 
+        self.results.append("returned path from get_util_path: %s\n" %
                             new_util_path)
         if not new_util_path == self.tmp_dir:
             raise MUTLibError("get_util_path fails to get expected path")
@@ -97,7 +101,7 @@ class test(utilities_console_base.test):
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             try:

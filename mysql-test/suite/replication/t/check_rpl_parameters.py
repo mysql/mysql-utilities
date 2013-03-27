@@ -60,7 +60,7 @@ class test(check_rpl.test):
         slave_ignore_str = " --slave=%s" % \
                            self.build_connection_string(self.server3)
         conn_str = master_str + slave_str
-        
+
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         try:
             res = self.exec_util(cmd, self.res_fname)
@@ -75,14 +75,18 @@ class test(check_rpl.test):
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrplcheck.py "
+                                           "version", 6)
+
         comment = "Test case 2 - master_info"
         cmd_opts = " --master-info=m.info -v"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         comment = "Test case 3 - width"
         cmd_opts = " --width=65"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
@@ -103,12 +107,12 @@ class test(check_rpl.test):
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         # Now show how quiet performs with warning and suppress
-        
+
         conn_str = master_str + slave_ignore_str
         cmd_str = "mysqlrplcheck.py " + conn_str
-        
+
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         try:
             res = self.exec_util(cmd, self.res_fname)
@@ -149,12 +153,9 @@ class test(check_rpl.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return check_rpl.test.cleanup(self)
-
-
-

@@ -27,7 +27,6 @@ from mysql.utilities.common.tools import check_python_version
 check_python_version()
 
 import logging
-import optparse
 import os.path
 import sys
 
@@ -43,6 +42,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_SLAVE_DISCO_EXC,
                                              WARN_OPT_NOT_REQUIRED,
                                              WARN_OPT_NOT_REQUIRED_ONLY_FOR)
+from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -52,7 +52,7 @@ from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
 
-class MyParser(optparse.OptionParser):
+class MyParser(UtilitiesParser):
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -92,7 +92,7 @@ parser.add_option("--force", action="store_true", dest="force",
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", None)     
+                  "tab, csv, or vertical format", None)
 
 # Add demote option
 parser.add_option("--demote-master", action="store_true", dest="demote",
@@ -136,7 +136,7 @@ except ValueError:
     parser.error("The --timeout option requires an integer value.")
 
 # Check errors and warnings of options and combinations.
-    
+
 command = args[0].lower()
 if not command in get_valid_rpl_commands():
     parser.error("'%s' is not a valid command." % command)
@@ -146,7 +146,7 @@ if command == 'switchover' and (not opt.new_master or not opt.master):
     req_opts = '--master and --new-master'
     parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
-# --master and either --slaves or --discover-slaves-login options are required 
+# --master and either --slaves or --discover-slaves-login options are required
 # by 'elect', 'health' and 'gtid'
 if command in ['elect', 'health', 'gtid'] and not opt.master and \
    (not opt.slaves or not opt.discover):
@@ -232,7 +232,7 @@ else:
     new_master_val = None
 
 # Parse the master, slaves, and candidates connection parameters
-try: 
+try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError:
     _, e, _ = sys.exc_info()
@@ -269,11 +269,11 @@ options = {
     'no_health'    : opt.no_health,
     'rpl_user'     : opt.rpl_user,
 }
- 
+
 # If command = HEALTH, turn on --force
 if command == 'health' or command == 'gtid':
     options['force'] = True
- 
+
 # Purge log file of old data
 if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
     parser.error("Error purging log file.")
@@ -294,7 +294,5 @@ except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)
     sys.exit(1)
-    
+
 sys.exit(0)
-
-
