@@ -257,7 +257,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         #Check if the login configuration file (.mylogin.cnf) exists
         if login_path and not my_login_config_exists():
             raise UtilError(".mylogin.cnf was not found at is default "
-                            "location: %s" % my_login_config_path())
+                            "location: %s."
+                            "Please configure your login-path data before "
+                            "using it (use the mysql_config_editor tool)."
+                            % my_login_config_path())
 
         # If needed, create a MyDefaultsReader and search for my_print_defaults
         # tool.
@@ -270,7 +273,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
         # the mylogin configuration file
         if not my_defaults_reader.check_login_path_support():
             raise UtilError("the used my_print_defaults tool does not "
-                            "support login-path options: %s"
+                            "support login-path options: %s. "
+                            "Please confirm that the location to a tool with "
+                            "login-path support is included in the PATH "
+                            "(at the beginning)."
                             % my_defaults_reader.tool_path)
 
         # Read and parse the login-path data (i.e., user, password and host)
@@ -280,6 +286,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
             user = login_path_data.get('user', None)
             passwd = login_path_data.get('password', None)
             host = login_path_data.get('host', None)
+            if not port:
+                port = login_path_data.get('port', 3306)
+            if not socket:
+                socket = login_path_data.get('socket', None)
         else:
             raise UtilError("No login credentials found for login-path: %s. "
                             "Please review the used connection string: %s"
