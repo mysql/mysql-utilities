@@ -26,6 +26,7 @@ import sys
 import re
 import subprocess
 
+from mysql.utilities import AVAILABLE_UTILITIES
 from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.exception import UtilError
 
@@ -145,7 +146,7 @@ class Utilities(object):
         pattern_alias = "\s+\-(\w+)\s*" # match Alias of the form <-Alias>
         self.program_name = re.compile(pattern_alias)
 
-        files = os.listdir(self.util_path)
+        files = AVAILABLE_UTILITIES
 
         working_utils = []
         for file_name in files:
