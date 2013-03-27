@@ -140,6 +140,11 @@ parser.add_option("-p", "--pedantic", action="store_true", default=False,
                   dest="pedantic", help="fail if some inconsistencies are "
                   "found (e.g. errant transactions on slaves).")
 
+# Add no keyboard input
+parser.add_option("--no-keyboard", action="store_true", default=False,
+                  dest="no_keyboard", help="start with no keyboard input "
+                  "support.")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -210,7 +215,8 @@ options = {
     'post_fail'     : opt.exec_post_fail,
     'rpl_user'      : opt.rpl_user,
     'rediscover'    : opt.rediscover,
-    'pedantic'      : opt.pedantic
+    'pedantic'      : opt.pedantic,
+    'no_keyboard'   : opt.no_keyboard
 }
 
 # Purge log file of old data
@@ -231,5 +237,7 @@ except UtilError:
     logging.log(logging.CRITICAL, e.errmsg.strip(' '))
     print("ERROR: %s" % e.errmsg)
     sys.exit(1)
+except KeyboardInterrupt:
+    sys.exit(0)
 
 sys.exit(0)

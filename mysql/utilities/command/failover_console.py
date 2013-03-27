@@ -28,6 +28,7 @@ from mysql.utilities.exception import UtilError, UtilRplError
 
 _CONSOLE_HEADER = "MySQL Replication Failover Utility"
 _CONSOLE_FOOTER = "Q-quit R-refresh H-health G-GTID Lists U-UUIDs"
+_CONSOLE_FOOTER_NO_KEYBOARD = "Press CTRL+C to quit"
 
 _COMMAND_KEYS = {'\x1b[A':'ARROW_UP', '\x1b[B':'ARROW_DN'}
 
@@ -161,6 +162,10 @@ class FailoverConsole(object):
         self.mode = options.get("failover_mode", "auto")
         self.logging = options.get("logging", False)
         self.log_file = options.get("log_file", None)
+
+        # If the option --no-keyboard is provided, the menu will be disabled
+        # and any keyboard request will be ignored.
+        self.no_keyboard = options.get("no_keyboard", False)
 
         self.alarm = time.time() + self.interval
         self.gtid_list = -1
@@ -399,7 +404,7 @@ class FailoverConsole(object):
         Returns - None or int (see above)        
         """
         # If on *nix systems, set the terminal IO sys to not echo
-        if os.name == "posix":
+        if not self.no_keyboard and os.name == "posix":
             import tty, termios
             old_settings = termios.tcgetattr(sys.stdin)
             tty.setcbreak(sys.stdin.fileno())
@@ -409,12 +414,12 @@ class FailoverConsole(object):
         # loop for interval in seconds while detecting keypress 
         while not done:
             done = self.alarm <= time.time()
-            if kbhit() and not done:
+            if not self.no_keyboard and kbhit() and not done:
                 key = getch()
                 done = True
 
         # Reset terminal IO sys to older state
-        if os.name == "posix":
+        if not self.no_keyboard and os.name == "posix":
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
         return key
@@ -622,14 +627,18 @@ class FailoverConsole(object):
         for i in range(self.rows_printed, self.max_rows-2):
             print
         # Show bottom menu options
-        print _CONSOLE_FOOTER,
-        # If logging enabled, show command
-        if self.logging:
-            print "L-log entries",
-        if scroll:
-            print "Up|Down-scroll"
+        footer = []
+        if self.no_keyboard:
+            # No support for keyboard, disable menu
+            footer.append(_CONSOLE_FOOTER_NO_KEYBOARD)
         else:
-            print
+            footer.append(_CONSOLE_FOOTER)
+            # If logging enabled, show command
+            if self.logging:
+                footer.append("L-log entries")
+            if scroll:
+                footer.append("Up|Down-scroll")
+        print(" ".join(footer))
         self.rows_printed = self.max_rows
    
     

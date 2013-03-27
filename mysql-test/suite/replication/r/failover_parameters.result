@@ -74,6 +74,7 @@ Options:
                         detect when slaves have been removed or added.
   -p, --pedantic        fail if some inconsistencies are found (e.g. errant
                         transactions on slaves).
+  --no-keyboard         start with no keyboard input support.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user
