@@ -21,7 +21,7 @@ This module contains and abstraction of a MySQL user object.
 
 import re
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
 from mysql.utilities.exception import FormatError
 
 
@@ -151,7 +151,8 @@ class User(object):
             # If we're connected as some other user, use the user@host
             # defined at instantiation
             if parts[0] != self.user:
-                self.current_user = "'%s'@'%s'" % (self.user, self.host)
+                host = clean_IPv6(self.host)
+                self.current_user = "'%s'@'%s'" % (self.user, host)
             else:
                 self.current_user = "'%s'@'%s'" % (parts[0], parts[1])
         grants = []

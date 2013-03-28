@@ -171,14 +171,6 @@ class RplCommands(object):
         self.logging = self.options.get("logging", False)
         self.candidates = self.options.get("candidates", None)
 
-        # Replace all local host IP addresses (i.e. 127.0.0.1) by localhost
-        for candidate in self.candidates:
-            if candidate['host'] == '127.0.0.1':
-                candidate['host'] = 'localhost'
-        for slave in slave_vals:
-            if slave['host'] == '127.0.0.1':
-                slave['host'] = 'localhost'
-
         self.rpl_user = self.options.get("rpl_user", None)
         self.topology = Topology(master_vals, slave_vals, self.options,
                                  skip_conn_err)

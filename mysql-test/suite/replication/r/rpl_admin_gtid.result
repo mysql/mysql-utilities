@@ -226,9 +226,9 @@ Test case 8 - switchover to master
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
 | 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 9 - show health after switchover
@@ -273,6 +273,9 @@ Test case 10 - health with loopback
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
@@ -414,7 +417,7 @@ Test case 22 - failover to localhost:PORT4
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT4  | MASTER  | UP     | ON         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.

@@ -354,14 +354,15 @@ class Topology(Replication):
                      "{0}:{1}".format(self.master.host, self.master.port))
         discovered_slaves = self.master.get_slaves(user, password)
         for slave in discovered_slaves:
-            host, port = slave.split(":")
+            if "]" in slave:
+               host, port = slave.split("]:")
+               host = "{0}]".format(host)
+            else:
+                host, port = slave.split(":")
             msg = "Discovering slave at {0}:{1}".format(host, port)
             self._report(msg, logging.INFO, False)
             if output_log:
                 print("# {0}".format(msg))
-            # Convert local IP to localhost
-            if host == '127.0.0.1':
-                host = 'localhost'
             # Skip hosts that are not registered properly
             if host == 'unknown host':
                 continue
@@ -477,8 +478,6 @@ class Topology(Replication):
         assert (candidate is not None), "A candidate server is required."
         assert (type(candidate) == Master), \
                "A candidate server must be a Master class instance."
-
-        from mysql.utilities.common.replication import Slave
 
         # If master has GTID=ON, ensure all servers have GTID=ON
         gtid_enabled = self.master.supports_gtid() == "ON"

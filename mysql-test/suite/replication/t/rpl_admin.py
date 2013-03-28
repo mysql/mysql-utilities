@@ -90,7 +90,8 @@ class test(mutlib.System_test):
         for slave in [self.server2, self.server3, self.server4]:
             slave.exec_query("SET SQL_LOG_BIN= 0")
             slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                              "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+                              "'rpl'@'%s' IDENTIFIED BY 'rpl'" %
+                              self.server1.host)
             slave.exec_query("SET SQL_LOG_BIN= 1")
 
         # Form replication topology - 1 master, 3 slaves
@@ -245,7 +246,7 @@ class test(mutlib.System_test):
         for slave in slaves:
             slave_str = " --slave=%s" % self.build_connection_string(slave)
             conn_str = self.master_str + slave_str
-            cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+            cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s -vvv" % conn_str
             res = self.exec_util(cmd, self.res_fname)
             if res != 0:
                 return False

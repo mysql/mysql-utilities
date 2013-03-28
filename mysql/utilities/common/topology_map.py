@@ -92,14 +92,16 @@ class TopologyMap(object):
             'version'   : "5.0.0",
             'unique'    : True,
         }
-        
+
         master_info = "%s:%s" % (conn['host'],
                                  conn['port'])
         master = None
         
         # Clear socket if used with a local server
-        if (conn['host'] == 'localhost' or \
-            conn['host'] == "127.0.0.1"):
+        if (conn['host'] == 'localhost' or 
+            conn['host'] == "127.0.0.1" or
+            conn['host'] == "::1" or
+            conn['host'] == "[::1]"):
             conn['unix_socket'] = None
         
         # Increment num_retries if not set when --prompt is used

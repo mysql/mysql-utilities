@@ -25,7 +25,8 @@ import os
 import re
 import mysql.connector
 from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
-from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip)
+from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
+                                              clean_IPv6, format_IPv6)
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID " 
@@ -307,7 +308,11 @@ def connect_servers(src_val, dest_val, options={}):
 
     # Get connection dictionaries
     src_dict = get_connection_dictionary(src_val)
+    if "]" in src_dict['host']:
+            src_dict['host'] = clean_IPv6(src_dict['host'])
     dest_dict = get_connection_dictionary(dest_val)
+    if dest_dict and "]" in dest_dict['host']:
+            dest_dict['host'] = clean_IPv6(dest_dict['host'])
 
     # Check for uniqueness - dictionary 
     if options.get("unique", False) and dest_dict is not None:
@@ -514,7 +519,7 @@ class Server(object):
                 local_aliases.append(local_info[0].split('.')[0])
             except:
                 pass
-            local_aliases.extend(['127.0.0.1', 'localhost'])
+            local_aliases.extend(['127.0.0.1', 'localhost', "::1","[::1]"])
             local_aliases.extend(local_info[1])
             local_aliases.extend(local_info[2])
         except (socket.herror, socket.gaierror):
@@ -559,7 +564,6 @@ class Server(object):
 
             self.aliases.extend(host_ip[1])
             self.aliases.extend(host_ip[2])
-
         return host_or_ip.lower() in self.aliases
 
 
@@ -883,9 +887,13 @@ class Server(object):
         from mysql.utilities.common.user import User
         
         errors = []
-        if host == '127.0.0.1':
-            host = 'localhost'
+        ipv6 = False
+        if "]" in host:
+            ipv6 = True
+            host = clean_IPv6(host)
         result = self.user_host_exists(user, host)
+        if ipv6:
+            result = format_IPv6(result)
         if result is None or result == []:
             errors.append("The replication user %s@%s was not found "
                           "on %s:%s." % (user, host, self.host, self.port))

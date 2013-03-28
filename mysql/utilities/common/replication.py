@@ -25,6 +25,8 @@ import time
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, UtilRplWarn, UtilRplError
+from mysql.utilities.common.user import User
+from mysql.utilities.common.ip_parser import clean_IPv6, format_IPv6
 
 _MASTER_INFO_COL = [
     'Master_Log_File', 'Read_Master_Log_Pos', 'Master_Host', 'Master_User',
@@ -170,7 +172,7 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
 
             res = master.get_status()
             if not res:
-               raise UtilError("Cannot retrieve master status.")
+                raise UtilError("Cannot retrieve master status.")
 
             # Need to get the master values for the make_change_master command
             master_values = {
@@ -795,7 +797,8 @@ class Master(Server):
         Returns bool - True = success, False = errors
         """
 
-        from mysql.utilities.common.user import User
+        if "]" in host:
+            host = clean_IPv6(host)
 
         # Create user class instance
         user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)
@@ -868,9 +871,6 @@ class Master(Server):
 
         Returns bool - True - is configured, False - not configured
         """
-        if conn_dict['conn_info']['host'] == '127.0.0.1':
-            conn_dict['conn_info']['host'] = 'localhost'
-        # Now we must attempt to connect to the slave.
         slave_conn = Slave(conn_dict)
         is_configured = False
         try:
@@ -903,6 +903,8 @@ class Master(Server):
         """
         def _get_slave_info(host, port):
             if len(host) > 0:
+                if ":" in host:
+                    host = format_IPv6(host)
                 slave_info = host
             else:
                 slave_info = "unknown host"
@@ -1646,6 +1648,8 @@ class Slave(Server):
         # If we cannot get the master info information, try the values passed
         if master_info is None:
             master_host = master_values['Master_Host']
+            if "]" in master_host:
+                master_host = clean_IPv6(master_host)
             master_port = master_values['Master_Port']
             master_user = master_values['Master_User']
             master_passwd = master_values['Master_Password']

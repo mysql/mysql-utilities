@@ -41,6 +41,7 @@ from mysql.utilities.exception import UtilError
 
 # Constants
 MAX_SERVER_POOL = 10
+HOST = "localhost"
 
 def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
     """Execute Utility
@@ -202,7 +203,7 @@ class Server_list(object):
         cmd += "--new-id=%s " % server_id
         cmd += "--new-data=%s " % os.path.normpath(full_datadir)
         if parameters is not None:
-            cmd += "--mysqld=%s" % parameters
+            cmd += "--mysqld=%s -vvv" % parameters
 
         res = _exec_util(cmd, "cmd.txt", self.utildir)
 
@@ -210,7 +211,7 @@ class Server_list(object):
         conn = {
             "user"   : "root",
             "passwd" : passwd,
-            "host"   : "localhost",
+            "host"   : HOST,
             "port"   : port,
             "unix_socket" : full_datadir + "/mysql.sock"
         }
@@ -290,7 +291,10 @@ class Server_list(object):
                                                        mysqladmin_client))
         cmd += mysqladmin_path
         cmd += " shutdown "
-        cmd += self.get_connection_parameters(server)
+        conn = self.get_connection_parameters(server).replace("127.0.0.1",
+                                                              "localhost")
+        conn = conn.replace("[::1]","localhost")
+        cmd += conn.replace("::1","localhost")
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
 
@@ -772,10 +776,15 @@ class System_test(object):
         conn_str = "%s" % conn_val[0]
         if conn_val[1]:
             conn_str += ":%s" % conn_val[1]
-        conn_str += "@%s:" % conn_val[2]
+        ipv6 = False
+        if ":" in conn_val[2] and not "]" in conn_val[2]:
+            conn_str += "@[%s]:" % conn_val[2]
+            ipv6 = True
+        else:
+            conn_str += "@%s:" % conn_val[2]
         if conn_val[3]:
             conn_str += "%s" % conn_val[3]
-        if conn_val[4] is not None and conn_val[4] != "":
+        if not ipv6 and conn_val[4] is not None and conn_val[4] != "":
             conn_str += ":%s " % conn_val[4]
 
         return conn_str
