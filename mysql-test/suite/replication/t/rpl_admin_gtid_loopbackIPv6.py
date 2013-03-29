@@ -234,7 +234,7 @@ class test(rpl_admin.test):
 
     def cleanup(self):
         # Restoring mutlib.HOST value to: {0}'.format(self.old_mutlib_HOST)
-        mutlib.HOST = _IPv6_LOOPBACK
+        mutlib.HOST = self.old_mutlib_HOST
         # Kill the servers that are only for this test.
         self.servers.stop_server(self.server1)
         self.servers.stop_server(self.server2)

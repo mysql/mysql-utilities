@@ -1616,7 +1616,6 @@ class Topology(Replication):
                 self._report("ERROR: %s" % msg, logging.ERROR)
                 return
             self.master.exec_query(_UPDATE_RPL_USER_QUERY % (passwd, user))
-            self.master.exec_query("FLUSH PRIVILEGES;")
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")

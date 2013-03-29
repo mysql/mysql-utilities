@@ -13,6 +13,12 @@ Test case 1 - mysqlrplshow OLD Master before demote
 
 Test case 2 - loopback (127.0.0.1) switchover demote-master 
 # Discovering slaves for master at 127.0.0.1:PORT1
+# Discovering slave at 127.0.0.1:PORT2
+# Found slave: 127.0.0.1:PORT2
+# Discovering slave at 127.0.0.1:PORT3
+# Found slave: 127.0.0.1:PORT3
+# Discovering slave at 127.0.0.1:PORT4
+# Found slave: 127.0.0.1:PORT4
 # Checking privileges.
 # Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
 # Checking candidate slave prerequisites.

@@ -276,9 +276,6 @@ Test case 10 - health with loopback
 | 127.0.0.1  | PORT2  | SLAVE   | UP     | NO         | OK      |
 | 127.0.0.1  | PORT3  | SLAVE   | UP     | NO         | OK      |
 | 127.0.0.1  | PORT4  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 11 - health with discovery
