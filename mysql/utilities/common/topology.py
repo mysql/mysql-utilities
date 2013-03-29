@@ -960,6 +960,31 @@ class Topology(Replication):
             # Check SQL thread and errors (no need to check for IO errors)
             # Note: IO errors are excepted as the master is down
             res = slave.get_sql_error()
+
+            # First, check if server is acting as a slave
+            if not res:
+                msg = ("Server '{host}@{port}' is not acting as a "
+                       "slave.").format(host=s_host, port=s_port)
+                # Print warning or raise an error according to the default
+                # failover behavior and defined options.
+                if ((stop_on_error and not self.force)
+                    or (not stop_on_error and self.pedantic)):
+                    print("# ERROR: {0}".format(msg))
+                    self._report(msg, logging.CRITICAL, False)
+                    if stop_on_error and not self.force:
+                        ignore_opt = "with the --force"
+                    else:
+                        ignore_opt = "without the --pedantic"
+                    ignore_tip = ("Note: To ignore this issue use the "
+                                  "utility {0} option.").format(ignore_opt)
+                    raise UtilRplError("{err} {note}".format(err=msg,
+                                                             note=ignore_tip))
+                else:
+                    print("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARN, False)
+                    continue
+
+            # Now, check the SQL thread status
             sql_running = res[0]
             sql_errorno = res[1]
             sql_error = res[2]
@@ -1654,10 +1679,10 @@ class Topology(Replication):
         if self.options.get("demote", False):
             self._report("# Demoting old master to be a slave to the "
                          "new master.")
-            
+
             slave = self._change_role(self.master)
             slave.stop()
-            
+
             slave_dict = {
               'host'     : self.master.host,  # host name for slave
               'port'     : self.master.port,  # port for slave

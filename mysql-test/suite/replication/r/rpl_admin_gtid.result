@@ -276,9 +276,6 @@ Test case 10 - health with loopback
 | 127.0.0.1  | PORT2  | SLAVE   | UP     | ON         | OK      |
 | 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
 | 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 11 - health with discovery
@@ -503,3 +500,15 @@ Test case 26 - mix FILE/TABLE and --rpl-user
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
+Test case 27 - slave not part of topology
+# ERROR: Errant transaction(s) found on slave(s).
+#  - For slave 'localhost@PORT?': XXXXX
+# WARNING: Server 'localhost@PORT5' is not acting as a slave.
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT2  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT5  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
