@@ -34,7 +34,7 @@ _DEFAULT_MYSQL_OPTS_FILE = '"--log-bin=mysql-bin --skip-slave-start ' + \
 class test(rpl_admin.test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
-    
+
     Note: this test requires GTID enabled servers.
     """
 
@@ -45,7 +45,7 @@ class test(rpl_admin.test):
 
     def setup(self):
         self.res_fname = "result.txt"
-        
+
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
@@ -65,20 +65,20 @@ class test(rpl_admin.test):
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
         self.s4_port = self.server5.port
-        
+
         rpl_admin.test.reset_topology(self)
 
         return True
 
     def run(self):
-        
+
         # As first phase, repeat rpl_admin tests
         phase1 =  rpl_admin.test.run(self)
         if not phase1:
             return False
-        
+
         test_num = 14
-        
+
         rpl_admin.test.reset_topology(self)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -86,7 +86,7 @@ class test(rpl_admin.test):
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
         slave4_conn = self.build_connection_string(self.server5).strip(' ')
-        
+
         comment = "Test case %s - elect" % test_num
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
@@ -107,7 +107,7 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         # Remove GTIDs here because they are not deterministic when run with
         # other tests that reuse these servers.
         self.remove_result("localhost,%s,MASTER," % self.m_port)
@@ -137,7 +137,7 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         slaves = ",".join([slave1_conn, slave2_conn])
         cmd_str = "mysqlrpladmin.py --master=%s " % slave3_conn
         comment = "Test case %s - show health after failover" % test_num
@@ -147,10 +147,10 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         # Test for BUG#14080657
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'")
-        
+
         cmd_str = "mysqlrpladmin.py --master=%s " % slave3_conn
         comment = "Test case %s - elect with missing rpl user" % test_num
         cmd_opts = " --slaves=%s elect -vvv --candidates=%s " % \
@@ -160,15 +160,13 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 
-        # Test for missing --rpl-user
-        
         # Add server5 to the topology
         conn_str = " --slave=%s" % self.build_connection_string(self.server5)
-        conn_str += self.master_str 
+        conn_str += self.master_str
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
@@ -200,18 +198,36 @@ class test(rpl_admin.test):
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 
+        self.server5.exec_query("STOP SLAVE")
+        self.server5.exec_query("RESET SLAVE")
+
+        # Test for BUG#16571812
+        comment = "Test case %s - slave not part of topology" % test_num
+        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
+        candidates = ",".join([slave1_conn, slave2_conn, slave3_conn])
+        cmd_str = " ".join(["mysqlrpladmin.py --master=%s " % master_conn,
+                            "failover", "--candidates=%s" % candidates,
+                            "--slaves=%s" % slaves, "--rpl-user=rpl:rpl",
+                            "--format=csv"])
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        test_num += 1
+
+        # Now we return the topology to its original state for other tests
+        rpl_admin.test.reset_topology(self)
+
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.s4_port), "PORT5")
-        
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return rpl_admin.test.cleanup(self)
-

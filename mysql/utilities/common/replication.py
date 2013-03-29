@@ -1249,24 +1249,30 @@ class Slave(Server):
     def get_retrieved_gtid_set(self):
         """Get any events (gtids) read but not executed
 
-        Returns list - gtids in retrieved_gtid_set
+        Returns a string with the list of gtids in Executed_Gtid_Set.
+
+        Note: an empty string is returned if the server is not acting as a
+              slave.
         """
         res = self.get_status()
         if res != []:
             return res[0][_RETRIEVED_GTID_SET]
-        return []
+        return ''
 
 
     def get_executed_gtid_set(self):
         """Get any events (gtids) executed
 
-        Returns list - gtids in retrieved_gtid_set
+        Returns a string with the list of gtids in Executed_Gtid_Set.
+
+        Note: an empty string is returned if the server is not acting as a
+              slave.
         """
         res = self.get_status()
-        if res != []:
+        if res:
             return res[0][_EXECUTED_GTID_SET]
 
-        return []
+        return ''
 
 
     def get_binlog_exceptions(self):

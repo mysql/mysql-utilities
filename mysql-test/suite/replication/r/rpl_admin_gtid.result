@@ -430,3 +430,26 @@ Test case 21 - mix FILE/TABLE and --rpl-user
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
+Test case 22 - slave not part of topology
+WARNING: The --format option is used only with the health and gtid commands.
+# Checking privileges.
+# Checking privileges on candidates.
+# Performing failover.
+# Candidate slave localhost:PORT2 will become the new master.
+# Preparing candidate for failover.
+# Creating replication user if it does not exist.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Switching slaves to new master.
+# Starting slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Failover complete.
+#
+# Replication Topology Health:
+host,port,role,state,gtid_mode,health
+localhost,PORT2,MASTER,UP,ON,OK
+localhost,PORT3,SLAVE,UP,ON,OK
+localhost,PORT4,SLAVE,UP,ON,OK
+localhost,PORT5,SLAVE,UP,ON,OK
+# ...done.
