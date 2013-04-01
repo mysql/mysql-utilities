@@ -32,7 +32,7 @@ _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
 class test(rpl_admin.test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology with
-    loopback address (127.0.0.1).
+    loopback address ([::1]).
 
     Note: this test requires GTID enabled servers.
     """

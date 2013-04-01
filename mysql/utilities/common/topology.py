@@ -48,6 +48,11 @@ _UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
                           'SET password = PASSWORD("%s")'
                           'where user ="%s";')
 
+_SELECT_RPL_USER_PASS_QUERY = ('SELECT user, host, grant_priv, password, '
+                               'Repl_slave_priv FROM mysql.user '
+                               'WHERE user ="%s" AND host ="%s";')
+
+
 def parse_failover_connections(options):
     """Parse the --master, --slaves, and --candidates options
 
@@ -1465,7 +1470,7 @@ class Topology(Replication):
           reset - STOP SLAVE; RESET SLAVE;
 
         command[in]        command to execute
-        quiet[in]          If True, do not print messges
+        quiet[in]          If True, do not print messages
                            Default is False
         :param command:
         :param quiet:
@@ -1603,23 +1608,60 @@ class Topology(Replication):
                 self._report(msg, logging.INFO)
 
         user, passwd = self._get_rpl_user(m_candidate)
+        if not passwd:
+            passwd = ''
 
         if not self.check_master_info_type("TABLE"):
             slave_candidate = self._change_role(m_candidate, slave=True)
             rpl_master_user = slave_candidate.get_rpl_master_user()
 
-            if user != rpl_master_user and not self.force:
-                msg = ("The replication user specified with --rpl-user does"
-                       " not match the existing replication user values. Use"
-                       " the --force option to use the replication user"
-                       " specified with --rpl-user.")
-                self._report("ERROR: %s" % msg, logging.ERROR)
-                return
+            if not self.force:
+                if (user != rpl_master_user):
+                    msg = ("The replication user specified with --rpl-user "
+                           "does not match the existing replication user.\n"
+                           "Use the --force option to use the "
+                           "replication user specified with --rpl-user.")
+                    self._report("ERROR: %s" % msg, logging.ERROR)
+                    return
+
+                # Cann't get rpl pass from remote master_repo=file
+                # but it can get the current used hashed to be compared.
+                slave_qry = slave_candidate.exec_query 
+                passwd_hash = slave_qry(_SELECT_RPL_USER_PASS_QUERY %
+                                        (user, m_candidate.host))
+                # if user does not exist passwd_hash will be an empty query.
+                #print("passwd_hash {0}".format(passwd_hash))
+                
+                if passwd_hash:
+                    passwd_hash = passwd_hash[0][3]
+                else:
+                    passwd_hash = ""
+                # now hash the given rpl password from --rpl-user.
+                rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
+                                            passwd)
+                #print("rpl_master_pass {0}".format(rpl_master_pass))
+                rpl_master_pass = rpl_master_pass[0][0]
+
+                if (rpl_master_pass != passwd_hash):
+                    if passwd == '':
+                        msg = ("The specified replication user is using a "
+                               "password (but none was specified).\n"
+                               "Use the --force option to force the use of "
+                               "the user specified with  --rpl-user and no "
+                               "password.")
+                    else:
+                        msg = ("The specified replication user is using a "
+                               "different password that the one specified.\n"
+                               "Use the --force option to force the use of "
+                               "the user specified with  --rpl-user and new "
+                               "password.")
+                    self._report("ERROR: %s" % msg, logging.ERROR)
+                    return
             self.master.exec_query(_UPDATE_RPL_USER_QUERY % (passwd, user))
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
-        #user, passwd = self._get_rpl_user(m_candidate)
+
         res = m_candidate.create_rpl_user(m_candidate.host,
                                           m_candidate.port,
                                           user, passwd)

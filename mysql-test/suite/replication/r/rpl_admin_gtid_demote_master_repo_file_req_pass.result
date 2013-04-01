@@ -1,0 +1,168 @@
+Test case 1 - mysqlrplshow OLD Master before demote
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT1
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT2 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+Test case 2 - demote-master switchover same user but different password given
+# Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
+# Checking candidate slave prerequisites.
+ERROR: The specified replication user is using a different password that the one specified.
+Use the --force option to force the use of the user specified with  --rpl-user and new password.
+# Errors found. Switchover aborted.
+# ...done.
+
+Test case 3 - demote-master switchover same user but missing password
+# Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
+# Checking candidate slave prerequisites.
+ERROR: The specified replication user is using a password (but none was specified).
+Use the --force option to force the use of the user specified with  --rpl-user and no password.
+# Errors found. Switchover aborted.
+# ...done.
+
+Test case 4 - demote-master switchover different user and password given
+# Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
+# Checking candidate slave prerequisites.
+ERROR: The replication user specified with --rpl-user does not match the existing replication user.
+Use the --force option to use the replication user specified with --rpl-user.
+# Errors found. Switchover aborted.
+# ...done.
+
+Test case 5 - demote-master switchover different user and password given, now using the --force
+# Discovering slaves for master at XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# ...done.
+
+Test case 6 - mysqlrplshow NEW Master.
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT2
+
+# Replication Topology Graph
+localhost:PORT2 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+Test case 7 - demote-master switchover different user and no password is given, now using the --force
+# Discovering slaves for master at XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT1
+# Found slave: XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT3
+# Found slave: XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT3.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# ...done.
+
+Test case 8 - mysqlrplshow NEW Master.
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT3
+
+# Replication Topology Graph
+localhost:PORT3 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT2 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT4 - (SLAVE)
+
+
+Test case 9 - demote-master switchover existing user with no password and no password is given
+# Discovering slaves for master at XXXXXXXXX:PORT3
+# Discovering slave at XXXXXXXXX:PORT1
+# Found slave: XXXXXXXXX:PORT1
+# Discovering slave at XXXXXXXXX:PORT2
+# Found slave: XXXXXXXXX:PORT2
+# Discovering slave at XXXXXXXXX:PORT4
+# Found slave: XXXXXXXXX:PORT4
+# Checking privileges.
+# Performing switchover from master at XXXXXXXXX:PORT3 to slave at XXXXXXXXX:PORT4.
+# Checking candidate slave prerequisites.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+# ...done.
+
+Test case 10 - mysqlrplshow NEW Master.
+# master on XXXXXXXXX: ... connected.
+# Finding slaves for master: XXXXXXXXX:PORT4
+
+# Replication Topology Graph
+localhost:PORT4 (MASTER)
+   |
+   +--- XXXXXXXXX:PORT1 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT2 - (SLAVE)
+   |
+   +--- XXXXXXXXX:PORT3 - (SLAVE)
+
+

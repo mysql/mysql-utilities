@@ -139,7 +139,8 @@ Test case 6 - demote-master switchover -vvv Using a different rpl user and no --
 #   Logging filters agree ... Ok
 #   Replication user exists ... Ok
 # When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
-ERROR: The replication user specified with --rpl-user does not match the existing replication user values. Use the --force option to use the replication user specified with --rpl-user.
+ERROR: The replication user specified with --rpl-user does not match the existing replication user.
+Use the --force option to use the replication user specified with --rpl-user.
 # Errors found. Switchover aborted.
 # Attempting to contact XXXXXXXXX ... Success
 # Attempting to contact XXXXXXXXX ... Success

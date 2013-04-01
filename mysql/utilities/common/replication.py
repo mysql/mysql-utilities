@@ -1678,7 +1678,9 @@ class Slave(Server):
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % master_host
         if master_user:
             change_master += "MASTER_USER = '%s', " % master_user
-        if master_passwd:
+        # To rewrite a current password with blank password, not check against
+        # empty string. 
+        if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
         if self.supports_gtid() == "ON":
