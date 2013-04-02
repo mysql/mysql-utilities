@@ -324,7 +324,8 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             # name from where this function was called
             frm = inspect.stack()[1]
             mod = inspect.getmodule(frm[0])
-            mod_name, ext = os.path.basename(mod.__file__).split('.')
+            mod_name = os.path.splitext(
+                os.path.basename(mod.__file__))[0]
             name = '%s utility' % mod_name
 
         # Build the error message
