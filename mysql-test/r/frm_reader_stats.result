@@ -306,7 +306,7 @@ CREATE TABLE `frm_test`.`orig` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -334,7 +334,7 @@ CREATE TABLE `frm_files`.`me@002etoo@002eperiods` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.1.50
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -357,7 +357,7 @@ CREATE TABLE `frm_files`.`t1` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -380,7 +380,7 @@ CREATE TABLE `frm_files`.`t2` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -403,7 +403,7 @@ CREATE TABLE `frm_files`.`t3` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -426,7 +426,7 @@ CREATE TABLE `frm_files`.`t4` (
 # Table Statistics:
 #                Engine : BLACKHOLE
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -449,7 +449,7 @@ CREATE TABLE `frm_files`.`t5` (
 # Table Statistics:
 #                Engine : CSV
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -472,7 +472,7 @@ CREATE TABLE `frm_files`.`t6` (
 # Table Statistics:
 #                Engine : ARCHIVE
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -495,7 +495,7 @@ CREATE TABLE `frm_files`.`t7` (
 # Table Statistics:
 #                Engine : INNODB
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -518,7 +518,7 @@ CREATE TABLE `frm_files`.`t8` (
 # Table Statistics:
 #                Engine : MERGE
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None
@@ -541,7 +541,7 @@ CREATE TABLE `frm_files`.`t9` (
 # Table Statistics:
 #                Engine : PARTITION
 #           frm Version : 9
-#         MySQL Version : 5.6.11
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : INNODB
@@ -565,7 +565,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 # Table Statistics:
 #                Engine : MYISAM
 #           frm Version : 9
-#         MySQL Version : 5.1.50
+#         MySQL Version : XXXXXXXX
 #      frm File_Version : 5
 #               IO_SIZE : 4096
 #  Def Partition Engine : None

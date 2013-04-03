@@ -57,14 +57,14 @@ class test(mutlib.System_test):
                         os.path.normpath("./std_data/transform_data.sql"))
 
         return True
-    
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-        
+
         s1_conn = "--server1=" + self.build_connection_string(self.server1)
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
+
         cmd_str = "mysqldiff.py %s %s util_test:util_test" % (s1_conn, s2_conn)
         cmd_str += " --force --difftype=sql "
 
@@ -74,43 +74,43 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         comment = "Test case 2 - create transform for objects for " + \
                   "--changes-for=server2"
         cmd_opts = " --changes-for=server2 "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         comment = "Test case 3 - create transform for objects for " + \
                   "--changes-for=server1 with reverse"
         cmd_opts = " --changes-for=server1 --show-reverse "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         comment = "Test case 4 - create transform for objects for " + \
                   "--changes-for=server2 with reverse"
         cmd_opts = " --changes-for=server2 --show-reverse "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         # Do transform for tables with different names
         cmd_str = "mysqldiff.py %s %s util_test.t1:util_test.t6" % \
                   (s1_conn, s2_conn)
         cmd_str += " --force --difftype=sql "
-        
-        self.server2.exec_query("CREATE TABLE util_test.t6 AS "
+
+        self.server2.exec_query("CREATE TABLE util_test.t6 ENGINE=MyISAM AS "
                                 "SELECT * FROM util_test.t1")
-        
+
         comment = "Test case 5 - create transform for renamed table "
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         # Check to see if rename worked
-        
+
         cmd_str = "mysqldiff.py %s %s util_test.t6:util_test.t6" % \
                   (s1_conn, s2_conn)
         cmd_str += " --force --difftype=sql "
@@ -125,7 +125,7 @@ class test(mutlib.System_test):
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
-        
+
         self.replace_result("+++ util_test.t1", "+++ util_test.t1\n")
         self.replace_result("+++ util_test.t2", "+++ util_test.t2\n")
         self.replace_result("--- util_test.t1", "--- util_test.t1\n")
@@ -135,15 +135,15 @@ class test(mutlib.System_test):
         self.replace_result("--- util_test.t3", "--- util_test.t3\n")
         self.replace_result("+++ util_test.t6", "+++ util_test.t6\n")
         self.replace_result("--- util_test.t6", "--- util_test.t6\n")
-        
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
@@ -155,7 +155,7 @@ class test(mutlib.System_test):
         except:
             return False
         return True
-    
+
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server2, "util_test")
@@ -165,7 +165,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

@@ -73,6 +73,8 @@ class test(frm_reader_base.test):
                             "# CREATE statement for [...]\n")
         self.replace_result("# Reading .frm file",
                             "# Reading .frm file XXXXXXX\n")
+        self.replace_result("#         MySQL Version :",
+                            "#         MySQL Version : XXXXXXXX\n")
 
         return True
 

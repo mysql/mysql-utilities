@@ -145,6 +145,9 @@ class test(frm_reader_base.test):
                             "ERROR: Cannot read XXXXXX\n")
         self.replace_result("#                  Mode :",
                             "#                  Mode : XXXXX\n")
+        self.replace_result("#         MySQL Version :",
+                            "#         MySQL Version : XXXXXXXX\n")
+        self.replace_substring("%s" % self.server0.port, "XXXXX")
 
         # Must remove these lines because on Windows they are not printed
         # in the same order as other systems.
