@@ -293,9 +293,9 @@ Test case 11 - health with discovery
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
 | localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
-| 127.0.0.1  | PORT2  | SLAVE   | UP     | ON         | OK      |
-| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
-| 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 12 - run command stop with --master
