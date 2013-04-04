@@ -1,5 +1,5 @@
 # Major, Minor, Patch, Status
-VERSION = (1, 3, 0, 'a', 0)
+VERSION = (1, 3, 1, 'a', 0)
 WORKBENCH_VERSION = (5, 2, 47)
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
