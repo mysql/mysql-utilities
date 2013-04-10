@@ -934,12 +934,17 @@ class SQLTransformer(object):
         add_indexes = []
         
         # Get the list of indexes
-        dest_idx = self.dest_tbl.get_tbl_indexes()
-        src_idx = self.src_tbl.get_tbl_indexes()
+        # Do not compare with the name of the tables
+        dest_idx = [('',) + tuple(idx[1:])
+                    for idx in self.dest_tbl.get_tbl_indexes()]
+        src_idx = [('',) + tuple(idx[1:])
+                   for idx in self.src_tbl.get_tbl_indexes()]
         
         # Now we determine the indexes we need to add and those to drop
         both, drop_idx, add_idx = get_common_lists(dest_idx, src_idx)
-        
+        if not drop_idx and not add_idx:
+            return ([], [])
+
         # Generate DROP index clauses
         drop_idx_recorded = [] # used to avoid duplicate index drops
         for index in drop_idx:

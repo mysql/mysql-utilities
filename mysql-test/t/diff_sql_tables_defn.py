@@ -24,12 +24,15 @@ _TABLE_TESTS = [
      "CREATE TABLE diff_table.t1(a int) ENGINE=MYISAM;",
      "CREATE TABLE diff_table.t1(a int) ENGINE=INNODB;",
      0, None),
-    ("Table auto_increment",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
-     "b CHAR(10)) AUTO_INCREMENT=5;",
-     "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
-     "b CHAR(10)) AUTO_INCREMENT=10;",
-     0, None),
+    # This test is failing using MySQL Server 5.6.12 due to a bug:
+    # http://clustra.no.oracle.com/orabugs/bug.php?id=16629820
+    #
+    # ("Table auto_increment",
+    #  "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
+    #  "b CHAR(10)) AUTO_INCREMENT=5;",
+    #  "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
+    #  "b CHAR(10)) AUTO_INCREMENT=10;",
+    #  0, None),
     ("Table multiple options",
      "CREATE TABLE diff_table.t1(a INT AUTO_INCREMENT NOT NULL PRIMARY KEY, "
      "b CHAR(10)) AUTO_INCREMENT=5 ENGINE=INNODB;",
@@ -62,6 +65,16 @@ _TABLE_TESTS = [
      "CREATE TABLE diff_table.t1(a int) INSERT_METHOD=LAST, PACK_KEYS=0 "
      "ENGINE=INNODB;",
      0, None),
+    ("Table column order",
+     "CREATE TABLE diff_table.t1(a int, b int, c int) ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(b int, a int, c int) ENGINE=INNODB;",
+     0, None),
+    ("Table index order",
+     "CREATE TABLE diff_table.t1(a int, b int, KEY a (a), KEY b (b)) "
+     "ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(b int, a int, KEY b (b), KEY a (a)) "
+     "ENGINE=INNODB;",
+    0, None),
 ]
 
 class test(test_sql_template.test):

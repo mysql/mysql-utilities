@@ -255,13 +255,13 @@ def check_verbosity(options):
         options.verbosity = None
 
 
-def add_changes_for(parser):
+def add_changes_for(parser, default="server1"):
     """Add the changes_for option.
 
     parser[in]        the parser instance
     """
     parser.add_option("--changes-for", action="store", dest="changes_for",
-                      type="choice", default="server1", help="specify the "
+                      type="choice", default=default, help="specify the "
                       "server to show transformations to match the other "
                       "server. For example, to see the transformation for "
                       "transforming server1 to match server2, use "

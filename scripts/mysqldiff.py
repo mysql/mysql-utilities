@@ -86,7 +86,7 @@ add_verbosity(parser, True)
 add_difftype(parser, True)
 
 # Add the direction (changes-for)
-add_changes_for(parser)
+add_changes_for(parser, None)
 
 # Add show reverse option
 add_reverse(parser)
