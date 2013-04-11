@@ -240,13 +240,20 @@ except UtilRplError:
     sys.exit(1)
 
 # Check hostname alias
+if new_master_val:
+    if check_hostname_alias(master_val, new_master_val):
+        parser.error("The master is the same host and port of the specified "
+                     "new the master.")
+
 if master_val:
     for slave_val in slaves_val:
         if check_hostname_alias(master_val, slave_val):
-            parser.error("The master and one of the slaves are the same host and port.")
+            parser.error("The master and one of the slaves are the same host "
+                         "and port.")
     for cand_val in candidates_val:
         if check_hostname_alias(master_val, cand_val):
-            parser.error("The master and one of the candidates are the same host and port.")
+            parser.error("The master and one of the candidates are the same "
+                         "host and port.")
 
 # Create dictionary of options
 options = {

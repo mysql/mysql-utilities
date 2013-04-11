@@ -77,3 +77,6 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                    % WARN_OPT_NOT_REQUIRED)
+
+ERROR_SAME_MASTER = ("The specified new master {0}:{1} is the same as the "
+                     "actual master {2}:{3}.")

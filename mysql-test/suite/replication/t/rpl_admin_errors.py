@@ -147,6 +147,34 @@ class test(rpl_admin.test):
                 raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
+        # Test error switchover --new-master and --master are the same value.
+        command = 'switchover'
+        comment = ("Test case {0} - {1} using switchover new master is "
+                   "the actual master with --discover-slaves"
+                   "").format(test_num, command.capitalize())
+        cmd_str = ("{0} {1} {2} {3} --new-master={4} "
+                   "--discover-slaves-login=root:root"
+                   "".format(base_cmd, command, master_str, 
+                             "--rpl-user=rpl:rpl", master_conn))
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Test error switchover --new-master and --master are the same value,
+        # replacing new-master host with alias.
+        command = 'switchover'
+        comment = ("Test case {0} - {1} using switchover new master is the "
+                   "actual master, replacing new-master host with alias."
+                   "").format(test_num, command.capitalize())
+        cmd_str = ("{0} {1} {2} {3},{4} --new-master={4}"
+                   "".format(base_cmd, command, master_str, slaves_str,
+                             master_conn.replace("localhost","127.0.0.1")))
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 

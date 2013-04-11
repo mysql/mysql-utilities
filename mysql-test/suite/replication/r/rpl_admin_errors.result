@@ -105,3 +105,11 @@ Test case 26 - Switchover using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 27 - Switchover using switchover new master is the actual master with --discover-slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.
+Test case 28 - Switchover using switchover new master is the actual master, replacing new-master host with alias.
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.

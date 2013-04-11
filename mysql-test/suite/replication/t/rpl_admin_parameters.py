@@ -37,7 +37,11 @@ class test(rpl_admin.test):
     # specifies these options but does not test them.
 
     def check_prerequisites(self):
-        return rpl_admin.test.check_prerequisites(self)
+        rpl_admin.test.check_prerequisites(self)
+        self.server0 = self.servers.get_server(0)
+        self.server5 = self.spawn_server("no_slaved")
+        
+        return True
 
     def setup(self):
         return rpl_admin.test.setup(self)
@@ -52,6 +56,7 @@ class test(rpl_admin.test):
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
+        no_slaved_conn = self.build_connection_string(self.server5).strip(' ')
 
         master_str = "--master=" + master_conn
         slaves_str = "--slaves=" + \
@@ -135,25 +140,40 @@ class test(rpl_admin.test):
         except:
             pass
 
-        comment = "Test case 6 - attempt risky switchover without force"
-        cmd_str = "%s --master=%s " % (base_cmd, slave2_conn)
-        new_slaves = " --slaves=" + ",".join([master_conn, slave1_conn, slave3_conn])
-        cmd_opts = new_slaves + " switchover "
-        cmd_opts += " --new-master=%s " % slave2_conn
+        comment = ("Test case 6 - attempt switchover with stranger server "
+                  "without using --force option")
+        cmd_str = "{0} --master={1} ".format(base_cmd, slave2_conn)
+        slaves = ",".join([master_conn, slave1_conn, slave3_conn])
+        new_slaves = " --slaves={0}".format(slaves)
+        cmd_opts = new_slaves + " switchover"
+        cmd_opts += " --new-master={0} ".format(no_slaved_conn)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 7 - attempt risky switchover with --force"
-        cmd_str = "%s --master=%s --force " % (base_cmd, slave2_conn)
-        new_slaves = " --slaves=" + ",".join([master_conn, slave1_conn, slave3_conn])
-        cmd_opts = new_slaves + " switchover "
-        cmd_opts += " --new-master=%s " % slave2_conn
+        comment = ("Test case 7 - attempt switchover with stranger server "
+                  "using --force option")
+        cmd_str = "{0} --master={1} --force".format(base_cmd, slave2_conn)
+        slaves = ",".join([master_conn, slave1_conn, slave3_conn])
+        new_slaves = " --slaves={0}".format(slaves)
+        cmd_opts = new_slaves + " switchover"
+        cmd_opts += " --new-master={0} ".format(no_slaved_conn)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = "Test case 8 - attempt master switchover it self"
+        cmd_str = "{0} --master={1} --force ".format(base_cmd, no_slaved_conn)
+        slaves = ",".join([master_conn, slave1_conn, slave3_conn])
+        new_slaves = " --slaves={0}".format(slaves)
+        cmd_opts = new_slaves + " switchover"
+        cmd_opts += " --new-master={0} ".format(no_slaved_conn)
+        res = self.run_test_case(2, "{0}{1}".format(cmd_str,cmd_opts),
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
@@ -165,6 +185,8 @@ class test(rpl_admin.test):
                                "XXXXXXXXXXXXXXXXXXXXXX")
         self.replace_result("# CHANGE MASTER TO MASTER_HOST",
                             "# CHANGE MASTER TO MASTER_HOST [...]\n")
+
+        self.replace_substring(str(self.server5.port), "PORT5")
 
         return True
 

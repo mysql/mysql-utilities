@@ -25,6 +25,7 @@ import os
 import sys
 from mysql.utilities.exception import UtilRplError
 from mysql.utilities.common.ip_parser import hostname_is_ip
+from mysql.utilities.common.messages import ERROR_SAME_MASTER
 
 _VALID_COMMANDS_TEXT = """
 Available Commands:
@@ -310,6 +311,18 @@ class RplCommands(object):
 
         Returns bool - True = no errors, False = errors reported.
         """
+        # Check new master is not actual master - need valid candidate
+        candidate = self.options.get("new_master", None)
+        if (self.topology.master.is_alias(candidate['host']) and
+            self.master_vals['port'] == candidate['port']):
+            err_msg = ERROR_SAME_MASTER.format(candidate['host'],
+                                               candidate['port'],
+                                               self.master_vals['host'],
+                                               self.master_vals['port'])
+            self._report(err_msg, logging.WARN)
+            self._report(err_msg, logging.CRITICAL)
+            raise UtilRplError(err_msg) 
+        
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
@@ -319,8 +332,7 @@ class RplCommands(object):
             print "# WARNING: %s" % _HOST_IP_WARNING
             self._report(_HOST_IP_WARNING, logging.WARN, False)
 
-        # Check prerequisites - need valid candidate
-        candidate = self.options.get("new_master", None)
+        # Check prerequisites
         if candidate is None:
             msg = "No candidate specified."
             self._report(msg, logging.CRITICAL)

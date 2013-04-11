@@ -216,11 +216,11 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 There are additional entries in the log.
-Test case 6 - attempt risky switchover without force
+Test case 6 - attempt switchover with stranger server without using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
-# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
 ERROR: Candidate is not connected to the correct master.
@@ -236,11 +236,11 @@ ERROR: Candidate is not connected to the correct master.
 | localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
 +------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
-Test case 7 - attempt risky switchover with --force
+Test case 7 - attempt switchover with stranger server using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
-# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT3.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
 ERROR: Candidate is not connected to the correct master.
@@ -257,9 +257,14 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT3  | MASTER  | UP     | NO         | OK      |
+| localhost  | PORT5  | MASTER  | UP     | NO         | OK      |
 | localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
+Test case 8 - attempt master switchover it self
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.
+WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
