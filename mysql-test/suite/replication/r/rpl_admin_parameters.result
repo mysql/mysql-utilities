@@ -134,6 +134,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 #   Logging filters agree ... Ok
 #   Binary logging turned on ... Ok
 #   Replication user exists ... Ok
+# Checking slaves configuration to master.
 # When the master_info_repository variable is set to FILE, the --rpl-user option may be used only if the user specified matches what is shown in the SLAVE STATUS output unless the --force option is used.
 # Creating replication user if it does not exist.
 # Blocking writes on master.
@@ -195,6 +196,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -244,6 +246,10 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
 ERROR: Candidate is not connected to the correct master.
+# Checking slaves configuration to master.
+# ERROR: Slave localhost:PORT1 is not configured with master localhost:PORT3.
+# ERROR: Slave localhost:PORT2 is not configured with master localhost:PORT3.
+# ERROR: Slave localhost:PORT4 is not configured with master localhost:PORT3.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.

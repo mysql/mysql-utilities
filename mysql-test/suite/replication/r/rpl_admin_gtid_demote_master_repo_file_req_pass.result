@@ -22,6 +22,7 @@ Test case 2 - demote-master switchover same user but different password given
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 ERROR: The specified replication user is using a different password that the one specified.
 Use the --force option to force the use of the user specified with  --rpl-user and new password.
 # Errors found. Switchover aborted.
@@ -38,6 +39,7 @@ Test case 3 - demote-master switchover same user but missing password
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 ERROR: The specified replication user is using a password (but none was specified).
 Use the --force option to force the use of the user specified with  --rpl-user and no password.
 # Errors found. Switchover aborted.
@@ -54,6 +56,7 @@ Test case 4 - demote-master switchover different user and password given
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 ERROR: The replication user specified with --rpl-user does not match the existing replication user.
 Use the --force option to use the replication user specified with --rpl-user.
 # Errors found. Switchover aborted.
@@ -70,6 +73,7 @@ Test case 5 - demote-master switchover different user and password given, now us
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -105,6 +109,7 @@ Test case 7 - demote-master switchover different user and no password is given, 
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT2 to slave at XXXXXXXXX:PORT3.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -141,6 +146,7 @@ Test case 9 - demote-master switchover existing user with no password and no pas
 # Checking privileges.
 # Performing switchover from master at XXXXXXXXX:PORT3 to slave at XXXXXXXXX:PORT4.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.

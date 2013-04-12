@@ -22,6 +22,7 @@ Test case 2 - loopback ([::1]) switchover demote-master
 # Checking privileges.
 # Performing switchover from master at [::1]:PORT1 to slave at [::1]:PORT2.
 # Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.

@@ -77,9 +77,6 @@ class test(rpl_admin.test):
         self.slave2_conn = build_str(self.server3).strip(' ')
         self.slave3_conn = build_str(self.server4).strip(' ')
 
-        self.servers = [self.server1, self.server2, self.server3,
-                        self.server4]
-
         return True
 
     def run(self):

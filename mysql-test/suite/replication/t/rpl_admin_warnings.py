@@ -90,9 +90,6 @@ class test(rpl_admin.test):
         self.reset_topology([self.server2, self.server3, self.server4,
                              self.server5])
 
-        self.servers = [self.server1, self.server2, self.server3,
-                        self.server4, self.server5]
-
         return True
 
     def run(self):
@@ -157,7 +154,8 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Reset the topology to its original state
-        rpl_admin.test.reset_topology(self)
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5])
 
         test_num += 1
         comment = ("Test case {0} - warning for --master and "
@@ -168,7 +166,23 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Now we return the topology to its original state for other tests
+        # Reset the topology to its original state
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5])
+
+        test_num += 1
+        comment = ("Test case {0} - warnings for switchover with offline "
+                   "slave").format(test_num)
+        off_slaves_str = ",".join([slave2_conn, slave3_conn,
+                                   "root@offline:1234"])
+        cmd_str = ("mysqlrpladmin.py --master={0} --new-master={1} --slaves="
+                   "{2} switchover ").format(master_conn, slave1_conn,
+                                             off_slaves_str)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Reset the topology to its original state for other tests
         self.reset_topology([self.server2, self.server3, self.server4,
                              self.server5])
 

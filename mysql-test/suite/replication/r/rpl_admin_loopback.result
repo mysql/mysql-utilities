@@ -23,6 +23,7 @@ Test case 2 - loopback (127.0.0.1) switchover demote-master
 # Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
 # Checking candidate slave prerequisites.
 Replication user not found but --force used.
+# Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.

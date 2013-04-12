@@ -135,10 +135,7 @@ class test(rpl_admin.test):
         else:
             self.results.append("ERROR: Nothing else written to the log.\n")
         log_file.close()
-        try:
-            os.unlink(_LOGNAME)
-        except:
-            pass
+        # log file removed by the cleanup method
 
         comment = ("Test case 6 - attempt switchover with stranger server "
                   "without using --force option")
@@ -197,6 +194,11 @@ class test(rpl_admin.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        # Remove log file (here to delete the file even if some test fails)
+        try:
+            os.unlink(_LOGNAME)
+        except:
+            pass
         try:
             os.rmdir("watchout_here")
         except:

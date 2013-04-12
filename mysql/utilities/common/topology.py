@@ -1487,9 +1487,9 @@ class Topology(Replication):
             msg = "#   Executing %s on slave %s " % (command, hostport)
             slave = slave_dict['instance']
             # skip dead or zombie slaves
-            if slave is None or not slave.is_alive():
+            if not slave or not slave.is_alive():
                 message = "{0}WARN - cannot connect to slave".format(msg)
-                self.report(message, logging.WARN)
+                self._report(message, logging.WARN)
             elif command == 'reset':
                 if (self.master and
                         not slave.is_configured_for_master(self.master) and
@@ -1593,7 +1593,28 @@ class Topology(Replication):
             if not self.force:
                 return
 
-        if (self.verbose and self.rpl_user):
+        # Check if the slaves are configured for the specified master
+        self._report("# Checking slaves configuration to master.")
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            # Skip not defined or alive slaves (Warning displayed elsewhere)
+            if not slave or not slave.is_alive():
+                continue
+
+            if not slave.is_configured_for_master(self.master):
+                # Slave not configured for master (i.e. not in topology)
+                msg = ("Slave {0}:{1} is not configured with master {2}:{3}"
+                       ".").format(slave_dict['host'], slave_dict['port'],
+                                   self.master.host, self.master.port)
+                print("# ERROR: {0}".format(msg))
+                self._report(msg, logging.ERROR, False)
+                if not self.force:
+                    raise UtilRplError("{0} Note: If you want to ignore this "
+                                       "issue, please use the utility with the "
+                                       "--force option.".format(msg))
+
+        # Check rpl-user definitions
+        if self.verbose and self.rpl_user:
             if self.check_master_info_type("TABLE"):
                 msg = ("# When the master_info_repository variable is set to"
                        " TABLE, the --rpl-user option is ignored and the"
@@ -1690,12 +1711,19 @@ class Topology(Replication):
         for slave_dict in self.slaves:
             master_info = self.master.get_status()[0]
             slave = slave_dict['instance']
-            # skip dead or zombie slaves
-            if slave is None or not slave.is_alive():
+            # skip dead or zombie slaves, and print warning
+            if not slave or not slave.is_alive():
+                if self.verbose:
+                    msg = ("Slave {0}:{1} skipped (not "
+                           "reachable)").format(slave_dict['host'],
+                                                slave_dict['port'])
+                    print("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARNING, False)
                 continue
             if gtid_enabled:
+                print_query = self.verbose and not self.quiet
                 res = slave.wait_for_slave_gtid(master_gtid, self.timeout,
-                                            self.verbose and not self.quiet)
+                                                print_query)
             else:
                 res = slave.wait_for_slave(master_info[0], master_info[1],
                                            self.timeout)
@@ -1756,16 +1784,21 @@ class Topology(Replication):
             'Read_Master_Log_Pos' : new_master_info[1],
         }
         for slave_dict in self.slaves:
-            if self.verbose:
-                self._report("# Executing CHANGE MASTER on %s:%s." %
-                             (slave_dict['host'], slave_dict['port']))
             slave = slave_dict['instance']
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
+                if self.verbose:
+                    self._report("# Skipping CHANGE MASTER for {0}:{1} (not "
+                                 "connected).".format(slave_dict['host'],
+                                                      slave_dict['port']))
                 continue
+            if self.verbose:
+                self._report("# Executing CHANGE MASTER on {0}:{1}"
+                             ".".format(slave_dict['host'],
+                                        slave_dict['port']))
             change_master = slave.make_change_master(False, master_values)
             if self.verbose:
-                self._report("# %s" % change_master)
+                self._report("# {0}".format(change_master))
             slave.exec_query(change_master)
 
         # Start all slaves

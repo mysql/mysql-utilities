@@ -65,3 +65,29 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
+Test case 7 - warnings for switchover with offline slave
+# Checking privileges.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave offline:1234 WARN - cannot connect to slave
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave offline:1234 WARN - cannot connect to slave
+# Checking slaves for errors.
+# Switchover complete.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------------------------+
+| host       | port  | role    | state  | gtid_mode  | health                    |
++------------+-------+---------+--------+------------+---------------------------+
+| localhost  | PORT2  | MASTER  | UP     | ON         | OK                        |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK                        |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK                        |
+| offline    | 1234  | SLAVE   | DOWN   |            | Cannot connect to slave.  |
++------------+-------+---------+--------+------------+---------------------------+
+# ...done.

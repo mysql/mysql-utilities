@@ -80,6 +80,7 @@ Test case 2 - test switchover scripts
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
 #   Replication user exists ... Ok
+# Checking slaves configuration to master.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX

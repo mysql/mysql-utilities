@@ -91,8 +91,9 @@ class test(rpl_admin.test):
                         " --master=%s" % self.master_conn])
         res = self.exec_util(cmd, self.res_fname)
 
-        self.servers = [self.server1, self.server2, self.server3,
-                        self.server4, self.server5]
+        self.servers_list = [self.server1, self.server2, self.server3,
+                             self.server4, self.server5]
+
 
         return True
 
@@ -172,7 +173,7 @@ class test(rpl_admin.test):
         self.wait_for_slave(self.server1, self.server5)
 
         # Show contents of server
-        for server in self.servers:
+        for server in self.servers_list:
             self.dump_table(server)
 
         comment = "Test case %s - failover to %s:%s with relay log entries" % \
@@ -193,7 +194,7 @@ class test(rpl_admin.test):
             self.wait_for_slave(self.server2, slave)
 
         # Show contents of server
-        for server in self.servers:
+        for server in self.servers_list:
             self.dump_table(server)
 
         comment = ("Test case %s - failover to %s:%s with skipping slaves" %
@@ -241,6 +242,6 @@ class test(rpl_admin.test):
         return True
 
     def cleanup(self):
-        for server in self.servers:
+        for server in self.servers_list:
             self.drop_db(server, "test_relay")
         return rpl_admin.test.cleanup(self)

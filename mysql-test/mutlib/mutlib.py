@@ -1134,6 +1134,27 @@ class System_test(object):
         """
         return False
 
+    def kill_server(self, name):
+        """This method kill (i.e. stop and remove) the referred server.
+
+            name[in]    Name of the server to kill.
+
+            Returns True if the server was found and killed successfully,
+            otherwise False.
+        """
+        index = self.servers.find_server_by_name(name)
+        if index >= 0:
+            server = self.servers.get_server(index)
+            if self.debug:
+                print "# Killing server {0}.".format(server.role)
+            self.servers.stop_server(server)
+            self.servers.remove_server(server.role)
+            return True
+        else:
+            if self.debug:
+                print "# Kill failed! Server '{0}' was not found.".format(name)
+            return False
+
 
     @abstractmethod
     def check_prerequisites(self):
