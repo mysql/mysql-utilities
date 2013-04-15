@@ -192,7 +192,7 @@ def hostname_is_ip(hostname):
     
     Return bool - True = is IP address
     """
-    if len(hostname.split(":")) <= 3:  # if fewer colons, must be IPv4
+    if len(hostname.split(":")) <= 1:  # if fewer colons, must be IPv4
         grp = _CONN_IPv4_NUM_ONLY.match(hostname)
     else:
         grp = _CONN_IPv6.match(hostname)
@@ -451,11 +451,13 @@ def _match(pattern, connection_str, trow_error=True):
     return grp.groups()
 
 def clean_IPv6(host_address):
-    host_address = host_address.replace("[","")
-    host_address = host_address.replace("]","")
+    if host_address:
+        host_address = host_address.replace("[","")
+        host_address = host_address.replace("]","")
     return host_address
 
 def format_IPv6(host_address):
-    if not "]" in host_address:
-        host_address = "[{0}]".format(host_address)
+    if host_address:
+        if not "]" in host_address:
+            host_address = "[{0}]".format(host_address)
     return host_address
