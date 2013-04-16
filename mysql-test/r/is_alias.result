@@ -19,7 +19,7 @@ Pass
 test case 7 - test alias: 0::0:1 is alias for server localhost
 Pass
 
-test case 8 - test alias: [::1] is alias for server localhost
+test case 8 - test alias: [0::1] is alias for server localhost
 Pass
 
 test case 9 - test alias: 0::0:0:1 is alias for server localhost
@@ -67,7 +67,7 @@ Pass
 test case 23 - test alias: 0::0:1 is alias for server ::1
 Pass
 
-test case 24 - test alias: [::1] is alias for server ::1
+test case 24 - test alias: [0::1] is alias for server ::1
 Pass
 
 test case 25 - test alias: 0::0:0:1 is alias for server ::1

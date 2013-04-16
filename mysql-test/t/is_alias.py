@@ -16,21 +16,18 @@
 #
 
 import socket
-
 import mutlib
-from mutlib import *
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.common import server
 
 _IPv6_LOOPBACK = "::1"
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin  --report-host=%s '
-                      '--report-port=%s --bind-address=:: "')
+                       '--report-port=%s --bind-address=:: "')
 _PASS = "Pass\n"
 _FAIL = "Failed\n\n"
 _BAD_RESULT_MSG = ("Got wrong result for test case {0}. \n"
                    " Expected: {1}, got: {2}.")
-_test_case_name ="test_case_name"
+_test_case_name = "test_case_name"
 _aliases = "aliases"
 _host_name = "host_name" 
 _result = "result"
@@ -90,6 +87,7 @@ _special_test_cases = [{_desc: "This test reuse of aliases",
                        _aliases: [], 
                        _host_name: _oracle_com,
                        _result: True},
+
                       {_desc: ("This test lookups of aliases for non "
                                "local server by hostname."),
                        _test_case_name: _python_org,
@@ -97,12 +95,13 @@ _special_test_cases = [{_desc: "This test reuse of aliases",
                        _host_name: _python_ip,
                        _result: True},
 
-                      {_desc: ("This test lookups of aliases for the "
-                               "given non local server."),
+                      {_desc: ("It test the reuse of aliases for the "
+                               "given non local server by hostname."),
                        _test_case_name: _python_org,
                        _aliases: [_python_ip], 
                        _host_name: _python_ip,
                        _result: True}]
+
 
 class test(mutlib.System_test):
     """test Server.is_alias() method.
@@ -119,10 +118,10 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
 
         # Spawn servers
-        # Retrieved mutlib.HOST value: {0}'.format(mutlib.HOST) #localhost
-        self.old_mutlib_HOST = mutlib.HOST
-        mutlib.HOST = _IPv6_LOOPBACK
-        # Setting mutlib.HOST to: {0}'.format(mutlib.HOST) #127.0.0.1
+        # Change clone Server_List host value
+        self.old_cloning_host = self.servers.cloning_host
+        self.servers.cloning_host = _IPv6_LOOPBACK
+
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
                                         self.servers.view_next_port())
@@ -130,24 +129,24 @@ class test(mutlib.System_test):
         res = self.servers.spawn_new_server(self.server0, "1001",
                                             self.server1_name, mysqld)
         if not res:
-            raise MUTLibError("Cannot spawn replication server '%s'." &
-                              name)
+            raise MUTLibError("Cannot spawn server '{0}'."
+                              "".format(name))
         self.server1 = res[0]
 
         self.host_name = socket.gethostname()
 
         # Duplicated values added to test reuse of calculated values.
-        # All elements of List of good test cases are espected to return True.
+        # All elements of List of good test cases are expected to return True.
         self.good_test_cases = ["127.0.0.1", "[::1]", "localhost",
                                 self.host_name, "::1", "0:0:0:0:0:0:0:1",
-                                "0::0:1", "[::1]", "0::0:0:1"]
-        # All elements of List of bad test cases are espected to return False.
+                                "0::0:1", "[0::1]", "0::0:0:1"]
+        # All elements of List of bad test cases are expected to return False.
         self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2", 
                                "0:0:0:0:0:0:0:2", "oracle.com", "python.org"]
 
         return True
 
-    def run_test_case(self, server, test_num, test_case,
+    def run_is_alias_test(self, server, test_num, test_case,
                                     exp_res=True):
         NOT = ""
         if not exp_res:
@@ -170,27 +169,27 @@ class test(mutlib.System_test):
         self.results.append("\n")
         server.aliases = []
 
-    def run_test_cases(self, server, test_num):
+    def run_is_alias_test_cases(self, server, test_num):
         for test_case in self.good_test_cases:
             test_num += 1
-            self.run_test_case(server, test_num, test_case)
+            self.run_is_alias_test(server, test_num, test_case)
         for test_case in self.bad_test_cases:
             test_num += 1
-            self.run_test_case(server, test_num, test_case, False)
+            self.run_is_alias_test(server, test_num, test_case, False)
         return test_num
 
     def run(self):
         test_num = 0
         if self.debug:
                 print("\n")
-        test_num = self.run_test_cases(self.server0, test_num)
-        test_num = self.run_test_cases(self.server1, test_num)
+        test_num = self.run_is_alias_test_cases(self.server0, test_num)
+        test_num = self.run_is_alias_test_cases(self.server1, test_num)
 
         for dict in _special_test_cases:
             test_num += 1
             self.server1.aliases = dict[_aliases]
             self.server1.host = dict[_host_name]
-            self.run_test_case(self.server1, test_num, dict[_test_case_name],
+            self.run_is_alias_test(self.server1, test_num, dict[_test_case_name],
                                dict[_result])
 
         # cleanup name_host
@@ -207,8 +206,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        # Restoring mutlib.HOST value to: {0}'.format(self.old_mutlib_HOST)
-        mutlib.HOST = self.old_mutlib_HOST
+        # Restoring clone Server_List host value
+        self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
         self.servers.stop_server(self.server1)
         return True

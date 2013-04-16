@@ -16,7 +16,6 @@
 #
 
 import mutlib
-from mutlib import *
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
@@ -46,9 +45,9 @@ class test(rpl_admin.test):
         self.res_fname = "result.txt"
 
         # Spawn servers
-        # Retrieved mutlib.HOST value: {0}'.format(mutlib.HOST) #localhost
-        self.old_mutlib_HOST = mutlib.HOST
-        mutlib.HOST = _IPv6_LOOPBACK
+        # Change clone Server_List host value
+        self.old_cloning_host = self.servers.cloning_host
+        self.servers.cloning_host = _IPv6_LOOPBACK
         # Setting mutlib.HOST to: {0}'.format(mutlib.HOST) #127.0.0.1
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
@@ -233,8 +232,8 @@ class test(rpl_admin.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        # Restoring mutlib.HOST value to: {0}'.format(self.old_mutlib_HOST)
-        mutlib.HOST = self.old_mutlib_HOST
+        # Restoring cloning Server_List host value
+        self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
         self.servers.stop_server(self.server1)
         self.servers.stop_server(self.server2)

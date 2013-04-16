@@ -450,11 +450,13 @@ def _match(pattern, connection_str, trow_error=True):
         return False
     return grp.groups()
 
+
 def clean_IPv6(host_address):
     if host_address:
         host_address = host_address.replace("[","")
         host_address = host_address.replace("]","")
     return host_address
+
 
 def format_IPv6(host_address):
     if host_address:

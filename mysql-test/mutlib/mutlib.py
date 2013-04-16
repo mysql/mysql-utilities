@@ -41,7 +41,6 @@ from mysql.utilities.exception import UtilError
 
 # Constants
 MAX_SERVER_POOL = 10
-HOST = "localhost"
 
 def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
     """Execute Utility
@@ -98,6 +97,7 @@ class Server_list(object):
                            default value = False
         """
 
+        self.cloning_host = "localhost"
         self.utildir = utildir      # Location of utilities being tested
         self.new_port = startport   # Starting port for spawned servers
         self.verbose = verbose      # Option for verbosity
@@ -211,7 +211,7 @@ class Server_list(object):
         conn = {
             "user"   : "root",
             "passwd" : passwd,
-            "host"   : HOST,
+            "host"   : self.cloning_host,
             "port"   : port,
             "unix_socket" : full_datadir + "/mysql.sock"
         }

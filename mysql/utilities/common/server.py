@@ -433,13 +433,13 @@ class Server(object):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
-        l
+
             - dictionary containing connection information including:
               (user, passwd, host, port, socket)
             - connection string in the form: user:pass@host:port:socket or
                                              login-path:port:socket
             - an instance of the Server class
-             
+
         options[in]        options for controlling behavior:
             conn_info      a dictionary containing connection information
                            (user, passwd, host, port, socket)
@@ -450,7 +450,7 @@ class Server(object):
                            (default latin1)
         """
         assert not options.get("conn_info") == None
-        
+
         self.verbose = options.get("verbose", False)
         self.db_conn = None
         self.host = None
@@ -506,12 +506,10 @@ class Server(object):
         Returns bool - True = host_or_ip is an alias
         """
         def get_aliases(host):
-            
             """Gets the aliases for the given host
             """
-            aliases = []
-            aliases.append(clean_IPv6(host))
-            if hostname_is_ip(clean_IPv6(host)): # IP address
+            aliases = [clean_IPv6(host)]
+            if hostname_is_ip(clean_IPv6(host)):  # IP address
                 try:
                     my_host = socket.gethostbyaddr(clean_IPv6(host))
                     aliases.append(my_host[0])
@@ -525,7 +523,7 @@ class Server(object):
                                    [fiveple[4][0] for fiveple in addrinfo],
                                    [addrinfo[0][4][0]])
                 except (socket.gaierror, socket.herror) as err:
-                    host_ip = ([],[],[])
+                    host_ip = ([], [], [])
                     if self.verbose:
                         print("WARNING: IP lookup failed for {0} {1}"
                               "".format(host, err))
@@ -538,7 +536,7 @@ class Server(object):
                                [fiveple[4][0] for fiveple in addrinfo],
                                [addrinfo[0][4][0]])
                 except (socket.gaierror, socket.herror) as err:
-                    host_ip = ([],[],[])
+                    host_ip = ([], [], [])
                     if self.verbose:
                         print("WARNING: IP lookup failed for {0} {1}"
                               "".format(host, err))
@@ -560,7 +558,7 @@ class Server(object):
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
 
-        # for quickness, verify in the existing  aliases, if they are. 
+        # for quickness, verify in the existing  aliases, if they are.
         if self.aliases:
             if host_or_ip.lower() in self.aliases:
                 return True
@@ -591,7 +589,8 @@ class Server(object):
             extend_aliases(local_aliases, local_info[2])
             extend_aliases(local_aliases, get_aliases(socket.gethostname()))
         except (socket.herror, socket.gaierror):
-            local_aliases = []
+            # Try with the basic local aliases.
+            local_aliases = ['127.0.0.1', 'localhost', '::1', '[::1]']
 
         # Get the aliases for this server host
         self.aliases = get_aliases(self.host)
