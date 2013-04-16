@@ -525,24 +525,40 @@ class Server(object):
                 except (socket.gaierror, socket.herror) as err:
                     host_ip = ([], [], [])
                     if self.verbose:
-                        print("WARNING: IP lookup failed for {0} {1}"
-                              "".format(host, err))
+                        print("WARNING: IP lookup by address failed for {0},"
+                              "reason: {1}".format(host, err.strerror))
             else:
                 try:
+                    # server may not really exist.
                     host_ip = socket.gethostbyname_ex(host)
-                    aliases.append(host_ip[0])
-                    addrinfo = socket.getaddrinfo(host, None)
-                    host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
+                except (socket.gaierror, socket.herror) as err:
+                    if self.verbose:
+                        print("WARNING: hostname: {0} may not be reachable, "
+                              "reason: {1}".format(host, err.strerror))
+                    return aliases
+                aliases.append(host_ip[0])
+                addrinfo = socket.getaddrinfo(host, None)
+                local_ip = None
+                error = None
+                for addr in addrinfo:
+                    try:
+                        local_ip = socket.gethostbyaddr(addr[4][0])
+                        break
+                    except (socket.gaierror, socket.herror) as err:
+                        error = err
+                        pass
+                if local_ip:
+                    host_ip = ([local_ip[0]],
                                [fiveple[4][0] for fiveple in addrinfo],
                                [addrinfo[0][4][0]])
-                except (socket.gaierror, socket.herror) as err:
+                else:
                     host_ip = ([], [], [])
                     if self.verbose:
-                        print("WARNING: IP lookup failed for {0} {1}"
-                              "".format(host, err))
+                        print("WARNING: IP lookup by name failed for {0},"
+                              "reason: {1}".format(host, error.strerror))
             extend_aliases(aliases, host_ip[1])
             extend_aliases(aliases, host_ip[2])
-            
+
             return aliases
 
         def extend_aliases(aliases, als_new):
