@@ -110,10 +110,10 @@ Test case 2 - test slave discovery
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - switchover with verbosity
@@ -177,10 +177,10 @@ NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 Switchover has written to the log.
 There are (before) 2 entries in the log.
@@ -211,10 +211,10 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 There are additional entries in the log.
@@ -232,7 +232,7 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+------------------------------------+
 | host       | port  | role    | state  | gtid_mode  | health                             |
 +------------+-------+---------+--------+------------+------------------------------------+
-| localhost  | PORT3  | MASTER  | UP     | NO         | OK                                 |
+| localhost  | PORT3  | MASTER  | UP     | XXX        | OK                                 |
 | localhost  | PORT1  | SLAVE   | WARN   |            | Slave is not connected to master.  |
 | localhost  | PORT2  | SLAVE   | WARN   |            | Slave is not connected to master.  |
 | localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
@@ -263,10 +263,10 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT5  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT5  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 8 - attempt master switchover it self

@@ -38,10 +38,10 @@ Replication user not found but --force used.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| 127.0.0.1  | PORT2  | MASTER  | UP     | NO         | OK      |
-| 127.0.0.1  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| 127.0.0.1  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| 127.0.0.1  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| 127.0.0.1  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 

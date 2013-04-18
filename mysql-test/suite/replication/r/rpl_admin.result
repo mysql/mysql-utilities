@@ -7,28 +7,28 @@ Test case 1 - show health before switchover
       port: PORT1
       role: MASTER
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       2. row *************************
       host: localhost
       port: PORT2
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       3. row *************************
       host: localhost
       port: PORT3
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       4. row *************************
       host: localhost
       port: PORT4
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 4 rows.
 # ...done.
@@ -51,10 +51,10 @@ Test case 2 - switchover to slave1
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - show health after switchover
@@ -66,28 +66,28 @@ Test case 3 - show health after switchover
       port: PORT2
       role: MASTER
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       2. row *************************
       host: localhost
       port: PORT1
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       3. row *************************
       host: localhost
       port: PORT3
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       4. row *************************
       host: localhost
       port: PORT4
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 4 rows.
 # ...done.
@@ -110,10 +110,10 @@ Test case 4 - switchover to slave2
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT3  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT3  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 5 - show health after switchover
@@ -125,28 +125,28 @@ Test case 5 - show health after switchover
       port: PORT3
       role: MASTER
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       2. row *************************
       host: localhost
       port: PORT1
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       3. row *************************
       host: localhost
       port: PORT2
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       4. row *************************
       host: localhost
       port: PORT4
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 4 rows.
 # ...done.
@@ -169,10 +169,10 @@ Test case 6 - switchover to slave3
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT4  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT4  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 7 - show health after switchover
@@ -184,28 +184,28 @@ Test case 7 - show health after switchover
       port: PORT4
       role: MASTER
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       2. row *************************
       host: localhost
       port: PORT1
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       3. row *************************
       host: localhost
       port: PORT2
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       4. row *************************
       host: localhost
       port: PORT3
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 4 rows.
 # ...done.
@@ -229,10 +229,10 @@ Test case 8 - switchover to master
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| 127.0.0.1  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| 127.0.0.1  | PORT4  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 9 - show health after switchover
@@ -244,28 +244,28 @@ Test case 9 - show health after switchover
       port: PORT1
       role: MASTER
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       2. row *************************
       host: localhost
       port: PORT2
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       3. row *************************
       host: localhost
       port: PORT3
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 *************************       4. row *************************
       host: localhost
       port: PORT4
       role: SLAVE
      state: UP
- gtid_mode: NO
+ gtid_mode: XXX
     health: OK
 4 rows.
 # ...done.
@@ -276,10 +276,10 @@ Test case 10 - health with loopback
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| 127.0.0.1  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| 127.0.0.1  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| 127.0.0.1  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 11 - health with discovery
@@ -296,10 +296,10 @@ Test case 11 - health with discovery
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 12 - run command stop with --master

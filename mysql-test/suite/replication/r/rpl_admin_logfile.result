@@ -6,8 +6,8 @@ NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test Case 2 - Log file is reopened
@@ -17,8 +17,8 @@ Test Case 2 - Log file is reopened
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test Case 3 - Log file can not be written to

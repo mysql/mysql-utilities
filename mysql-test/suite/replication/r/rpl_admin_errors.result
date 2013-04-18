@@ -39,10 +39,10 @@ Test case 11 - Not enough privileges - health jane
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | OFF        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | OFF        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | OFF        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | OFF        | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 12 - Not enough privileges - switchover jane
@@ -141,9 +141,9 @@ Test case 30 - Switchover using a wrong slave and with --force
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | OFF        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | OFF        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | OFF        | OK      |
-| localhost  | PORT5  | SLAVE   | UP     | OFF        | OK      |
+| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT5  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.

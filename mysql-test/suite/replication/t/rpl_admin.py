@@ -213,6 +213,10 @@ class test(mutlib.System_test):
         self.replace_substring(str(self.s2_port), "PORT3")
         self.replace_substring(str(self.s3_port), "PORT4")
 
+        self.replace_substring("NO ", "XXX")  # for columns.
+        self.replace_substring("NO", "XXX")
+        self.replace_substring("OFF", "XXX")
+
     def reset_master(self, servers_list=[]):
         # Clear binary log and GTID_EXECUTED of given servers
         if servers_list:
