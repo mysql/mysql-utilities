@@ -221,7 +221,6 @@ There are additional entries in the log.
 Test case 6 - attempt switchover with stranger server without using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
-# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
@@ -241,7 +240,6 @@ ERROR: Candidate is not connected to the correct master.
 Test case 7 - attempt switchover with stranger server using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
-# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.

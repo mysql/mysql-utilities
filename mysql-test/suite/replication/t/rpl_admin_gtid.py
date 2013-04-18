@@ -227,6 +227,29 @@ class test(rpl_admin.test):
         self.replace_result("#  - For slave 'localhost",
                             "#  - For slave 'localhost@PORT?': XXXXX\n")
 
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health  |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("+----------------------------------------------"
+                               "-----------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                       "
+                               "                                         |",
+                               "| health  |")
+        self.replace_substring("| OK                                           "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., No, "
+                               "Slave has 1 transactions behind master.  |",
+                               "| OK      |")
+
         return True
 
     def get_result(self):

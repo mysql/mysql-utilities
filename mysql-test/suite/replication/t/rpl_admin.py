@@ -187,6 +187,11 @@ class test(mutlib.System_test):
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
 
+        # Needed to reset the topology here to run with 5.1 servers.
+        # Note: With 5.1 servers after reset commands slaves seem to forgot
+        # about their master.
+        self.reset_topology()
+
         # Perform stop, start, and reset (without --master option)
         commands = ['start', 'stop', 'reset']
         for cmd in commands:

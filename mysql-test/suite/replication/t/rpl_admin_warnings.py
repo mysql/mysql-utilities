@@ -189,6 +189,19 @@ class test(rpl_admin.test):
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
 
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------------------------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health                    |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK                        |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK                        |")
+        self.replace_substring("| Cannot connect to slave.                   "
+                               "  |", "| Cannot connect to slave.  |")
+
         return True
 
     def get_result(self):

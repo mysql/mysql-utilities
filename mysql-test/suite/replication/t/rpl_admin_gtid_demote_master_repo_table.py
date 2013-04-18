@@ -59,7 +59,7 @@ class test(rpl_admin.test):
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
-        
+
         rpl_admin.test.reset_topology(self)
 
         return True
@@ -85,10 +85,10 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        #--discover-slaves-login=root:root --demote-master  switchover 
-        # --rpl-user=rpl:rplpass 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        #--discover-slaves-login=root:root --demote-master  switchover
+        # --rpl-user=rpl:rplpass
         comment = ("Test case %s - demote-master after switchover -vvv"
                    % test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
@@ -116,7 +116,7 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow NEW Master after demote" 
+        comment = ("Test case %s - mysqlrplshow NEW Master after demote"
                    % test_num)
         cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
         #  --master=root:root@localhost:13091 --disco=root:root -r
@@ -204,6 +204,8 @@ class test(rpl_admin.test):
         self.mask_column_result("| version", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
+        self.replace_result("# Return Code = 0",
+                            "# Return Code = NNN\n")
 
         return True
 
@@ -215,4 +217,3 @@ class test(rpl_admin.test):
 
     def cleanup(self):
         return rpl_admin.test.cleanup(self)
-

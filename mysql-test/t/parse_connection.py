@@ -15,6 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+import os
+
 import mutlib
 from mysql.utilities.exception import MUTLibError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
@@ -25,7 +28,7 @@ _TEST_RESULTS = [
     # Quoted hostname tests
     ('check quoted host name #1', "'mysql.com'", 'mysql.com', False),
     ('check quoted host name #2', "'mysql.com':socket", 'mysql.com', False),
-    ('check quoted host name #3', '"mysql.com"' , 'mysql.com', False),
+    ('check quoted host name #3', '"mysql.com"', 'mysql.com', False),
     ('check quoted host name #4',
          '"bk-internal.mysql.com"', 'bk-internal.mysql.com', False),
     
@@ -43,7 +46,7 @@ _TEST_RESULTS = [
     ('check a FQDN address 4 parts', 'm1.m2.m3.m4', 'm1.m2.m3.m4', False),
     ('check a host name with hyphen', 'host-hyphen', 'host-hyphen', False),
     ('check a host name with extra characters', 'a!(*%(*$*', 'FAIL', True),
-    ('check valid host name #1', '1m23','1m23', False),
+    ('check valid host name #1', '1m23', '1m23', False),
     ('check valid host name #2',
         'label1.2label.label-3.label--4.LaBeL5.com',
         'label1.2label.label-3.label--4.LaBeL5.com', False),
@@ -96,7 +99,7 @@ _TEST_RESULTS = [
         'what:is::::this?', 'FAIL', True),
 
     ('check invalid IPv6 #3',
-        '::0:WHAT:1.2.3.4', 'FAIL', True), # truncation
+        '::0:WHAT:1.2.3.4', 'FAIL', True),  # truncation
     
     ('check invalid IPv6 #4',
         '1:2:3:4:5:6:192.168.1.110', 'FAIL', True),
@@ -132,38 +135,40 @@ _TEST_RESULTS_WITH_CREDENTIALS = [
      'mats:foo@localhost:3308', 'mats:foo@localhost:3308', False),
 
     ('check valid with credentials #5',
-     'mats@localhost:3308:/usr/var/mysqld.sock',
-     'mats@localhost:3308:/usr/var/mysqld.sock', False),
-
-    ('check valid with credentials #6',
      'mats:@localhost', 'mats@localhost:3306', False),
 
-    ('check valid with credentials #7',
+    ('check valid with credentials #6',
      'mysql-user:!#$-%&@localhost', 'mysql-user:!#$-%&@localhost:3306', False),
 
-    ('check valid with credentials #8',
+    ('check valid with credentials #7',
      '"nuno:mariz":foo@localhost', "'nuno:mariz':foo@localhost:3306", False),
 
-    ('check valid with credentials #9',
+    ('check valid with credentials #8',
      "nmariz:'foo:bar'@localhost", "nmariz:'foo:bar'@localhost:3306", False),
 
-    ('check valid with credentials #10',
+    ('check valid with credentials #9',
      "nmariz:'foo@bar'@localhost", "nmariz:'foo@bar'@localhost:3306", False),
 
-    ('check valid with credentials #11',
+    ('check valid with credentials #10',
      "nmariz:foo'bar@localhost", "nmariz:foo'bar@localhost:3306", False),
 
-    ('check valid with credentials #12',
+    ('check valid with credentials #11',
      "foo'bar:nmariz@localhost", "foo'bar:nmariz@localhost:3306", False),
 
-    ('check valid with credentials #13',
+    ('check valid with credentials #12',
      'nmariz:foo"bar@localhost', 'nmariz:foo"bar@localhost:3306', False),
 
-    ('check valid with credentials #14',
+    ('check valid with credentials #13',
      'foo"bar:nmariz@localhost', 'foo"bar:nmariz@localhost:3306', False),
 
-    ('check valid with credentials #15',
+    ('check valid with credentials #14',
      u'ɱysql:unicode@localhost', u'ɱysql:unicode@localhost:3306', False),
+]
+
+_TEST_RESULTS_WITH_CREDENTIALS_POSIX = [
+    ('check valid with credentials #15',
+     'mats@localhost:3308:/usr/var/mysqld.sock',
+     'mats@localhost:3308:/usr/var/mysqld.sock', False),
 ]
 
 
@@ -203,6 +208,10 @@ class test(mutlib.System_test):
         return self.check_num_servers(0)
     
     def setup(self):
+        # On windows SET PYTHONIOENCODING = UTF-8, in order for strange
+        # characters to be output (i.e. printed) correctly.
+        if os.name == 'nt':
+            os.environ['PYTHONIOENCODING'] = "UTF-8"
         return True
     
     def test_connection(self, test_num, test_data, with_credentials=False):
@@ -241,6 +250,10 @@ class test(mutlib.System_test):
                       (i+1, _TEST_RESULTS[i][2], self.results[i])
                 if _TEST_RESULTS[i][3]:
                     print "Test case is expected to fail."
+
+        if os.name == "posix":
+            _TEST_RESULTS_WITH_CREDENTIALS.extend(
+                _TEST_RESULTS_WITH_CREDENTIALS_POSIX)
 
         for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
             i += 1

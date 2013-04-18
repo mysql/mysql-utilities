@@ -22,9 +22,9 @@ from mysql.utilities.exception import MUTLibError
 _IPv4_LOOPBACK = "127.0.0.1"
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
-                      '--log-slave-updates  '
-                      '--report-host=%s '
-                      '--report-port=%s --bind-address=:: "')
+                       '--log-slave-updates  '
+                       '--report-host=%s '
+                       '--report-port=%s --bind-address=0.0.0.0 "')
 
 
 class test(rpl_admin.test):
@@ -34,8 +34,9 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 9):
-            raise MUTLibError("Test requires server version prior to 5.6.9")
+        # Check if GTID_MODE is disabled (required for this test)
+        if self.servers.get_server(0).supports_gtid() == "ON":
+            raise MUTLibError("Test requires servers without GTID enabled.")
         return self.check_num_servers(1)
 
     def setup(self):
@@ -197,6 +198,23 @@ class test(rpl_admin.test):
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
 
+        self.replace_result("| 127.0.0.1  | PORT2  | MASTER  | UP     "
+                            "| OFF        | OK      |",
+                            "| 127.0.0.1  | PORT2  | MASTER  | UP     "
+                            "| NO         | OK      |\n")
+        self.replace_result("| 127.0.0.1  | PORT1  | SLAVE   | UP     "
+                            "| OFF        | OK      |",
+                            "| 127.0.0.1  | PORT1  | SLAVE   | UP     "
+                            "| NO         | OK      |\n")
+        self.replace_result("| 127.0.0.1  | PORT3  | SLAVE   | UP     "
+                            "| OFF        | OK      |",
+                            "| 127.0.0.1  | PORT3  | SLAVE   | UP     "
+                            "| NO         | OK      |\n")
+        self.replace_result("| 127.0.0.1  | PORT4  | SLAVE   | UP     "
+                            "| OFF        | OK      |",
+                            "| 127.0.0.1  | PORT4  | SLAVE   | UP     "
+                            "| NO         | OK      |\n")
+
         return True
 
     def get_result(self):
@@ -209,9 +227,9 @@ class test(rpl_admin.test):
         # Restoring cloning Server_List host value
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
-        self.servers.stop_server(self.server1)
-        self.servers.stop_server(self.server2)
-        self.servers.stop_server(self.server3)
-        self.servers.stop_server(self.server4)
+        self.kill_server("rep_master_loopback")
+        self.kill_server("rep_slave1_loopback")
+        self.kill_server("rep_slave2_loopback")
+        self.kill_server("rep_slave3_loopback")
         return rpl_admin.test.cleanup(self)
 

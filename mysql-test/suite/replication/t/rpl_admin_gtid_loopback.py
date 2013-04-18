@@ -226,6 +226,25 @@ class test(rpl_admin.test):
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
 
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health  |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("+------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                   |",
+                               "| health  |")
+        self.replace_substring("| OK                                       |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.  |",
+                               "| OK      |")
+
         return True
 
     def get_result(self):
@@ -238,9 +257,9 @@ class test(rpl_admin.test):
         # Restoring cloning Server_List host value
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
-        self.servers.stop_server(self.server1)
-        self.servers.stop_server(self.server2)
-        self.servers.stop_server(self.server3)
-        self.servers.stop_server(self.server4)
+        self.kill_server("rep_master_gtid_loopback")
+        self.kill_server("rep_slave1_gtid_loopback")
+        self.kill_server("rep_slave2_gtid_loopback")
+        self.kill_server("rep_slave3_gtid_loopback")
         return rpl_admin.test.cleanup(self)
 

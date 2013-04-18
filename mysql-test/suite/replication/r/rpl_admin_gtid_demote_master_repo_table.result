@@ -42,13 +42,13 @@ Test case 2 - demote-master after switchover -vvv
 # Waiting for slaves to catch up to old master.
 # Slave XXXXXXXXX:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
-# Return Code = 0
+# Return Code = NNN
 # Slave XXXXXXXXX:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
-# Return Code = 0
+# Return Code = NNN
 # Slave XXXXXXXXX:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
-# Return Code = 0
+# Return Code = NNN
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave XXXXXXXXX:PORT2 Ok

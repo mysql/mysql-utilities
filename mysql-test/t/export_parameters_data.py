@@ -38,7 +38,7 @@ class test(export_parameters_def.test):
                                     " x_blob blob")
         except UtilDBError, e:
             raise MUTLibError("Cannot alter table: %s" % e.errmsg)
-            
+
         try:
             self.server1.exec_query("UPDATE util_test.t2 SET x_blob = "
                                     "'This is a blob.' ")
@@ -47,14 +47,14 @@ class test(export_parameters_def.test):
             raise MUTLibError("Cannot update rows: %s" % e.errmsg)
 
         return True
-         
+
     def run(self):
         self.res_fname = "result.txt"
-       
+
         from_conn = "--server=" + self.build_connection_string(self.server1)
-       
+
         cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
-        
+
         cmd_opts = "%s util_test --format=SQL --export=data" % cmd_str
         comment = "Test case 1 - SQL single rows"
         res = self.run_test_case(0, cmd_opts, comment)
@@ -65,12 +65,12 @@ class test(export_parameters_def.test):
         res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         comment = "Test case 3 - skip blobs"
         res = self.run_test_case(0, cmd_opts + " --skip-blobs", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-        
+
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.
 
@@ -92,17 +92,16 @@ class test(export_parameters_def.test):
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Source on [::1]: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
+        # Mask GTID warning when servers with GTID enabled are used
+        self.remove_result("# WARNING: The server supports GTIDs but you")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return export_parameters_def.test.cleanup(self)
-
-
-

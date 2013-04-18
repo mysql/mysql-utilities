@@ -38,7 +38,7 @@ class test(mutlib.System_test):
                          '--report-port={1}"').format('localhost', new_port)
         self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
-                                           name, mysqld_params)
+                                            name, mysqld_params)
         if not res:
             raise MUTLibError("Cannot spawn replication slave server.")
         server = res[0]
@@ -177,7 +177,7 @@ class test(mutlib.System_test):
 
         comment = ("Test case {0} - show topology with master:master "
                    "replication").format(test_num)
-        cmd_str = ("mysqlrplshow.py --disco=root:root --master={0}"
+        cmd_str = ("mysqlrplshow.py --disco=root:root --master={0} "
                    "--show-list --recurse").format(multi_master1_con)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:

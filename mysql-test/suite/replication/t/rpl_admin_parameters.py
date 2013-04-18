@@ -184,6 +184,10 @@ class test(rpl_admin.test):
 
         self.replace_substring(str(self.server5.port), "PORT5")
 
+        # Add mask - WARNING not issued with 5.1. servers
+        self.remove_result("# WARNING: You may be mixing host names and "
+                           "IP addresses. ")
+
         return True
 
     def get_result(self):

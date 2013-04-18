@@ -81,7 +81,7 @@ class test(mutlib.System_test):
         else:
             self.s2_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                               "import_basic")
+                                               "import_basic", '"--sql_mode="')
             if not res:
                 raise MUTLibError("Cannot spawn import_basic server.")
             self.server2 = res[0]
