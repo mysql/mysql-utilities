@@ -24,13 +24,15 @@ class test(mutlib.System_test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
     
-    Note: this test will run against older servers. See rpl_admin_gtid
-    test for test cases for GTID enabled servers.
+    Note: this test will run against servers without GTID enabled.
+    See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version prior to 5.6.5")
+        if not self.servers.get_server(0).check_version_compat(5, 5, 30):
+            raise MUTLibError("Test requires server version 5.5.30 or later.")
+        if self.servers.get_server(0).supports_gtid() == "ON":
+            raise MUTLibError("Test requires servers without GTID enabled.")
         return self.check_num_servers(1)
 
     def spawn_server(self, name, mysqld=None, kill=False):

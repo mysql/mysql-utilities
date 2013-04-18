@@ -272,5 +272,5 @@ ERROR: Candidate is not connected to the correct master.
 Test case 8 - attempt master switchover it self
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.
+mysqlrpladmin.py: error: The specified new master localhost:PORT5 is the same as the actual master localhost:PORT5.
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.

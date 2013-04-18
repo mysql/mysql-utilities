@@ -41,9 +41,12 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_SLAVE_DISCO_REQ,
                                              PARSE_ERR_SLAVE_DISCO_EXC,
                                              WARN_OPT_NOT_REQUIRED,
-                                             WARN_OPT_NOT_REQUIRED_ONLY_FOR)
+                                             WARN_OPT_NOT_REQUIRED_ONLY_FOR,
+                                             ERROR_SAME_MASTER,
+                                             ERROR_MASTER_IN_SLAVES,
+                                             SLAVES, CANDIDATES)
 from mysql.utilities.common.options import UtilitiesParser
-from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.server import Server, check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
@@ -242,18 +245,34 @@ except UtilRplError:
 # Check hostname alias
 if new_master_val:
     if check_hostname_alias(master_val, new_master_val):
-        parser.error("The master is the same host and port of the specified "
-                     "new the master.")
+        master = Server({'conn_info' : master_val})
+        new_master = Server({'conn_info' : new_master_val})
+        parser.error(ERROR_SAME_MASTER.format(n_master_host=new_master.host,
+                                              n_master_port=new_master.port,
+                                              master_host=master.host,
+                                              master_port=master.port))
 
 if master_val:
     for slave_val in slaves_val:
         if check_hostname_alias(master_val, slave_val):
-            parser.error("The master and one of the slaves are the same host "
-                         "and port.")
+            master = Server({'conn_info' : master_val})
+            slave = Server({'conn_info' : slave_val})
+            msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
+                                                master_port=master.port,
+                                                slaves_candidates=SLAVES,
+                                                slave_host=slave.host,
+                                                slave_port=slave.port)
+            parser.error(msg)
     for cand_val in candidates_val:
         if check_hostname_alias(master_val, cand_val):
-            parser.error("The master and one of the candidates are the same "
-                         "host and port.")
+            master = Server({'conn_info' : master_val})
+            candidate = Server({'conn_info' : cand_val})
+            msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
+                                                master_port=master.port,
+                                                slaves_candidates=CANDIDATES,
+                                                slave_host=candidate.host,
+                                                slave_port=candidate.port)
+            parser.error(msg)
 
 # Create dictionary of options
 options = {

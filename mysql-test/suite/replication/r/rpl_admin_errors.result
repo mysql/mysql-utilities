@@ -60,15 +60,15 @@ mysqlrpladmin.py: error: Invalid --discover-slaves-login option for 'failover'. 
 Test case 15 - Master listed as a slave - literal
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified slaves are the same localhost:PORT1.
 Test case 16 - Master listed as a slave - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified slaves are the same <hostname>:PORT1.
 Test case 17 - Master listed as a candidate - alias
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified candidates are the same <hostname>:PORT1.
 Test case 18 - Start without --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
@@ -108,11 +108,11 @@ mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be 
 Test case 27 - Switchover using switchover new master is the actual master with --discover-slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.
+mysqlrpladmin.py: error: The specified new master localhost:PORT1 is the same as the actual master localhost:PORT1.
 Test case 28 - Switchover using switchover new master is the actual master, replacing new-master host with alias.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master is the same host and port of the specified new the master.
+mysqlrpladmin.py: error: The specified new master 127.0.0.1:PORT1 is the same as the actual master localhost:PORT1.
 Test case 29 - Switchover using a wrong slave (without --force)
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.

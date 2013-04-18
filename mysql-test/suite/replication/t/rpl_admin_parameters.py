@@ -38,12 +38,11 @@ class test(rpl_admin.test):
 
     def check_prerequisites(self):
         rpl_admin.test.check_prerequisites(self)
-        self.server0 = self.servers.get_server(0)
-        self.server5 = self.spawn_server("no_slaved")
-        
         return True
 
     def setup(self):
+        self.server0 = self.servers.get_server(0)
+        self.server5 = self.spawn_server("no_slaved")
         return rpl_admin.test.setup(self)
 
     def run(self):

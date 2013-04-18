@@ -78,5 +78,14 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                    % WARN_OPT_NOT_REQUIRED)
 
-ERROR_SAME_MASTER = ("The specified new master {0}:{1} is the same as the "
-                     "actual master {2}:{3}.")
+ERROR_SAME_MASTER = ("The specified new master {n_master_host}:{n_master_port}"
+                     " is the same as the "
+                     "actual master {master_host}:{master_port}.")
+
+SLAVES = "slaves"
+
+CANDIDATES = "candidates"
+
+ERROR_MASTER_IN_SLAVES = ("The master {master_host}:{master_port} "
+                          "and one of the specified {slaves_candidates} "
+                          "are the same {slave_host}:{slave_port}.")

@@ -217,6 +217,9 @@ class test(rpl_admin.test):
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.server5.port), "PORT5")
 
+        self.replace_substring(socket.gethostname().split('.', 1)[0],
+                               "<hostname>")
+
         self.replace_result("mysqlrpladmin.py: error: New master connection "
                             "values invalid",
                             "mysqlrpladmin.py: error: New master connection "
