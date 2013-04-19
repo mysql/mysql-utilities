@@ -57,6 +57,8 @@ class test(export_basic.test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
 
+        self.replace_substring("on [::1]", "on localhost")
+
         self.remove_result("# WARNING: The server supports GTIDs")
 
         return True

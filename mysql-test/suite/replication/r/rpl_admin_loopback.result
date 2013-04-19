@@ -1,0 +1,78 @@
+Test case 1 - mysqlrplshow OLD Master before demote
+# master on 127.0.0.1: ... connected.
+# Finding slaves for master: 127.0.0.1:PORT1
+
+# Replication Topology Graph
+127.0.0.1:PORT1 (MASTER)
+   |
+   +--- 127.0.0.1:PORT2 - (SLAVE)
+   |
+   +--- 127.0.0.1:PORT3 - (SLAVE)
+   |
+   +--- 127.0.0.1:PORT4 - (SLAVE)
+
+Test case 2 - loopback (127.0.0.1) switchover demote-master 
+# Discovering slaves for master at 127.0.0.1:PORT1
+# Discovering slave at 127.0.0.1:PORT2
+# Found slave: 127.0.0.1:PORT2
+# Discovering slave at 127.0.0.1:PORT3
+# Found slave: 127.0.0.1:PORT3
+# Discovering slave at 127.0.0.1:PORT4
+# Found slave: 127.0.0.1:PORT4
+# Checking privileges.
+# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
+# Checking candidate slave prerequisites.
+Replication user not found but --force used.
+# Checking slaves configuration to master.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| 127.0.0.1  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+
+Test case 3 - mysqlrplshow NEW Master after demote
+# master on 127.0.0.1: ... connected.
+# Finding slaves for master: 127.0.0.1:PORT2
+
+# Replication Topology Graph
+127.0.0.1:PORT2 (MASTER)
+   |
+   +--- 127.0.0.1:PORT1 - (SLAVE)
+   |
+   +--- 127.0.0.1:PORT3 - (SLAVE)
+   |
+   +--- 127.0.0.1:PORT4 - (SLAVE)
+
+Test case 4 - mysqlrplcheck NEW Master after demote
+# master on 127.0.0.1: ... connected.
+# slave on 127.0.0.1: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+# ...done.
+

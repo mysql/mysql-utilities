@@ -29,7 +29,7 @@ from mysql.utilities import VERSION_FRM
 from mysql.utilities.command.read_frm import read_frm_files
 from mysql.utilities.command.read_frm import read_frm_files_diagnostic
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.exception import FormatError

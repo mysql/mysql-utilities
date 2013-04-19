@@ -71,7 +71,13 @@ class test(mutlib.System_test):
                                       "WHERE ROUTINE_SCHEMA = 'util_spec_clone'"
                                       " AND ROUTINE_NAME = 'spec_date'")
         self.results.append(res[0][0].strip(' ')+"\n")
-        
+
+        # Mask known source and destination host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
+
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
 

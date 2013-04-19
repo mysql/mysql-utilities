@@ -1,67 +1,149 @@
 Test case 1 - Multiple commands issued.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: You can only specify one command to execute at a time.
 Test case 2 - No commands.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: You must specify a command to execute.
 Test case 3 - Invalid command.
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: 'notacommand' is not a valid command.
 Test case 4 - Switchover but no --master, --new-master,
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
+mysqlrpladmin.py: error: 'switchover' requires the following option(s): --master and --new-master.
 Test case 5 - No slaves or discover-slaves-login
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: One of these options is required to use the utility: --discover-slaves-login or --slaves.
-Test case 6 - Force used with failover
-Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
-
-mysqlrpladmin.py: error: You cannot use the --force option with failover.
-Test case 7 - Bad --new-master connection string
+mysqlrpladmin.py: error: Option --discover-slaves-login or --slaves is required.
+Test case 6 - Bad --new-master connection string
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin.py: error: New master connection values invalid
-Test case 8 - Bad --master connection string
+Test case 7 - Bad --master connection string
 ERROR: Master connection values invalid or cannot be parsed
-Test case 9 - Bad --slaves connection string
+Test case 8 - Bad --slaves connection string
 ERROR: Slave connection values invalid or cannot be parsed
-Test case 10 - Bad --candidates connection string
+Test case 9 - Bad --candidates connection string
 ERROR: Candidate connection values invalid or cannot be parsed
-Test case 11 - Not enough privileges - health joe
+Test case 10 - Not enough privileges - health joe
 # Checking privileges.
 User joe on localhost does not have sufficient privileges to execute the health command.
 ERROR: Not enough privileges to execute command.
-Test case 12 - Not enough privileges - health jane
+Test case 11 - Not enough privileges - health jane
 # Checking privileges.
 #
 # Replication Topology Health:
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | NO         | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | NO         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | NO         | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 13 - Not enough privileges - switchover jane
+Test case 12 - Not enough privileges - switchover jane
 # Checking privileges.
 User jane on localhost does not have sufficient privileges to execute the switchover command.
 ERROR: Not enough privileges to execute command.
-Test case 14 - Master listed as a slave - literal
+Test case 13 - Failover command requires --slaves
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 15 - Master listed as a slave - alias
+mysqlrpladmin.py: error: Option --discover-slaves-login or --slaves is required.
+Test case 14 - Failover command cannot be used with --discover-slaves-login
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the slaves are the same host and port.
-Test case 16 - Master listed as a candiate - alias
+mysqlrpladmin.py: error: Invalid --discover-slaves-login option for 'failover'. Use --slaves instead.
+Test case 15 - Master listed as a slave - literal
 Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The master and one of the candidates are the same host and port.
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified slaves are the same localhost:PORT1.
+Test case 16 - Master listed as a slave - alias
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified slaves are the same <hostname>:PORT1.
+Test case 17 - Master listed as a candidate - alias
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The master localhost:PORT1 and one of the specified candidates are the same <hostname>:PORT1.
+Test case 18 - Start without --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: 'start' requires the following option(s): --slaves.
+Test case 19 - Stop without --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: 'stop' requires the following option(s): --slaves.
+Test case 20 - Reset without --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: 'reset' requires the following option(s): --slaves.
+Test case 21 - Start using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 22 - Stop using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 23 - Reset using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 24 - Health using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 25 - Failover using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 26 - Switchover using --discover-slaves-login and --slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+Test case 27 - Switchover using switchover new master is the actual master with --discover-slaves
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The specified new master localhost:PORT1 is the same as the actual master localhost:PORT1.
+Test case 28 - Switchover using switchover new master is the actual master, replacing new-master host with alias.
+Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+
+mysqlrpladmin.py: error: The specified new master 127.0.0.1:PORT1 is the same as the actual master localhost:PORT1.
+Test case 29 - Switchover using a wrong slave (without --force)
+# Checking privileges.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
+# ERROR: Slave localhost:PORT5 is not configured with master localhost:PORT1.
+ERROR: Slave localhost:PORT5 is not configured with master localhost:PORT1. Note: If you want to ignore this issue, please use the utility with the --force option.
+Test case 30 - Switchover using a wrong slave and with --force
+# Checking privileges.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
+# ERROR: Slave localhost:PORT5 is not configured with master localhost:PORT1.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT5  | SLAVE   | UP     | XXX        | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.

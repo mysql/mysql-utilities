@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ from mysql.utilities.exception import UtilError, UtilRplError
 
 _CONSOLE_HEADER = "MySQL Replication Failover Utility"
 _CONSOLE_FOOTER = "Q-quit R-refresh H-health G-GTID Lists U-UUIDs"
+_CONSOLE_FOOTER_NO_KEYBOARD = "Press CTRL+C to quit"
 
 _COMMAND_KEYS = {'\x1b[A':'ARROW_UP', '\x1b[B':'ARROW_DN'}
 
@@ -162,6 +163,10 @@ class FailoverConsole(object):
         self.logging = options.get("logging", False)
         self.log_file = options.get("log_file", None)
 
+        # If the option --no-keyboard is provided, the menu will be disabled
+        # and any keyboard request will be ignored.
+        self.no_keyboard = options.get("no_keyboard", False)
+
         self.alarm = time.time() + self.interval
         self.gtid_list = -1
         self.scroll_size = 0
@@ -172,7 +177,10 @@ class FailoverConsole(object):
         self.comment = _HEALTH_LIST
         self.scroll_on = False
         self.old_mode = None
-        
+
+        # Dictionary that holds the current warning messages
+        self.warnings_dic = {}
+
         # Callback methods for reading data
         self.master = master
         self.get_health_data = get_health_data
@@ -396,7 +404,7 @@ class FailoverConsole(object):
         Returns - None or int (see above)        
         """
         # If on *nix systems, set the terminal IO sys to not echo
-        if os.name == "posix":
+        if not self.no_keyboard and os.name == "posix":
             import tty, termios
             old_settings = termios.tcgetattr(sys.stdin)
             tty.setcbreak(sys.stdin.fileno())
@@ -406,12 +414,12 @@ class FailoverConsole(object):
         # loop for interval in seconds while detecting keypress 
         while not done:
             done = self.alarm <= time.time()
-            if kbhit() and not done:
+            if not self.no_keyboard and kbhit() and not done:
                 key = getch()
                 done = True
 
         # Reset terminal IO sys to older state
-        if os.name == "posix":
+        if not self.no_keyboard and os.name == "posix":
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
         return key
@@ -496,8 +504,35 @@ class FailoverConsole(object):
             print
         print
         self.rows_printed += 7
-    
-    
+
+    def _print_warnings(self):
+        """Print current warning messages
+
+        This method displays current warning messages if they exist.
+        """
+        # Only do something if warnings exist.
+        if self.warnings_dic:
+            for msg in self.warnings_dic.itervalues():
+                print("WARNING: {0}".format(msg))
+                self.rows_printed += 1
+
+    def add_warning(self, warning_key, warning_msg):
+        """Add a warning message to the current dictionary of warnings.
+
+        warning_key[in]    key associated with the warning message to add.
+        warning_msg[in]    warning message to add to the current dictionary of
+                           warnings.
+        """
+        self.warnings_dic[warning_key] = warning_msg
+
+    def del_warning(self, warning_key):
+        """Remove a warning message from the current dictionary of warnings.
+
+        warning_key[in]    key associated with the warning message to remove.
+        """
+        if warning_key in self.warnings_dic:
+            del self.warnings_dic[warning_key]
+
     def _scroll(self, key):
         """Scroll the list view
         
@@ -592,14 +627,18 @@ class FailoverConsole(object):
         for i in range(self.rows_printed, self.max_rows-2):
             print
         # Show bottom menu options
-        print _CONSOLE_FOOTER,
-        # If logging enabled, show command
-        if self.logging:
-            print "L-log entries",
-        if scroll:
-            print "Up|Down-scroll"
+        footer = []
+        if self.no_keyboard:
+            # No support for keyboard, disable menu
+            footer.append(_CONSOLE_FOOTER_NO_KEYBOARD)
         else:
-            print
+            footer.append(_CONSOLE_FOOTER)
+            # If logging enabled, show command
+            if self.logging:
+                footer.append("L-log entries")
+            if scroll:
+                footer.append("Up|Down-scroll")
+        print(" ".join(footer))
         self.rows_printed = self.max_rows
    
     
@@ -613,6 +652,7 @@ class FailoverConsole(object):
         self._reset_screen_size()
         self._print_header()
         self._print_master_status()
+        self._print_warnings()
         # refresh health if already displayed
         if self.report_mode == 'H':
             self.list_data = self._format_health_data()
@@ -632,7 +672,7 @@ class FailoverConsole(object):
         
         Returns bool - True = user exit no errors, False = errors
         """
-        self._reset_interval()
+        self._reset_interval(self.interval)
 
         # Get the data for first printing of the screen
         if self.list_data is None:

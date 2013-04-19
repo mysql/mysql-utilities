@@ -23,6 +23,8 @@ server operations used in multiple utilities.
 
 import os
 import re
+import socket
+
 import mysql.connector
 import socket
 import string
@@ -30,12 +32,12 @@ import subprocess
 import tempfile
 
 from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
-from mysql.utilities.common.options import hostname_is_ip
-from mysql.utilities.common.options import parse_connection
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.common.tools import execute_script
 from mysql.utilities.common.tools import ping_host
 from mysql.utilities.common.user import User
+from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
+                                              clean_IPv6, format_IPv6)
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
@@ -59,7 +61,7 @@ def get_connection_dictionary(conn_info):
     if conn_info is None:
         return conn_info
     conn_val = {}
-    if isinstance(conn_info, dict):
+    if isinstance(conn_info, dict) and 'host' in conn_info:
         conn_val = conn_info
     elif isinstance(conn_info, Server):
         # get server's dictionary
@@ -310,7 +312,11 @@ def connect_servers(src_val, dest_val, options={}):
 
     # Get connection dictionaries
     src_dict = get_connection_dictionary(src_val)
+    if "]" in src_dict['host']:
+            src_dict['host'] = clean_IPv6(src_dict['host'])
     dest_dict = get_connection_dictionary(dest_val)
+    if dest_dict and "]" in dest_dict['host']:
+            dest_dict['host'] = clean_IPv6(dest_dict['host'])
 
     # Check for uniqueness - dictionary
     if options.get("unique", False) and dest_dict is not None:
@@ -555,8 +561,6 @@ class Server(object):
         self.fkeys = None
         self.read_only = False
         self.aliases = []
-        self.is_alias("")
-
 
     def is_alive(self):
         """Determine if connection to server is still alive.
@@ -587,9 +591,91 @@ class Server(object):
 
         Returns bool - True = host_or_ip is an alias
         """
-        if self.aliases:
-            return host_or_ip.lower() in self.aliases
+        def get_aliases(host):
+            """Gets the aliases for the given host
+            """
+            aliases = [clean_IPv6(host)]
+            if hostname_is_ip(clean_IPv6(host)):  # IP address
+                try:
+                    my_host = socket.gethostbyaddr(clean_IPv6(host))
+                    aliases.append(my_host[0])
+                    # socket.gethostbyname_ex() does not work with ipv6
+                    if (not my_host[0].count(":") < 1 or 
+                        not my_host[0] == "ip6-localhost"):
+                        host_ip = socket.gethostbyname_ex(my_host[0])
+                    else:
+                        addrinfo = socket.getaddrinfo(my_host[0], None)
+                        host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
+                                   [fiveple[4][0] for fiveple in addrinfo],
+                                   [addrinfo[0][4][0]])
+                except (socket.gaierror, socket.herror) as err:
+                    host_ip = ([], [], [])
+                    if self.verbose:
+                        print("WARNING: IP lookup by address failed for {0},"
+                              "reason: {1}".format(host, err.strerror))
+            else:
+                try:
+                    # server may not really exist.
+                    host_ip = socket.gethostbyname_ex(host)
+                except (socket.gaierror, socket.herror) as err:
+                    if self.verbose:
+                        print("WARNING: hostname: {0} may not be reachable, "
+                              "reason: {1}".format(host, err.strerror))
+                    return aliases
+                aliases.append(host_ip[0])
+                addrinfo = socket.getaddrinfo(host, None)
+                local_ip = None
+                error = None
+                for addr in addrinfo:
+                    try:
+                        local_ip = socket.gethostbyaddr(addr[4][0])
+                        break
+                    except (socket.gaierror, socket.herror) as err:
+                        error = err
+                        pass
+                if local_ip:
+                    host_ip = ([local_ip[0]],
+                               [fiveple[4][0] for fiveple in addrinfo],
+                               [addrinfo[0][4][0]])
+                else:
+                    host_ip = ([], [], [])
+                    if self.verbose:
+                        print("WARNING: IP lookup by name failed for {0},"
+                              "reason: {1}".format(host, error.strerror))
+            extend_aliases(aliases, host_ip[1])
+            extend_aliases(aliases, host_ip[2])
 
+            return aliases
+
+        def extend_aliases(aliases, als_new):
+            """Does intersection of the two given list.
+            Returns List of no repeated elements from the two list
+            """
+            if als_new:
+                als_new = [alias for alias in als_new if (alias and
+                                                          alias not in aliases
+                                                          )]
+                aliases.extend(als_new)
+
+
+        host_or_ip = clean_IPv6(host_or_ip.lower())
+
+        # for quickness, verify in the existing  aliases, if they are.
+        if self.aliases:
+            if host_or_ip.lower() in self.aliases:
+                return True
+            else:
+                # get the alias for the given host_or_ip 
+                host_or_ip_aliases = get_aliases(host_or_ip)
+                host_or_ip_aliases.append(host_or_ip)
+                for alias in host_or_ip_aliases:
+                    if alias in self.aliases:
+                        #save the aliases for future
+                        extend_aliases(self.aliases, host_or_ip_aliases)
+                        return True
+                return False
+
+        # If not previews aliases save, look for them.
         # First, get the local information
         try:
             local_info = socket.gethostbyname_ex(socket.gethostname())
@@ -599,39 +685,39 @@ class Server(object):
                 local_aliases.append(local_info[0].split('.')[0])
             except:
                 pass
-            local_aliases.extend(['127.0.0.1', 'localhost'])
-            local_aliases.extend(local_info[1])
-            local_aliases.extend(local_info[2])
+            extend_aliases(local_aliases, ['127.0.0.1', 'localhost',
+                                           '::1', '[::1]'])
+            extend_aliases(local_aliases, local_info[1])
+            extend_aliases(local_aliases, local_info[2])
+            extend_aliases(local_aliases, get_aliases(socket.gethostname()))
         except (socket.herror, socket.gaierror):
-            local_aliases = []
+            # Try with the basic local aliases.
+            local_aliases = ['127.0.0.1', 'localhost', '::1', '[::1]']
 
-        # Check for local
+        # Get the aliases for this server host
+        self.aliases = get_aliases(self.host)
+        # Check if this server is local
         if self.host in local_aliases:
-            self.aliases.extend(local_aliases)
+            # save the local aliases for future.
+            extend_aliases(self.aliases, local_aliases)
+            # check if the host_or_ip is alias 
+            if host_or_ip in self.aliases:
+                return True
         else:
-            self.aliases.append(self.host)
-            if hostname_is_ip(self.host): # IP address
-                try:
-                    my_host = socket.gethostbyaddr(self.host)
-                    self.aliases.append(my_host[0])
-                    host_ip = socket.gethostbyname_ex(my_host[0])
-                except Exception, e:
-                    host_ip = ([],[],[])
-                    if self.verbose:
-                        print "WARNING: IP lookup failed", e
-            else:
-                try:
-                    host_ip = socket.gethostbyname_ex(self.host)
-                    self.aliases.append(host_ip[0])
-                except Exception, e:
-                    host_ip = ([],[],[])
-                    if self.verbose:
-                        print "WARNING: Hostname lookup failed", e
+            # server host is not local, do not use local aliases
+            # check if the given host_or_ip is alias of the host. 
+            if host_or_ip in self.aliases:
+                return True
 
-            self.aliases.extend(host_ip[1])
-            self.aliases.extend(host_ip[2])
-
-        return host_or_ip.lower() in self.aliases
+        # lastly get the alias for the given host_or_ip 
+        host_or_ip_aliases = get_aliases(host_or_ip)
+        host_or_ip_aliases.append(host_or_ip)
+        for alias in host_or_ip_aliases:
+            if alias in self.aliases:
+                #save the aliases for future
+                extend_aliases(self.aliases, host_or_ip_aliases)
+                return True
+        return False
 
 
     def user_host_exists(self, user, host_or_ip):
@@ -694,6 +780,8 @@ class Server(object):
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
             parameters['charset'] = self.charset
+            parameters['host'] = parameters['host'].replace("[", "")
+            parameters['host'] = parameters['host'].replace("]", "") 
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
             # Reset any previous value if the connection cannot be established,
@@ -949,9 +1037,13 @@ class Server(object):
         Returns [] - no exceptions, list if exceptions found
         """
         errors = []
-        if host == '127.0.0.1':
-            host = 'localhost'
+        ipv6 = False
+        if "]" in host:
+            ipv6 = True
+            host = clean_IPv6(host)
         result = self.user_host_exists(user, host)
+        if ipv6:
+            result = format_IPv6(result)
         if result is None or result == []:
             errors.append("The replication user %s@%s was not found "
                           "on %s:%s." % (user, host, self.host, self.port))

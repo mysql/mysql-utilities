@@ -14,11 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import mutlib
 import rpl_admin
 import socket
 from mysql.utilities.exception import MUTLibError
+
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -27,10 +28,16 @@ class test(rpl_admin.test):
     """
 
     def check_prerequisites(self):
-        return rpl_admin.test.check_prerequisites(self)
+        return self.check_num_servers(1)
 
     def setup(self):
-        return rpl_admin.test.setup(self)
+        if not rpl_admin.test.setup(self):
+            return False
+
+        #Spawn an independent server
+        self.server5 = self.spawn_server("alone_srv", kill=True)
+
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
@@ -45,7 +52,8 @@ class test(rpl_admin.test):
     
         # create a user for priv check
         self.server1.exec_query("CREATE USER 'joe'@'localhost'")
-        self.server1.exec_query("GRANT SELECT, SUPER ON *.* TO 'jane'@'localhost'")
+        self.server1.exec_query("GRANT SELECT, SUPER ON *.* TO "
+                                "'jane'@'localhost'")
         mock_master1 = "--master=joe@localhost:%s" % self.server1.port
         mock_master2 = "--master=jane@localhost:%s" % self.server1.port
         slaves_str = "--slaves=" + \
@@ -58,18 +66,18 @@ class test(rpl_admin.test):
             # (comment, ret_val, option1, ...),
             ("Multiple commands issued.", 2, "switchover", "start"),
             ("No commands.", 2, ""),
-            ("Invalid command.", 2, "NOTACOMMAND"),
-            ("Switchover but no --master, --new-master,", 2, "switchover"),
+            ("Invalid command.", 2, "NOTACOMMAND",
+             "--discover-slaves-login=root"),
+            ("Switchover but no --master, --new-master,", 2, "switchover",
+             "--discover-slaves-login=root"),
             ("No slaves or discover-slaves-login", 2, "switchover", master_str),
-            ("Force used with failover", 2, "failover", "--force", master_str,
-             slaves_str),
             ("Bad --new-master connection string", 2, "switchover", master_str,
              slaves_str, "--new-master=whatmeworry?"),
             ("Bad --master connection string", 1, "switchover", slaves_str,
              "--new-master=%s" % master_conn, "--master=whatmeworry?"),
             ("Bad --slaves connection string", 1, "switchover", master_str,
              "--new-master=%s" % master_conn, "--slaves=what,me,worry?"),
-            ("Bad --candidates connection string", 1, "failover", master_str,
+            ("Bad --candidates connection string", 1, "failover",
              slaves_str, "--candidates=what,me,worry?"),
             ("Not enough privileges - health joe", 1, "health", mock_master1,
              slaves_str),
@@ -77,6 +85,9 @@ class test(rpl_admin.test):
              slaves_str),
             ("Not enough privileges - switchover jane", 1, "switchover",
              mock_master2, slaves_str, "--new-master=%s" % slave3_conn),
+            ("Failover command requires --slaves", 2, "failover"),
+            ("Failover command cannot be used with --discover-slaves-login", 2,
+             "--discover-slaves-login=root", "failover",)
         ]
 
         test_num = 1
@@ -93,12 +104,13 @@ class test(rpl_admin.test):
             test_num += 1
 
         # Now test to see what happens when master is listed as a slave
-        comment = "Test case %s - Master listed as a slave - literal" % test_num
-        cmd_str = "%s health %s %s,%s" % (base_cmd, master_str, slaves_str, master_conn)
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str,
-                                               comment)
+        comment = ("Test case {0} - Master listed as a slave - "
+                   "literal").format(test_num)
+        cmd_str = "{0} health {1} {2},{3}".format(base_cmd, master_str,
+                                                  slaves_str, master_conn)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         comment = "Test case %s - Master listed as a slave - alias"  % test_num
@@ -111,7 +123,7 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
-        comment = "Test case %s - Master listed as a candiate - alias" % test_num
+        comment = "Test case %s - Master listed as a candidate - alias" % test_num
         cmd_str = "%s elect %s %s %s" % (base_cmd, master_str,
                   "--candidates=root:root@%s:%s" % \
                     (socket.gethostname().split('.', 1)[0], self.server1.port),
@@ -122,11 +134,91 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
-        # Now we return the topology to its original state for other tests
-        rpl_admin.test.reset_topology(self)
+        for command in ('start', 'stop', 'reset'):
+            comment = ("Test case {0} - {1} without "
+                       "--slaves").format(test_num, command.capitalize())
+            cmd_str = ("{0} {1} --discover-slaves-login="
+                       "root:root").format(base_cmd, command)
+            res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
+            test_num += 1
+
+        # Test error using --discover and --slaves at the same time
+        for command in ('start', 'stop', 'reset', 'health', 'failover',
+                        'switchover'):
+            comment = ("Test case {0} - {1} using --discover-slaves-login and "
+                       "--slaves").format(test_num, command.capitalize())
+            cmd_str = ("{0} {1} {2} --discover-slaves-login="
+                       "root:root").format(base_cmd, command, slaves_str)
+            res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
+            test_num += 1
+
+        # Test error switchover --new-master and --master are the same value.
+        command = 'switchover'
+        comment = ("Test case {0} - {1} using switchover new master is "
+                   "the actual master with --discover-slaves"
+                   "").format(test_num, command.capitalize())
+        cmd_str = ("{0} {1} {2} {3} --new-master={4} "
+                   "--discover-slaves-login=root:root"
+                   "".format(base_cmd, command, master_str,
+                             "--rpl-user=rpl:rpl", master_conn))
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Test error switchover --new-master and --master are the same value,
+        # replacing new-master host with alias.
+        command = 'switchover'
+        comment = ("Test case {0} - {1} using switchover new master is the "
+                   "actual master, replacing new-master host with alias."
+                   "").format(test_num, command.capitalize())
+        cmd_str = ("{0} {1} {2} {3},{4} --new-master={4}"
+                   "".format(base_cmd, command, master_str, slaves_str,
+                             master_conn.replace("localhost","127.0.0.1")))
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Test switchover with a wrong slave (not in the topology)
+        # Note: --rpl-user is required if master-info-repository is not TABLE
+        alone_srv_conn = self.build_connection_string(self.server5).strip(' ')
+
+        comment = ("Test case {0} - Switchover using a wrong slave (without "
+                   "--force)").format(test_num)
+        slaves_str = ",".join([slave2_conn, slave3_conn, alone_srv_conn])
+        cmd_str = ("{0} --master={1} --new-master={2} --slaves={3} "
+                   "switchover --rpl-user=rpl:rpl").format(base_cmd,
+                                                           master_conn,
+                                                           slave1_conn,
+                                                           slaves_str)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Switchover using a wrong slave and with "
+                   "--force").format(test_num)
+        slaves_str = ",".join([slave2_conn, slave3_conn, alone_srv_conn])
+        cmd_str = ("{0} --master={1} --new-master={2} --slaves={3} --force "
+                   "switchover --rpl-user=rpl:rpl").format(base_cmd,
+                                                           master_conn,
+                                                           slave1_conn,
+                                                           slaves_str)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
+        self.replace_substring(str(self.server5.port), "PORT5")
+
+        self.replace_substring(socket.gethostname().split('.', 1)[0],
+                               "<hostname>")
 
         self.replace_result("mysqlrpladmin.py: error: New master connection "
                             "values invalid",
@@ -145,24 +237,48 @@ class test(rpl_admin.test):
                             "ERROR: Candidate connection values invalid or "
                             "cannot be parsed\n")
 
+        self.replace_result("| localhost  | PORT1  | MASTER  | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT1  | MASTER  | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT2  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT2  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT3  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT3  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT4  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT4  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT2  | MASTER  | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT2  | MASTER  | UP     "
+                            "| OFF        | OK      |\n")
+        self.replace_result("| localhost  | PORT5  | SLAVE   | UP     "
+                            "| NO         | OK      |",
+                            "| localhost  | PORT5  | SLAVE   | UP     "
+                            "| OFF        | OK      |\n")
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
-        try:
-            self.server1.exec_query("DROP USER 'joe'@'localhost'")
-        except:
-            pass
-        try:
-            self.server1.exec_query("DROP USER 'jane'@'localhost'")
-        except:
-            pass
+
+        # Kill independent server
+        self.kill_server("alone_srv")
+
+        # Kill all remaining servers (to avoid problems for other tests).
+        self.kill_server("rep_master")
+        self.kill_server("rep_slave1")
+        self.kill_server("rep_slave2")
+        self.kill_server("rep_slave3")
+
         return rpl_admin.test.cleanup(self)
-
-
-

@@ -52,11 +52,14 @@ class test(rpl_admin.test):
         mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master()
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
-        
+
         rpl_admin.test.reset_topology(self)
 
         return True
@@ -82,10 +85,10 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        #--discover-slaves-login=root:root --demote-master  switchover 
-        # --rpl-user=rpl:rplpass 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        #--discover-slaves-login=root:root --demote-master  switchover
+        # --rpl-user=rpl:rplpass
         comment = ("Test case %s - demote-master after switchover -vvv"
                    % test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
@@ -113,7 +116,7 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow NEW Master after demote" 
+        comment = ("Test case %s - mysqlrplshow NEW Master after demote"
                    % test_num)
         cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
         #  --master=root:root@localhost:13091 --disco=root:root -r
@@ -179,9 +182,30 @@ class test(rpl_admin.test):
                             "| 0              |            "
                             "| 0             |\n")
 
+        self.replace_result("+------------+-------+---------+--------"
+                            "+------------+---------+-------------",
+                            "+------------+-------+---------+--------"
+                            "+------------+---------+-------------"
+                            "+-------------------+-----------------"
+                            "+------------+-------------+--------------"
+                            "+------------------+---------------+-----------"
+                            "+----------------+------------+---------------+"
+                            "\n")
+        self.replace_result("| host       | port  | role    | state  "
+                            "| gtid_mode  | health  | version  ",
+                            "| host       | port  | role    | state  "
+                            "| gtid_mode  | health  | version     "
+                            "| master_log_file   | master_log_pos  "
+                            "| IO_Thread  | SQL_Thread  | Secs_Behind  "
+                            "| Remaining_Delay  | IO_Error_Num  | IO_Error  "
+                            "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
+                            "\n")
+
         self.mask_column_result("| version", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
+        self.replace_result("# Return Code = 0",
+                            "# Return Code = NNN\n")
 
         return True
 
@@ -193,4 +217,3 @@ class test(rpl_admin.test):
 
     def cleanup(self):
         return rpl_admin.test.cleanup(self)
-

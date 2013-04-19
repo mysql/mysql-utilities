@@ -23,8 +23,8 @@ _BASE_COMMENT = "Test Case %d: "
 class test(mutlib.System_test):
     """mysql utilities console - parameters
     This test executes tests of the parameters for mysqluc. Note that piping
-    and the --execute are tested in the utilities_console_base and 
-    utilities_console_pipe tests. 
+    and the --execute are tested in the utilities_console_base and
+    utilities_console_pipe tests.
     """
 
     def check_prerequisites(self):
@@ -34,19 +34,19 @@ class test(mutlib.System_test):
     def setup(self):
         self.server0 = self.servers.get_server(0)
         return True
-    
+
     def do_test(self, test_num, comment, command):
         res = self.run_test_case(0, command, _BASE_COMMENT%test_num + comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         # Setup options to show
         test_num = 1
         cmd_str = "mysqluc.py %s"
-        
+
         # show help
         cmd_opt = '--help'
         self.do_test(test_num, "Help", cmd_str % cmd_opt)
@@ -76,7 +76,7 @@ class test(mutlib.System_test):
         cmd_opt = '-e "help mysqldiff" --width=66'
         self.do_test(test_num, "Normal - width 66", cmd_str % cmd_opt)
         test_num += 1
-        
+
         # test replacement
         cmd_opt = ' -e "set SERVER=%s;show variables;' % \
                   self.build_connection_string(self.server0)
@@ -86,26 +86,28 @@ class test(mutlib.System_test):
             cmd_opt += 'mysqldiff --server1=$SERVER"'
         self.do_test(test_num, "Replacement", cmd_str % cmd_opt)
         test_num += 1
-        
+
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.replace_result("Quiet mode, saving output to",
                             "Quiet mode, saving output to XXXXXXXXXXXXXX\n")
         self.remove_result("Launching console ...")
-         
-        return True    
-          
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqluc.py "
+                                           "version", 6)
+
+        self.replace_substring(".py", "")
+
+        return True
+
     def get_result(self):
         return self.compare(__name__, self.results)
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return True
-
-
-
-

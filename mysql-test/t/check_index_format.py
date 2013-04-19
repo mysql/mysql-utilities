@@ -67,6 +67,10 @@ class test(check_index_parameters.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Mask known source host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        
         return True
   
     def get_result(self):

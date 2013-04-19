@@ -24,7 +24,7 @@ import time
 
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Master, Slave, Replication
 from mysql.utilities.common.server import get_server_state
@@ -41,10 +41,17 @@ _HEALTH_DETAIL_COLS = ["version", "master_log_file", "master_log_pos",
 
 _GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
+_GTID_SUBTRACT_TO_EXECUTED = ("SELECT GTID_SUBTRACT('{0}', "
+                              "@@GLOBAL.GTID_EXECUTED)")
 
 _UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
                           'SET password = PASSWORD("%s")'
                           'where user ="%s";')
+
+_SELECT_RPL_USER_PASS_QUERY = ('SELECT user, host, grant_priv, password, '
+                               'Repl_slave_priv FROM mysql.user '
+                               'WHERE user ="%s" AND host ="%s";')
+
 
 def parse_failover_connections(options):
     """Parse the --master, --slaves, and --candidates options
@@ -170,6 +177,7 @@ class Topology(Replication):
         self.max_delay = self.options.get("max_delay", 0)
         self.max_pos = self.options.get("max_position", 0)
         self.force = self.options.get("force", False)
+        self.pedantic = self.options.get("pedantic", False)
         self.before_script = self.options.get("before", None)
         self.after_script = self.options.get("after", None)
         self.timeout = int(self.options.get("timeout", 300))
@@ -181,7 +189,7 @@ class Topology(Replication):
                                                             slave_vals,
                                                             self.options,
                                                             skip_conn_err)
-        self.discover_slaves()
+        self.discover_slaves(output_log=True)
 
 
     def _report(self, message, level=logging.INFO, print_msg=True):
@@ -325,14 +333,18 @@ class Topology(Replication):
                     return False
         return True
 
-
-    def discover_slaves(self, skip_conn_err=True):
+    def discover_slaves(self, skip_conn_err=True, output_log=False):
         """Discover slaves connected to the master
+
+        skip_conn_err[in]   Skip connection errors to the slaves (i.e. log the
+                            errors but do not raise an exception),
+                            by default True.
+        output_log[in]      Output the logged information (i.e. print the
+                            information of discovered slave to the output),
+                            by default False.
 
         Returns bool - True if new slaves found
         """
-        from mysql.utilities.common.replication import Slave
-
         # See if the user wants us to discover slaves.
         discover = self.options.get("discover", None)
         if not discover or not self.master:
@@ -343,16 +355,19 @@ class Topology(Replication):
 
         # Find discovered slaves
         new_slaves_found = False
-        self._report("# Discovering slaves for master at %s:%s" %
-                     (self.master.host, self.master.port))
+        self._report("# Discovering slaves for master at "
+                     "{0}:{1}".format(self.master.host, self.master.port))
         discovered_slaves = self.master.get_slaves(user, password)
         for slave in discovered_slaves:
-            host, port = slave.split(":")
-            self._report("Discovering slave at %s:%s" % (host, port),
-                         logging.INFO, False)
-            # Convert local IP to localhost
-            if host == '127.0.0.1':
-                host = 'localhost'
+            if "]" in slave:
+               host, port = slave.split("]:")
+               host = "{0}]".format(host)
+            else:
+                host, port = slave.split(":")
+            msg = "Discovering slave at {0}:{1}".format(host, port)
+            self._report(msg, logging.INFO, False)
+            if output_log:
+                print("# {0}".format(msg))
             # Skip hosts that are not registered properly
             if host == 'unknown host':
                 continue
@@ -378,26 +393,34 @@ class Topology(Replication):
                     try:
                         slave_conn.connect()
                         # Skip discovered slaves that are not connected
-                        # to the master
+                        # to the master (i.e. IO thread is not running)
                         if slave_conn.is_connected():
                             self.slaves.append({ 'host' : host, 'port' : port,
                                                  'instance' : slave_conn,
                                                  'discovered' : True})
-                            self._report("Found slave: %s:%s" %
-                                         (host, port), logging.INFO, False)
+                            msg = "Found slave: {0}:{1}".format(host, port)
+                            self._report(msg, logging.INFO, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                             new_slaves_found = True
                         else:
-                            self._report("Not found.", logging.WARN, False)
+                            msg = ("Slave skipped (IO not running): "
+                                   "{0}:{1}").format(host, port)
+                            self._report(msg, logging.WARN, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                     except UtilError, e:
-                        msg = ("Cannot connect to slave %s:%s as user '%s'. "
-                               % (host, port, user))
+                        msg = ("Cannot connect to slave {0}:{1} as user "
+                               "'{2}'.").format(host, port, user)
                         if skip_conn_err:
-                            self._report(msg + e.errmsg, logging.WARN, False)
+                            msg = "{0} {1}".format(msg, e.errmsg)
+                            self._report(msg, logging.WARN, False)
+                            if output_log:
+                                print("# {0}".format(msg))
                         else:
                             raise UtilRplError(msg)
 
         return new_slaves_found
-
 
     def _get_server_gtid_data(self, server, role):
         """Retrieve the GTID information from the server.
@@ -460,8 +483,6 @@ class Topology(Replication):
         assert (candidate is not None), "A candidate server is required."
         assert (type(candidate) == Master), \
                "A candidate server must be a Master class instance."
-
-        from mysql.utilities.common.replication import Slave
 
         # If master has GTID=ON, ensure all servers have GTID=ON
         gtid_enabled = self.master.supports_gtid() == "ON"
@@ -901,6 +922,182 @@ class Topology(Replication):
 
         return True
 
+    def _check_slaves_status(self, stop_on_error=False):
+        """Check all slaves for error before performing failover.
+
+        This method check the status of all slaves (before the new master catch
+        up with them), using SHOW SLAVE STATUS, reporting any error found and
+        warning the user if failover might result in an inconsistent
+        replication topology. By default the process will not stop, but if
+        the --pedantic option is used then failover will stop with an error.
+
+        stop_on_error[in]  Define the default behavior of failover if errors
+                           are found. By default: False (not stop on errors).
+        """
+        for slave_dict in self.slaves:
+            s_host = slave_dict['host']
+            s_port = slave_dict['port']
+            slave = slave_dict['instance']
+
+            # Verify if the slave is alive
+            if not slave or not slave.is_alive():
+                msg = "Slave '{host}@{port}' is not alive.".format(host=s_host,
+                                                                   port=s_port)
+                # Print warning or raise an error according to the default
+                # failover behavior and defined options.
+                if ((stop_on_error and not self.force)
+                    or (not stop_on_error and self.pedantic)):
+                    print("# ERROR: {0}".format(msg))
+                    self._report(msg, logging.CRITICAL, False)
+                    if stop_on_error and not self.force:
+                        ignore_opt = "with the --force"
+                    else:
+                        ignore_opt = "without the --pedantic"
+                    ignore_tip = ("Note: To ignore this issue use the "
+                                  "utility {0} option.").format(ignore_opt)
+                    raise UtilRplError("{err} {note}".format(err=msg,
+                                                             note=ignore_tip))
+                else:
+                    print("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARN, False)
+                    continue
+
+            # Check SQL thread and errors (no need to check for IO errors)
+            # Note: IO errors are excepted as the master is down
+            res = slave.get_sql_error()
+
+            # First, check if server is acting as a slave
+            if not res:
+                msg = ("Server '{host}@{port}' is not acting as a "
+                       "slave.").format(host=s_host, port=s_port)
+                # Print warning or raise an error according to the default
+                # failover behavior and defined options.
+                if ((stop_on_error and not self.force)
+                    or (not stop_on_error and self.pedantic)):
+                    print("# ERROR: {0}".format(msg))
+                    self._report(msg, logging.CRITICAL, False)
+                    if stop_on_error and not self.force:
+                        ignore_opt = "with the --force"
+                    else:
+                        ignore_opt = "without the --pedantic"
+                    ignore_tip = ("Note: To ignore this issue use the "
+                                  "utility {0} option.").format(ignore_opt)
+                    raise UtilRplError("{err} {note}".format(err=msg,
+                                                             note=ignore_tip))
+                else:
+                    print("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARN, False)
+                    continue
+
+            # Now, check the SQL thread status
+            sql_running = res[0]
+            sql_errorno = res[1]
+            sql_error = res[2]
+            if sql_running == "No" or sql_errorno or sql_error:
+                msg = ("Problem detected with SQL thread for slave "
+                       "'{host}'@'{port}' that can result on a unstable "
+                       "topology.").format(host=s_host, port=s_port)
+                msg_thread = " - SQL thread running: {0}".format(sql_running)
+                if not sql_errorno and not sql_error:
+                    msg_error = " - SQL error: None"
+                else:
+                    msg_error = (" - SQL error: {errno} - "
+                                 "{errmsg}").format(errno=sql_errorno,
+                                                    errmsg=sql_error)
+                msg_tip = ("Check the slave server log to identify "
+                           "the problem and fix it. For more information, "
+                           "see: http://dev.mysql.com/doc/refman/5.6/en/"
+                           "replication-problems.html")
+                # Print warning or raise an error according to the default
+                # failover behavior and defined options.
+                if ((stop_on_error and not self.force)
+                    or (not stop_on_error and self.pedantic)):
+                    print ("# ERROR: {0}".format(msg))
+                    self._report(msg, logging.CRITICAL, False)
+                    print ("# {0}".format(msg_thread))
+                    self._report(msg_thread, logging.CRITICAL, False)
+                    print ("# {0}".format(msg_error))
+                    self._report(msg_error, logging.CRITICAL, False)
+                    print ("#  Tip: {0}".format(msg_tip))
+                    if stop_on_error and not self.force:
+                        ignore_opt = "with the --force"
+                    else:
+                        ignore_opt = "without the --pedantic"
+                    ignore_tip = ("Note: To ignore this issue use the "
+                                  "utility {0} option.").format(ignore_opt)
+                    raise UtilRplError("{err} {note}".format(err=msg,
+                                                             note=ignore_tip))
+                else:
+                    print ("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARN, False)
+                    print ("# {0}".format(msg_thread))
+                    self._report(msg_thread, logging.WARN, False)
+                    print ("# {0}".format(msg_error))
+                    self._report(msg_error, logging.WARN, False)
+                    print ("#  Tip: {0}".format(msg_tip))
+
+    def find_errant_transactions(self):
+        """Check all slaves for the existence of errant transactions.
+
+        In particular, for all slaves it search for executed transactions that
+        are not found on the other slaves (only on one slave) and not from the
+        current master.
+
+        Returns a list of tuples, each tuple containing the slave host, port
+        and set of corresponding errant transactions, i.e.:
+        [(host1, port1, set1), ..., (hostn, portn, setn)]. If no errant
+        transactions are found an empty list is returned.
+        """
+        res = []
+
+        # Get master UUID (if master is available otherwise get it from slaves)
+        use_master_uuid_from_slave = True
+        if self.master:
+            master_uuid = self.master.get_uuid()
+            use_master_uuid_from_slave = False
+
+        # Check all slaves for executed transactions not in other slaves
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            # Skip not defined or dead slaves
+            if not slave or not slave.is_alive():
+                continue
+            tnx_set = slave.get_executed_gtid_set()
+
+            # Get master UUID from salve if master is not available
+            if use_master_uuid_from_slave:
+                master_uuid = slave.get_master_uuid()
+
+            slave_set = set()
+            for others_slave_dic in self.slaves:
+                if (slave_dict['host'] != others_slave_dic['host'] or
+                    slave_dict['port'] != others_slave_dic['port']):
+                    other_slave = others_slave_dic['instance']
+                    # Skip not defined or dead slaves
+                    if not other_slave or not other_slave.is_alive():
+                        continue
+                    errant_res = other_slave.exec_query(
+                                    _GTID_SUBTRACT_TO_EXECUTED.format(tnx_set))
+
+                    # Only consider the transaction as errant if not from the
+                    # current master
+                    errant_set = set()
+                    for tnx in errant_res:
+                        if tnx[0] and not tnx[0].startswith(master_uuid):
+                            errant_set.update(tnx[0].split(',\n'))
+
+                    # Errant transactions exist on only one slave, therefore if
+                    # the returned set is empty the loop can be break
+                    # (no need to check the remaining slaves).
+                    if not errant_set:
+                        break
+
+                    slave_set = slave_set.union(errant_set)
+            # Store result
+            if slave_set:
+                res.append((slave_dict['host'], slave_dict['port'], slave_set))
+
+        return res
 
     def _check_all_slaves(self, new_master):
         """Check all slaves for errors.
@@ -917,12 +1114,12 @@ class Topology(Replication):
             if slave is None or not slave.is_alive():
                 continue
             rpl = Replication(new_master, slave, self.options)
-            # Use timeout to check slave status
+            # Use pingtime to check slave status
             iteration = 0
             slave_ok = True
-            while iteration < int(self.timeout):
+            while iteration < int(self.pingtime):
                 res = rpl.check_slave_connection()
-                if not res and iteration >= self.timeout:
+                if not res and iteration >= self.pingtime:
                     slave_error = None
                     if self.verbose:
                         res = slave.get_io_error()
@@ -936,7 +1133,7 @@ class Topology(Replication):
                                      (slave_dict['host'],
                                       slave_dict['port']), logging.WARN)
                 elif res:
-                    iteration = int(self.timeout) + 1
+                    iteration = int(self.pingtime) + 1
                 else:
                     time.sleep(1)
                     iteration += 1
@@ -989,6 +1186,32 @@ class Topology(Replication):
             return slave.supports_gtid() == "ON"
         return False
 
+    def get_servers_with_gtid_not_on(self):
+        """Get the list of servers from the topology with GTID turned off.
+
+        Note: not connected slaves will be ignored
+
+        Returns a list of tuples identifying the slaves (host, port, gtid_mode)
+                with GTID_MODE=OFF or GTID_MODE=NO (i.e., not available).
+        """
+        res = []
+        # Check master GTID_MODE
+        if self.master:
+            gtid_mode = self.master.supports_gtid()
+            if gtid_mode != "ON":
+                res.append((self.master.host, self.master.port, gtid_mode))
+
+        # Check slaves GTID_MODE
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            # skip not available or not alive slaves
+            if not slave or not slave.is_alive():
+                continue
+            gtid_mode = slave.supports_gtid()
+            if gtid_mode != "ON":
+                res.append((slave_dict['host'], slave_dict['port'], gtid_mode))
+
+        return res
 
     def get_health(self):
         """Retrieve the replication health for the master and slaves.
@@ -1247,8 +1470,10 @@ class Topology(Replication):
           reset - STOP SLAVE; RESET SLAVE;
 
         command[in]        command to execute
-        quiet[in]          If True, do not print messges
+        quiet[in]          If True, do not print messages
                            Default is False
+        :param command:
+        :param quiet:
         """
 
         assert (self.slaves is not None), \
@@ -1262,12 +1487,13 @@ class Topology(Replication):
             msg = "#   Executing %s on slave %s " % (command, hostport)
             slave = slave_dict['instance']
             # skip dead or zombie slaves
-            if slave is None or not slave.is_alive():
+            if not slave or not slave.is_alive():
                 message = "{0}WARN - cannot connect to slave".format(msg)
-                self.report(message, logging.WARN)
+                self._report(message, logging.WARN)
             elif command == 'reset':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
@@ -1278,8 +1504,9 @@ class Topology(Replication):
                 elif not quiet:
                     self._report("{0}Ok".format(msg))
             elif command == 'start':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
@@ -1290,8 +1517,9 @@ class Topology(Replication):
                 elif not quiet:
                     self._report("{0}Ok".format(msg))
             elif command == 'stop':
-                if not slave.is_configured_for_master(self.master) and \
-                   not quiet:
+                if (self.master and
+                        not slave.is_configured_for_master(self.master) and
+                        not quiet):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
@@ -1365,7 +1593,28 @@ class Topology(Replication):
             if not self.force:
                 return
 
-        if (self.verbose and self.rpl_user):
+        # Check if the slaves are configured for the specified master
+        self._report("# Checking slaves configuration to master.")
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            # Skip not defined or alive slaves (Warning displayed elsewhere)
+            if not slave or not slave.is_alive():
+                continue
+
+            if not slave.is_configured_for_master(self.master):
+                # Slave not configured for master (i.e. not in topology)
+                msg = ("Slave {0}:{1} is not configured with master {2}:{3}"
+                       ".").format(slave_dict['host'], slave_dict['port'],
+                                   self.master.host, self.master.port)
+                print("# ERROR: {0}".format(msg))
+                self._report(msg, logging.ERROR, False)
+                if not self.force:
+                    raise UtilRplError("{0} Note: If you want to ignore this "
+                                       "issue, please use the utility with the "
+                                       "--force option.".format(msg))
+
+        # Check rpl-user definitions
+        if self.verbose and self.rpl_user:
             if self.check_master_info_type("TABLE"):
                 msg = ("# When the master_info_repository variable is set to"
                        " TABLE, the --rpl-user option is ignored and the"
@@ -1380,24 +1629,60 @@ class Topology(Replication):
                 self._report(msg, logging.INFO)
 
         user, passwd = self._get_rpl_user(m_candidate)
+        if not passwd:
+            passwd = ''
 
         if not self.check_master_info_type("TABLE"):
             slave_candidate = self._change_role(m_candidate, slave=True)
             rpl_master_user = slave_candidate.get_rpl_master_user()
 
-            if user != rpl_master_user and not self.force:
-                msg = ("The replication user specified with --rpl-user does"
-                       " not match the existing replication user values. Use"
-                       " the --force option to use the replication user"
-                       " specified with --rpl-user.")
-                self._report("ERROR: %s" % msg, logging.ERROR)
-                return
+            if not self.force:
+                if (user != rpl_master_user):
+                    msg = ("The replication user specified with --rpl-user "
+                           "does not match the existing replication user.\n"
+                           "Use the --force option to use the "
+                           "replication user specified with --rpl-user.")
+                    self._report("ERROR: %s" % msg, logging.ERROR)
+                    return
+
+                # Cann't get rpl pass from remote master_repo=file
+                # but it can get the current used hashed to be compared.
+                slave_qry = slave_candidate.exec_query 
+                passwd_hash = slave_qry(_SELECT_RPL_USER_PASS_QUERY %
+                                        (user, m_candidate.host))
+                # if user does not exist passwd_hash will be an empty query.
+                #print("passwd_hash {0}".format(passwd_hash))
+                
+                if passwd_hash:
+                    passwd_hash = passwd_hash[0][3]
+                else:
+                    passwd_hash = ""
+                # now hash the given rpl password from --rpl-user.
+                rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
+                                            passwd)
+                #print("rpl_master_pass {0}".format(rpl_master_pass))
+                rpl_master_pass = rpl_master_pass[0][0]
+
+                if (rpl_master_pass != passwd_hash):
+                    if passwd == '':
+                        msg = ("The specified replication user is using a "
+                               "password (but none was specified).\n"
+                               "Use the --force option to force the use of "
+                               "the user specified with  --rpl-user and no "
+                               "password.")
+                    else:
+                        msg = ("The specified replication user is using a "
+                               "different password that the one specified.\n"
+                               "Use the --force option to force the use of "
+                               "the user specified with  --rpl-user and new "
+                               "password.")
+                    self._report("ERROR: %s" % msg, logging.ERROR)
+                    return
             self.master.exec_query(_UPDATE_RPL_USER_QUERY % (passwd, user))
-            self.master.exec_query("FLUSH PRIVILEGES;")
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
-        #user, passwd = self._get_rpl_user(m_candidate)
+
         res = m_candidate.create_rpl_user(m_candidate.host,
                                           m_candidate.port,
                                           user, passwd)
@@ -1426,12 +1711,19 @@ class Topology(Replication):
         for slave_dict in self.slaves:
             master_info = self.master.get_status()[0]
             slave = slave_dict['instance']
-            # skip dead or zombie slaves
-            if slave is None or not slave.is_alive():
+            # skip dead or zombie slaves, and print warning
+            if not slave or not slave.is_alive():
+                if self.verbose:
+                    msg = ("Slave {0}:{1} skipped (not "
+                           "reachable)").format(slave_dict['host'],
+                                                slave_dict['port'])
+                    print("# WARNING: {0}".format(msg))
+                    self._report(msg, logging.WARNING, False)
                 continue
             if gtid_enabled:
+                print_query = self.verbose and not self.quiet
                 res = slave.wait_for_slave_gtid(master_gtid, self.timeout,
-                                            self.verbose and not self.quiet)
+                                                print_query)
             else:
                 res = slave.wait_for_slave(master_info[0], master_info[1],
                                            self.timeout)
@@ -1456,10 +1748,10 @@ class Topology(Replication):
         if self.options.get("demote", False):
             self._report("# Demoting old master to be a slave to the "
                          "new master.")
-            
+
             slave = self._change_role(self.master)
             slave.stop()
-            
+
             slave_dict = {
               'host'     : self.master.host,  # host name for slave
               'port'     : self.master.port,  # port for slave
@@ -1492,16 +1784,21 @@ class Topology(Replication):
             'Read_Master_Log_Pos' : new_master_info[1],
         }
         for slave_dict in self.slaves:
-            if self.verbose:
-                self._report("# Executing CHANGE MASTER on %s:%s." %
-                             (slave_dict['host'], slave_dict['port']))
             slave = slave_dict['instance']
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
+                if self.verbose:
+                    self._report("# Skipping CHANGE MASTER for {0}:{1} (not "
+                                 "connected).".format(slave_dict['host'],
+                                                      slave_dict['port']))
                 continue
+            if self.verbose:
+                self._report("# Executing CHANGE MASTER on {0}:{1}"
+                             ".".format(slave_dict['host'],
+                                        slave_dict['port']))
             change_master = slave.make_change_master(False, master_values)
             if self.verbose:
-                self._report("# %s" % change_master)
+                self._report("# {0}".format(change_master))
             slave.exec_query(change_master)
 
         # Start all slaves
@@ -1618,7 +1915,7 @@ class Topology(Replication):
         return None
 
 
-    def failover(self, candidates, strict=False):
+    def failover(self, candidates, strict=False, stop_on_error=False):
         """Perform failover to best slave in a GTID-enabled topology.
 
         This method performs a failover to one of the candidates specified. If
@@ -1642,16 +1939,16 @@ class Topology(Replication):
         all slaves are started, the after script is run to trigger
         applications, and the slaves are checked for errors.
 
-        candidates[in] list of slave connection dictionary of candidate
-        strict[in]     if True, use only the candidate list for slave
-                       election and fail if no candidates are viable.
-                       Default = False
+        candidates[in]     list of slave connection dictionary of candidate
+        strict[in]         if True, use only the candidate list for slave
+                           election and fail if no candidates are viable.
+                           Default = False
+        stop_on_error[in]  Define the default behavior of failover if errors
+                           are found. By default: False (not stop on errors).
 
         Returns bool - True if successful,
                        raises exception if failure and forst is False
         """
-        from mysql.utilities.common.server import get_connection_dictionary
-
         # Get best slave from list of candidates
         new_master_dict = self.find_best_slave(candidates, False, strict)
         if new_master_dict is None:
@@ -1706,6 +2003,10 @@ class Topology(Replication):
                      (host, port))
 
         user, passwd = self._get_rpl_user(self._change_role(new_master))
+
+        # Check slaves for errors that might result on an unstable topology
+        self._report("# Checking slaves status (before failover).")
+        self._check_slaves_status(stop_on_error)
 
         # Prepare candidate
         self._report("# Preparing candidate for failover.")

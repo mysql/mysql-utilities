@@ -34,20 +34,24 @@ class test(export_basic.test):
 
     def setup(self):
         return export_basic.test.setup(self)
-         
+
     def run(self):
         self.res_fname = "result.txt"
-       
+
         from_conn = "--server=" + self.build_connection_string(self.server1)
-       
+
         cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
-        
+
         cmd_opts = "util_test --help"
         comment = "Test case 1 - help"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbexport.py "
+                                           "version", 6)
+
         # Now test the skips
 
         cmd_opts = "%s util_test --skip=grants" % cmd_str
@@ -90,20 +94,20 @@ class test(export_basic.test):
         comment = "Test case 8 - no tables"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",create_db"
         comment = "Test case 9 - no create_db"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)        
+            raise MUTLibError("%s: failed" % comment)
 
         cmd_opts += ",data"
         comment = "Test case 10 - no data"
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         cmd_opts = "%s util_test --format=SQL --export=definitions" % cmd_str
         comment = "Test case 11 - SQL single rows"
         res = self.run_test_case(0, cmd_opts, comment)
@@ -123,7 +127,7 @@ class test(export_basic.test):
     def test_format_and_display_values(self, cmd_opts, starting_case_num,
                                        full_format=True, no_headers=True,
                                        abbrev=True, displays=True):
-        
+
         _FORMATS = ("sql", "csv", "tab", "GRID", "VERTICAL")
         _FORMATS_ABBREV = ("SQ", "CS", "ta", "g", "v")
 
@@ -137,7 +141,7 @@ class test(export_basic.test):
                 starting_case_num += 1
                 if not res:
                     raise MUTLibError("%s: failed" % comment)
-        
+
         # Now without headers
         if no_headers:
             for format in _FORMATS:
@@ -148,7 +152,7 @@ class test(export_basic.test):
                 starting_case_num += 1
                 if not res:
                     raise MUTLibError("%s: failed" % comment)
-        
+
         # Now the abbreviations
         if abbrev:
             for format in _FORMATS_ABBREV:
@@ -161,7 +165,7 @@ class test(export_basic.test):
                     raise MUTLibError("%s: failed" % comment)
 
         # Conduct format and display combination tests
-        
+
         _DISPLAYS = ("BRIEF", "FULL", "NAMES")
         # SQL format not valid
         _FORMAT_DISPLAY = ("GRID","CSV","TAB","VERTICAL")
@@ -178,14 +182,19 @@ class test(export_basic.test):
                         raise MUTLibError("%s: failed" % comment)
 
         # Perform masking for deterministic output
-        
+
         self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("CREATE DEFINER=`root`@`localhost` EVENT `e1`",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
- 
+
+        ## Mask known source.
+        self.replace_result("# Source on localhost: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Source on [::1]: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
 
         self.remove_result("# WARNING: The server supports GTIDs")
         self._mask_grid()
@@ -359,7 +368,7 @@ class test(export_basic.test):
                             "               MAX_DATA_LENGTH: XXXXXXX\n")
         self.replace_result("                     DATA_FREE:",
                             "                     DATA_FREE: XXXXXXXXXXX\n")
-        
+
         self.replace_result("           AVG_ROW_LENGTH:",
                             "           AVG_ROW_LENGTH: XXXXXXX\n")
         self.replace_result("              DATA_LENGTH:",
@@ -378,15 +387,12 @@ class test(export_basic.test):
                             "            TRIGGER_CATALOG: None\n")
         self.replace_result("       EVENT_OBJECT_CATALOG: def",
                             "       EVENT_OBJECT_CATALOG: None\n")
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return export_basic.test.cleanup(self)
-
-
-

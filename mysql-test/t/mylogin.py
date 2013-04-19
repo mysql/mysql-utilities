@@ -17,7 +17,7 @@
 
 import mutlib
 
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import parse_user_password
 
 

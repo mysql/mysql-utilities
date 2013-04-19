@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+import time
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
@@ -24,13 +25,15 @@ class test(mutlib.System_test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
     
-    Note: this test will run against older servers. See rpl_admin_gtid
-    test for test cases for GTID enabled servers.
+    Note: this test will run against servers without GTID enabled.
+    See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version prior to 5.6.5")
+        if not self.servers.get_server(0).check_version_compat(5, 5, 30):
+            raise MUTLibError("Test requires server version 5.5.30 or later.")
+        if self.servers.get_server(0).supports_gtid() == "ON":
+            raise MUTLibError("Test requires servers without GTID enabled.")
         return self.check_num_servers(1)
 
     def spawn_server(self, name, mysqld=None, kill=False):
@@ -71,7 +74,7 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.res_fname = "result.txt"
-        
+
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         self.server1 = self.spawn_server("rep_master")
@@ -79,14 +82,20 @@ class test(mutlib.System_test):
         self.server3 = self.spawn_server("rep_slave2")
         self.server4 = self.spawn_server("rep_slave3")
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master()
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
-        
+
         for slave in [self.server2, self.server3, self.server4]:
+            slave.exec_query("SET SQL_LOG_BIN= 0")
             slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                              "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+                              "'rpl'@'%s' IDENTIFIED BY 'rpl'" %
+                              self.server1.host)
+            slave.exec_query("SET SQL_LOG_BIN= 1")
 
         # Form replication topology - 1 master, 3 slaves
         return self.reset_topology()
@@ -151,28 +160,55 @@ class test(mutlib.System_test):
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
 
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " health --disc=root:root "
-        cmd_opts += "--slaves=%s" % slaves_loopback
-        comment= "Test case %s - health with loopback and discovery" % test_num
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+        cmd_str = ("mysqlrpladmin.py --master={0} health "
+                   "--slaves={1}").format(master_conn, slaves_loopback)
+        comment = "Test case {0} - health with loopback".format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        # Perform stop, start, and reset
+        cmd_str = ("mysqlrpladmin.py --master={0} health "
+                   "--disc=root:root").format(master_conn)
+        comment = "Test case {0} - health with discovery".format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Perform stop, start, and reset (with --master option)
         commands = ['stop', 'start', 'stop', 'reset']
         for cmd in commands:
-            comment = "Test case %s - run command %s" % (test_num, cmd)
-            cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-            cmd_opts = " --slaves=%s %s" % (slaves_str, cmd)
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                                   comment)
+            comment = ("Test case {0} - run command {1} with "
+                       "--master").format(test_num, cmd)
+            cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} "
+                       "{2}").format(master_conn, slaves_str, cmd)
+            res = self.run_test_case(0, cmd_str, comment)
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
-            
+            # START SLAVE is asynchronous and it can take some time to complete
+            # on slow servers
+            if cmd == 'start':
+                time.sleep(3)  # wait 3 second for START to finish
+
+        # Needed to reset the topology here to run with 5.1 servers.
+        # Note: With 5.1 servers after reset commands slaves seem to forgot
+        # about their master.
+        self.reset_topology()
+
+        # Perform stop, start, and reset (without --master option)
+        commands = ['start', 'stop', 'reset']
+        for cmd in commands:
+            comment = ("Test case {0} - run command {1} without "
+                       "--master").format(test_num, cmd)
+            cmd_str = ("mysqlrpladmin.py --slaves={0} "
+                       "{1}").format(slaves_str, cmd)
+            res = self.run_test_case(0, cmd_str, comment)
+            if not res:
+                raise MUTLibError("%s: failed" % comment)
+            test_num += 1
+
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 
@@ -186,22 +222,64 @@ class test(mutlib.System_test):
         self.replace_substring(str(self.s1_port), "PORT2")
         self.replace_substring(str(self.s2_port), "PORT3")
         self.replace_substring(str(self.s3_port), "PORT4")
-        
-    def reset_topology(self):
-        # Form replication topology - 1 master, 3 slaves
+
+        self.replace_substring(": NO", ": XXX")  # for columns.
+        self.replace_substring("| NO ", "| XXX")
+        self.replace_substring("OFF", "XXX")
+
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health  |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 2 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 3 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 4 seconds behind master., "
+                               "No  |", "| OK      |")
+
+    def reset_master(self, servers_list=[]):
+        # Clear binary log and GTID_EXECUTED of given servers
+        if servers_list:
+            servers = servers_list
+        else:
+            servers = [self.server1, self.server2, self.server3, self.server4]
+        for srv in servers:
+            try:
+                srv.exec_query("RESET MASTER")
+            except Exception as err:
+                raise MUTLibError("Unexpected error performing RESET MASTER "
+                                  "for server %s:%s: %s"
+                                  % (srv.host, srv.port, err))
+
+    def reset_topology(self, slaves_list=[]):
+        if slaves_list:
+            slaves = slaves_list
+        else:
+            # Default replication topology - 1 master, 3 slaves
+            slaves = [self.server2, self.server3, self.server4]
         self.master_str = " --master=%s" % \
                           self.build_connection_string(self.server1)
-        for slave in [self.server1, self.server2, self.server3, self.server4]:
+
+        servers = [self.server1]
+        servers.extend(slaves)
+        for slave in servers:
             try:
                 slave.exec_query("STOP SLAVE")
                 slave.exec_query("RESET SLAVE")
             except:
                 pass
-        
-        for slave in [self.server2, self.server3, self.server4]:
+
+        for slave in slaves:
             slave_str = " --slave=%s" % self.build_connection_string(slave)
             conn_str = self.master_str + slave_str
-            cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+            cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s -vvv" % conn_str
             res = self.exec_util(cmd, self.res_fname)
             if res != 0:
                 return False

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ _EXCLUDE_UTILS = ['mysqluc','mysqlfrm',]
 
 def get_util_path(default_path=''):
     """Find the path to the MySQL utilities
-    
-    This method will attempt to 
-    
+
+    This method will attempt to
+
     default_path[in]   provides known location of utilities
                        if provided, method will search this location first
                        before searching PYTHONPATH
@@ -60,22 +60,22 @@ def get_util_path(default_path=''):
 
     needle_name = 'mysqlreplicate'
     needles = [needle_name + ".py"]
-    if os.name == "nt": 
+    if os.name == "nt":
         needles.append(needle_name + ".exe")
-    else: 
+    else:
         needles.append(needle_name)
 
     # Try the default by itself
     path_found = _search_paths(needles, [default_path])
     if path_found:
-        return path_found 
+        return path_found
 
-    # Try the pythonpath environment variable    
+    # Try the pythonpath environment variable
     pythonpath = os.getenv("PYTHONPATH")
     if pythonpath:
         #This is needed on windows without a python setup, cause needs to
         #find the executable scripts.
-        path = _search_paths(needles, [os.path.join(n, "../") 
+        path = _search_paths(needles, [os.path.join(n, "../")
                                        for n in pythonpath.split(";", 1)])
         if path:
             return path
@@ -94,11 +94,11 @@ def get_util_path(default_path=''):
 class Utilities(object):
     """The utilities class can be used to discover what utilities are installed
     on the system as well as the usage and options for each utility.
-    
+
     The list of utilities are read at initialization.
-    
+
     This class is designed to support the following operations:
-    
+
         get_util_matches()    - find all utilities that match a prefix
         get_option_matches()  - find all options that match a prefix for a
                                 given utility
@@ -113,7 +113,7 @@ class Utilities(object):
     def __init__(self, options={}):
         """Constructor
         """
-        
+
         self.util_list = []
         self.width = options.get('width', _MAX_WIDTH)
         self.util_path = get_util_path(options.get('utildir', ''))
@@ -122,17 +122,18 @@ class Utilities(object):
 
     def find_utilities(self):
         """ Locate the utility scripts
-        
+
         This method builds a list of utilities.
         """
-        pattern_usage = ("(?P<Usage>Usage:\s.*?)\w+\s\-\s" #this match first
+        pattern_usage = ("(?P<Version>.*?)"
+                         "(?P<Usage>Usage:\s.*?)\w+\s\-\s" #this match first
                          # section <Usage> matching all till find a " - "
                          "(?P<Description>.*?)" # Description is the text next
                          # to " - " and till next match.
                          "(?P<O>\w*):"  # This is beginning of Options section
                          "(?P<Options>.*)" # this match  the utility options
                          )
-        self.program_usage = re.compile(pattern_usage, re.S)    
+        self.program_usage = re.compile(pattern_usage, re.S)
 
         pattern_options = ("^(?P<Alias>\s\s\-.*?)\s{2,}" # Option Alias
                            # followed by 2 o more spaces is his description
@@ -158,32 +159,32 @@ class Utilities(object):
             if (parts[0] not in _EXCLUDE_UTILS and
                 (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
                 util_name = str(parts[0])
-                if util_name not in working_utils: 
-                    util_info = self._get_util_info(self.util_path, util_name, 
+                if util_name not in working_utils:
+                    util_info = self._get_util_info(self.util_path, util_name,
                                                     file_name, parts[1])
                     if util_info and util_info["usage"]:
                         self.util_list.append(util_info)
                         working_utils.append(util_name)
 
         self.util_list.sort(key=lambda util_list:util_list['name'])
-    
+
 
     def _get_util_info(self, util_path, util_name, file_name, file_ext):
         """Get information about utility
-        
+
         util_path[in]  path to utilities
         util_name[in]  name of utility to get information
-        
+
         Returns dictionary - name, description, usage, options
         """
         # Get the --help output for the utility
         command = util_name + ".py"
         if not os.path.exists(os.path.join(util_path, command)):
-            command = file_name 
+            command = file_name
         cmd = []
         if not file_ext == '.exe':
             cmd.append('python ')
-        
+
         cmd += ['"', os.path.join(util_path, command), '"', " --help"]
 
         # Hide errors from stderr output
@@ -200,6 +201,7 @@ class Utilities(object):
         option = None
 
         res = self.program_usage.match(stdout_temp.replace("\r", ""))
+
         Options = ""
         if not res:
             return None
@@ -207,13 +209,13 @@ class Utilities(object):
             usage = res.group("Usage").replace("\n", "")
             desc_clean = res.group("Description").replace("\n", " ").split()
             description = (" ".join(desc_clean)) + " "
-            #standardize string. 
+            #standardize string.
             Options =  res.group("Options") + "\n  -"
 
         res = self.program_options.findall(Options)
 
         for opt in res:
-            option = {}          
+            option = {}
             name = self.program_option.search(opt[0] + " ")
             if name:
                 option['name'] = str(name.group(1))
@@ -241,13 +243,13 @@ class Utilities(object):
             'options'     : options
         }
         return utility_data
-    
-    
+
+
     def get_util_matches(self, util_prefix):
         """Get list of utilities that match a prefix
-        
+
         util_prefix[in] prefix for name of utility
-        
+
         Returns dictionary entry for utility based on matching first n chars
         """
         matches = []
@@ -257,16 +259,16 @@ class Utilities(object):
             if util['name'][0:len(util_prefix)].lower() == util_prefix:
                 matches.append(util)
         return matches
- 
-    
+
+
     def get_option_matches(self, util_info, option_prefix, find_alias=False):
         """Get list of option dictionary entries for options that match
         the prefix.
-        
+
         util_info[in]     utility information
         option_prefix[in] prefix for option name
         find_alias[in]    if True, match alias (default = False)
-        
+
         Returns list of dictionary items that match prefix
         """
         # Check type of util_info
@@ -275,7 +277,7 @@ class Utilities(object):
             raise UtilError("Empty or invalide utility dictionary.")
 
         matches = []
-        
+
         stop = len(option_prefix)
         for option in util_info['options']:
             if option is None:
@@ -286,20 +288,20 @@ class Utilities(object):
             if find_alias:
                 if option.get('alias', '') == option_prefix:
                     matches.append(option)
-            else:   
+            else:
                 if name[0:stop] == option_prefix:
                     matches.append(option)
-        
+
         return matches
-    
-    
+
+
     def show_utilities(self, list=None):
         """Show list of utilities as a 2-column list.
-        
+
         list[in]       list of utilities to print - default is None
                        which means print all utilities
         """
-        
+
         if list is None:
             list_of_utilities = self.util_list
         else:
@@ -308,21 +310,21 @@ class Utilities(object):
         if len(list_of_utilities) > 0:
             print_dictionary_list(['Utility', 'Description'],
                                   ['name', 'description'],
-                                  list_of_utilities, self.width)        
+                                  list_of_utilities, self.width)
         else:
             print
             print "No utilities match the search term."
         print
 
-    
+
     def get_options_dictionary(self, options):
         """Retrieve the options dictionary.
-        
+
         This method builds a new dictionary that contains the options for the
         utilities read.
-        
+
         options[in]        list of options for utilities.
-        
+
         Return dictionary - list of options for all utilities.
         """
         dictionary_list = []
@@ -339,33 +341,33 @@ class Utilities(object):
                 'description' : option.get('description', '')
             }
             dictionary_list.append(item)
-        
+
         return dictionary_list
 
-        
+
     def show_options(self, options):
         """Show list of options for a utility by name.
-        
+
         options[in]    structure containing the options
-        
+
         This method displays a list of the options and their descriptions
         for the given utility.
-        """  
+        """
         if len(options) > 0:
             dictionary_list = self.get_options_dictionary(options)
             print
             print
             print_dictionary_list(['Option', 'Description'],
                                   ['long_name', 'description'],
-                                  dictionary_list, self.width)        
+                                  dictionary_list, self.width)
             print
 
 
     def get_usage(self, util_info):
         """Get the usage statement for the utility
-        
+
         util_info[in]  dictionary entry for utility information
-        
+
         Returns string usage statement
         """
         # Check type of util_info

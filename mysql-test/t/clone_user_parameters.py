@@ -48,12 +48,18 @@ class test(clone_user.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqluserclone.py "
+                                           "version", 6)
+
         comment = "Test case 3 - use the quiet parameter"
         res = self.run_test_case(0, cmd_str + "joe_nopass@user --force" + \
                                  " jack@user john@user jill@user --quiet ",
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        self.replace_substring("on [::1]", "on localhost")
 
         return True
 

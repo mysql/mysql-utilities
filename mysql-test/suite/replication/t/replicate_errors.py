@@ -58,7 +58,7 @@ class test(replicate.test):
 
         comment = "Test case 3 - error: invalid login to server (master)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        slave_str + " --master=nope@nada:localhost:5510 " +
+                        slave_str + " --master=nope:nada@localhost:5510 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -67,7 +67,7 @@ class test(replicate.test):
         
         comment = "Test case 4 - error: invalid login to server (slave)"
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        master_str + " --slave=nope@nada:localhost:5511 " +
+                        master_str + " --slave=nope:nada@localhost:5511 " +
                         "--rpl-user=rpl:whatsit", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -110,7 +110,7 @@ class test(replicate.test):
         cmd_str += slave_str
         
         comment = "Test case 6 - error: No binary logging on master"
-        cmd = cmd_str + "--rpl-user=rpl:whatsit "
+        cmd = cmd_str + " --rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -144,7 +144,7 @@ class test(replicate.test):
         self.server2.exec_query("SET GLOBAL server_id = 0")
         
         comment = "Test case 8 - error: Master server id = 0"
-        cmd = cmd_str + "--rpl-user=rpl:whatsit "
+        cmd = cmd_str + " --rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -159,7 +159,7 @@ class test(replicate.test):
         self.server1.exec_query("SET GLOBAL server_id = 0")
         
         comment = "Test case 9 - error: Slave server id = 0"
-        cmd = cmd_str + "--rpl-user=rpl:whatsit "
+        cmd = cmd_str + " --rpl-user=rpl:whatsit "
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

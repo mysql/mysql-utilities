@@ -264,6 +264,10 @@ class test(mutlib.System_test):
         self.replace_result("         VERSION:",
                             "         VERSION: ...\n")
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep.py "
+                                           "version", 6)
+
     def get_result(self):
         return self.compare(__name__, self.results)
 

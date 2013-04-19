@@ -31,7 +31,7 @@ import sys
 import time
 
 from mysql.utilities.command import dbimport
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import setup_common_options, add_engines
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity

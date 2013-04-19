@@ -25,7 +25,7 @@ import sys
 import re
 
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 
 _COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
             'config_file', 'binary_log', 'binary_log_pos', 'relay_log',

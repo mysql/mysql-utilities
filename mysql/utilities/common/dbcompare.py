@@ -14,9 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+import re
+
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.database import Database
 
 """
 This file contains the methods for checking consistency among two databases.
@@ -72,6 +77,9 @@ _COMPARE_SPAN_QUERY = """
     SELECT * FROM {db}.{table} WHERE {where}
 """
 
+_RE_EMPTY_ALTER_TABLE = "^ALTER TABLE {0};$".format(REGEXP_QUALIFIED_OBJ_NAME)
+
+
 def _get_objects(server, database, options):
     """Get all objects from the database (except grants)
     
@@ -97,13 +105,13 @@ def _get_objects(server, database, options):
 
 def get_create_object(server, object_name, options):
     """Get the object's create statement.
-    
+
     This method retrieves the object create statement from the database.
-    
+
     server[in]        server connection
     object_name[in]   name of object in the form db.objectname
     options[in]       options: verbosity, quiet
-    
+
     Returns string : create statement or raise error if object or db not exist
     """
     from mysql.utilities.common.database import Database
@@ -111,7 +119,8 @@ def get_create_object(server, object_name, options):
     verbosity = options.get("verbosity", 0)
     quiet = options.get("quiet", False)
 
-    db_name, sep, obj_name = object_name.partition(".")
+    m_obj = re.match(REGEXP_QUALIFIED_OBJ_NAME, object_name)
+    db_name, obj_name = m_obj.groups()
     object = [db_name]
 
     db = Database(server, object[0], options)
@@ -130,7 +139,7 @@ def get_create_object(server, object_name, options):
             raise UtilDBError("The object {0} does not exist.".
                               format(object_name))
     create_stmt = db.get_create_statement(object[0], object[1], obj_type)
-        
+
     if verbosity > 0 and not quiet:
         print "\n# Definition for object {0}:".format(object_name)
         print create_stmt 
@@ -300,10 +309,10 @@ def _get_diff(list1, list2, object1, object2, difftype):
 
 def _get_transform(server1, server2, object1, object2, options):
     """Get the transformation SQL statements
-    
+
     This method generates the SQL statements to transform the destination
     object based on direction of the compare.
-    
+
     server1[in]        first server connection
     server2[in]        second server connection
     object1            the first object in the compare in the form: (db.name)
@@ -317,49 +326,108 @@ def _get_transform(server1, server2, object1, object2, options):
     from mysql.utilities.common.sql_transform import SQLTransformer
 
     obj_type = None
-    direction = options.get("changes-for", "server1")
 
-    # If there is no dot, we do not have the format 'db_name.obj_name' for
-    # object1 and therefore must treat it as a database name.
-    if object1.find('.') == -1:
+    try:
+        m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
+        db1, name1 = m_obj1.groups()
+        m_obj2 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object2)
+        db2, name2 = m_obj2.groups()
+    except:
+            raise UtilError("Invalid object name arguments for _get_transform"
+                            "(): %s, %s." % (object1, object2))
+    # If the second part of the object qualified name is None, then the format
+    # is not 'db_name.obj_name' for object1 and therefore must treat it as a
+    # database name. (supports backticks and the use of '.' (dots) in names.)
+    if not name1:
         obj_type = "DATABASE"
-        
+
         # We are working with databases so db and name need to be set
         # to the database name to tell the get_object_definition() method
         # to retrieve the database information.
-        db1 = object1
-        db2 = object2
-        name1 = object1
-        name2 = object2
-    else:
-        try:
-            db1, name1 = object1.split('.')
-            db2, name2 = object2.split('.')
-        except:
-            raise UtilError("Invalid object name arguments for _get_transform"
-                            "(): %s, %s." % (object1, object2))
-            
+        name1 = db1
+        name2 = db2
+
     db_1 = Database(server1, db1, options)
     db_2 = Database(server2, db2, options)
-    
-    if obj_type is None:
+
+    if not obj_type:
         obj_type = db_1.get_object_type(name1)
 
-    transform_str = []
     obj1 = db_1.get_object_definition(db1, name1, obj_type)
     obj2 = db_2.get_object_definition(db2, name2, obj_type)
-    
+
     # Get the transformation based on direction.
     transform_str = []
-    same_db_name = True
     xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], obj_type,
                            options.get('verbosity', 0))
 
     differences = xform.transform_definition()
-    if differences is not None and len(differences) > 0:
+    if differences and len(differences) > 0:
         transform_str.extend(differences)
 
     return transform_str
+
+
+def _check_tables_structure(server1, server2, object1, object2, options):
+    """Check if the tables have the same structure
+
+    This method compares the tables structure, ignoring the order of the
+    definitions.
+
+    server1[in]        first server connection
+    server2[in]        second server connection
+    object1            the first object in the compare in the form: (db.name)
+    object2            the second object in the compare in the form: (db.name)
+    options[in]        a dictionary containing the options for the operation:
+                       (quiet, verbosity, difftype, width, suppress_sql)
+
+    Returns bool - True if tables have the same structure
+    """
+    try:
+        m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
+        db1, name1 = m_obj1.groups()
+        m_obj2 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object2)
+        db2, name2 = m_obj2.groups()
+    except:
+        raise UtilError("Invalid object name arguments for diff_objects"
+                        "(): %s, %s." % (object1, object2))
+
+    # If the second part of the object qualified name is None, then the format
+    # is not 'db_name.obj_name' for object1 and therefore must treat it as a
+    # database name.
+    if not name1:
+        return False
+
+    db_1 = Database(server1, db1, options)
+    db_2 = Database(server2, db2, options)
+
+    obj_type = db_1.get_object_type(name1)
+
+    if obj_type != "TABLE":
+        # Objects are not tables
+        return False
+
+    # Get tables definition
+    table_1 = db_1.get_object_definition(db1, name1, obj_type)[0]
+    table_2 = db_2.get_object_definition(db2, name2, obj_type)[0]
+
+    # Check tables info, discard TABLE_SCHEMA, AUTO_INCREMENT and AVG_ROW_LENGTH
+    for i in range(10):
+        if i not in (0, 3, 4) and table_1[0][i] != table_2[0][i]:
+            return False
+
+    # Check if both tables have the same columns definition
+    # Discard column order
+    table_1_cols = [col[1:] for col in table_1[1]]
+    table_2_cols = [col[1:] for col in table_2[1]]
+    if not set(table_1_cols) == set(table_2_cols):
+        return False
+
+    # Check if both tables have the same partitions definition
+    # Discard part name
+    table_1_part = [part[1:] for part in table_1[2]]
+    table_2_part = [part[1:] for part in table_2[2]]
+    return set(table_1_part) == set(table_2_part)
 
 
 def build_diff_list(diff1, diff2, transform1, transform2,
@@ -455,7 +523,7 @@ def diff_objects(server1, server2, object1, object2, options):
     verbosity = options.get("verbosity", 0)
     difftype = options.get("difftype", "unified")
     width = options.get("width", 75)
-    direction = options.get("changes-for", "server1")
+    direction = options.get("changes-for", None)
     reverse = options.get("reverse", False)
 
     object1_create = get_create_object(server1, object1, options)
@@ -477,7 +545,7 @@ def diff_objects(server1, server2, object1, object2, options):
     transform_server2 = []
 
     # Get the difference based on direction.
-    if direction == 'server1' or reverse:
+    if direction == 'server1' or direction is None or reverse:
         diff_server1 = _get_diff(object1_create_list,
                                  object2_create_list,
                                  object1, object2, difftype)
@@ -497,7 +565,7 @@ def diff_objects(server1, server2, object1, object2, options):
 
 
     # Build diff list
-    if direction == 'server1':
+    if direction == 'server1' or direction is None:
         diff_list = build_diff_list(diff_server1, diff_server2,
                                     transform_server1, transform_server2,
                                     'server1', 'server2', options)
@@ -505,7 +573,26 @@ def diff_objects(server1, server2, object1, object2, options):
         diff_list = build_diff_list(diff_server2, diff_server1,
                                     transform_server2, transform_server1,
                                     'server2', 'server1', options)
-    
+
+    same_table_structure  = _check_tables_structure(server1, server2,
+                                                    object1, object2, options)
+
+    # Check if ALTER TABLE statement have changes. If not, is probably because
+    # there are differences but they have no influence on the create table,
+    # such as different order on indexes.
+    if diff_list and same_table_structure and \
+       re.match(_RE_EMPTY_ALTER_TABLE, diff_list[1]):
+        print("[PASS]")
+        return None
+
+    if diff_list and direction is None and same_table_structure:
+        if not quiet:
+            print("[PASS]")
+            print("# WARNING: The tables structure is the same, but the order "
+                  "of some definitions is different. Use --change-for to "
+                  "take the order into account.")
+        return None
+
     # Check for failure to generate SQL statements
     if (difftype == 'sql') and \
        ((direction == 'server1' and transform_server1 == [] \
@@ -717,7 +804,8 @@ def _get_rows_span(table, span):
             _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                  span=row))
         pk = res1[0][2:len(res1[0])-1]
-        pkeys = [col[0] for col in table.get_primary_index()]
+        pkeys = [quote_with_backticks(col[0]) \
+                        for col in table.get_primary_index()]
         where_clause = ' AND '.join("{0} = '{1}'".
                                     format(key, col)
                                     for key, col in zip(pkeys, pk))

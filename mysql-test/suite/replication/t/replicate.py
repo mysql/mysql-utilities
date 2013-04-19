@@ -199,6 +199,9 @@ class test(mutlib.System_test):
     
     def cleanup(self):
         if self.res_fname:
-            os.unlink(self.res_fname)
+            try:
+                os.unlink(self.res_fname)
+            except:
+                pass
         return True
 

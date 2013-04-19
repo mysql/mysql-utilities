@@ -41,6 +41,10 @@ class test(check_index.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlindexcheck.py"
+                                           " version", 6)
+
         comment = "Test case 2 - show drops for a table with dupe indexes"
         res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops "
                                  "-vv", comment)
@@ -83,6 +87,9 @@ class test(check_index.test):
         if not res:
             return False
 
+        # Mask known source host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
 
         return True
 

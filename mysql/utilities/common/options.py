@@ -21,7 +21,6 @@ parsing among the multiple utilities.
 
 Methods:
   setup_common_options()     Setup standard options for utilities
-  parse_connection()         Parse connection parameters
 """
 
 import copy
@@ -36,11 +35,23 @@ from optparse import Option as CustomOption, OptionValueError as ValueError
 
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.my_print_defaults import my_login_config_exists
-from mysql.utilities.common.my_print_defaults import my_login_config_path
 
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
 _PERMITTED_RPL_DUMP = ["master", "slave"]
+
+
+class UtilitiesParser(optparse.OptionParser):
+    """Special subclass of parser that allows showing of version information
+       when --help is used.
+    """
+
+    def print_help(self):
+        """Show version information before help
+        """
+        print self.version
+        optparse.OptionParser.print_help(self)
+
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -111,7 +122,7 @@ def setup_common_options(program_name, desc_str, usage_str,
     Returns parser object
     """
 
-    parser = optparse.OptionParser(
+    parser = UtilitiesParser(
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,
@@ -244,13 +255,13 @@ def check_verbosity(options):
         options.verbosity = None
 
 
-def add_changes_for(parser):
+def add_changes_for(parser, default="server1"):
     """Add the changes_for option.
 
     parser[in]        the parser instance
     """
     parser.add_option("--changes-for", action="store", dest="changes_for",
-                      type="choice", default="server1", help="specify the "
+                      type="choice", default=default, help="specify the "
                       "server to show transformations to match the other "
                       "server. For example, to see the transformation for "
                       "transforming server1 to match server2, use "
@@ -586,217 +597,6 @@ def obj2sql(obj):
     return MySQLConverter().quote(obj)
 
 
-_CONN_USERPASS = re.compile(
-    r"(\w+)"                     # User name
-    r"(?:\:(\w+))?"              # Optional password
-    )
-
-_CONN_LOGINPATH = re.compile(
-    r"(\w+)"                     # login-path
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
-
-_CONN_QUOTEDHOST = re.compile(
-    r"((?:^[\'].*[\'])|(?:^[\"].*[\"]))" # quoted host name
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
-
-_CONN_IPv4 = re.compile(
-    # we match either: labels sized from 1-63 chars long, first label has alpha character
-    # or we match IPv4 addresses
-    # it is missing a RE for IPv6
-    r"((?:(?:(?:(?!-)(?:[\w\d-])*[A-Za-z](?:[\w\d-])*(?:(?<!-))){1,63})"
-     "(?:(?:\.)?(?:(?!-)[\w\d-]{1,63}(?<!-)))*|"
-     "(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))))"
-                                 # Domain name or IP address
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
-
-_CONN_IPv4_NUM_ONLY = re.compile(
-    # we match IPv4 addresses only
-    r"(?:[\d]{1,3}(?:\.[\d]{1,3})(?:\.[\d]{1,3})(?:\.[\d]{1,3}))"
-    )
-
-_CONN_IPv6 = re.compile(
-    r"((?!.*::.*::)"             # Only a single whildcard allowed
-     "(?:(?!:)|:(?=:))"          # Colon iff it would be part of a wildcard
-     "(?:"                       # Repeat 6 times:
-     "[0-9a-f]{0,4}"             #   A group of at most four hexadecimal digits
-     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceded by wildcard
-     "){6}(?:"                   # Either
-     "[0-9a-f]{0,4}"             #   Another group
-     "(?:(?<=::)|(?<!::):)"      #   Colon unless preceded by wildcard
-     "[0-9a-f]{0,4}"             #   Last group
-     "(?:(?<=::)"                #   Colon iff preceded by exacly one colon
-     "|(?<!:)|(?<=:)(?<!::) :)"  # OR
-     "|"                         #   A v4 address with NO leading zeros
-     "(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)"
-     "(?: \.(?:25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))"
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
-
-_BAD_CONN_FORMAT = ("Connection '{0}' cannot be parsed. Please review the "
-                    "used connection string (accepted formats: "
-                    "<user>[:<password>]@<host>[:<port>][:<socket>] or "
-                    "<login-path>[:<port>][:<socket>])")
-_BAD_QUOTED_HOST = "Connection '{0}' has a malformed quoted host"
-
-
-def hostname_is_ip(hostname):
-    """Determine hostname is an IP address.
-
-    Return bool - True = is IP address
-    """
-    if len(hostname.split(":")) <= 3:  # if fewer colons, must be IPv4
-        grp = _CONN_IPv4_NUM_ONLY.match(hostname)
-    else:
-        grp = _CONN_IPv6.match(hostname)
-    if not grp:
-        return False
-    return True
-
-
-def parse_connection(connection_values, my_defaults_reader=None, options={}):
-    """Parse connection values.
-
-    The function parses a connection specification of one of the forms::
-
-      - user[:password]@host[:port][:socket]
-      - login-path[:port][:socket]
-
-    A dictionary is returned containing the connection parameters. The
-    function is designed so that it shall be possible to use it with a
-    ``connect`` call in the following manner::
-
-      options = parse_connection(spec)
-      conn = mysql.connector.connect(**options)
-
-    conn_values[in]         Connection values in the form:
-                            user:password@host:port:socket
-                            or login-path:port:socket
-    my_defaults_reader[in]  Instance of MyDefaultsReader to read the
-                            information of the login-path from configuration
-                            files. By default, the value is None.
-    options[in]             Dictionary of options (e.g. basedir), from the used
-                            utility. By default, it set with an empty
-                            dictionary. Note: also supports options values
-                            from optparse.
-
-    Notes:
-
-    This method validates IPv4 addresses and standard IPv6 addresses.
-
-    This method accepts quoted host portion strings. If the host is marked
-    with quotes, the code extracts this without validation and assigns it to
-    the host variable in the returned tuple. This allows users to specify host
-    names and IP addresses that are outside of the supported validation.
-
-    Returns dictionary (user, passwd, host, port, socket)
-            or raise an exception if parsing error
-    """
-
-    def _match(pattern, search_str):
-        grp = pattern.match(search_str)
-        if not grp:
-            raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
-        return grp.groups()
-
-    # Split on the '@' to determine the connection string format.
-    conn_format = connection_values.split('@')
-
-    if len(conn_format) == 1:
-        # No '@' then handle has in the format: login-path[:port][:socket]
-        login_path, port, socket = _match(_CONN_LOGINPATH, conn_format[0])
-
-        #Check if the login configuration file (.mylogin.cnf) exists
-        if login_path and not my_login_config_exists():
-            raise UtilError(".mylogin.cnf was not found at is default "
-                            "location: %s."
-                            "Please configure your login-path data before "
-                            "using it (use the mysql_config_editor tool)."
-                            % my_login_config_path())
-
-        # If needed, create a MyDefaultsReader and search for my_print_defaults
-        # tool.
-        if not my_defaults_reader:
-            my_defaults_reader = MyDefaultsReader(options)
-        elif not my_defaults_reader.tool_path:
-            my_defaults_reader.search_my_print_defaults_tool()
-
-        # Check if the my_print_default tool is able to read a login-path from
-        # the mylogin configuration file
-        if not my_defaults_reader.check_login_path_support():
-            raise UtilError("the used my_print_defaults tool does not "
-                            "support login-path options: %s. "
-                            "Please confirm that the location to a tool with "
-                            "login-path support is included in the PATH "
-                            "(at the beginning)."
-                            % my_defaults_reader.tool_path)
-
-        # Read and parse the login-path data (i.e., user, password and host)
-        login_path_data = my_defaults_reader.get_group_data(login_path)
-
-        if login_path_data:
-            user = login_path_data.get('user', None)
-            passwd = login_path_data.get('password', None)
-            host = login_path_data.get('host', None)
-            if not port:
-                port = login_path_data.get('port', 3306)
-            if not socket:
-                socket = login_path_data.get('socket', None)
-        else:
-            raise UtilError("No login credentials found for login-path: %s. "
-                            "Please review the used connection string: %s"
-                            % (login_path, connection_values))
-
-    elif len(conn_format) == 2:
-
-        # Handle as in the format: user[:password]@host[:port][:socket]
-        userpass, hostportsock = conn_format
-
-        # Get user, password
-        user, passwd = _match(_CONN_USERPASS, userpass)
-
-        # Handle host, port and socket
-        if len(hostportsock) <= 0:
-            raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
-
-        if hostportsock[0] in ['"', "'"]:
-            # need to strip the quotes
-            host, port, socket = _match(_CONN_QUOTEDHOST, hostportsock)
-            if host[0] == '"':
-                host = host.strip('"')
-            if host[0] == "'":
-                host = host.strip("'")
-        elif len(hostportsock.split(":")) <= 3:  # if fewer colons, must be IPv4
-            host, port, socket = _match(_CONN_IPv4, hostportsock)
-        else:
-            host, port, socket = _match(_CONN_IPv6, hostportsock)
-
-    else:
-        # Unrecognized format
-        raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
-
-    # Set parsed connection values
-    connection = {
-        "user"   : user,
-        "host"   : host,
-        "port"   : int(port) if port else 3306,
-        "passwd" : passwd if passwd else ''
-    }
-
-    # Handle optional parameters. They are only stored in the dict if
-    # they were provided in the specifier.
-    if socket is not None and os.name == "posix":
-        connection['unix_socket'] = socket
-
-    return connection
-
-
 def parse_user_password(userpass_values, my_defaults_reader=None, options={}):
     """ This function parses a string with the user/password credentials.
 
@@ -886,6 +686,12 @@ def add_basedir_option(parser):
 def check_basedir_option(parser, opt_basedir):
     """ Check if the specified --basedir option is valid.
     """
-    if opt_basedir and not os.path.isdir(opt_basedir):
+    if opt_basedir and not os.path.isdir(get_absolute_path(opt_basedir)):
         parser.error("The specified path for --basedir option is not a "
                      "directory: %s" % opt_basedir)
+
+
+def get_absolute_path(path):
+    """ Returns the absolute path.
+    """
+    return os.path.abspath(os.path.expanduser(os.path.normpath(path)))

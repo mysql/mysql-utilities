@@ -30,7 +30,8 @@ import os
 import sys
 import time
 from mysql.utilities.command.dbexport import export_databases
-from mysql.utilities.common.options import parse_connection, add_regexp
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity

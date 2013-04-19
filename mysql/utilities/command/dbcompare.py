@@ -421,10 +421,11 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         raise UtilDBError(_ERROR_DB_MISSING.format(db2))
 
     message = "# Checking databases {0} on server1 and {1} on server2\n#"
-    print message.format(db1, db2)
+    print message.format(db1_conn.db_name, db2_conn.db_name)
     
     # Check for database existance and CREATE differences
-    _check_databases(server1, server2, db1, db2, options)
+    _check_databases(server1, server2, db1_conn.q_db_name, db2_conn.q_db_name,
+                     options)
 
     # Get common objects and report discrepencies
     in_both = _check_objects(server1, server2, db1, db2,
@@ -449,7 +450,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         reporter.report_object(obj_type, item[1][0])
 
         # Check for differences in CREATE
-        errors = _compare_objects(server1, server2, obj1, obj2,
+        errors = _compare_objects(server1, server2, q_obj1, q_obj2,
                                   reporter, options)
         error_list.extend(errors)
         

@@ -58,8 +58,8 @@ stock_number,description,qty,cost,type,notes,supplier
 # Object definitions differ. (--changes-for=server1)
 #
 
---- inventory.tools
-+++ inventory.tools
+--- `inventory`.`tools`
++++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
 +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
@@ -128,8 +128,8 @@ stock_number,description,qty,cost,type,notes,supplier
 # Object definitions differ. (--changes-for=server1)
 #
 
---- inventory.tools
-+++ inventory.tools
+--- `inventory`.`tools`
++++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
 +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
@@ -229,8 +229,8 @@ Test case 4 -  --skip-data-check --format=csv -a
 # Object definitions differ. (--changes-for=server1)
 #
 
---- inventory.tools
-+++ inventory.tools
+--- `inventory`.`tools`
++++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
 +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))

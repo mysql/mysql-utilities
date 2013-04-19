@@ -70,7 +70,7 @@ class test(import_basic.test):
         else:
             self.s1_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "import_basic")
+                                               "import_basic", '"--sql_mode="')
             if not res:
                 raise MUTLibError("Cannot spawn import_basic server.")
             self.server1 = res[0]
@@ -178,6 +178,12 @@ class test(import_basic.test):
         _get_engines()
 
         self.replace_result("# Importing", "# Importing ... bad_engines.csv\n")
+
+        # Mask known source and destination host name.
+        self.replace_substring("on localhost",
+                               "on XXXX-XXXX")
+        self.replace_substring("on [::1]",
+                               "on XXXX-XXXX")
 
         return True
 

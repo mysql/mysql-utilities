@@ -20,12 +20,12 @@
 This file contains the mysql utilities client.
 """
 
-from mysql.utilities.common.tools import check_python_version    
+from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.tools import check_python_version
 
 # Check Python version compatibility
 check_python_version()
 
-import optparse
 import os
 import sys
 
@@ -51,7 +51,7 @@ NAME = "MySQL Utilities Client - mysqluc "
 DESCRIPTION = "mysqluc - Command line client for running MySQL Utilities"
 USAGE = "%prog "
 WELCOME_MESSAGE = """
-Welcome to the MySQL Utilities Client (mysqluc) version %s 
+Welcome to the MySQL Utilities Client (mysqluc) version %s
 Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.\n
 Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
 Other names may be trademarks of their respective owners.
@@ -64,7 +64,7 @@ UTIL_PATH = "/scripts"
 
 def build_variable_dictionary_list(args):
     """Build a variable dictionary from the arguments
-    
+
     Returns list - list of variables
     """
     variables = []
@@ -74,7 +74,7 @@ def build_variable_dictionary_list(args):
             name, value = arg.split('=')
             variables.append({'name': name, 'value': value})
             arguments.pop(i)
-    
+
     if len(arguments) % 2:
         parser.error("Unbalanced arguments. Please check your command.")
     for i in range(0, len(arguments), 2):
@@ -82,7 +82,7 @@ def build_variable_dictionary_list(args):
     return variables
 
 # Setup the command parser
-parser = optparse.OptionParser(
+parser = UtilitiesParser(
     version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
     description=DESCRIPTION,
     usage=USAGE,

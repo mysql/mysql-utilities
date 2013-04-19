@@ -1,5 +1,5 @@
 Test case 1 - GRID format with BRIEF display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -103,7 +103,7 @@ Test case 1 - GRID format with BRIEF display
 +----+----+
 #...done.
 Test case 2 - GRID format with FULL display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -208,7 +208,7 @@ Test case 2 - GRID format with FULL display
 +----+----+
 #...done.
 Test case 3 - GRID format with NAMES display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 +-------------+
@@ -311,7 +311,7 @@ Test case 3 - GRID format with NAMES display
 +----+----+
 #...done.
 Test case 4 - CSV format with BRIEF display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -382,7 +382,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 3,2
 #...done.
 Test case 5 - CSV format with FULL display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -454,7 +454,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 3,2
 #...done.
 Test case 6 - CSV format with NAMES display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -524,7 +524,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 3,2
 #...done.
 Test case 7 - TAB format with BRIEF display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -595,7 +595,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 3	2
 #...done.
 Test case 8 - TAB format with FULL display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -667,7 +667,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 3	2
 #...done.
 Test case 9 - TAB format with NAMES display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -737,7 +737,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 3	2
 #...done.
 Test case 10 - VERTICAL format with BRIEF display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -1117,7 +1117,7 @@ Test case 10 - VERTICAL format with BRIEF display
 1 rows.
 #...done.
 Test case 11 - VERTICAL format with FULL display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -1631,7 +1631,7 @@ Test case 11 - VERTICAL format with FULL display
 1 rows.
 #...done.
 Test case 12 - VERTICAL format with NAMES display
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -1836,7 +1836,7 @@ Test case 12 - VERTICAL format with NAMES display
 1 rows.
 #...done.
 Test case 13 - copy all databases
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;

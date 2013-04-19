@@ -31,7 +31,7 @@ import sys
 
 from mysql.utilities.common.options import add_basedir_option
 from mysql.utilities.common.options import check_basedir_option
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities import exception

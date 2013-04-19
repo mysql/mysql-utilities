@@ -147,9 +147,9 @@ class test(mutlib.System_test):
                    "(backticks)")
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db``:db`:`db``:db`'"
+            cmd_arg = "'`db.``:db`:`db.``:db`'"
         else:
-            cmd_arg = '"`db``:db`:`db``:db`"'
+            cmd_arg = '"`db.``:db`:`db.``:db`"'
         cmd_str = "mysqldiff.py %s %s %s" % (s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -159,11 +159,11 @@ class test(mutlib.System_test):
                    "(backticks)")
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = ("'`db``:db`.```t``.``export_2`:"
-                       "`db``:db`.```t``.``export_2`'")
+            cmd_arg = ("'`db.``:db`.```t``.``export_2`:"
+                       "`db.``:db`.```t``.``export_2`'")
         else:
-            cmd_arg = ('"`db``:db`.```t``.``export_2`:'
-                       '`db``:db`.```t``.``export_2`"')
+            cmd_arg = ('"`db.``:db`.```t``.``export_2`:'
+                       '`db.``:db`.```t``.``export_2`"')
         cmd_str = "mysqldiff.py %s %s %s" % (s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -176,6 +176,8 @@ class test(mutlib.System_test):
         self.replace_result("+++ util_test.t2", "+++ util_test.t2\n")
         self.replace_result("--- util_test.t1", "--- util_test.t1\n")
         self.replace_result("--- util_test.t2", "--- util_test.t2\n")
+
+        self.replace_substring("on [::1]", "on localhost")
 
         return True
           
@@ -202,8 +204,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "util_test1")
         self.drop_db(self.server2, "util_test")
-        self.drop_db(self.server1, 'db`:db')
-        self.drop_db(self.server2, 'db`:db')
+        self.drop_db(self.server1, 'db.`:db')
+        self.drop_db(self.server2, 'db.`:db')
         return True
 
     def cleanup(self):

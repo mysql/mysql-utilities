@@ -115,6 +115,12 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Mask known source and destination host name.
+        self.replace_substring("on localhost",
+                               "on XXXX-XXXX")
+        self.replace_substring("on [::1]",
+                               "on XXXX-XXXX")
+
         return True
 
     def get_result(self):

@@ -10,7 +10,7 @@ Test case 3 - error: cannot connect
 ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 4 - cannot create directory
-# Cloning the MySQL server running on localhost.
+# Cloning the MySQL server running on XXXXX-XXXXX.
 # Creating new data directory...
 ERROR: Unable to create directory '/not/there/yes'
 Test case 5 - error: --new-data exists

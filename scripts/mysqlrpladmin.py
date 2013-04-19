@@ -27,17 +27,26 @@ from mysql.utilities.common.tools import check_python_version
 check_python_version()
 
 import logging
-import optparse
 import os.path
 import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
-from mysql.utilities.common.options import parse_connection, add_verbosity
-from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import add_format_option, add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
-from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
+                                             PARSE_ERR_OPTS_REQ_BY_CMD,
+                                             PARSE_ERR_SLAVE_DISCO_REQ,
+                                             PARSE_ERR_SLAVE_DISCO_EXC,
+                                             WARN_OPT_NOT_REQUIRED,
+                                             WARN_OPT_NOT_REQUIRED_ONLY_FOR,
+                                             ERROR_SAME_MASTER,
+                                             ERROR_MASTER_IN_SLAVES,
+                                             SLAVES, CANDIDATES)
+from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.server import Server, check_hostname_alias
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
@@ -46,7 +55,7 @@ from mysql.utilities.exception import FormatError
 from mysql.utilities import VERSION_FRM
 
 
-class MyParser(optparse.OptionParser):
+class MyParser(UtilitiesParser):
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -78,13 +87,15 @@ parser.add_option("--new-master", action="store", dest="new_master", default=Non
                   " or <login-path>[:<port>][:<socket>]. Valid only with "
                   "switchover command.")
 
-# Force
+# Force the execution of the command, ignoring some errors
 parser.add_option("--force", action="store_true", dest="force",
-                  help="ignore prerequsite check results and execute action")
+                  help="ignore prerequisite check results or some "
+                  "inconsistencies found (e.g. errant transactions on slaves) "
+                  "and execute action")
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", None)     
+                  "tab, csv, or vertical format", None)
 
 # Add demote option
 parser.add_option("--demote-master", action="store_true", dest="demote",
@@ -103,19 +114,22 @@ add_rpl_user(parser, None)
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
-# At least one of the options --discover-slaves-login or --slaves is required.
-if not opt.discover and not opt.slaves:
-    parser.error("One of these options is required to use the utility: "
-                 "--discover-slaves-login or --slaves.")
-
-# Check slaves list
-check_server_lists(parser, opt.master, opt.slaves)
-
 # Check for invalid command
 if len(args) > 1:
     parser.error("You can only specify one command to execute at a time.")
 elif len(args) == 0:
     parser.error("You must specify a command to execute.")
+
+# At least one of the options --discover-slaves-login or --slaves is required.
+if not opt.discover and not opt.slaves:
+    parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
+
+# --discover-slaves-login and --slaves cannot be used simultaneously (only one)
+if opt.discover and opt.slaves:
+    parser.error(PARSE_ERR_SLAVE_DISCO_EXC)
+
+# Check slaves list
+check_server_lists(parser, opt.master, opt.slaves)
 
 # The value for --timeout needs to be an integer > 0.
 try:
@@ -125,59 +139,89 @@ except ValueError:
     parser.error("The --timeout option requires an integer value.")
 
 # Check errors and warnings of options and combinations.
-    
+
 command = args[0].lower()
 if not command in get_valid_rpl_commands():
     parser.error("'%s' is not a valid command." % command)
 
-if command == 'switchover' and (opt.new_master is None or opt.master is None):
-    parser.error("The switchover command requires the --master and "
-                 "--new-master options.")
-    
-if command in ['health', 'gtid'] and opt.discover is None and \
-   (opt.slaves is None or opt.master is None):
-    parser.error("The health and gtid commands requires the --master and "
-                 "--slaves options.")
+# --master and --new-master options are required by 'switchover'
+if command == 'switchover' and (not opt.new_master or not opt.master):
+    req_opts = '--master and --new-master'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
-if command in ['start', 'stop', 'reset'] and \
-   (not opt.slaves or not opt.master):
-    parser.error("The start, stop and reset commands require the --master "
-                 "and --slaves options.")
+# --master and either --slaves or --discover-slaves-login options are required
+# by 'elect', 'health' and 'gtid'
+if command in ['elect', 'health', 'gtid'] and not opt.master and \
+   (not opt.slaves or not opt.discover):
+    req_opts = '--master and either --slaves or --discover-slaves-login'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
-if command in ['elect', 'failover', 'start', 'stop', 'reset'] and \
-    not opt.discover and not opt.slaves:
-    parser.error("You must supply a list of slaves or the "
-                 "--discover-slaves-login option.")
-    
-if command == 'failover' and opt.force:
-    parser.error("You cannot use the --force option with failover.")
+# --slaves options are required by 'start', 'stop' and 'reset'
+# --master is optional
+if command in ['start', 'stop', 'reset'] and not opt.slaves:
+    req_opts = '--slaves'
+    parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command, opts=req_opts))
 
+# Validate the required options for the failover command
+if command == 'failover':
+    # --discover-slaves-login is invalid (as it will require a master)
+    # instead --slaves needs to be used.
+    if opt.discover:
+        invalid_opt = '--discover-slaves-login'
+        parser.error(PARSE_ERR_OPT_INVALID_CMD_TIP.format(opt=invalid_opt,
+                                                          cmd=command,
+                                                          opt_tip='--slaves'))
+    # --master will be ignored
+    if opt.master:
+        print(WARN_OPT_NOT_REQUIRED.format(opt='--master', cmd=command))
+        opt.master = None
+
+# --ping only used by 'health' command
 if opt.ping and not command == 'health':
-    print("WARNING: The --ping option is used only with the health command.")
-    
-if command not in ['switchover', 'failover'] and \
-   (opt.exec_after or opt.exec_before):
-    print("WARNING: The --exec-* options are used only with the failover"
-          " and switchover commands.")
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--ping', cmd=command,
+                                                only_cmd='health'))
+    opt.ping = None
 
+# --exec-after only used by 'failover' or 'switchover' command
+if opt.exec_after and command not in ['switchover', 'failover']:
+    only_used_cmds = 'failover or switchover'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--exec-after',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.exec_after = None
+
+# --exec-before only used by 'failover' or 'switchover' command
+if opt.exec_before and command not in ['switchover', 'failover']:
+    only_used_cmds = 'failover or switchover'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--exec-before',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.exec_before = None
+
+# --new-master only required for 'switchover' command
 if opt.new_master and command != 'switchover':
-    print("WARNING: The --new-master option is used only with the "
-          "switchover command.")
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--new-master',
+                                                cmd=command,
+                                                only_cmd='switchover'))
+    opt.new_master = None
 
+# --candidates only used by 'failover' or 'elect' command
 if opt.candidates and command not in ['elect', 'failover']:
-    print("WARNING: The --candidates option is used only with the "
-          "failover and elect commands.")
+    only_used_cmds = 'failover or elect'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--candidates',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
     opt.candidates = None
 
-if (opt.candidates or opt.new_master) and command in ['stop', 'start', 'reset']:
-    print("WARNING: The --new-master and --candidates options are not "
-          "used with the stop, start, and reset commands.")
-    opt.candidates = None
-    
+# --format only used by 'health' or 'gtid' command
 if opt.format and command not in ['health', 'gtid']:
-    print("WARNING: The --format option is used only with the health "
-          "and gtid commands.")
-        
+    only_used_cmds = 'health or gtid'
+    print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--format',
+                                                cmd=command,
+                                                only_cmd=only_used_cmds))
+    opt.format = None
+
+# Parse the --new-master connection string
 if opt.new_master:
     try:
         new_master_val = parse_connection(opt.new_master, None, opt)
@@ -191,7 +235,7 @@ else:
     new_master_val = None
 
 # Parse the master, slaves, and candidates connection parameters
-try: 
+try:
     master_val, slaves_val, candidates_val = parse_failover_connections(opt)
 except UtilRplError:
     _, e, _ = sys.exc_info()
@@ -199,13 +243,36 @@ except UtilRplError:
     sys.exit(1)
 
 # Check hostname alias
+if new_master_val:
+    if check_hostname_alias(master_val, new_master_val):
+        master = Server({'conn_info' : master_val})
+        new_master = Server({'conn_info' : new_master_val})
+        parser.error(ERROR_SAME_MASTER.format(n_master_host=new_master.host,
+                                              n_master_port=new_master.port,
+                                              master_host=master.host,
+                                              master_port=master.port))
+
 if master_val:
     for slave_val in slaves_val:
         if check_hostname_alias(master_val, slave_val):
-            parser.error("The master and one of the slaves are the same host and port.")
+            master = Server({'conn_info' : master_val})
+            slave = Server({'conn_info' : slave_val})
+            msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
+                                                master_port=master.port,
+                                                slaves_candidates=SLAVES,
+                                                slave_host=slave.host,
+                                                slave_port=slave.port)
+            parser.error(msg)
     for cand_val in candidates_val:
         if check_hostname_alias(master_val, cand_val):
-            parser.error("The master and one of the candidates are the same host and port.")
+            master = Server({'conn_info' : master_val})
+            candidate = Server({'conn_info' : cand_val})
+            msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
+                                                master_port=master.port,
+                                                slaves_candidates=CANDIDATES,
+                                                slave_host=candidate.host,
+                                                slave_port=candidate.port)
+            parser.error(msg)
 
 # Create dictionary of options
 options = {
@@ -228,11 +295,11 @@ options = {
     'no_health'    : opt.no_health,
     'rpl_user'     : opt.rpl_user,
 }
- 
+
 # If command = HEALTH, turn on --force
 if command == 'health' or command == 'gtid':
     options['force'] = True
- 
+
 # Purge log file of old data
 if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
     parser.error("Error purging log file.")
@@ -248,12 +315,10 @@ except IOError:
 
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
-    rpl_cmds.execute_command(command)
+    rpl_cmds.execute_command(command, options)
 except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)
     sys.exit(1)
-    
+
 sys.exit(0)
-
-

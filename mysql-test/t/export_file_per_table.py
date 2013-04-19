@@ -42,7 +42,7 @@ class test(export_parameters_def.test):
         self.server1.exec_query("CREATE DATABASE IF NOT EXISTS util_test_mt")
 
         cmd_str = "mysqldbexport.py %s util_test_mt --export=definitions " \
-                  "--file-per-table --skip-gtid " % from_conn 
+                  "--file-per-table --skip-gtid " % from_conn
         comment = "Test case 1 - warning: def only with --file-per-table"
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -82,6 +82,13 @@ class test(export_parameters_def.test):
                     raise MUTLibError("File from export missing: %s" % \
                                        file_name)
             self.results.append("\n")
+
+            ## Mask known source.
+        self.replace_result("# Source on localhost: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Source on [::1]: ... connected.",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.remove_result("# WARNING: The server supports GTIDs but you")
 
         return True
 

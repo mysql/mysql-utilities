@@ -100,6 +100,7 @@ class Server_list(object):
                            default value = False
         """
 
+        self.cloning_host = "localhost"
         self.utildir = utildir      # Location of utilities being tested
         self.new_port = startport   # Starting port for spawned servers
         self.verbose = verbose      # Option for verbosity
@@ -188,6 +189,9 @@ class Server_list(object):
                     server = Server class instance or None if error
                     msg = None or error message if error
         """
+
+        from mysql.utilities.common.server import Server
+
         new_server = (None, None)
 
         # Set data directory for new server so that it is unique
@@ -202,7 +206,7 @@ class Server_list(object):
         cmd += "--new-id=%s " % server_id
         cmd += "--new-data=%s " % os.path.normpath(full_datadir)
         if parameters is not None:
-            cmd += "--mysqld=%s" % parameters
+            cmd += "--mysqld=%s -vvv" % parameters
 
         res = _exec_util(cmd, "cmd.txt", self.utildir)
 
@@ -210,7 +214,7 @@ class Server_list(object):
         conn = {
             "user"   : "root",
             "passwd" : passwd,
-            "host"   : "localhost",
+            "host"   : self.cloning_host,
             "port"   : port,
             "unix_socket" : full_datadir + "/mysql.sock"
         }
@@ -711,10 +715,15 @@ class System_test(object):
         conn_str = "%s" % conn_val[0]
         if conn_val[1]:
             conn_str += ":%s" % conn_val[1]
-        conn_str += "@%s:" % conn_val[2]
+        ipv6 = False
+        if ":" in conn_val[2] and not "]" in conn_val[2]:
+            conn_str += "@[%s]:" % conn_val[2]
+            ipv6 = True
+        else:
+            conn_str += "@%s:" % conn_val[2]
         if conn_val[3]:
             conn_str += "%s" % conn_val[3]
-        if conn_val[4] is not None and conn_val[4] != "":
+        if not ipv6 and conn_val[4] is not None and conn_val[4] != "":
             conn_str += ":%s " % conn_val[4]
 
         return conn_str
@@ -796,7 +805,7 @@ class System_test(object):
 
 
     def remove_result_and_lines_before(self, prefix, lines=1):
-        """Remove lines in the results.
+        """Remove lines in the results with lines before prefix.
 
         prefix[in]         starting prefix of string to mask
         lines[in]          number of lines to remove previously
@@ -817,6 +826,27 @@ class System_test(object):
         for linenum in range(len(linenums) - 1, - 1, - 1):
             self.results.pop(linenums[linenum])
 
+    def remove_result_and_lines_after(self, prefix, lines=0):
+        """Remove lines in the results and lines after prefix.
+
+        prefix[in]         starting prefix of string to mask
+        lines[in]          number of lines to remove after the prefix line.
+        """
+        linenums = []
+        linenum = 0
+        del_lines = 9999999
+        for line in self.results:
+            index = line.find(prefix)
+            if index == 0:
+                linenums.append(int(linenum))
+                del_lines = 0
+            elif del_lines < lines:
+                linenums.append(int(linenum))
+                del_lines += 1
+            linenum += 1
+        # Must remove lines in reverse order
+        for linenum in range(len(linenums) - 1, - 1, - 1):
+            self.results.pop(linenums[linenum])
 
     def replace_substring(self, target, replacement):
         """Replace a target substring in the entire result file.
@@ -1040,6 +1070,27 @@ class System_test(object):
         Override this method to specify the test is a long-running test.
         """
         return False
+
+    def kill_server(self, name):
+        """This method kill (i.e. stop and remove) the referred server.
+
+            name[in]    Name of the server to kill.
+
+            Returns True if the server was found and killed successfully,
+            otherwise False.
+        """
+        index = self.servers.find_server_by_name(name)
+        if index >= 0:
+            server = self.servers.get_server(index)
+            if self.debug:
+                print "# Killing server {0}.".format(server.role)
+            self.servers.stop_server(server)
+            self.servers.remove_server(server.role)
+            return True
+        else:
+            if self.debug:
+                print "# Kill failed! Server '{0}' was not found.".format(name)
+            return False
 
 
     @abstractmethod

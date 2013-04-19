@@ -18,14 +18,26 @@ import glob
 import os.path
 import sys
 import unittest
+import optparse
 
 if __name__ == '__main__':
+    parser = optparse.OptionParser()
+    (options, args) = parser.parse_args()
     suite = unittest.TestSuite()
-    for fname in glob.glob("unit_tests/test*.py"):
-        base, ext = os.path.splitext(fname)
+
+    if args:
+        test_files = []
+        for arg in args:
+            file_name = arg if arg.endswith('.py') else '{0}*.py'.format(arg)
+            test_files.extend(glob.glob(os.path.join('unit_tests', file_name)))
+    else:
+        test_files = glob.glob('unit_tests/test*.py')
+
+    for fname in test_files:
+        (base, ext) = os.path.splitext(fname)
         name = '.'.join(base.split('/'))
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(name))
+
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         sys.exit(1)             # Results are printed above
-

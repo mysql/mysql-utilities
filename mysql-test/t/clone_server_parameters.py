@@ -134,7 +134,15 @@ class test(mutlib.System_test):
         self.replace_result("#         fill_help_tables.sql:",
                             "#         fill_help_tables.sql: XXXXXXXXXXXX\n")
 
+        self.replace_result("# Cloning the MySQL server running on ",
+                            "# Cloning the MySQL server running on "
+                            "XXXXX-XXXXX.\n")
+
         self.remove_result("# trying again...")
+
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlserverclone"
+                                           ".py version", 6)
 
         return True
 

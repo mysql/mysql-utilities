@@ -114,6 +114,10 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbcopy.py "
+                                           "version", 6)
+
         # We exercise --force here to ensure skips don't interfere
         cmd_opts = "--force --skip=data util_test:util_db_clone"
         comment = "Test case 4 - no data"
@@ -141,6 +145,12 @@ class test(copy_db.test):
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")
+
+        # Mask known source and destination host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
 
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")

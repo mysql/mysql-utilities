@@ -70,7 +70,7 @@ class test(rpl_admin_gtid.test):
         slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
                            slave2_conn, slave3_conn])
         script = os.path.join(os.getcwd(), "std_data/show_arguments.sh")
-        command = " ".join(["mysqlrpladmin.py --master=%s " % master_conn,
+        command = " ".join(["mysqlrpladmin.py ",
                             "--candidates=%s  " % slave3_conn,
                             "--slaves=%s failover" % slaves,
                             "--exec-before=%s" % script,

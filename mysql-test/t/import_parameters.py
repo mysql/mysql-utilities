@@ -67,6 +67,10 @@ class test(import_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbimport.py "
+                                           "version", 6)
+
         # Now test the skips
 
         # Note: data and blobs must be done separately

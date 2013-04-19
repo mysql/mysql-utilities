@@ -60,6 +60,10 @@ class test(rpl_admin.test):
         mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
         self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set)
+        self.reset_master([self.server1, self.server2, self.server3,
+                           self.server4, self.server5])
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
@@ -77,7 +81,7 @@ class test(rpl_admin.test):
         if not phase1:
             return False
 
-        test_num = 14
+        test_num = 19
 
         rpl_admin.test.reset_topology(self)
 
@@ -129,7 +133,7 @@ class test(rpl_admin.test):
                   (test_num, self.server4.host, self.server4.port)
         slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
                            slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_str = "mysqlrpladmin.py "
         cmd_opts = " --candidates=%s  " % slave3_conn
         cmd_opts += " --slaves=%s failover" % slaves
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
@@ -205,10 +209,9 @@ class test(rpl_admin.test):
         comment = "Test case %s - slave not part of topology" % test_num
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
         candidates = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = " ".join(["mysqlrpladmin.py --master=%s " % master_conn,
-                            "failover", "--candidates=%s" % candidates,
-                            "--slaves=%s" % slaves, "--rpl-user=rpl:rpl",
-                            "--format=csv"])
+        cmd_str = " ".join(["mysqlrpladmin.py", "failover", "--force",
+                            "--candidates=%s" % candidates, "--quiet",
+                            "--slaves=%s" % slaves, "--rpl-user=rpl:rpl"])
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -220,6 +223,32 @@ class test(rpl_admin.test):
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.s4_port), "PORT5")
+
+        self.replace_result("#  - For slave 'localhost",
+                            "#  - For slave 'localhost@PORT?': XXXXX\n")
+
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health  |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("+----------------------------------------------"
+                               "-----------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                       "
+                               "                                         |",
+                               "| health  |")
+        self.replace_substring("| OK                                           "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., No, "
+                               "Slave has 1 transactions behind master.  |",
+                               "| OK      |")
 
         return True
 

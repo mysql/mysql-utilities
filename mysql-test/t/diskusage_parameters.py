@@ -48,6 +48,10 @@ class test(diskusage_basic.test):
         self.results.append("\n")
         test_num += 1
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldiskusage.py "
+                                           "version", 6)
+
         # no headers - only works when format != GRID
         comment = "Test Case %d : No headers " % test_num
         cmd_opts = " --no-headers "

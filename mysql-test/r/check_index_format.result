@@ -1,5 +1,5 @@
 Test case 1 - show indexes using default format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 +--------------+--------+----------+----------+----------+
@@ -29,7 +29,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 +--------------+--------+-------+--------+----------+
 #
 Test case 2 - show indexes using SQL format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 ALTER TABLE util_test_a.t1 ADD PRIMARY KEY (A)
@@ -51,7 +51,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 CREATE INDEX id ON util_test_a.t2 (id) USING BTREE
 #
 Test case 3 - show indexes using GRID format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 +--------------+--------+----------+----------+----------+
@@ -81,7 +81,7 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
 +--------------+--------+-------+--------+----------+
 #
 Test case 4 - show indexes using TAB format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 database	table	name	type	columns
@@ -105,7 +105,7 @@ database	table	name	type	columns
 util_test_a	t2	id	BTREE	id
 #
 Test case 5 - show indexes using CSV format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 database,table,name,type,columns
@@ -129,7 +129,7 @@ database,table,name,type,columns
 util_test_a,t2,id,BTREE,id
 #
 Test case 6 - show indexes using VERTICAL format
-# Source on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
 #
 *************************       1. row *************************

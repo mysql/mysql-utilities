@@ -11,19 +11,19 @@ Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pas
 
 mysqldbcopy.py: error: Cannot parse the specified database(s): '::sad'. Please verify that the database(s) are specified in a valid format (i.e., orig_db[:new_db]) and that backtick quotes are properly used when required.
 Test case 4 - error: old database doesn't exist
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 5 - error: cannot connect to source
-# Source on localhost: ... ERROR: Cannot connect to the Source server.
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
 Test case 6 - error: cannot connect to destination
-# Source on localhost: ... connected.
-# Destination on localhost: ... ERROR: Cannot connect to the Destination server.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... ERROR: Cannot connect to the Destination server.
 Error XXXX: Access denied
 Test case 7 - users with minimal privileges
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
@@ -40,20 +40,20 @@ Test case 7 - users with minimal privileges
 # Copying EVENT util_test.e1
 #...done.
 Test case 8 - source user not enough privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - source user has some privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 10 - source user has some privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 11 - source user has privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
@@ -70,20 +70,20 @@ Test case 11 - source user has privileges needed
 # Copying EVENT util_test.e1
 #...done.
 Test case 12 - dest user not enough privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
 Test case 13 - dest user has some privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 14 - dest user has some privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
 Test case 15 - dest user has privileges needed
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
@@ -116,8 +116,8 @@ Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pas
 
 mysqldbcopy.py: error: You must specify at least one database to copy or use the --all option to copy all databases.
 Test case 20 - new storage engine missing
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
@@ -135,8 +135,8 @@ WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying EVENT util_test.e1
 #...done.
 Test case 21 - default storage engine missing
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1

@@ -1,23 +1,23 @@
 Test case 1 - error: same database
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: Destination database name is same as source - source = util_test, destination = util_test
 Test case 2 - error: old database doesn't exist
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 3 - error: target database already exists
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
 ERROR: destination database exists. Use --force to overwrite existing database.
 Test case 4 - error: user with % - not enough permissions
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 5 - No error: user with % - has permissions
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
@@ -51,6 +51,6 @@ Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pas
 
 mysqldbcopy.py: error: You must specify at least one database to copy or use the --all option to copy all databases.
 Test case 10 - clone with --all
-# Source on localhost: ... connected.
-# Destination on localhost: ... connected.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
 ERROR: Cannot copy all databases on the same server.

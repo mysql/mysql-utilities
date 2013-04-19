@@ -25,6 +25,8 @@ import time
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, UtilRplWarn, UtilRplError
+from mysql.utilities.common.user import User
+from mysql.utilities.common.ip_parser import clean_IPv6, format_IPv6
 
 _MASTER_INFO_COL = [
     'Master_Log_File', 'Read_Master_Log_Pos', 'Master_Host', 'Master_User',
@@ -39,9 +41,9 @@ _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
     _SLAVE_MASTER_LOG_FILE, _SLAVE_MASTER_LOG_FILE_POS, _SLAVE_IO_RUNNING, \
     _SLAVE_SQL_RUNNING, _SLAVE_DO_DB, _SLAVE_IGNORE_DB, _SLAVE_DELAY, \
     _SLAVE_REMAINING_DELAY, _SLAVE_IO_ERRORNO, _SLAVE_IO_ERROR, \
-    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _RETRIEVED_GTID_SET, \
+    _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _MASTER_UUID, _RETRIEVED_GTID_SET, \
     _EXECUTED_GTID_SET = \
-    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 51, 52
+    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 40, 51, 52
 
 _PRINT_WIDTH = 75
 
@@ -170,7 +172,7 @@ def negotiate_rpl_connection(server, is_master=True, strict=True, options={}):
 
             res = master.get_status()
             if not res:
-               raise UtilError("Cannot retrieve master status.")
+                raise UtilError("Cannot retrieve master status.")
 
             # Need to get the master values for the make_change_master command
             master_values = {
@@ -795,7 +797,8 @@ class Master(Server):
         Returns bool - True = success, False = errors
         """
 
-        from mysql.utilities.common.user import User
+        if "]" in host:
+            host = clean_IPv6(host)
 
         # Create user class instance
         user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)
@@ -868,9 +871,6 @@ class Master(Server):
 
         Returns bool - True - is configured, False - not configured
         """
-        if conn_dict['conn_info']['host'] == '127.0.0.1':
-            conn_dict['conn_info']['host'] = 'localhost'
-        # Now we must attempt to connect to the slave.
         slave_conn = Slave(conn_dict)
         is_configured = False
         try:
@@ -903,6 +903,8 @@ class Master(Server):
         """
         def _get_slave_info(host, port):
             if len(host) > 0:
+                if ":" in host:
+                    host = format_IPv6(host)
                 slave_info = host
             else:
                 slave_info = "unknown host"
@@ -1319,7 +1321,7 @@ class Slave(Server):
         res = self.get_status()
         if res == []:
             return False
-        return res[0][10].upper() == "YES"
+        return res[0][_SLAVE_IO_RUNNING].upper() == "YES"
 
     def get_rpl_master_user(self):
         """Get the rpl master user from the slave status
@@ -1331,6 +1333,16 @@ class Slave(Server):
         if not res:
             return False
         return res[0][_SLAVE_MASTER_USER]
+
+    def get_master_uuid(self):
+        """Get the master_uuid from the slave status.
+
+        Return the master UUID or None if not an acting slave.
+        """
+        res = self.get_status()
+        if not res:
+            return None
+        return res[0][_MASTER_UUID]
 
     def get_state(self):
         """Get the slave's connection state
@@ -1422,6 +1434,22 @@ class Slave(Server):
         io_error = res[0][_SLAVE_IO_ERROR]
 
         return (state, io_errorno, io_error)
+
+    def get_sql_error(self):
+        """Return the slave slave sql error status
+
+        Returns tuple - (sql_running, sql_errorno, sql_error)
+                        or None if not connected
+        """
+        res = self.get_status()
+        if not res:
+            return None
+
+        sql_running = res[0][_SLAVE_SQL_RUNNING]
+        sql_errorno = int(res[0][_SLAVE_SQL_ERRORNO])
+        sql_error = res[0][_SLAVE_SQL_ERROR]
+
+        return (sql_running, sql_errorno, sql_error)
 
     def get_slaves_errors(self):
         """Return the slave slave io and sql error status
@@ -1626,6 +1654,8 @@ class Slave(Server):
         # If we cannot get the master info information, try the values passed
         if master_info is None:
             master_host = master_values['Master_Host']
+            if "]" in master_host:
+                master_host = clean_IPv6(master_host)
             master_port = master_values['Master_Port']
             master_user = master_values['Master_User']
             master_passwd = master_values['Master_Password']
@@ -1648,7 +1678,9 @@ class Slave(Server):
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % master_host
         if master_user:
             change_master += "MASTER_USER = '%s', " % master_user
-        if master_passwd:
+        # To rewrite a current password with blank password, not check against
+        # empty string. 
+        if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
         if self.supports_gtid() == "ON":

@@ -65,6 +65,10 @@ class test(clone_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqldbcopy.py "
+                                           "version", 6)
+
         # We exercise --force here to ensure skips don't interfere
         cmd_opts = "--force --skip=data util_test:util_db_clone"
         comment = "Test case 4 - no data"
@@ -81,6 +85,12 @@ class test(clone_db.test):
         self.replace_result("# Reading the file", "# Reading data file.\n")
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        # Mask known source and destination host name.
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
 
         return True
 

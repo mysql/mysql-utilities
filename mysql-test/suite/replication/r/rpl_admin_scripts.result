@@ -1,12 +1,12 @@
 Test case 1 - test failover scripts
 # ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
 # new master host:  localhost
 # new master port:  PORT4
 # ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
 # new master host:  localhost
 # new master port:  PORT4
 # Checking privileges.
@@ -16,35 +16,12 @@ Test case 1 - test failover scripts
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
 # Candidate slave localhost:PORT4 will become the new master.
+# Checking slaves status (before failover).
 # Preparing candidate for failover.
-# Reading events in relay log for slave localhost:PORT2
-# Missing transactions found on localhost:PORT2. SELECT gtid_subset() = 0
-# LOCK STRING: FLUSH TABLES WITH READ LOCK
-# Connecting candidate to localhost:PORT2 as a temporary slave to retrieve unprocessed GTIDs.
-# Change master command for localhost:PORT4
-# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
-# UNLOCK STRING: UNLOCK TABLES
-# Waiting for candidate to catch up to slave localhost:PORT2.
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
+# Reading events in relay log for slave 127.0.0.1:PORT2
+# No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
 # Reading events in relay log for slave localhost:PORT3
-# Missing transactions found on localhost:PORT3. SELECT gtid_subset() = 0
-# LOCK STRING: FLUSH TABLES WITH READ LOCK
-# Connecting candidate to localhost:PORT3 as a temporary slave to retrieve unprocessed GTIDs.
-# Change master command for localhost:PORT4
-# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT3, MASTER_AUTO_POSITION=1
-# UNLOCK STRING: UNLOCK TABLES
-# Waiting for candidate to catch up to slave localhost:PORT3.
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
-# Slave localhost:PORT4:
-# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
-# Return Code = XXX
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Reading events in relay log for slave localhost:PORT4
 # Creating replication user if it does not exist.
 # Spawning external script.
@@ -52,14 +29,14 @@ Test case 1 - test failover scripts
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 WARN - slave is not configured with this master
-#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
 #   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
-# Change master command for localhost:PORT2
+# Change master command for 127.0.0.1:PORT2
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Change master command for localhost:PORT3
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
@@ -67,17 +44,17 @@ Test case 1 - test failover scripts
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting slaves.
 # Performing START on all slaves.
-#   Executing start on slave localhost:PORT2 Ok
+#   Executing start on slave 127.0.0.1:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # Script completed Ok.
 # Checking slaves for errors.
-# localhost:PORT2 status: Ok 
+# 127.0.0.1:PORT2 status: Ok 
 # localhost:PORT3 status: Ok 
 # Failover complete.
 # Attempting to contact localhost ... Success
-# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
 # Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
@@ -94,6 +71,7 @@ Test case 2 - test switchover scripts
 # new master host: 
 # new master port: 
 # Checking privileges.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
@@ -102,6 +80,7 @@ Test case 2 - test switchover scripts
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
 #   Replication user exists ... Ok
+# Checking slaves configuration to master.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
@@ -109,7 +88,7 @@ Test case 2 - test switchover scripts
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
 # Waiting for slaves to catch up to old master.
-# Slave localhost:PORT2:
+# Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Slave localhost:PORT3:
@@ -120,13 +99,13 @@ Test case 2 - test switchover scripts
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
-# Executing CHANGE MASTER on localhost:PORT2.
+# Executing CHANGE MASTER on 127.0.0.1:PORT2.
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Executing CHANGE MASTER on localhost:PORT3.
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
@@ -134,19 +113,19 @@ Test case 2 - test switchover scripts
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
-#   Executing start on slave localhost:PORT2 Ok
+#   Executing start on slave 127.0.0.1:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # Script completed Ok.
 # Checking slaves for errors.
-# localhost:PORT2 status: Ok 
+# 127.0.0.1:PORT2 status: Ok 
 # localhost:PORT3 status: Ok 
 # localhost:PORT1 status: Ok 
 # Switchover complete.
 # Attempting to contact localhost ... Success
-# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
 # Attempting to contact localhost ... Success
 # Attempting to contact localhost ... Success
 #

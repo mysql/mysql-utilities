@@ -58,7 +58,7 @@ class test(mutlib.System_test):
         else:
             num_server -= 1 # Get last server in list
         self.server1 = self.servers.get_server(num_server)
-        
+
         # Now install the audit log plugin
         if os.name == "posix":
             ext = ".so"
@@ -73,7 +73,7 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
 
         s1_conn = "--server=" + self.build_connection_string(self.server1)
-       
+
         cmd_base = "mysqlauditadmin.py "
 
         num_test = 1
@@ -108,7 +108,7 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         num_test += 1
-        
+
         # To show last test case succeeded, we need to show the log files again
         comment = "Test case %d - show file stats after rotate " % num_test
         cmd_opts = " --file-stats --audit-log-name=%s " % \
@@ -124,7 +124,7 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         num_test += 1
-        
+
         comment = "Test case %d - change the policy to default" % num_test
         cmd_opts = " --show-options %s policy --value=DEFAULT " % s1_conn
         res = self.run_test_case(0, cmd_base + cmd_opts, comment)
@@ -140,7 +140,7 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         num_test += 1
-        
+
         comment = "Test case %d - change the rotate_on_size to default" \
                   % num_test
         cmd_opts = " --show-options %s rotate_on_size --value=0 " % s1_conn
@@ -151,17 +151,21 @@ class test(mutlib.System_test):
         self.do_replacements()
 
         return True
-    
+
     def do_replacements(self):
         self.replace_substring("127.0.0.1", "localhost")
         self.replace_result("| audit.log", "| audit.log [...] \n")
 
+        # Remove version information
+        self.remove_result_and_lines_after("MySQL Utilities mysqlauditadmin"
+                                           ".py version", 6)
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)

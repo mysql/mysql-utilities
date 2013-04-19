@@ -23,6 +23,7 @@ import multiprocessing
 import re
 import sys
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
@@ -42,6 +43,7 @@ _FOREIGN_KEY_QUERY = """
         REFERENCED_TABLE_SCHEMA IS NOT NULL
 """
 
+
 def _parse_object_name(qualified_name):
     """Parse db, name from db.name
 
@@ -51,12 +53,12 @@ def _parse_object_name(qualified_name):
     """
 
     # Split the qualified name considering backtick quotes
-    parts = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\.)(`(?:[^`]|``)+`|\w+))?",
-                     qualified_name)
+    parts = re.match(REGEXP_QUALIFIED_OBJ_NAME, qualified_name)
     if parts:
         return parts.groups()
     else:
         return (None, None)
+
 
 class Index(object):
     """
@@ -381,6 +383,7 @@ class Table(object):
             columns = self.server.exec_query("explain %s" % self.q_table)
         stop = len(columns)
         self.column_names = []
+        self.q_column_names = []
         col_format_values = [''] * stop
         if columns is not None:
             for col in range(0, stop):
@@ -418,6 +421,7 @@ class Table(object):
 
         if self.column_format is None:
             self.column_names = []
+            self.q_column_names = []
             rows = self.server.exec_query("explain %s" % self.q_table)
             for row in rows:
                 self.column_names.append(row[0])
@@ -449,7 +453,7 @@ class Table(object):
         has_data = False
         stop = len(row)
         for col in range(0,stop):
-            col_name = quote_with_backticks(self.column_names[col])
+            col_name = self.q_column_names[col]
             if col in self.blob_columns:
                 if row[col] is not None and len(row[col]) > 0:
                     if do_commas:

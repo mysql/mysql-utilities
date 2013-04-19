@@ -57,3 +57,35 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
                             "{db_no_obj_label} '{db_no_obj_value}', while "
                             "object '{only_obj_value}' was specified for "
                             "{db_obj_label} '{db_obj_value}'.")
+
+PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
+
+PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
+                                 % PARSE_ERR_OPT_INVALID_CMD)
+
+PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
+                             "{opts}.")
+
+PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
+                             "required.")
+
+PARSE_ERR_SLAVE_DISCO_EXC = ("Options --discover-slaves-login and --slaves "
+                             "cannot be used simultaneously.")
+
+WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
+                         "'{cmd}' (option ignored).")
+
+WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
+                                   % WARN_OPT_NOT_REQUIRED)
+
+ERROR_SAME_MASTER = ("The specified new master {n_master_host}:{n_master_port}"
+                     " is the same as the "
+                     "actual master {master_host}:{master_port}.")
+
+SLAVES = "slaves"
+
+CANDIDATES = "candidates"
+
+ERROR_MASTER_IN_SLAVES = ("The master {master_host}:{master_port} "
+                          "and one of the specified {slaves_candidates} "
+                          "are the same {slave_host}:{slave_port}.")

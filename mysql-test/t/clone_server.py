@@ -116,6 +116,10 @@ class test(mutlib.System_test):
         self.servers.stop_server(server)
         self.servers.clear_last_port()
         
+        self.replace_result("# Cloning the MySQL server running on",
+                            "# Cloning the MySQL server running on xxxxx-"
+                            "xxxxx.\n")
+        
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
         self.replace_result("# Cloning the MySQL server located at",
                             "# Cloning the MySQL server located at XXXX\n")

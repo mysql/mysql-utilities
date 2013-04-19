@@ -1,0 +1,123 @@
+test case 1 - test alias: 127.0.0.1 is alias for server localhost
+Pass
+
+test case 2 - test alias: [::1] is alias for server localhost
+Pass
+
+test case 3 - test alias: localhost is alias for server localhost
+Pass
+
+test case 4 - test alias: <computer_name> is alias for server localhost
+Pass
+
+test case 5 - test alias: ::1 is alias for server localhost
+Pass
+
+test case 6 - test alias: 0:0:0:0:0:0:0:1 is alias for server localhost
+Pass
+
+test case 7 - test alias: 0::0:1 is alias for server localhost
+Pass
+
+test case 8 - test alias: [0::1] is alias for server localhost
+Pass
+
+test case 9 - test alias: 0::0:0:1 is alias for server localhost
+Pass
+
+test case 10 - test alias: 0.0.0.2 is not alias for server localhost
+Pass
+
+test case 11 - test alias: [::2] is not alias for server localhost
+Pass
+
+test case 12 - test alias: host_local is not alias for server localhost
+Pass
+
+test case 13 - test alias: ::2 is not alias for server localhost
+Pass
+
+test case 14 - test alias: 0:0:0:0:0:0:0:2 is not alias for server localhost
+Pass
+
+test case 15 - test alias: oracle.com is not alias for server localhost
+Pass
+
+test case 16 - test alias: python.org is not alias for server localhost
+Pass
+
+test case 17 - test alias: 127.0.0.1 is alias for server ::1
+Pass
+
+test case 18 - test alias: [::1] is alias for server ::1
+Pass
+
+test case 19 - test alias: localhost is alias for server ::1
+Pass
+
+test case 20 - test alias: <computer_name> is alias for server ::1
+Pass
+
+test case 21 - test alias: ::1 is alias for server ::1
+Pass
+
+test case 22 - test alias: 0:0:0:0:0:0:0:1 is alias for server ::1
+Pass
+
+test case 23 - test alias: 0::0:1 is alias for server ::1
+Pass
+
+test case 24 - test alias: [0::1] is alias for server ::1
+Pass
+
+test case 25 - test alias: 0::0:0:1 is alias for server ::1
+Pass
+
+test case 26 - test alias: 0.0.0.2 is not alias for server ::1
+Pass
+
+test case 27 - test alias: [::2] is not alias for server ::1
+Pass
+
+test case 28 - test alias: host_local is not alias for server ::1
+Pass
+
+test case 29 - test alias: ::2 is not alias for server ::1
+Pass
+
+test case 30 - test alias: 0:0:0:0:0:0:0:2 is not alias for server ::1
+Pass
+
+test case 31 - test alias: oracle.com is not alias for server ::1
+Pass
+
+test case 32 - test alias: python.org is not alias for server ::1
+Pass
+
+test case 33 - test alias: alias_reuseness is alias for server alias_reuseness
+Pass
+
+test case 34 - test alias: mock_no_local_host is alias for server mock_no_local_host
+Pass
+
+test case 35 - test alias: alias_reuseness is not alias for server mock_no_local_host
+Pass
+
+test case 36 - test alias: oracle.com is not alias for server python.org
+Pass
+
+test case 37 - test alias: oracle.com is not alias for server mock_no_local_host
+Pass
+
+test case 38 - test alias: 82.94.164.162 is not alias for server mock_no_local_host
+Pass
+
+test case 39 - test alias: 137.254.16.101 is alias for server oracle.com
+Pass
+
+test case 40 - test alias: python.org is alias for server 82.94.164.162
+Pass
+
+test case 41 - test alias: python.org is alias for server 82.94.164.162
+Pass
+

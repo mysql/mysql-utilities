@@ -31,7 +31,7 @@ import sys
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import parse_connection
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.command.check_rpl import check_replication
