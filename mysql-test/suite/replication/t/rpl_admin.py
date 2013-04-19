@@ -223,8 +223,8 @@ class test(mutlib.System_test):
         self.replace_substring(str(self.s2_port), "PORT3")
         self.replace_substring(str(self.s3_port), "PORT4")
 
-        self.replace_substring("NO ", "XXX")  # for columns.
-        self.replace_substring("NO", "XXX")
+        self.replace_substring(": NO", ": XXX")  # for columns.
+        self.replace_substring("| NO ", "| XXX")
         self.replace_substring("OFF", "XXX")
 
         # Mask slaves behind master.
