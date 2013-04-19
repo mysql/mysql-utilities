@@ -128,7 +128,8 @@ class test(replicate.test):
         return result
     
     def wait_for_slave(self, slave, attempts):
-        # Wait for slave to read the master log file
+        # Wait for slave to successfully connect to the master, waiting for
+        # events from him
         i = 0
         while i < attempts:
             if self.debug:
@@ -199,6 +200,8 @@ class test(replicate.test):
             if self.debug:
                 print "# Waiting for slave to sync",
             try:
+                # Note: wait_for_slave will only guaranty that the slave is
+                # connected to the master (not that it is fully synced.
                 self.wait_for_slave(destination, _MAX_ATTEMPTS)
             except MUTLibError, e:
                 raise MUTLibError(e.errmsg)
@@ -218,7 +221,14 @@ class test(replicate.test):
             if self.debug:
                 print "# Waiting for slave to sync",
             try:
-                self.wait_for_slave(destination, _MAX_ATTEMPTS)
+                # Wait 5 seconds for the slave to catch-up with the master
+                time.sleep(5)
+                # Note: the use of wait_for_slave() is useless here, since the
+                # slave is already connected to the master and waiting for
+                # events.
+                # TODO: Implement an accurate method to wait for the slave to
+                # sync with the master (i.e., process remaining transactions).
+                #self.wait_for_slave(destination, _MAX_ATTEMPTS)
             except MUTLibError, e:
                 raise MUTLibError(e.errmsg)
             if self.debug:
