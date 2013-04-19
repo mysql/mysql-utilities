@@ -81,6 +81,15 @@ class test(replicate.test):
         self.replace_result("#  slave uuid = ",
                             "#  slave uuid = XXXXX\n")
 
+        # Remove status data that might appear when connection to master takes
+        # more time (slower)
+        self.remove_result("# IO status: Connecting to master")
+        self.remove_result("# IO thread running: Connecting")
+        self.remove_result("# IO error: None")
+        self.remove_result("# SQL thread running: Yes")
+        self.remove_result("# SQL error: None")
+        self.remove_result("# Waiting for slave to synchronize with master")
+
         return True
 
     def get_result(self):

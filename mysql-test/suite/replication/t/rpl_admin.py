@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+import time
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
@@ -186,6 +187,10 @@ class test(mutlib.System_test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
+            # START SLAVE is asynchronous and it can take some time to complete
+            # on slow servers
+            if cmd == 'start':
+                time.sleep(3)  # wait 3 second for START to finish
 
         # Needed to reset the topology here to run with 5.1 servers.
         # Note: With 5.1 servers after reset commands slaves seem to forgot
@@ -221,6 +226,23 @@ class test(mutlib.System_test):
         self.replace_substring("NO ", "XXX")  # for columns.
         self.replace_substring("NO", "XXX")
         self.replace_substring("OFF", "XXX")
+
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+--------------------------------------------"
+                               "--+", "+---------+")
+        self.replace_substring("| health                                     "
+                               "  |", "| health  |")
+        self.replace_substring("| OK                                         "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave delay is 1 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 2 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 3 seconds behind master., "
+                               "No  |", "| OK      |")
+        self.replace_substring("| Slave delay is 4 seconds behind master., "
+                               "No  |", "| OK      |")
 
     def reset_master(self, servers_list=[]):
         # Clear binary log and GTID_EXECUTED of given servers

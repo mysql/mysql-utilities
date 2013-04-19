@@ -15,9 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
+import time
 import replicate
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _MASTER_DB_CMDS = [
     "DROP DATABASE IF EXISTS master_db1",
@@ -82,14 +82,14 @@ class test(replicate.test):
             self.server3 = self.servers.get_server(index)
             try:
                 res = self.server3.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get new replication slave " +
-                                   "server_id: %s" % e.errmsg)
+            except UtilError as err:
+                raise MUTLibError("Cannot get new replication slave "
+                                  "server_id: {0}").format(err.errmsg)
             self.s3_serverid = int(res[0][1])
         else:
             self.s3_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s3_serverid,
-                                               "new_slave")
+                                                "new_slave")
             if not res:
                 raise MUTLibError("Cannot spawn new replication slave server.")
             self.server3 = res[0]
@@ -136,6 +136,8 @@ class test(replicate.test):
             res = slave.exec_query("SHOW SLAVE STATUS")
             if res and res[0][0] == 'Waiting for master to send event':
                 break
+            # Wait 1 second before next iteration
+            time.sleep(1)
             i += 1
             if i == attempts:
                 raise MUTLibError("Slave did not sync with master.")

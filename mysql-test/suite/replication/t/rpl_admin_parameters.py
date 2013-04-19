@@ -161,6 +161,8 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         comment = "Test case 8 - attempt master switchover it self"
+        base_cmd = ("mysqlrpladmin.py --timeout=7 --rpl-user=rpl:rpl "
+                    "--seconds-behind=30 --max-position=100 ")
         cmd_str = "{0} --master={1} --force ".format(base_cmd, no_slaved_conn)
         slaves = ",".join([master_conn, slave1_conn, slave3_conn])
         new_slaves = " --slaves={0}".format(slaves)
