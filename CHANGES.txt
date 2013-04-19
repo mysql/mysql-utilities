@@ -1,3 +1,36 @@
+Release 1.3.1 (Released April 19, 2013)
+---------------------------------------
+No changes.
+
+Release 1.2.2 (Released April 19, 2013)
+---------------------------------------
+
+- BUG#13383767: Utilities do not show version and copyright info
+- BUG#13650863: mysqldiff, mysqldbcompare not work on table names with '-'
+- BUG#15836908: mysqldiff doesn't accept minus sign in user or password
+- BUG#15903171: MySQL Utilities does not support IPv6 address format.
+- BUG#16202902: mysqlrpladmin --master option is confusing
+- BUG#16204732: Replication Utilities are unable to use loopback addresses.
+- BUG#16205200: failover fails when errant transactions exist
+- BUG#16210222: switchover fails due to missing or wrong password.
+- BUG#16210246: --demote-master failing to unlink new master in topology
+- BUG#16210447: failover does not work on unstable topology
+- BUG#16231372: mysqlserverclone does not expand the tilde to the user home
+- BUG#16244454: 'mysqlrpladmin --discover-slaves... stop' fails in topology.py
+- BUG#16268060: mysqlrpladmin fail to start slaves with --discover-slaves-login
+- BUG#16327406: mysqlfailover option so it can be invoked from JET/Java framework
+- BUG#16327743: mysqlfailover ignores the --interval option
+- BUG#16382195: Fixed mysqluc when installed under /usr/bin
+- BUG#16410648: mysqldiff is unreliable
+- BUG#16454212: serverclone can change password of root user
+- BUG#16489494: mysqlrpladmin failover crashes when gtid is off
+- BUG#16520505: mysqlrpladmin switchover takes too much time to check slaves
+- BUG#16565502: mysqlrpladmin switchover new master is actual master
+- BUG#16571812: Server module Hide errors looking for Aliases.
+- BUG#16584598: mysql switchover has no proper error with wrong slave name
+- BUG#16587341: Fix error when utility has no .py extension
+- BUG#16597814: mysqlrpladmin switchover hangs with a wrong master
+
 Release 1.3.0 (Released April 3, 2013)
 --------------------------------------
 - WL#5613: .frm Reader
