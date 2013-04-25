@@ -21,6 +21,7 @@ utilities are installed, their options, and usage. This module can be
 used to allow a client to provide auto type and option completion.
 """
 
+import glob
 import os
 import sys
 import re
@@ -119,6 +120,22 @@ class Utilities(object):
         self.find_utilities()
 
 
+    def find_executable(self, util_name):
+        """Search the system path for an executable matching the utility
+        
+        util_name[in]  Name of utility
+        
+        Returns string - name of executable (util_name or util_name.exe) or
+                         original name if not found on the system path
+        """
+        paths = os.getenv("PATH").split(os.pathsep)
+        for path in paths:
+            found_path = glob.glob(os.path.join(path, util_name + "*"))
+            if found_path:
+                return os.path.split(found_path[0])[1]
+        return util_name
+        
+
     def find_utilities(self):
         """ Locate the utility scripts
 
@@ -151,7 +168,7 @@ class Utilities(object):
 
         working_utils = []
         for file_name in files:
-            parts = os.path.splitext(file_name)
+            parts = os.path.splitext(self.find_executable(file_name))
             # Only accept python files - not .pyc and others
             # Parts returns second as empty if does not have ext, so len is 2
             exts = ['.py', '.exe', '']
