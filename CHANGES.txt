@@ -26,6 +26,7 @@ Release 1.2.2 (Released April 19, 2013)
 - BUG#16584598: mysql switchover has no proper error with wrong slave name
 - BUG#16587341: Fix error when utility has no .py extension
 - BUG#16597814: mysqlrpladmin switchover hangs with a wrong master
+- BUG#16714425: mysqluc not listing any utilties
 
 Release 1.2.1 (Released February 28, 2013)
 ------------------------------------------
