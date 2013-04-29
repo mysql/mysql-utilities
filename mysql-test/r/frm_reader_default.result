@@ -905,6 +905,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #...done.
 Test case 3: - User the --user option
 # Source on localhost: ... connected.
+# Spawning server with --user=JOE_USER.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
