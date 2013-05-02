@@ -21,3 +21,12 @@ Test case 6 - master and slave same host
 Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
 
 mysqlrplcheck.py: error: The master and slave are the same host and port.
+Test case 7 - no options used
+WARNING: Using default value 'root@localhost:3306' for option --master.
+Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
+
+mysqlrplcheck.py: error: Option '--slave' is required.
+Test case 8 - option --slave missing
+Usage: mysqlrplcheck.py --master=root@localhost:3306 --slave=root@localhost:3310 
+
+mysqlrplcheck.py: error: Option '--slave' is required.

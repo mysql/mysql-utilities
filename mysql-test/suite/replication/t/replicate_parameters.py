@@ -34,8 +34,8 @@ class test(replicate.test):
         self.res_fname = "result.txt"
 
         comment = "Test case 1 - use the test feature"
-        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
-                                 comment, "--test-db=db_not_there_yet", True)
+        res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
+                                comment, "--test-db=db_not_there_yet", True)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
@@ -45,8 +45,8 @@ class test(replicate.test):
             pass
 
         comment = "Test case 2 - show the help"
-        res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
-                                 comment, "--help", True)
+        res = self.run_rpl_test(self.server1, self.server2, self.s1_serverid,
+                                comment, "--help", True)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
@@ -55,8 +55,8 @@ class test(replicate.test):
                                            "version", 6)
 
         comment = "Test case 3 - use the verbose feature"
-        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
-                                 comment, " --verbose", True)
+        res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
+                                comment, " --verbose", True)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
@@ -66,8 +66,8 @@ class test(replicate.test):
             pass
 
         comment = "Test case 4 - use the start-from-beginning feature"
-        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
-                                 comment, " --start-from-beginning", True)
+        res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
+                                comment, " --start-from-beginning", True)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 

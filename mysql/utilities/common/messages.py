@@ -63,6 +63,8 @@ PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
                                  % PARSE_ERR_OPT_INVALID_CMD)
 
+PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
+
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
                              "{opts}.")
 
@@ -77,6 +79,9 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                    % WARN_OPT_NOT_REQUIRED)
+
+WARN_OPT_USING_DEFAULT = ("WARNING: Using default value '{default}' for option "
+                          "{opt}.")
 
 ERROR_SAME_MASTER = ("The specified new master {n_master_host}:{n_master_port}"
                      " is the same as the "

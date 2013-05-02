@@ -56,3 +56,12 @@ Test case 13 - --master-log-file+pos and --start-from-beginning
 Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
 
 mysqlreplicate.py: error: The --start-from-beginning option is not valid in combination with --master-log-file or --master-log-pos.
+Test case 14 - no options used
+WARNING: Using default value 'root@localhost:3306' for option --master.
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
+
+mysqlreplicate.py: error: Option '--slave' is required.
+Test case 15 - option --slave missing
+Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
+
+mysqlreplicate.py: error: Option '--slave' is required.
