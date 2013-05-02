@@ -91,7 +91,7 @@
          Source="$(var.BuildDir)\mysqldiskusage.exe" DiskId="1"/>
         <File Id="exe_mysqlfailover" Name="mysqlfailover.exe"
          Source="$(var.BuildDir)\mysqlfailover.exe" DiskId="1"/>
-        <File Id="exe_mysqlfailover" Name="mysqlfrm.exe"
+        <File Id="exe_mysqlfrm" Name="mysqlfrm.exe"
          Source="$(var.BuildDir)\mysqlfrm.exe" DiskId="1"/>
         <File Id="exe_mysqlindexcheck" Name="mysqlindexcheck.exe"
          Source="$(var.BuildDir)\mysqlindexcheck.exe" DiskId="1"/>
