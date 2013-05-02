@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
-  xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'> 
+  xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
   <Product Id="*"
    Name="$(var.ProductName)"
    Version="$(var.Version)"
@@ -15,9 +15,9 @@
 
     <MajorUpgrade AllowDowngrades="no" Disallow="no"
      DowngradeErrorMessage="A later version of $(var.ProductName) is already installed."/>
-    
+
     <Media Id="1" Cabinet="ConnectorPython_Python.cab" EmbedCab="yes"/>
-   
+
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="ProgFilesFolder">
         <Directory Id="CompanyDir" Name="MySQL">
@@ -91,6 +91,8 @@
          Source="$(var.BuildDir)\mysqldiskusage.exe" DiskId="1"/>
         <File Id="exe_mysqlfailover" Name="mysqlfailover.exe"
          Source="$(var.BuildDir)\mysqlfailover.exe" DiskId="1"/>
+        <File Id="exe_mysqlfailover" Name="mysqlfrm.exe"
+         Source="$(var.BuildDir)\mysqlfrm.exe" DiskId="1"/>
         <File Id="exe_mysqlindexcheck" Name="mysqlindexcheck.exe"
          Source="$(var.BuildDir)\mysqlindexcheck.exe" DiskId="1"/>
         <File Id="exe_mysqlmetagrep" Name="mysqlmetagrep.exe"
@@ -249,7 +251,7 @@
         <ComponentRef Id="CompanyMenuComponent"/>
       </Feature>
     </Feature>
-    
+
     <InstallExecuteSequence>
       <!--<RemoveExistingProducts After="InstallInitialize"/>-->
     </InstallExecuteSequence>
@@ -270,4 +272,3 @@
     <!--<WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseRtf)" />-->
   </Product>
 </Wix>
-
