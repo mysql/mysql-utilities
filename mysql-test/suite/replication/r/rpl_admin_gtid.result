@@ -517,3 +517,49 @@ Test case 27 - slave not part of topology
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 | localhost  | PORT5  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
+Test case 28 - HEALTH with some transactions behind
+# Checking privileges.
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+*************************       1. row *************************
+            host: localhost
+            port: PORT1
+            role: MASTER
+           state: UP
+       gtid_mode: ON
+          health: OK
+         version: XX.XX.XX
+ master_log_file: XXXXX.XXXX
+  master_log_pos: XXXX
+       IO_Thread: 
+      SQL_Thread: 
+     Secs_Behind: X
+ Remaining_Delay: XXX
+    IO_Error_Num: 
+        IO_Error: 
+   SQL_Error_Num: 
+       SQL_Error: 
+    Trans_Behind: 
+*************************       2. row *************************
+            host: localhost
+            port: PORT2
+            role: SLAVE
+           state: UP
+       gtid_mode: ON
+          health: SQL thread is not running., Slave has 3 transactions behind master.
+         version: XX.XX.XX
+ master_log_file: XXXXX.XXXX
+  master_log_pos: XXXX
+       IO_Thread: Yes
+      SQL_Thread: No
+     Secs_Behind: X
+ Remaining_Delay: XXX
+    IO_Error_Num: 0
+        IO_Error: 
+   SQL_Error_Num: 0
+       SQL_Error: 
+    Trans_Behind: 3
+2 rows.
+# ...done.
