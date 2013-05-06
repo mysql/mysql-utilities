@@ -109,8 +109,8 @@ if opt.best is not None:
         best = int(opt.best)
     except:
         best = -1
-if best is not None and best < 0:
-    parser.error("The --best parameter must be an integer > 1")
+if best is not None and best < 1:
+    parser.error("The --best parameter must be an integer >= 1")
     
 worst = None
 if opt.worst is not None:
@@ -118,8 +118,8 @@ if opt.worst is not None:
         worst = int(opt.worst)
     except:
         worst = -1
-if worst is not None and worst < 0:
-    parser.error("The --worst parameter must be an integer > 1")
+if worst is not None and worst < 1:
+    parser.error("The --worst parameter must be an integer >= 1")
         
 if opt.stats and worst is not None and best is not None:
     parser.error("You must specify either --best or --worst but not both.")
@@ -130,7 +130,7 @@ if opt.stats and worst is None and best is None:
     
 # no stats specified
 if (worst is not None or best is not None) and not opt.stats:
-    parser.error("You must specify --stats for --best or --worst to take " \
+    parser.error("You must specify --stats for --best or --worst to take "
                  "effect.")
 
 # Build dictionary of options

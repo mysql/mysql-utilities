@@ -1102,9 +1102,14 @@ class Table(object):
             rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
                                          query_options)
         if rows:
-            print "#"
-            print "# Showing the top %s performing indexes from %s:\n#" % \
-                  (type, self.table)
+            print("#")
+            if limit == 1:
+                print("# Showing the {0} performing index from "
+                      "{1}:".format(type, self.table))
+            else:
+                print("# Showing the top {0} {1} performing indexes from "
+                "{2}:".format(limit, type, self.table))
+            print("#")
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")
             print_list(sys.stdout, format, cols, rows)

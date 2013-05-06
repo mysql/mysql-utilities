@@ -87,6 +87,16 @@ class test(check_index.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        comment = "Test case 10 - error: stats and worst=0"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=0 "
+                                 "util_test_a", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
+        comment = "Test case 11 - error: stats and best=0"
+        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=0 "
+                                 "util_test_a", comment)
+        if not res:
+            raise MUTLibError("%s: failed" % comment)
         self.replace_result("Error 1045", "Error XXXX: Access denied\n")
         self.replace_result("Error 2003", "Error XXXX: Access denied\n")
 

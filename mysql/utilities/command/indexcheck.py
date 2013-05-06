@@ -37,7 +37,7 @@ def check_index(src_val, table_args, options):
     table_args[in]     list of tables in the form 'db.table' or 'db'
     options[in]        dictionary of options to include:
                          show-drops   : show drop statements for dupe indexes
-                         skip         : skip non-existant tables
+                         skip         : skip non-existent tables
                          verbosity    : print extra information
                          show-indexes : show all indexes for each table
                          index-format : index format = sql, table, tab, csv
@@ -74,7 +74,7 @@ def check_index(src_val, table_args, options):
     table_list = []  # list of all tables to process
     
     # Build a list of objects to process
-    # 1. start with db_list if no obects present on command line
+    # 1. start with db_list if no objects present on command line
     # 2. process command line options.
     # 3. loop through database list and add all tables
     # 4. check indexes
@@ -142,4 +142,4 @@ def check_index(src_val, table_args, options):
 
     if verbosity > 1:    
         print "# ...done."
-    
+
