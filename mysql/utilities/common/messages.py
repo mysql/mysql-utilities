@@ -58,6 +58,8 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
                             "object '{only_obj_value}' was specified for "
                             "{db_obj_label} '{db_obj_value}'.")
 
+PARSE_ERR_DB_MISSING_CMP = "No databases specified to compare."
+
 PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
 
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."

@@ -31,8 +31,9 @@ import re
 import sys
 
 from mysql.utilities.command.dbcompare import database_compare
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
+from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
+                                             PARSE_ERR_DB_PAIR_EXT,
+                                             PARSE_ERR_DB_MISSING_CMP)
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -164,6 +165,10 @@ if opt.server2:
     except UtilError:
         _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
+
+# Check for arguments
+if len(args) == 0:
+    parser.error(PARSE_ERR_DB_MISSING_CMP)
 
 # Operations to perform:
 # 1) databases exist

@@ -22,3 +22,7 @@ Test case 5 - invalid format :inventory
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
 mysqldbcompare.py: error: Cannot parse the specified database(s): ':inventory'. Please verify that the database(s) are specified in a valid format (i.e., db1[:db2]) and that backtick quotes are properly used when required.
+Test case 6 - no options
+Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+
+mysqldbcompare.py: error: No databases specified to compare.
