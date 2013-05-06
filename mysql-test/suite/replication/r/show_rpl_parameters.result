@@ -140,4 +140,4 @@ localhost:PORT2 (MASTER)
 *************************       1. row *************************
  Master: localhost:PORT2
   Slave: localhost:PORT1
-1 rows.
+1 row.

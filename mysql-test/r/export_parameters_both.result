@@ -878,7 +878,7 @@ Test case 10 - VERTICAL format with BRIEF display
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
-1 rows.
+1 row.
 # TRIGGERS in util_test:
 *************************       1. row *************************
          TRIGGER_NAME: trg
@@ -893,7 +893,7 @@ Test case 10 - VERTICAL format with BRIEF display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
    DATABASE_COLLATION: latin1_swedish_ci
-1 rows.
+1 row.
 # PROCEDURES in util_test:
 *************************       1. row *************************
                  NAME: p1
@@ -909,7 +909,7 @@ Test case 10 - VERTICAL format with BRIEF display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
-1 rows.
+1 row.
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                  NAME: f1
@@ -925,7 +925,7 @@ Test case 10 - VERTICAL format with BRIEF display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
-1 rows.
+1 row.
 # EVENTS in util_test:
 *************************       1. row *************************
                  NAME: e1
@@ -944,7 +944,7 @@ Test case 10 - VERTICAL format with BRIEF display
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
-1 rows.
+1 row.
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -1114,7 +1114,7 @@ Test case 10 - VERTICAL format with BRIEF display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 11 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -1361,7 +1361,7 @@ Test case 11 - VERTICAL format with FULL display
         SECURITY_TYPE: DEFINER
  CHARACTER_SET_CLIENT: latin1
  COLLATION_CONNECTION: latin1_swedish_ci
-1 rows.
+1 row.
 # TRIGGERS in util_test:
 *************************       1. row *************************
             TRIGGER_CATALOG: None
@@ -1386,7 +1386,7 @@ Test case 11 - VERTICAL format with FULL display
        CHARACTER_SET_CLIENT: latin1
        COLLATION_CONNECTION: latin1_swedish_ci
          DATABASE_COLLATION: latin1_swedish_ci
-1 rows.
+1 row.
 # PROCEDURES in util_test:
 *************************       1. row *************************
                    DB: util_test
@@ -1409,7 +1409,7 @@ Test case 11 - VERTICAL format with FULL display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: INSERT INTO util_test.t1 VALUES ("50")
-1 rows.
+1 row.
 # FUNCTIONS in util_test:
 *************************       1. row *************************
                    DB: util_test
@@ -1432,7 +1432,7 @@ Test case 11 - VERTICAL format with FULL display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: RETURN (SELECT 1)
-1 rows.
+1 row.
 # EVENTS in util_test:
 *************************       1. row *************************
                    DB: util_test
@@ -1457,7 +1457,7 @@ Test case 11 - VERTICAL format with FULL display
  COLLATION_CONNECTION: latin1_swedish_ci
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: DELETE FROM util_test.t1 WHERE a = "not there"
-1 rows.
+1 row.
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -1628,7 +1628,7 @@ Test case 11 - VERTICAL format with FULL display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 12 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -1646,23 +1646,23 @@ Test case 12 - VERTICAL format with NAMES display
 # VIEWS in util_test:
 *************************       1. row *************************
  TABLE_NAME: v1
-1 rows.
+1 row.
 # TRIGGERS in util_test:
 *************************       1. row *************************
  TRIGGER_NAME: trg
-1 rows.
+1 row.
 # PROCEDURES in util_test:
 *************************       1. row *************************
  NAME: p1
-1 rows.
+1 row.
 # FUNCTIONS in util_test:
 *************************       1. row *************************
  NAME: f1
-1 rows.
+1 row.
 # EVENTS in util_test:
 *************************       1. row *************************
  NAME: e1
-1 rows.
+1 row.
 # GRANTS in util_test:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
@@ -1833,7 +1833,7 @@ Test case 12 - VERTICAL format with NAMES display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 13 - copy all databases
 # Source on XXXX-XXXX: ... connected.

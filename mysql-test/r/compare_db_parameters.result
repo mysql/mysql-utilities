@@ -294,13 +294,13 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
   code: 2
 - name: Never Enough Inc.
 + name: Wesayso Corporation
- 1 rows.
+ 1 row.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
-1 rows.
+1 row.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
@@ -683,18 +683,18 @@ Test case 9 - Use  -a --difftype=context --format=vertical
   *************************       1. row *************************
    code: 2
 !  name: Never Enough Inc.
-  1 rows.
+  1 row.
 --- 1,4 ----
   *************************       1. row *************************
    code: 2
 !  name: Wesayso Corporation
-  1 rows.
+  1 row.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
-1 rows.
+1 row.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #
@@ -1090,13 +1090,13 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
    code: 2
 -  name: Never Enough Inc.
 +  name: Wesayso Corporation
-  1 rows.
+  1 row.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
  code: 3
  name: Never Enough Inc.
-1 rows.
+1 row.
 
 # TABLE     supplies                                pass    FAIL    FAIL    
 #

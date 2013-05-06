@@ -175,5 +175,5 @@ CREATE INDEX s4 ON util_test_a.t1 (d(32))
      name: id
      type: BTREE
   columns: id
-1 rows.
+1 row.
 #

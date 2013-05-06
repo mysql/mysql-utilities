@@ -163,8 +163,8 @@ def format_vertical_list(file, columns, rows):
                                                 row[i]))
 
     if row_num > 0:
-        file.write("%d rows.\n" % int(row_num))
-
+        row_str = 'rows' if row_num > 1 else 'row'
+        file.write("{0} {1}.\n".format(row_num, row_str))
 
 def print_list(file, format, columns, rows, no_headers=False, sort=False):
     """Print a list based on format.

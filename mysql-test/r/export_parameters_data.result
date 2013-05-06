@@ -228,7 +228,7 @@ Test case 8 - VERTICAL format
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 9 - sql format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -392,7 +392,7 @@ Test case 13 - VERTICAL format no headers
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 14 - SQ format
 # Source on XXXX-XXXX: ... connected.
@@ -556,7 +556,7 @@ Test case 18 - v format
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 19 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
@@ -879,7 +879,7 @@ Test case 28 - VERTICAL format with BRIEF display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 29 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -927,7 +927,7 @@ Test case 29 - VERTICAL format with FULL display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 30 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -975,7 +975,7 @@ Test case 30 - VERTICAL format with NAMES display
 *************************       1. row *************************
  c: 3
  d: 2
-1 rows.
+1 row.
 #...done.
 Test case 31 - multiple blobs
 # Source on XXXX-XXXX: ... connected.
