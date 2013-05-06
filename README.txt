@@ -1,6 +1,6 @@
 ###############
 MySQL Utilities
-############### 
+###############
 
 MySQL Utilities contain a collection of scripts useful for managing
 and administering MySQL servers.
@@ -26,6 +26,45 @@ To get a complete list of commands available for ``setup.py``, you can
 do::
 
     python setup.py --help-commands
+
+
+Uninstall
+---------
+
+There is no automatic uninstall for MySQL Utilities due to the limitations
+of the distutils Python package builder. There is no uninstall/remove
+operation supported by distutils.
+
+The 1.3.X release of MySQL Utilities available on dev.mysql.com has
+been packaged for several platforms which do support install/uninstall.
+
+You can remove MySQL Utilities manually by performing the following steps:
+
+On Mac OS X:
+
+1. remove the mysql scripts from /usr/local/bin
+2. remove the directory tree /Library/Python/X.Y/site-packages/mysql/utilities/
+   Where X.Y is your Python version - e.g. 2.7
+
+   Note: you may need elevated privileges to delete the files
+
+On Windows:
+
+1. remove the mysql scripts from c:\pythonXY\scripts
+2. remove the directory tree c:\pythonXY\Lib\site-packages\mysql\utilities
+
+   Where XY is your version of Python - e.g. c:\Python27\)
+
+On Linux:
+
+1. remove the mysql scripts from /usr/local/bin
+2. remove the directory tree /usr/local/lib/Python/X.Y/site-packages/mysql/utilities/
+   Where X.Y is your Python version - e.g. 2.7
+
+   Note: you may need elevated privileges to delete the files
+
+Note: If the mysql package folder does not contain other packages, and
+only the __init__.py, you can also remove the mysql package folder.
 
 
 Requirements
