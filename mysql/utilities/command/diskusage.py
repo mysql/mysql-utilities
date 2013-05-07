@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,10 +26,10 @@ import sys
 from mysql.utilities.exception import UtilError
 
 # Constants
-_KB = (1024)
-_MB = (1024*_KB)
-_GB = (1024*_MB)
-_TB = (1024*_GB)
+_KB = 1024.0
+_MB = 1024.0 * _KB
+_GB = 1024.0 * _MB
+_TB = 1024.0 * _GB
 
 _QUERY_DATAFREE = """
     SELECT DISTINCT data_free
