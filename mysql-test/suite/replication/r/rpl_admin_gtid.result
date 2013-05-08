@@ -408,6 +408,7 @@ Test case 22 - failover to localhost:PORT4
 # Stopping slaves.
 # Performing STOP on all slaves.
 # Switching slaves to new master.
+# Disconnecting new master as slave.
 # Starting slaves.
 # Performing START on all slaves.
 # Checking slaves for errors.

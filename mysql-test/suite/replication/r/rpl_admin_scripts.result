@@ -40,8 +40,8 @@ Test case 1 - test failover scripts
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Change master command for localhost:PORT3
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for localhost:PORT4
-# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Disconnecting new master as slave.
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok

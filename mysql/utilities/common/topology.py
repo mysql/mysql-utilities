@@ -2027,6 +2027,9 @@ class Topology(Replication):
         self._report("# Stopping slaves.")
         self.run_cmd_on_slaves("stop", not self.verbose)
 
+        # Take the new master out of the slaves list.
+        self._remove_slave(new_master_dict)
+
         self._report("# Switching slaves to new master.")
         for slave_dict in self.slaves:
             slave = slave_dict['instance']
@@ -2036,8 +2039,16 @@ class Topology(Replication):
             slave.switch_master(self.master, user, passwd, False, None, None,
                                 self.verbose and not self.quiet)
 
-        # Take the server out of the list.
-        self._remove_slave(new_master_dict)
+        # Clean previous replication settings on the new master.
+        self._report("# Disconnecting new master as slave.")
+        # Make sure the new master is not acting as a slave (STOP SLAVE).
+        self.master.exec_query("STOP SLAVE")
+        # Execute RESET SLAVE ALL on the new master.
+        if self.verbose and not self.quiet:
+            self._report("# Execute on {0}:{1}: "
+                         "RESET SLAVE ALL".format(self.master.host,
+                                                  self.master.port))
+        self.master.exec_query("RESET SLAVE ALL")
 
         # Starting all slaves
         self._report("# Starting slaves.")
