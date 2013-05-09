@@ -502,6 +502,7 @@ def add_failover_options(parser):
       --seconds-behind
       --slaves
       --timeout
+      --script-threshold
 
     parser[in]        the parser instance
     """
@@ -573,6 +574,13 @@ def add_failover_options(parser):
                       "replication command to complete. For example, timeout "
                       "for slave waiting to catch up to master. "
                       "Default = 300.")
+
+    parser.add_option("--script-threshold", action="store", default=None,
+                      dest="script_threshold",
+                      help="Value for external scripts to trigger aborting "
+                      "the operation if result is greater than or equal to "
+                      "the threshold. Default = None (no threshold "
+                      "checking).")
 
 
 def check_server_lists(parser, master, slaves):

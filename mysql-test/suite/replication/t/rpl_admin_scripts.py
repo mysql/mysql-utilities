@@ -66,16 +66,22 @@ class test(rpl_admin_gtid.test):
         self.remove_result("localhost,%s,SLAVE," % self.s2_port)
         self.remove_result("localhost,%s,SLAVE," % self.s3_port)
 
-        comment = "Test case %s - test failover scripts" % test_num
-        slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
+        slaves = ",".join(["root:root@127.0.0.1:{0}".format(self.server2.port),
                            slave2_conn, slave3_conn])
         script = os.path.join(os.getcwd(), "std_data/show_arguments.sh")
-        command = " ".join(["mysqlrpladmin.py ",
-                            "--candidates=%s  " % slave3_conn,
-                            "--slaves=%s failover" % slaves,
-                            "--exec-before=%s" % script,
-                            "--exec-after=%s" % script, "-vvv"])
-        res = mutlib.System_test.run_test_case(self, 0, command, comment)
+
+        master_str = "--master={0}".format(master_conn)
+        new_master_str = "--new-master={0} ".format(slave3_conn)
+        exec_before_str = "--exec-before={0}".format(script)
+        exec_after_str = "--exec-after={0}".format(script)
+        slaves_str = "--slaves={0}".format(slaves)
+        candidates_str = "--candidates={0}".format(slave3_conn)
+
+        comment = "Test case %s - test failover scripts" % test_num
+        command = " ".join(["mysqlrpladmin.py ", candidates_str, slaves_str,
+                            "failover", exec_before_str, exec_after_str,
+                            "-vvv"])
+        res = self.run_test_case(0, command, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
@@ -84,15 +90,45 @@ class test(rpl_admin_gtid.test):
         rpl_admin_gtid.test.reset_topology(self)
 
         comment = "Test case %s - test switchover scripts" % test_num
-        command = " ".join(["mysqlrpladmin.py --master=%s " % master_conn,
-                            "--new-master=%s  " % slave3_conn, "switchover",
-                            "--exec-before=%s" % script, "--demote-master",
-                            "--exec-after=%s" % script, "-vvv",
-                            "--slaves=%s" % slaves])
-        res = mutlib.System_test.run_test_case(self, 0, command, comment)
+        command = " ".join(["mysqlrpladmin.py", master_str, new_master_str,
+                            "switchover", exec_before_str, exec_after_str,
+                            "--demote-master", "-vvv", slaves_str])
+        res = self.run_test_case(0, command, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
+
+        # Run test cases for testing:
+        # a) before/after script fail for switchover, failover
+        # b) border cases for threshold parameter
+
+        script_exit = os.path.join(os.getcwd(), "std_data/check_threshold.sh")
+        script_test_cases = [("<", 11, 0), ("=", 10, 1), (">", 9, 1)]
+        script_options = [(script_exit, script), (script, script_exit)]
+
+
+        com_fmt = "Test case {0} - test script exit {1} threshold {2}"
+        switch_fmt = " ".join(["mysqlrpladmin.py", master_str, "switchover",
+                               "--exec-before={0} ", new_master_str,
+                               slaves_str, "--demote-master",
+                               "--exec-after={1} ", "-vvv",
+                               "--script-threshold={2}"])
+        fail_fmt = " ".join(["mysqlrpladmin.py ", candidates_str, slaves_str,
+                             "--exec-before={0} ", "--exec-after={1} ",
+                             "-vvv", "--script-threshold={2}", "failover"])
+        commands = [("switchover", switch_fmt), ("failover", fail_fmt)]
+        for command in commands:
+            for opt in script_options:
+                for test_case in script_test_cases:
+                    # Now we return the topology to its original state for other tests
+                    rpl_admin_gtid.test.reset_topology(self)
+                    comment = com_fmt.format(test_num, test_case[0],
+                                             command[0])
+                    cmd_str = command[1].format(opt[0], opt[1], test_case[1])
+                    res = self.run_test_case(test_case[2], cmd_str, comment)
+                    if not res:
+                        raise MUTLibError("{0}: failed".format(comment))
+                    test_num += 1
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
@@ -108,6 +144,13 @@ class test(rpl_admin_gtid.test):
         self.replace_result("# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_",
                             "# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]\n")
         self.replace_result("# Return Code =", "# Return Code = XXX\n")
+        self.replace_result("ERROR: External script",
+                            "ERROR: External script XXXXXXX\n")
+        self.replace_result("ERROR: {0}".format(script),
+                            "ERROR: XXX Script failed.\n")
+        self.replace_result("ERROR: {0}".format(script_exit),
+                            "ERROR: XXX Script failed.\n")
+
 
         return True
 

@@ -96,3 +96,9 @@ CANDIDATES = "candidates"
 ERROR_MASTER_IN_SLAVES = ("The master {master_host}:{master_port} "
                           "and one of the specified {slaves_candidates} "
                           "are the same {slave_host}:{slave_port}.")
+
+SCRIPT_THRESHOLD_WARNING = ("WARNING: You have chosen to use external script "
+                            "return code checking. Depending on which script "
+                            "fails, this can leave the operation in an "
+                            "undefined state. Please check your results "
+                            "carefully if the operation aborts.")

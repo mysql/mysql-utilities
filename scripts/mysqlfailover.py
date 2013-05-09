@@ -32,6 +32,7 @@ import signal
 import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
@@ -200,26 +201,27 @@ for cand_val in candidates_val:
 
 # Create dictionary of options
 options = {
-    'candidates'    : candidates_val,
-    'ping'          : 3 if opt.ping is None else opt.ping,
-    'verbosity'     : 0 if opt.verbosity is None else opt.verbosity,
-    'before'        : opt.exec_before,
-    'after'         : opt.exec_after,
-    'fail_check'    : opt.exec_fail,
-    'max_position'  : opt.max_position,
-    'max_delay'     : opt.max_delay,
-    'discover'      : opt.discover,
-    'timeout'       : int(opt.timeout),
-    'interval'      : opt.interval,
-    'failover_mode' : opt.failover_mode,
-    'logging'       : opt.log_file is not None,
-    'log_file'      : opt.log_file,
-    'force'         : opt.force,
-    'post_fail'     : opt.exec_post_fail,
-    'rpl_user'      : opt.rpl_user,
-    'rediscover'    : opt.rediscover,
-    'pedantic'      : opt.pedantic,
-    'no_keyboard'   : opt.no_keyboard
+    'candidates'       : candidates_val,
+    'ping'             : 3 if opt.ping is None else opt.ping,
+    'verbosity'        : 0 if opt.verbosity is None else opt.verbosity,
+    'before'           : opt.exec_before,
+    'after'            : opt.exec_after,
+    'fail_check'       : opt.exec_fail,
+    'max_position'     : opt.max_position,
+    'max_delay'        : opt.max_delay,
+    'discover'         : opt.discover,
+    'timeout'          : int(opt.timeout),
+    'interval'         : opt.interval,
+    'failover_mode'    : opt.failover_mode,
+    'logging'          : opt.log_file is not None,
+    'log_file'         : opt.log_file,
+    'force'            : opt.force,
+    'post_fail'        : opt.exec_post_fail,
+    'rpl_user'         : opt.rpl_user,
+    'rediscover'       : opt.rediscover,
+    'pedantic'         : opt.pedantic,
+    'no_keyboard'      : opt.no_keyboard,
+    'script_threshold' : opt.script_threshold,
 }
 
 # Purge log file of old data
@@ -230,6 +232,10 @@ if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
 logging.basicConfig(filename=opt.log_file, level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt=_DATE_FORMAT)
+
+# Warn user about script threshold checking.
+if opt.script_threshold:
+    print(SCRIPT_THRESHOLD_WARNING)
 
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)

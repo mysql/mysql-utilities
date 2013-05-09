@@ -32,6 +32,7 @@ import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
 from mysql.utilities.common.options import add_format_option, add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
@@ -279,24 +280,25 @@ if master_val:
 
 # Create dictionary of options
 options = {
-    'new_master'   : new_master_val,
-    'candidates'   : candidates_val,
-    'ping'         : 3 if opt.ping is None else opt.ping,
-    'format'       : opt.format,
-    'verbosity'    : 0 if opt.verbosity is None else opt.verbosity,
-    'before'       : opt.exec_before,
-    'after'        : opt.exec_after,
-    'force'        : opt.force,
-    'max_position' : opt.max_position,
-    'max_delay'    : opt.max_delay,
-    'discover'     : opt.discover,
-    'timeout'      : int(opt.timeout),
-    'demote'       : opt.demote,
-    'quiet'        : opt.quiet,
-    'logging'      : opt.log_file is not None,
-    'log_file'     : opt.log_file,
-    'no_health'    : opt.no_health,
-    'rpl_user'     : opt.rpl_user,
+    'new_master'       : new_master_val,
+    'candidates'       : candidates_val,
+    'ping'             : 3 if opt.ping is None else opt.ping,
+    'format'           : opt.format,
+    'verbosity'        : 0 if opt.verbosity is None else opt.verbosity,
+    'before'           : opt.exec_before,
+    'after'            : opt.exec_after,
+    'force'            : opt.force,
+    'max_position'     : opt.max_position,
+    'max_delay'        : opt.max_delay,
+    'discover'         : opt.discover,
+    'timeout'          : int(opt.timeout),
+    'demote'           : opt.demote,
+    'quiet'            : opt.quiet,
+    'logging'          : opt.log_file is not None,
+    'log_file'         : opt.log_file,
+    'no_health'        : opt.no_health,
+    'rpl_user'         : opt.rpl_user,
+    'script_threshold' : opt.script_threshold,
 }
 
 # If command = HEALTH, turn on --force
@@ -306,6 +308,10 @@ if command == 'health' or command == 'gtid':
 # Purge log file of old data
 if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
     parser.error("Error purging log file.")
+
+# Warn user about script threshold checking.
+if opt.script_threshold:
+    print(SCRIPT_THRESHOLD_WARNING)
 
 # Setup log file
 try:
