@@ -73,7 +73,10 @@ parser = MyParser(
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
     epilog=get_valid_rpl_command_text())
-parser.add_option("--help", action="help")
+
+# Default option to provide help information
+parser.add_option("--help", action="help", help="display this help message "
+                  "and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)

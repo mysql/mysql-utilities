@@ -41,11 +41,11 @@ Options:
                         server2, use --changes-for=server1. Valid values are
                         'server1' or 'server2'. The default is 'server1'.
   --show-reverse        produce a transformation report containing the SQL
-                        statements to conform the object definitions specified
-                        in reverse. For example if --changes-for is set to
-                        server1, also generate the transformation for server2.
-                        Note: the reverse changes are annotated and marked as
-                        comments.
+                        statements to transform the object definitions
+                        specified in reverse. For example if --changes-for is
+                        set to server1, also generate the transformation for
+                        server2. Note: the reverse changes are annotated and
+                        marked as comments.
 Test case 2 - Use  -a --difftype=unified --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

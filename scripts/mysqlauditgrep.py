@@ -71,24 +71,24 @@ parser.add_option("--help", action="help", help="display this help message "
 
 # Output format, default is initially set to None to determine the correct
 # behavior when no search criteria is specified.
-add_format_option_with_extras(parser, "Display the output in either GRID "
+add_format_option_with_extras(parser, "display the output in either GRID "
                               "(default), TAB, CSV, VERTICAL and RAW format",
                               None, ['raw'])
 
 # Search criteria to find entries for specified users
 parser.add_option("--users", "-u", action="store", dest="users",
                   type="string", default=None,
-                  help="Find log entries by user name. Accepts a comma-"
+                  help="find log entries by user name. Accepts a comma-"
                   "separated list of user names, for example: joe,sally,nick")
 
 # Show audit log file statistics
 parser.add_option("--file-stats", action="store_true", default=False,
-                  dest="stats", help="Display the audit log statistics.")
+                  dest="stats", help="display the audit log statistics.")
 
 # Search criteria to retrieve entries starting from a specific date/time
 parser.add_option("--start-date", action="store", dest="start_date",
                   type="string", default=None,
-                  help="Retrieve log entries starting from the specified "
+                  help="retrieve log entries starting from the specified "
                   "date/time. If not specified or the value is 0, all entries "
                   "from the start of the log are displayed. Accepted formats: "
                   "yyyy-mm-ddThh:mm:ss or yyyy-mm-dd.")
@@ -96,7 +96,7 @@ parser.add_option("--start-date", action="store", dest="start_date",
 # Search criteria to retrieve entries until the specific date/time
 parser.add_option("--end-date", action="store", dest="end_date",
                   type="string", default=None,
-                  help="Retrieve log entries until the specified date/time."
+                  help="retrieve log entries until the specified date/time."
                   "If not specified or the value is 0, all entries to the "
                   "end of the log are displayed. Accepted formats: "
                   "yyyy-mm-ddThh:mm:ss or yyyy-mm-dd.")
@@ -104,12 +104,12 @@ parser.add_option("--end-date", action="store", dest="end_date",
 # Search pattern to retrieve matching entries
 parser.add_option("-e", "--pattern", action="store", dest="pattern",
                   type="string", default=None,
-                  help="Search pattern to retrieve matching entries.")
+                  help="search pattern to retrieve matching entries.")
 
 # Search criteria to retrieve entries from the given SQL stmt/cmd types
 parser.add_option("--query-type", action="store", dest="query_type",
                   type="string", default=None,
-                  help="Search for all SQL statements/commands from the given "
+                  help="search for all SQL statements/commands from the given "
                   "list of commands. Accepts a comma-separated list of "
                   "commands. Supported values: "
                   + ", ".join(audit_log.QUERY_TYPES))
@@ -117,7 +117,7 @@ parser.add_option("--query-type", action="store", dest="query_type",
 # Search criteria to retrieve entries from the given SQL stmt/cmd types
 parser.add_option("--event-type", action="store", dest="event_type",
                   type="string", default=None,
-                  help="Search for all recorded event types from the given "
+                  help="search for all recorded event types from the given "
                   "list of supported log events. Accepts a comma-separated "
                   "list of event types. Supported values: "
                   + ", ".join(audit_log.EVENT_TYPES))

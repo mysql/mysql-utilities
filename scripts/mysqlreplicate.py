@@ -76,7 +76,7 @@ parser.add_option("-p", "--pedantic", action="store_true", default=False,
 # Test replication option
 parser.add_option("--test-db", action="store", dest="test_db",
                   type="string", help="database name to use in testing "
-                  " replication setup (optional)")
+                  "replication setup (optional)")
 
 # Add master log file option
 parser.add_option("--master-log-file", action="store", dest="master_log_file",

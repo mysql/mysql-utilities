@@ -5,7 +5,7 @@ mysqlrpladmin - administration utility for MySQL replication
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display this help message and exit
   --candidates=CANDIDATES
                         connection information for candidate slave servers for
                         failover in the form:
@@ -34,21 +34,21 @@ Options:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>]
   --max-position=MAX_POSITION
-                        Used to detect slave delay. The maximum difference
+                        used to detect slave delay. The maximum difference
                         between the master's log position and the slave's
                         reported read position of the master. A value greater
                         than this means the slave is too far behind the
                         master. Default is 0.
   --ping=PING           Number of ping attempts for detecting downed server.
   --seconds-behind=MAX_DELAY
-                        Used to detect slave delay. The maximum number of
+                        used to detect slave delay. The maximum number of
                         seconds behind the master permitted before slave is
                         considered behind the master. Default is 0.
   --slaves=SLAVES       connection information for slave servers in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>]. List multiple slaves
                         in comma-separated list.
-  --timeout=TIMEOUT     Maximum timeout in seconds to wait for each
+  --timeout=TIMEOUT     maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout
                         for slave waiting to catch up to master. Default =
                         300.

@@ -7,33 +7,33 @@ Options:
   --version             show program's version number and exit
   --help                display this help message and exit
   -f FORMAT, --format=FORMAT
-                        Display the output in either GRID (default), TAB, CSV,
+                        display the output in either GRID (default), TAB, CSV,
                         VERTICAL and RAW format
   -u USERS, --users=USERS
-                        Find log entries by user name. Accepts a comma-
+                        find log entries by user name. Accepts a comma-
                         separated list of user names, for example:
                         joe,sally,nick
-  --file-stats          Display the audit log statistics.
+  --file-stats          display the audit log statistics.
   --start-date=START_DATE
-                        Retrieve log entries starting from the specified
+                        retrieve log entries starting from the specified
                         date/time. If not specified or the value is 0, all
                         entries from the start of the log are displayed.
                         Accepted formats: yyyy-mm-ddThh:mm:ss or yyyy-mm-dd.
-  --end-date=END_DATE   Retrieve log entries until the specified date/time.If
+  --end-date=END_DATE   retrieve log entries until the specified date/time.If
                         not specified or the value is 0, all entries to the
                         end of the log are displayed. Accepted formats: yyyy-
                         mm-ddThh:mm:ss or yyyy-mm-dd.
   -e PATTERN, --pattern=PATTERN
-                        Search pattern to retrieve matching entries.
+                        search pattern to retrieve matching entries.
   --query-type=QUERY_TYPE
-                        Search for all SQL statements/commands from the given
+                        search for all SQL statements/commands from the given
                         list of commands. Accepts a comma-separated list of
                         commands. Supported values: CREATE, ALTER, DROP,
                         TRUNCATE, RENAME, GRANT, REVOKE, SELECT, INSERT,
                         UPDATE, DELETE, COMMIT, SHOW, SET, CALL, PREPARE,
                         EXECUTE, DEALLOCATE
   --event-type=EVENT_TYPE
-                        Search for all recorded event types from the given
+                        search for all recorded event types from the given
                         list of supported log events. Accepts a comma-
                         separated list of event types. Supported values:
                         Audit, Binlog Dump, Change user, Close stmt, Connect

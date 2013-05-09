@@ -277,7 +277,7 @@ def add_reverse(parser):
     """
     parser.add_option("--show-reverse", action="store_true", dest="reverse",
                       default=False, help="produce a transformation report "
-                      "containing the SQL statements to conform the object "
+                      "containing the SQL statements to transform the object "
                       "definitions specified in reverse. For example if "
                       "--changes-for is set to server1, also generate the "
                       "transformation for server2. Note: the reverse changes "
@@ -545,7 +545,7 @@ def add_failover_options(parser):
                       "[:<socket>] or <login-path>[:<port>][:<socket>]")
 
     parser.add_option("--max-position", action="store", dest="max_position",
-                      default=0, type="int", help="Used to detect slave "
+                      default=0, type="int", help="used to detect slave "
                       "delay. The maximum difference between the master's "
                       "log position and the slave's reported read position of "
                       "the master. A value greater than this means the slave "
@@ -556,7 +556,7 @@ def add_failover_options(parser):
                       "server.")
 
     parser.add_option("--seconds-behind", action="store", dest="max_delay",
-                      default=0, type="int", help="Used to detect slave "
+                      default=0, type="int", help="used to detect slave "
                       "delay. The maximum number of seconds behind the master "
                       "permitted before slave is considered behind the master. "
                       "Default is 0.")
@@ -569,7 +569,7 @@ def add_failover_options(parser):
                       "List multiple slaves in comma-separated list.")
 
     parser.add_option("--timeout", action="store", dest="timeout", default=300,
-                      help="Maximum timeout in seconds to wait for each "
+                      help="maximum timeout in seconds to wait for each "
                       "replication command to complete. For example, timeout "
                       "for slave waiting to catch up to master. "
                       "Default = 300.")

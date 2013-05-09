@@ -29,7 +29,7 @@ Options:
                         requirement, in the form: <user>[:<password>] or
                         <login-path>. E.g. rpl:passwd - By default = rpl:rpl
   -p, --pedantic        fail if storage engines differ among master and slave.
-  --test-db=TEST_DB     database name to use in testing  replication setup
+  --test-db=TEST_DB     database name to use in testing replication setup
                         (optional)
   --master-log-file=MASTER_LOG_FILE
                         use this master log file to initiate the slave.

@@ -5,11 +5,11 @@ mysqluc - Command line client for running MySQL Utilities
 
 Options:
   --version             show program's version number and exit
-  --help                
+  --help                display this help message and exit
   --width=WIDTH         display width
   --utildir=UTILDIR     location of utilities
   -e COMMANDS, --execute=COMMANDS
-                        Execute commands and exit. Multiple commands are
+                        execute commands and exit. Multiple commands are
                         separated with semi-colons. Note: some platforms may
                         require double quotes around command list.
   -v, --verbose         control how much information is displayed. e.g., -v =
@@ -49,11 +49,12 @@ Option                     Description
                            are 'server1' or 'server2'. The default is      
                            'server1'.                                      
 --show-reverse             produce a transformation report containing the  
-                           SQL statements to conform the object definitions
-                           specified in reverse. For example if --changes- 
-                           for is set to server1, also generate the        
-                           transformation for server2. Note: the reverse   
-                           changes are annotated and marked as comments.   
+                           SQL statements to transform the object          
+                           definitions specified in reverse. For example if
+                           --changes-for is set to server1, also generate  
+                           the transformation for server2. Note: the       
+                           reverse changes are annotated and marked as     
+                           comments.                                       
 
 Test Case 3: Verbosity
 
@@ -91,11 +92,12 @@ Option                     Description
                            are 'server1' or 'server2'. The default is      
                            'server1'.                                      
 --show-reverse             produce a transformation report containing the  
-                           SQL statements to conform the object definitions
-                           specified in reverse. For example if --changes- 
-                           for is set to server1, also generate the        
-                           transformation for server2. Note: the reverse   
-                           changes are annotated and marked as comments.   
+                           SQL statements to transform the object          
+                           definitions specified in reverse. For example if
+                           --changes-for is set to server1, also generate  
+                           the transformation for server2. Note: the       
+                           reverse changes are annotated and marked as     
+                           comments.                                       
 
 Test Case 4: Quiet
 Quiet mode, saving output to XXXXXXXXXXXXXX
@@ -148,7 +150,7 @@ Option                     Description
                            'server1'.                  
 --show-reverse             produce a transformation    
                            report containing the SQL   
-                           statements to conform the   
+                           statements to transform the 
                            object definitions specified
                            in reverse. For example if  
                            --changes-for is set to     
@@ -197,7 +199,7 @@ Option                     Description
                            or 'server2'. The default is 'server1'.
 --show-reverse             produce a transformation report        
                            containing the SQL statements to       
-                           conform the object definitions         
+                           transform the object definitions       
                            specified in reverse. For example if   
                            --changes-for is set to server1, also  
                            generate the transformation for        

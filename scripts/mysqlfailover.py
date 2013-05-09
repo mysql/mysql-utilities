@@ -92,7 +92,10 @@ parser = UtilitiesParser(
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False)
-parser.add_option("--help", action="help")
+
+# Default option to provide help information
+parser.add_option("--help", action="help", help="display this help message "
+                  "and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)
@@ -132,7 +135,7 @@ parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
 
 # Add rediscover on interval
 parser.add_option("--rediscover", action="store_true", dest="rediscover",
-                  help="Rediscover slaves on interval. Allows console to "
+                  help="rediscover slaves on interval. Allows console to "
                   "detect when slaves have been removed or added.")
 
 # Pedantic mode for failing if some inconsistencies are found

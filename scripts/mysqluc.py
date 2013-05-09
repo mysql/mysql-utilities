@@ -87,7 +87,10 @@ parser = UtilitiesParser(
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False)
-parser.add_option("--help", action="help")
+
+# Default option to provide help information
+parser.add_option("--help", action="help", help="display this help message "
+                  "and exit")
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
@@ -101,7 +104,7 @@ parser.add_option("--utildir", action="store", dest="utildir",
 
 # Add execute mode
 parser.add_option("-e", "--execute", action="store", dest="commands",
-                  type="string", help="Execute commands and exit. Multiple "
+                  type="string", help="execute commands and exit. Multiple "
                   "commands are separated with semi-colons. Note: some "
                   "platforms may require double quotes around command list.",
                   default=None)
