@@ -180,7 +180,7 @@ def _read_row(file, format, skip_comments=False):
                 elif len(row[0]) > _GTID_PREFIX + _RPL and \
                    row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                     yield row
-                    
+
             elif format == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
@@ -444,14 +444,13 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
                             cur_col[ref_col_index], cur_col[ref_col_ref]])
     if len(key_str) > 0:
         stop = len(key_list)
+        fixed_keys = []
         for key in range(0,stop):
             # Quote keys with backticks if needed
             if key_list[key] and not is_quoted_with_backticks(key_list[key]):
                 key_list[key] = quote_with_backticks(key_list[key])
-            key_str += "%s" % key_list[key]
-            if key+1 < stop-1:
-                key_str += ", "
-        key_str += ")"
+            fixed_keys.append(key_list[key])
+        key_str += ",".join(fixed_keys) + ")"
         create_str += key_str
     if len(constraints) > 0:
         for constraint in constraints:
@@ -751,7 +750,7 @@ def _build_insert_data(col_names, tbl_name, data):
     Returns (string) the INSERT statement.
     """
     from mysql.utilities.common.sql_transform import to_sql
-    
+
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
            ") VALUES (" + ','.join(imap(to_sql, data))  + ");"
 
@@ -1062,7 +1061,7 @@ def import_file(dest_val, file_name, options):
 
             dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                        access_options)
-            
+
         # Now check to see if we want definitions, data, or both:
         if row[0] == "sql" or row[0] in _DEFINITION_LIST:
             if format != "sql" and len(row[1]) == 1:
@@ -1121,7 +1120,7 @@ def import_file(dest_val, file_name, options):
                                                          row[1])
                                 statements.append(str)
 
-    # Process remaining definitions                                 
+    # Process remaining definitions
     if len(definitions) > 0:
         _process_definitions(statements, table_col_list, db_name)
         definitions = []
@@ -1136,7 +1135,7 @@ def import_file(dest_val, file_name, options):
     _exec_statements(statements, destination, format, options, dryrun)
 
     file.close()
-    
+
     # Check gtid process
     if supports_gtid and not gtid_command_found:
         print _GTID_MISSING_WARNING
