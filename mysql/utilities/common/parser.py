@@ -31,11 +31,12 @@ _HEADER_SERVER_CRE = re.compile(r"Tcp port:\s*(\d+)\s+Unix socket:\s+(.*)")
 
 _SLOW_TIMESTAMP_CRE = re.compile(r"#\s+Time:\s+(" + _DATE_PAT + r")")
 _SLOW_USERHOST_CRE = re.compile(r"#\s+User@Host:\s+"
-                       r"(?:([\w\d]+))?\s*"
-                       r"\[\s*([\w\d]+)\s*\]\s*"
-                       r"@\s*"
-                       r"([\w\d\.\-]*)\s*"
-                       r"\[\s*([\d.]*)\s*\]")
+                                r"(?:([\w\d]+))?\s*"
+                                r"\[\s*([\w\d]+)\s*\]\s*"
+                                r"@\s*"
+                                r"([\w\d\.\-]*)\s*"
+                                r"\[\s*([\d.]*)\s*\]\s*"
+                                r"(?:Id\:\s*(\d+)?\s*)?")
 _SLOW_STATS_CRE = re.compile(r"#\sQuery_time:\s(\d*\.\d{1,6})\s*"
             r"Lock_time:\s(\d*\.\d{1,6})\s*"
             r"Rows_sent:\s(\d*)\s*"
@@ -562,10 +563,12 @@ class SlowQueryLog(LogParserBase):
         (priv_user,
          unpriv_user,
          host,
-         ip) = self._parse_line(_SLOW_USERHOST_CRE, line)
+         ip,
+         sid) = self._parse_line(_SLOW_USERHOST_CRE, line)
 
         entry['user'] = priv_user if priv_user else unpriv_user
         entry['host'] = host if host else ip
+        entry['session_id'] = sid
 
     def _parse_timestamp(self, line, entry):
         """Parses a timestamp
@@ -714,6 +717,7 @@ class LogEntryBase(dict):
         self['database'] = None
         self['user'] = None
         self['host'] = None
+        self['session_id'] = None
     
     def __getattr__(self, name):
         if name in self:
