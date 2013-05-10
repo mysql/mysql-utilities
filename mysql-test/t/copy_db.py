@@ -203,7 +203,15 @@ class test(mutlib.System_test):
         except:
             pass
         try:
+            self.server1.exec_query("DROP USER 'joe_wildcard'@'%'")
+        except:
+            pass
+        try:
             self.server2.exec_query("DROP USER 'joe'@'user'")
+        except:
+            pass
+        try:
+            self.server2.exec_query("DROP USER 'joe_wildcard'@'%'")
         except:
             pass
         return res

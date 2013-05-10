@@ -14,9 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
-import mutlib
+
 import copy_db_parameters
+from mysql.utilities.common.table import quote_with_backticks
 from mysql.utilities.exception import MUTLibError
 
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
@@ -80,11 +80,12 @@ class test(copy_db_parameters.test):
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
+            res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
         except:
-            return True # Ok to exit here as there weren't any dbs to drop
+            return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            q_db = quote_with_backticks(db)
+            res = server.exec_query("DROP DATABASE {0}".format(q_db))
         except:
             return False
         return True

@@ -16,9 +16,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -46,10 +46,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
@@ -73,9 +75,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -103,10 +105,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
@@ -127,9 +131,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -157,10 +161,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.

@@ -25,9 +25,11 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 #
 
 ALTER TABLE `util_test`.`t3` 
+  DROP PRIMARY KEY, 
   DROP COLUMN b, 
+  ADD PRIMARY KEY(`a`), 
   ADD COLUMN d char(30) NULL AFTER a, 
-ENGINE=MyISAM;
+ENGINE=MyISAM, AUTO_INCREMENT=4;
 
 # Comparing util_test.t4 to util_test.t4                           [FAIL]
 # Transformation for --changes-for=server1:
@@ -80,9 +82,11 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 #
 
 ALTER TABLE `util_test`.`t3` 
+  DROP PRIMARY KEY, 
   DROP COLUMN d, 
-  ADD COLUMN b char(30) NULL AFTER a, 
-ENGINE=InnoDB;
+  ADD PRIMARY KEY(`a`), 
+  ADD COLUMN b varchar(30) NULL AFTER a, 
+ENGINE=InnoDB, AUTO_INCREMENT=5;
 
 # Comparing util_test.t4 to util_test.t4                           [FAIL]
 # Transformation for --changes-for=server2:
@@ -149,17 +153,21 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 #
 
 ALTER TABLE `util_test`.`t3` 
+  DROP PRIMARY KEY, 
   DROP COLUMN b, 
+  ADD PRIMARY KEY(`a`), 
   ADD COLUMN d char(30) NULL AFTER a, 
-ENGINE=MyISAM;
+ENGINE=MyISAM, AUTO_INCREMENT=4;
 
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
 # ALTER TABLE `util_test`.`t3` 
+#   DROP PRIMARY KEY, 
 #   DROP COLUMN d, 
-#   ADD COLUMN b char(30) NULL AFTER a, 
-# ENGINE=InnoDB;
+#   ADD PRIMARY KEY(`a`), 
+#   ADD COLUMN b varchar(30) NULL AFTER a, 
+# ENGINE=InnoDB, AUTO_INCREMENT=5;
 #
 
 # Comparing util_test.t4 to util_test.t4                           [FAIL]
@@ -250,17 +258,21 @@ CREATE DEFINER=root@localhost PROCEDURE util_test.p1 (p1 CHAR(20)) CONTAINS SQL 
 #
 
 ALTER TABLE `util_test`.`t3` 
+  DROP PRIMARY KEY, 
   DROP COLUMN d, 
-  ADD COLUMN b char(30) NULL AFTER a, 
-ENGINE=InnoDB;
+  ADD PRIMARY KEY(`a`), 
+  ADD COLUMN b varchar(30) NULL AFTER a, 
+ENGINE=InnoDB, AUTO_INCREMENT=5;
 
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
 # ALTER TABLE `util_test`.`t3` 
+#   DROP PRIMARY KEY, 
 #   DROP COLUMN b, 
+#   ADD PRIMARY KEY(`a`), 
 #   ADD COLUMN d char(30) NULL AFTER a, 
-# ENGINE=MyISAM;
+# ENGINE=MyISAM, AUTO_INCREMENT=4;
 #
 
 # Comparing util_test.t4 to util_test.t4                           [FAIL]

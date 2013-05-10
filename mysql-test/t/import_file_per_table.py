@@ -96,7 +96,11 @@ class test(import_basic.test):
                     for row in res:
                         str = ""
                         for col in row:
-                            str += col + " "
+                            # Handle None values
+                            if col:
+                                str = "{0}{1} ".format(str, col)
+                            else:
+                                str = "{0}NULL ".format(str)
                         self.results.append(str+"\n")
 
                 except:

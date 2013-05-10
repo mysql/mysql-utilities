@@ -14,12 +14,14 @@ INSERT INTO util_test.t1 VALUES ("07 Test Basic database example");
 CREATE TABLE util_test.t2 (a char(30)) ENGINE=MYISAM;
 INSERT INTO util_test.t2 VALUES ("11 Test Basic database example"); 
 INSERT INTO util_test.t2 VALUES ("12 Test Basic database example"); 
-INSERT INTO util_test.t2 VALUES ("13 Test Basic database example"); 
+INSERT INTO util_test.t2 VALUES ("13 Test Basic database example");
+INSERT INTO util_test.t2 VALUES (NULL);
 
-CREATE TABLE util_test.t3 (a int not null auto_increment, b char(30), primary key(a)) ENGINE=InnoDB;
+CREATE TABLE util_test.t3 (a int not null auto_increment, b varchar(30), primary key(a)) ENGINE=InnoDB;
 INSERT INTO util_test.t3 (b) VALUES ("14 test fkeys");
 INSERT INTO util_test.t3 (b) VALUES ("15 test fkeys");
 INSERT INTO util_test.t3 (b) VALUES ("16 test fkeys");
+INSERT INTO util_test.t3 (b) VALUES (NULL);
 
 CREATE TABLE util_test.t4 (c int not null, d int not null, CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES util_test.t3(a)) ENGINE=InnoDB;
 INSERT INTO util_test.t4 VALUES (3, 2);
@@ -35,3 +37,5 @@ CREATE VIEW util_test.v1 as SELECT * FROM util_test.t1;
 CREATE EVENT util_test.e1 ON SCHEDULE EVERY 1 YEAR DISABLE DO DELETE FROM util_test.t1 WHERE a = "not there";
 
 GRANT ALL ON util_test.* TO 'joe'@'user';
+
+GRANT ALL ON util_test.* TO 'joe_wildcard'@'%';

@@ -24,6 +24,7 @@ import re
 import sys
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.sql_transform import convert_special_characters
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
@@ -396,7 +397,7 @@ class Table(object):
                     self.q_column_names.append(
                                 quote_with_backticks(columns[col][0]))
                 col_type_prefix = columns[col][1][0:4].lower()
-                if col_type_prefix in ("char", "enum", "set("):
+                if col_type_prefix in ('varc', 'char', 'enum', 'set('):
                     self.text_columns.append(col)
                     col_format_values[col] = "'%s'"
                 elif col_type_prefix in ("blob", "text"):
@@ -463,7 +464,12 @@ class Table(object):
                     has_data = True
                     do_commas = True
             else:
-                where_values.append("%s = '%s' " % (col_name, row[col]))
+                # Convert None values to NULL (not '' to NULL)
+                if row[col] is None:
+                    value = 'NULL'
+                else:
+                    value = "'{0}'".format(row[col])
+                where_values.append("{0} = {1}".format(col_name, value))
         if has_data:
             return blob_insert + " WHERE " + " AND ".join(where_values) + ";"
         return None
@@ -499,15 +505,18 @@ class Table(object):
         for col in self.text_columns:
             #Check if the value is not None before replacing quotes
             if values[col]:
-                values[col] = values[col].replace("'", "\\'")
+                # Apply escape sequences to special characters
+                values[col] = convert_special_characters(values[col])
 
-        # Build string
+        # Build string (add quotes to "string" like types)
         val_str = self.column_format % tuple(values)
 
         # Change 'None' occurrences with "NULL"
         val_str = val_str.replace(", None", ", NULL")
         val_str = val_str.replace("(None", "(NULL")
-        
+        val_str = val_str.replace(", 'None'", ", NULL")
+        val_str = val_str.replace("('None'", "(NULL")
+
         return (val_str, blob_inserts)
 
 

@@ -341,8 +341,6 @@ def read_next(file, format, no_headers=False):
                     continue
                 else:
                     yield (cmd_type, row)
-        if row[0][0] != "#" and row[0][0:2] != "--":
-            yield (cmd_type, row)
 
 
 def _get_db(row):
@@ -1114,7 +1112,11 @@ def import_file(dest_val, file_name, options):
                             read_columns = False
                         else:
                             if not single:
-                                table_rows.append(row[1])
+                                # Convert 'NULL' to None to be correctly
+                                # handled internally
+                                data = [None if val == 'NULL' else val
+                                        for val in row[1]]
+                                table_rows.append(data)
                             else:
                                 str = _build_insert_data(columns, tbl_name,
                                                          row[1])

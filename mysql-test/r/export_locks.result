@@ -15,9 +15,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -81,6 +81,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
 # Exporting data from util_test
@@ -96,10 +132,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
@@ -119,10 +157,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
@@ -142,10 +182,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
@@ -165,10 +207,12 @@ INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
 # Data for table `util_test`.`t3`: 
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.

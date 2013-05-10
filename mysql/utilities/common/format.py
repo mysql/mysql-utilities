@@ -79,12 +79,14 @@ def format_tabular_list(file, columns, rows, options={}):
         separator      if set, use the char specified for a ?SV output
         quiet          if True, do not print the grid text (no borders)
         print_footer   if False, do not print footer
+        none_to_null   if True converts None values to NULL
     """
 
     print_header = options.get("print_header", True)
     separator = options.get("separator", None)
     quiet = options.get("quiet", False)
     print_footer = options.get("print_footer", True)
+    none_to_null = options.get("none_to_null", False)
     
     # do nothing if no rows.
     if len(rows) == 0:
@@ -98,6 +100,9 @@ def format_tabular_list(file, columns, rows, options={}):
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
+            if none_to_null:
+                # Convert None values to 'NULL'
+                row = ['NULL' if not val else val for val in row]
             csv_writer.writerow(row)
     else:
         # Calculate column width for each column
@@ -110,12 +115,12 @@ def format_tabular_list(file, columns, rows, options={}):
         for row in rows:
             # if there is one column, just use row.
             if stop == 1:
-                col_size = len(row[0]) + 1
+                col_size = len(str(row[0])) + 1
                 if col_size > col_widths[0]:
                     col_widths[0] = col_size
             else:
                 for i in range(0, stop):
-                    col_size = len("%s" % row[i]) + 1
+                    col_size = len(str(row[i])) + 1
                     if col_size > col_widths[i]:
                         col_widths[i] = col_size
 
@@ -125,12 +130,17 @@ def format_tabular_list(file, columns, rows, options={}):
             _format_row_separator(file, columns, col_widths, columns, quiet)
         _format_col_separator(file, columns, col_widths, quiet)
         for row in rows:
+            if none_to_null:
+                # Convert None values to 'NULL'
+                row = tuple(['NULL' if not val else val for val in row])
+                # Note: list need to be converted to tuple as expected by
+                # next method (to handle single column rows correctly)
             _format_row_separator(file, columns, col_widths, row, quiet)
         if print_footer:
             _format_col_separator(file, columns, col_widths, quiet)
 
 
-def format_vertical_list(file, columns, rows):
+def format_vertical_list(file, columns, rows, options={}):
     """Format a list in a vertical format.
 
     This method will format and write a list of rows in a vertical format
@@ -139,7 +149,11 @@ def format_vertical_list(file, columns, rows):
     file[in]           file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
+    options[in]        options controlling list:
+        none_to_null   if True converts None values to NULL
     """
+
+    none_to_null = options.get("none_to_null", False)
 
     # do nothing if no rows.
     if len(rows) == 0:
@@ -158,6 +172,9 @@ def format_vertical_list(file, columns, rows):
         file.write('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
                                                                       row_num,
                                                                       ' ', 8))
+        if none_to_null:
+            # Convert None values to 'NULL'
+            row = ['NULL' if not val else val for val in row]
         for i in range(0, stop):
             file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
                                                 row[i]))

@@ -20,6 +20,8 @@ This file contains the methods for building SQL statements for definition
 differences.
 """
 
+import re
+
 from mysql.utilities.exception import UtilError, UtilDBError
 
 _IGNORE_COLUMN = -1  # Ignore column in comparisons and transformations
@@ -114,7 +116,44 @@ def is_quoted_with_backticks(identifier):
 
     Returns True if the identifier has backtick quotes, and False otherwise.
     """
-    return (identifier[0] == "`" and identifier[-1] == "`")
+    return identifier[0] == "`" and identifier[-1] == "`"
+
+
+def convert_special_characters(str_val):
+    """Convert especial characters in the string to respective escape sequence.
+
+    This method converts special characters in the input string to the
+    corresponding MySQL escape sequence, according to:
+    http://dev.mysql.com/doc/en/string-literals.html#character-escape-sequences
+
+    str_val[in]  string value to be converted.
+
+    Returns the input string with all special characters replaced by its
+    respective escape sequence.
+    """
+    # Check if the input value is a string before performing replacement.
+    if str_val and isinstance(str_val, basestring):
+        # First replace backslash '\' character, to avoid replacing '\' in
+        # further escape sequences. backslash_re matches '|' not followed by %
+        # as \% and \_ do not need to be replaced, and when '|' appear at the
+        # end of the string to be replaced correctly.
+        backslash_re = r'\\(?=[^%_])|\\\Z'
+        res = re.sub(backslash_re, r'\\\\', str_val)
+
+        # Replace remaining especial characters
+        res = res.replace('\x00', '\\0')  # \0
+        res = res.replace("'", "\\'")  # \'
+        res = res.replace('"', '\\"')  # \"
+        res = res.replace('\b', '\\b')  # \b
+        res = res.replace('\n', '\\n')  # \n
+        res = res.replace('\r', '\\r')  # \r
+        res = res.replace('\t', '\\t')  # \t
+        res = res.replace(chr(26), '\\Z')  # \Z
+
+        return res
+    else:
+        # Not a string, return the input value
+        return str_val
 
 
 def build_pkey_where_clause(table, row):

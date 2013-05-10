@@ -165,11 +165,27 @@ class test(copy_db.test):
 
     def cleanup(self):
         try:
-            self.drop_db(self.server3, "util_test")
+            self.drop_db(self.server1, 'util_test')
         except:
             pass
         try:
-            self.drop_db(self.server3, "wesaysocorp")
+            self.drop_db(self.server1, 'db`:db')
+        except:
+            pass
+        try:
+            self.drop_db(self.server2, 'util_test')
+        except:
+            pass
+        try:
+            self.drop_db(self.server2, 'db`:db')
+        except:
+            pass
+        try:
+            self.drop_db(self.server2, 'wesaysocorp')
+        except:
+            pass
+        try:
+            self.drop_db(self.server3, 'wesaysocorp')
         except:
             pass
         return copy_db.test.cleanup(self)

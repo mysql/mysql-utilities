@@ -86,9 +86,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -139,9 +139,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -187,9 +187,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -228,9 +228,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -263,9 +263,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -293,9 +293,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -338,9 +338,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -409,6 +409,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 Test case 12 - SQL bulk insert
 # Source on XXXX-XXXX: ... connected.
@@ -427,9 +463,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -498,6 +534,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 Test case 13 - sql format
 # Source on XXXX-XXXX: ... connected.
@@ -516,9 +588,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -587,6 +659,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 Test case 14 - csv format
 # Source on XXXX-XXXX: ... connected.
@@ -596,7 +704,7 @@ TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLA
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 `util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 `util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
@@ -634,6 +742,24 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 15 - tab format
 # Source on XXXX-XXXX: ... connected.
@@ -643,7 +769,7 @@ TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLA
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
-`util_test`	`t3`	InnoDB	2	`b`	char(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t3`	InnoDB	2	`b`	varchar(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
 `util_test`	`t4`	InnoDB	1	`c`	int(11)	NO		MUL	latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 `util_test`	`t4`	InnoDB	2	`d`	int(11)	NO			latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
@@ -681,6 +807,24 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 16 - GRID format
 # Source on XXXX-XXXX: ... connected.
@@ -692,7 +836,7 @@ Test case 16 - GRID format
 | util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b            | varchar(30)  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
 | util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 | util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -727,28 +871,46 @@ Test case 16 - GRID format
 | e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 17 - VERTICAL format
 # Source on XXXX-XXXX: ... connected.
@@ -823,7 +985,7 @@ Test case 17 - VERTICAL format
                   ENGINE: InnoDB
         ORDINAL_POSITION: 2
              COLUMN_NAME: b
-             COLUMN_TYPE: char(30)
+             COLUMN_TYPE: varchar(30)
              IS_NULLABLE: YES
           COLUMN_DEFAULT: None
               COLUMN_KEY: 
@@ -1086,7 +1248,133 @@ Test case 17 - VERTICAL format
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
 Test case 18 - sql format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -1105,9 +1393,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -1176,6 +1464,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 Test case 19 - csv format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -1184,7 +1508,7 @@ Test case 19 - csv format no headers
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 `util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 `util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
@@ -1216,6 +1540,24 @@ Test case 19 - csv format no headers
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 20 - tab format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -1224,7 +1566,7 @@ Test case 20 - tab format no headers
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
-`util_test`	`t3`	InnoDB	2	`b`	char(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t3`	InnoDB	2	`b`	varchar(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
 `util_test`	`t4`	InnoDB	1	`c`	int(11)	NO		MUL	latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 `util_test`	`t4`	InnoDB	2	`d`	int(11)	NO			latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
@@ -1256,6 +1598,24 @@ Test case 20 - tab format no headers
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 21 - GRID format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -1267,7 +1627,7 @@ Test case 21 - GRID format no headers
 | util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b            | varchar(30)  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
 | util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 | util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -1302,28 +1662,46 @@ Test case 21 - GRID format no headers
 | e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 22 - VERTICAL format no headers
 # Source on XXXX-XXXX: ... connected.
@@ -1398,7 +1776,7 @@ Test case 22 - VERTICAL format no headers
                   ENGINE: InnoDB
         ORDINAL_POSITION: 2
              COLUMN_NAME: b
-             COLUMN_TYPE: char(30)
+             COLUMN_TYPE: varchar(30)
              IS_NULLABLE: YES
           COLUMN_DEFAULT: None
               COLUMN_KEY: 
@@ -1661,7 +2039,133 @@ Test case 22 - VERTICAL format no headers
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
 Test case 23 - SQ format
 # Source on XXXX-XXXX: ... connected.
@@ -1680,9 +2184,9 @@ CREATE TABLE `t2` (
 # TABLE: util_test.t3
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
-  `b` char(30) DEFAULT NULL,
+  `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TABLE: util_test.t4
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
@@ -1751,6 +2255,42 @@ GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 Test case 24 - CS format
 # Source on XXXX-XXXX: ... connected.
@@ -1760,7 +2300,7 @@ TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLA
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 `util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 `util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
@@ -1798,6 +2338,24 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 25 - ta format
 # Source on XXXX-XXXX: ... connected.
@@ -1807,7 +2365,7 @@ TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLA
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
-`util_test`	`t3`	InnoDB	2	`b`	char(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t3`	InnoDB	2	`b`	varchar(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
 `util_test`	`t4`	InnoDB	1	`c`	int(11)	NO		MUL	latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 `util_test`	`t4`	InnoDB	2	`d`	int(11)	NO			latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
@@ -1845,6 +2403,24 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 26 - g format
 # Source on XXXX-XXXX: ... connected.
@@ -1856,7 +2432,7 @@ Test case 26 - g format
 | util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b            | varchar(30)  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
 | util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 | util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -1891,28 +2467,46 @@ Test case 26 - g format
 | e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 27 - v format
 # Source on XXXX-XXXX: ... connected.
@@ -1987,7 +2581,7 @@ Test case 27 - v format
                   ENGINE: InnoDB
         ORDINAL_POSITION: 2
              COLUMN_NAME: b
-             COLUMN_TYPE: char(30)
+             COLUMN_TYPE: varchar(30)
              IS_NULLABLE: YES
           COLUMN_DEFAULT: None
               COLUMN_KEY: 
@@ -2250,7 +2844,133 @@ Test case 27 - v format
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
 Test case 28 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
@@ -2262,7 +2982,7 @@ Test case 28 - GRID format with BRIEF display
 | util_test     | t1          | MEMORY  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t2          | MyISAM  | 1                 | a            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None      | None                     | None                    |
 | util_test     | t3          | InnoDB  | 1                 | a            | int(11)      | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b            | char(30)     | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b            | varchar(30)  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a         | None                     | None                    |
 | util_test     | t4          | InnoDB  | 1                 | c            | int(11)      | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 | util_test     | t4          | InnoDB  | 2                 | d            | int(11)      | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -2297,28 +3017,46 @@ Test case 28 - GRID format with BRIEF display
 | e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | latin1                | latin1_swedish_ci     | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 29 - GRID format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -2328,9 +3066,9 @@ Test case 29 - GRID format with FULL display
 | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | ORDINAL_POSITION  | COLUMN_NAME  | COLUMN_TYPE  | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_SCHEMA  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME  | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
 | None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None      | None                     | None                    |
-| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 3           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None      | None                     | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | int(11)      | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 3           | 5461            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 4               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | b            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
+| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 4           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | char(30)     | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None      | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a            | int(11)      | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | b            | varchar(30)  | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a         | None                     | None                    |
 | None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | c            | int(11)      | NO           | None            | MUL         | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 | None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | d            | int(11)      | NO           | None            |             | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c         | util_test                | a                       |
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -2365,28 +3103,46 @@ Test case 29 - GRID format with FULL display
 | util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | X           | SYSTEM     | latin1                | latin1_swedish_ci     | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 30 - GRID format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -2431,28 +3187,46 @@ Test case 30 - GRID format with NAMES display
 | e1    |
 +-------+
 # GRANTS in util_test:
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| GRANTEE       | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
-| 'joe'@'user'  | ALTER                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | CREATE VIEW              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DELETE                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | DROP                     | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EVENT                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | EXECUTE                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INDEX                    | util_test     | None        | None         | None          |
-| 'joe'@'user'  | INSERT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | LOCK TABLES              | util_test     | None        | None         | None          |
-| 'joe'@'user'  | REFERENCES               | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SELECT                   | util_test     | None        | None         | None          |
-| 'joe'@'user'  | SHOW VIEW                | util_test     | None        | None         | None          |
-| 'joe'@'user'  | TRIGGER                  | util_test     | None        | None         | None          |
-| 'joe'@'user'  | UPDATE                   | util_test     | None        | None         | None          |
-+---------------+--------------------------+---------------+-------------+--------------+---------------+
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
+| 'joe'@'user'        | ALTER                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DELETE                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | DROP                     | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EVENT                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INDEX                    | util_test     | None        | None         | None          |
+| 'joe'@'user'        | INSERT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe'@'user'        | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SELECT                   | util_test     | None        | None         | None          |
+| 'joe'@'user'        | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe'@'user'        | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe'@'user'        | UPDATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | ALTER ROUTINE            | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE ROUTINE           | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE TEMPORARY TABLES  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | CREATE VIEW              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DELETE                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | DROP                     | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EVENT                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | EXECUTE                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INDEX                    | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | INSERT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | LOCK TABLES              | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | REFERENCES               | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SELECT                   | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | SHOW VIEW                | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | TRIGGER                  | util_test     | None        | None         | None          |
+| 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
++---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 Test case 31 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
@@ -2462,7 +3236,7 @@ TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLA
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 `util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 `util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
@@ -2500,6 +3274,24 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 32 - CSV format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -2507,9 +3299,9 @@ Test case 32 - CSV format with FULL display
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 ,`util_test`,`t1`,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
-,`util_test`,`t2`,BASE TABLE,MyISAM,10,Fixed,3,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
-,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,int(11),NO,,PRI,,,,,,,`PRIMARY`,`a`,,
-,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,3,5461,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,4,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`b`,char(30),YES,,,,,,,,,`PRIMARY`,`a`,,
+,`util_test`,`t2`,BASE TABLE,MyISAM,10,Fixed,4,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
+,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,int(11),NO,,PRI,,,,,,,`PRIMARY`,`a`,,
+,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`b`,varchar(30),YES,,,,,,,,,`PRIMARY`,`a`,,
 ,`util_test`,`t4`,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`c`,int(11),NO,,MUL,`ref_t3`,`t3`,`PRIMARY`,`util_test`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 ,`util_test`,`t4`,BASE TABLE,InnoDB,10,Compact,1,16384,XXXXXXXXXX,XXXXXXXXXX,16384,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`d`,int(11),NO,,,`ref_t3`,`t3`,`PRIMARY`,`util_test`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
 # VIEWS in util_test:
@@ -2547,6 +3339,24 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 33 - CSV format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -2592,6 +3402,24 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',SHOW VIEW,util_test,,,
 'joe'@'user',TRIGGER,util_test,,,
 'joe'@'user',UPDATE,util_test,,,
+'joe_wildcard'@'%',ALTER,util_test,,,
+'joe_wildcard'@'%',ALTER ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE,util_test,,,
+'joe_wildcard'@'%',CREATE ROUTINE,util_test,,,
+'joe_wildcard'@'%',CREATE TEMPORARY TABLES,util_test,,,
+'joe_wildcard'@'%',CREATE VIEW,util_test,,,
+'joe_wildcard'@'%',DELETE,util_test,,,
+'joe_wildcard'@'%',DROP,util_test,,,
+'joe_wildcard'@'%',EVENT,util_test,,,
+'joe_wildcard'@'%',EXECUTE,util_test,,,
+'joe_wildcard'@'%',INDEX,util_test,,,
+'joe_wildcard'@'%',INSERT,util_test,,,
+'joe_wildcard'@'%',LOCK TABLES,util_test,,,
+'joe_wildcard'@'%',REFERENCES,util_test,,,
+'joe_wildcard'@'%',SELECT,util_test,,,
+'joe_wildcard'@'%',SHOW VIEW,util_test,,,
+'joe_wildcard'@'%',TRIGGER,util_test,,,
+'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 Test case 34 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
@@ -2601,7 +3429,7 @@ TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLA
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
-`util_test`	`t3`	InnoDB	2	`b`	char(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
+`util_test`	`t3`	InnoDB	2	`b`	varchar(30)	YES			latin1_swedish_ci							`PRIMARY`	`a`		
 `util_test`	`t4`	InnoDB	1	`c`	int(11)	NO		MUL	latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 `util_test`	`t4`	InnoDB	2	`d`	int(11)	NO			latin1_swedish_ci		`ref_t3`	`t3`	`PRIMARY`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
@@ -2639,6 +3467,24 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 35 - TAB format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -2646,9 +3492,9 @@ Test case 35 - TAB format with FULL display
 # TABLES in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 	`util_test`	`t1`	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
-	`util_test`	`t2`	BASE TABLE	MyISAM	10	Fixed	3	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
-	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	int(11)	NO		PRI							`PRIMARY`	`a`		
-	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	3	5461	XXXXXX	XXXXXXXX	0	XX	4	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`b`	char(30)	YES									`PRIMARY`	`a`		
+	`util_test`	`t2`	BASE TABLE	MyISAM	10	Fixed	4	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
+	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	int(11)	NO		PRI							`PRIMARY`	`a`		
+	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`b`	varchar(30)	YES									`PRIMARY`	`a`		
 	`util_test`	`t4`	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`c`	int(11)	NO		MUL	`ref_t3`	`t3`	`PRIMARY`	`util_test`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 	`util_test`	`t4`	BASE TABLE	InnoDB	10	Compact	1	16384	XXXXXX	XXXXXXXX	16384	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`d`	int(11)	NO			`ref_t3`	`t3`	`PRIMARY`	`util_test`	RESTRICT	RESTRICT	`ref_t3`	`c`	`util_test`	`a`
 # VIEWS in util_test:
@@ -2686,6 +3532,24 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 36 - TAB format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -2731,6 +3595,24 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	SHOW VIEW	util_test			
 'joe'@'user'	TRIGGER	util_test			
 'joe'@'user'	UPDATE	util_test			
+'joe_wildcard'@'%'	ALTER	util_test			
+'joe_wildcard'@'%'	ALTER ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE	util_test			
+'joe_wildcard'@'%'	CREATE ROUTINE	util_test			
+'joe_wildcard'@'%'	CREATE TEMPORARY TABLES	util_test			
+'joe_wildcard'@'%'	CREATE VIEW	util_test			
+'joe_wildcard'@'%'	DELETE	util_test			
+'joe_wildcard'@'%'	DROP	util_test			
+'joe_wildcard'@'%'	EVENT	util_test			
+'joe_wildcard'@'%'	EXECUTE	util_test			
+'joe_wildcard'@'%'	INDEX	util_test			
+'joe_wildcard'@'%'	INSERT	util_test			
+'joe_wildcard'@'%'	LOCK TABLES	util_test			
+'joe_wildcard'@'%'	REFERENCES	util_test			
+'joe_wildcard'@'%'	SELECT	util_test			
+'joe_wildcard'@'%'	SHOW VIEW	util_test			
+'joe_wildcard'@'%'	TRIGGER	util_test			
+'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 Test case 37 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
@@ -2805,7 +3687,7 @@ Test case 37 - VERTICAL format with BRIEF display
                   ENGINE: InnoDB
         ORDINAL_POSITION: 2
              COLUMN_NAME: b
-             COLUMN_TYPE: char(30)
+             COLUMN_TYPE: varchar(30)
              IS_NULLABLE: YES
           COLUMN_DEFAULT: None
               COLUMN_KEY: 
@@ -3068,7 +3950,133 @@ Test case 37 - VERTICAL format with BRIEF display
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
 Test case 38 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
@@ -3120,7 +4128,7 @@ Test case 38 - VERTICAL format with FULL display
                    ENGINE: MyISAM
                   VERSION: 10
                ROW_FORMAT: Fixed
-               TABLE_ROWS: 3
+               TABLE_ROWS: 4
            AVG_ROW_LENGTH: XXXXXXX
               DATA_LENGTH: XXXXXXX
           MAX_DATA_LENGTH: XXXXXXX
@@ -3158,13 +4166,13 @@ Test case 38 - VERTICAL format with FULL display
                    ENGINE: InnoDB
                   VERSION: 10
                ROW_FORMAT: Compact
-               TABLE_ROWS: 3
+               TABLE_ROWS: 4
            AVG_ROW_LENGTH: XXXXXXX
               DATA_LENGTH: XXXXXXX
           MAX_DATA_LENGTH: XXXXXXX
              INDEX_LENGTH: XXXXXXX
                 DATA_FREE: XXXXXXXXXXX
-           AUTO_INCREMENT: 4
+           AUTO_INCREMENT: 5
               CREATE_TIME: XXXX-XX-XX XX:XX:XX
               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
                CHECK_TIME: None
@@ -3196,13 +4204,13 @@ Test case 38 - VERTICAL format with FULL display
                    ENGINE: InnoDB
                   VERSION: 10
                ROW_FORMAT: Compact
-               TABLE_ROWS: 3
+               TABLE_ROWS: 4
            AVG_ROW_LENGTH: XXXXXXX
               DATA_LENGTH: XXXXXXX
           MAX_DATA_LENGTH: XXXXXXX
              INDEX_LENGTH: XXXXXXX
                 DATA_FREE: XXXXXXXXXXX
-           AUTO_INCREMENT: 4
+           AUTO_INCREMENT: 5
               CREATE_TIME: XXXX-XX-XX XX:XX:XX
               UPDATE_TIME: XXXX-XX-XX XX:XX:XX
                CHECK_TIME: None
@@ -3212,7 +4220,7 @@ Test case 38 - VERTICAL format with FULL display
             TABLE_COMMENT: 
          ORDINAL_POSITION: 2
               COLUMN_NAME: b
-              COLUMN_TYPE: char(30)
+              COLUMN_TYPE: varchar(30)
               IS_NULLABLE: YES
            COLUMN_DEFAULT: None
                COLUMN_KEY: 
@@ -3539,7 +4547,133 @@ Test case 38 - VERTICAL format with FULL display
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
 Test case 39 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
@@ -3701,5 +4835,131 @@ Test case 39 - VERTICAL format with NAMES display
      TABLE_NAME: None
     COLUMN_NAME: None
    ROUTINE_NAME: None
-18 rows.
+*************************      19. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      20. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: ALTER ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      21. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      22. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE ROUTINE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      23. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE TEMPORARY TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      24. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: CREATE VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      25. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DELETE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      26. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: DROP
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      27. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EVENT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      28. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: EXECUTE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      29. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INDEX
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      30. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: INSERT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      31. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: LOCK TABLES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      32. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: REFERENCES
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      33. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SELECT
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      34. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: SHOW VIEW
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      35. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: TRIGGER
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+*************************      36. row *************************
+        GRANTEE: 'joe_wildcard'@'%'
+ PRIVILEGE_TYPE: UPDATE
+   TABLE_SCHEMA: util_test
+     TABLE_NAME: None
+    COLUMN_NAME: None
+   ROUTINE_NAME: None
+36 rows.
 #...done.
