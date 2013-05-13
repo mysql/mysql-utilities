@@ -1226,10 +1226,6 @@ Test case 14 - without force
 # Checking databases inventory on server1 and inventory on server2
 #
 ERROR: The list of objects differs among database inventory and inventory.
-
-# Database consistency check failed.
-#
-# ...done
 Test case 15 -  -d differ --format=csv --quiet -a
 # Checking databases inventory on server1 and inventory on server2
 #

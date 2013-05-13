@@ -73,7 +73,7 @@ parser.add_option("--server2", action="store", dest="server2",
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")  
+                  "tab, csv, or vertical format", "grid")
 
 # Add skips
 parser.add_option("--skip-object-compare", action="store_true",
@@ -218,15 +218,14 @@ for db in args:
     except UtilError:
         _, e, _ = sys.exc_info()
         print("ERROR: %s" % e.errmsg)
-        check_failed = True
-        if not opt.run_all_tests:
-            break
+        sys.exit(1)
+
     if not res:
         check_failed = True
 
     if check_failed and not opt.run_all_tests:
         break
-    
+
 if not opt.quiet:
     print
     if check_failed:
@@ -241,6 +240,5 @@ if not opt.quiet:
 
 if check_failed:
     sys.exit(1)
-    
-sys.exit()
 
+sys.exit()

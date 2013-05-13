@@ -14,10 +14,6 @@ Test case 4 - non existing database '`inventory.inventory`'
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 ERROR: The database inventory.inventory does not exist.
-
-# Database consistency check failed.
-#
-# ...done
 Test case 5 - invalid format :inventory 
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
