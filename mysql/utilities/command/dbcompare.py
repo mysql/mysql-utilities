@@ -164,6 +164,8 @@ def _check_objects(server1, server2, db1, db2,
     from mysql.utilities.common.dbcompare import get_common_objects
     from mysql.utilities.common.dbcompare import print_missing_list
 
+    differs = False
+
     # Check for same number of objects
     in_both, in_db1, in_db2 = get_common_objects(server1, server2,
                                                  db1, db2, False, options)
@@ -177,12 +179,15 @@ def _check_objects(server1, server2, db1, db2,
         if len(in_db1) or len(in_db2):
             if options['run_all_tests']:
                 if len(in_db1) > 0:
+                    differs = True
                     print_missing_list(in_db1, server1_str, server2_str)
                     print "#"
                 if len(in_db2) > 0:
+                    differs = True
                     print_missing_list(in_db2, server2_str, server1_str)
                     print "#"
             else:
+                differs = True
                 raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
 
     # If in verbose mode, show count of object types.
@@ -204,7 +209,7 @@ def _check_objects(server1, server2, db1, db2,
         for object in objects:
             print " {0:>12} : {1}".format(object, objects[object])
 
-    return in_both
+    return (in_both, differs)
 
 
 def _compare_objects(server1, server2, obj1, obj2, reporter, options):
@@ -428,14 +433,14 @@ def database_compare(server1_val, server2_val, db1, db2, options):
                      options)
 
     # Get common objects and report discrepencies
-    in_both = _check_objects(server1, server2, db1, db2,
-                             db1_conn, db2_conn, options)
+    (in_both, differs) = _check_objects(server1, server2, db1, db2,
+                                        db1_conn, db2_conn, options)
+    success = not differs
 
     reporter = _CompareDBReport(options)
     reporter.print_heading()
     
     # Remaining operations can occur in a loop one for each object.        
-    success = True if len(in_both) > 0 else False
     for item in in_both:
         error_list = []
         obj_type = db1_conn.get_object_type(item[1][0])

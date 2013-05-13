@@ -70,7 +70,27 @@ class test(mutlib.System_test):
                               % (data_file_backticks, err.errmsg))
 
         return True
-    
+
+    def create_extra_table(self):
+        try:
+            self.server2.exec_query("USE inventory;")
+            create_table = ("CREATE TABLE `inventory`.`extra_table` ("
+                            "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+                            "`name` varchar(255) NOT NULL,"
+                            "PRIMARY KEY (`id`)"
+                            ") ENGINE=InnoDB DEFAULT CHARSET=latin1;")
+            self.server2.exec_query(create_table)
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+
+    def drop_extra_table(self):
+        try:
+            self.server2.exec_query("DROP TABLE `inventory`.`extra_table`")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+
     def alter_data(self):
         try:
             # Now do some alterations...
@@ -115,33 +135,44 @@ class test(mutlib.System_test):
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
+        self.create_extra_table()
+
+        comment = ("Test case 2 - check database with known differences "
+                   "(extra table)")
+        res = self.run_test_case(1, "{0} {1}".format(cmd_str,
+                                                     "inventory:inventory -a"),
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.drop_extra_table()
         self.alter_data()
 
-        comment = "Test case 2 - check database with known differences " + \
-                  "direction = server1 (default)"
+        comment = ("Test case 3 - check database with known differences "
+                   "direction = server1 (default)")
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
-        comment = "Test case 3 - check database with known differences " + \
-                  "direction = server2"
+
+        comment = ("Test case 4 - check database with known differences "
+                   "direction = server2")
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV --changes-for=server2", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 4 - check database with known differences " + \
-                  "direction = server1 and reverse"
+        comment = ("Test case 5 - check database with known differences "
+                   "direction = server1 and reverse")
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV --changes-for=server1 "
                                  "--show-reverse", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 5 - check database with known differences " + \
-                  "direction = server2 and reverse"
+        comment = ("Test case 6 - check database with known differences "
+                   "direction = server2 and reverse")
         res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
                                  "--format=CSV --changes-for=server2 "
                                  "--show-reverse", comment)
@@ -152,14 +183,15 @@ class test(mutlib.System_test):
         
         self.server1.exec_query("CREATE DATABASE inventory2")
         
-        comment = "Test case 6 - compare two databases on same server w/server2"
+        comment = ("Test case 7 - compare two databases on same server "
+                   "w/server2")
         cmd_str = "mysqldbcompare.py %s %s " % (s1_conn, s2_conn_dupe)
         res = self.run_test_case(1, cmd_str + "inventory:inventory2 -a ",
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
             
-        comment = "Test case 7 - compare two databases on same server"
+        comment = "Test case 8 - compare two databases on same server"
         cmd_str = "mysqldbcompare.py %s " % s1_conn
         res = self.run_test_case(1, cmd_str + "inventory:inventory2 -a ",
                                  comment)
@@ -172,11 +204,20 @@ class test(mutlib.System_test):
         else:
             cmd_arg = '"`db.``:db`:`db.``:db`" -a'
         cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_arg)
-        comment = ("Test case 8 - compare a database with weird names "
+        comment = ("Test case 9 - compare a database with weird names "
                    "(backticks)")
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        comment = "Test case 10 - compare two empty databases"
+        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(
+            s1_conn, s2_conn, "empty_db:empty_db -a"
+        )
+        res = self.run_test_case(0, cmd_str, comment)
+
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.do_replacements()
 
@@ -224,6 +265,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, "inventory")
         self.drop_db(self.server1, 'db.`:db')
         self.drop_db(self.server2, 'db.`:db')
+        self.drop_db(self.server1, "empty_db")
+        self.drop_db(self.server2, "empty_db")
         return True
 
     def cleanup(self):

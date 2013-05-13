@@ -15,7 +15,27 @@ Test case 1 - check a sample database
 Databases are consistent.
 #
 # ...done
-Test case 2 - check database with known differences direction = server1 (default)
+Test case 2 - check database with known differences (extra table)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server2.inventory but not in server1.inventory:
+#        TABLE: extra_table
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    pass    pass    
+# TABLE     supplies                                pass    pass    pass    
+# VIEW      cleaning                                pass    -       -       
+# VIEW      finishing_up                            pass    -       -       
+# VIEW      tools                                   pass    -       -      
+
+# Database consistency check failed.
+#
+# ...done
+Test case 3 - check database with known differences direction = server1 (default)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -89,7 +109,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 3 - check database with known differences direction = server2
+Test case 4 - check database with known differences direction = server2
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -163,7 +183,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 - check database with known differences direction = server1 and reverse
+Test case 5 - check database with known differences direction = server1 and reverse
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -291,7 +311,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 5 - check database with known differences direction = server2 and reverse
+Test case 6 - check database with known differences direction = server2 and reverse
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -419,7 +439,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 6 - compare two databases on same server w/server2
+Test case 7 - compare two databases on same server w/server2
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory2 on server2
@@ -447,7 +467,7 @@ Test case 6 - compare two databases on same server w/server2
 # Database consistency check failed.
 #
 # ...done
-Test case 7 - compare two databases on same server
+Test case 8 - compare two databases on same server
 # server1 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory2 on server2
 #
@@ -474,7 +494,7 @@ Test case 7 - compare two databases on same server
 # Database consistency check failed.
 #
 # ...done
-Test case 8 - compare a database with weird names (backticks)
+Test case 9 - compare a database with weird names (backticks)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
@@ -485,6 +505,18 @@ Test case 8 - compare a database with weird names (backticks)
 # TABLE     `t`.`export_2                           pass    pass    pass    
 # TABLE     `t`export_1                             pass    pass    pass    
 # VIEW      `v`export_1                             pass    -       -      
+
+Databases are consistent.
+#
+# ...done
+Test case 10 - compare two empty databases
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# -------------------------------------------------------------------------
 
 Databases are consistent.
 #

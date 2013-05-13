@@ -2,6 +2,8 @@
 # This test data is for checking database consistency.
 #
 
+CREATE DATABASE empty_db;
+
 CREATE DATABASE inventory;
 USE inventory;
 
