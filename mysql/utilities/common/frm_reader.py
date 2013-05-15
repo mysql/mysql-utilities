@@ -913,7 +913,7 @@ class FrmReader(object):
                                                           data[13])]
                 col_def = {
                     'field_length'    : data[2], # 1, +3
-                    'bytes_in_col'    : data[3], # 1, +4
+                    'bytes_in_col'    : int(data[3]) + (int(data[4]) << 8),
                     'recpos'          : (int(data[6]) << 8) +
                                         (int(data[5])) + (int(data[4]) << 16),
                     'unireg'          : data[7], # 1, +8
@@ -1109,7 +1109,9 @@ class FrmReader(object):
                 maxlen = self.csi.get_maxlen(field_cs_num)
             else:
                 maxlen = 1
-            length = length / maxlen
+            # Only convert the length for character type fields
+            if _is_cs_enabled(col):
+                length = length / maxlen
             decimals = int((col_flags >> _FIELDFLAG_DEC_SHIFT) & \
                 _FIELDFLAG_MAX_DEC)
             col_parts = []
@@ -1120,7 +1122,7 @@ class FrmReader(object):
                 col_str += ",".join(["'%s'" % i for i in col['enums']])
                 col_str += ")"
                 col_parts.append(col_str)
-            elif _is_no_parens(col) or _is_blob(col):
+            elif _is_no_parens(col) and not _is_blob(col):
                 col_parts.append("  `%s` %s" %
                                  (col['name'],
                                   col['field_type_name'].lower()))

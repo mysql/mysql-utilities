@@ -39,7 +39,7 @@ from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import MUTLibError
 from mutlib.mutlib import Server_list
-    
+
 # Constants
 NAME = "MySQL Utilities Test - mut "
 DESCRIPTION = "mut - run tests on the MySQL Utilities"
@@ -550,7 +550,7 @@ have_disabled = len(disable_list)
 
 # Print header
 print("\n" + "-" * opt.width)
-print("".join(["TEST NAME", ' ' * (opt.width - 24), "STATUS   TIME"]))
+print("".join(["TEST NAME", ' ' * (opt.width - 22), "STATUS   TIME"]))
 print("=" * opt.width)
 
 # Protect against interactive consoles that fail: save terminal settings.

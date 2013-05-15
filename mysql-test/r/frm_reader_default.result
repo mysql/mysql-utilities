@@ -793,6 +793,37 @@ Test case 2: - Check .frm files in a db folder
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
+# Reading the col_widths.frm file.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`col_widths` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `lang` char(5) DEFAULT NULL,
+  `datetime` datetime NOT NULL,
+  `type` tinyint(3) unsigned DEFAULT NULL,
+  `sub_type` tinyint(3) unsigned DEFAULT NULL,
+  `category_id` int(10) unsigned DEFAULT NULL,
+  `title` varchar(768) DEFAULT NULL,
+  `meta_title` varchar(256) DEFAULT NULL,
+  `description` text,
+  `text` text,
+  `keywords` text,
+  `meta_data` text,
+  `extracted_tags` text,
+  `image_urls` text,
+  `duration` smallint(6) DEFAULT NULL,
+  `ref_url` varchar(512) DEFAULT NULL,
+  `links` text,
+  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  FULLTEXT KEY `title` (`title`,`meta_title`,`description`,`text`,`keywords`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+
+#
 # Reading the me@002etoo@002eperiods.frm file.
 #
 # CREATE statement for [...]
