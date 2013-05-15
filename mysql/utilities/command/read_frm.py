@@ -29,6 +29,8 @@ from mysql.utilities.command import serverclone
 from mysql.utilities.common.frm_reader import FrmReader
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.server import stop_running_server
+from mysql.utilities.common.tools import requires_encoding, encode
+from mysql.utilities.common.tools import requires_decoding, decode
 from mysql.utilities.exception import UtilError
 from shutil import copy
 
@@ -213,24 +215,21 @@ def _get_create_statement(server, temp_datadir,
 
         new_frm = os.path.join(new_path, frm_file[1] + ".frm")
 
-        # Decipher unicode file names
-        if '@' in frm_file[1]:
-            parts = frm_file[1].split('@')
-            new_parts = [parts[0]]
-            for part in parts[1:]:
-                # take first four positions and convert to ascii
-                new_parts.append(chr(int(part[0:4], 16)))
-                new_parts.append(part[4:])
-            frm_file = (frm_file[0], "".join(new_parts), frm_file[2])
-            copy(frm_file[2], new_path)
-        # Special case for files with periods in the name
-        elif "." in frm_file[1]:
-            dot_parts = frm_file[1].split('.')
-            new_frm_file = "@002e".join(dot_parts) + ".frm"
-            new_frm = os.path.join(new_path, new_frm_file)
-            copy(frm_file[2], new_frm)
-        else:
-            copy(frm_file[2], new_path)
+        # Check name for decoding and decode
+        try:
+            if requires_decoding(frm_file[1]):
+                new_frm_file = decode(frm_file[1])
+                frm_file = (frm_file[0], new_frm_file, frm_file[2])
+                copy(frm_file[2], new_path)
+            # Check name for encoding and encode
+            elif requires_encoding(frm_file[1]):
+                new_frm_file = encode(frm_file[1]) + ".frm"
+                new_frm = os.path.join(new_path, new_frm_file)
+                copy(frm_file[2], new_frm)
+            else:
+                copy(frm_file[2], new_path)
+        except Exception, e:
+            print("ERROR: {0}".format(e))
 
         server.exec_query("CREATE DATABASE IF NOT EXISTS %s" % db_name)
 
