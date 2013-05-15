@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,46 +15,48 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import utilities_console_base
-from mysql.utilities import PYTHON_MAX_VERSION
+import mutlib
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common.tools import check_python_version
 
-_BASE_COMMENT = "Test Case %d: "
 
-class test(utilities_console_base.test):
-    """mysql utilities console - piped commands
-    This test executes tests of commands piped into mysqluc. It uses the
-    utilities_console_base for test execution.
+class test(mutlib.System_test):
+    """ Test the warnings generated at startup for the console. Test requires
+    Python 2.6.
     """
 
     def check_prerequisites(self):
         try:
-            check_python_version((2, 7, 0), PYTHON_MAX_VERSION, True)
+            check_python_version((2, 6, 0), (2, 6, 99), True)
         except:
-            raise MUTLibError("Test requires Python 2.7 or higher.")
+            raise MUTLibError("Test requires Python 2.6")
         return True
 
     def setup(self):
         return True
 
-    def do_test(self, test_num, comment, command):
-        res = self.exec_util(command, self.res_fname, True)
-        if comment:
-            self.results.append(_BASE_COMMENT%test_num + comment + "\n")
-        self.record_results(self.res_fname)
-        if res:
-            raise MUTLibError("%s: failed" % comment)
-
     def run(self):
         self.res_fname = "result.txt"
 
-        # Setup options to show
-        cmd_str = 'echo "%s" | python '
-        cmd_opt = "%s/mysqluc.py --width=77 " % self.utildir
+        test_num = 1
+        comment = ("Test case {0} - Test for warnings at "
+                   "startup".format(test_num))
+        res = self.run_test_case(0, 'mysqluc.py --width=77 -e "quit"', comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
 
-        return utilities_console_base.test.do_coverage_tests(self,
-                                                             cmd_str+cmd_opt)
+        self.replace_result("Welcome to the MySQL Utilities Client",
+                            "Welcome to the MySQL Utilities Client\n")
+        self.replace_result("Copyright", "Copyright BLAH BLAH BLAH\n")
+        self.replace_result("ERROR: The mysqlauditadmin utility",
+                            "ERROR: The mysqlauditadmin utility "
+                            "<PYTHON ERROR>\n")
+        self.replace_result("ERROR: The mysqlauditgrep utility",
+                            "ERROR: The mysqlauditgrep utility "
+                            "<PYTHON ERROR>\n")
+
+        return True
 
     def get_result(self):
         return self.compare(__name__, self.results)

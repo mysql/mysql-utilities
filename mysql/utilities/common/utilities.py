@@ -122,9 +122,9 @@ class Utilities(object):
 
     def find_executable(self, util_name):
         """Search the system path for an executable matching the utility
-        
+
         util_name[in]  Name of utility
-        
+
         Returns string - name of executable (util_name or util_name.exe) or
                          original name if not found on the system path
         """
@@ -134,7 +134,7 @@ class Utilities(object):
             if found_path:
                 return os.path.split(found_path[0])[1]
         return util_name
-        
+
 
     def find_utilities(self):
         """ Locate the utility scripts
@@ -217,6 +217,15 @@ class Utilities(object):
         option = None
 
         res = self.program_usage.match(stdout_temp.replace("\r", ""))
+        if not res:
+            print("WARNING: {0} failed to read options. This utility will "
+                  "not be shown in 'help utilities' and cannot be accessed "
+                  "from the console.".format(util_name))
+            if "ERROR" in stdout_temp:
+                print(stdout_temp)
+            else:
+                print("UNKNOWN. To diagnose, exit mysqluc and attempt the "
+                      "command: {0} --help".format(util_name))
 
         Options = ""
         if not res:

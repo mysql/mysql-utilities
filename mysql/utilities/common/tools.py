@@ -288,7 +288,8 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
 def check_python_version(min_version=PYTHON_MIN_VERSION,
                          max_version=PYTHON_MAX_VERSION,
                          raise_exception_on_fail=False,
-                         name=None):
+                         name=None, print_on_fail=True,
+                         exit_on_fail=True):
     """Check the Python version compatibility.
 
     By default this method uses constants to define the minimum and maximum
@@ -306,6 +307,10 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
     name[in]                      String for a custom name, if not provided
                                   will get the module name from where this
                                   function was called.
+    print_on_fail[in]             If True, print error else do not print
+                                  error on failure.
+    exit_on_fail[in]              If True, issue exit() else do not exit()
+                                  on failure.
     """
 
     # Only use the fields: major, minor and micro
@@ -326,7 +331,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             mod = inspect.getmodule(frm[0])
             mod_name = os.path.splitext(
                 os.path.basename(mod.__file__))[0]
-            name = '%s utility' % mod_name
+            name = '{0} utility'.format(mod_name)
 
         # Build the error message
         if max_version:
@@ -351,8 +356,13 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
         if raise_exception_on_fail:
             raise UtilError(error_msg)
 
-        print('ERROR: %s' % error_msg)
-        sys.exit(1)
+        if print_on_fail:
+            print('ERROR: {0}'.format(error_msg))
+
+        if exit_on_fail:
+            sys.exit(1)
+
+    return is_compat
 
 
 def check_port_in_use(host, port):
