@@ -81,17 +81,28 @@ class AuditLogReader(object):
         """Get the next audit log record.
 
         Generator function that return the next audit log record.
-        More precisely, it returns a tuple with a formated record dict and
+        More precisely, it returns a tuple with a formatted record dict and
         the original record.
         """
+        next_line = ""
         for line in self.log:
+            if line.startswith('<AUDIT_RECORD') and not line.endswith('/>\n'):
+                next_line = "{0} ".format(line.strip('\n'))
+                continue
+            elif len(next_line) > 0 and not line.endswith('/>\n'):
+                next_line = '{0}{1}'.format(next_line, line.strip('\n'))
+                continue
+            else:
+                next_line += line
+            log_entry = next_line
+            next_line = ""
             try:
-                yield (self._make_record(xml.fromstring(line)), line)
+                yield (self._make_record(xml.fromstring(log_entry)), log_entry)
             except xml.ParseError:
-                if not self._validXML(line):
+                if not self._validXML(log_entry):
                     raise UtilError("Malformed XML - Cannot parse log file: "
-                                    + "'%s'\nInvalid XML element: %r"
-                                    % (self.log_name, line))
+                                    "'{0}'\nInvalid XML element: "
+                                    "{1!r}".format(self.log_name, log_entry))
 
     def _do_replacements(self, old_str):
         """Replace special masked characters.

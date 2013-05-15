@@ -280,3 +280,9 @@ Test case 16 - Apply all search criteria
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
 | 1046    | 1          | Query  | 2012-10-10T17:47:17  | 12             | tester  | root       | select * from test_encoding where value = '<>"&'  |
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
+Test case 17 - Search entries of multi-line log
+STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
+0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM",24578
+Test case 18 - Search entries of single line log
+STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
+0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL, txt TEXT NOT NULL, PRIMARY KEY (id), FULLTEXT (txt)) ENGINE=MyISAM",24578
