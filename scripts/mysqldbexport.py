@@ -38,9 +38,9 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option, add_rpl_mode
 from mysql.utilities.common.options import add_all, check_all, add_locking
 from mysql.utilities.common.options import add_rpl_user, check_rpl_options
-
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.tools import check_connector_python
 
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
@@ -52,6 +52,10 @@ USAGE = "%prog --server=user:pass@host:port:socket db1, db2, db3"
 
 _PERMITTED_DISPLAY = ["names", "brief", "full"]
 _PERMITTED_EXPORTS = ["data", "definitions", "both"]
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -72,7 +76,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Output format
 add_format_option(parser, "display the output in either sql (default), "
-                  "grid, tab, csv, or vertical format", "sql", True)     
+                  "grid, tab, csv, or vertical format", "sql", True)
 
 # Display format
 parser.add_option("-d", "--display", action="store", dest="display",
@@ -170,7 +174,7 @@ if len(args) == 0 and not opt.all:
 
 # Check replication options
 check_rpl_options(parser, opt)
-    
+
 # Fail if we have arguments and all databases option listed.
 check_all(parser, opt, args, "databases")
 
@@ -238,10 +242,10 @@ try:
     # record start time
     if opt.verbosity >= 3:
         start_test = time.time()
-        
+
     # Export all databases specified
     export_databases(server_values, db_list, options)
-        
+
     # record elapsed time
     if opt.verbosity >= 3:
         print_elapsed_time(start_test)

@@ -38,6 +38,7 @@ from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
 from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities import VERSION_FRM
@@ -49,6 +50,10 @@ USAGE = "%prog --master=root@localhost --discover-slaves-login=root " + \
         "--candidates=root@host123:3306,root@host456:3306 "
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 _DATE_LEN = 22
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup a terminal signal handler for SIGNIT
 # Must use SetConsoleCtrlHandler function on Windows!

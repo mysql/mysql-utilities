@@ -43,6 +43,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.tools import check_connector_python
 
 from mysql.utilities.exception import UtilError, FormatError
 
@@ -52,6 +53,10 @@ DESCRIPTION = "mysqldbcompare - compare databases for consistency"
 USAGE = "%prog --server1=user:pass@host:port:socket " + \
         "--server2=user:pass@host:port:socket db1:db2"
 PRINT_WIDTH = 75
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),

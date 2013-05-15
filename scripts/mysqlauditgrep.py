@@ -40,6 +40,7 @@ from mysql.utilities.common.options import add_regexp
 from mysql.utilities.common.options import add_format_option_with_extras
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.command import audit_log
 from mysql.utilities.command.audit_log import AuditLog
 from mysql.utilities import VERSION_FRM
@@ -53,6 +54,10 @@ class MyParser(UtilitiesParser):
 NAME = "MySQL Utilities - mysqlauditgrep "
 DESCRIPTION = "mysqlauditgrep - audit log search utility "
 USAGE = "%prog [options] AUDIT_LOG_FILE "
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = MyParser(

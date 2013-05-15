@@ -48,6 +48,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              SLAVES, CANDIDATES)
 from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import Server, check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
@@ -65,6 +66,10 @@ NAME = "MySQL Utilities - mysqlrpladmin "
 DESCRIPTION = "mysqlrpladmin - administration utility for MySQL replication"
 USAGE = "%prog --slaves=root@localhost:3306 <command>"
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = MyParser(

@@ -21,6 +21,7 @@ This file contains the mysql utilities client.
 """
 
 from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.tools import check_python_version
 
 # Check Python version compatibility
@@ -29,12 +30,9 @@ check_python_version()
 import os
 import sys
 
-try:
-    import mysql.connector
-except:
-    print("ERROR: The Connector/Python module is not installed or "
-          "is not accessible from this terminal.")
-    sys.exit(2)
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 try:
     from mysql.utilities.command.utilitiesconsole import UtilitiesConsole

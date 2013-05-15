@@ -36,6 +36,7 @@ from mysql.utilities.common.options import setup_common_options, add_engines
 from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -45,6 +46,10 @@ DESCRIPTION = "mysqldbimport - import metadata and data from files"
 USAGE = "%prog --server=user:pass@host:port:socket db1.csv db2.sql db3.grid"
 
 _PERMITTED_IMPORTS = ["data", "definitions", "both"]
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -65,7 +70,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Input format
 add_format_option(parser, "the input file format in either sql (default), "
-                  "grid, tab, csv, or vertical format", "sql", True)     
+                  "grid, tab, csv, or vertical format", "sql", True)
 
 # Import mode
 parser.add_option("-i", "--import", action="store", dest="import_type",

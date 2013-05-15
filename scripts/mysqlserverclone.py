@@ -34,6 +34,7 @@ from mysql.utilities.common.options import check_basedir_option
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities import exception
 from mysql.utilities.command import serverclone
 
@@ -42,6 +43,10 @@ NAME = "MySQL Utilities - mysqlserverclone "
 DESCRIPTION = "mysqlserverclone - start another instance of a running server"
 USAGE = "%prog --server=user:pass@host:port:socket --new-data=/tmp/data2 " \
         "--new-port=3310 --new-id=12 --root-password=root"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),

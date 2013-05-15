@@ -35,6 +35,7 @@ from mysql.utilities.common.options import add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
 
 
 def add_pattern(option, opt, value, parser, field):
@@ -43,6 +44,10 @@ def add_pattern(option, opt, value, parser, field):
         getattr(parser.values, option.dest).append(entry)
     except AttributeError:
         setattr(parser.values, option.dest, [entry])
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -78,7 +83,7 @@ parser.add_option(
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")     
+                  "tab, csv, or vertical format", "grid")
 
 # Add verbosity mode
 add_verbosity(parser, False)

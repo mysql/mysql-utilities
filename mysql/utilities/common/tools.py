@@ -379,3 +379,21 @@ def check_port_in_use(host, port):
         return True
     sock.close()
     return False
+
+def check_connector_python(print_error=True):
+    """ Check to see if Connector/Python is installed and accessible
+
+    print_error[in]     if True, print the error. Default True
+
+    Prints error and returns False on failure to find connector.
+    """
+    try:
+        import mysql.connector
+    except ImportError:
+        if print_error:
+            print("ERROR: The MySQL Connector/Python module was not found. "
+                  "MySQL Utilities requires the connector to be installed. "
+                  "Please check your paths or download and install the "
+                  "Connector/Python from http://dev.mysql.com.")
+        return False
+    return True

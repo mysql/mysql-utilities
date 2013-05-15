@@ -36,6 +36,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
                                              WARN_OPT_USING_DEFAULT)
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.command.check_rpl import check_replication
 from mysql.utilities.exception import FormatError
 
@@ -45,6 +46,10 @@ DESCRIPTION = "mysqlrplcheck - check replication"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 "
 
 PRINT_WIDTH = 75
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -128,7 +133,7 @@ except UtilError:
 # Check hostname alias
 if check_hostname_alias(m_values, s_values):
     parser.error("The master and slave are the same host and port.")
-    
+
 # Create dictionary of options
 options = {
     'verbosity'    : opt.verbosity,
@@ -139,7 +144,7 @@ options = {
     'slave_status' : opt.slave_status,
     'width'        : opt.width
 }
-  
+
 try:
     res = check_replication(m_values, s_values, options)
     if res:

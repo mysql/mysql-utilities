@@ -41,6 +41,7 @@ from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_changes_for, add_reverse
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -51,6 +52,10 @@ DESCRIPTION = "mysqldiff - compare object definitions among objects" + \
 USAGE = "%prog --server1=user:pass@host:port:socket " + \
         "--server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4"
 PRINT_WIDTH = 75
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -128,7 +133,7 @@ if opt.server2 is not None:
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
 else:
     server2_values = None
-    
+
 # Check for arguments
 if len(args) == 0:
     parser.error("No objects specified to compare.")
@@ -203,7 +208,7 @@ for argument in args:
             sys.exit(1)
         if diff is not None:
             diff_failed = True
-            
+
     # We have db1:db2
     else:
         try:
@@ -219,10 +224,9 @@ for argument in args:
 if diff_failed:
     if not opt.quiet:
         print("Compare failed. One or more differences found.")
-    sys.exit(1)            
+    sys.exit(1)
 
 if not opt.quiet:
     print("Success. All objects are the same.")
-    
-sys.exit()
 
+sys.exit()

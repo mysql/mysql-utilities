@@ -36,6 +36,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity, add_rpl_user
 from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -44,6 +45,10 @@ NAME = "MySQL Utilities - mysqlreplicate "
 DESCRIPTION = "mysqlreplicate - establish replication with a master"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
         "--rpl-user=rpl:passwd "
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -136,17 +141,17 @@ except UtilError:
 # Check hostname alias
 if check_hostname_alias(m_values, s_values):
     parser.error("The master and slave are the same host and port.")
-    
+
 # Check required --master-log-file for --master-log-pos
 if (opt.master_log_pos >= 0 and opt.master_log_file is None):
     parser.error("You must specify a master log file to use the master "
                  "log file position option.")
-    
+
 if ((opt.master_log_pos >= 0) or (opt.master_log_file is not None)) and \
    opt.from_beginning:
     parser.error("The --start-from-beginning option is not valid in "
                  "combination with --master-log-file or --master-log-pos.")
-    
+
 # Create dictionary of options
 options = {
     'verbosity'       : opt.verbosity,

@@ -36,12 +36,17 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
 USAGE = "%prog --server=user:pass@host:port:socket db1.table1 db2 db3.table2"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -65,7 +70,7 @@ parser.add_option("-s", "--skip", action="store_true", dest="skip",
 # Index list format
 add_format_option(parser, "display the list of indexes per table in either "
                   "sql, grid (default), tab, csv, or vertical format", "grid",
-                  True)     
+                  True)
 
 # Show index statistics
 parser.add_option("--stats", action="store_true",
@@ -111,7 +116,7 @@ if opt.best is not None:
         best = -1
 if best is not None and best < 1:
     parser.error("The --best parameter must be an integer >= 1")
-    
+
 worst = None
 if opt.worst is not None:
     try:
@@ -120,14 +125,14 @@ if opt.worst is not None:
         worst = -1
 if worst is not None and worst < 1:
     parser.error("The --worst parameter must be an integer >= 1")
-        
+
 if opt.stats and worst is not None and best is not None:
     parser.error("You must specify either --best or --worst but not both.")
-    
+
 # default to worst performing queries
 if opt.stats and worst is None and best is None:
     worst = 5
-    
+
 # no stats specified
 if (worst is not None or best is not None) and not opt.stats:
     parser.error("You must specify --stats for --best or --worst to take "
