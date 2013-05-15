@@ -130,6 +130,10 @@ Helpful Hints
     server. If mysqlfrm fails in the middle, you may need to manually
     shutdown the server on the port specified with --port.
 
+  - If the spawned server takes more than 10 seconds to start, use the
+    --start-timeout option to increase the timeout to wait for the
+    spawned server to start.
+
   - If you need to run the utility with elevated privileges, use the --user
     option to execute the spawned server using a normal user account.
 
@@ -197,6 +201,11 @@ parser.add_option("--user", action="store", dest="user", type="string",
                   "Required if running as root user. Used only in the "
                   "default mode.")
 
+# Add startup timeout
+parser.add_option("--start-timeout", action="store", dest="start_timeout",
+                  type=int, default=10, help="Number of seconds to wait for "
+                  "spawned server to start. Default = 10.")
+
 # Add verbosity mode
 add_verbosity(parser, True)
 
@@ -241,8 +250,14 @@ if opt.diagnostic and opt.user:
 
 server = None
 if opt.server is None and opt.diagnostic:
-    print "# WARNING: Cannot generate character set or " + \
-          "collation names without the --server option."
+    print("# WARNING: Cannot generate character set or "
+          "collation names without the --server option.")
+
+# Check start timeout for minimal value
+if int(opt.start_timeout) < 10:
+    opt.start_timeout = 10
+    print("# WARNING: --start-timeout must be >= 10 seconds. Using "
+          "default value.")
 
 # Parse source connection values if --server provided
 if opt.server is not None and not opt.basedir:
@@ -273,14 +288,15 @@ else:
 
 # Set options for frm operations.
 options = {
-    "basedir"      : basedir,
-    "new_engine"   : opt.new_engine,
-    "show_stats"   : opt.show_stats,
-    "port"         : use_port,
-    "quiet"        : opt.quiet,
-    "server"       : server,
-    "verbosity"    : opt.verbosity if opt.verbosity else 0,
-    "user"         : opt.user,
+    "basedir"       : basedir,
+    "new_engine"    : opt.new_engine,
+    "show_stats"    : opt.show_stats,
+    "port"          : use_port,
+    "quiet"         : opt.quiet,
+    "server"        : server,
+    "verbosity"     : opt.verbosity if opt.verbosity else 0,
+    "user"          : opt.user,
+    "start_timeout" : opt.start_timeout,
 }
 
 # Print disclaimer banner for diagnostic mode

@@ -22,6 +22,7 @@ and general options (verbosity, etc.).
 
 import os
 import re
+import subprocess
 import sys
 import tempfile
 
@@ -36,6 +37,11 @@ from shutil import copy
 
 # The following are storage engines that cannot be read in default mode
 _CANNOT_READ_ENGINE = ["PARTITION", "PERFORMANCE_SCHEMA"]
+_SPAWN_SERVER_ERROR = ("Spawn server operation failed{0}. To diagnose, run the "
+                       "utility again and use the --verbosity option to view "
+                       "the messages from the spawned server and correct any "
+                       "errors presented then run the utility again.")
+
 
 def _get_frm_path(dbtablename, datadir, new_db=None):
     """Form the path and discover the db and name of a frm file.
@@ -114,6 +120,7 @@ def _spawn_server(options):
     quiet = options.get("quiet", False)
     new_port = options.get("port", 3310)
     user = options.get("user", None)
+    start_timeout = int(options.get("start_timeout", 10))
 
     # 1) create a directory to use for new datadir
     temp_datadir = tempfile.mkdtemp()
@@ -137,12 +144,34 @@ def _spawn_server(options):
         'basedir'        : options.get("basedir"),
         'delete'         : True,
         'quiet'          : True if verbosity <= 1 else False,
-        'user'           : user
+        'user'           : user,
+        'start_timeout'  : start_timeout,
     }
     if verbosity > 1 and not quiet:
         print
 
-    serverclone.clone_server(None, bootstrap_options)
+    try:
+        serverclone.clone_server(None, bootstrap_options)
+    except UtilError as error:
+        if error.errmsg.startswith("Unable to communicate"):
+            err = ". Clone server error: {0}".format(error.errmsg)
+            proc_id = int(error.errmsg.split("=")[1].strip('.'))
+            print("ERROR Attempting to stop failed spawned server. "
+                  " Process id = {0}.".format(proc_id))
+            if os.name == "posix":
+                try:
+                    os.kill(proc_id, subprocess.signal.SIGTERM)
+                except OSError:
+                    pass
+            else:
+                try:
+                    retval = subprocess.Popen("taskkill /F /T /PID %i" %
+                                              proc_id, shell=True)
+                except:
+                    pass
+            raise UtilError(_SPAWN_SERVER_ERROR.format(err))
+        else:
+            raise
 
     if verbosity > 1 and not quiet:
         print "# Connecting to spawned server"
@@ -160,11 +189,7 @@ def _spawn_server(options):
     try:
         server.connect()
     except UtilError:
-        raise UtilError("Spawn server operation failed. To diagnose, "
-                        "run the utility again and use the --verbosity option "
-                        "to view the messages from the spawned server and "
-                        "correct any errors presented then run the utility"
-                        "again.")
+        raise UtilError(_SPAWN_SERVER_ERROR.format(""))
 
     if not quiet:
         print "done."

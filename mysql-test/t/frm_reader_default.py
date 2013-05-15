@@ -40,14 +40,21 @@ class test(frm_reader_base.test):
         test_num = 1
 
         port = self.servers.get_next_port()
-        self.cmd = "mysqlfrm.py --server=%s --port=%s " % \
+        cmd = "mysqlfrm.py --server=%s --port=%s " % \
                    (self.build_connection_string(self.server1), port)
+
+        # Show the help
+        comment = "Test case {0}: - Show help".format(test_num)
+        res = self.run_test_case(0, "{0} --help".format(cmd), comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
 
         # Perform test of all .frm files in a known database folder
         datadir = self.server1.show_server_variable("datadir")[0][1]
         frm_file_path = os.path.normpath("%s/frm_test/" % datadir)
         comment = "Test case %s: - Check .frm files in a db folder" % test_num
-        res = self.run_test_case(0, self.cmd + frm_file_path, comment)
+        res = self.run_test_case(0, cmd + frm_file_path, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
@@ -55,7 +62,7 @@ class test(frm_reader_base.test):
         # Perform test of all .frm files in a random folder
         frm_file_path = os.path.normpath("./std_data/frm_files")
         comment = "Test case %s: - Check .frm files in a db folder" % test_num
-        res = self.run_test_case(0, self.cmd + frm_file_path, comment)
+        res = self.run_test_case(0, cmd + frm_file_path, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
@@ -72,7 +79,7 @@ class test(frm_reader_base.test):
 
         comment = "Test case %s: - User the --user option" % test_num
         frm_file_path = os.path.join(frm_file_path, "t1.frm")
-        cmd_str = " ".join([self.cmd, frm_file_path, "--user=%s" % user, "-v"])
+        cmd_str = " ".join([cmd, frm_file_path, "--user=%s" % user, "-v"])
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)

@@ -60,6 +60,7 @@ def clone_server(conn_val, options):
       quiet[in]           If True, do not print messages.
                           (default is False)
       cmd_file[in]        file name to write startup command
+      start_timeout[in]   Number of seconds to wait for server to start
     """
 
     from mysql.utilities.common.server import Server
@@ -73,9 +74,10 @@ def clone_server(conn_val, options):
     user = options.get('user', 'root')
     quiet = options.get('quiet', False)
     cmd_file = options.get('cmd_file', None)
+    start_timeout = int(options.get('start_timeout', 10))
 
     if not check_port_in_use('localhost', int(new_port)):
-       raise UtilError("Port in use. Please choose an available port.")
+        raise UtilError("Port in use. Please choose an available port.")
 
     # Clone running server
     if conn_val is not None:
@@ -232,6 +234,7 @@ def clone_server(conn_val, options):
         proc = subprocess.Popen(cmd, shell=True)
     else:
         proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
+    proc_id = proc.pid
 
     # Try to connect to the new MySQL instance
     if not quiet:
@@ -255,22 +258,22 @@ def clone_server(conn_val, options):
     }
     server2 = Server(server2_options)
 
-    stop = 10 # stop after 10 attempts
     i = 0
-    while i < stop:
+    while i < start_timeout:
         i += 1
         time.sleep(1)
         try:
             server2.connect()
-            i = stop + 1
+            i = start_timeout + 1
         except:
             pass
         finally:
             if verbosity >= 1 and not quiet:
                 print "# trying again..."
 
-    if i == stop:
-        raise UtilError("Unable to communicate with new instance.")
+    if i == start_timeout:
+        raise UtilError("Unable to communicate with new instance. "
+                        "Process id = {0}.".format(proc_id))
     elif not quiet:
         print "# Success!"
 

@@ -27,6 +27,9 @@ Options:
                         and is not empty.
   --user=USER           user account to launch cloned server. Default is
                         current user.
+  --start-timeout=START_TIMEOUT
+                        Number of seconds to wait for server to start. Default
+                        = 10.
 Test case 2 : write command to file
 # Cloning the MySQL server running on XXXXX-XXXXX.
 # Creating new data directory...

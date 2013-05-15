@@ -93,6 +93,11 @@ parser.add_option("--user", action="store", dest="user", type="string",
                   default=None, help="user account to launch cloned server. "
                   "Default is current user.")
 
+# Add startup timeout
+parser.add_option("--start-timeout", action="store", dest="start_timeout",
+                  type=int, default=10, help="Number of seconds to wait for "
+                  "server to start. Default = 10.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -122,6 +127,12 @@ if os.path.exists(opt.new_data):
         parser.error("Target data directory exists and is not empty. Use "
                      "--delete-data option to delete folder before cloning.")
 
+# Check start timeout for minimal value
+if int(opt.start_timeout) < 10:
+    opt.start_timeout = 10
+    print("# WARNING: --start-timeout must be >= 10 seconds. Using "
+          "default value.")
+
 # Build options
 options = {
     'new_data'       : opt.new_data,
@@ -135,6 +146,7 @@ options = {
     'basedir'        : opt.basedir,
     'delete'         : opt.delete,
     'user'           : opt.user,
+    'start_timeout'  : opt.start_timeout,
 }
 
 # Expand user paths and resolve relative paths
