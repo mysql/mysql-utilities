@@ -31,7 +31,6 @@ from mysql.utilities.common.server import Server
 from mysql.utilities.common.server import stop_running_server
 from mysql.utilities.exception import UtilError
 from shutil import copy
-from traceback import print_exc
 
 # The following are storage engines that cannot be read in default mode
 _CANNOT_READ_ENGINE = ["PARTITION", "PERFORMANCE_SCHEMA"]
@@ -121,6 +120,8 @@ def _spawn_server(options):
 
     # 2) spawn a server pointed to temp
     if not quiet:
+        if user:
+            print("# Spawning server with --user={0}.".format(user))
         print "# Starting the spawned server on port %s ..." % new_port,
         sys.stdout.flush()
 
@@ -130,10 +131,11 @@ def _spawn_server(options):
         'new_id'         : 101,
         'root_pass'      : "root",
         'mysqld_options' : None,
-        'verbosity'      : verbosity,
+        'verbosity'      : verbosity if verbosity > 1 else 0,
         'basedir'        : options.get("basedir"),
         'delete'         : True,
-        'quiet'          : True if verbosity == 0 else False,
+        'quiet'          : True if verbosity <= 1 else False,
+        'user'           : user
     }
     if verbosity > 1 and not quiet:
         print
@@ -253,7 +255,7 @@ def _get_create_statement(server, temp_datadir,
                 server_version = (int(current_engine[2][0]),
                                   int(current_engine[2][1:3]),
                                   int(current_engine[2][3:]))
-                if verbosity > 0 and not quiet:
+                if verbosity > 1 and not quiet:
                     print ("# Server version in file: %s.%s.%s" %
                            server_version)
                 if not server.check_version_compat(server_version[0],
@@ -359,7 +361,7 @@ def read_frm_files(file_names, options):
     datadir = options.get("datadir", None)
 
     # 1) for each .frm, determine its type and db, table name
-    if verbosity > 0 and not quiet:
+    if verbosity > 1 and not quiet:
         print "# Checking read access to .frm files "
     frm_files = []
     for file_name in file_names:

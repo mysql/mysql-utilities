@@ -75,6 +75,7 @@ mysqldiff         compare object definitions among objects where the
                   difference is how db1.obj1 differs from db2.obj2           
 mysqldiskusage    show disk usage for databases                              
 mysqlfailover     automatic replication health monitoring and failover       
+mysqlfrm          show CREATE TABLE from .frm files                          
 mysqlindexcheck   check for duplicate or redundant indexes                   
 mysqlmetagrep     search metadata                                            
 mysqlprocgrep     search process information                                 
@@ -160,6 +161,7 @@ mysqldiff         compare object definitions among objects where the
                   difference is how db1.obj1 differs from db2.obj2           
 mysqldiskusage    show disk usage for databases                              
 mysqlfailover     automatic replication health monitoring and failover       
+mysqlfrm          show CREATE TABLE from .frm files                          
 mysqlindexcheck   check for duplicate or redundant indexes                   
 mysqlmetagrep     search metadata                                            
 mysqlprocgrep     search process information                                 
@@ -185,6 +187,7 @@ mysqldiff         compare object definitions among objects where the
                   difference is how db1.obj1 differs from db2.obj2           
 mysqldiskusage    show disk usage for databases                              
 mysqlfailover     automatic replication health monitoring and failover       
+mysqlfrm          show CREATE TABLE from .frm files                          
 mysqlindexcheck   check for duplicate or redundant indexes                   
 mysqlmetagrep     search metadata                                            
 mysqlprocgrep     search process information                                 
@@ -222,6 +225,7 @@ mysqldiff         compare object definitions among objects where the
                   difference is how db1.obj1 differs from db2.obj2           
 mysqldiskusage    show disk usage for databases                              
 mysqlfailover     automatic replication health monitoring and failover       
+mysqlfrm          show CREATE TABLE from .frm files                          
 mysqlindexcheck   check for duplicate or redundant indexes                   
 mysqlmetagrep     search metadata                                            
 mysqlprocgrep     search process information                                 

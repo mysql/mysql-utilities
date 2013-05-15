@@ -17,8 +17,7 @@
 import os
 import sys
 import frm_reader_base
-from mysql.utilities.exception import MUTLibError, UtilDBError
-from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.exception import MUTLibError
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -73,7 +72,7 @@ class test(frm_reader_base.test):
 
         comment = "Test case %s: - User the --user option" % test_num
         frm_file_path = os.path.join(frm_file_path, "t1.frm")
-        cmd_str = " ".join([self.cmd, frm_file_path, "--user=%s" % user])
+        cmd_str = " ".join([self.cmd, frm_file_path, "--user=%s" % user, "-v"])
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -85,6 +84,7 @@ class test(frm_reader_base.test):
                             "# CREATE statement for [...]\n")
         self.replace_result("# std_data",
                             "# std_data/frm_files/t9.frm\n")
+        self.replace_substring(user, "JOE_USER")
 
         return True
 

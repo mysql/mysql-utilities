@@ -21,6 +21,7 @@ utilities are installed, their options, and usage. This module can be
 used to allow a client to provide auto type and option completion.
 """
 
+import glob
 import os
 import sys
 import re
@@ -33,8 +34,7 @@ from mysql.utilities.exception import UtilError
 _MAX_WIDTH = 78
 
 # These utilities should not be used with the console
-# Note: mysqlfrm can be removed once BUG#16238411 is implemented.
-_EXCLUDE_UTILS = ['mysqluc','mysqlfrm',]
+_EXCLUDE_UTILS = ['mysqluc',]
 
 
 def get_util_path(default_path=''):
@@ -120,20 +120,48 @@ class Utilities(object):
         self.find_utilities()
 
 
+    def find_executable(self, util_name):
+        """Search the system path for an executable matching the utility
+
+        util_name[in]  Name of utility
+
+        Returns string - name of executable (util_name or util_name.exe) or
+                         original name if not found on the system path
+        """
+        paths = os.getenv("PATH").split(os.pathsep)
+        for path in paths:
+            found_path = glob.glob(os.path.join(path, util_name + "*"))
+            if found_path:
+                return os.path.split(found_path[0])[1]
+        return util_name
+
+
     def find_utilities(self):
         """ Locate the utility scripts
 
         This method builds a list of utilities.
         """
+        # Here we capture the parts of the --help output. We add the
+        # extended help and helpful hints sections but these are ignored
+        # until BUG#16238411 is implemented. These variables will make that
+        # work a bit easier.
         pattern_usage = ("(?P<Version>.*?)"
                          "(?P<Usage>Usage:\s.*?)\w+\s\-\s" #this match first
                          # section <Usage> matching all till find a " - "
                          "(?P<Description>.*?)" # Description is the text next
                          # to " - " and till next match.
                          "(?P<O>\w*):"  # This is beginning of Options section
-                         "(?P<Options>.*)" # this match  the utility options
+                         "(?P<Options>.*(?=^Introduction.\-{12})|.*$)"
+                         # match Options till end or till find Introduction -.
+                         "(?:^Introduction.\-{12}){0,1}"  # not catching group
+                         "(?P<Introduction>.*(?=^Helpful\sHints.\-{13})|.*$)"
+                         # captures Introduction (optional)
+                         # it will match Introduction till end or till Hints -
+                         "(?:^Helpful\sHints.\-{13}){0,1}"# not catching group
+                         "(?P<Helpful_Hints>.*)"
+                         # captures Helpful Hints (optional)
                          )
-        self.program_usage = re.compile(pattern_usage, re.S)
+        self.program_usage = re.compile(pattern_usage, re.S|re.M)
 
         pattern_options = ("^(?P<Alias>\s\s\-.*?)\s{2,}" # Option Alias
                            # followed by 2 o more spaces is his description
@@ -152,7 +180,7 @@ class Utilities(object):
 
         working_utils = []
         for file_name in files:
-            parts = os.path.splitext(file_name)
+            parts = os.path.splitext(self.find_executable(file_name))
             # Only accept python files - not .pyc and others
             # Parts returns second as empty if does not have ext, so len is 2
             exts = ['.py', '.exe', '']

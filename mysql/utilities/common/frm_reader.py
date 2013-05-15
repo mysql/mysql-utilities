@@ -24,7 +24,6 @@ import bisect
 import os
 import stat
 import struct
-import sys
 import time
 
 from mysql.utilities.common.charsets import CharsetInfo
@@ -531,12 +530,12 @@ class FrmReader(object):
         """
         try:
             # Skip to header position
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to header at : %0000x" % 2
             self.frm_file.seek(2, 0)
             data = self.frm_file.read(_HEADER_LEN)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot read header.")
 
@@ -583,11 +582,11 @@ class FrmReader(object):
         offset = self.general_data['IO_SIZE']
         try:
             # Skip ahead to key section
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to key data at : %0000x" % int(offset)
             self.frm_file.seek(offset, 0)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot locate keys.")
 
@@ -674,12 +673,12 @@ class FrmReader(object):
         offset = (((record_offset/io_size) + 1) * io_size) + 46
         try:
             # Skip to column position
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to table comments at : %0000x" % int(offset)
             self.frm_file.seek(offset, 0)
             data = self.frm_file.read(1)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot read table comment.")
 
@@ -697,11 +696,11 @@ class FrmReader(object):
                  self.general_data['tmp_key_length']
         try:
             # Skip ahead to key section
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to default data at : %0000x" % int(offset+1)
             self.frm_file.seek(offset+1, 0)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot find default data.")
 
@@ -722,11 +721,11 @@ class FrmReader(object):
                  self.general_data['rec_length']
         try:
             # Skip ahead to key section
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to keys at : %0000x" % int(offset+2)
             self.frm_file.seek(offset+2, 0)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot find engine data.")
 
@@ -932,7 +931,7 @@ class FrmReader(object):
                 }
                 column_data.append(col_def)
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot locate column data")
         return column_data
@@ -952,12 +951,12 @@ class FrmReader(object):
         offset = (((record_offset/io_size) + 1) * io_size) + 258
         try:
             # Skip to column position
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Skipping to column data at : %0000x" % int(offset)
             self.frm_file.seek(offset, 0)
             data = struct.unpack("<HHHHHHHHHHHHH", self.frm_file.read(26))
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot read column header.")
         self.num_cols = data[0]
@@ -979,14 +978,14 @@ class FrmReader(object):
         try:
             self.frm_file.read(7)
             fields_per_screen = struct.unpack("<B", self.frm_file.read(1))[0]
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Fields per screen =", fields_per_screen
             self.frm_file.read(46)
             col_names = self._read_column_names(fields_per_screen)[1]
             self.frm_file.read(1) # skip 1 byte
             self.column_data = self._read_column_metadata()
         except Exception, error:
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "EXCEPTION:", error
             raise UtilError("Cannot read column data.")
 
@@ -1028,7 +1027,7 @@ class FrmReader(object):
 
         # Now read column comments
         for i in range(0, len(col_names)):
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Column comment:", \
                     self.column_data[i]['comment_length']
             if self.column_data[i]['comment_length'] > 0:
@@ -1513,7 +1512,7 @@ class FrmReader(object):
 
             # Read partition information
             self._read_engine_data()
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Engine string:", self.engine_str
                 print "# Partition string:", self.partition_str
 
@@ -1527,7 +1526,7 @@ class FrmReader(object):
 
             # Read comment
             self._read_comment()
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print "# Comment:", self.comment_str
 
             if self.csi is not None and self.verbosity > 2:
@@ -1574,7 +1573,7 @@ class FrmReader(object):
         """
         # Here we must change the code in position 0x03 to the engine code
         # and the engine string in body of the file (Calculated location)
-        if self.verbosity > 0 and not self.quiet:
+        if self.verbosity > 1 and not self.quiet:
             print "# Changing engine for .frm file %s:" % self.frm_path
 
         # Fail if we cannot read the file
@@ -1618,7 +1617,7 @@ class FrmReader(object):
         engine_len = struct.unpack("<H", self.frm_file.read(2))[0]
         engine_str = "".join(struct.unpack("c"*engine_len,
                                            self.frm_file.read(engine_len)))
-        if self.verbosity > 0:
+        if self.verbosity > 1:
             print "# Engine string:", engine_str
 
         # If this is a CSV storage engine, don't change the engine type
