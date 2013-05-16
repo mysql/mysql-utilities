@@ -327,9 +327,9 @@ class Table(object):
         self.dest_vals = None
 
         # Get max allowed packet
-        res = self.server.show_server_variable("_MAXALLOWED_PACKET")
+        res = self.server.exec_query("SELECT @@session.max_allowed_packet")
         if res:
-            self.max_packet_size = res[0][1]
+            self.max_packet_size = res[0][0]
         else:
             self.max_packet_size = _MAXPACKET_SIZE
         # Watch for invalid values
