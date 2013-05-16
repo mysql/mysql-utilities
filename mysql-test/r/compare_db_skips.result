@@ -251,6 +251,6 @@ Test case 5 -   --skip-object-compare --skip-row-count --skip-diff --skip-data-c
 # TABLE     supplies                                SKIP    SKIP    SKIP    
 # VIEW      tools                                   SKIP    -       -      
 
-Databases are consistent given skip options specified.
+# Databases are consistent given skip options specified.
 #
 # ...done

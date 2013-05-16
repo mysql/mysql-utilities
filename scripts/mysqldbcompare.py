@@ -236,7 +236,7 @@ if not opt.quiet:
     if check_failed:
         print("# Database consistency check failed.")
     else:
-        sys.stdout.write("Databases are consistent")
+        sys.stdout.write("# Databases are consistent")
         if opt.no_object_check or opt.no_diff or \
            opt.no_row_count or opt.no_data:
             sys.stdout.write(" given skip options specified")

@@ -219,6 +219,37 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Compare databases with objects of different type with the same name
+
+        # Create the same PROCEDURE on each server with the same name of an
+        # already existing TABLE (i.e., ```t``export_1`).
+        self.server1.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 1")
+        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 1")
+        # Execute test (no differences expected)
+        comment = ("Test case 11 - compare a database with objects of "
+                   "different type with the same name (no differences)")
+        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
+                                                         cmd_arg)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Replace the PROCEDURE previously created on one of the servers by a
+        # different one.
+        self.server2.exec_query("DROP PROCEDURE `db.``:db`.```t``export_1`")
+        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 2")
+        # Execute test (differences expected)
+        comment = ("Test case 12 - compare a database with objects of "
+                   "different type with the same name (with differences)")
+        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
+                                                         cmd_arg)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True

@@ -12,7 +12,7 @@ Test case 1 - check a sample database generate SQL
 # VIEW      finishing_up                            pass    -       -       
 # VIEW      tools                                   pass    -       -      
 
-Databases are consistent.
+# Databases are consistent.
 #
 # ...done
 Test case 2 - check database with known differences generate SQL direction = server1 (default)

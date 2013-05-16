@@ -736,35 +736,34 @@ class Database(object):
 
         return str
 
-
     def get_object_type(self, object_name):
         """Return the object type of an object
 
         This method attempts to locate the object name among the objects
         in the database. It returns the object type if found or None
         if not found.
+        Note: different types of objects with the same name might exist in the
+        database.
 
         object_name[in]    Name of the object to find
 
-        Returns (string) object type or None if not found
+        Returns (list of strings) with the object types or None if not found
         """
-        object_type = None
+        object_types = None
 
         # Remove object backticks if needed
         obj_name = remove_backtick_quoting(object_name) \
-                    if is_quoted_with_backticks(object_name) else object_name
+            if is_quoted_with_backticks(object_name) else object_name
 
         res = self.source.exec_query(_OBJTYPE_QUERY %
-                                     { 'db_name'  : self.db_name,
-                                       'obj_name' : obj_name })
+                                     {'db_name': self.db_name,
+                                      'obj_name': obj_name})
 
-        if res != [] and res is not None and len(res) > 0:
-            object_type = res[0][0]
-            if object_type == 'BASE TABLE':
-                object_type = 'TABLE'
+        if res:
+            object_types = ['TABLE' if row[0] == 'BASE TABLE' else row[0]
+                            for row in res]
 
-        return object_type
-
+        return object_types
 
     def get_db_objects(self, obj_type, columns='names', get_columns=False,
                        need_backtick=False):

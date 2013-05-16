@@ -15,18 +15,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+This file contains the methods for checking consistency among two databases.
+"""
+
 import re
 
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.sql_transform import SQLTransformer
 from mysql.utilities.common.database import Database
-
-"""
-This file contains the methods for checking consistency among two databases.
-"""
-
 from mysql.utilities.exception import UtilError, UtilDBError
 
 # The following are the queries needed to perform table data consistency
@@ -103,7 +103,7 @@ def _get_objects(server, database, options):
     return db_objects
 
 
-def get_create_object(server, object_name, options):
+def get_create_object(server, object_name, options, object_type):
     """Get the object's create statement.
 
     This method retrieves the object create statement from the database.
@@ -111,34 +111,31 @@ def get_create_object(server, object_name, options):
     server[in]        server connection
     object_name[in]   name of object in the form db.objectname
     options[in]       options: verbosity, quiet
+    object_type[in]   type of the specified object (e.g, TABLE, PROCEDURE,
+                      etc.).
 
     Returns string : create statement or raise error if object or db not exist
     """
-    from mysql.utilities.common.database import Database
 
     verbosity = options.get("verbosity", 0)
     quiet = options.get("quiet", False)
 
     m_obj = re.match(REGEXP_QUALIFIED_OBJ_NAME, object_name)
     db_name, obj_name = m_obj.groups()
-    object = [db_name]
+    obj = [db_name]
 
-    db = Database(server, object[0], options)
+    db = Database(server, obj[0], options)
 
-    # Error if atabase does not exist
+    # Error if database does not exist
     if not db.exists():
-        raise UtilDBError("The database does not exist: {0}".format(object[0]))
+        raise UtilDBError("The database does not exist: {0}".format(obj[0]))
 
-    if not obj_name:
-        object.append(object[0])
-        obj_type = "DATABASE"
+    if not obj_name or object_type == 'DATABASE':
+        obj.append(db_name)
     else:
-        object.append(obj_name)
-        obj_type = db.get_object_type(object[1])
-        if obj_type is None:
-            raise UtilDBError("The object {0} does not exist.".
-                              format(object_name))
-    create_stmt = db.get_create_statement(object[0], object[1], obj_type)
+        obj.append(obj_name)
+
+    create_stmt = db.get_create_statement(obj[0], obj[1], object_type)
 
     if verbosity > 0 and not quiet:
         print "\n# Definition for object {0}:".format(object_name)
@@ -307,7 +304,8 @@ def _get_diff(list1, list2, object1, object2, difftype):
     return diff_str
 
 
-def _get_transform(server1, server2, object1, object2, options):
+def _get_transform(server1, server2, object1, object2, options,
+                   object_type):
     """Get the transformation SQL statements
 
     This method generates the SQL statements to transform the destination
@@ -319,13 +317,11 @@ def _get_transform(server1, server2, object1, object2, options):
     object2            the second object in the compare in the form: (db.name)
     options[in]        a dictionary containing the options for the operation:
                        (quiet, etc.)
+    object_type[in]    type of the objects to be compared (e.g., TABLE,
+                       PROCEDURE, etc.).
 
     Returns tuple - (bool - same db name?, list of transformation statements)
     """
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.sql_transform import SQLTransformer
-
-    obj_type = None
 
     try:
         m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
@@ -338,8 +334,7 @@ def _get_transform(server1, server2, object1, object2, options):
     # If the second part of the object qualified name is None, then the format
     # is not 'db_name.obj_name' for object1 and therefore must treat it as a
     # database name. (supports backticks and the use of '.' (dots) in names.)
-    if not name1:
-        obj_type = "DATABASE"
+    if not name1 or object_type == 'DATABASE':
 
         # We are working with databases so db and name need to be set
         # to the database name to tell the get_object_definition() method
@@ -350,15 +345,12 @@ def _get_transform(server1, server2, object1, object2, options):
     db_1 = Database(server1, db1, options)
     db_2 = Database(server2, db2, options)
 
-    if not obj_type:
-        obj_type = db_1.get_object_type(name1)
-
-    obj1 = db_1.get_object_definition(db1, name1, obj_type)
-    obj2 = db_2.get_object_definition(db2, name2, obj_type)
+    obj1 = db_1.get_object_definition(db1, name1, object_type)
+    obj2 = db_2.get_object_definition(db2, name2, object_type)
 
     # Get the transformation based on direction.
     transform_str = []
-    xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], obj_type,
+    xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], object_type,
                            options.get('verbosity', 0))
 
     differences = xform.transform_definition()
@@ -368,7 +360,8 @@ def _get_transform(server1, server2, object1, object2, options):
     return transform_str
 
 
-def _check_tables_structure(server1, server2, object1, object2, options):
+def _check_tables_structure(server1, server2, object1, object2, options,
+                            object_type):
     """Check if the tables have the same structure
 
     This method compares the tables structure, ignoring the order of the
@@ -380,6 +373,8 @@ def _check_tables_structure(server1, server2, object1, object2, options):
     object2            the second object in the compare in the form: (db.name)
     options[in]        a dictionary containing the options for the operation:
                        (quiet, verbosity, difftype, width, suppress_sql)
+    object_type[in]    type of the objects to be compared (e.g., TABLE,
+                       PROCEDURE, etc.).
 
     Returns bool - True if tables have the same structure
     """
@@ -401,15 +396,13 @@ def _check_tables_structure(server1, server2, object1, object2, options):
     db_1 = Database(server1, db1, options)
     db_2 = Database(server2, db2, options)
 
-    obj_type = db_1.get_object_type(name1)
-
-    if obj_type != "TABLE":
+    if object_type != "TABLE":
         # Objects are not tables
         return False
 
     # Get tables definition
-    table_1 = db_1.get_object_definition(db1, name1, obj_type)[0]
-    table_2 = db_2.get_object_definition(db2, name2, obj_type)[0]
+    table_1 = db_1.get_object_definition(db1, name1, object_type)[0]
+    table_2 = db_2.get_object_definition(db2, name2, object_type)[0]
 
     # Check tables info, discard TABLE_SCHEMA, AUTO_INCREMENT and AVG_ROW_LENGTH
     for i in range(10):
@@ -495,7 +488,7 @@ def build_diff_list(diff1, diff2, transform1, transform2,
     return diff_list
 
 
-def diff_objects(server1, server2, object1, object2, options):
+def diff_objects(server1, server2, object1, object2, options, object_type):
     """diff the definition (CREATE statement) of two objects
     
     Produce a diff in the form unified, context, or ndiff of two objects.
@@ -510,15 +503,15 @@ def diff_objects(server1, server2, object1, object2, options):
     
     server1[in]        first server connection
     server2[in]        second server connection
-    object1            the first object in the compare in the form: (db.name)
-    object2            the second object in the compare in the form: (db.name)
+    object1[in]        the first object in the compare in the form: (db.name)
+    object2[in]        the second object in the compare in the form: (db.name)
     options[in]        a dictionary containing the options for the operation:
                        (quiet, verbosity, difftype, width, suppress_sql)
+    object_type[in]    type of the objects to be compared (e.g., TABLE,
+                       PROCEDURE, etc.).
 
     Returns None = objects are the same, diff[] = objects differ
     """
-    import sys
-    
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
     difftype = options.get("difftype", "unified")
@@ -526,8 +519,8 @@ def diff_objects(server1, server2, object1, object2, options):
     direction = options.get("changes-for", None)
     reverse = options.get("reverse", False)
 
-    object1_create = get_create_object(server1, object1, options)
-    object2_create = get_create_object(server2, object2, options)
+    object1_create = get_create_object(server1, object1, options, object_type)
+    object2_create = get_create_object(server2, object2, options, object_type)
     
     if not quiet:
         msg = "# Comparing {0} to {1} ".format(object1, object2)
@@ -538,7 +531,6 @@ def diff_objects(server1, server2, object1, object2, options):
     object1_create_list = object1_create.split('\n')
     object2_create_list = object2_create.split('\n')
 
-    diff_list = []    
     diff_server1 = []
     diff_server2 = []
     transform_server1 = []
@@ -552,7 +544,8 @@ def diff_objects(server1, server2, object1, object2, options):
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server1) > 0:
             transform_server1 = _get_transform(server1, server2,
-                                               object1, object2, options)
+                                               object1, object2, options,
+                                               object_type)
 
     if direction == 'server2' or reverse:
         diff_server2 = _get_diff(object2_create_list,
@@ -561,8 +554,8 @@ def diff_objects(server1, server2, object1, object2, options):
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server2) > 0:
             transform_server2 = _get_transform(server2, server1,
-                                               object2, object1, options)
-
+                                               object2, object1, options,
+                                               object_type)
 
     # Build diff list
     if direction == 'server1' or direction is None:
@@ -574,8 +567,9 @@ def diff_objects(server1, server2, object1, object2, options):
                                     transform_server2, transform_server1,
                                     'server2', 'server1', options)
 
-    same_table_structure  = _check_tables_structure(server1, server2,
-                                                    object1, object2, options)
+    same_table_structure = _check_tables_structure(server1, server2,
+                                                   object1, object2, options,
+                                                   object_type)
 
     # Check if ALTER TABLE statement have changes. If not, is probably because
     # there are differences but they have no influence on the create table,

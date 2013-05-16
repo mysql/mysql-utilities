@@ -12,7 +12,7 @@ Test case 1 - check a sample database
 # VIEW      finishing_up                            pass    -       -       
 # VIEW      tools                                   pass    -       -      
 
-Databases are consistent.
+# Databases are consistent.
 #
 # ...done
 Test case 2 - check database with known differences (extra table)
@@ -469,7 +469,7 @@ Test case 7 - compare two databases on same server w/server2
 # ...done
 Test case 8 - compare two databases on same server
 # server1 on localhost: ... connected.
-# Checking databases inventory on server1 and inventory2 on server2
+# Checking databases inventory and inventory2 on server1
 #
 # Object definitions differ. (--changes-for=server1)
 #
@@ -506,7 +506,7 @@ Test case 9 - compare a database with weird names (backticks)
 # TABLE     `t`export_1                             pass    pass    pass    
 # VIEW      `v`export_1                             pass    -       -      
 
-Databases are consistent.
+# Databases are consistent.
 #
 # ...done
 Test case 10 - compare two empty databases
@@ -518,6 +518,49 @@ Test case 10 - compare two empty databases
 # Type      Object Name                             Diff    Count   Check  
 # -------------------------------------------------------------------------
 
-Databases are consistent.
+# Databases are consistent.
+#
+# ...done
+Test case 11 - compare a database with objects of different type with the same name (no differences)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db.`:db on server1 and db.`:db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# PROCEDURE `t`export_1                             pass    -       -       
+# TABLE     `t`.`export_2                           pass    pass    pass    
+# TABLE     `t`export_1                             pass    pass    pass    
+# VIEW      `v`export_1                             pass    -       -      
+
+# Databases are consistent.
+#
+# ...done
+Test case 12 - compare a database with objects of different type with the same name (with differences)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db.`:db on server1 and db.`:db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# PROCEDURE `t`export_1                             FAIL    -       -       
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `db.``:db`.```t``export_1`
++++ `db.``:db`.```t``export_1`
+@@ -1,2 +1,2 @@
+ CREATE DEFINER=`root`@`localhost` PROCEDURE ```t``export_1`()
+-SELECT 1
++SELECT 2
+
+# TABLE     `t`.`export_2                           pass    pass    pass    
+# TABLE     `t`export_1                             pass    pass    pass    
+# VIEW      `v`export_1                             pass    -       -      
+
+# Database consistency check failed.
 #
 # ...done
