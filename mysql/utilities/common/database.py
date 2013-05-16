@@ -253,24 +253,23 @@ class Database(object):
             create_str = self.get_create_statement(self.db_name,
                                                    obj[0], obj_type)
             if self.new_db != self.db_name:
-                create_str = re.sub(r" %s\." % self.q_db_name,
-                                    r" %s." % self.q_new_db,
-                                    create_str)
-                create_str = re.sub(r",%s\." % self.q_db_name,
-                                    r",%s." % self.q_new_db,
-                                    create_str)
-                create_str = re.sub(r" %s\." % self.db_name,
-                                    r" %s." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r",%s\." % self.db_name,
-                                    r",%s." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r" '%s'\." % self.db_name,
-                                    r" '%s'." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r' "%s"\.' % self.db_name,
-                                    r' "%s".' % self.new_db,
-                                    create_str)
+                # Replace the occurrences of the old database name (quoted with
+                # backticks) with the new one when preceded by: a whitespace
+                # character, comma or optionally a left parentheses.
+                create_str = re.sub(
+                    r"(\s|,)(\(?){0}\.".format(self.q_db_name),
+                    r"\1\2{0}.".format(self.q_new_db),
+                    create_str
+                )
+                # Replace the occurrences of the old database name (without
+                # backticks) with the new one when preceded by: a whitespace
+                # character, comma or optionally a left parentheses and
+                # surrounded by single or double quotes.
+                create_str = re.sub(
+                    r"(\s|,)(\(?)(\"|\'?){0}(\"|\'?)\.".format(self.db_name),
+                    r"\1\2\3{0}\4.".format(self.new_db),
+                    create_str
+                )
         return create_str
 
 
