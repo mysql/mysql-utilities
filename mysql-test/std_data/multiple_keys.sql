@@ -12,6 +12,8 @@ ALTER TABLE util_test_keys.t1 ADD PRIMARY KEY (a);
 
 CREATE TABLE util_test_keys.t2 AS SELECT * FROM util_test_keys.t1;
 ALTER TABLE util_test_keys.t2 ADD PRIMARY KEY (a, b);
+ALTER TABLE util_test_keys.t2 ENGINE = InnoDB;
 
 CREATE TABLE util_test_keys.t3 AS SELECT * FROM util_test_keys.t1;
 ALTER TABLE util_test_keys.t3 ADD PRIMARY KEY (a, b, c);
+ALTER TABLE util_test_keys.t3 ENGINE = InnoDB;
