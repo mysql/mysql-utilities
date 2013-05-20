@@ -21,12 +21,14 @@ table data.
 """
 
 import csv
+import re
+
 from itertools import imap
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 
 # List of database objects for enumeration
@@ -48,6 +50,7 @@ _GTID_SKIP_WARNING = "# WARNING: GTID commands are present in the import " + \
     "file but the server does not support GTIDs. Commands are ignored."
 _GTID_MISSING_WARNING = "# WARNING: GTIDs are enabled on this server but " + \
     "the import file did not contain any GTID commands."
+
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
@@ -292,6 +295,11 @@ def read_next(file, format, no_headers=False):
             else:
                 sql_cmd += row
         yield (cmd_type, sql_cmd) # need last row.
+    elif format == "raw_csv":
+        csv_reader = csv.reader(file, delimiter=",")
+        for row in csv_reader:
+            if row:
+                yield row
     else:
         table_rows = []
         found_obj = ""
@@ -929,14 +937,22 @@ def import_file(dest_val, file_name, options):
         if len(col_list) > 0:
             table_col_list.extend(col_list)
 
-    def _process_data(tbl_name, statements, columns,
-                      table_col_list, table_rows, skip_blobs):
+    def _process_data(tbl_name, statements, columns, table_col_list,
+                      table_rows, skip_blobs, use_columns_names=False):
         # if there is data here, build bulk inserts
         # First, create table reference, then call insert_rows()
         tbl = Table(destination, tbl_name)
         # Need to check to see if table exists!
         if tbl.exists():
-            tbl.get_column_metadata()
+            columns_defn = None
+            if use_columns_names:
+                # Get columns definitions
+                res = tbl.server.exec_query("explain {0}".format(tbl_name))
+                # Only add selected columns
+                columns_defn = [row for row in res if row[0] in columns]
+                # Sort by selected columns definitions
+                columns_defn.sort(key=lambda item: columns.index(item[0]))
+            tbl.get_column_metadata(columns_defn)
             col_meta = True
         elif len(table_col_list) > 0:
             col_meta = _get_column_metadata(tbl, table_col_list)
@@ -947,7 +963,9 @@ def import_file(dest_val, file_name, options):
         if not col_meta:
             raise UtilError("Cannot build bulk insert statements without "
                                  "the table definition.")
-        ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name)
+        columns_names = columns[:] if use_columns_names else None
+        ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name,
+                                        columns_names)
         if len(ins_strs[0]) > 0:
             statements.extend(ins_strs[0])
         if len(ins_strs[1]) > 0 and not skip_blobs:
@@ -997,6 +1015,7 @@ def import_file(dest_val, file_name, options):
     file = open(file_name)
     columns = []
     read_columns = False
+    use_columns_names = False
     table_rows = []
     obj_type = ""
     definitions = []
@@ -1009,8 +1028,52 @@ def import_file(dest_val, file_name, options):
     skip_gtid_warning_printed = False
     gtid_version_checked = False
 
+    if format == "raw_csv":
+        # Use the first row as columns
+        read_columns = True
+
+        # Use columns names in INSERT statement
+        use_columns_names = True
+
+        table = options.get("table", None)
+        (db_name_part, tbl_name_part) = Database.parse_object_name(table)
+
+        # Work with quoted objects
+        db_name = (db_name_part if is_quoted_with_backticks(db_name_part)
+                   else quote_with_backticks(db_name_part))
+        tbl_name = (tbl_name_part if is_quoted_with_backticks(tbl_name_part)
+                    else quote_with_backticks(tbl_name_part))
+        tbl_name = ".".join([db_name, tbl_name])
+
+        # Check database existence and permissions
+        dest_db = Database(destination, db_name)
+        if not dest_db.exists():
+            raise UtilDBError(
+                "The database does not exist: {0}".format(db_name)
+            )
+
+        # Check user permissions for write
+        dest_db.check_write_access(dest_val['user'], dest_val['host'], options)
+
+        # Check table existence
+        tbl = Table(destination, tbl_name)
+        if not tbl.exists():
+            raise UtilDBError("The table does not exist: {0}".format(table))
+
     # Read the file one object/definition group at a time
     for row in read_next(file, format):
+        # Check if --format=raw_csv
+        if format == "raw_csv":
+            if read_columns:
+                # Use the first row as columns names
+                columns = row[:]
+                read_columns = False
+                continue
+            if single:
+                statements.append(_build_insert_data(columns, tbl_name, row))
+            else:
+                table_rows.append(row)
+            continue
         # Check for replication command
         if row[0] == "RPL_COMMAND":
             if not skip_rpl:
@@ -1129,8 +1192,8 @@ def import_file(dest_val, file_name, options):
 
     # Process remaining data rows
     if len(table_rows) > 0:
-        _process_data(tbl_name, statements, columns,
-                      table_col_list, table_rows, skip_blobs)
+        _process_data(tbl_name, statements, columns, table_col_list,
+                      table_rows, skip_blobs, use_columns_names)
         table_rows = []
 
     # Now process the statements

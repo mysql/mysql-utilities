@@ -168,3 +168,41 @@ Running import...
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 18 : Testing import with RAW_CSV format
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/raw_data.csv.
+#...done.
+Comparing tables...
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases import_test on server1 and import_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     customers                               pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test Case 19 : Testing import with RAW_CSV format using --bulk-insert 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/raw_data.csv.
+#...done.
+Comparing tables...
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases import_test on server1 and import_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     customers                               pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done

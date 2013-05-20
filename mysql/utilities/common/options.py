@@ -191,7 +191,8 @@ def check_skip_options(skip_list):
     return new_skip_list
 
 
-def add_format_option(parser, help_text, default_val, sql=False):
+def add_format_option(parser, help_text, default_val, sql=False,
+                      extra_formats=None):
     """Add the format option.
 
     parser[in]        the parser instance
@@ -199,12 +200,15 @@ def add_format_option(parser, help_text, default_val, sql=False):
     default_val[in]   default value
     sql[in]           if True, add 'sql' format
                       default=False
+    extra_formats[in] list with extra formats
 
     Returns corrected format value
     """
     formats = _PERMITTED_FORMATS
     if sql:
         formats.append('sql')
+    if extra_formats:
+        formats.extend(extra_formats)
     parser.add_option("-f", "--format", action="store", dest="format",
                       default=default_val, help=help_text, type="choice",
                       choices=formats)

@@ -26,6 +26,7 @@ from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -1176,3 +1177,19 @@ class Database(object):
                                    priv[0]), -1, priv[0])
 
         return True
+
+    @staticmethod
+    def parse_object_name(qualified_name):
+        """Parse db, name from db.name
+
+        qualified_name[in] MySQL object string (e.g. db.table)
+
+        Returns tuple containing name split
+        """
+
+        # Split the qualified name considering backtick quotes
+        parts = re.match(REGEXP_QUALIFIED_OBJ_NAME, qualified_name)
+        if parts:
+            return parts.groups()
+        else:
+            return (None, None)

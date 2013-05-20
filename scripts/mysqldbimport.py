@@ -29,6 +29,7 @@ check_python_version()
 import os
 import sys
 import time
+import re
 
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
@@ -37,6 +38,7 @@ from mysql.utilities.common.options import add_skip_options, check_skip_options
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -70,7 +72,8 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Input format
 add_format_option(parser, "the input file format in either sql (default), "
-                  "grid, tab, csv, or vertical format", "sql", True)
+                  "grid, tab, csv, raw_csv or vertical format", "sql", True,
+                  extra_formats=["raw_csv"])
 
 # Import mode
 parser.add_option("-i", "--import", action="store", dest="import_type",
@@ -100,6 +103,10 @@ parser.add_option("--dryrun", action="store_true", dest="dryrun",
                   default=False, help="import the files and generate the "
                   "statements but do not execute them - useful for testing "
                   "file validity")
+
+# Add table for import raw csv files
+parser.add_option("--table", action="store", dest="table", default=None,
+                  help="destination table in the form: <db>.<table>.")
 
 # Skip blobs for import
 parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
@@ -177,6 +184,7 @@ options = {
     "def_engine"    : opt.def_engine,
     "skip_rpl"      : opt.skip_rpl,
     "skip_gtid"     : opt.skip_gtid,
+    "table"         : opt.table,
 }
 
 # Parse server connection values
@@ -188,6 +196,21 @@ except FormatError:
 except UtilError:
     _, err, _ = sys.exc_info()
     parser.error("Server connection values invalid: %s." % err.errmsg)
+
+# Check values for --format=raw_csv
+if opt.format == "raw_csv":
+    if not opt.table:
+        print("ERROR: You must provide --table while using --format=raw_csv.")
+        sys.exit(1)
+    # Validate table name using format <db>.<table>
+    table_re = re.compile(r"{0}(?:\.){0}".format(REGEXP_QUALIFIED_OBJ_NAME))
+    if not table_re.match(opt.table):
+        parser.error("Invalid table name: {0}.".format(opt.table))
+
+# Ignore --table for formats other than RAW_CSV.
+if opt.table and opt.format != "raw_csv":
+    print("WARNING: The --table option is only required for --format=raw_csv "
+          "(option ignored).")
 
 # Build list of files to import
 file_list = []

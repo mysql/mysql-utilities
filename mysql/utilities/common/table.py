@@ -20,14 +20,14 @@ This module contains abstractions of a MySQL table and an index.
 """
 
 import multiprocessing
-import re
 import sys
+
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import convert_special_characters
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.database import Database
 
 # Constants
 _MAXPACKET_SIZE = 1024 * 1024
@@ -43,22 +43,6 @@ _FOREIGN_KEY_QUERY = """
   WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND 
         REFERENCED_TABLE_SCHEMA IS NOT NULL
 """
-
-
-def _parse_object_name(qualified_name):
-    """Parse db, name from db.name
-
-    qualified_name[in] MySQL object string (e.g. db.table)
-
-    Returns tuple containing name split
-    """
-
-    # Split the qualified name considering backtick quotes
-    parts = re.match(REGEXP_QUALIFIED_OBJ_NAME, qualified_name)
-    if parts:
-        return parts.groups()
-    else:
-        return (None, None)
 
 
 class Index(object):
@@ -298,13 +282,13 @@ class Table(object):
         # Keep table identifier considering backtick quotes
         if is_quoted_with_backticks(name):
             self.q_table = name
-            self.q_db_name, self.q_tbl_name = _parse_object_name(name)
+            self.q_db_name, self.q_tbl_name = Database.parse_object_name(name)
             self.db_name = remove_backtick_quoting(self.q_db_name)
             self.tbl_name = remove_backtick_quoting(self.q_tbl_name)
             self.table = ".".join([self.db_name, self.tbl_name])
         else:
             self.table = name
-            self.db_name, self.tbl_name = _parse_object_name(name)
+            self.db_name, self.tbl_name = Database.parse_object_name(name)
             self.q_db_name = quote_with_backticks(self.db_name)
             self.q_tbl_name = quote_with_backticks(self.tbl_name)
             self.q_table = ".".join([self.q_db_name, self.q_tbl_name])
@@ -354,7 +338,7 @@ class Table(object):
 
         db, table = (None, None)
         if tbl_name:
-            db, table = _parse_object_name(tbl_name)
+            db, table = Database.parse_object_name(tbl_name)
         else:
             db = self.db_name
             table = self.tbl_name
@@ -520,7 +504,7 @@ class Table(object):
         return (val_str, blob_inserts)
 
 
-    def make_bulk_insert(self, rows, new_db):
+    def make_bulk_insert(self, rows, new_db, columns_names=None):
         """Create bulk insert statements for the data
 
         Reads data from a table (rows) and builds group INSERT statements for
@@ -544,7 +528,12 @@ class Table(object):
         val_str = None
         for row in rows:
             if row_count == 0:
-                insert_str = self._insert % (new_db, self.q_tbl_name)
+                if columns_names:
+                    insert_str = "INSERT INTO {0}.{1} ({2}) VALUES ".format(
+                        new_db, self.q_tbl_name, ", ".join(columns_names)
+                    )
+                else:
+                    insert_str = self._insert % (new_db, self.q_tbl_name)
                 if val_str:
                     row_count += 1
                     insert_str += val_str

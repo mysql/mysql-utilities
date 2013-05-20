@@ -11,7 +11,7 @@ Options:
                         <login-path>[:<port>][:<socket>].
   -f FORMAT, --format=FORMAT
                         the input file format in either sql (default), grid,
-                        tab, csv, or vertical format
+                        tab, csv, raw_csv or vertical format
   -i IMPORT_TYPE, --import=IMPORT_TYPE
                         control the import of either 'data' = only the table
                         data for the tables in the database list,
@@ -24,6 +24,7 @@ Options:
   -h, --no-headers      files do not contain column headers
   --dryrun              import the files and generate the statements but do
                         not execute them - useful for testing file validity
+  --table=TABLE         destination table in the form: <db>.<table>.
   --skip-blobs          do not import blob data.
   --skip-rpl            do not execute replication commands.
   --skip-gtid           do not execute the GTID_PURGED statements.

@@ -20,7 +20,7 @@ import mutlib
 from mysql.utilities.common.table import quote_with_backticks
 
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 class test(mutlib.System_test):
     """Import Data
@@ -104,6 +104,15 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file %s: %s"
                               % (data_file_backticks, err.errmsg))
 
+        # Create database for import tests
+        data_file_import = os.path.normpath("./std_data/import_data.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_import, self.debug)
+            self.server1.exec_query("COMMIT")  # Commit SQL
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_import, err.errmsg))
+
         return True
     
     def run_import_test(self, expected_res, from_conn, to_conn, db, frmt,
@@ -146,6 +155,46 @@ class test(mutlib.System_test):
         self.results.append("AFTER:\n")
         self.results.append(self.check_objects(self.server2, db))
 
+    def run_import_raw_csv_test(self, expected_res, from_conn, to_conn, db,
+                                table, comment, import_options=None):
+        self.results.append("{0}\n".format(comment))
+        self.results.append("Running export...\n")
+
+        # Create database and table on server2
+        try:
+            self.server2.exec_query("CREATE DATABASE `import_test`")
+            self.server2.exec_query(
+                "CREATE TABLE `import_test`.`customers` "
+                "(`id` int(10) unsigned NOT NULL, "
+                "`name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) "
+                "ENGINE=InnoDB;"
+            )
+        except UtilDBError as err:
+            raise MUTLibError(err.errmsg)
+
+        # Build import command
+        csv_file = os.path.normpath("./std_data/raw_data.csv")
+        import_cmd = (
+            "mysqldbimport.py {0} --import=data --format=raw_csv "
+            "--table={1}.{2} {3} {4}".format(to_conn, db, table, csv_file,
+                                             import_options or "")
+        )
+
+        res = self.run_test_case(expected_res, import_cmd, "Running import...")
+        if not res:
+            raise MUTLibError("IMPORT: {0}: failed".format(comment))
+
+        # Compare databases
+        compare_cmd = (
+            "mysqldbcompare.py {0} {1} "
+            "{2}:{2}".format(from_conn.replace("--server", "--server1"),
+                             to_conn.replace("--server", "--server2"),
+                             db)
+        )
+        res = self.run_test_case(0, compare_cmd, "Comparing tables...")
+        if not res:
+            raise MUTLibError("IMPORT: {0}: failed".format(comment))
+
     def run(self):
         self.res_fname = "result.txt"
 
@@ -186,6 +235,31 @@ class test(mutlib.System_test):
         self.run_import_test(0, from_conn, to_conn, '`db``:db`',
                              frmt, "BOTH", comment, " --display=%s" % display)
         self.drop_db(self.server2, 'db`:db')
+        test_num += 1
+
+        comment = ("Test Case {0} : Testing import with RAW_CSV "
+                   "format".format(test_num))
+        self.run_import_raw_csv_test(0, from_conn, to_conn, "import_test",
+                                     "customers", comment)
+        self.drop_db(self.server2, 'import_test')
+        if os.name != "posix":
+            self.replace_result(
+                "# Importing data from std_data\\raw_data.csv.",
+                "# Importing data from std_data/raw_data.csv.\n"
+            )
+        test_num += 1
+
+        comment = ("Test Case {0} : Testing import with RAW_CSV format using "
+                   "--bulk-insert ".format(test_num))
+        self.run_import_raw_csv_test(0, from_conn, to_conn, "import_test",
+                                     "customers", comment,
+                                     import_options="--bulk-insert")
+        self.drop_db(self.server2, 'import_test')
+        if os.name != "posix":
+            self.replace_result(
+                "# Importing data from std_data\\raw_data.csv.",
+                "# Importing data from std_data/raw_data.csv.\n"
+            )
 
         return True
 
@@ -218,11 +292,19 @@ class test(mutlib.System_test):
         except:
             return False
         try:
+            self.drop_db(self.server1, "import_test")
+        except:
+            return False
+        try:
             self.drop_db(self.server2, "util_test")
         except:
             pass  # ok if this fails - it is a spawned server
         try:
             self.drop_db(self.server2, 'db`:db')
+        except:
+            pass  # ok if this fails - it is a spawned server
+        try:
+            self.drop_db(self.server2, "import_test")
         except:
             pass  # ok if this fails - it is a spawned server
         return True
