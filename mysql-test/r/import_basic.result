@@ -206,3 +206,20 @@ Comparing tables...
 # Databases are consistent.
 #
 # ...done
+Test Case 20 : Testing import with CSV format with no data (using --format=data)
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/no_data.csv.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
+# WARNING: No data was found.
+#...done.
+Test Case 21 : Testing import with CSV format with RPL statements (using --format=data)
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/rpl_data.csv.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
+# WARNING: No data was found.
+#...done.

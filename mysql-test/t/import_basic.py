@@ -195,6 +195,20 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("IMPORT: {0}: failed".format(comment))
 
+    def run_import_csv_no_data_test(self, expected_res, from_conn, comment,
+                                    csv_file, import_options):
+        self.results.append("{0}\n".format(comment))
+
+        # Build import command
+        import_cmd = (
+            "mysqldbimport.py {0} {1} {2}".format(from_conn, csv_file,
+                                                  import_options)
+        )
+
+        res = self.run_test_case(expected_res, import_cmd, "Running import...")
+        if not res:
+            raise MUTLibError("IMPORT: {0}: failed".format(comment))
+
     def run(self):
         self.res_fname = "result.txt"
 
@@ -260,6 +274,32 @@ class test(mutlib.System_test):
                 "# Importing data from std_data\\raw_data.csv.",
                 "# Importing data from std_data/raw_data.csv.\n"
             )
+        test_num += 1
+
+        comment = ("Test Case {0} : Testing import with CSV format with no "
+                   "data (using --format=data)".format(test_num))
+        import_options = "--import=data --format=csv --skip-rpl"
+        csv_file = os.path.normpath("./std_data/no_data.csv")
+        self.run_import_csv_no_data_test(0, from_conn, comment, csv_file,
+                                         import_options)
+        if os.name != "posix":
+            self.replace_result(
+                "# Importing data from std_data\\no_data.csv.",
+                "# Importing data from std_data/no_data.csv.\n"
+            )
+        test_num += 1
+
+        comment = ("Test Case {0} : Testing import with CSV format with RPL "
+                   "statements (using --format=data)".format(test_num))
+        import_options = "--import=data --format=csv --skip-rpl"
+        csv_file = os.path.normpath("./std_data/rpl_data.csv")
+        self.run_import_csv_no_data_test(0, from_conn, comment, csv_file,
+                                         import_options)
+        if os.name != "posix":
+            self.replace_result(
+                "# Importing data from std_data\\rpl_data.csv.",
+                "# Importing data from std_data/rpl_data.csv.\n"
+            )
 
         return True
 
@@ -321,7 +361,3 @@ class test(mutlib.System_test):
             except:
                 pass
         return self.drop_all()
-
-
-
-

@@ -38,7 +38,7 @@ _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
 _IMPORT_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT,
                 _GRANT, _DATA_DECORATE]
 _DEFINITION_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT]
-_BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP"]
+_BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP", "SET"]
 _DATA_COMMANDS = ["INSERT", "UPDATE"]
 _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
@@ -167,6 +167,9 @@ def _read_row(file, format, skip_comments=False):
             separator = "|"
         csv_reader = csv.reader(file, delimiter=separator)
         for row in csv_reader:
+            # Ignore empty lines
+            if not row:
+                continue
             if row[0].startswith("# WARNING"):
                 warnings_found.append(row[0])
                 continue
@@ -322,6 +325,11 @@ def read_next(file, format, no_headers=False):
                len(row[0]) > _GTID_PREFIX + _RPL and \
                row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                 yield("GTID_COMMAND", row[0][_RPL:])
+                continue
+            # Check for basic command
+            if (first_word == "" and
+               row[0][0:row[0].find(' ')].upper() in _BASIC_COMMANDS):
+                yield("BASIC_COMMAND", row[0])
                 continue
             # Check to see if we have a marker for rows of objects or data
             for obj in _IMPORT_LIST:
@@ -1015,6 +1023,7 @@ def import_file(dest_val, file_name, options):
     file = open(file_name)
     columns = []
     read_columns = False
+    has_data = False
     use_columns_names = False
     table_rows = []
     obj_type = ""
@@ -1073,6 +1082,7 @@ def import_file(dest_val, file_name, options):
                 statements.append(_build_insert_data(columns, tbl_name, row))
             else:
                 table_rows.append(row)
+            has_data = True
             continue
         # Check for replication command
         if row[0] == "RPL_COMMAND":
@@ -1093,6 +1103,11 @@ def import_file(dest_val, file_name, options):
                     servers[0].check_gtid_version()
                     # Check the gtid_purged value too
                     servers[0].check_gtid_executed("import")
+                statements.append(row[1])
+            continue
+        # Check for basic command
+        if row[0] == "BASIC_COMMAND":
+            if import_type != "data":
                 statements.append(row[1])
             continue
         # If this is the first pass, get the database name from the file
@@ -1154,6 +1169,7 @@ def import_file(dest_val, file_name, options):
                     continue  # skip data
                 elif format == "sql":
                     statements.append(row[1])
+                    has_data = True
                 else:
                     if row[0] == "BEGIN_DATA":
                         # Start of table so first row is columns.
@@ -1180,10 +1196,13 @@ def import_file(dest_val, file_name, options):
                                 data = [None if val == 'NULL' else val
                                         for val in row[1]]
                                 table_rows.append(data)
+                                has_data = True
                             else:
                                 str = _build_insert_data(columns, tbl_name,
                                                          row[1])
                                 statements.append(str)
+
+                                has_data = True
 
     # Process remaining definitions
     if len(definitions) > 0:
@@ -1195,6 +1214,8 @@ def import_file(dest_val, file_name, options):
         _process_data(tbl_name, statements, columns, table_col_list,
                       table_rows, skip_blobs, use_columns_names)
         table_rows = []
+    elif import_type == "data" and not has_data:
+        print("# WARNING: No data was found.")
 
     # Now process the statements
     _exec_statements(statements, destination, format, options, dryrun)
