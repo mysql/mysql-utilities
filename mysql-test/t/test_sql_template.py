@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+import sys
+
 import mutlib
 from mysql.utilities.exception import MUTLibError, UtilDBError
 from mysql.utilities.common.tools import get_tool_path
@@ -269,12 +271,15 @@ class test(mutlib.System_test):
                     res = self.exec_util(command, self.res_fname, True)
 
                     if self.debug:
-                        # display results of command in _TRANSFORM_FILE
+                        # Display results of command in _TRANSFORM_FILE
+                        # Note: flush not to mix output with utility
+                        sys.stdout.flush()
                         print "\nContents of output file:"
                         t_file = open(_TRANSFORM_FILE, 'r+')
                         for line in t_file.readlines():
                             print line,
-                        t_file.close()                        
+                        t_file.close()
+                        sys.stdout.flush()
 
                 error_codes = obj.get('error_codes', None)
                 if error_codes is not None and len(error_codes) >= i+1:
