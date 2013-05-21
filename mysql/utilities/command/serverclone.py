@@ -24,6 +24,7 @@ import os
 import subprocess
 import sys
 import time
+import shlex
 import shutil
 
 from mysql.utilities.common.tools import check_port_in_use
@@ -66,12 +67,13 @@ def clone_server(conn_val, options):
     from mysql.utilities.exception import UtilError
     from mysql.utilities.common.tools import get_tool_path
 
-    new_data = options.get('new_data', None)
+    new_data = os.path.abspath(options.get('new_data', None))
     new_port = options.get('new_port', '3307')
     root_pass = options.get('root_pass', None)
     verbosity = options.get('verbosity', 0)
     quiet = options.get('quiet', False)
     cmd_file = options.get('cmd_file', None)
+    mysqld_options = options.get('mysqld_options', '')
 
     if not check_port_in_use('localhost', int(new_port)):
        raise UtilError("Port in use. Please choose an available port.")
@@ -94,11 +96,11 @@ def clone_server(conn_val, options):
         rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if not rows:
             raise UtilError("Unable to determine basedir of running server.")
-        basedir = rows[0][1]
+        basedir = os.path.normpath(rows[0][1])
 
     # Cloning downed or offline server
     else:
-        basedir = options.get("basedir", None)
+        basedir = os.path.abspath(options.get("basedir", None))
         if not quiet:
             print "# Cloning the MySQL server located at %s." % basedir
 
@@ -158,26 +160,42 @@ def clone_server(conn_val, options):
     if not quiet:
         print "# Setting up empty database and mysql tables..."
 
-    # Create the bootstrap file
-    f_boot = open("bootstrap.sql", 'w')
-    f_boot.write("CREATE DATABASE mysql;\n")
-    f_boot.write("USE mysql;\n")
-    f_boot.writelines(open(system_tables).readlines())
-    f_boot.writelines(open(system_tables_data).readlines())
-    f_boot.writelines(open(test_data_timezone).readlines())
-    f_boot.writelines(open(help_data).readlines())
-    f_boot.close()
+    # Get bootstrap SQL statements
+    sql = list()
+    sql.append("CREATE DATABASE mysql;")
+    sql.append("USE mysql;")
+    innodb_disabled = False
+    if mysqld_options:
+        innodb_disabled = '--innodb=OFF' in mysqld_options
+    for sqlfile in [system_tables, system_tables_data, test_data_timezone,
+                    help_data]:
+        lines = open(sqlfile, 'r').readlines()
+        for line in lines:
+            line = line.strip()
+            # Don't fail when InnoDB is turned off (Bug#16369955) (Ugly hack)
+            if (sqlfile == system_tables and
+                "SET @sql_mode_orig==@@SES" in line and innodb_disabled):
+                for line in lines:
+                    if 'SET SESSION sql_mode=@@sql' in line:
+                        break
+            sql.append(line)
 
     # Bootstap to setup mysql tables
     fnull = open(os.devnull, 'w')
-    cmd = mysqld_path + " --no-defaults --bootstrap " + \
-            " --datadir=%s --basedir=%s " % (new_data, mysql_basedir) + \
-            " < bootstrap.sql"
+    cmd = [
+        mysqld_path,
+        "--no-defaults",
+        "--bootstrap",
+        "--datadir={0}".format(new_data),
+        "--basedir={0}".format(os.path.abspath(mysql_basedir)),
+        ]
     proc = None
     if verbosity >= 1 and not quiet:
-        proc = subprocess.Popen(cmd, shell=True)
+        proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
     else:
-        proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
+        proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE,
+                                stdout=fnull, stderr=fnull)
+    proc.communicate('\n'.join(sql))
 
     # Wait for subprocess to finish
     res = proc.wait()
@@ -203,16 +221,23 @@ def clone_server(conn_val, options):
     # Start the instance
     if not quiet:
         print "# Starting new instance of the server..."
-    cmd = mysqld_path + " --no-defaults "
-    if options.get('mysqld_options', None):
-        cmd += options.get('mysqld_options') + " --user=root "
-    cmd += "--datadir=%s " % (new_data)
-    cmd += "--tmpdir=%s " % (new_data)
-    cmd += "--pid-file=%s " % os.path.join(new_data, "clone.pid")
-    cmd += "--port=%s " % (new_port)
-    cmd += "--server-id=%s " % (options.get('new_id', 2))
-    cmd += "--basedir=%s " % (mysql_basedir)
-    cmd += "--socket=%s/mysql.sock " % (new_data)
+
+    cmd = [mysqld_path, '--no-defaults']
+    if mysqld_options:
+        if isinstance(mysqld_options, (list, tuple)):
+            cmd.extend(mysqld_options)
+        else:
+            cmd.extend(shlex.split(mysqld_options))
+        cmd.append('--user=root')
+    cmd.extend([
+        '--datadir={0}'.format(new_data),
+        '--tmpdir={0}'.format(new_data),
+        '--pid-file={0}'.format(os.path.join(new_data, "clone.pid")),
+        '--port={0}'.format(new_port),
+        '--server-id={0}'.format(options.get('new_id', 2)),
+        '--basedir={0}'.format(mysql_basedir),
+        '--socket={0}'.format(os.path.join(new_data, 'mysql.sock')),
+        ])
 
     # Write startup command if specified
     if cmd_file is not None:
@@ -228,9 +253,9 @@ def clone_server(conn_val, options):
     if verbosity >= 1 and not quiet:
         if verbosity >= 2:
             print "# Startup command for new server:\n%s" % cmd
-        proc = subprocess.Popen(cmd, shell=True)
+        proc = subprocess.Popen(cmd, shell=False)
     else:
-        proc = subprocess.Popen(cmd, shell=True, stdout=fnull, stderr=fnull)
+        proc = subprocess.Popen(cmd, shell=False, stdout=fnull, stderr=fnull)
 
     # Try to connect to the new MySQL instance
     if not quiet:
@@ -277,16 +302,16 @@ def clone_server(conn_val, options):
     if root_pass:
         if not quiet:
             print "# Setting the root password..."
+        cmd = [mysqladmin_path, '--no-defaults', '-v', '-uroot']
         if os.name == "posix":
-            cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
-                  "--socket=%s password %s " % (new_sock, root_pass)
+            cmd.append("--socket={0}".format(new_sock))
         else:
-            cmd = mysqladmin_path + " --no-defaults -v -uroot " + \
-                  "password %s --port=%s" % (root_pass, int(new_port))
+            cmd.append("--port={0}".format(int(new_port)))
+        cmd.extend(["password", root_pass])
         if verbosity > 0 and not quiet:
-            proc = subprocess.Popen(cmd, shell=True)
+            proc = subprocess.Popen(cmd, shell=False)
         else:
-            proc = subprocess.Popen(cmd, shell=True,
+            proc = subprocess.Popen(cmd, shell=False,
                                     stdout=fnull, stderr=fnull)
 
         # Wait for subprocess to finish

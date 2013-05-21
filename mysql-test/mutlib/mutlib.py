@@ -32,7 +32,9 @@ import tempfile
 
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.my_print_defaults import my_login_config_path
-from mysql.utilities.common.tools import get_tool_path
+from mysql.utilities.common.tools import get_tool_path, delete_directory
+from mysql.utilities.common.server import Server
+from mysql.utilities.command.serverclone import clone_server
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
@@ -42,7 +44,8 @@ from mysql.utilities.exception import UtilError
 # Constants
 MAX_SERVER_POOL = 10
 
-def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
+def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
+               file_in=None):
     """Execute Utility
 
     This method executes a MySQL utility using the utildir specified in
@@ -55,9 +58,21 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
     debug[in]          Prints debug information during execution of
                        utility
     abspath[in]        Use absolute path and not current directory
+    file_in[in]        A file-like object for sending data to STDIN
 
     Returns return value of process run.
     """
+    # Support both cmd as string and list
+    if isinstance(cmd, list) and abspath is True:
+        shell = False
+    else:
+        shell = True
+
+    if file_in:
+        stdin = subprocess.PIPE
+    else:
+        stdin = None
+
     if not abspath:
         run_cmd = "python " + utildir + "/" + cmd
     else:
@@ -66,10 +81,18 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False):
     if debug:
         print
         print "exec_util command=", run_cmd
-        proc = subprocess.Popen(run_cmd, shell=True)
+        proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin)
     else:
-        proc = subprocess.Popen(run_cmd, shell=True,
+        proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin,
                                 stdout = f_out, stderr = f_out)
+
+    if file_in:
+        try:
+            lines = file_in.readlines()
+            proc.communicate(''.join(lines))
+        except AttributeError:
+            raise MUTLibError("file_in parameter must be a file-like object")
+
     ret_val = proc.wait()
     if debug:
         print "ret_val=", ret_val
@@ -186,26 +209,23 @@ class Server_list(object):
                     server = Server class instance or None if error
                     msg = None or error message if error
         """
-
-        from mysql.utilities.common.server import Server
-
-        new_server = (None, None)
-
-        # Set data directory for new server so that it is unique
-        full_datadir = os.getcwd() + "/temp_%s" % port
-
-        # Attempt to clone existing server
-        cmd = "mysqlserverclone.py --delete-data --server="
-        cmd += self.get_connection_string(cur_server)
-        if passwd:
-           cmd += " --root-password=%s " % passwd
-        cmd += " --new-port=%s " % port
-        cmd += "--new-id=%s " % server_id
-        cmd += "--new-data=%s " % os.path.normpath(full_datadir)
-        if parameters is not None:
-            cmd += "--mysqld=%s -vvv" % parameters
-
-        res = _exec_util(cmd, "cmd.txt", self.utildir)
+        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port))
+        clone_options = {
+            'new_data': full_datadir,
+            'new_port': port,
+            'new_id': server_id,
+            'root_pass': passwd,
+            'mysqld_options': parameters,
+        }
+        if self.verbose:
+            clone_options['quiet'] = False
+            clone_options['verbosity'] = 3
+        else:
+            clone_options['quiet'] = True
+            clone_options['verbosity'] = 0
+        connection_params = self.get_connection_parameters(
+            cur_server, asdict=True)
+        clone_server(connection_params, clone_options)
 
         # Create a new instance
         conn = {
@@ -213,14 +233,13 @@ class Server_list(object):
             "passwd" : passwd,
             "host"   : self.cloning_host,
             "port"   : port,
-            "unix_socket" : full_datadir + "/mysql.sock"
         }
-        if os.name != "posix":
-            conn["unix_socket"] = None
+        if os.name == "posix":
+            conn["unix_socket"] = os.path.join(full_datadir, "mysql.sock")
 
         server_options = {
             'conn_info' : conn,
-            'role'      : role,
+            'role'      : role or 'server_{0}'.format(port),
         }
         self.new_server = Server(server_options)
 
@@ -268,10 +287,7 @@ class Server_list(object):
         if server is None:
             return True
 
-        from mysql.utilities.common.tools import delete_directory
-
         # Build the shutdown command
-        cmd = ""
         res = server.show_server_variable("basedir")
         mysqladmin_client = "mysqladmin"
         if not os.name == "posix":
@@ -289,12 +305,19 @@ class Server_list(object):
             mysqladmin_path= os.path.normpath(os.path.join(res[0][1],
                                                        "client/release",
                                                        mysqladmin_client))
-        cmd += mysqladmin_path
-        cmd += " shutdown "
-        conn = self.get_connection_parameters(server).replace("127.0.0.1",
-                                                              "localhost")
-        conn = conn.replace("[::1]","localhost")
-        cmd += conn.replace("::1","localhost")
+
+        conn = self.get_connection_parameters(server, aslist=True)
+        hostidx = [
+            i for i, needle in enumerate(conn) if needle.startswith('--host')
+            ][0]
+
+        conn[hostidx] = conn[hostidx].replace("[::1]", "localhost")
+        conn[hostidx] = conn[hostidx].replace("::1", "localhost")
+
+        cmd = [mysqladmin_path, '--no-defaults']
+        cmd.extend(conn)
+        cmd.append("shutdown")
+
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
 
@@ -313,7 +336,7 @@ class Server_list(object):
         # Stop the server
         file = os.devnull
         f_out = open(file, 'w')
-        proc = subprocess.Popen(cmd, shell=True,
+        proc = subprocess.Popen(cmd, shell=False,
                                 stdout = f_out, stderr = f_out)
         ret_val = proc.wait()
         f_out.close()
@@ -459,14 +482,40 @@ class Server_list(object):
         return server.get_connection_values()
 
 
-    def get_connection_parameters(self, server):
-        """Return a string that comprises the normal connection parameters
+    def get_connection_parameters(self, server, aslist=False, asdict=False):
+        """Return connection parameters for a server.
+
+        Return a string that comprises the normal connection parameters
         common to MySQL utilities for a particular server.
+
+        When aslist is True, the parameters are returned as a list. When
+        asdict is True, the parameters are returned as a dictionary.
 
         server[in]         A Server object
 
         Returns string
         """
+        if asdict:
+            return {
+                'host': server.host,
+                'user': server.user,
+                'passwd': server.passwd,
+                'socket': server.socket,
+                'port': server.port
+            }
+
+        if aslist:
+            params = [
+                '--user={0}'.format(server.user),
+                '--host={0}'.format(server.host),
+                ]
+            if server.passwd:
+                params.append('--password={0}'.format(server.passwd))
+            if server.socket:
+                params.append('--socket={0}'.format(server.socket))
+            else:
+                params.append('--port={0}'.format(server.port))
+            return params
 
         str1 = "--user=%s --host=%s " % (server.user, server.host)
         if server.passwd:
@@ -704,7 +753,7 @@ class System_test(object):
             subprocess.call(cmd, stdout=out_file,
                             stderr=null_file)
 
-    def exec_util(self, cmd, file_out, abspath=False):
+    def exec_util(self, cmd, file_out, abspath=False, file_in=None):
         """Execute Utility
 
         This method executes a MySQL utility using the utildir specified in
@@ -714,10 +763,12 @@ class System_test(object):
         cmd[in]            The command to execute including all parameters
         file_out[in]       Path and filename of a file to write output
         abspath[in]        Use absolute path and not current directory
+        file_in[in]        A file-like object for sending data to STDIN
 
         Returns return value of process run.
         """
-        return _exec_util(cmd, file_out, self.utildir, self.debug, abspath)
+        return _exec_util(cmd, file_out, self.utildir, self.debug,
+                          abspath, file_in)
 
 
     def check_num_servers(self, num_servers):
