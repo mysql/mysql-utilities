@@ -241,7 +241,7 @@ def clone_server(conn_val, options):
             new_opts = mysqld_options.strip(" ")
             # Drop the --mysqld=
             if new_opts.startswith("--mysqld="):
-                new_opts = new_opts[8:]
+                new_opts = new_opts[9:]
             if new_opts.startswith('"') and new_opts.endswith('"'):
                 cmd.extend(shlex.split(new_opts.strip('"')))
             elif new_opts.startswith("'")  and new_opts.endswith("'"):
