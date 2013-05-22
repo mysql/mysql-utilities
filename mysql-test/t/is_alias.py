@@ -29,7 +29,7 @@ _BAD_RESULT_MSG = ("Got wrong result for test case {0}. \n"
                    " Expected: {1}, got: {2}.")
 _test_case_name = "test_case_name"
 _aliases = "aliases"
-_host_name = "host_name" 
+_host_name = "host_name"
 _result = "result"
 _desc = "description"
 
@@ -44,61 +44,61 @@ _python_ip = socket.getaddrinfo(_python_org, None)[0][4][0]
 
 _special_test_cases = [{_desc: "This test reuse of aliases",
                         _test_case_name: _alias_reuseness,
-                       _aliases: [_alias_reuseness], 
+                       _aliases: [_alias_reuseness],
                        _host_name: _alias_reuseness,
                        _result: True},
 
                       {_desc: "this test addition of  lookup to aliases",
                        _test_case_name: _mock_no_local_host,
-                       _aliases: [], 
+                       _aliases: [],
                        _host_name: _mock_no_local_host,
                        _result: True},
 
                       {_desc: "This test Negative host added to aliases",
                        _test_case_name: _alias_reuseness,
-                       _aliases: [], 
+                       _aliases: [],
                        _host_name: _mock_no_local_host,
                        _result: False},
 
                       {_desc: ("This test non local server host name,"
                                " lookup of his aliases"),
                        _test_case_name: _oracle_com,
-                       _aliases: [], 
+                       _aliases: [],
                        _host_name: _python_org,
                        _result: False},
 
                       {_desc: ("This test non local server, lookup"
-                               " of aliases for the given hostname"), 
+                               " of aliases for the given hostname"),
                       _test_case_name: _oracle_com,
-                       _aliases: [_mock_no_local_host], 
+                       _aliases: [_mock_no_local_host],
                        _host_name: _mock_no_local_host,
                        _result: False},
 
                       {_desc: ("This test non local server,"
-                               "lookup of aliases for the given ip"), 
+                               "lookup of aliases for the given ip"),
                        _test_case_name: _python_ip,
-                       _aliases: [_mock_no_local_host], 
+                       _aliases: [_mock_no_local_host],
                        _host_name: _mock_no_local_host,
                        _result: False},
 
                       {_desc: ("This test lookup of aliases for non "
                                "local server by IP."),
                        _test_case_name: _oracle_ip,
-                       _aliases: [], 
+                       _aliases: [],
                        _host_name: _oracle_com,
                        _result: True},
 
                       {_desc: ("This test lookups of aliases for non "
                                "local server by hostname."),
                        _test_case_name: _python_org,
-                       _aliases: [], 
+                       _aliases: [],
                        _host_name: _python_ip,
                        _result: True},
 
                       {_desc: ("It test the reuse of aliases for the "
                                "given non local server by hostname."),
                        _test_case_name: _python_org,
-                       _aliases: [_python_ip], 
+                       _aliases: [_python_ip],
                        _host_name: _python_ip,
                        _result: True}]
 
@@ -141,7 +141,7 @@ class test(mutlib.System_test):
                                 self.host_name, "::1", "0:0:0:0:0:0:0:1",
                                 "0::0:1", "[0::1]", "0::0:0:1"]
         # All elements of List of bad test cases are expected to return False.
-        self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2", 
+        self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2",
                                "0:0:0:0:0:0:0:2", "oracle.com", "python.org"]
 
         return True
@@ -196,6 +196,8 @@ class test(mutlib.System_test):
         self.server1.host = "localhost"
         # Mask Known results values.
         self.replace_substring(self.host_name, "<computer_name>")
+        self.replace_substring(_oracle_ip, "ORACLE_IP")
+        self.replace_substring(_python_ip, "PYTHON.ORG_IP")
 
         return True
 
@@ -211,4 +213,3 @@ class test(mutlib.System_test):
         # Kill the servers that are only for this test.
         self.servers.stop_server(self.server1)
         return True
-

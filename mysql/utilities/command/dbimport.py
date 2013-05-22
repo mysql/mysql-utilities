@@ -271,6 +271,12 @@ def read_next(file, format, no_headers=False):
                     sql_cmd = ""
                 cmd_type = "sql"
                 multiline = True
+            elif len(row) > _GTID_PREFIX and \
+                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
+                #yield goes here
+                yield (cmd_type, sql_cmd)
+                cmd_type = "GTID_COMMAND"
+                sql_cmd = row
             elif first_word in _BASIC_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
@@ -282,12 +288,6 @@ def read_next(file, format, no_headers=False):
                     #yield goes here
                     yield (cmd_type, sql_cmd)
                 cmd_type = "RPL_COMMAND"
-                sql_cmd = row
-            elif len(row) > _GTID_PREFIX and \
-                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
-                #yield goes here
-                yield (cmd_type, sql_cmd)
-                cmd_type = "GTID_COMMAND"
                 sql_cmd = row
             elif first_word in _DATA_COMMANDS:
                 cmd_type = "DATA"

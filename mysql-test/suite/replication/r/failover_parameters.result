@@ -52,6 +52,10 @@ Options:
                         replication command to complete. For example, timeout
                         for slave waiting to catch up to master. Default =
                         300.
+  --script-threshold=SCRIPT_THRESHOLD
+                        Value for external scripts to trigger aborting the
+                        operation if result is greater than or equal to the
+                        threshold. Default = None (no threshold checking).
   -i INTERVAL, --interval=INTERVAL
                         interval in seconds for polling the master for failure
                         and reporting health. Default = 15 seconds. Lowest

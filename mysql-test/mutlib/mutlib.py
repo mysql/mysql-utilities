@@ -216,6 +216,7 @@ class Server_list(object):
             'new_id': server_id,
             'root_pass': passwd,
             'mysqld_options': parameters,
+            'delete' : True,
         }
         if self.verbose:
             clone_options['quiet'] = False

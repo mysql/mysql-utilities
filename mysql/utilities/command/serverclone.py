@@ -21,6 +21,7 @@ of an existing server.
 """
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -223,12 +224,6 @@ def clone_server(conn_val, options):
         print "# Starting new instance of the server..."
 
     cmd = [mysqld_path, '--no-defaults']
-    if mysqld_options:
-        if isinstance(mysqld_options, (list, tuple)):
-            cmd.extend(mysqld_options)
-        else:
-            cmd.extend(shlex.split(mysqld_options))
-        cmd.append('--user=root')
     cmd.extend([
         '--datadir={0}'.format(new_data),
         '--tmpdir={0}'.format(new_data),
@@ -238,6 +233,28 @@ def clone_server(conn_val, options):
         '--basedir={0}'.format(mysql_basedir),
         '--socket={0}'.format(os.path.join(new_data, 'mysql.sock')),
         ])
+
+    if mysqld_options:
+        if isinstance(mysqld_options, (list, tuple)):
+            cmd.extend(mysqld_options)
+        else:
+            new_opts = mysqld_options.strip(" ")
+            # Drop the --mysqld=
+            if new_opts.startswith("--mysqld="):
+                new_opts = new_opts[8:]
+            if new_opts.startswith('"') and new_opts.endswith('"'):
+                cmd.extend(shlex.split(new_opts.strip('"')))
+            elif new_opts.startswith("'")  and new_opts.endswith("'"):
+                cmd.extend(shlex.split(new_opts.strip("'")))
+            # Special case where there is only 1 option
+            elif len(new_opts.split("--")) == 1:
+                cmd.append(mysqld_options)
+            else:
+                cmd.extend(shlex.split(new_opts))
+        cmd.append('--user=root')
+
+    # Strip spaces from each option
+    cmd = [opt.strip(' ') for opt in cmd]
 
     # Write startup command if specified
     if cmd_file is not None:
@@ -252,7 +269,8 @@ def clone_server(conn_val, options):
 
     if verbosity >= 1 and not quiet:
         if verbosity >= 2:
-            print "# Startup command for new server:\n%s" % cmd
+            print("# Startup command for new server:\n"
+                  "{0}".format(" ".join(cmd)))
         proc = subprocess.Popen(cmd, shell=False)
     else:
         proc = subprocess.Popen(cmd, shell=False, stdout=fnull, stderr=fnull)

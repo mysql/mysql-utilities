@@ -109,15 +109,15 @@ Pass
 test case 37 - test alias: oracle.com is not alias for server mock_no_local_host
 Pass
 
-test case 38 - test alias: 82.94.164.162 is not alias for server mock_no_local_host
+test case 38 - test alias: PYTHON.ORG_IP is not alias for server mock_no_local_host
 Pass
 
-test case 39 - test alias: 137.254.16.101 is alias for server oracle.com
+test case 39 - test alias: ORACLE_IP is alias for server oracle.com
 Pass
 
-test case 40 - test alias: python.org is alias for server 82.94.164.162
+test case 40 - test alias: python.org is alias for server PYTHON.ORG_IP
 Pass
 
-test case 41 - test alias: python.org is alias for server 82.94.164.162
+test case 41 - test alias: python.org is alias for server PYTHON.ORG_IP
 Pass
 

@@ -52,6 +52,10 @@ Options:
                         replication command to complete. For example, timeout
                         for slave waiting to catch up to master. Default =
                         300.
+  --script-threshold=SCRIPT_THRESHOLD
+                        Value for external scripts to trigger aborting the
+                        operation if result is greater than or equal to the
+                        threshold. Default = None (no threshold checking).
   --new-master=NEW_MASTER
                         connection information for the slave to be used to
                         replace the master for switchover, in the form:
