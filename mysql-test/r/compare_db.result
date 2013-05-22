@@ -72,27 +72,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11040,Leather care,1,9.99,other,,1
--11186,Plastic polish,1,9.99,polishing,,1
 -11146,Speed shine,1,9.99,repair,,1
-+11040,Leather care,1,10.00,other,,1
-+11186,Plastic polish,1,10.00,polishing,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11040,Leather care,1,9.99,other,,1
 +11146,Speed shine,1,10.00,repair,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11040,Leather care,1,10.00,other,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11104,Interior cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 11136,Rubber cleaner,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 11106,Wheel cleaner,1,9.99,cleaning,,1
-11270,Carpet cleaner,1,9.99,cleaning,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 
 # VIEW      tools                                   FAIL    -       -       
 #
@@ -146,27 +146,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11040,Leather care,1,10.00,other,,1
--11186,Plastic polish,1,10.00,polishing,,1
 -11146,Speed shine,1,10.00,repair,,1
-+11040,Leather care,1,9.99,other,,1
-+11186,Plastic polish,1,9.99,polishing,,1
+-11186,Plastic polish,1,10.00,polishing,,1
+-11040,Leather care,1,10.00,other,,1
 +11146,Speed shine,1,9.99,repair,,1
++11186,Plastic polish,1,9.99,polishing,,1
++11040,Leather care,1,9.99,other,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11104,Interior cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 11136,Rubber cleaner,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 11106,Wheel cleaner,1,9.99,cleaning,,1
-11270,Carpet cleaner,1,9.99,cleaning,,1
 
 # VIEW      tools                                   FAIL    -       -       
 #
@@ -234,54 +234,54 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11040,Leather care,1,9.99,other,,1
--11186,Plastic polish,1,9.99,polishing,,1
 -11146,Speed shine,1,9.99,repair,,1
-+11040,Leather care,1,10.00,other,,1
-+11186,Plastic polish,1,10.00,polishing,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11040,Leather care,1,9.99,other,,1
 +11146,Speed shine,1,10.00,repair,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11040,Leather care,1,10.00,other,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11104,Interior cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 11136,Rubber cleaner,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 11106,Wheel cleaner,1,9.99,cleaning,,1
-11270,Carpet cleaner,1,9.99,cleaning,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 
 # # Data differences found among rows:
 # --- `inventory`.`supplies`
 # +++ `inventory`.`supplies`
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
-# -11040,Leather care,1,10.00,other,,1
-# -11186,Plastic polish,1,10.00,polishing,,1
 # -11146,Speed shine,1,10.00,repair,,1
-# +11040,Leather care,1,9.99,other,,1
-# +11186,Plastic polish,1,9.99,polishing,,1
+# -11186,Plastic polish,1,10.00,polishing,,1
+# -11040,Leather care,1,10.00,other,,1
 # +11146,Speed shine,1,9.99,repair,,1
+# +11186,Plastic polish,1,9.99,polishing,,1
+# +11040,Leather care,1,9.99,other,,1
 # 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
-# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 # 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 # 10665,Glass polish pad,3,10.00,polishing,,1
+# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 # 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
-# 11104,Interior cleaner,1,9.99,cleaning,,1
+# 11270,Carpet cleaner,1,9.99,cleaning,,1
 # 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 # 11136,Rubber cleaner,1,9.99,cleaning,,1
+# 11104,Interior cleaner,1,9.99,cleaning,,1
 # 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 # 11106,Wheel cleaner,1,9.99,cleaning,,1
-# 11270,Carpet cleaner,1,9.99,cleaning,,1
 #
 
 
@@ -362,54 +362,54 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11040,Leather care,1,10.00,other,,1
--11186,Plastic polish,1,10.00,polishing,,1
 -11146,Speed shine,1,10.00,repair,,1
-+11040,Leather care,1,9.99,other,,1
-+11186,Plastic polish,1,9.99,polishing,,1
+-11186,Plastic polish,1,10.00,polishing,,1
+-11040,Leather care,1,10.00,other,,1
 +11146,Speed shine,1,9.99,repair,,1
++11186,Plastic polish,1,9.99,polishing,,1
++11040,Leather care,1,9.99,other,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11104,Interior cleaner,1,9.99,cleaning,,1
+11270,Carpet cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 11136,Rubber cleaner,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 11106,Wheel cleaner,1,9.99,cleaning,,1
-11270,Carpet cleaner,1,9.99,cleaning,,1
 
 # # Data differences found among rows:
 # --- `inventory`.`supplies`
 # +++ `inventory`.`supplies`
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
-# -11040,Leather care,1,9.99,other,,1
-# -11186,Plastic polish,1,9.99,polishing,,1
 # -11146,Speed shine,1,9.99,repair,,1
-# +11040,Leather care,1,10.00,other,,1
-# +11186,Plastic polish,1,10.00,polishing,,1
+# -11186,Plastic polish,1,9.99,polishing,,1
+# -11040,Leather care,1,9.99,other,,1
 # +11146,Speed shine,1,10.00,repair,,1
+# +11186,Plastic polish,1,10.00,polishing,,1
+# +11040,Leather care,1,10.00,other,,1
 # 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
-# 11104,Interior cleaner,1,9.99,cleaning,,1
+# 11270,Carpet cleaner,1,9.99,cleaning,,1
 # 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
 # 11136,Rubber cleaner,1,9.99,cleaning,,1
+# 11104,Interior cleaner,1,9.99,cleaning,,1
 # 11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 # 11106,Wheel cleaner,1,9.99,cleaning,,1
-# 11270,Carpet cleaner,1,9.99,cleaning,,1
 # 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 # stock_number,description,qty,cost,type,notes,supplier
-# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 # 11116,Microfiber wax removal towel,3,16.99,waxing,,1
 # 10665,Glass polish pad,3,10.00,polishing,,1
+# 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 #
 
 

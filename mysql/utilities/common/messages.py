@@ -60,6 +60,11 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
 
 PARSE_ERR_DB_MISSING_CMP = "No databases specified to compare."
 
+PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW = (
+    "The value {s_value} specified for option --span-key-size is too small "
+    "and would cause inaccurate results, please retry with a bigger value "
+    "or the default value of {default}.")
+
 PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
 
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."

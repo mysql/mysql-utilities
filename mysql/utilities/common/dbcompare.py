@@ -38,13 +38,18 @@ _COMPARE_TABLE_DROP = """
     DROP TABLE {db}.{compare_tbl};
 """
 
+# The Length of key for the span index has been increased from 4 to 8 allow
+# more accurate hits. This may slow the algorithm for big dbs, for future
+# the key length could be calculated by the number of rows.
+DEFAULT_SPAN_KEY_SIZE = 8
+
 _COMPARE_TABLE = """
     CREATE TEMPORARY TABLE {db}.{compare_tbl} (
         compare_sign char(32) NOT NULL PRIMARY KEY,
         pk_hash char(32) NOT NULL,
         {pkdef}
-        span char(4) NOT NULL,
-        KEY span_key (pk_hash(4)));
+        span char(8) NOT NULL,
+        KEY span_key (pk_hash({span_key_size})));
 """
 
 _COMPARE_INSERT = """
@@ -54,7 +59,7 @@ _COMPARE_INSERT = """
         MD5(CONCAT_WS('/', {colstr})),
         MD5(CONCAT_WS('/', {pkstr})),
         {pkstr},
-        LEFT(MD5(CONCAT_WS('/', {pkstr})), 4)
+        LEFT(MD5(CONCAT_WS('/', {pkstr})), {span_key_size})
     FROM {db}.{table}
 """
 
@@ -647,7 +652,8 @@ def _drop_compare_object(server, db_name, tbl_name):
         pass
 
 
-def _get_compare_objects(index_cols, table1):
+def _get_compare_objects(index_cols, table1,
+                         span_key_size=DEFAULT_SPAN_KEY_SIZE):
     """Build the compare table and identify the primary index
     
     This method creates the compare table for use in forming the MD5 hash
@@ -657,6 +663,8 @@ def _get_compare_objects(index_cols, table1):
     index_cols[in]    a list of columns that form the primary key in the form
                       (column_name, type)
     table1[in]        a Table instance of the original table
+    
+    span_key_size[in] the size of key used for the hash.
     
     Returns tuple (table create statement, concatenated string of the
                    primary index columns)
@@ -677,12 +685,14 @@ def _get_compare_objects(index_cols, table1):
                             _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name))
 
         table = _COMPARE_TABLE.format(db=table1.q_db_name,
-                                      compare_tbl=q_tbl_name, pkdef=index_defn)
+                                      compare_tbl=q_tbl_name,
+                                      pkdef=index_defn,
+                                      span_key_size=span_key_size)
 
     return (table, index_str)
 
 
-def _setup_compare(table1, table2):
+def _setup_compare(table1, table2, span_key_size):
     """Create and populate the compare summary tables
     
     This method creates the condensed hash table used to compare groups
@@ -696,6 +706,7 @@ def _setup_compare(table1, table2):
     
     table1[in]        table1 Table instance
     table2[in]        table2 Table instance
+    span_key_size[in] the size of key used for the hash.
 
     Returns tuple - string representations of the primary index columns
     """
@@ -716,8 +727,10 @@ def _setup_compare(table1, table2):
     _drop_compare_object(server2, table2.db_name, table2.tbl_name)
 
     # Build the primary key hash if needed
-    tbl1_table, pri_idx1 = _get_compare_objects(table1_idx, table1)
-    tbl2_table, pri_idx2 = _get_compare_objects(table1_idx, table2)
+    tbl1_table, pri_idx1 = _get_compare_objects(table1_idx, table1,
+                                                span_key_size)
+    tbl2_table, pri_idx2 = _get_compare_objects(table1_idx, table2,
+                                                span_key_size)
     
     if tbl1_table is None or tbl2_table is None:
         raise UtilError("Cannot create compare table.")
@@ -729,7 +742,7 @@ def _setup_compare(table1, table2):
     return (pri_idx1, pri_idx2)
 
 
-def _make_sum_rows(table, idx_str):
+def _make_sum_rows(table, idx_str, span_key_size=8):
     """Populate the summary table
     
     This method inserts rows into the compare table from the original table
@@ -760,7 +773,8 @@ def _make_sum_rows(table, idx_str):
         _COMPARE_INSERT.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                colstr=col_str.strip(", "),
                                pkstr=idx_str.strip(", "),
-                               table=table.q_tbl_name))
+                               table=table.q_tbl_name,
+                               span_key_size=span_key_size))
 
     res = table.server.exec_query(
         _COMPARE_SUM.format(db=table.q_db_name, compare_tbl=q_tbl_name))
@@ -917,7 +931,7 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
         
     format = options.get('format', 'GRID')
     difftype = options.get('difftype', 'unified')
-    
+    span_key_size = options.get('span_key_size', DEFAULT_SPAN_KEY_SIZE)
     if options.get('toggle_binlog', 'False'):
         binlog_server1 = server1.binlog_enabled()
         if binlog_server1:
@@ -935,11 +949,11 @@ def check_consistency(server1, server2, table1_name, table2_name, options={}):
     table2 = Table(server2, table2_name)
 
     # Setup the comparative tables and calculate the hashes
-    pri_idx_str1, pri_idx_str2 = _setup_compare(table1, table2)
+    pri_idx_str1, pri_idx_str2 = _setup_compare(table1, table2, span_key_size)
     
     # Populate the compare tables and retrieve rows from each table
-    tbl1_hash = _make_sum_rows(table1, pri_idx_str1)
-    tbl2_hash = _make_sum_rows(table2, pri_idx_str2)
+    tbl1_hash = _make_sum_rows(table1, pri_idx_str1, span_key_size)
+    tbl2_hash = _make_sum_rows(table2, pri_idx_str2, span_key_size)
 
     # Compare results
     in_both, in1_not2, in2_not1 = get_common_lists(tbl1_hash, tbl2_hash)

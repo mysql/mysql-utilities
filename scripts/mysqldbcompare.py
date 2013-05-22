@@ -31,9 +31,11 @@ import re
 import sys
 
 from mysql.utilities.command.dbcompare import database_compare
+from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
 from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
                                              PARSE_ERR_DB_PAIR_EXT,
-                                             PARSE_ERR_DB_MISSING_CMP)
+                                             PARSE_ERR_DB_MISSING_CMP,
+                                             PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW)
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -115,6 +117,15 @@ parser.add_option("--disable-binary-logging", action="store_true",
                   "Prevents compare operations from being written to the "
                   "binary log.")
 
+# turn off binlog mode
+parser.add_option(
+    "--span-key-size", action="store", default=DEFAULT_SPAN_KEY_SIZE,
+    type="int", dest="span_key_size", help="changes the size of the key used"
+    " for compare table contents. A higher value can help to get more "
+    "accurate results comparing large databases, but may slow the algorithm."
+    " Default value is {0}.".format(DEFAULT_SPAN_KEY_SIZE)
+    )
+
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
@@ -148,6 +159,7 @@ options = {
     "toggle_binlog"    : opt.toggle_binlog,
     "changes-for"      : opt.changes_for,
     "reverse"          : opt.reverse,
+    "span_key_size"    : opt.span_key_size
 }
 
 # Parse server connection values
@@ -175,6 +187,11 @@ if opt.server2:
 if len(args) == 0:
     parser.error(PARSE_ERR_DB_MISSING_CMP)
 
+
+if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
+    parser.error(
+        PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW.format(
+            s_value=opt.span_key_size, default=DEFAULT_SPAN_KEY_SIZE))
 # Operations to perform:
 # 1) databases exist
 # 2) check object counts

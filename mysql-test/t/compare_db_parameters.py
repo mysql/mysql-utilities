@@ -111,6 +111,14 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        test_num += 1
+        cmd_opts = " --format=csv -vvv -a --span-key-size=16"
+        comment = "Test case {0} - {1}".format(test_num, cmd_opts)
+        cmd = "{0}{1}".format(cmd_str, cmd_opts) 
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         compare_db.test.do_replacements(self)
 
         return True

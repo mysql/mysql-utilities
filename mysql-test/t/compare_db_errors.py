@@ -45,47 +45,77 @@ class test(compare_db.test):
 
         s1_conn = "--server1=" + self.build_connection_string(self.server1)
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
+
+        test_num = 1
         cmd_str = "mysqldbcompare.py -a -vvv inventory:inventory "
         cmd_opts = "--server1=joeunk:@:dooer " + s2_conn
-        comment = "Test case 1 - Invalid --server1 "
+        comment = "Test case {0} - Invalid --server1 ".format(test_num)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_opts = "--server2=joeunk:@:dooer " + s1_conn
-        comment = "Test case 2 - Invalid --server2 "
+        comment = "Test case {0} - Invalid --server2 ".format(test_num)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
         cmd_opts = " inventory.inventory"
-        comment = "Test case 3 - missing backticks%s " % cmd_opts
+        comment = ("Test case {0} - missing backticks{1} "
+                   "").format(test_num, cmd_opts)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_opts = "'`inventory.inventory`'"
         else:
             cmd_opts = '"`inventory.inventory`"'
         cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_opts)
-        comment = "Test case 4 - non existing database '`inventory.inventory`'"
+        comment = ("Test case {0} - non existing database "
+                   "'`inventory.inventory`'").format(test_num)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
         cmd_opts = " :inventory"
-        comment = "Test case 5 - invalid format%s " % cmd_opts
+        comment = ("Test case {0} - invalid format{1} "
+                   "").format(test_num, cmd_opts)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+        cmd_opts = "--span-key-size=A"
+        comment = ("Test case {0} - invalid value for {1} "
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+        cmd_opts = "--span-key-size=-4"
+        comment = ("Test case {0} - size too low for {1} "
+                   "".format(test_num, cmd_opts))
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         cmd_str = "mysqldbcompare.py"
-        comment = "Test case 6 - no options"
+        comment = "Test case {0} - no options".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

@@ -27,6 +27,7 @@ from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
 
 
 _PRINT_WIDTH = 75
@@ -49,6 +50,7 @@ _DEFAULT_OPTIONS = {
     "no_row_count"    : False,
     "no_data"         : False,
     "transform"       : False,
+    "span_key_size"  : DEFAULT_SPAN_KEY_SIZE
 }
 
 class _CompareDBReport:
