@@ -522,7 +522,8 @@ class Server(object):
                         host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
                                    [fiveple[4][0] for fiveple in addrinfo],
                                    [addrinfo[0][4][0]])
-                except (socket.gaierror, socket.herror) as err:
+                except (socket.gaierror, socket.herror,
+                        socket.error) as err:
                     host_ip = ([], [], [])
                     if self.verbose:
                         print("WARNING: IP lookup by address failed for {0},"
@@ -531,7 +532,8 @@ class Server(object):
                 try:
                     # server may not really exist.
                     host_ip = socket.gethostbyname_ex(host)
-                except (socket.gaierror, socket.herror) as err:
+                except (socket.gaierror, socket.herror,
+                        socket.error) as err:
                     if self.verbose:
                         print("WARNING: hostname: {0} may not be reachable, "
                               "reason: {1}".format(host, err.strerror))
@@ -544,7 +546,8 @@ class Server(object):
                     try:
                         local_ip = socket.gethostbyaddr(addr[4][0])
                         break
-                    except (socket.gaierror, socket.herror) as err:
+                    except (socket.gaierror, socket.herror,
+                            socket.error) as err:
                         error = err
                         pass
                 if local_ip:
@@ -604,7 +607,7 @@ class Server(object):
             extend_aliases(local_aliases, local_info[1])
             extend_aliases(local_aliases, local_info[2])
             extend_aliases(local_aliases, get_aliases(socket.gethostname()))
-        except (socket.herror, socket.gaierror):
+        except (socket.herror, socket.gaierror, socket.error):
             # Try with the basic local aliases.
             local_aliases = ['127.0.0.1', 'localhost', '::1', '[::1]']
 
