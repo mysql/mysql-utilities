@@ -42,11 +42,12 @@ class test(mutlib.System_test):
         try:
             rows = self.server1.exec_query("SHOW DATABASES LIKE '{0}'"
                                            "".format(self.db_test_name))
-            self.server1.exec_query("USE {0}".format(self.db_test_name))
-            res = self.server1.exec_query("SHOW TABLE STATUS  LIKE '{0}'"
-                                          "".format("City"))
-            if res:
-                engine = res[0][1]
+            if len(rows) > 0:
+                self.server1.exec_query("USE {0}".format(self.db_test_name))
+                res = self.server1.exec_query("SHOW TABLE STATUS  LIKE '{0}'"
+                                              "".format("City"))
+                if res:
+                    engine = res[0][1]
         except MUTLibError as err:
             print("Error checking prerequisites: {0}".format(err))
         if engine.upper() != "INNODB" or len(rows) == 0:
