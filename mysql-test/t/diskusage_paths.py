@@ -18,8 +18,9 @@ import os
 import diskusage_basic
 from mysql.utilities.exception import MUTLibError, UtilError
 
-_MYSQLD = '"--log-bin=%s --general-log --slow-query-log ' + \
-          '--slow-query-log-file=%s --general-log-file=%s --log-error=%s"'
+_MYSQLD = ('--log-bin="{0}" --general-log --slow-query-log ' + \
+           '--slow-query-log-file="{1}" --general-log-file="{2}" '
+           ' --log-error="{3}"')
 
 
 class test(diskusage_basic.test):
@@ -55,12 +56,11 @@ class test(diskusage_basic.test):
             self.slow_log = os.path.join(os.getcwd(), "slow.log")
             self.error_log = os.path.join(os.getcwd(), "error_log.err")
             self.s1_serverid = self.servers.get_next_id()
+            mysqld_options = _MYSQLD.format(self.binlog, self.gen_log,
+                                            self.slow_log, self.error_log)
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                 "diskusage_paths",
-                                                _MYSQLD %
-                                                (self.binlog, self.gen_log,
-                                                 self.slow_log,
-                                                 self.error_log))
+                                                mysqld_options)
             if not res:
                 raise MUTLibError("Cannot spawn diskusage_all server.")
             self.server1 = res[0]

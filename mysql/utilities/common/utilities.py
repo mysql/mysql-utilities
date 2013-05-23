@@ -195,17 +195,22 @@ class Utilities(object):
         """
         # Get the --help output for the utility
         command = util_name + ".py"
-        if not os.path.exists(os.path.join(util_path, command)):
+        utility_path = os.path.join(util_path, command)
+        if not os.path.exists(utility_path):
             command = file_name
-        cmd = []
-        if not file_ext == '.exe':
-            cmd.append('python ')
+            
+        # Check for running against .exe
+        if utility_path.endswith(".exe"):
+            cmd = []
+        # Not using .exe
+        else:
+            cmd = ['python']
 
-        cmd += ['"', os.path.join(util_path, command), '"', " --help"]
+        cmd.extend([utility_path, " --help"])
 
         # Hide errors from stderr output
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen("".join(cmd), shell=True,
+        proc = subprocess.Popen(" ".join(cmd), shell=True,
                                 stdout=subprocess.PIPE, stderr=out)
 
         stdout_temp = proc.communicate()[0]
