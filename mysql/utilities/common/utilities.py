@@ -210,7 +210,7 @@ class Utilities(object):
         utility_path = os.path.join(util_path, command)
         if not os.path.exists(utility_path):
             command = file_name
-            
+
         # Check for running against .exe
         if utility_path.endswith(".exe"):
             cmd = []
@@ -243,6 +243,7 @@ class Utilities(object):
             else:
                 print("UNKNOWN. To diagnose, exit mysqluc and attempt the "
                       "command: {0} --help".format(util_name))
+            sys.stdout.flush()   # Needed to ensure tests are deterministic
 
         Options = ""
         if not res:
