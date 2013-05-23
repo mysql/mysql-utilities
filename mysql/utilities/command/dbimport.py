@@ -21,12 +21,14 @@ table data.
 """
 
 import csv
+import re
+
 from itertools import imap
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 
 
 # List of database objects for enumeration
@@ -36,7 +38,7 @@ _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
 _IMPORT_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT,
                 _GRANT, _DATA_DECORATE]
 _DEFINITION_LIST = [_TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT]
-_BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP"]
+_BASIC_COMMANDS = ["CREATE", "USE", "GRANT", "DROP", "SET"]
 _DATA_COMMANDS = ["INSERT", "UPDATE"]
 _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
@@ -48,6 +50,7 @@ _GTID_SKIP_WARNING = "# WARNING: GTID commands are present in the import " + \
     "file but the server does not support GTIDs. Commands are ignored."
 _GTID_MISSING_WARNING = "# WARNING: GTIDs are enabled on this server but " + \
     "the import file did not contain any GTID commands."
+
 
 def _read_row(file, format, skip_comments=False):
     """Read a row of from the file.
@@ -164,6 +167,9 @@ def _read_row(file, format, skip_comments=False):
             separator = "|"
         csv_reader = csv.reader(file, delimiter=separator)
         for row in csv_reader:
+            # Ignore empty lines
+            if not row:
+                continue
             if row[0].startswith("# WARNING"):
                 warnings_found.append(row[0])
                 continue
@@ -180,7 +186,7 @@ def _read_row(file, format, skip_comments=False):
                 elif len(row[0]) > _GTID_PREFIX + _RPL and \
                    row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                     yield row
-                    
+
             elif format == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
@@ -265,6 +271,12 @@ def read_next(file, format, no_headers=False):
                     sql_cmd = ""
                 cmd_type = "sql"
                 multiline = True
+            elif len(row) > _GTID_PREFIX and \
+                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
+                #yield goes here
+                yield (cmd_type, sql_cmd)
+                cmd_type = "GTID_COMMAND"
+                sql_cmd = row
             elif first_word in _BASIC_COMMANDS:
                 if len(sql_cmd) > 0:
                     #yield goes here
@@ -277,12 +289,6 @@ def read_next(file, format, no_headers=False):
                     yield (cmd_type, sql_cmd)
                 cmd_type = "RPL_COMMAND"
                 sql_cmd = row
-            elif len(row) > _GTID_PREFIX and \
-                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
-                #yield goes here
-                yield (cmd_type, sql_cmd)
-                cmd_type = "GTID_COMMAND"
-                sql_cmd = row
             elif first_word in _DATA_COMMANDS:
                 cmd_type = "DATA"
                 if len(sql_cmd) > 0:
@@ -292,6 +298,11 @@ def read_next(file, format, no_headers=False):
             else:
                 sql_cmd += row
         yield (cmd_type, sql_cmd) # need last row.
+    elif format == "raw_csv":
+        csv_reader = csv.reader(file, delimiter=",")
+        for row in csv_reader:
+            if row:
+                yield row
     else:
         table_rows = []
         found_obj = ""
@@ -314,6 +325,11 @@ def read_next(file, format, no_headers=False):
                len(row[0]) > _GTID_PREFIX + _RPL and \
                row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                 yield("GTID_COMMAND", row[0][_RPL:])
+                continue
+            # Check for basic command
+            if (first_word == "" and
+               row[0][0:row[0].find(' ')].upper() in _BASIC_COMMANDS):
+                yield("BASIC_COMMAND", row[0])
                 continue
             # Check to see if we have a marker for rows of objects or data
             for obj in _IMPORT_LIST:
@@ -341,8 +357,6 @@ def read_next(file, format, no_headers=False):
                     continue
                 else:
                     yield (cmd_type, row)
-        if row[0][0] != "#" and row[0][0:2] != "--":
-            yield (cmd_type, row)
 
 
 def _get_db(row):
@@ -444,14 +458,13 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
                             cur_col[ref_col_index], cur_col[ref_col_ref]])
     if len(key_str) > 0:
         stop = len(key_list)
+        fixed_keys = []
         for key in range(0,stop):
             # Quote keys with backticks if needed
             if key_list[key] and not is_quoted_with_backticks(key_list[key]):
                 key_list[key] = quote_with_backticks(key_list[key])
-            key_str += "%s" % key_list[key]
-            if key+1 < stop-1:
-                key_str += ", "
-        key_str += ")"
+            fixed_keys.append(key_list[key])
+        key_str += ",".join(fixed_keys) + ")"
         create_str += key_str
     if len(constraints) > 0:
         for constraint in constraints:
@@ -751,7 +764,7 @@ def _build_insert_data(col_names, tbl_name, data):
     Returns (string) the INSERT statement.
     """
     from mysql.utilities.common.sql_transform import to_sql
-    
+
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
            ") VALUES (" + ','.join(imap(to_sql, data))  + ");"
 
@@ -932,14 +945,22 @@ def import_file(dest_val, file_name, options):
         if len(col_list) > 0:
             table_col_list.extend(col_list)
 
-    def _process_data(tbl_name, statements, columns,
-                      table_col_list, table_rows, skip_blobs):
+    def _process_data(tbl_name, statements, columns, table_col_list,
+                      table_rows, skip_blobs, use_columns_names=False):
         # if there is data here, build bulk inserts
         # First, create table reference, then call insert_rows()
         tbl = Table(destination, tbl_name)
         # Need to check to see if table exists!
         if tbl.exists():
-            tbl.get_column_metadata()
+            columns_defn = None
+            if use_columns_names:
+                # Get columns definitions
+                res = tbl.server.exec_query("explain {0}".format(tbl_name))
+                # Only add selected columns
+                columns_defn = [row for row in res if row[0] in columns]
+                # Sort by selected columns definitions
+                columns_defn.sort(key=lambda item: columns.index(item[0]))
+            tbl.get_column_metadata(columns_defn)
             col_meta = True
         elif len(table_col_list) > 0:
             col_meta = _get_column_metadata(tbl, table_col_list)
@@ -950,7 +971,9 @@ def import_file(dest_val, file_name, options):
         if not col_meta:
             raise UtilError("Cannot build bulk insert statements without "
                                  "the table definition.")
-        ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name)
+        columns_names = columns[:] if use_columns_names else None
+        ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name,
+                                        columns_names)
         if len(ins_strs[0]) > 0:
             statements.extend(ins_strs[0])
         if len(ins_strs[1]) > 0 and not skip_blobs:
@@ -1000,6 +1023,8 @@ def import_file(dest_val, file_name, options):
     file = open(file_name)
     columns = []
     read_columns = False
+    has_data = False
+    use_columns_names = False
     table_rows = []
     obj_type = ""
     definitions = []
@@ -1012,8 +1037,53 @@ def import_file(dest_val, file_name, options):
     skip_gtid_warning_printed = False
     gtid_version_checked = False
 
+    if format == "raw_csv":
+        # Use the first row as columns
+        read_columns = True
+
+        # Use columns names in INSERT statement
+        use_columns_names = True
+
+        table = options.get("table", None)
+        (db_name_part, tbl_name_part) = Database.parse_object_name(table)
+
+        # Work with quoted objects
+        db_name = (db_name_part if is_quoted_with_backticks(db_name_part)
+                   else quote_with_backticks(db_name_part))
+        tbl_name = (tbl_name_part if is_quoted_with_backticks(tbl_name_part)
+                    else quote_with_backticks(tbl_name_part))
+        tbl_name = ".".join([db_name, tbl_name])
+
+        # Check database existence and permissions
+        dest_db = Database(destination, db_name)
+        if not dest_db.exists():
+            raise UtilDBError(
+                "The database does not exist: {0}".format(db_name)
+            )
+
+        # Check user permissions for write
+        dest_db.check_write_access(dest_val['user'], dest_val['host'], options)
+
+        # Check table existence
+        tbl = Table(destination, tbl_name)
+        if not tbl.exists():
+            raise UtilDBError("The table does not exist: {0}".format(table))
+
     # Read the file one object/definition group at a time
     for row in read_next(file, format):
+        # Check if --format=raw_csv
+        if format == "raw_csv":
+            if read_columns:
+                # Use the first row as columns names
+                columns = row[:]
+                read_columns = False
+                continue
+            if single:
+                statements.append(_build_insert_data(columns, tbl_name, row))
+            else:
+                table_rows.append(row)
+            has_data = True
+            continue
         # Check for replication command
         if row[0] == "RPL_COMMAND":
             if not skip_rpl:
@@ -1033,6 +1103,11 @@ def import_file(dest_val, file_name, options):
                     servers[0].check_gtid_version()
                     # Check the gtid_purged value too
                     servers[0].check_gtid_executed("import")
+                statements.append(row[1])
+            continue
+        # Check for basic command
+        if row[0] == "BASIC_COMMAND":
+            if import_type != "data":
                 statements.append(row[1])
             continue
         # If this is the first pass, get the database name from the file
@@ -1062,7 +1137,7 @@ def import_file(dest_val, file_name, options):
 
             dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                        access_options)
-            
+
         # Now check to see if we want definitions, data, or both:
         if row[0] == "sql" or row[0] in _DEFINITION_LIST:
             if format != "sql" and len(row[1]) == 1:
@@ -1094,6 +1169,7 @@ def import_file(dest_val, file_name, options):
                     continue  # skip data
                 elif format == "sql":
                     statements.append(row[1])
+                    has_data = True
                 else:
                     if row[0] == "BEGIN_DATA":
                         # Start of table so first row is columns.
@@ -1115,28 +1191,37 @@ def import_file(dest_val, file_name, options):
                             read_columns = False
                         else:
                             if not single:
-                                table_rows.append(row[1])
+                                # Convert 'NULL' to None to be correctly
+                                # handled internally
+                                data = [None if val == 'NULL' else val
+                                        for val in row[1]]
+                                table_rows.append(data)
+                                has_data = True
                             else:
                                 str = _build_insert_data(columns, tbl_name,
                                                          row[1])
                                 statements.append(str)
 
-    # Process remaining definitions                                 
+                                has_data = True
+
+    # Process remaining definitions
     if len(definitions) > 0:
         _process_definitions(statements, table_col_list, db_name)
         definitions = []
 
     # Process remaining data rows
     if len(table_rows) > 0:
-        _process_data(tbl_name, statements, columns,
-                      table_col_list, table_rows, skip_blobs)
+        _process_data(tbl_name, statements, columns, table_col_list,
+                      table_rows, skip_blobs, use_columns_names)
         table_rows = []
+    elif import_type == "data" and not has_data:
+        print("# WARNING: No data was found.")
 
     # Now process the statements
     _exec_statements(statements, destination, format, options, dryrun)
 
     file.close()
-    
+
     # Check gtid process
     if supports_gtid and not gtid_command_found:
         print _GTID_MISSING_WARNING

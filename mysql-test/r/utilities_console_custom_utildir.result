@@ -6,6 +6,42 @@ Test Pass
 
 Test Case 2: Show help utilities with custom utildir
 Launching console ...
+WARNING: mysqlauditadmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlauditadmin --help
+WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlauditgrep --help
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbcompare --help
+WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbcopy --help
+WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbexport --help
+WARNING: mysqldbimport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbimport --help
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldiff --help
+WARNING: mysqldiskusage failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldiskusage --help
+WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlfailover --help
+WARNING: mysqlindexcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlindexcheck --help
+WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlmetagrep --help
+WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlprocgrep --help
+WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrpladmin --help
+WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrplcheck --help
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrplshow --help
+WARNING: mysqlserverclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlserverclone --help
+WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlserverinfo --help
+WARNING: mysqluserclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqluserclone --help
 
 Utility         Description                                                  
 --------------  -------------------------------------------------------------
@@ -29,7 +65,7 @@ Options:
                         requirement, in the form: <user>[:<password>] or
                         <login-path>. E.g. rpl:passwd - By default = rpl:rpl
   -p, --pedantic        fail if storage engines differ among master and slave.
-  --test-db=TEST_DB     database name to use in testing  replication setup
+  --test-db=TEST_DB     database name to use in testing replication setup
                         (optional)
   --master-log-file=MASTER_LOG_FILE
                         use this master log file to initiate the slave.
@@ -44,5 +80,41 @@ Options:
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
 Launching console ...
+WARNING: mysqlauditadmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlauditadmin --help
+WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlauditgrep --help
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbcompare --help
+WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbcopy --help
+WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbexport --help
+WARNING: mysqldbimport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldbimport --help
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldiff --help
+WARNING: mysqldiskusage failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqldiskusage --help
+WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlfailover --help
+WARNING: mysqlindexcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlindexcheck --help
+WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlmetagrep --help
+WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlprocgrep --help
+WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrpladmin --help
+WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrplcheck --help
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlrplshow --help
+WARNING: mysqlserverclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlserverclone --help
+WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlserverinfo --help
+WARNING: mysqluserclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqluserclone --help
 
 

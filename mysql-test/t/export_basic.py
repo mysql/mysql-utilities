@@ -37,56 +37,85 @@ class test(copy_db_parameters.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = ("--server="
+                     "{0}").format(self.build_connection_string(self.server1))
 
-        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn 
+        cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
 
-        comment = "Test case 1 - export metadata only"
-        cmd_str = cmd + " --export=definitions --format=SQL --skip=events "
+        test_num = 1
+        comment = "Test case {0} - export metadata only".format(test_num)
+        cmd_str = ("{0} --export=definitions --format=SQL "
+                   "--skip=events ").format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - export data only - single rows"
-        cmd_str = cmd + " --export=data --format=SQL "
+        test_num += 1
+        comment = ("Test case {0} - export data only - single "
+                   "rows").format(test_num)
+        cmd_str = "{0} --export=data --format=SQL ".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - export data only - bulk insert"
-        cmd_str = cmd + " --export=DATA --format=SQL --bulk-insert"
+        test_num += 1
+        comment = ("Test case {0} - export data only - bulk "
+                   "insert").format(test_num)
+        cmd_str = "{0} --export=DATA --format=SQL --bulk-insert".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - export data and metadata"
-        cmd_str = cmd + " --export=both --format=SQL --skip=events"
+        test_num += 1
+        comment = "Test case {0} - export data and metadata".format(test_num)
+        cmd_str = "{0} --export=both --format=SQL --skip=events".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 5 - export data and metadata with quiet"
-        cmd_str = cmd + " --export=both --format=SQL --skip=events --quiet"
+        test_num += 1
+        comment = ("Test case {0} - export data and metadata with "
+                   "quiet").format(test_num)
+        cmd_str = ("{0} --export=both --format=SQL --skip=events "
+                   "--quiet").format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 6 - export data and metadata with debug"
-        cmd_str = cmd + " --export=both --format=SQL --skip=events -vvv"
+        test_num += 1
+        comment = ("Test case {0} - export data and metadata with "
+                   "debug").format(test_num)
+        cmd_str = ("{0} --export=both --format=SQL --skip=events "
+                   "-vvv").format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db``:db`' --export=both"
         else:
             cmd_arg = '"`db``:db`" --export=both'
-        cmd_str = "mysqldbexport.py %s %s --skip-gtid" % (from_conn, cmd_arg)
-        comment = "Test case 7 - export database with weird names (backticks)"
+        cmd_str = "mysqldbexport.py {0} {1} --skip-gtid".format(from_conn,
+                                                                cmd_arg)
+        comment = ("Test case {0} - export database with weird names "
+                   "(backticks)").format(test_num)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # Insert data with special characters in `db``:db`
+        special_chars = r'\0\'\"\b\n\r\t\Z\\\%\_'
+        insert_query = ("INSERT INTO `db``:db`.```t``export_1` (other) "
+                        "VALUES ('{0}')".format(special_chars))
+        self.server1.exec_query(insert_query)
+        comment = ("Test case {0} - export data with special "
+                   "characters").format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("Time:", "Time:       XXXXXX\n")
 

@@ -162,9 +162,9 @@ class test(replicate.test):
     
     def run_and_record_test(self, comment, options):
         # Execute the test and record the results
-        res = replicate.test.run_test_case(self, self.server1, self.server2,
-                                           self.s1_serverid, comment, options,
-                                           False, 0, False)
+        res = replicate.test.run_rpl_test(self, self.server1, self.server2,
+                                          self.s1_serverid, comment, options,
+                                          False, 0, False)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 

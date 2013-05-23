@@ -26,6 +26,7 @@ from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -74,7 +75,7 @@ _PARTITION_QUERY = """
 
 _COLUMN_QUERY = """
   SELECT ORDINAL_POSITION, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE,
-         COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT, COLUMN_KEY       
+         COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT, COLUMN_KEY
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE TABLE_SCHEMA = '%(db)s' AND TABLE_NAME = '%(name)s'
 """
@@ -154,9 +155,9 @@ class Database(object):
             db = db_name
         else:
             db = self.db_name
-            
+
         _QUERY = """
-            SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA 
+            SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA
             WHERE SCHEMA_NAME = '%s'
         """
         res = server.exec_query(_QUERY % db)
@@ -253,24 +254,23 @@ class Database(object):
             create_str = self.get_create_statement(self.db_name,
                                                    obj[0], obj_type)
             if self.new_db != self.db_name:
-                create_str = re.sub(r" %s\." % self.q_db_name,
-                                    r" %s." % self.q_new_db,
-                                    create_str)
-                create_str = re.sub(r",%s\." % self.q_db_name,
-                                    r",%s." % self.q_new_db,
-                                    create_str)
-                create_str = re.sub(r" %s\." % self.db_name,
-                                    r" %s." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r",%s\." % self.db_name,
-                                    r",%s." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r" '%s'\." % self.db_name,
-                                    r" '%s'." % self.new_db,
-                                    create_str)
-                create_str = re.sub(r' "%s"\.' % self.db_name,
-                                    r' "%s".' % self.new_db,
-                                    create_str)
+                # Replace the occurrences of the old database name (quoted with
+                # backticks) with the new one when preceded by: a whitespace
+                # character, comma or optionally a left parentheses.
+                create_str = re.sub(
+                    r"(\s|,)(\(?){0}\.".format(self.q_db_name),
+                    r"\1\2{0}.".format(self.q_new_db),
+                    create_str
+                )
+                # Replace the occurrences of the old database name (without
+                # backticks) with the new one when preceded by: a whitespace
+                # character, comma or optionally a left parentheses and
+                # surrounded by single or double quotes.
+                create_str = re.sub(
+                    r"(\s|,)(\(?)(\"|\'?){0}(\"|\'?)\.".format(self.db_name),
+                    r"\1\2\3{0}\4.".format(self.new_db),
+                    create_str
+                )
         return create_str
 
 
@@ -417,7 +417,7 @@ class Database(object):
         The method can also be used to copy a database to another server
         by providing the new server object (new_server). Copy to the same
         name by setting new_db = old_db or as a new database.
-        
+
         new_db[in]         Name of the new database
         options[in]        Options for copy e.g. force, etc.
         new_server[in]     Connection to another server for copying the db
@@ -524,7 +524,7 @@ class Database(object):
 
         if self.skip_data:
             return
-        
+
         self.destination = new_server
 
         # We know we're cloning if there is no new connection.
@@ -534,7 +534,7 @@ class Database(object):
             self.destination = self.source
 
         quiet = options.get("quiet", False)
-        
+
         tbl_options = {
             'verbose'  : self.verbose,
             'get_cols' : True,
@@ -544,7 +544,7 @@ class Database(object):
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
         for tblname in table_names:
             if not quiet:
-                print "# Copying data for TABLE %s.%s" % (self.db_name, 
+                print "# Copying data for TABLE %s.%s" % (self.db_name,
                                                           tblname)
             tbl = Table(self.source, "%s.%s" % (self.q_db_name,
                                                 quote_with_backticks(tblname)),
@@ -592,7 +592,7 @@ class Database(object):
 
     def get_object_definition(self, db, name, obj_type):
         """Return a list of the object's creation metadata.
-        
+
         This method queries the INFORMATION_SCHEMA or MYSQL database for the
         row-based (list) description of the object. This is similar to the
         output EXPLAIN <object>.
@@ -625,7 +625,7 @@ class Database(object):
                       'TABLE_COMMENT, ROW_FORMAT, CREATE_OPTIONS'
             from_name = 'TABLES'
             condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
-                         (db, name) 
+                         (db, name)
         elif obj_type == _VIEW:
             columns = 'TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, ' + \
                       'CHECK_OPTION, DEFINER, SECURITY_TYPE'
@@ -661,7 +661,7 @@ class Database(object):
                       'ON_COMPLETION, STARTS, ENDS'
             from_name = 'EVENTS'
             condition = "EVENT_SCHEMA = '%s' AND EVENT_NAME = '%s'" % \
-                         (db, name)            
+                         (db, name)
 
         if from_name is None:
             raise UtilError('Attempting to get definition from unknown object '
@@ -686,9 +686,9 @@ class Database(object):
                 definition.append((basic_def, col_def, part_def))
             else:
                 definition.append(rows[0])
-            
+
         return definition
-    
+
 
     def get_next_object(self):
         """Retrieve the next object in the database list.
@@ -719,7 +719,7 @@ class Database(object):
         Returns (string) String to add to where clause or ""
         """
         from mysql.utilities.common.options import obj2sql
-        
+
         oper = 'NOT REGEXP' if self.use_regexp else 'NOT LIKE'
         str = ""
         for pattern in self.exclude_patterns:
@@ -736,37 +736,36 @@ class Database(object):
 
         return str
 
-
     def get_object_type(self, object_name):
         """Return the object type of an object
-        
+
         This method attempts to locate the object name among the objects
         in the database. It returns the object type if found or None
         if not found.
-        
+        Note: different types of objects with the same name might exist in the
+        database.
+
         object_name[in]    Name of the object to find
-        
-        Returns (string) object type or None if not found
+
+        Returns (list of strings) with the object types or None if not found
         """
-        object_type = None
+        object_types = None
 
         # Remove object backticks if needed
         obj_name = remove_backtick_quoting(object_name) \
-                    if is_quoted_with_backticks(object_name) else object_name
+            if is_quoted_with_backticks(object_name) else object_name
 
         res = self.source.exec_query(_OBJTYPE_QUERY %
-                                     { 'db_name'  : self.db_name,
-                                       'obj_name' : obj_name })
-        
-        if res != [] and res is not None and len(res) > 0:
-            object_type = res[0][0]
-            if object_type == 'BASE TABLE':
-                object_type = 'TABLE'
-        
-        return object_type
+                                     {'db_name': self.db_name,
+                                      'obj_name': obj_name})
 
+        if res:
+            object_types = ['TABLE' if row[0] == 'BASE TABLE' else row[0]
+                            for row in res]
 
-    def get_db_objects(self, obj_type, columns='names', get_columns=False, 
+        return object_types
+
+    def get_db_objects(self, obj_type, columns='names', get_columns=False,
                        need_backtick=False):
         """Return a result set containing a list of objects for a given
         database based on type.
@@ -852,11 +851,13 @@ class Database(object):
                 AND
                 TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME
             WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW' %s
+            GROUP BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
+                     COLUMNS.ORDINAL_POSITION
             ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
                      COLUMNS.ORDINAL_POSITION
             """
             exclude_param = "TABLES.TABLE_NAME"
-            
+
         elif obj_type == _VIEW:
             _NAMES = """
             SELECT TABLE_NAME
@@ -889,7 +890,7 @@ class Database(object):
                    EVENT_MANIPULATION, EVENT_OBJECT_CATALOG,
                    EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE, ACTION_ORDER,
                    ACTION_CONDITION, ACTION_STATEMENT, ACTION_ORIENTATION,
-                   ACTION_TIMING, ACTION_REFERENCE_OLD_TABLE, 
+                   ACTION_TIMING, ACTION_REFERENCE_OLD_TABLE,
                    ACTION_REFERENCE_NEW_TABLE, ACTION_REFERENCE_OLD_ROW,
                    ACTION_REFERENCE_NEW_ROW, CREATED, SQL_MODE, DEFINER,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
@@ -1090,7 +1091,7 @@ class Database(object):
 
         It will also skip specific checks if certain objects are not being
         copied (i.e., views, procs, funcs, grants).
-    
+
         user[in]           user name to check
         host[in]           host name to check
         options[in]        dictionary of values to include:
@@ -1176,3 +1177,19 @@ class Database(object):
                                    priv[0]), -1, priv[0])
 
         return True
+
+    @staticmethod
+    def parse_object_name(qualified_name):
+        """Parse db, name from db.name
+
+        qualified_name[in] MySQL object string (e.g. db.table)
+
+        Returns tuple containing name split
+        """
+
+        # Split the qualified name considering backtick quotes
+        parts = re.match(REGEXP_QUALIFIED_OBJ_NAME, qualified_name)
+        if parts:
+            return parts.groups()
+        else:
+            return (None, None)

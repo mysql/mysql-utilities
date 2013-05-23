@@ -168,3 +168,58 @@ Running import...
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+Test Case 18 : Testing import with RAW_CSV format
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/raw_data.csv.
+#...done.
+Comparing tables...
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases import_test on server1 and import_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     customers                               pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test Case 19 : Testing import with RAW_CSV format using --bulk-insert 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/raw_data.csv.
+#...done.
+Comparing tables...
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases import_test on server1 and import_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     customers                               pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test Case 20 : Testing import with CSV format with no data (using --format=data)
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/no_data.csv.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
+# WARNING: No data was found.
+#...done.
+Test Case 21 : Testing import with CSV format with RPL statements (using --format=data)
+Running import...
+# Source on localhost: ... connected.
+# Importing data from std_data/rpl_data.csv.
+# WARNING: GTID commands are present in the import file but the server does not support GTIDs. Commands are ignored.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
+# WARNING: No data was found.
+#...done.

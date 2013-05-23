@@ -206,8 +206,8 @@ class TopologyMap(object):
                 slave_conn['host'] = host
                 slave_conn['port'] = port
 
-                io_running = None
-                # If verbose then get slave IO status
+                io_sql_running = None
+                # If verbose then get slave threads (IO and SQL) status
                 if self.verbose:
                     # Create slave instance
                     conn_dict = {
@@ -218,13 +218,16 @@ class TopologyMap(object):
                         'verbose': self.verbose
                     }
                     slave_obj = Slave(conn_dict)
-                    # Get IO status
+                    # Get IO and SQL status
                     try:
                         slave_obj.connect()
-                        io_running = slave_obj.get_io_running()
+                        thread_status = slave_obj.get_thread_status()
+                        if thread_status:
+                            io_sql_running = (thread_status[1],
+                                              thread_status[2])
                     except UtilError:
                         # Connection error
-                        io_running = 'ERROR'
+                        io_sql_running = ('ERROR', 'ERROR')
 
                 # Now check for circular replication topology - do not recurse
                 # if slave is also a master.
@@ -233,16 +236,16 @@ class TopologyMap(object):
                     new_list = self._get_slaves(max_depth, slave_conn,
                                                 masters_found)
                     if new_list == []:
-                        slave_list.append((slave, [], io_running))
+                        slave_list.append((slave, [], io_sql_running))
                     else:
-                        # Add IO state to slave from recursion
-                        if io_running:
+                        # Add IO and SQL state to slave from recursion
+                        if io_sql_running:
                             new_list = [(new_list[0][0], new_list[0][1],
-                                         io_running)]
+                                         io_sql_running)]
                         slave_list.append(new_list)
                     depth += 1
                 else:
-                    slave_list.append((slave, [], io_running))
+                    slave_list.append((slave, [], io_sql_running))
         topology.append((master_info, slave_list))
 
         return topology
@@ -326,17 +329,17 @@ class TopologyMap(object):
                     role = "{0} + MASTER".format(role)
                 role = "{0})".format(role)
 
-                # Print IO status if verbose
-                io_status = ''
+                # Print threads (IO and SQL) status if verbose
+                t_status = ''
                 if self.verbose:
                     try:
-                        io_status = " [IO running: {0}]".format(slave[2])
+                        t_status = " [IO: {0}, SQL: {1}]".format(slave[2][0],
+                                                                 slave[2][1])
                     except IndexError:
                         # This should never happened... (done to avoid crash)
-                        io_status = " [IO running: ??]"
+                        t_status = " [IO: ??, SQL: ??]"
 
-                print "{0}+--- {1}{2}".format(new_preamble, slave[0],
-                                              io_status),
+                print "{0}+--- {1}{2}".format(new_preamble, slave[0], t_status),
 
                 if (slave[0] in masters_found):
                     print "<-->",

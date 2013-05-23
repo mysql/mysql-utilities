@@ -35,6 +35,7 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.tools import show_file_statistics
 from mysql.utilities.command import audit_log
 from mysql.utilities.command.audit_log import AuditLog
@@ -52,6 +53,10 @@ class MyParser(UtilitiesParser):
 NAME = "MySQL Utilities - mysqlauditadmin "
 DESCRIPTION = "mysqlauditadmin - audit log maintenance utility "
 USAGE = "%prog --server=user:pass@host:port --show-options "
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = MyParser(

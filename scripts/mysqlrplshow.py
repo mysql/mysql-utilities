@@ -34,6 +34,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.options import add_verbosity, setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.exception import FormatError
 
@@ -43,6 +44,10 @@ DESCRIPTION = "mysqlrplshow - show slaves attached to a master"
 USAGE = "%prog --master=root@localhost:3306 "
 
 PRINT_WIDTH = 75
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),

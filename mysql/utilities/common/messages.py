@@ -58,10 +58,19 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
                             "object '{only_obj_value}' was specified for "
                             "{db_obj_label} '{db_obj_value}'.")
 
+PARSE_ERR_DB_MISSING_CMP = "No databases specified to compare."
+
+PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW = (
+    "The value {s_value} specified for option --span-key-size is too small "
+    "and would cause inaccurate results, please retry with a bigger value "
+    "or the default value of {default}.")
+
 PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
 
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
                                  % PARSE_ERR_OPT_INVALID_CMD)
+
+PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
                              "{opts}.")
@@ -78,6 +87,9 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                    % WARN_OPT_NOT_REQUIRED)
 
+WARN_OPT_USING_DEFAULT = ("WARNING: Using default value '{default}' for option "
+                          "{opt}.")
+
 ERROR_SAME_MASTER = ("The specified new master {n_master_host}:{n_master_port}"
                      " is the same as the "
                      "actual master {master_host}:{master_port}.")
@@ -89,3 +101,9 @@ CANDIDATES = "candidates"
 ERROR_MASTER_IN_SLAVES = ("The master {master_host}:{master_port} "
                           "and one of the specified {slaves_candidates} "
                           "are the same {slave_host}:{slave_port}.")
+
+SCRIPT_THRESHOLD_WARNING = ("WARNING: You have chosen to use external script "
+                            "return code checking. Depending on which script "
+                            "fails, this can leave the operation in an "
+                            "undefined state. Please check your results "
+                            "carefully if the operation aborts.")

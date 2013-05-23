@@ -183,6 +183,7 @@ class Topology(Replication):
         self.timeout = int(self.options.get("timeout", 300))
         self.logging = self.options.get("logging", False)
         self.rpl_user = self.options.get("rpl_user", None)
+        self.script_threshold = self.options.get("script_threshold", None)
 
         # Attempt to connect to all servers
         self.master, self.slaves = self._connect_to_servers(master_vals,
@@ -547,7 +548,8 @@ class Topology(Replication):
         """Run an external script
 
         This method executes an external script. Result is checked for
-        success (res == 0).
+        success (res == 0). If the user specified a threshold and the
+        threshold is exceeded, an error is raised.
 
         script[in]     script to execute
         quiet[in]      if True, do not print messages
@@ -562,6 +564,13 @@ class Topology(Replication):
             return
         self._report("# Spawning external script.")
         res = execute_script(script, None, options, self.verbose)
+        if self.script_threshold and res >= int(self.script_threshold):
+            raise UtilRplError("External script '{0}' failed. Result = {1}.\n"
+                               "Specified threshold exceeded. Operation abort"
+                               "ed.\nWARNING: The operation did not complete."
+                               " Depending on when the external script was "
+                               "called, you should check the topology "
+                               "for inconsistencies.".format(script, res))
         if res == 0:
             self._report("# Script completed Ok.")
         elif not quiet:
@@ -1645,14 +1654,12 @@ class Topology(Replication):
                     self._report("ERROR: %s" % msg, logging.ERROR)
                     return
 
-                # Cann't get rpl pass from remote master_repo=file
+                # Can't get rpl pass from remote master_repo=file
                 # but it can get the current used hashed to be compared.
-                slave_qry = slave_candidate.exec_query 
+                slave_qry = slave_candidate.exec_query
                 passwd_hash = slave_qry(_SELECT_RPL_USER_PASS_QUERY %
                                         (user, m_candidate.host))
                 # if user does not exist passwd_hash will be an empty query.
-                #print("passwd_hash {0}".format(passwd_hash))
-                
                 if passwd_hash:
                     passwd_hash = passwd_hash[0][3]
                 else:
@@ -1660,7 +1667,6 @@ class Topology(Replication):
                 # now hash the given rpl password from --rpl-user.
                 rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
                                             passwd)
-                #print("rpl_master_pass {0}".format(rpl_master_pass))
                 rpl_master_pass = rpl_master_pass[0][0]
 
                 if (rpl_master_pass != passwd_hash):
@@ -2027,6 +2033,9 @@ class Topology(Replication):
         self._report("# Stopping slaves.")
         self.run_cmd_on_slaves("stop", not self.verbose)
 
+        # Take the new master out of the slaves list.
+        self._remove_slave(new_master_dict)
+
         self._report("# Switching slaves to new master.")
         for slave_dict in self.slaves:
             slave = slave_dict['instance']
@@ -2036,8 +2045,16 @@ class Topology(Replication):
             slave.switch_master(self.master, user, passwd, False, None, None,
                                 self.verbose and not self.quiet)
 
-        # Take the server out of the list.
-        self._remove_slave(new_master_dict)
+        # Clean previous replication settings on the new master.
+        self._report("# Disconnecting new master as slave.")
+        # Make sure the new master is not acting as a slave (STOP SLAVE).
+        self.master.exec_query("STOP SLAVE")
+        # Execute RESET SLAVE ALL on the new master.
+        if self.verbose and not self.quiet:
+            self._report("# Execute on {0}:{1}: "
+                         "RESET SLAVE ALL".format(self.master.host,
+                                                  self.master.port))
+        self.master.exec_query("RESET SLAVE ALL")
 
         # Starting all slaves
         self._report("# Starting slaves.")

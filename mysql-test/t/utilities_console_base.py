@@ -16,45 +16,51 @@
 #
 import os
 import mutlib
+from mysql.utilities import PYTHON_MAX_VERSION
 from mysql.utilities.exception import MUTLibError
+from mysql.utilities.common.tools import check_python_version
 
 _BASE_COMMENT = "Test Case %d: "
 
 class test(mutlib.System_test):
     """mysql utilities console - base commands
     This test executes tests of the base commands for mysqluc.
-    
+
     These include:
 
-    Command                 Description                                        
+    Command                 Description
     ----------------------  --------------------------------------------------
-    help utilities          Display list of all utilities supported.           
-    help <utility>          Display help for a specific utility.               
-    help | help commands    Show this list.                                    
-    exit | quit             Exit the console.                                  
-    set <variable>=<value>  Store a variable for recall in commands.           
-    show options            Display list of options specified by the user on   
-                            launch.                                            
-    show variables          Display list of variables.                         
+    help utilities          Display list of all utilities supported.
+    help <utility>          Display help for a specific utility.
+    help | help commands    Show this list.
+    exit | quit             Exit the console.
+    set <variable>=<value>  Store a variable for recall in commands.
+    show options            Display list of options specified by the user on
+                            launch.
+    show variables          Display list of variables.
 
     These commands are executed using the --execute option to simulate an
     interactive environment.
     """
 
     def check_prerequisites(self):
+        try:
+            check_python_version((2, 7, 0), PYTHON_MAX_VERSION, True)
+        except:
+            raise MUTLibError("Test requires Python 2.7 or higher.")
         return True
 
     def setup(self):
         return True
-    
+
     def do_test(self, test_num, comment, command):
         res = self.run_test_case(0, command, _BASE_COMMENT%test_num + comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
     def do_coverage_tests(self, base_command):
         test_num = 1
-        
+
         # Simple single-command tests
         _SIMPLE_COMMANDS = [
             ("Show Help", "help"),
@@ -92,7 +98,7 @@ class test(mutlib.System_test):
         self.do_test(test_num, "Set and Show Variables",
                 base_command % "set killer=123;set ABC='test123';show variables")
         test_num += 1
-        
+
         # Show we cannot execute extraneous commands
         self.do_test(test_num, "Attempt to run extraneous command.",
                      base_command % "mkdir make_mischief")
@@ -101,28 +107,24 @@ class test(mutlib.System_test):
         self.remove_result("Launching console ...")
         self.replace_result("The utility mysqla is not accessible (from the",
                             "The utility mysqla is not accessible (...)\n")
-            
-        return True    
-            
+
+        return True
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         # Setup options to show
         cmd_str = 'mysqluc.py --width=77 -e "%s" '
 
         return self.do_coverage_tests(cmd_str)
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return True
-
-
-
-

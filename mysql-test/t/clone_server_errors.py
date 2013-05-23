@@ -114,6 +114,10 @@ class test(mutlib.System_test):
 
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
 
+        self.replace_result(
+            "ERROR: Unable to create directory",
+            "ERROR: Unable to create directory '/not/there/yes'\n")
+
         return True
 
     def get_result(self):

@@ -16,7 +16,7 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 class test(mutlib.System_test):
     """check indexes for duplicates and redundancies
@@ -41,32 +41,61 @@ class test(mutlib.System_test):
         return res
 
     def setup(self):
-        return True   # No setup needed
-        
+        try:
+            # Runs analyze table to ensure determinism in the list of indexes
+            # returned by the these tests
+            self.server1.exec_query("ANALYZE NO_WRITE_TO_BINLOG TABLE "
+                                    "employees.departments,"
+                                    "employees.dept_emp,"
+                                    "employees.dept_manager,"
+                                    "employees.employees,"
+                                    "employees.salaries")
+        except UtilError as err:
+            raise MUTLibError("Error Executing ANALYZE TABLE:"
+                              "{0}".format(err.errmsg))
+        return True
+
     def run(self):
         self.res_fname = "result.txt"
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
         cmd_str = "mysqlindexcheck.py %s employees.dept_emp " % from_conn
         cmd_str += " --format=csv "
-        
-        comment = "Test case 1 - show best indexes"
-        res = self.run_test_case(0, cmd_str + "--stats -vv --best=5", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 2 - show worst indexes"
-        res = self.run_test_case(0, cmd_str + "--stats -vv --worst=5", comment)
+        test_num = 1
+        comment = "Test case {0} - show best indexes".format(test_num)
+        cmd = "{0}--stats -vv --best=5".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - show worst indexes".format(test_num)
+        cmd = "{0}--stats -vv --worst=5".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = "Test case {0} - show only best index".format(test_num)
+        cmd = "{0}--stats -vv --best=1".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed" .format(comment))
+
+        test_num += 1
+        comment = "Test case {0} - show only worst index".format(test_num)
+        cmd = "{0}--stats -vv --worst=1".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
         # Mask the output
         self.mask_column_result("employees", ",", 7, 'NNNNNNN')
         self.mask_column_result("employees", ",", 8, 'NNNNNNN')
         self.mask_column_result("employees", ",", 9, 'NNNNNNN')
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
     

@@ -22,11 +22,13 @@ Test objects count
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
+NULL
 Showing data for table t3 
 a	b
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
+4	NULL
 Showing data for table t4 
 c	d
 3	2
@@ -54,11 +56,13 @@ Test objects count
 11 Test Basic database example
 12 Test Basic database example
 13 Test Basic database example
+NULL
 Showing data for table t3 
 a	b
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
+4	NULL
 Showing data for table t4 
 c	d
 3	2

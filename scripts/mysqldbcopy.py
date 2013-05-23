@@ -45,6 +45,7 @@ from mysql.utilities.common.options import add_regexp, add_rpl_mode
 from mysql.utilities.common.options import check_rpl_options, add_rpl_user
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.tools import check_connector_python
 
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
@@ -54,6 +55,10 @@ NAME = "MySQL Utilities - mysqldbcopy "
 DESCRIPTION = "mysqldbcopy - copy databases from one server to another"
 USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket orig_db:new_db"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -152,7 +157,7 @@ if opt.destination is None:
 if len(args) == 0 and not opt.all:
     parser.error("You must specify at least one database to copy or "
                  "use the --all option to copy all databases.")
-    
+
 # Fail if we have arguments and all databases option listed.
 check_all(parser, opt, args, "databases")
 

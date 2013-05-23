@@ -34,7 +34,7 @@ Test Case 4 : Testing disk space with VERTICAL format
 *************************       1. row *************************
  db_name: util_test
     total: XXXXXXX
-1 rows.
+1 row.
 
 Total database disk usage = XXXXXXX
 

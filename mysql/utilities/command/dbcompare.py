@@ -19,9 +19,16 @@
 This file contains the commands for checking consistency of two databases.
 """
 
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
+                                              get_create_object,
+                                              print_missing_list,
+                                              server_connect)
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
+
 
 _PRINT_WIDTH = 75
 _ROW_FORMAT = "# {0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
@@ -43,6 +50,7 @@ _DEFAULT_OPTIONS = {
     "no_row_count"    : False,
     "no_data"         : False,
     "transform"       : False,
+    "span_key_size"  : DEFAULT_SPAN_KEY_SIZE
 }
 
 class _CompareDBReport:
@@ -129,8 +137,7 @@ def _check_databases(server1, server2, db1, db2, options):
     
     Returns tuple - Database class instances for databases
     """
-    from mysql.utilities.common.dbcompare import diff_objects
-        
+
     # Check database create for differences
     if not options['no_diff']:
         # temporarily make the diff quiet to retrieve errors
@@ -138,7 +145,7 @@ def _check_databases(server1, server2, db1, db2, options):
         new_opt.update(options)
         new_opt['quiet'] = True          # do not print messages
         new_opt['suppress_sql'] = True   # do not print SQL statements either
-        res = diff_objects(server1, server2, db1, db2, new_opt)
+        res = diff_objects(server1, server2, db1, db2, new_opt, 'DATABASE')
         if res is not None:
             for row in res:
                 print row
@@ -161,8 +168,8 @@ def _check_objects(server1, server2, db1, db2,
     
     Returns list of objects in both databases
     """
-    from mysql.utilities.common.dbcompare import get_common_objects
-    from mysql.utilities.common.dbcompare import print_missing_list
+
+    differs = False
 
     # Check for same number of objects
     in_both, in_db1, in_db2 = get_common_objects(server1, server2,
@@ -177,12 +184,15 @@ def _check_objects(server1, server2, db1, db2,
         if len(in_db1) or len(in_db2):
             if options['run_all_tests']:
                 if len(in_db1) > 0:
+                    differs = True
                     print_missing_list(in_db1, server1_str, server2_str)
                     print "#"
                 if len(in_db2) > 0:
+                    differs = True
                     print_missing_list(in_db2, server2_str, server1_str)
                     print "#"
             else:
+                differs = True
                 raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
 
     # If in verbose mode, show count of object types.
@@ -196,7 +206,7 @@ def _check_objects(server1, server2, db1, db2,
                 'EVENT' : 0,
         }
         for item in in_both:
-            obj_type = db1_conn.get_object_type(item[1][0])
+            obj_type = item[0]
             objects[obj_type] += 1
         print "Looking for object types table, view, trigger, procedure," + \
               " function, and event."
@@ -204,10 +214,11 @@ def _check_objects(server1, server2, db1, db2,
         for object in objects:
             print " {0:>12} : {1}".format(object, objects[object])
 
-    return in_both
+    return (in_both, differs)
 
 
-def _compare_objects(server1, server2, obj1, obj2, reporter, options):
+def _compare_objects(server1, server2, obj1, obj2, reporter, options,
+                     object_type):
     """Compare object definitions and produce difference
     
     server1[in]       first server Server instance
@@ -216,10 +227,11 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options):
     obj2[in]          second object
     reporter[in]      database compare reporter class instance
     options[in]       options dictionary
+    object_type[in]   type of the objects to be compared (e.g., TABLE,
+                      PROCEDURE, etc.).
     
     Returns list of errors
     """
-    from mysql.utilities.common.dbcompare import diff_objects
 
     errors = []
     if not options['no_diff']:
@@ -229,7 +241,7 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options):
         new_opt.update(options)
         new_opt['quiet'] = True          # do not print messages
         new_opt['suppress_sql'] = True   # do not print SQL statements either
-        res = diff_objects(server1, server2, obj1, obj2, new_opt)
+        res = diff_objects(server1, server2, obj1, obj2, new_opt, object_type)
         if res is not None:
             reporter.report_state('FAIL')
             errors.extend(res)
@@ -400,11 +412,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
     Returns bool True if all object match, False if partial match
     """
-    
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.dbcompare import server_connect, \
-                                                 get_create_object
-    
+
     _check_option_defaults(options)
     
     # Connect to servers
@@ -420,25 +428,31 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     if not db2_conn.exists():
         raise UtilDBError(_ERROR_DB_MISSING.format(db2))
 
-    message = "# Checking databases {0} on server1 and {1} on server2\n#"
-    print message.format(db1_conn.db_name, db2_conn.db_name)
-    
-    # Check for database existance and CREATE differences
+    # Print a different message is server2 is not defined
+    if not server2_val:
+        message = "# Checking databases {0} and {1} on server1\n#"
+    else:
+        message = "# Checking databases {0} on server1 and {1} on server2\n#"
+    print(message.format(db1_conn.db_name, db2_conn.db_name))
+
+    # Check for database existence and CREATE differences
     _check_databases(server1, server2, db1_conn.q_db_name, db2_conn.q_db_name,
                      options)
 
-    # Get common objects and report discrepencies
-    in_both = _check_objects(server1, server2, db1, db2,
-                             db1_conn, db2_conn, options)
+    # Get common objects and report discrepancies
+    (in_both, differs) = _check_objects(server1, server2, db1, db2,
+                                        db1_conn, db2_conn, options)
+    success = not differs
 
     reporter = _CompareDBReport(options)
     reporter.print_heading()
-    
-    # Remaining operations can occur in a loop one for each object.        
-    success = True if len(in_both) > 0 else False
+
+    # Remaining operations can occur in a loop one for each object.
     for item in in_both:
         error_list = []
-        obj_type = db1_conn.get_object_type(item[1][0])
+
+        # Set the object type
+        obj_type = item[0]
 
         obj1 = "{0}.{1}".format(db1, item[1][0])
         obj2 = "{0}.{1}".format(db2, item[1][0])
@@ -451,35 +465,39 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
         # Check for differences in CREATE
         errors = _compare_objects(server1, server2, q_obj1, q_obj2,
-                                  reporter, options)
+                                  reporter, options, obj_type)
         error_list.extend(errors)
-        
+
         # Check row counts
         if obj_type == 'TABLE':
             errors = _check_row_counts(server1, server2, q_obj1, q_obj2,
                                        reporter, options)
             if len(errors) != 0:
-                success = False
                 error_list.extend(errors)
         else:
             reporter.report_state("-")
-            
+
         # Check data consistency for tables
         if obj_type == 'TABLE':
             errors = _check_data_consistency(server1, server2, q_obj1, q_obj2,
                                              reporter, options)
             if len(errors) != 0:
-                success = False
                 error_list.extend(errors)
         else:
             reporter.report_state("-")
-                    
+
         if options['verbosity'] > 0:
             print
-            object1_create = get_create_object(server1, obj1, options)
-            object2_create = get_create_object(server2, obj2, options)
-          
+            object1_create = get_create_object(server1, obj1, options,
+                                               obj_type)
+            object2_create = get_create_object(server2, obj2, options,
+                                               obj_type)
+
         reporter.report_errors(error_list)
-        
+
+        # Fail if errors are found
+        if error_list:
+            success = False
+
     return success
 

@@ -191,7 +191,8 @@ def check_skip_options(skip_list):
     return new_skip_list
 
 
-def add_format_option(parser, help_text, default_val, sql=False):
+def add_format_option(parser, help_text, default_val, sql=False,
+                      extra_formats=None):
     """Add the format option.
 
     parser[in]        the parser instance
@@ -199,12 +200,15 @@ def add_format_option(parser, help_text, default_val, sql=False):
     default_val[in]   default value
     sql[in]           if True, add 'sql' format
                       default=False
+    extra_formats[in] list with extra formats
 
     Returns corrected format value
     """
     formats = _PERMITTED_FORMATS
     if sql:
         formats.append('sql')
+    if extra_formats:
+        formats.extend(extra_formats)
     parser.add_option("-f", "--format", action="store", dest="format",
                       default=default_val, help=help_text, type="choice",
                       choices=formats)
@@ -277,7 +281,7 @@ def add_reverse(parser):
     """
     parser.add_option("--show-reverse", action="store_true", dest="reverse",
                       default=False, help="produce a transformation report "
-                      "containing the SQL statements to conform the object "
+                      "containing the SQL statements to transform the object "
                       "definitions specified in reverse. For example if "
                       "--changes-for is set to server1, also generate the "
                       "transformation for server2. Note: the reverse changes "
@@ -502,6 +506,7 @@ def add_failover_options(parser):
       --seconds-behind
       --slaves
       --timeout
+      --script-threshold
 
     parser[in]        the parser instance
     """
@@ -545,7 +550,7 @@ def add_failover_options(parser):
                       "[:<socket>] or <login-path>[:<port>][:<socket>]")
 
     parser.add_option("--max-position", action="store", dest="max_position",
-                      default=0, type="int", help="Used to detect slave "
+                      default=0, type="int", help="used to detect slave "
                       "delay. The maximum difference between the master's "
                       "log position and the slave's reported read position of "
                       "the master. A value greater than this means the slave "
@@ -556,7 +561,7 @@ def add_failover_options(parser):
                       "server.")
 
     parser.add_option("--seconds-behind", action="store", dest="max_delay",
-                      default=0, type="int", help="Used to detect slave "
+                      default=0, type="int", help="used to detect slave "
                       "delay. The maximum number of seconds behind the master "
                       "permitted before slave is considered behind the master. "
                       "Default is 0.")
@@ -569,10 +574,17 @@ def add_failover_options(parser):
                       "List multiple slaves in comma-separated list.")
 
     parser.add_option("--timeout", action="store", dest="timeout", default=300,
-                      help="Maximum timeout in seconds to wait for each "
+                      help="maximum timeout in seconds to wait for each "
                       "replication command to complete. For example, timeout "
                       "for slave waiting to catch up to master. "
                       "Default = 300.")
+
+    parser.add_option("--script-threshold", action="store", default=None,
+                      dest="script_threshold",
+                      help="Value for external scripts to trigger aborting "
+                      "the operation if result is greater than or equal to "
+                      "the threshold. Default = None (no threshold "
+                      "checking).")
 
 
 def check_server_lists(parser, master, slaves):

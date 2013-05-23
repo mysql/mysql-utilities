@@ -169,6 +169,54 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        # Diff databases with objects of different type with the same name
+
+        # Create the same PROCEDURE on each server with the same name of an
+        # already existing TABLE (i.e., ```t``export_1`).
+        self.server1.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 1")
+        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 1")
+        if os.name == 'posix':
+            cmd_arg = "'`db.``:db`:`db.``:db`'"
+        else:
+            cmd_arg = '"`db.``:db`:`db.``:db`"'
+        # Execute test (no differences expected)
+        comment = ("Test case 10 - diff a database with objects of "
+                   "different type with the same name (no differences)")
+        cmd_str = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Replace the PROCEDURE previously created on one of the servers by a
+        # different one.
+        self.server2.exec_query("DROP PROCEDURE `db.``:db`.```t``export_1`")
+        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+                                "SELECT 2")
+        # Execute test (differences expected)
+        comment = ("Test case 11 - diff a database with objects of "
+                   "different type with the same name (with differences)")
+        cmd_str = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Set input parameter with appropriate quotes for the OS
+        if os.name == 'posix':
+            cmd_arg = ("'`db.``:db`.```t``export_1`:"
+                       "`db.``:db`.```t``export_1`'")
+        else:
+            cmd_arg = ('"`db.``:db`.```t``export_1`:'
+                       '`db.``:db`.```t``export_1`"')
+        # Execute test for specific objects (differences expected)
+        comment = ("Test case 12 - diff specific objects of "
+                   "different type with the same name (with differences)")
+        cmd_str = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
         

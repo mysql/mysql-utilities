@@ -92,13 +92,13 @@ Test case 5 - show circular topology with verbose option
 # Replication Topology Graph
 localhost:PORT2 (MASTER)
    |
-   +--- localhost:PORT1 [IO running: Yes] - (SLAVE)
+   +--- localhost:PORT1 [IO: Yes, SQL: Yes] - (SLAVE)
    |
-   +--- localhost:PORT3 [IO running: Yes] - (SLAVE + MASTER)
+   +--- localhost:PORT3 [IO: Yes, SQL: Yes] - (SLAVE + MASTER)
        |
-       +--- localhost:PORT4 [IO running: Yes] - (SLAVE + MASTER)
+       +--- localhost:PORT4 [IO: Yes, SQL: Yes] - (SLAVE + MASTER)
            |
-           +--- localhost:PORT2 [IO running: Yes] <--> (SLAVE + MASTER)
+           +--- localhost:PORT2 [IO: Yes, SQL: Yes] <--> (SLAVE + MASTER)
 
 +-----------------+-----------------+
 | Master          | Slave           |

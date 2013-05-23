@@ -123,3 +123,42 @@ Test case 9 - diff a single object with weird names (backticks)
 # server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
 Success. All objects are the same.
+Test case 10 - diff a database with objects of different type with the same name (no differences)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing `db.``:db` to `db.``:db`                               [PASS]
+# Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
+# Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
+# Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
+# Comparing `db.``:db`.```v``export_1` to `db.``:db`.```v``export_1`   [PASS]
+Success. All objects are the same.
+Test case 11 - diff a database with objects of different type with the same name (with differences)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing `db.``:db` to `db.``:db`                               [PASS]
+# Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [FAIL]
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `db.``:db`.```t``export_1`
++++ `db.``:db`.```t``export_1`
+@@ -1,2 +1,2 @@
+ CREATE DEFINER=`root`@`localhost` PROCEDURE ```t``export_1`()
+-SELECT 1
++SELECT 2
+Compare failed. One or more differences found.
+Test case 12 - diff specific objects of different type with the same name (with differences)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
+# Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [FAIL]
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `db.``:db`.```t``export_1`
++++ `db.``:db`.```t``export_1`
+@@ -1,2 +1,2 @@
+ CREATE DEFINER=`root`@`localhost` PROCEDURE ```t``export_1`()
+-SELECT 1
++SELECT 2
+Compare failed. One or more differences found.

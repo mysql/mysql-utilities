@@ -11,7 +11,7 @@ Options:
                         <login-path>[:<port>][:<socket>].
   -f FORMAT, --format=FORMAT
                         the input file format in either sql (default), grid,
-                        tab, csv, or vertical format
+                        tab, csv, raw_csv or vertical format
   -i IMPORT_TYPE, --import=IMPORT_TYPE
                         control the import of either 'data' = only the table
                         data for the tables in the database list,
@@ -24,6 +24,7 @@ Options:
   -h, --no-headers      files do not contain column headers
   --dryrun              import the files and generate the statements but do
                         not execute them - useful for testing file validity
+  --table=TABLE         destination table in the form: <db>.<table>.
   --skip-blobs          do not import blob data.
   --skip-rpl            do not execute replication commands.
   --skip-gtid           do not execute the GTID_PURGED statements.
@@ -200,7 +201,7 @@ CREATE TABLE `util_test`.`t2` (
 ) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
-  `b` char(30),
+  `b` varchar(30),
   `me_blob` blob,
   PRIMARY KEY(`a`)
 ) ENGINE=InnoDB;
@@ -232,12 +233,31 @@ GRANT SELECT ON `util_test`.* TO 'joe'@'user'
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%'
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
-INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1'  AND `b` = '14 test fkeys' ;
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2'  AND `b` = '15 test fkeys' ;
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3'  AND `b` = '16 test fkeys' ;
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example'),  (NULL)
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL),  (4, NULL, NULL)
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1' AND `b` = '14 test fkeys';
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2' AND `b` = '15 test fkeys';
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3' AND `b` = '16 test fkeys';
+UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '4' AND `b` = NULL;
 INSERT INTO `util_test`.`t4` VALUES  (3, 2)
 #...done.
 Test case 19 - no data
@@ -252,7 +272,7 @@ CREATE TABLE `util_test`.`t2` (
 ) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
-  `b` char(30),
+  `b` varchar(30),
   `me_blob` blob,
   PRIMARY KEY(`a`)
 ) ENGINE=InnoDB;
@@ -284,6 +304,24 @@ GRANT SELECT ON `util_test`.* TO 'joe'@'user'
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%'
 #...done.
 Test case 20 - no blobs
 # WARNING: --skip-blobs option ignored for metadata import.
@@ -298,7 +336,7 @@ CREATE TABLE `util_test`.`t2` (
 ) ENGINE=MyISAM;
 CREATE TABLE `util_test`.`t3` (
   `a` int(11) NOT NULL,
-  `b` char(30),
+  `b` varchar(30),
   `me_blob` blob,
   PRIMARY KEY(`a`)
 ) ENGINE=InnoDB;
@@ -330,9 +368,27 @@ GRANT SELECT ON `util_test`.* TO 'joe'@'user'
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user'
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user'
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user'
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%'
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example')
-INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL)
+INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example'),  (NULL)
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL),  (4, NULL, NULL)
 INSERT INTO `util_test`.`t4` VALUES  (3, 2)
 #...done.
 Test case 21 - no messages (quiet)

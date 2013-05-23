@@ -33,6 +33,7 @@ from mysql.utilities.common.options import check_basedir_option
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.tools import check_connector_python
 
 from mysql.utilities.exception import UtilError
 
@@ -40,6 +41,10 @@ from mysql.utilities.exception import UtilError
 NAME = "MySQL Utilities - mysqlserverinfo "
 DESCRIPTION = "mysqlserverinfo - show server information"
 USAGE = "%prog --server=user:pass@host:port:socket --format=grid"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -49,7 +54,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Input format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")     
+                  "tab, csv, or vertical format", "grid")
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
@@ -94,7 +99,7 @@ check_basedir_option(parser, opt.basedir)
 if os.name == 'nt':
     parts = opt.ports.split(":")
     if len(parts) != 2:
-        print("# WARNING : %s is not a valid port range. Using default." % 
+        print("# WARNING : %s is not a valid port range. Using default." %
               opt.ports)
         opt.ports = "3306:3333"
 

@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import check_rpl
 import mutlib
 import socket
@@ -53,21 +53,25 @@ class test(check_rpl.test):
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
-        comment = "Test case 1 - master parameter invalid"
+        test_num = 1
+        comment = "Test case {0} - master parameter invalid".format(test_num)
         cmd_opts = " %s --master=root_root_root" % slave_str
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
-        comment = "Test case 2 - slave parameter invalid"
+
+        test_num += 1
+        comment = "Test case {0} - slave parameter invalid".format(test_num)
         cmd_opts = " %s --slave=root_root_root" % master_str
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                    comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 3 - same server literal specification"
+        test_num += 1
+        comment = ("Test case {0} - same server literal "
+                   "specification").format(test_num)
         same_str = self.build_connection_string(self.server2)
         cmd_opts = " --master=%s --slave=%s" % (same_str, same_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
@@ -75,29 +79,46 @@ class test(check_rpl.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        comment = "Test case 4 - error: invalid login to server (master)"
+        test_num += 1
+        comment = ("Test case {0} - error: invalid login to server "
+                   "(master)").format(test_num)
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         slave_str + " --master=nope:nada@localhost:5510",
                         comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        conn_values = self.get_connection_values(self.server1)
-        
-        comment = "Test case 5 - error: invalid login to server (slave)"
+        test_num += 1
+        comment = ("Test case {0} - error: invalid login to server "
+                   "(slave)").format(test_num)
         res = mutlib.System_test.run_test_case(self, 1, cmd_str +
                         master_str + " --slave=nope:nada@localhost:5511",
                         comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
-        comment = "Test case 6 - master and slave same host"
+
+        test_num += 1
+        comment = "Test case {0} - master and slave same host".format(test_num)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str +
                         master_str + " --slave=root:root@%s:%s" %
                         (socket.gethostname().split('.', 1)[0],
                          self.server2.port), comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
+
+        test_num += 1
+        comment = "Test case {0} - no options used".format(test_num)
+        cmd = "mysqlrplcheck.py"
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = "Test case {0} - option --slave missing".format(test_num)
+        cmd = "mysqlrplcheck.py {0}".format(master_str)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.do_replacements()
 

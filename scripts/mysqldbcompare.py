@@ -31,8 +31,11 @@ import re
 import sys
 
 from mysql.utilities.command.dbcompare import database_compare
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
+from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
+from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
+                                             PARSE_ERR_DB_PAIR_EXT,
+                                             PARSE_ERR_DB_MISSING_CMP,
+                                             PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW)
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_difftype
 from mysql.utilities.common.options import add_verbosity, check_verbosity
@@ -42,6 +45,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.tools import check_connector_python
 
 from mysql.utilities.exception import UtilError, FormatError
 
@@ -51,6 +55,10 @@ DESCRIPTION = "mysqldbcompare - compare databases for consistency"
 USAGE = "%prog --server1=user:pass@host:port:socket " + \
         "--server2=user:pass@host:port:socket db1:db2"
 PRINT_WIDTH = 75
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -72,7 +80,7 @@ parser.add_option("--server2", action="store", dest="server2",
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")  
+                  "tab, csv, or vertical format", "grid")
 
 # Add skips
 parser.add_option("--skip-object-compare", action="store_true",
@@ -109,6 +117,15 @@ parser.add_option("--disable-binary-logging", action="store_true",
                   "Prevents compare operations from being written to the "
                   "binary log.")
 
+# turn off binlog mode
+parser.add_option(
+    "--span-key-size", action="store", default=DEFAULT_SPAN_KEY_SIZE,
+    type="int", dest="span_key_size", help="changes the size of the key used"
+    " for compare table contents. A higher value can help to get more "
+    "accurate results comparing large databases, but may slow the algorithm."
+    " Default value is {0}.".format(DEFAULT_SPAN_KEY_SIZE)
+    )
+
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
@@ -142,6 +159,7 @@ options = {
     "toggle_binlog"    : opt.toggle_binlog,
     "changes-for"      : opt.changes_for,
     "reverse"          : opt.reverse,
+    "span_key_size"    : opt.span_key_size
 }
 
 # Parse server connection values
@@ -165,6 +183,15 @@ if opt.server2:
         _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
 
+# Check for arguments
+if len(args) == 0:
+    parser.error(PARSE_ERR_DB_MISSING_CMP)
+
+
+if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
+    parser.error(
+        PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW.format(
+            s_value=opt.span_key_size, default=DEFAULT_SPAN_KEY_SIZE))
 # Operations to perform:
 # 1) databases exist
 # 2) check object counts
@@ -213,21 +240,20 @@ for db in args:
     except UtilError:
         _, e, _ = sys.exc_info()
         print("ERROR: %s" % e.errmsg)
-        check_failed = True
-        if not opt.run_all_tests:
-            break
+        sys.exit(1)
+
     if not res:
         check_failed = True
 
     if check_failed and not opt.run_all_tests:
         break
-    
+
 if not opt.quiet:
     print
     if check_failed:
         print("# Database consistency check failed.")
     else:
-        sys.stdout.write("Databases are consistent")
+        sys.stdout.write("# Databases are consistent")
         if opt.no_object_check or opt.no_diff or \
            opt.no_row_count or opt.no_data:
             sys.stdout.write(" given skip options specified")
@@ -236,6 +262,5 @@ if not opt.quiet:
 
 if check_failed:
     sys.exit(1)
-    
-sys.exit()
 
+sys.exit()

@@ -34,6 +34,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity, check_verbosity
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import userclone
@@ -45,6 +46,10 @@ DESCRIPTION = "mysqluserclone - clone a MySQL user account to" + \
 USAGE = "%prog --source=user:pass@host:port:socket " \
         "--destination=user:pass@host:port:socket " \
         "joe@localhost sam:secret1@localhost"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -88,7 +93,7 @@ parser.add_option("--list", action="store_true", dest="list_users",
 # format for list
 add_format_option(parser, "display the list of users in either grid (default)"
                   ", tab, csv, or vertical format - valid only for --list "
-                  "option", "grid")     
+                  "option", "grid")
 
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)

@@ -1365,9 +1365,18 @@ class Slave(Server):
         res = self.get_status()
         if res == []:
             return None
-        state = res[0][_SLAVE_IO_RUNNING]
+        return res[0][_SLAVE_IO_RUNNING]
 
-        return state
+
+    def get_sql_running(self):
+        """Get the slave's SQL thread status
+
+        Returns SQL_THREAD state or None if not acting as slave
+        """
+        res = self.get_status()
+        if res == []:
+            return None
+        return res[0][_SLAVE_SQL_RUNNING]
 
 
     def get_delay(self):
@@ -1559,11 +1568,23 @@ class Slave(Server):
         slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
         gtids = self.exec_query("SELECT GTID_SUBTRACT('%s','%s')" %
                                (master_gtids[0][0], slave_gtids))[0]
-        if len(gtids) == 1 and len(gtids[0]) == 0:
-            gtid_behind = 0
-        else:
-            gtids = gtids[0].split("\n")
-            gtid_behind = len(gtids)
+        # Init gtid_behind count (if no GTIDs behind then 0 is returned)
+        gtid_behind = 0
+        # Check if there are GTIDs behind
+        # (i.e. string with GTIDs set is not equal to '')
+        if gtids[0]:
+            gtids_list = gtids[0].split("\n")
+            # Extract the interval for each GTID and compute its length
+            for gtid_item in gtids_list:
+                interval_str = gtid_item.split(':')[-1]
+                interval = interval_str.split('-')
+                if len(interval) == 1:
+                    # Interval has only one element
+                    gtid_behind += 1
+                else:
+                    # Compute interval size and sum to total of GTIDs behind
+                    num_gtids = int(interval[1]) - int(interval[0]) + 1
+                    gtid_behind += num_gtids
         return gtid_behind
 
 

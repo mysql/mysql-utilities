@@ -217,8 +217,27 @@ class test(rpl_admin.test):
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
 
+        # Reset the topology to its original state
+        self.reset_topology()
+
+        # Test if the correct number of transactions behind is displayed.
+        # STOP the slave (not to catch up with the master.
+        self.server2.exec_query("STOP SLAVE SQL_THREAD")
+        # Add 3 transactions to the master.
+        self.server1.exec_query("CREATE DATABASE `trx_behind`")
+        self.server1.exec_query("CREATE TABLE `trx_behind`.`t1` (x char(30))")
+        self.server1.exec_query("DROP DATABASE `trx_behind`")
+
+        comment = ("Test case {0} - HEALTH with some transactions "
+                   "behind").format(test_num)
+        cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} health "
+                   "--format=VERTICAL -vvv").format(master_conn, slave1_conn)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Now we return the topology to its original state for other tests
-        rpl_admin.test.reset_topology(self)
+        self.reset_topology()
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
@@ -226,6 +245,18 @@ class test(rpl_admin.test):
 
         self.replace_result("#  - For slave 'localhost",
                             "#  - For slave 'localhost@PORT?': XXXXX\n")
+
+        # Mask data from verbose health report (except Trans_Behind)
+        self.replace_result("         version: ",
+                            "         version: XX.XX.XX\n")
+        self.replace_result(" master_log_file: ",
+                            " master_log_file: XXXXX.XXXX\n")
+        self.replace_result("  master_log_pos: ",
+                            "  master_log_pos: XXXX\n")
+        self.replace_result("     Secs_Behind: ",
+                            "     Secs_Behind: X\n")
+        self.replace_result(" Remaining_Delay: ",
+                            " Remaining_Delay: XXX\n")
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.

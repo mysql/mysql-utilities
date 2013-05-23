@@ -236,6 +236,24 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        num_test += 1
+        comment = ("Test case {0} - Search entries of "
+                   "multi-line log".format(num_test))
+        audit_log_name = os.path.normpath("./std_data/multi.log")
+        cmd_opts = "--format=csv --query=CREATE {0}".format(audit_log_name)
+        res = self.run_test_case(0, " ".join([cmd_base, cmd_opts]), comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        num_test += 1
+        comment = ("Test case {0} - Search entries of "
+                   "single line log".format(num_test))
+        audit_log_name = os.path.normpath("./std_data/single.log")
+        cmd_opts = "--format=csv --query=CREATE {0}".format(audit_log_name)
+        res = self.run_test_case(0, " ".join([cmd_base, cmd_opts]), comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True

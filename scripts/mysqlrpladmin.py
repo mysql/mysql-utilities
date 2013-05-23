@@ -32,6 +32,7 @@ import sys
 
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
 from mysql.utilities.common.options import add_format_option, add_verbosity
 from mysql.utilities.common.options import add_failover_options, add_rpl_user
 from mysql.utilities.common.options import check_server_lists
@@ -47,6 +48,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              SLAVES, CANDIDATES)
 from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import Server, check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
@@ -65,6 +67,10 @@ DESCRIPTION = "mysqlrpladmin - administration utility for MySQL replication"
 USAGE = "%prog --slaves=root@localhost:3306 <command>"
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
+
 # Setup the command parser
 parser = MyParser(
     version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
@@ -73,7 +79,10 @@ parser = MyParser(
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
     epilog=get_valid_rpl_command_text())
-parser.add_option("--help", action="help")
+
+# Default option to provide help information
+parser.add_option("--help", action="help", help="display this help message "
+                  "and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)
@@ -276,24 +285,25 @@ if master_val:
 
 # Create dictionary of options
 options = {
-    'new_master'   : new_master_val,
-    'candidates'   : candidates_val,
-    'ping'         : 3 if opt.ping is None else opt.ping,
-    'format'       : opt.format,
-    'verbosity'    : 0 if opt.verbosity is None else opt.verbosity,
-    'before'       : opt.exec_before,
-    'after'        : opt.exec_after,
-    'force'        : opt.force,
-    'max_position' : opt.max_position,
-    'max_delay'    : opt.max_delay,
-    'discover'     : opt.discover,
-    'timeout'      : int(opt.timeout),
-    'demote'       : opt.demote,
-    'quiet'        : opt.quiet,
-    'logging'      : opt.log_file is not None,
-    'log_file'     : opt.log_file,
-    'no_health'    : opt.no_health,
-    'rpl_user'     : opt.rpl_user,
+    'new_master'       : new_master_val,
+    'candidates'       : candidates_val,
+    'ping'             : 3 if opt.ping is None else opt.ping,
+    'format'           : opt.format,
+    'verbosity'        : 0 if opt.verbosity is None else opt.verbosity,
+    'before'           : opt.exec_before,
+    'after'            : opt.exec_after,
+    'force'            : opt.force,
+    'max_position'     : opt.max_position,
+    'max_delay'        : opt.max_delay,
+    'discover'         : opt.discover,
+    'timeout'          : int(opt.timeout),
+    'demote'           : opt.demote,
+    'quiet'            : opt.quiet,
+    'logging'          : opt.log_file is not None,
+    'log_file'         : opt.log_file,
+    'no_health'        : opt.no_health,
+    'rpl_user'         : opt.rpl_user,
+    'script_threshold' : opt.script_threshold,
 }
 
 # If command = HEALTH, turn on --force
@@ -303,6 +313,10 @@ if command == 'health' or command == 'gtid':
 # Purge log file of old data
 if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
     parser.error("Error purging log file.")
+
+# Warn user about script threshold checking.
+if opt.script_threshold:
+    print(SCRIPT_THRESHOLD_WARNING)
 
 # Setup log file
 try:

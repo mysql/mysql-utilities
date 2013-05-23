@@ -1,0 +1,261 @@
+Test case 1 - check database with No differences 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases world on server1 and world on server2
+#
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 3
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     City                                    pass    pass    pass   
+
+# Definition for object world.City:
+CREATE TABLE `City` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` char(35) NOT NULL DEFAULT '',
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `District` char(20) NOT NULL DEFAULT '',
+  `Population` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `city_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4080 DEFAULT CHARSET=latin1
+
+# Definition for object world.City:
+CREATE TABLE `City` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` char(35) NOT NULL DEFAULT '',
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `District` char(20) NOT NULL DEFAULT '',
+  `Population` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `city_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4080 DEFAULT CHARSET=latin1
+
+# TABLE     Country                                 pass    pass    pass   
+
+# Definition for object world.Country:
+CREATE TABLE `Country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` float(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint(6) DEFAULT NULL,
+  `Population` int(11) NOT NULL DEFAULT '0',
+  `LifeExpectancy` float(3,1) DEFAULT NULL,
+  `GNP` float(10,2) DEFAULT NULL,
+  `GNPOld` float(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int(11) DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object world.Country:
+CREATE TABLE `Country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` float(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint(6) DEFAULT NULL,
+  `Population` int(11) NOT NULL DEFAULT '0',
+  `LifeExpectancy` float(3,1) DEFAULT NULL,
+  `GNP` float(10,2) DEFAULT NULL,
+  `GNPOld` float(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int(11) DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# TABLE     CountryLanguage                         pass    pass    pass   
+
+# Definition for object world.CountryLanguage:
+CREATE TABLE `CountryLanguage` (
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `Language` char(30) NOT NULL DEFAULT '',
+  `IsOfficial` enum('T','F') NOT NULL DEFAULT 'F',
+  `Percentage` float(4,1) NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`CountryCode`,`Language`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `countryLanguage_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object world.CountryLanguage:
+CREATE TABLE `CountryLanguage` (
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `Language` char(30) NOT NULL DEFAULT '',
+  `IsOfficial` enum('T','F') NOT NULL DEFAULT 'F',
+  `Percentage` float(4,1) NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`CountryCode`,`Language`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `countryLanguage_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+
+# Databases are consistent.
+#
+# ...done
+Test case 2 - check database with known differences 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases world on server1 and world on server2
+#
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 3
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     City                                    pass    FAIL    FAIL   
+
+# Definition for object world.City:
+CREATE TABLE `City` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` char(35) NOT NULL DEFAULT '',
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `District` char(20) NOT NULL DEFAULT '',
+  `Population` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `city_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4080 DEFAULT CHARSET=latin1
+
+# Definition for object world.City:
+CREATE TABLE `City` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` char(35) NOT NULL DEFAULT '',
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `District` char(20) NOT NULL DEFAULT '',
+  `Population` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `city_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4080 DEFAULT CHARSET=latin1
+
+#
+# Row counts are not the same among `world`.`City` and `world`.`City`.
+#
+# Transformation for --changes-for=server2:
+#
+
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4059', 'Cary', 'USA', 'North Carolina', '91213');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4066', 'Charleston', 'USA', 'South Carolina', '89063');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4061', 'Fall River', 'USA', 'Massachusetts', '90555');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4069', 'Bulawayo', 'ZWE', 'Bulawayo', '621742');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4078', 'Nablus', 'PSE', 'Nablus', '100231');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4056', 'San Mateo', 'USA', 'California', '91799');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4073', 'Gweru', 'ZWE', 'Midlands', '128037');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4055', 'Arden-Arcade', 'USA', 'California', '92040');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4070', 'Chitungwiza', 'ZWE', 'Harare', '274912');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4072', 'Mutare', 'ZWE', 'Manicaland', '131367');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4079', 'Rafah', 'PSE', 'Rafah', '92020');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4051', 'Billings', 'USA', 'Montana', '92988');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4062', 'Kenosha', 'USA', 'Wisconsin', '89447');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4063', 'Elgin', 'USA', 'Illinois', '89408');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4064', 'Odessa', 'USA', 'Texas', '89293');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4075', 'Khan Yunis', 'PSE', 'Khan Yunis', '123175');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4077', 'Jabaliya', 'PSE', 'North Gaza', '113901');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4054', 'Fairfield', 'USA', 'California', '92256');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4060', 'Santa Monica', 'USA', 'California', '91084');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4052', 'Compton', 'USA', 'California', '92864');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4065', 'Carson', 'USA', 'California', '89089');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4053', 'Gainesville', 'USA', 'Florida', '92291');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4058', 'Boulder', 'USA', 'Colorado', '91238');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4071', 'Mount Darwin', 'ZWE', 'Harare', '164362');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4076', 'Hebron', 'PSE', 'Hebron', '119401');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4067', 'Charlotte Amalie', 'VIR', 'St Thomas', '13000');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4057', 'Visalia', 'USA', 'California', '91762');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4074', 'Gaza', 'PSE', 'Gaza', '353632');
+INSERT INTO `world`.`City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES('4068', 'Harare', 'ZWE', 'Harare', '1410000');
+
+
+# TABLE     Country                                 pass    pass    pass   
+
+# Definition for object world.Country:
+CREATE TABLE `Country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` float(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint(6) DEFAULT NULL,
+  `Population` int(11) NOT NULL DEFAULT '0',
+  `LifeExpectancy` float(3,1) DEFAULT NULL,
+  `GNP` float(10,2) DEFAULT NULL,
+  `GNPOld` float(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int(11) DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object world.Country:
+CREATE TABLE `Country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` float(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint(6) DEFAULT NULL,
+  `Population` int(11) NOT NULL DEFAULT '0',
+  `LifeExpectancy` float(3,1) DEFAULT NULL,
+  `GNP` float(10,2) DEFAULT NULL,
+  `GNPOld` float(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int(11) DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# TABLE     CountryLanguage                         pass    pass    pass   
+
+# Definition for object world.CountryLanguage:
+CREATE TABLE `CountryLanguage` (
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `Language` char(30) NOT NULL DEFAULT '',
+  `IsOfficial` enum('T','F') NOT NULL DEFAULT 'F',
+  `Percentage` float(4,1) NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`CountryCode`,`Language`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `countryLanguage_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object world.CountryLanguage:
+CREATE TABLE `CountryLanguage` (
+  `CountryCode` char(3) NOT NULL DEFAULT '',
+  `Language` char(30) NOT NULL DEFAULT '',
+  `IsOfficial` enum('T','F') NOT NULL DEFAULT 'F',
+  `Percentage` float(4,1) NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`CountryCode`,`Language`),
+  KEY `CountryCode` (`CountryCode`),
+  CONSTRAINT `countryLanguage_ibfk_1` FOREIGN KEY (`CountryCode`) REFERENCES `Country` (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
+#
+# ...done

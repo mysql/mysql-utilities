@@ -29,6 +29,11 @@ from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.options import add_regexp
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.tools import check_connector_python
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 # Setup the command parser and setup server, help
 parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -46,7 +51,7 @@ def quote(string):
 
 # Add some more advanced parsing here to handle types better.
 parser.add_option(
-    '--search-objects', '--object-types', 
+    '--search-objects', '--object-types',
     dest="object_types", default=','.join(OBJECT_TYPES),
     help="the object type to search in: a comma-separated list"
     " of one or more of: " + ', '.join(map(quote, OBJECT_TYPES)))
@@ -69,7 +74,7 @@ parser.add_option(
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")     
+                  "tab, csv, or vertical format", "grid")
 
 options, args = parser.parse_args()
 
@@ -92,7 +97,7 @@ if not options.pattern:
 if options.print_sql:
     if options.server is not None and len(options.server) > 0:
         parser.error(_NO_SERVERS_ALLOWED_MSG)
-else:        
+else:
     if options.server is None or len(options.server) == 0:
         parser.error(_AT_LEAST_ONE_SERVER_MSG)
 

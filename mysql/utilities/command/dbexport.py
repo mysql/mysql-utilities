@@ -136,8 +136,6 @@ def export_metadata(source, src_val, db_list, options):
                     else:
                         create_str = "GRANT %s ON %s.* TO %s;" % \
                                      (dbobj[1][1], q_db_name, dbobj[1][0])
-                    if create_str.find("%"):
-                        create_str = re.sub("%", "%%", create_str)
                     print create_str
                 else:
                     if not quiet:
@@ -231,7 +229,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
     tbl_name = cur_table.tbl_name
     q_db_name = cur_table.q_db_name
     full_name = cur_table.q_table
-    list_options = {}
+    list_options = {'none_to_null': True}
     # if outfile is not set, use stdout.
     if outfile is None:
         outfile = sys.stdout # default file handle
@@ -270,11 +268,11 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
                 for blob_row in blob_rows:
                     outfile.write(blob_row + "\n")
 
-    # Cannot use print_list here becasue we must manipulate
+    # Cannot use print_list here because we must manipulate
     # the behavior of format_tabular_list
     elif format == "vertical":
         format_vertical_list(outfile, cur_table.get_col_names(),
-                             data_rows)
+                             data_rows, list_options)
     elif format == "tab":
         list_options['print_header'] = first
         list_options['separator'] = '\t'
@@ -289,7 +287,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
                             data_rows, list_options)
     else:  # default to table format - header is always printed
         format_tabular_list(outfile, cur_table.get_col_names(),
-                            data_rows)
+                            data_rows, list_options)
 
 
 def export_data(source, src_val, db_list, options):

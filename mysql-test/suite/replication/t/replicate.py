@@ -73,9 +73,9 @@ class test(mutlib.System_test):
             
         return True
     
-    def run_test_case(self, slave, master, s_id,
-                      comment, options=None, save_for_compare=False,
-                      expected_result=0, save_results=True):
+    def run_rpl_test(self, slave, master, s_id,
+                     comment, options=None, save_for_compare=False,
+                     expected_result=0, save_results=True):
 
         master_str = "--master=%s" % self.build_connection_string(master)
         slave_str = " --slave=%s" % self.build_connection_string(slave)
@@ -118,8 +118,8 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
         
         comment = "Test case 1 - replicate server1 as slave of server2 "
-        res = self.run_test_case(self.server1, self.server2, self.s1_serverid,
-                                 comment, None)
+        res = self.run_rpl_test(self.server1, self.server2, self.s1_serverid,
+                                comment, None)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         
@@ -129,8 +129,8 @@ class test(mutlib.System_test):
             raise MUTLibError("%s: Failed to stop slave." % comment)
 
         comment = "Test case 2 - replicate server2 as slave of server1 "
-        res = self.run_test_case(self.server2, self.server1, self.s2_serverid,
-                                 comment, None)
+        res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
+                                comment, None)
         if not res:
             raise MUTLibError("%s: failed" % comment)
         

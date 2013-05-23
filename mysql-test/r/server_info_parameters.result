@@ -60,7 +60,7 @@ Test case 6 -  --format=VERTICAL --no-headers
  binary_log_pos: XXXX
       relay_log: XXXX
   relay_log_pos: XXXX
-1 rows.
+1 row.
 #...done.
 Test case 7 - verbose run against online server
 # Source on localhost: ... connected.
@@ -75,7 +75,7 @@ Test case 7 - verbose run against online server
  binary_log_pos: XXXX
       relay_log: XXXX
   relay_log_pos: XXXX
-1 rows.
+1 row.
 #...done.
 Test case 8 - show servers
 # 
@@ -93,7 +93,7 @@ Test case 8 - show servers
  binary_log_pos: XXXX
       relay_log: XXXX
   relay_log_pos: XXXX
-1 rows.
+1 row.
 #...done.
 Test case 9 - run against offline server
 # Server is offline.
@@ -112,5 +112,5 @@ Test case 9 - run against offline server
  binary_log_pos: XXXX
       relay_log: XXXX
   relay_log_pos: XXXX
-1 rows.
+1 row.
 #...done.

@@ -51,6 +51,7 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 # Stopping slaves.
 # Performing STOP on all slaves.
 # Switching slaves to new master.
+# Disconnecting new master as slave.
 # Starting slaves.
 # Performing START on all slaves.
 # Checking slaves for errors.

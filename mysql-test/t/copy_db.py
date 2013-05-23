@@ -65,6 +65,16 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file %s: %s"
                               % (data_file_backticks, err.errmsg))
 
+        # Create database with test VIEWS.
+        data_file_views = os.path.normpath("./std_data/db_copy_views.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_views, self.debug)
+        except UtilError as err:
+            raise MUTLibError(
+                "Failed to read commands from file "
+                "{0}: {1}".format(data_file_views, err.errmsg)
+            )
+
         return True
 
     
@@ -120,6 +130,15 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("%s: failed" % comment)
 
+        comment = "Test case 6 - copy a sample database with views"
+        cmd = "mysqldbcopy.py {0} {1} {2}".format(
+            from_conn, to_conn, "views_test:views_test_clone"
+        )
+        res = self.exec_util(cmd, self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTLibError("{0}: failed".format(comment))
+
         return True
   
     def get_result(self):
@@ -153,6 +172,13 @@ class test(mutlib.System_test):
                     return (True, msg)
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
+            query = "SHOW DATABASES LIKE 'views_test_clone'"
+            try:
+                res = self.server2.exec_query(query)
+                if res and res[0][0] == 'views_test_clone':
+                    return (True, msg)
+            except UtilDBError as err:
+                raise MUTLibError(err.errmsg)
         return (False, ("Result failure.\n", "Database copy not found.\n"))
     
     def record(self):
@@ -183,6 +209,10 @@ class test(mutlib.System_test):
         except:
             res = res and False
         try:
+            self.drop_db(self.server1, 'views_test')
+        except:
+            res = res and False
+        try:
             self.drop_db(self.server2, "util_test")
         except:
             res = res and False
@@ -199,11 +229,23 @@ class test(mutlib.System_test):
         except:
             res = res and False
         try:
+            self.drop_db(self.server2, "views_test_clone")
+        except:
+            res = res and False
+        try:
             self.server1.exec_query("DROP USER 'joe'@'user'")
         except:
             pass
         try:
+            self.server1.exec_query("DROP USER 'joe_wildcard'@'%'")
+        except:
+            pass
+        try:
             self.server2.exec_query("DROP USER 'joe'@'user'")
+        except:
+            pass
+        try:
+            self.server2.exec_query("DROP USER 'joe_wildcard'@'%'")
         except:
             pass
         return res

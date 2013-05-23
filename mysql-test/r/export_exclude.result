@@ -5,7 +5,7 @@ Test case 1 - exclude by name
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 # VIEWS in util_test: (none found)
 # TRIGGERS in util_test:
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,latin1,latin1_swedish_ci,latin1_swedish_ci
@@ -21,7 +21,7 @@ Test case 2 - exclude by regex
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 # VIEWS in util_test:
 `util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,latin1,latin1_swedish_ci
 # TRIGGERS in util_test:
@@ -37,7 +37,7 @@ Test case 3 - exclude by name and regex
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
-`util_test`,`t3`,InnoDB,2,`b`,char(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
 # VIEWS in util_test: (none found)
 # TRIGGERS in util_test: (none found)
 # PROCEDURES in util_test: (none found)

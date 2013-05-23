@@ -36,6 +36,7 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -43,6 +44,10 @@ from mysql.utilities.exception import UtilError
 NAME = "MySQL Utilities - mysqldiskusage "
 DESCRIPTION = "mysqldiskusage - show disk usage for databases"
 USAGE = "%prog --server=user:pass@host:port:socket db1 --all"
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -63,7 +68,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
-                  "tab, csv, or vertical format", "grid")     
+                  "tab, csv, or vertical format", "grid")
 
 # Header row
 parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",

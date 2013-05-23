@@ -207,17 +207,22 @@ class Utilities(object):
         """
         # Get the --help output for the utility
         command = util_name + ".py"
-        if not os.path.exists(os.path.join(util_path, command)):
+        utility_path = os.path.join(util_path, command)
+        if not os.path.exists(utility_path):
             command = file_name
-        cmd = []
-        if not file_ext == '.exe':
-            cmd.append('python ')
+            
+        # Check for running against .exe
+        if utility_path.endswith(".exe"):
+            cmd = []
+        # Not using .exe
+        else:
+            cmd = ['python']
 
-        cmd += ['"', os.path.join(util_path, command), '"', " --help"]
+        cmd.extend([utility_path, " --help"])
 
         # Hide errors from stderr output
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen("".join(cmd), shell=True,
+        proc = subprocess.Popen(" ".join(cmd), shell=True,
                                 stdout=subprocess.PIPE, stderr=out)
 
         stdout_temp = proc.communicate()[0]
@@ -229,6 +234,15 @@ class Utilities(object):
         option = None
 
         res = self.program_usage.match(stdout_temp.replace("\r", ""))
+        if not res:
+            print("WARNING: {0} failed to read options. This utility will "
+                  "not be shown in 'help utilities' and cannot be accessed "
+                  "from the console.".format(util_name))
+            if "ERROR" in stdout_temp:
+                print(stdout_temp)
+            else:
+                print("UNKNOWN. To diagnose, exit mysqluc and attempt the "
+                      "command: {0} --help".format(util_name))
 
         Options = ""
         if not res:

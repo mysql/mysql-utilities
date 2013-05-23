@@ -20,11 +20,20 @@ This file contains the diff commands for finding the difference among
 the definitions of two databases.
 """
 
+import re
+
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.dbcompare import diff_objects
+from mysql.utilities.common.dbcompare import get_common_objects
+from mysql.utilities.common.dbcompare import server_connect
+from mysql.utilities.exception import UtilDBError
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import quote_with_backticks
 
 
-def object_diff(server1_val, server2_val, object1, object2, options):
+def object_diff(server1_val, server2_val, object1, object2, options,
+                object_type=None):
     """diff the definition of two objects
     
     Find the difference among two object definitions.
@@ -39,17 +48,49 @@ def object_diff(server1_val, server2_val, object1, object2, options):
     object2[in]        the second object in the compare in the form: (db.name)
     options[in]        a dictionary containing the options for the operation:
                        (quiet, verbosity, difftype)
+    object_type[in]    type of the objects to be compared (e.g., TABLE,
+                       PROCEDURE, etc.). By default None (not defined).
 
     Returns None = objects are the same, diff[] = tables differ
     """
-    from mysql.utilities.common.dbcompare import diff_objects, server_connect
-
     server1, server2 = server_connect(server1_val, server2_val,
                                       object1, object2, options)
-    result = diff_objects(server1, server2, object1, object2, options)
-    
-    return result
 
+    # Get the object type if unknown considering that objects of different
+    # types can be found with the same name.
+    if not object_type:
+        #Get object types of object1
+        regexp_obj = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
+        m_obj = regexp_obj.match(object1)
+        db_name, obj_name = m_obj.groups()
+        db = Database(server1, db_name, options)
+        obj1_types = db.get_object_type(obj_name)
+        if not obj1_types:
+            raise UtilDBError("The object {0} does not exist.".format(object1))
+
+        # Get object types of object2
+        m_obj = regexp_obj.match(object2)
+        db_name, obj_name = m_obj.groups()
+        db = Database(server2, db_name, options)
+        obj2_types = db.get_object_type(obj_name)
+        if not obj2_types:
+            raise UtilDBError("The object {0} does not exist.".format(object2))
+
+        # Merge types found for both objects
+        obj_types = set(obj1_types + obj2_types)
+
+        # Diff objects considering all types found
+        result = []
+        for obj_type in obj_types:
+            res = diff_objects(server1, server2, object1, object2, options,
+                               obj_type)
+            if res:
+                result.append(res)
+        return result if len(result) > 0 else None
+    else:
+        # Diff objects of known type
+        return diff_objects(server1, server2, object1, object2, options,
+                            object_type)
 
 def database_diff(server1_val, server2_val, db1, db2, options):
     """Find differences among objects from two databases.
@@ -75,9 +116,6 @@ def database_diff(server1_val, server2_val, db1, db2, options):
 
     Returns bool True if all object match, False if partial match
     """
-    from mysql.utilities.common.dbcompare import get_common_objects
-    from mysql.utilities.common.dbcompare import server_connect
-    
     force = options.get("force", False)
 
     server1, server2 = server_connect(server1_val, server2_val,
@@ -89,7 +127,7 @@ def database_diff(server1_val, server2_val, db1, db2, options):
         return False
     
     # Do the diff for the databases themselves
-    result = object_diff(server1, server2, db1, db2, options)
+    result = object_diff(server1, server2, db1, db2, options, 'DATABASE')
     if result is not None:
         success = False
         if not force:
@@ -104,7 +142,8 @@ def database_diff(server1_val, server2_val, db1, db2, options):
                         if is_quoted_with_backticks(db2) else item[1][0]
         object1 = "%s.%s" % (db1, obj_name1)
         object2 = "%s.%s" % (db2, obj_name2)
-        result = object_diff(server1, server2, object1, object2, options)
+        result = object_diff(server1, server2, object1, object2, options,
+                             item[0])
         if result is not None:
             success = False
             if not force:

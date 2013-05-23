@@ -289,7 +289,8 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
 def check_python_version(min_version=PYTHON_MIN_VERSION,
                          max_version=PYTHON_MAX_VERSION,
                          raise_exception_on_fail=False,
-                         name=None):
+                         name=None, print_on_fail=True,
+                         exit_on_fail=True):
     """Check the Python version compatibility.
 
     By default this method uses constants to define the minimum and maximum
@@ -307,6 +308,10 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
     name[in]                      String for a custom name, if not provided
                                   will get the module name from where this
                                   function was called.
+    print_on_fail[in]             If True, print error else do not print
+                                  error on failure.
+    exit_on_fail[in]              If True, issue exit() else do not exit()
+                                  on failure.
     """
 
     # Only use the fields: major, minor and micro
@@ -327,7 +332,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             mod = inspect.getmodule(frm[0])
             mod_name = os.path.splitext(
                 os.path.basename(mod.__file__))[0]
-            name = '%s utility' % mod_name
+            name = '{0} utility'.format(mod_name)
 
         # Build the error message
         if max_version:
@@ -352,8 +357,13 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
         if raise_exception_on_fail:
             raise UtilError(error_msg)
 
-        print('ERROR: %s' % error_msg)
-        sys.exit(1)
+        if print_on_fail:
+            print('ERROR: {0}'.format(error_msg))
+
+        if exit_on_fail:
+            sys.exit(1)
+
+    return is_compat
 
 
 def check_port_in_use(host, port):
@@ -470,3 +480,22 @@ def decode(orig_str):
         new_parts.append(chr(int(part[0:4], 16)))
         new_parts.append(part[4:])
     return "".join(new_parts)
+
+
+def check_connector_python(print_error=True):
+    """ Check to see if Connector/Python is installed and accessible
+
+    print_error[in]     if True, print the error. Default True
+
+    Prints error and returns False on failure to find connector.
+    """
+    try:
+        import mysql.connector
+    except ImportError:
+        if print_error:
+            print("ERROR: The MySQL Connector/Python module was not found. "
+                  "MySQL Utilities requires the connector to be installed. "
+                  "Please check your paths or download and install the "
+                  "Connector/Python from http://dev.mysql.com.")
+        return False
+    return True

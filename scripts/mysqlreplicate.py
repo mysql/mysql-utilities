@@ -31,9 +31,12 @@ import sys
 
 from mysql.utilities.command.setup_rpl import setup_replication
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
+                                             WARN_OPT_USING_DEFAULT)
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity, add_rpl_user
 from mysql.utilities.common.server import check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
 
@@ -43,6 +46,10 @@ DESCRIPTION = "mysqlreplicate - establish replication with a master"
 USAGE = "%prog --master=root@localhost:3306 --slave=root@localhost:3310 " \
         "--rpl-user=rpl:passwd "
 
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
+
 # Setup the command parser
 parser = setup_common_options(os.path.basename(sys.argv[0]),
                               DESCRIPTION, USAGE, True, False)
@@ -50,16 +57,16 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Setup utility-specific options:
 
 # Connection information for the source server
-parser.add_option("--master", action="store", dest="master",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for master server in " + \
+parser.add_option('--master', action="store", dest="master",
+                  type="string", default=None,
+                  help="connection information for master server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>] or"
                   " <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
-parser.add_option("--slave", action="store", dest="slave",
-                  type = "string", default=None,
-                  help="connection information for slave server in " + \
+parser.add_option('--slave', action="store", dest="slave",
+                  type="string", default=None,
+                  help="connection information for slave server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>] or"
                   " <login-path>[:<port>][:<socket>].")
 
@@ -73,8 +80,8 @@ parser.add_option("-p", "--pedantic", action="store_true", default=False,
 
 # Test replication option
 parser.add_option("--test-db", action="store", dest="test_db",
-                  type = "string", help="database name to use in testing "
-                         " replication setup (optional)")
+                  type="string", help="database name to use in testing "
+                  "replication setup (optional)")
 
 # Add master log file option
 parser.add_option("--master-log-file", action="store", dest="master_log_file",
@@ -98,6 +105,17 @@ add_verbosity(parser)
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
+
+# option --master is required (mandatory)
+if not opt.master:
+    default_val = 'root@localhost:3306'
+    print(WARN_OPT_USING_DEFAULT.format(default=default_val, opt='--master'))
+    # Print the WARNING to force determinism if a parser error occurs.
+    sys.stdout.flush()
+
+# option --slave is required (mandatory)
+if not opt.slave:
+    parser.error(PARSE_ERR_OPTS_REQ.format(opt='--slave'))
 
 # Parse source connection values
 try:
@@ -123,17 +141,17 @@ except UtilError:
 # Check hostname alias
 if check_hostname_alias(m_values, s_values):
     parser.error("The master and slave are the same host and port.")
-    
+
 # Check required --master-log-file for --master-log-pos
 if (opt.master_log_pos >= 0 and opt.master_log_file is None):
     parser.error("You must specify a master log file to use the master "
                  "log file position option.")
-    
+
 if ((opt.master_log_pos >= 0) or (opt.master_log_file is not None)) and \
    opt.from_beginning:
     parser.error("The --start-from-beginning option is not valid in "
                  "combination with --master-log-file or --master-log-pos.")
-    
+
 # Create dictionary of options
 options = {
     'verbosity'       : opt.verbosity,

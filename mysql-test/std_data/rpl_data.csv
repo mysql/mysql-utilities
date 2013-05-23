@@ -1,0 +1,16 @@
+# Source on localhost: ... connected.
+# WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to generate the GTID statement, use the --skip-gtid option. To export all databases, use the --all and --export=both options.
+-- SET @MYSQLUTILS_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+-- SET @@SESSION.SQL_LOG_BIN = 0;
+-- SET @@GLOBAL.GTID_PURGED = '75272e49-564c-11e2-b043-00144f40b86c:1-229';
+# Exporting metadata from oltp
+# TABLES in oltp: (none found)
+# VIEWS in oltp: (none found)
+# TRIGGERS in oltp: (none found)
+# PROCEDURES in oltp: (none found)
+# FUNCTIONS in oltp: (none found)
+# EVENTS in oltp: (none found)
+#...done.
+-- SET @@SESSION.SQL_LOG_BIN = @MYSQLUTILS_TEMP_LOG_BIN;
+
+
