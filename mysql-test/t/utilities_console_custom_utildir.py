@@ -37,8 +37,7 @@ class test(utilities_console_base.test):
         self.tmp_dir = "tmp_scripts"
         self.util_test = 'mysqlreplicate'
         self.util_file = self.util_test
-        if os.name == "nt":
-            self.util_file = self.util_test + ".py"
+        self.util_file = self.util_test + ".py"
         if not os.path.isdir(self.tmp_dir):
             os.makedirs(self.tmp_dir)
         shutil.copyfile(os.path.join(self.utildir, self.util_test + ".py"),
@@ -86,8 +85,8 @@ class test(utilities_console_base.test):
 
         test_num += 1
         comment = "Show help utilities with custom utildir"
-        cmd_str = '%s/mysqluc.py --width=77' % self.utildir
-        cmd_str += ' --utildir=%s' % self.tmp_dir + ' -e "%s"'
+        cmd_str = 'mysqluc.py --width=77'
+        cmd_str += ' --utildir=%s' % self.tmp_dir + ' --execute="%s"'
         cmd = "help utilities"
         self.do_test(test_num, comment, cmd_str % cmd)
 
