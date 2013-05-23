@@ -1577,6 +1577,7 @@ class Slave(Server):
             # Extract the interval for each GTID and compute its length
             for gtid_item in gtids_list:
                 interval_str = gtid_item.split(':')[-1]
+                interval_str = interval_str.rstrip(', ')
                 interval = interval_str.split('-')
                 if len(interval) == 1:
                     # Interval has only one element
