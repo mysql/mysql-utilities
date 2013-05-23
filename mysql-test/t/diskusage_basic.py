@@ -56,12 +56,12 @@ class test(mutlib.System_test):
             self.s1_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
                                                 "diskusage_all",
-                                                ' --mysqld="--log-bin=mysql-'
+                                                ' --mysqld=--log-bin=mysql-'
                                                 'bin --general-log '
                                                 '--slow-query-log '
-                                                '--slow-query-log-file=%s '
-                                                '--general-log-file=%s '
-                                                ' --log-error=%s"' %
+                                                '--slow-query-log-file="%s" '
+                                                '--general-log-file="%s" '
+                                                ' --log-error="%s"' %
                                                 (self.gen_log, self.slow_log,
                                                  self.error_log))
             if not res:

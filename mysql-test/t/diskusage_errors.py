@@ -42,9 +42,9 @@ class test(diskusage_basic.test):
                                             self.port1,
                                             self.servers.get_next_id(),
                                             "root", "diskusage_none",
-                                            ' --mysqld="--skip-innodb '
+                                            '--skip-innodb '
                                             '--default-storage-engine=MyISAM '
-                                            ' --log-error=%s"' % self.error_log)
+                                            ' --log-error="%s"' % self.error_log)
         self.server1 = res[0]
         if not self.server1:
             raise MUTLibError("%s: Failed to create a new slave." % comment)
