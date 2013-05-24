@@ -204,7 +204,7 @@ class Utilities(object):
             cmd = []
         # Not using .exe
         else:
-            cmd = ['python']
+            cmd = [sys.executable]
 
         cmd.extend([utility_path, " --help"])
 
