@@ -56,6 +56,14 @@ else:
         'sdist_rpm': SourceRPM,
     })
 
+try:
+    from support.dist_deb import BuildDistDebian
+except ImportError:
+    pass
+else:
+    COMMANDS['cmdclass'].update({
+        'bdist_deb': BuildDistDebian
+    })
 ARGS = {
 }
 

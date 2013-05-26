@@ -1,0 +1,45 @@
+#!/bin/sh -e
+
+#DEBHELPER#
+# postinst script for mysql-utilities
+
+echo "postinst script for mysql-utilities"
+PYVERS=`pyversions -s`
+
+echo $PYVERS
+for PYVER in $(pyversions -s)
+do
+	echo "found"
+	echo $PYVER
+	PYSHARED="/usr/share/pyshared"
+	PYDIST=`$PYVER -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())"`
+	echo $PYDIST
+	MYSQLINIT="/mysql/__init__.py"
+	if [ -d $PYSHARED/mysql ];
+	then	
+		if [ ! -f $PYSHARED$MYSQLINIT ];
+		then
+			#ls $PYSHARED$MYSQLINIT
+			touch $PYSHARED$MYSQLINIT
+			ls $PYSHARED$MYSQLINIT -l
+		fi
+		if [ -d $PYDIST/mysql ];
+		then	
+			if [ ! -f $PYDIST$MYSQLINIT ];
+			then
+				#ls $PYDIST
+				ln -sf $PYSHARED$MYSQLINIT $PYDIST$MYSQLINIT
+				ls $PYDIST/mysql -l
+			fi
+		else
+			echo "WARNING: $PYDIST/mysql not found."
+		fi
+	else
+		# we should not reach this point.
+		echo "ERROR: $PYSHARED/mysql not found, nothing to do."
+	fi
+done
+
+PYSHAREMYSQL="/usr/share/pyshared/mysql"
+
+exit 0

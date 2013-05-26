@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+#PYTHON2=$(shell pyversions -vr)
+
+DEB_PYTHON_INSTALL_ARGS_ALL = --install-layout=deb
+
+override_dh_compress:
+	echo 'dh_compress override'
+	echo `pwd`
+	ls mysql/
+	echo 'removing mysql/__init__.py'
+	if [ -f debian/mysql-utilities/usr/share/pyshared/mysql/__init__.py ] ; then \
+		rm debian/mysql-utilities/usr/share/pyshared/mysql/__init__.py ; \
+		ls debian/mysql-utilities/usr/share/pyshared/mysql ; fi
+	if [ -L debian/mysql-utilities/usr/lib/python2.6/dist-packages/mysql/__init__.py ] ; then \
+		rm debian/mysql-utilities/usr/lib/python2.6/dist-packages/mysql/__init__.py ; \
+		ls debian/mysql-utilities/usr/lib/python2.6/dist-packages/mysql ; fi
+	if [ -L debian/mysql-utilities/usr/lib/python2.7/dist-packages/mysql/__init__.py ] ; then \
+		rm debian/mysql-utilities/usr/lib/python2.7/dist-packages/mysql/__init__.py ; \
+		ls debian/mysql-utilities/usr/lib/python2.7/dist-packages/mysql; fi
+	#
+	dh_compress -O--buildsystem=python_distutils
+
+%:
+	dh $@ --buildsystem=python_distutils --with python2
+
+
