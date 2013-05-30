@@ -206,26 +206,34 @@ class Utilities(object):
         Returns dictionary - name, description, usage, options
         """
         # Get the --help output for the utility
-        command = util_name + ".py"
+        # Give priority to '.py' files
+        if not file_ext:
+            file_ext = '.py'
+        command = "{0}{1}".format(util_name, file_ext)
+        util_path = os.path.normpath(os.path.join(os.getcwd(), util_path))
         utility_path = os.path.join(util_path, command)
-        if not os.path.exists(utility_path):
-            command = file_name
 
-        # Check for running against .exe
-        if utility_path.endswith(".exe"):
-            cmd = []
-        # Not using .exe
-        else:
+        if (not os.path.exists(utility_path) and
+            not os.path.exists(os.path.join(os.getcwd(), utility_path))):
+            utility_path = os.path.join(util_path, util_name)
+
+        cmd = []
+        if utility_path.endswith(".py"):
             cmd = ['python']
 
-        cmd.extend([utility_path, " --help"])
+        cmd.extend([utility_path, "--help"])
 
         # Hide errors from stderr output
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen(" ".join(cmd), shell=True,
-                                stdout=subprocess.PIPE, stderr=out)
 
-        stdout_temp = proc.communicate()[0]
+        try:
+            proc = subprocess.Popen(cmd, shell=False,   
+                                    stdout=subprocess.PIPE, stderr=out)
+            stdout_temp = proc.communicate()[0]
+        except OSError:
+            # No such file or directory
+            stdout_temp = ""
+
         # Parse the help output and save the information found
         alias = None
         usage = None

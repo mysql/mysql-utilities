@@ -50,7 +50,7 @@ DESCRIPTION = "mysqluc - Command line client for running MySQL Utilities"
 USAGE = "%prog "
 WELCOME_MESSAGE = """
 Welcome to the MySQL Utilities Client (mysqluc) version %s
-Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.\n
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.\n
 Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
 Other names may be trademarks of their respective owners.
 
