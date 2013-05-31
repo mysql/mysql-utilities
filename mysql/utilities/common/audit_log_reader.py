@@ -86,7 +86,8 @@ class AuditLogReader(object):
         """
         next_line = ""
         for line in self.log:
-            if line.startswith('<AUDIT_RECORD') and not line.endswith('/>\n'):
+            if ((line.lstrip()).startswith('<AUDIT_RECORD') and
+                    not line.endswith('/>\n')):
                 next_line = "{0} ".format(line.strip('\n'))
                 continue
             elif len(next_line) > 0 and not line.endswith('/>\n'):

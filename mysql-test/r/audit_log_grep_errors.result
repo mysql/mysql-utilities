@@ -8,7 +8,7 @@ Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE
 mysqlauditgrep.py: error: The specified argument is not a file: xpto.log
 Test case 3 - Malformed log file
 ERROR: Malformed XML - Cannot parse log file: 'std_data/audit.log.invalid'
-Invalid XML element: '  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Quit" CONNECTION_ID="6" STATUS="0"\n'
+Invalid XML element: '  <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Quit" CONNECTION_ID="6" STATUS="0"   <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:39" NAME="Connect" CONNECTION_ID="7" STATUS="0" USER="root" PRIV_USER="root" OS_LOGIN="" PROXY_USER="" HOST="localhost" IP="127.0.0.1" DB=""/>\n'
 Test case 4 - Only one file search at a time
 Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
 
