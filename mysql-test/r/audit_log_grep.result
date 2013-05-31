@@ -283,6 +283,7 @@ Test case 16 - Apply all search criteria
 Test case 17 - Search entries of multi-line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM",24578
+0,2013-05-31T07:04:30,Query,"CREATE TABLE mytexttable2 (  id   INT NOT NULL,  txt  TEXT NOT NULL,  PRIMARY KEY (id),  FULLTEXT (txt)) ENGINE=MyISAM",1
 Test case 18 - Search entries of single line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL, txt TEXT NOT NULL, PRIMARY KEY (id), FULLTEXT (txt)) ENGINE=MyISAM",24578
