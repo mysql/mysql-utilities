@@ -212,8 +212,9 @@ class Utilities(object):
         command = "{0}{1}".format(util_name, file_ext)
         util_path = os.path.normpath(os.path.join(os.getcwd(), util_path))
         utility_path = os.path.join(util_path, command)
-        if not os.path.exists(utility_path):
-            command = file_name
+        if (not os.path.exists(utility_path) and
+            not os.path.exists(os.path.join(os.getcwd(), utility_path))):
+            utility_path = os.path.join(util_path, util_name)
 
         # Check for running against .exe
         if utility_path.endswith(".exe"):
