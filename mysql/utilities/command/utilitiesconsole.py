@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ This file contains the utilities console mechanism.
 """
 
 import os
+import sys
 import tempfile
 import subprocess
 
@@ -286,7 +287,7 @@ class UtilitiesConsole(Console):
         # In cases where the utility does not have permissions to execute,
         # the use of the interpreter is necessary
         if '.py' in utility_path or not '.exe' in utility_path:
-            cmd.append('python ')
+            cmd.append("{0} ".format(sys.executable))
 
         cmd += ['"', utility_path, '"', ' ', parameters]
 

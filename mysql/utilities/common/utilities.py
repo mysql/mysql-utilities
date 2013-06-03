@@ -212,14 +212,15 @@ class Utilities(object):
         command = "{0}{1}".format(util_name, file_ext)
         util_path = os.path.normpath(os.path.join(os.getcwd(), util_path))
         utility_path = os.path.join(util_path, command)
+        if not os.path.exists(utility_path):
+            command = file_name
 
-        if (not os.path.exists(utility_path) and
-            not os.path.exists(os.path.join(os.getcwd(), utility_path))):
-            utility_path = os.path.join(util_path, util_name)
-
-        cmd = []
-        if utility_path.endswith(".py"):
-            cmd = ['python']
+        # Check for running against .exe
+        if utility_path.endswith(".exe"):
+            cmd = []
+        # Not using .exe
+        else:
+            cmd = [sys.executable]
 
         cmd.extend([utility_path, "--help"])
 
@@ -227,7 +228,7 @@ class Utilities(object):
         out = open(os.devnull, 'w')
 
         try:
-            proc = subprocess.Popen(cmd, shell=False,   
+            proc = subprocess.Popen(cmd, shell=False,
                                     stdout=subprocess.PIPE, stderr=out)
             stdout_temp = proc.communicate()[0]
         except OSError:
