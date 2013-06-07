@@ -1,3 +1,15 @@
+Release 1.3.2 (Released June 07, 2013)
+--------------------------------------
+
+- BUG#16459749: mysqlfrm may report incorrect size for columns
+- BUG#16499681: mysqlfrm does not read some files with special chars
+- BUG#16605696: mysqlfrm missing from mysqluc
+- BUG#16605710: no man entry for mysqlfrm
+- BUG#16625961: mysqlfrm does not pass --user argument properly
+- BUG#16625962: mysqlfrm bootstrap server fails to start in time
+- WL#6814: Debian Packaging mechanism
+
+
 Release 1.3.1 (Released April 19, 2013)
 ---------------------------------------
 No changes.
