@@ -514,8 +514,7 @@ class Server_list(object):
                 params.append('--password={0}'.format(server.passwd))
             if server.socket:
                 params.append('--socket={0}'.format(server.socket))
-            else:
-                params.append('--port={0}'.format(server.port))
+            params.append('--port={0}'.format(server.port))
             return params
 
         str1 = "--user=%s --host=%s " % (server.user, server.host)
@@ -523,8 +522,7 @@ class Server_list(object):
             str1 += "--password=%s " % server.passwd
         if server.socket:
             str2 = "--socket=%s " % (server.socket)
-        else:
-            str2 = "--port=%s " % (server.port)
+        str2 = "--port=%s " % (server.port)
         return str1 + str2
 
 
