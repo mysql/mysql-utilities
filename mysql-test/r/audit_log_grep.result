@@ -42,6 +42,11 @@ Options:
                         Kill, Long Data, NoAudit, Ping, Prepare, Processlist,
                         Query, Quit, Refresh, Register Slave, Reset stmt, Set
                         option, Shutdown, Sleep, Statistics, Table Dump, Time
+  --status=STATUS       search for all entries with the specified status
+                        values. Accepts a comma-separated list of non-negative
+                        integers (corresponding to MySQL error codes) or
+                        intervals marked with a dash. For example:
+                        1051,1068-1075,1109,1146.
   -G, --basic-regexp, --regexp
                         use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.
@@ -274,16 +279,29 @@ Test case 15 - No entry found for specified event types
 #
 # No entry found!
 #
-Test case 16 - Apply all search criteria
+Test case 16 - Search entries with specific status
++---------+----------------------+--------+---------------------------------------------------------------------+----------------+
+| STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                                             | CONNECTION_ID  |
++---------+----------------------+--------+---------------------------------------------------------------------+----------------+
+| 1046    | 2012-10-10T15:57:26  | Query  | show tables test                                                    | 11             |
+| 1046    | 2012-10-10T15:57:36  | Query  | show tables test                                                    | 11             |
+| 1146    | 2012-10-10T17:44:55  | Query  | select * from teste.employees where salary > 500 and salary < 1000  | 12             |
+| 1046    | 2012-10-10T17:47:17  | Query  | select * from test_encoding where value = '<>"&'                    | 12             |
++---------+----------------------+--------+---------------------------------------------------------------------+----------------+
+Test case 17 - No entry found for specific status
+#
+# No entry found!
+#
+Test case 18 - Apply all search criteria
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
 | STATUS  | SERVER_ID  | NAME   | TIMESTAMP            | CONNECTION_ID  | USER    | PRIV_USER  | SQLTEXT                                           |
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
 | 1046    | 1          | Query  | 2012-10-10T17:47:17  | 12             | tester  | root       | select * from test_encoding where value = '<>"&'  |
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
-Test case 17 - Search entries of multi-line log
+Test case 19 - Search entries of multi-line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM",24578
 0,2013-05-31T07:04:30,Query,"CREATE TABLE mytexttable2 (  id   INT NOT NULL,  txt  TEXT NOT NULL,  PRIMARY KEY (id),  FULLTEXT (txt)) ENGINE=MyISAM",1
-Test case 18 - Search entries of single line log
+Test case 20 - Search entries of single line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL, txt TEXT NOT NULL, PRIMARY KEY (id), FULLTEXT (txt)) ENGINE=MyISAM",24578

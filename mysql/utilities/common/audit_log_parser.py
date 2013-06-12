@@ -84,6 +84,11 @@ class AuditLogParser(AuditLogReader):
                                               self.options['event_type'])):
                 matching_record = False
 
+            # Check if record matches status criteria
+            if (matching_record and self.options['status']
+                and not self.match_status(record, self.options['status'])):
+                matching_record = False
+
             # Check if record matches datetime range criteria
             if (matching_record
                 and not self.match_datetime_range(record,
@@ -151,7 +156,7 @@ class AuditLogParser(AuditLogReader):
         """ Match date/time range.
 
         Check if the given record match the datetime range criteria.
-        Returns True if the record matches one of the specified users.
+        Returns True if the record matches the specified date range.
 
         record[in] audit log record to check;
         start_date[in] start date/time of the record (inclusive);
@@ -211,3 +216,30 @@ class AuditLogParser(AuditLogReader):
             return True
         else:
             return False
+
+    def match_status(self, record, status_list):
+        """ Match the record status.
+
+        Check if the given record match the specified status criteria.
+
+        record[in]          audit log record to check;
+        status_list[in]     list of status values or intervals (representing
+                            MySQL error codes) to match;
+
+        Returns True if the record status matches one of the specified values
+        or intervals in the list.
+        """
+        rec_status = record.get('STATUS', None)
+        if rec_status:
+            rec_status = int(rec_status)
+            for status_val in status_list:
+                # Check if the status value is an interval (tuple) or int
+                if isinstance(status_val, tuple):
+                    # It is an interval; Check if it contains the record status.
+                    if status_val[0] <= rec_status <= status_val[1]:
+                        return True
+                else:
+                    # Directly check if the status match (is equal).
+                    if rec_status == status_val:
+                        return True
+        return False

@@ -127,6 +127,15 @@ parser.add_option("--event-type", action="store", dest="event_type",
                   "list of event types. Supported values: "
                   + ", ".join(audit_log.EVENT_TYPES))
 
+# Search criteria to retrieve entries with the specified status.
+parser.add_option("--status", action="store", dest="status",
+                  type="string", default=None,
+                  help="search for all entries with the specified status "
+                       "values. Accepts a comma-separated list of "
+                       "non-negative integers (corresponding to MySQL error "
+                       "codes) or intervals marked with a dash. "
+                       "For example: 1051,1068-1075,1109,1146.")
+
 # Add regexp option
 add_regexp(parser)
 
@@ -136,8 +145,8 @@ add_verbosity(parser, False)
 
 def exist_search_criteria():
     # Return true if at least one search criteria is specified
-    return opt.users or opt.start_date or opt.end_date or opt.pattern \
-           or opt.query_type or opt.event_type
+    return (opt.users or opt.start_date or opt.end_date or opt.pattern
+            or opt.query_type or opt.event_type or opt.status)
 
 
 # Parse the command line arguments.
@@ -243,6 +252,44 @@ if opt.pattern and not opt.use_regexp:
     # Convert SQL LIKE pattern to Python REGEXP
     pattern = pattern_matching.convertSQL_LIKE2REGEXP(opt.pattern)
 
+# Check if the values specified for the --status option are valid
+status_list = []
+if opt.status:
+    # filter empty values and convert all to integers cases
+    status_values = opt.status.split(",")
+    status_values = filter(None, status_values)
+    if not len(status_values) > 0:
+        parser.error("The value for the option --status is not valid: "
+                     "'{0}'.".format(opt.status))
+    for value in status_values:
+        interval = value.split('-')
+        if len(interval) == 2:
+            try:
+                lv = int(interval[0])
+            except ValueError:
+                parser.error("Invalid status value '{0}' (must be a "
+                             "non-negative integer) for interval "
+                             "'{1}'.".format(interval[0], value))
+            try:
+                hv = int(interval[1])
+            except ValueError:
+                parser.error("Invalid status value '{0}' (must be a "
+                             "non-negative integer) for interval "
+                             "'{1}'.".format(interval[1], value))
+            # Add interval (tuple) to the status list.
+            status_list.append((lv, hv))
+        elif len(interval) == 1:
+            # Add single value to the status list.
+            try:
+                status_list.append(int(value))
+            except ValueError:
+                parser.error("Invalid status value '{0}' (must be a "
+                             "non-negative integer).".format(value))
+        else:
+            # Invalid format.
+            parser.error("Invalid format for status interval (a single "
+                         "dash must be used): '{0}'.".format(value))
+
 # Create dictionary of options
 options = {
     'log_name': args[0],
@@ -255,6 +302,7 @@ options = {
     'use_regexp': opt.use_regexp,
     'query_type': query_types,
     'event_type': event_types,
+    'status': status_list,
 }
 
 try:
