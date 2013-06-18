@@ -316,6 +316,19 @@ Test case 13 - run command start with --master
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
+Test case 13(b) - health after start
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
 Test case 14 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
@@ -343,6 +356,19 @@ Test case 16 - run command start without --master
 #   Executing start on slave localhost:PORT2 Ok
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
+# ...done.
+Test case 16(b) - health after start
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 17 - run command stop without --master
 # Checking privileges.

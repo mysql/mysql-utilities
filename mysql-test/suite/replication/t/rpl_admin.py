@@ -186,11 +186,19 @@ class test(mutlib.System_test):
             res = self.run_test_case(0, cmd_str, comment)
             if not res:
                 raise MUTLibError("%s: failed" % comment)
-            test_num += 1
             # START SLAVE is asynchronous and it can take some time to complete
             # on slow servers
             if cmd == 'start':
                 time.sleep(3)  # wait 3 second for START to finish
+                # Show HEALTH to make sure all slaves started.
+                cmd_str = ("mysqlrpladmin.py --master={0} health "
+                           "--slaves={1}").format(master_conn, slaves_str)
+                comment = ("Test case {0}(b) - health after "
+                           "{1}").format(test_num, cmd)
+                res = self.run_test_case(0, cmd_str, comment)
+                if not res:
+                    raise MUTLibError("{0}: failed".format(comment))
+            test_num += 1
 
         # Needed to reset the topology here to run with 5.1 servers.
         # Note: With 5.1 servers after reset commands slaves seem to forgot
@@ -207,6 +215,16 @@ class test(mutlib.System_test):
             res = self.run_test_case(0, cmd_str, comment)
             if not res:
                 raise MUTLibError("%s: failed" % comment)
+            if cmd == 'start':
+                time.sleep(3)  # wait 3 second for START to finish
+                # Show HEALTH to make sure all slaves started.
+                cmd_str = ("mysqlrpladmin.py --master={0} health "
+                           "--slaves={1}").format(master_conn, slaves_str)
+                comment = ("Test case {0}(b) - health after "
+                           "{1}").format(test_num, cmd)
+                res = self.run_test_case(0, cmd_str, comment)
+                if not res:
+                    raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
         # Now we return the topology to its original state for other tests

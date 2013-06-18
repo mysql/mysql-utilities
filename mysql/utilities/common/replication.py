@@ -1514,13 +1514,31 @@ class Slave(Server):
             return (m_host, m_passwd)
         return (None, None)
 
+    def start(self, options={}, autocommit_fix=True):
+        """Start the slave.
 
-    def start(self, options={}):
-        """Start the slave
+        Execute the START SLAVE statement (to start the IO and SQL threads).
 
-        options[in]    query options
+        options[in]         query options
+        autocommit_fix[in]  If True, turn off AUTOCOMMIT before start command.
+                            True by default to always apply the fix.
         """
-        return self.exec_query("START SLAVE", options)
+        # Temporary workaround for BUG#16533802 - remove when fixed (part 1/2).
+        if autocommit_fix:
+            autocommit_value = self.autocommit_set()
+            # If disabled, turn it on.
+            if not autocommit_value:
+                self.toggle_autocommit(True)
+
+        res = self.exec_query("START SLAVE", options)
+
+        # Temporary workaround for BUG#16533802 - remove when fixed (part 2/2).
+        if autocommit_fix:
+            # If disabled originally, turn it off.
+            if not autocommit_value:
+                self.toggle_autocommit(False)
+
+        return res
 
     def start_sql_thread(self, options={}):
         """Start the slave SQL thread
