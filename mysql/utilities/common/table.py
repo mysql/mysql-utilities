@@ -67,11 +67,14 @@ class Index(object):
 
         # Initialize and save values
         self.db = db
+        self.q_db = quote_with_backticks(db)
         self.verbose = verbose
         self.columns = []
         self.table = index_tuple[0]
+        self.q_table = quote_with_backticks(index_tuple[0])
         self.unique = not index_tuple[1]
         self.name = index_tuple[2]
+        self.q_name = quote_with_backticks(index_tuple[2])
         col = (index_tuple[4], index_tuple[7])
         self.columns.append(col)
         self.type = index_tuple[10]
@@ -183,7 +186,6 @@ class Index(object):
             self.column_subparts = True
         self.columns.append(col)
 
-
     def get_drop_statement(self):
         """Get the drop statement for this index
 
@@ -191,61 +193,62 @@ class Index(object):
 
         Returns the DROP statement for this index.
         """
-
         if self.name == "PRIMARY":
-           return None
-        query_str = "ALTER TABLE %s.%s DROP INDEX %s" % \
-                    (self.db, self.table, self.name)
+            return None
+        query_str = "ALTER TABLE {db}.{table} DROP INDEX {name}".format(
+            db=self.q_db, table=self.q_table, name=self.q_name
+        )
         return query_str
 
-
-    def __get_column_list(self):
+    def __get_column_list(self, backtick_quoting=True):
         """Get the column list for an index
 
-        This method is used to print the CREATE and DROP statements
+        This method is used to print the CREATE and DROP statements.
+
+        backtick_quoting[in]    Indicates if the columns names are to be quoted
+                                with backticks or not. By default: True.
 
         Returns a string representing the list of columns for a
         column list. e.g. 'a, b(10), c'
         """
-
-        col_str = ""
-        stop = len(self.columns)
-        i = 0
+        col_list = []
         for col in self.columns:
             name, sub_part = (col[0], col[1])
-            col_str = col_str + "%s" % (name)
+            if backtick_quoting:
+                name = quote_with_backticks(name)
             if sub_part > 0:
-                col_str = col_str + "(%s)" % (sub_part)
-            i = i + 1
-            if (stop > 1) and (i < stop):
-                col_str = col_str + ", "
-        return col_str
-
+                col_str = "{0}({1})".format(name, sub_part)
+            else:
+                col_str = name
+            col_list.append(col_str)
+        return ', '.join(col_list)
 
     def print_index_sql(self):
         """Print the CREATE INDEX for indexes and ALTER TABLE for a primary key
         """
-
         if self.name == "PRIMARY":
-            print "ALTER TABLE %s.%s ADD PRIMARY KEY (%s)" % \
-                  (self.db, self.table, self.__get_column_list())
+            print("ALTER TABLE {db}.{table} ADD PRIMARY KEY ({cols})"
+                  "".format(db=self.q_db, table=self.q_table,
+                            cols=self.__get_column_list()))
         else:
-            create_str = "CREATE "
-            if self.unique:
-                create_str += "UNIQUE "
-            if self.type == "FULLTEXT":
-                create_str += "FULLTEXT "
-            create_str += "INDEX %s ON %s.%s (%s) " % \
-                  (self.name, self.db, self.table, self.__get_column_list())
+            create_str = ("CREATE {unique}{fulltext}INDEX {name} ON "
+                          "{db}.{table} ({cols}) {using}")
+            unique_str = 'UNIQUE ' if self.unique else ''
+            fulltext_str = 'FULLTEXT ' if self.type == 'FULLTEXT' else ''
             if (self.type == "BTREE") or (self.type == "RTREE"):
-                create_str += "USING %s" % (self.type)
-            print create_str
-
+                using_str = 'USING {0}'.format(self.type)
+            else:
+                using_str = ''
+            print(create_str.format(unique=unique_str, fulltext=fulltext_str,
+                                    name=self.q_name, db=self.q_db,
+                                    table=self.q_table,
+                                    cols=self.__get_column_list(),
+                                    using=using_str))
 
     def get_row(self):
         """Return index information as a list of columns for tabular output.
         """
-        cols = self.__get_column_list()
+        cols = self.__get_column_list(backtick_quoting=False)
         return (self.db, self.table, self.name, self.type, cols)
 
 
@@ -989,7 +992,6 @@ class Table(object):
                 idx.add_column(row[4], row[7])
         return True
 
-
     def check_indexes(self, show_drops=False):
         """Check for duplicate or redundant indexes and display all matches
 
@@ -1022,22 +1024,22 @@ class Table(object):
             dupes.extend(res[1])
 
         if len(dupes) > 0:
-            print "# The following indexes are duplicates or redundant " \
-                  "for table %s:" % (self.table)
+            print("# The following indexes are duplicates or redundant "
+                  "for table {0}:".format(self.table))
             for index in dupes:
-                print "#"
+                print("#")
                 index.print_index_sql()
-                print "#     may be redundant or duplicate of:"
+                print("#     may be redundant or duplicate of:")
                 index.duplicate_of.print_index_sql()
             if show_drops:
-                print "#\n# DROP statements:\n#"
+                print("#\n# DROP statements:\n#")
                 for index in dupes:
-                    print "%s;" % (index.get_drop_statement())
-                print "#"
+                    print("{0};".format(index.get_drop_statement()))
+                print("#")
         else:
             if not self.quiet:
-                print "# Table %s has no duplicate indexes." % (self.table)
-
+                print("# Table {0} has no duplicate indexes."
+                      "".format(self.table))
 
     def show_special_indexes(self, format, limit, best=False):
         """Display a list of the best or worst queries for this table.

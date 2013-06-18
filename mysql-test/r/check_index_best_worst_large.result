@@ -4,9 +4,9 @@ Test case 1 - show best indexes
 # Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
-CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
+CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
-ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
+ALTER TABLE `employees`.`dept_emp` ADD PRIMARY KEY (`emp_no`, `dept_no`)
 #
 # Showing the top 5 best performing indexes from employees.dept_emp:
 #
@@ -21,9 +21,9 @@ Test case 2 - show worst indexes
 # Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
-CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
+CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
-ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
+ALTER TABLE `employees`.`dept_emp` ADD PRIMARY KEY (`emp_no`, `dept_no`)
 #
 # Showing the top 5 worst performing indexes from employees.dept_emp:
 #
@@ -38,9 +38,9 @@ Test case 3 - show only best index
 # Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
-CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
+CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
-ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
+ALTER TABLE `employees`.`dept_emp` ADD PRIMARY KEY (`emp_no`, `dept_no`)
 #
 # Showing the best performing index from employees.dept_emp:
 #
@@ -54,9 +54,9 @@ Test case 4 - show only worst index
 # Getting indexes for employees.dept_emp
 # The following indexes are duplicates or redundant for table employees.dept_emp:
 #
-CREATE INDEX emp_no ON employees.dept_emp (emp_no) USING BTREE
+CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
-ALTER TABLE employees.dept_emp ADD PRIMARY KEY (emp_no, dept_no)
+ALTER TABLE `employees`.`dept_emp` ADD PRIMARY KEY (`emp_no`, `dept_no`)
 #
 # Showing the worst performing index from employees.dept_emp:
 #

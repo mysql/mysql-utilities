@@ -11,29 +11,29 @@ Test case 2 - check a list of tables and databases
 # Getting indexes for util_test_a.t1
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # Getting indexes for util_test_c.t5
 #   Table %s does not contain a PRIMARY key.
 # The following indexes are duplicates or redundant for table util_test_c.t5:
 #
-CREATE FULLTEXT INDEX ft1 ON util_test_c.t5 (y) 
+CREATE FULLTEXT INDEX `ft1` ON `util_test_c`.`t5` (`y`) 
 #     may be redundant or duplicate of:
-CREATE FULLTEXT INDEX ft ON util_test_c.t5 (y) 
+CREATE FULLTEXT INDEX `ft` ON `util_test_c`.`t5` (`y`) 
 #
-CREATE FULLTEXT INDEX ft6 ON util_test_c.t5 (a, b, c) 
+CREATE FULLTEXT INDEX `ft6` ON `util_test_c`.`t5` (`a`, `b`, `c`) 
 #     may be redundant or duplicate of:
-CREATE FULLTEXT INDEX ft2 ON util_test_c.t5 (a, b, c) 
+CREATE FULLTEXT INDEX `ft2` ON `util_test_c`.`t5` (`a`, `b`, `c`) 
 #
-CREATE FULLTEXT INDEX ft5 ON util_test_c.t5 (a, b, y) 
+CREATE FULLTEXT INDEX `ft5` ON `util_test_c`.`t5` (`a`, `b`, `y`) 
 #     may be redundant or duplicate of:
-CREATE FULLTEXT INDEX ft4 ON util_test_c.t5 (a, b, y) 
+CREATE FULLTEXT INDEX `ft4` ON `util_test_c`.`t5` (`a`, `b`, `y`) 
 #
 # Getting indexes for util_test_c.t6
 # Table util_test_c.t6 is not indexed.
@@ -53,13 +53,13 @@ Test case 3 - check all tables for a single database
 # Getting indexes for util_test_a.t1
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # Getting indexes for util_test_a.t2
 #   Table %s does not contain a PRIMARY key.
