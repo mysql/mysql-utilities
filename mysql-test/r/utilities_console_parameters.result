@@ -219,3 +219,18 @@ SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
 
 
 
+Test Case 8: Long variables
+
+
+Variable                                          Value                    
+------------------------------------------------  -------------------------
+longvariableeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee...  test                     
+
+Test Case 9: Unbalanced arguments
+Usage: mysqluc 
+
+mysqluc: error: Unbalanced arguments. Please check your command.
+Test Case 10: Invalid assigning in arguments
+Usage: mysqluc 
+
+mysqluc: error: Invalid argument assignment: c==3. Please check your command.

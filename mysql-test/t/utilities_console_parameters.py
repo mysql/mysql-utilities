@@ -93,6 +93,27 @@ class test(mutlib.System_test):
         self.do_test(test_num, "Replacement", cmd_str % cmd_opt)
         test_num += 1
 
+        # Long variables
+        cmd_opt = '-e "show variables" longvariable{0}=test'.format('e' * 80)
+        self.do_test(test_num, "Long variables",
+                     "mysqluc.py {0}".format(cmd_opt))
+        test_num += 1
+
+        # Unbalanced arguments
+        comment = "Unbalanced arguments"
+        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c", "Test Case "
+                                 "{0}: {1}".format(test_num, comment))
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Invalid assigning in arguments
+        comment = "Invalid assigning in arguments"
+        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c==3", "Test Case "
+                                 "{0}: {1}".format(test_num, comment))
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.replace_result("Quiet mode, saving output to",

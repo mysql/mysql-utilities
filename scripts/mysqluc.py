@@ -67,13 +67,19 @@ def build_variable_dictionary_list(args):
     """
     variables = []
     arguments = list(args)
-    for i, arg in enumerate(arguments):
+    for arg in arguments[:]:
         if '=' in arg:
-            name, value = arg.split('=')
+            try:
+                name, value = arg.split('=')
+                if not value:
+                    raise ValueError
+            except ValueError:
+                parser.error("Invalid argument assignment: {0}. Please check "
+                             "your command.".format(arg))
             variables.append({'name': name, 'value': value})
-            arguments.pop(i)
+            arguments.remove(arg)
 
-    if len(arguments) % 2:
+    if len(arguments) > 0:
         parser.error("Unbalanced arguments. Please check your command.")
     for i in range(0, len(arguments), 2):
         variables.append({'name': arguments[i], 'value': arguments[i+1]})

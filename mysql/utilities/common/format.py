@@ -26,6 +26,7 @@ METHODS
 
 import csv
 import os
+import textwrap
 
 _MAX_WIDTH = 78
 _TWO_COLUMN_DISPLAY = "{0:{1}}  {2:{3}}"
@@ -241,12 +242,16 @@ def print_dictionary_list(column_names, keys, dictionary_list,
     
 
     """
-    import textwrap
-    
+    # max column size for the name
     max_name = _get_max_key_dict_list(dictionary_list, keys[0])
     if max_name < len(column_names[0]):
         max_name = len(column_names[0])
-    max_value = (max_width - 2 - max_name) or 25
+    min_value = 25  # min column size for the value
+    max_value = max_width - 2 - max_name  # max column size for the value
+    if max_value < min_value:
+        max_value = min_value
+        max_name = max_width - 2 - max_value
+
     if show_header:
         print(_TWO_COLUMN_DISPLAY.format(column_names[0], max_name,
                                          column_names[1], max_value))
@@ -254,6 +259,8 @@ def print_dictionary_list(column_names, keys, dictionary_list,
                                          '-'*max_value, max_value))
     for item in dictionary_list:
         name = item[keys[0]]
+        if len(name) > max_name:
+            name = "{0}...".format(name[:(max_name - 3)])
         value = item[keys[1]]
         if isinstance(value, (bool, int)) or value is None:
             description = [str(value)]
