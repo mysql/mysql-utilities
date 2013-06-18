@@ -43,32 +43,35 @@ _QUERY_DBSIZE = """
     GROUP BY db_name
 """
 
+
 def _print_size(prefix, total):
     """Print size formatted with commas and estimated to the largest XB.
 
     prefix[in]        The preamble to the size. e.g. "Total XXX ="
     total[in]         Integer value to format.
     """
+    msg = "{0}{1} bytes".format(prefix, locale.format("%d", total,
+                                                      grouping=True))
 
     # Calculate largest XByte...
     if total > _TB:
-        converted = total/_TB
-        print prefix + "%s bytes or {0:.2f} TB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _TB
+        print("{0} or {1} TB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _GB:
-        converted = total/_GB
-        print prefix + "%s bytes or {0:.2f} GB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _GB
+        print("{0} or {1} GB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _MB:
-        converted = total/_MB
-        print prefix + "%s bytes or {0:.2f} MB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _MB
+        print("{0} or {1} MB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _KB:
-        converted = total/_KB
-        print prefix + "%s bytes or {0:.2f} KB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _KB
+        print("{0} or {1} KB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     else:
-        print prefix + "%s bytes" % locale.format("%d", total, grouping=True)
+        print(msg)
 
 
 def _get_formatted_max_width(rows, columns, col):
@@ -784,7 +787,7 @@ def show_innodb_usage(server, datadir, options):
                                            datadir, tablespaces, verbosity)
         if innodb == []:
             raise UtilError("InnoDB is enabled but there is a problem "
-                                 "reading the tablespace files.")
+                            "reading the tablespace files.")
 
         columns = ['innodb_file', 'size']
         if verbosity > 0:
@@ -792,7 +795,7 @@ def show_innodb_usage(server, datadir, options):
             columns.append('specificaton')
         size = 'size'
         fmt_innodb = []
-        if format == 'GRID':
+        if format.upper() == 'GRID':
             max_col = _get_formatted_max_width(innodb, columns, 1)
             if max_col < len('size'):
                 max_col = len('size')
