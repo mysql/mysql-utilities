@@ -115,13 +115,14 @@ class test(rpl_admin.test):
         log_file.writelines(_LOG_ENTRIES)
         self.results.append("There are (before) %s entries in the log.\n" %
                             len(_LOG_ENTRIES))
+        num_log_lines = len(_LOG_ENTRIES)
         log_file.close()
 
         comment = "Test case 5 - switchover with logs"
         cmd_str = "%s %s " % (base_cmd, master_str)
         cmd_opts = " --discover-slaves-login=root:root switchover "
         cmd_opts += " --demote-master --new-master=%s " % slave1_conn
-        cmd_opts += " --log=%s --log-age=1 " % _LOGNAME
+        cmd_opts += " --log=%s " % _LOGNAME
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
@@ -189,6 +190,7 @@ class test(rpl_admin.test):
         # Add mask - WARNING not issued with 5.1. servers
         self.remove_result("# WARNING: You may be mixing host names and "
                            "IP addresses. ")
+        self.remove_result("NOTE: Log file")
 
         return True
 

@@ -18,7 +18,9 @@
 import mutlib
 import rpl_admin
 import socket
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
+_LOGNAME = "temp_log.txt"
 
 
 class test(rpl_admin.test):
@@ -34,22 +36,25 @@ class test(rpl_admin.test):
         if not rpl_admin.test.setup(self):
             return False
 
-        #Spawn an independent server
-        self.server5 = self.spawn_server("alone_srv", kill=True)
+        # Spawn an independent server
+        self.server5 = self.spawn_server("alone_srv", kill=True,
+                                         mysqld="--sql_mode="
+                                         "NO_AUTO_CREATE_USER "
+                                         "--log-bin=mysqlbin")
 
         return True
 
     def run(self):
         self.res_fname = "result.txt"
-        
+
         base_cmd = "mysqlrpladmin.py "
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        
+
         master_str = "--master=" + master_conn
-    
+
         # create a user for priv check
         self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         self.server1.exec_query("GRANT SELECT, SUPER ON *.* TO "
@@ -213,6 +218,34 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Switchover using with --force and user "
+                   "does not have grant priv").format(test_num)
+        slaves_str = ",".join([slave2_conn, slave3_conn])
+        cmd_str = ("{0} --master={1} --new-master={2} --force switchover -q "
+                   "--rpl-user=rpl:rpl --slaves={3} --log={4} --log-age=1 "
+                   "--rpl-user=notthere --no-health"
+                   ).format(base_cmd, slave1_conn, alone_srv_conn, slaves_str,
+                            _LOGNAME)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Check log file for error.
+        # Now check the log and dump its entries for debugging
+        log_file = open(_LOGNAME, "r")
+        rows = log_file.readlines()
+        log_file.close()
+        for row in rows:
+            if self.debug:
+                print("> {0}".format(row))
+            if "Cannot grant replication slave" in row:
+                self.results.append("Error found in log file. \n")
+                break
+        else:
+            self.results.append("Error NOT found in the log.\n")
+        # log file removed by the cleanup method
+
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.server5.port), "PORT5")
@@ -280,5 +313,11 @@ class test(rpl_admin.test):
         self.kill_server("rep_slave1")
         self.kill_server("rep_slave2")
         self.kill_server("rep_slave3")
+
+        # Remove log file (here to delete the file even if some test fails)
+        try:
+            os.unlink(_LOGNAME)
+        except:
+            pass
 
         return rpl_admin.test.cleanup(self)

@@ -83,6 +83,7 @@ Test case 2 - failover to localhost:PORT2 with SQL errors on slaves --force opti
 #
 # Replication Topology Health:
 # ...done.
+Error found in log file. 
 Test case 3 - failover with a slave with GTID_MODE=XXX.
 # Checking privileges.
 # ERROR: Slave election requires GTID_MODE=ON for all servers.

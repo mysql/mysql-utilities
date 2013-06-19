@@ -43,6 +43,8 @@ _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('{0}', {1})"
 
 _SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
 
+_LOGNAME = "temp_log.txt"
+
 
 class test(rpl_admin.test):
     """Test replication administration command - failover
@@ -133,10 +135,24 @@ class test(rpl_admin.test):
                    "slaves --force option.".format(test_num, self.server2.host,
                                                    self.server2.port))
         cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
-                   "--force failover -vvv".format(self.slave1_conn, slaves))
+                   "--force failover -vvv --log={2} --log-age=1 "
+                   "".format(self.slave1_conn, slaves, _LOGNAME))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        # Check log file for error.
+        # Now check the log and dump its entries
+        log_file = open(_LOGNAME, "r")
+        rows = log_file.readlines()
+        log_file.close()
+        for row in rows:
+            if "Problem detected with SQL thread" in row:
+                self.results.append("Error found in log file. \n")
+                break
+        else:
+            self.results.append("Error NOT found in the log.\n")
+        # log file removed by the cleanup method
 
         test_num += 1
 
@@ -183,4 +199,9 @@ class test(rpl_admin.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        # Remove log file (here to delete the file even if some test fails)
+        try:
+            os.unlink(_LOGNAME)
+        except:
+            pass
         return rpl_admin.test.cleanup(self)

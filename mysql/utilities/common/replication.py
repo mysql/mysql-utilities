@@ -549,7 +549,7 @@ class Replication(object):
         r_user, r_pass = parse_user_password(rpl_user)
 
         # Check to see if rpl_user is present, else create her
-        if not self.create_rpl_user(r_user, r_pass):
+        if not self.create_rpl_user(r_user, r_pass)[0]:
             return False
 
         # Read master log file information
@@ -794,7 +794,8 @@ class Master(Server):
         verbosity[in]  verbosity of output
                        Default = 0
 
-        Returns bool - True = success, False = errors
+        Returns tuple (bool, str) - (True, None) = success,
+                                    (False, <error>) = error
         """
 
         if "]" in host:
@@ -813,11 +814,10 @@ class Master(Server):
             try:
                 self.exec_query(query_str)
             except UtilError, e:
-                print "ERROR: Cannot grant replication slave to " + \
-                      "replication user."
-                return False
+                return (False, "ERROR: Cannot grant replication slave to "
+                        "replication user.")
 
-        return True
+        return (True, None)
 
 
     def reset(self, options={}):
@@ -1719,7 +1719,7 @@ class Slave(Server):
         if master_user:
             change_master += "MASTER_USER = '%s', " % master_user
         # To rewrite a current password with blank password, not check against
-        # empty string. 
+        # empty string.
         if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port

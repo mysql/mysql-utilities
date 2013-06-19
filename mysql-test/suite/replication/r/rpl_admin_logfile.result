@@ -1,5 +1,4 @@
 Test Case 1 - Log file is newly created
-NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 # Checking privileges.
 #
 # Replication Topology Health:

@@ -515,8 +515,11 @@ class Topology(Replication):
             # Create replication user if --force is specified.
             if self.force and candidate_ok[1] == "RPL_USER":
                 user, passwd = slave.get_rpl_user()
-                candidate.create_rpl_user(slave.host, slave.port,
-                                          user, passwd)
+                res = candidate.create_rpl_user(slave.host, slave.port,
+                                                user, passwd)
+                if not res[0]:
+                    print("# ERROR: {0}".format(res[1]))
+                    self._report(res[1], logging.CRITICAL, False)
             else:
                 msg = candidate_ok[2]
                 self._report(msg, logging.CRITICAL)
@@ -1021,13 +1024,13 @@ class Topology(Replication):
                 # failover behavior and defined options.
                 if ((stop_on_error and not self.force)
                     or (not stop_on_error and self.pedantic)):
-                    print ("# ERROR: {0}".format(msg))
+                    print("# ERROR: {0}".format(msg))
                     self._report(msg, logging.CRITICAL, False)
-                    print ("# {0}".format(msg_thread))
+                    print("# {0}".format(msg_thread))
                     self._report(msg_thread, logging.CRITICAL, False)
-                    print ("# {0}".format(msg_error))
+                    print("# {0}".format(msg_error))
                     self._report(msg_error, logging.CRITICAL, False)
-                    print ("#  Tip: {0}".format(msg_tip))
+                    print("#  Tip: {0}".format(msg_tip))
                     if stop_on_error and not self.force:
                         ignore_opt = "with the --force"
                     else:
@@ -1037,13 +1040,13 @@ class Topology(Replication):
                     raise UtilRplError("{err} {note}".format(err=msg,
                                                              note=ignore_tip))
                 else:
-                    print ("# WARNING: {0}".format(msg))
+                    print("# WARNING: {0}".format(msg))
                     self._report(msg, logging.WARN, False)
-                    print ("# {0}".format(msg_thread))
+                    print("# {0}".format(msg_thread))
                     self._report(msg_thread, logging.WARN, False)
-                    print ("# {0}".format(msg_error))
+                    print("# {0}".format(msg_error))
                     self._report(msg_error, logging.WARN, False)
-                    print ("#  Tip: {0}".format(msg_tip))
+                    print("#  Tip: {0}".format(msg_tip))
 
     def find_errant_transactions(self):
         """Check all slaves for the existence of errant transactions.
@@ -1692,6 +1695,9 @@ class Topology(Replication):
         res = m_candidate.create_rpl_user(m_candidate.host,
                                           m_candidate.port,
                                           user, passwd)
+        if not res[0]:
+            print("# ERROR: {0}".format(res[1]))
+            self._report(res[1], logging.CRITICAL, False)
 
         # Call exec_before script - display output if verbose on
         self.run_script(self.before_script, False,
@@ -2024,6 +2030,9 @@ class Topology(Replication):
         # Need Master class instance to check master and replication user
         self.master = self._change_role(new_master, False)
         res = self.master.create_rpl_user(host, port, user, passwd)
+        if not res[0]:
+            print("# ERROR: {0}".format(res[1]))
+            self._report(res[1], logging.CRITICAL, False)
 
         # Call exec_before script - display output if verbose on
         self.run_script(self.before_script, False,
