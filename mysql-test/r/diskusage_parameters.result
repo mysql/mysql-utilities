@@ -40,7 +40,7 @@ util_test,XXXXXXX
 
 Total database disk usage = XXXXXXX
 
-# binary log information:
+# Binary log information:
 Current binary log file = XXXX
 log_file,size
 mysql-bin.000001,XXXX
@@ -117,7 +117,7 @@ error_log.err,XXXX
 
 Total size of logs = XXXX
 
-# binary log information:
+# Binary log information:
 Current binary log file = XXXX
 log_file,size
 mysql-bin.000001,XXXX
@@ -156,7 +156,7 @@ error_log.err,XXXX
 
 Total size of logs = XXXX
 
-# binary log information:
+# Binary log information:
 Current binary log file = XXXX
 log_file,size
 mysql-bin.000001,XXXX
@@ -197,4 +197,70 @@ innodb_file,size
 ib_logfile0,XXXXXXXX
 ib_logfile1,XXXXXXXX
 ibdata1,XXXXXXXX
+
+Test Case 10 : Use a user only with SUPER privilege.
+# Source on localhost: ... connected.
+# Database totals:
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+log_name,size
+slow.log,XXXX
+general.log,XXXX
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# Binary log information:
+Current binary log file = XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
+# Server is not an active slave - no relay log information.
+# InnoDB tablespace information:
+innodb_file,size
+ib_logfile0,XXXXXXXX
+ib_logfile1,XXXXXXXX
+ibdata1,XXXXXXXX
+
+Total size of InnoDB files = XXXXXXXX
+
+#...done.
+
+Test Case 11 : Use a user only with REPLICATION CLIENT privilege.
+# Source on localhost: ... connected.
+# Database totals:
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+log_name,size
+slow.log,XXXX
+general.log,XXXX
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# Binary log information:
+Current binary log file = XXXX
+log_file,size
+mysql-bin.000001,XXXX
+mysql-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
+# Server is not an active slave - no relay log information.
+# InnoDB tablespace information:
+innodb_file,size
+ib_logfile0,XXXXXXXX
+ib_logfile1,XXXXXXXX
+ibdata1,XXXXXXXX
+
+Total size of InnoDB files = XXXXXXXX
+
+#...done.
 

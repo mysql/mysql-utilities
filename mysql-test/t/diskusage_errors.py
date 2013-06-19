@@ -16,7 +16,8 @@
 #
 import os
 import diskusage_basic
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(diskusage_basic.test):
     """Disk usage errors
@@ -44,35 +45,57 @@ class test(diskusage_basic.test):
                                             "root", "diskusage_none",
                                             '--skip-innodb '
                                             '--default-storage-engine=MyISAM '
-                                            ' --log-error="%s"' % self.error_log)
+                                            '--log-bin '
+                                            '--log-error="{0}"'.format(
+                                                self.error_log
+                                            ))
         self.server1 = res[0]
         if not self.server1:
-            raise MUTLibError("%s: Failed to create a new slave." % comment)
+            raise MUTLibError("Failed to start a new server.")
 
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
+
+        # Create a new user 'repl:repl' (without privileges).
+        try:
+            self.server1.exec_query("CREATE USER 'repl'@'{0}' IDENTIFIED BY "
+                                    "'repl'".format(self.server1.host))
+        except UtilError as err:
+            raise MUTLibError("Failed to create user 'repl'@'{0}' (with "
+                              "password 'repl'): {1}".format(self.server1.host,
+                                                             err.errmsg))
         return True
 
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1)
+        )
 
-        cmd_base = "mysqldiskusage.py %s --format=csv" % from_conn
+        cmd_base = "mysqldiskusage.py {0} --format=csv".format(from_conn)
         test_num = 1
-        comment = "Test Case %d : Errors for logs, binlog, innodb " % test_num
-        cmd_opts = " -lambi -vv"
-        res = self.run_test_case(0, cmd_base+cmd_opts, comment)
+        comment = ("Test Case {0} : Errors for logs, binlog, "
+                   "innodb ").format(test_num)
+        cmd = "{0} -lambi -vv".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
         self.results.append("\n")
-        test_num += 1
 
+        test_num += 1
+        comment = ("Test Case {0} : Using a user without "
+                   "privileges.").format(test_num)
+        cmd_base = cmd_base.replace('root', 'repl')
+        cmd = '{0} -a'.format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
 
         diskusage_basic.test.mask(self)
 
@@ -83,11 +106,10 @@ class test(diskusage_basic.test):
         self.mask_column_result("mysql,X", ",", 4, "XXXXXXX")
         self.mask_column_result("util_test,X", ",", 4, "XXXXXXX")
         self.mask_column_result("mysql,X", ",", 5, "XXXXXXX")
-        self.mask_column_result("util_test,X", ",", 5
-                                , "XXXXXXX")
-        
+        self.mask_column_result("util_test,X", ",", 5, "XXXXXXX")
+
         self.replace_result("error_log.err", "error_log.err,XXXX\n")
-        
+
         # Remove this row for 5.5 servers
         self.remove_result("performance_schema")
 
@@ -100,9 +122,12 @@ class test(diskusage_basic.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        # Perform base cleanup.
+        res = diskusage_basic.test.cleanup(self)
+
         # Need to shutdown the spawned server
         if self.server1:
             res = self.servers.stop_server(self.server1)
             self.server1 = None
             self.servers.clear_last_port()
-        return diskusage_basic.test.cleanup(self)
+        return res
