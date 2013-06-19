@@ -115,6 +115,15 @@ class test(server_info.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        test_num += 1
+        cmd_opts = "--start-timeout=1.5"
+        cmd = "{0} {1}".format(cmd_str, cmd_opts)
+        comment = ("Test case {0} - Invalid --start-timeout "
+                   "value").format(test_num)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         server_info.test.do_replacements(self)
 
         self.replace_result("ERROR: Server connection values invalid:",

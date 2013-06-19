@@ -86,6 +86,11 @@ parser.add_option("--port-range", action="store", dest="ports",
 parser.add_option("--show-servers", action="store_true", dest="show_servers",
                   help="show any known MySQL servers running on this host")
 
+# Add startup timeout
+parser.add_option("--start-timeout", action="store", dest="start_timeout",
+                  type=int, default=10, help="Number of seconds to wait for "
+                  "the server to start. Default = 10.")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -95,12 +100,18 @@ opt, args = parser.parse_args()
 # Check the basedir option for errors (e.g., invalid path)
 check_basedir_option(parser, opt.basedir)
 
+# Check start timeout for minimal value
+if int(opt.start_timeout) < 10:
+    opt.start_timeout = 10
+    print("# WARNING: --start-timeout must be >= 10 seconds. Using "
+          "default value 10.")
+
 # Check port range
 if os.name == 'nt':
     parts = opt.ports.split(":")
     if len(parts) != 2:
-        print("# WARNING : %s is not a valid port range. Using default." %
-              opt.ports)
+        print("# WARNING : {0} is not a valid port range. "
+              "Using default." .format(opt.ports))
         opt.ports = "3306:3333"
 
 # Set options for database operations.
@@ -114,7 +125,8 @@ options = {
     "basedir"       : opt.basedir,
     "datadir"       : opt.datadir,
     "ports"         : opt.ports,
-    "show_servers"  : opt.show_servers
+    "show_servers"  : opt.show_servers,
+    "start_timeout" : opt.start_timeout,
 }
 
 if opt.server is None:

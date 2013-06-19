@@ -104,12 +104,13 @@ class test(server_info.test):
         #         specific data from the server start command.
 
         test_num += 1
-        cmd_opts = " --format=vertical --start " + \
-                   "--basedir=%s --datadir=%s" % (self.basedir, self.datadir3)
-        comment = "Test case %d - run against offline server" % test_num
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        comment = "Test case {0} - run against offline server".format(test_num)
+        cmd_opts = ("--format=vertical --start --basedir={0} --datadir={1} "
+                    "--start-timeout=0").format(self.basedir, self.datadir3)
+        cmd = "{0} {1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         server_info.test.do_replacements(self)
 
