@@ -36,7 +36,7 @@ if not check_connector_python():
 
 try:
     from mysql.utilities.command.utilitiesconsole import UtilitiesConsole
-    from mysql.utilities import VERSION_FRM, VERSION_STRING
+    from mysql.utilities import VERSION_FRM, VERSION_STRING, COPYRIGHT_FULL
     from mysql.utilities.common.options import add_verbosity, check_verbosity
     from mysql.utilities.exception import UtilError
 except:
@@ -49,11 +49,7 @@ NAME = "MySQL Utilities Client - mysqluc "
 DESCRIPTION = "mysqluc - Command line client for running MySQL Utilities"
 USAGE = "%prog "
 WELCOME_MESSAGE = """
-Welcome to the MySQL Utilities Client (mysqluc) version %s
-Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.\n
-Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
-Other names may be trademarks of their respective owners.
-
+Welcome to the MySQL Utilities Client (mysqluc) version {0}\n{1}
 Type 'help' for a list of commands or press TAB twice for list of utilities.
 """
 GOODBYE_MESSAGE = "\nThanks for using the MySQL Utilities Client!\n"
@@ -138,7 +134,7 @@ options = {
     'utildir'   : opt.utildir,
     'variables' : build_variable_dictionary_list(args),
     'prompt'    : 'mysqluc> ',
-    'welcome'   : WELCOME_MESSAGE % VERSION_STRING,
+    'welcome'   : WELCOME_MESSAGE.format(VERSION_STRING, COPYRIGHT_FULL),
     'goodbye'   : GOODBYE_MESSAGE,
     'commands'  : opt.commands,
     'custom'    : True, # We are using custom commands

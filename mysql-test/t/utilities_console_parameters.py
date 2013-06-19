@@ -121,8 +121,7 @@ class test(mutlib.System_test):
         self.remove_result("Launching console ...")
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqluc.py "
-                                           "version", 6)
+        self.remove_result("MySQL Utilities mysqluc.py version")
 
         self.replace_substring(".py", "")
 
