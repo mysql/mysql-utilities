@@ -27,6 +27,9 @@ Options:
   --port-range=PORTS    the port range to search for running mysql servers on
                         Windows systems
   --show-servers        show any known MySQL servers running on this host
+  --start-timeout=START_TIMEOUT
+                        Number of seconds to wait for the server to start.
+                        Default = 10.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
 Test case 2 - no headers
@@ -96,6 +99,7 @@ Test case 8 - show servers
 1 row.
 #...done.
 Test case 9 - run against offline server
+# WARNING: --start-timeout must be >= 10 seconds. Using default value 10.
 # Server is offline.
 # Checking server version ... done.
 # Starting read-only instance of the server ... done.

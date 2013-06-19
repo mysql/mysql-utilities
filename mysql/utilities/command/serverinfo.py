@@ -20,12 +20,19 @@ This file contains the reporting mechanisms for reporting disk usage.
 """
 
 import os
+import re
 import subprocess
 import sys
-import re
+import tempfile
+import time
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.server import (connect_servers, get_local_servers,
+                                           Server, test_connect)
+from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
+from mysql.utilities.exception import UtilError
+
 
 _COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
             'config_file', 'binary_log', 'binary_log_pos', 'relay_log',
@@ -87,19 +94,12 @@ def _server_info(server_val, get_defaults=False, options={}):
 
     Return tuple - information about server
     """
-    import tempfile
-
-    from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.tools import get_tool_path
-
-    verbosity = options.get("verbosity", 0)
-
     # Parse source connection values
     source_values = parse_connection(server_val, None, options)
 
     # Connect to the server
     conn_options = {
-        'version'   : "5.1.30",
+        'version': "5.1.30",
     }
     servers = connect_servers(source_values, None, conn_options)
     server = servers[0]
@@ -110,37 +110,44 @@ def _server_info(server_val, get_defaults=False, options={}):
     else:
         raise UtilError("Unable to determine basedir of running server.")
 
-    my_def_search = []
-    my_def_path = get_tool_path(basedir, "my_print_defaults")
     if os.name == "posix":
         my_def_search = ["/etc/my.cnf", "/etc/mysql/my.cnf",
                          os.path.join(basedir, "my.cnf"), "~/.my.cnf"]
     else:
-        my_def_search = ["c:\windows\my.ini","c:\my.ini", "c:\my.cnf",
+        my_def_search = ["c:\windows\my.ini", "c:\my.ini", "c:\my.cnf",
                          os.path.join(os.curdir, "my.ini")]
     my_def_search.append(os.path.join(os.curdir, "my.cnf"))
 
-    # Make 'key' value
-    server_id = source_values['host']
-    # Use string mapping because port is an integer
-    server_id += ":%s" % source_values['port']
-    if source_values.get('socket', None) is not None:
-        server_id += ":" + source_values.get('socket')
+    # Identify server by string: 'host:port[:socket]'.
+    server_id = "{0}:{1}".format(source_values['host'], source_values['port'])
+    if source_values.get('socket', None):
+        server_id = "{0}:{1}".format(server_id, source_values.get('socket'))
 
+    # Get server's default configuration values.
     defaults = []
     if get_defaults:
-        if verbosity > 0:
-            file = tempfile.TemporaryFile()
+        # Can only get defaults for local servers (need to access local data).
+        if server.is_alias('localhost'):
+            try:
+                my_def_path = get_tool_path(basedir, "my_print_defaults")
+            except UtilError as err:
+                raise UtilError("Unable to retrieve the defaults data "
+                                "(requires access to my_print_defaults): {0} "
+                                "(basedir: {1})".format(err.errmsg, basedir))
+            out_file = tempfile.TemporaryFile()
+            # Execute tool: <basedir>/my_print_defaults mysqld
+            subprocess.call([my_def_path, "mysqld"], stdout=out_file)
+            out_file.seek(0)
+            # Get defaults data from temp output file.
+            defaults.append("\nDefaults for server {0}".format(server_id))
+            for line in out_file.readlines():
+                defaults.append(line.rstrip())
         else:
-            file = open(os.devnull, "w+b")
-        subprocess.call([my_def_path, "mysqld"], stdout=file)
-        file.seek(0)
-        defaults.append("\nDefaults for server " + server_id)
-        for line in file.readlines():
-            defaults.append(line.rstrip())
+            # Remote server; Cannot get the defaults data.
+            defaults.append("\nWARNING: The utility can not get defaults from "
+                            "a remote host.")
 
     # Get server version
-    version = None
     try:
         res = server.show_server_variable('version')
         version = res[0][1]
@@ -152,7 +159,7 @@ def _server_info(server_val, get_defaults=False, options={}):
     for search_path in my_def_search:
         if os.path.exists(search_path):
             if len(config_file) > 0:
-                config_file += ", " + search_path
+                config_file = "{0}, {1}".format(config_file, search_path)
             else:
                 config_file = search_path
 
@@ -184,11 +191,8 @@ def _start_server(server_val, basedir, datadir, options={}):
     datadir[in]       the data directory for the server
     options[in]       dictionary of options (verbosity)
     """
-    from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
-    from mysql.utilities.common.server import Server
-    import time
-
     verbosity = options.get("verbosity", 0)
+    start_timeout = options.get("start_timeout", 10)
 
     mysqld_path = get_tool_path(basedir, "mysqld")
 
@@ -198,24 +202,19 @@ def _start_server(server_val, basedir, datadir, options={}):
     print "# Checking server version ...",
     version = get_mysqld_version(mysqld_path)
     print "done."
-    post_5_5 = version is not None and \
-               int(version[0]) >= 5 and int(version[1]) >= 5
     post_5_6 = version is not None and \
                int(version[0]) >= 5 and int(version[1]) >= 6
 
     # Start the instance
     print "# Starting read-only instance of the server ...",
     args = [
+        "--no-defaults",
         "--skip-grant-tables",
         "--read_only",
         "--port=%(port)s" % server_val,
         "--basedir=" + basedir,
         "--datadir=" + datadir,
     ]
-
-    # If the server is 5.5 or later, add --no-defaults.
-    if post_5_5:
-        args.insert(0, "--no-defaults")
 
     # It the server is 5.6 or later, we must use additional parameters
     if post_5_6:
@@ -244,13 +243,24 @@ def _start_server(server_val, basedir, datadir, options={}):
         'role'      : "read_only",
     }
     server = Server(server_options)
-    # Now wait for the server to become ready - could be up to 10 seconds
-    # for Windows machines.
-    if os.name == "nt":
-        time.sleep(10)
-    else:
+
+    # Try to connect to the server, waiting for the server to become ready
+    # (retry start_timeout times and wait 1 sec between each attempt).
+    # Note: It can take up to 10 seconds for Windows machines.
+    for retry in range(start_timeout):
+        # Reset error and wait 1 second.
+        error = None
         time.sleep(1)
-    server.connect()
+        try:
+            server.connect()
+            break  # Server ready (connect succeed)! Exit the for loop.
+        except UtilError as err:
+            # Store exception to raise later (if needed).
+            error = err
+    # Raise last known exception (if unable to connect to the server)
+    if error:
+        raise error
+
     print "done."
     return server
 
@@ -267,8 +277,6 @@ def _stop_server(server_val, basedir, options={}):
     basedir[in]       the base directory for the server
     options[in]       dictionary of options (verbosity)
     """
-    from mysql.utilities.common.tools import get_tool_path
-
     verbosity = options.get("verbosity", 0)
     socket = server_val.get("unix_socket", None)
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
@@ -298,8 +306,6 @@ def _show_running_servers(start=3306, end=3333):
     start[in]         starting port for Windows servers
     end[in]           ending port for Windows servers
     """
-    from mysql.utilities.common.server import get_local_servers
-
     print "# "
     processes = get_local_servers(True, start, end)
     if len(processes) > 0:
@@ -342,9 +348,6 @@ def show_server_info(servers, options):
 
     Returns tuple ((server information), defaults)
     """
-    from mysql.utilities.common.server import test_connect
-    from mysql.utilities.common.format import print_list
-
     no_headers = options.get("no_headers", False)
     format = options.get("format", "grid")
     show_defaults = options.get("show_defaults", False)
@@ -357,15 +360,13 @@ def show_server_info(servers, options):
     if show_servers:
         if os.name == 'nt':
             ports = options.get("ports", "3306:3333")
-            start, end = ports.split(":")
-            _show_running_servers(start, end)
+            start_p, end_p = ports.split(":")
+            _show_running_servers(start_p, end_p)
         else:
             _show_running_servers()
 
-    defaults_rows = []
     rows = []
     server_val = {}
-    get_defaults = True
     for server in servers:
         new_server = None
         try:
@@ -415,12 +416,9 @@ def show_server_info(servers, options):
                 new_server = _start_server(server_val, basedir,
                                            datadir, options)
 
-        info, defaults = _server_info(server, get_defaults, options)
+        info, defaults = _server_info(server, show_defaults, options)
         if info:
             rows.append(info)
-        if defaults and len(defaults_rows) == 0:
-            defaults_rows = defaults
-            get_defaults = False
         if new_server:
             # Need to stop the server!
             new_server.disconnect()
@@ -428,6 +426,7 @@ def show_server_info(servers, options):
 
     print_list(sys.stdout, format, _COLUMNS, rows, no_headers)
 
-    if show_defaults and len(defaults_rows) > 0:
-        for row in defaults_rows:
-            print "  %s" % row
+    # Print the default configurations.
+    if show_defaults and len(defaults) > 0:
+        for row in defaults:
+            print("  {0}".format(row))

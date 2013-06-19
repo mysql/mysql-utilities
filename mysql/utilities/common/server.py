@@ -500,7 +500,6 @@ class Server(object):
             res = False
         return res
 
-
     def is_alias(self, host_or_ip):
         """Determine if host_or_ip is an alias for this host
 
@@ -541,7 +540,7 @@ class Server(object):
                         print("WARNING: hostname: {0} may not be reachable, "
                               "reason: {1}".format(host, err.strerror))
                     return aliases
-                aliases.append(host_ip[0])
+                extend_aliases(aliases, [host_ip[0]])
                 addrinfo = socket.getaddrinfo(host, None)
                 local_ip = None
                 error = None
@@ -572,11 +571,11 @@ class Server(object):
             Returns List of no repeated elements from the two list
             """
             if als_new:
+                als_new = set(als_new)  # Create a set to remove duplicates.
                 als_new = [alias for alias in als_new if (alias and
                                                           alias not in aliases
                                                           )]
                 aliases.extend(als_new)
-
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
 
@@ -617,28 +616,33 @@ class Server(object):
         # Get the aliases for this server host
         self.aliases = get_aliases(self.host)
         # Check if this server is local
-        if self.host in local_aliases:
-            # save the local aliases for future.
-            extend_aliases(self.aliases, local_aliases)
-            # check if the host_or_ip is alias
-            if host_or_ip in self.aliases:
-                return True
-        else:
-            # server host is not local, do not use local aliases
-            # check if the given host_or_ip is alias of the host.
-            if host_or_ip in self.aliases:
-                return True
+        for host in self.aliases:
+            if host in local_aliases:
+                # Is local then save the local aliases for future.
+                extend_aliases(self.aliases, local_aliases)
+                break
+            # Handle special ".local" hostnames.
+            if host.endswith('.local'):
+                # Remove '.local' and attempt to match with local aliases.
+                host, _ = host.rsplit('.', 1)
+                if host in local_aliases:
+                    # Is local then save the local aliases for future.
+                    extend_aliases(self.aliases, local_aliases)
+                    break
+
+        # Check if the given host_or_ip is alias of the server host.
+        if host_or_ip in self.aliases:
+            return True
 
         # lastly get the alias for the given host_or_ip
         host_or_ip_aliases = get_aliases(host_or_ip)
-        host_or_ip_aliases.append(host_or_ip)
+        extend_aliases(host_or_ip_aliases, [host_or_ip])
         for alias in host_or_ip_aliases:
             if alias in self.aliases:
                 #save the aliases for future
                 extend_aliases(self.aliases, host_or_ip_aliases)
                 return True
         return False
-
 
     def user_host_exists(self, user, host_or_ip):
         """Check to see if a user, host exists
