@@ -449,14 +449,14 @@ class Server(object):
             verbose        print extra data during operations (optional)
                            default value = False
             charset        Default character set for the connection.
-                           (default latin1)
+                           (default utf8)
         """
         assert not options.get("conn_info") == None
 
         self.verbose = options.get("verbose", False)
         self.db_conn = None
         self.host = None
-        self.charset = options.get("charset", "latin1")
+        self.charset = options.get("charset", "utf8")
         self.role = options.get("role", "Server")
         conn_values = get_connection_dictionary(options.get("conn_info"))
         try:

@@ -19,7 +19,7 @@ import mutlib
 import copy_db_parameters
 
 from mysql.utilities.common.table import quote_with_backticks
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 
 class test(copy_db_parameters.test):
@@ -32,7 +32,17 @@ class test(copy_db_parameters.test):
         return copy_db_parameters.test.check_prerequisites(self)
 
     def setup(self):
-        return copy_db_parameters.test.setup(self)
+        copy_db_parameters.test.setup(self)
+
+        # Create database to export data with unicode characters
+        data_file_import = os.path.normpath("./std_data/import_data.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_import, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_import, err.errmsg))
+
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
@@ -117,6 +127,14 @@ class test(copy_db_parameters.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - export data with unicode "
+                   "characters").format(test_num)
+        cmd_str = "{0} --export=data --format=SQL import_test".format(cmd)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_result("Time:", "Time:       XXXXXX\n")
 
         _REPLACEMENTS = ("PROCEDURE", "FUNCTION", "TRIGGER", "SQL")
@@ -174,4 +192,8 @@ class test(copy_db_parameters.test):
         return True
 
     def cleanup(self):
+        try:
+            self.drop_db(self.server1, 'import_test')
+        except:
+            pass
         return copy_db_parameters.test.cleanup(self)
