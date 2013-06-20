@@ -279,6 +279,25 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         num_test += 1
+        comment = ("Test case {0} - Test query-type false "
+                   "positives").format(num_test)
+        cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        query_types = "COMMIT,SET,PREPARE"
+        num_test += 1
+        comment = ("Test case {0} - Test query-type false "
+                   "positives (particular cases)").format(num_test)
+        cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        num_test += 1
         comment = ("Test case {0} - Search entries of "
                    "multi-line log".format(num_test))
         audit_log_name = os.path.normpath("./std_data/multi.log")

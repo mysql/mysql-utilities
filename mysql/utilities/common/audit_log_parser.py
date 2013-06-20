@@ -43,18 +43,40 @@ class AuditLogParser(AuditLogReader):
         self.rows = []
         self.connection_ids = []
 
-    def parse_log(self):
-        """Parse audit log records, apply search criteria and store results.
-        """
-
         # Compile regexp pattern
-        regexp_obj = None
+        self.regexp_pattern = None
         if self.options['pattern']:
             try:
-                regexp_obj = re.compile(self.options['pattern'])
+                self.regexp_pattern = re.compile(self.options['pattern'])
             except:
                 raise UtilError("Invalid Pattern: " + self.options['pattern'])
 
+        # Add a space after the query type to reduce false positives.
+        # Note: Although not perfect, this simple trick considerably reduce
+        # false positives, avoiding the use of complex regex (with lower
+        # performance).
+        self.match_qtypes = []  # list of matching SQL statement/command types.
+        self.regexp_comment = None
+        self.regexp_quoted = None
+        self.regexp_backtick = None
+        if self.options['query_type']:
+            # Generate strings to match query types
+            for qt in self.options['query_type']:
+                if qt == "commit":
+                    # COMMIT is an exception (can appear alone without spaces)
+                    self.match_qtypes.append(qt)
+                else:
+                    self.match_qtypes.append("{0} ".format(qt))
+            # Compile regexp to match comments (/*...*/) to be ignored/removed.
+            self.regexp_comment = re.compile(r'/\*.*?\*/', re.DOTALL)
+            # Compile regexp to match single quoted text ('...') to be ignored.
+            self.regexp_quoted = re.compile(r"'.*?'", re.DOTALL)
+            # Compile regexp to match text between backticks (`) to be ignored.
+            self.regexp_backtick = re.compile(r'`.*?`', re.DOTALL)
+
+    def parse_log(self):
+        """Parse audit log records, apply search criteria and store results.
+        """
         # Find and store records matching search criteria
         for record, line in self.get_next_record():
             name = record.get("NAME")
@@ -98,13 +120,12 @@ class AuditLogParser(AuditLogReader):
 
             # Check if record matches query type criteria
             if (matching_record and self.options['query_type']
-                and not self.match_query_type(record,
-                                              self.options['query_type'])):
+                and not self.match_query_type(record)):
                 matching_record = False
 
             # Search attributes values for matching pattern
-            if (matching_record and regexp_obj
-                and not self.match_pattern(record, regexp_obj)):
+            if (matching_record and self.regexp_pattern
+                and not self.match_pattern(record)):
                 matching_record = False
 
             # Store record into resulting rows (i.e., survived defined filters)
@@ -169,34 +190,52 @@ class AuditLogParser(AuditLogReader):
         else:
             return True
 
-    def match_pattern(self, record, regexp_obj):
+    def match_pattern(self, record):
         """ Match REGEXP pattern.
 
         Check if the given record matches the defined pattern.
         Returns True if one of the record values matches the pattern.
 
         record[in] audit log record to check;
-        regexp_obj[in] compiled regular expression object;
         """
         for val in record.values():
-            if val and regexp_obj.match(val):
+            if val and self.regexp_pattern.match(val):
                 return True
         return False
 
-    def match_query_type(self, record, query_types):
+    def match_query_type(self, record):
         """ Match query types.
 
         Check if the given record matches one of the given query types.
         Returns True if the record possesses a SQL statement/command that
         matches one of the query types from the given list of query types.
 
-        record[in] audit log record to check;
-        query_types[in] list of matching SQL statement/command types;
+        record[in]          audit log record to check;
         """
         sqltext = record.get('SQLTEXT', None)
         if sqltext:
+            # Ignore (i.e., remove) comments in query.
+            if self.regexp_comment:
+                sqltext = re.sub(self.regexp_comment, '', sqltext)
+            # Ignore (i.e., remove) quoted text in query.
+            if self.regexp_quoted:
+                sqltext = re.sub(self.regexp_quoted, '', sqltext)
+            # Ignore (i.e., remove) names quoted with backticks in query.
+            if self.regexp_backtick:
+                sqltext = re.sub(self.regexp_backtick, '', sqltext)
+            # Search query types strings inside text.
             sqltext = sqltext.lower()
-            for qtype in query_types:
+            for qtype in self.match_qtypes:
+                # Handle specific query-types to avoid false positives.
+                if (qtype.startswith('set') and
+                        ('insert ' in sqltext or 'update ' in sqltext)):
+                    # Do not match SET in INSERT or UPDATE queries.
+                    continue
+                if (qtype.startswith('prepare') and
+                        ('drop ' in sqltext or 'deallocate ' in sqltext)):
+                    # Do not match PREPARE in DROP or DEALLOCATE queries.
+                    continue
+                # Check if query type is found.
                 if qtype in sqltext:
                     return True
         return False
