@@ -276,7 +276,8 @@ class test(mutlib.System_test):
                                   "for server %s:%s: %s"
                                   % (srv.host, srv.port, err))
 
-    def reset_topology(self, slaves_list=[]):
+    def reset_topology(self, slaves_list=None, rpl_user='rpl',
+                       rpl_passwd='rpl'):
         if slaves_list:
             slaves = slaves_list
         else:
@@ -297,7 +298,8 @@ class test(mutlib.System_test):
         for slave in slaves:
             slave_str = " --slave=%s" % self.build_connection_string(slave)
             conn_str = self.master_str + slave_str
-            cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s -vvv" % conn_str
+            cmd = ("mysqlreplicate.py --rpl-user={0}:{1} {2} "
+                   "-vvv").format(rpl_user, rpl_passwd, conn_str)
             res = self.exec_util(cmd, self.res_fname)
             if res != 0:
                 return False

@@ -622,11 +622,13 @@ class RplCommands(object):
         self._report("# Checking privileges.")
         errors = self.topology.check_privileges(failover_mode != 'fail')
         if len(errors):
-            msg = "User %s on %s does not have sufficient privileges to " + \
-                  "execute the %s command."
             for error in errors:
-                self._report(msg % (error[0], error[1], 'failover'),
-                                    logging.CRITICAL)
+                msg = ("User {0} on {1}@{2} does not have sufficient "
+                       "privileges to execute the {3} command "
+                       "(required: {4}).").format(error[0], error[1], error[2],
+                                                  'failover', error[3])
+                print("# ERROR: {0}".format(msg))
+                self._report(msg, logging.CRITICAL, False)
             raise UtilRplError("Not enough privileges to execute command.")
 
         # Require --master-info-repository=TABLE for all slaves

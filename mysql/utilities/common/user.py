@@ -174,21 +174,34 @@ class User(object):
         return grants
 
     def has_privilege(self, db, obj, access):
-        """Check to see user has a specific access to a db.object
-        
- 
+        """Check to see user has a specific access to a db.object.
+
         db[in]             Name of database
         obj[in]            Name of object
-        access[in]         MySQL access to test (e.g. SELECT)
+        access[in]         MySQL privilege to check (e.g. SELECT, SUPER, DROP)
 
         Returns True if user has access, False if not
         """
-        regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|%s)\b.*"
-                           r"ON\s+(?:\*|['`]?%s['`]?)\.(?:\*|[`']?%s[`']?)\s+TO"
-                           % (re.escape(access), re.escape(db), re.escape(obj)))
+        # Convert privilege to upper cases.
+        access = access.upper()
+        # Create regexp to match SHOW GRANTS.
+        if access == "GRANT OPTION":
+            # WITH GRANT OPTION appears at the end of SHOW GRANTS.
+            regex = re.compile(r"GRANT.+ON\s+"
+                               r"(?:\*|['`]?{db}['`]?)\.(?:\*|[`']?{obj}[`']?)"
+                               r"\s+TO.+"
+                               r"WITH GRANT OPTION".format(db=re.escape(db),
+                                                           obj=re.escape(obj)))
+        else:
+            # GRANT with ALL PRIVILEGES or given privilege (access parameter).
+            regex = re.compile(r"GRANT.*\b(?:ALL PRIVILEGES|{priv})\b.*ON\s+"
+                               r"(?:\*|['`]?{db}['`]?)\.(?:\*|[`']?{obj}[`']?)"
+                               r"\s+TO".format(priv=re.escape(access),
+                                               db=re.escape(db),
+                                               obj=re.escape(obj)))
         for grant in self.get_grants(True):
-            #print "G:", grant[0], regex.match(grant[0]) is not None
-            if regex.match(grant[0]) is not None:
+            # Check if SHOW GRANTS match regexp with privilege.
+            if regex.match(grant[0]):
                 return True
 
     def print_grants(self):

@@ -1455,15 +1455,21 @@ class Topology(Replication):
                     candidate_slaves.append(slave)
 
         for server in servers:
-            user_inst = User(server, "%s@%s" % (server.user, server.host))
+            user_inst = User(server, "{0}@{1}".format(server.user, server.host))
             if not failover:
                 if not user_inst.has_privilege("*", "*", "SUPER"):
-                    errors.append((server.user, server.host))
+                    errors.append((server.user, server.host, server.port,
+                                   'SUPER'))
             else:
-                if not user_inst.has_privilege("*", "*", "SUPER") or \
-                   not user_inst.has_privilege("*", "*", "GRANT") or \
-                   not user_inst.has_privilege("*", "*", "REPLICATION SLAVE"):
-                    errors.append((server.user, server.host))
+                if (not user_inst.has_privilege("*", "*", "SUPER") or
+                    not user_inst.has_privilege("*", "*", "GRANT OPTION") or
+                    not user_inst.has_privilege("*", "*", "SELECT") or
+                    not user_inst.has_privilege("*", "*", "RELOAD") or
+                    not user_inst.has_privilege("*", "*",
+                                                "REPLICATION SLAVE")):
+                    errors.append((server.user, server.host, server.port,
+                                   'SUPER, GRANT OPTION, REPLICATION SLAVE, '
+                                   'SELECT, RELOAD'))
 
         # Disconnect if we connected to any candidates
         for slave in candidate_slaves:
