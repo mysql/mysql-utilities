@@ -21,6 +21,7 @@ This module contains methods for working with mysql server tools.
 
 import inspect
 import os
+import re
 import sys
 import shutil
 import socket
@@ -379,6 +380,107 @@ def check_port_in_use(host, port):
         return True
     sock.close()
     return False
+
+
+def requires_encoding(orig_str):
+    """Check to see if a string requires encoding
+
+    This method will check to see if a string requires encoding to be used
+    as a MySQL file name (r"[\w$]*").
+
+    orig_str[in]        original string
+
+    Returns bool - True = requires encoding, False = does not require encoding
+    """
+    ok_chars = re.compile(r"[\w$]*")
+    parts = ok_chars.findall(orig_str)
+    return len(parts) > 2 and parts[1].strip() == ''
+
+
+def encode(orig_str):
+    """Encode a string containing non-MySQL observed characters
+
+    This method will take a string containing characters other than those
+    recognized by MySQL (r"[\w$]*") and covert them to embedded ascii values.
+    For example, "this.has.periods" becomes "this@002ehas@00e2periods"
+
+    orig_str[in]        original string
+
+    Returns string - encoded string or original string
+    """
+    # First, find the parts that match valid characters
+    ok_chars = re.compile(r"[\w$]*")
+    parts = ok_chars.findall(orig_str)
+
+    # Now find each part that does not match the list of valid characters
+    # Save the good parts
+    i = 0
+    encode_parts = []
+    good_parts = []
+    for part in parts:
+        if not len(part):
+            continue
+        good_parts.append(part)
+        if i == 0:
+            i = len(part)
+        else:
+            j = orig_str[i:].find(part)
+            encode_parts.append(orig_str[i:i+j])
+            i += len(part) + j
+
+    # Next, convert the non-valid parts to the form @NNNN (hex)
+    encoded_parts = []
+    for part in encode_parts:
+        new_part = "".join(["@%04x" % ord(c) for c in part])
+        encoded_parts.append(new_part)
+
+    # Take the good parts and the encoded parts and reform the string
+    i = 0
+    new_parts = []
+    for part in good_parts[:len(good_parts) - 1]:
+        new_parts.append(part)
+        new_parts.append(encoded_parts[i])
+        i += 1
+    new_parts.append(good_parts[len(good_parts) - 1])
+
+    # Return the new string
+    return "".join(new_parts)
+
+
+def requires_decoding(orig_str):
+    """Check to if a string required decoding
+
+    This method will check to see if a string requires decoding to be used
+    as a filename (has @NNNN entries)
+
+    orig_str[in]        original string
+
+    Returns bool - True = requires decoding, False = does not require decoding
+    """
+    return '@' in orig_str
+
+
+def decode(orig_str):
+    """Decode a string containing @NNNN entries
+
+    This method will take a string containing characters other than those
+    recognized by MySQL (r"[\w$]*") and covert them to character values.
+    For example, "this@002ehas@00e2periods" becomes "this.has.periods".
+
+    orig_str[in]        original string
+
+    Returns string - decoded string or original string
+    """
+    parts = orig_str.split('@')
+    if len(parts) == 1:
+        return orig_str
+    new_parts = [parts[0]]
+    for part in parts[1:]:
+        # take first four positions and convert to ascii
+        new_parts.append(chr(int(part[0:4], 16)))
+        new_parts.append(part[4:])
+    return "".join(new_parts)
+
 
 def check_connector_python(print_error=True):
     """ Check to see if Connector/Python is installed and accessible

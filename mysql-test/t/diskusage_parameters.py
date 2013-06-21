@@ -137,6 +137,22 @@ class test(diskusage_basic.test):
             raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
         self.results.append("\n")
 
+        # Create a database using strange characters.
+        self.server1.exec_query("CREATE DATABASE `strange.``name`")
+        self.server1.exec_query("CREATE TABLE `strange.``name`.`we.i``rd` "
+                                "(a char(30))")
+        self.server1.exec_query('INSERT INTO `strange.``name`.`we.i``rd` '
+                                'VALUES ("sample text")')
+
+        test_num += 1
+        comment = ("Test Case {0} : Database name with strange "
+                   "characters.").format(test_num)
+        cmd = '{0}'.format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
+        self.results.append("\n")
+
         # Show log usage using a user with strictly required mySQL privileges.
 
         # Grant only SUPER privilege to user (no previous privilege).
@@ -173,6 +189,7 @@ class test(diskusage_basic.test):
 
         diskusage_basic.test.mask(self)
 
+        self.mask_column_result("strange.`name,", ",", 2, "XXXXXXX")
         self.mask_column_result("mysql,", ",", 2, "XXXXXXX")
         self.mask_column_result("util_test", ",", 2, "XXXXXXX")
         self.mask_column_result("mysql,X", ",", 3, "XXXXXXX")

@@ -24,6 +24,7 @@ import os
 import sys
 
 from mysql.utilities.common.format import print_list
+from mysql.utilities.common.tools import encode
 from mysql.utilities.common.user import User
 from mysql.utilities.exception import UtilError
 
@@ -373,8 +374,11 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
     for row in rows:
         # If user can read the datadir, calculate actual and misc file totals
         if have_read:
-            dbdir_size = _get_folder_size(os.path.join(datadir, row[0]))
-            misc_files = _get_db_dir_size(os.path.join(datadir, row[0]))
+            # Encode database name (with strange characters) to the
+            # corresponding directory name.
+            db_dir = encode(row[0])
+            dbdir_size = _get_folder_size(os.path.join(datadir, db_dir))
+            misc_files = _get_db_dir_size(os.path.join(datadir, db_dir))
         else:
             dbdir_size = 0
             misc_files = 0

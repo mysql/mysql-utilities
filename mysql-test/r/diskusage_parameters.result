@@ -198,7 +198,19 @@ ib_logfile0,XXXXXXXX
 ib_logfile1,XXXXXXXX
 ibdata1,XXXXXXXX
 
-Test Case 10 : Use a user only with SUPER privilege.
+Test Case 10 : Database name with strange characters.
+# Source on localhost: ... connected.
+# Database totals:
+db_name,total
+mysql,XXXXXXX
+strange.`name,XXXXXXX
+util_test,XXXXXXX
+
+Total database disk usage = XXXXXXX
+
+#...done.
+
+Test Case 11 : Use a user only with SUPER privilege.
 # Source on localhost: ... connected.
 # Database totals:
 
@@ -231,7 +243,7 @@ Total size of InnoDB files = XXXXXXXX
 
 #...done.
 
-Test Case 11 : Use a user only with REPLICATION CLIENT privilege.
+Test Case 12 : Use a user only with REPLICATION CLIENT privilege.
 # Source on localhost: ... connected.
 # Database totals:
 
