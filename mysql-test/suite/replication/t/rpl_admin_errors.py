@@ -294,6 +294,8 @@ class test(rpl_admin.test):
                             "| NO         | OK      |",
                             "| localhost  | PORT5  | SLAVE   | UP     "
                             "| OFF        | OK      |\n")
+        
+        self.remove_result("NOTE: Log file")
 
         return True
 

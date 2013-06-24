@@ -1,5 +1,4 @@
 Test case 1 - failover (fail) using 'repl' only with: REPLICATION SLAVE.
-NOTE: Log file '1fail_log.txt' does not exist. Will be created.
 # Discovering slaves for master at localhost:PORT1
 Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
@@ -12,7 +11,6 @@ WARNING: There are slaves that had connection errors.
 # ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD).
 ERROR: Not enough privileges to execute command.
 Test case 2 - failover (fail) using 'repl' without: SUPER.
-NOTE: Log file '2fail_log.txt' does not exist. Will be created.
 # Discovering slaves for master at localhost:PORT1
 Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
@@ -25,7 +23,6 @@ WARNING: There are slaves that had connection errors.
 # ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD).
 ERROR: Not enough privileges to execute command.
 Test case 3 - failover (fail) using 'repl' without: GRANT OPTION.
-NOTE: Log file '3fail_log.txt' does not exist. Will be created.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -36,7 +33,6 @@ NOTE: Log file '3fail_log.txt' does not exist. Will be created.
 # ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD).
 ERROR: Not enough privileges to execute command.
 Test case 4 - failover (fail) using 'repl' without: SELECT.
-NOTE: Log file '4fail_log.txt' does not exist. Will be created.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -47,7 +43,6 @@ NOTE: Log file '4fail_log.txt' does not exist. Will be created.
 # ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD).
 ERROR: Not enough privileges to execute command.
 Test case 5 - failover (fail) using 'repl' without: RELOAD.
-NOTE: Log file '5fail_log.txt' does not exist. Will be created.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3

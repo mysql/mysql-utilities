@@ -478,6 +478,7 @@ class Server(object):
         self.autocommit = None
         self.read_only = False
         self.aliases = []
+        self.grants_enabled = None
 
     def is_alive(self):
         """Determine if connection to server is still alive.
@@ -1427,3 +1428,24 @@ class Server(object):
             return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
                                    "ON" if on else "OFF")
         return None
+
+
+    def grant_tables_enabled(self):
+        """Check to see if grant tables are enabled
+
+        Returns bool - True = grant tables are enabled, False = disabled
+        """
+        if self.grants_enabled is None:
+            try:
+                res = self.exec_query("CREATE USER 'snuffles'@'host' "
+                                      "IDENTIFIED BY 'sniff'")
+                res = self.exec_query("DROP USER 'snuffles'@'host'")
+                self.grants_enabled = True
+            except UtilError as error:
+                if "--skip-grant-tables" in error.errmsg:
+                    self.grants_enabled = False
+                # Ignore other errors as they are not pertinent to the check
+                else: 
+                    return True
+        return self.grants_enabled
+

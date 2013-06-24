@@ -30,13 +30,15 @@ class test(mutlib.System_test):
         self.port_repl = []
         return self.check_num_servers(1)
 
-    def get_server(self, name):
+    def get_server(self, name, mysqld_params=None):
         serverid = self.servers.get_next_id()
-        new_port = self.servers.get_next_port()
-        mysqld_params = (' --mysqld="--log-bin=mysql-bin '
-                         ' --report-host={0} '
-                         '--report-port={1}"').format('localhost', new_port)
-        self.servers.clear_last_port()
+        if not mysqld_params:
+            new_port = self.servers.get_next_port()
+            mysqld_params = (' --mysqld="--log-bin=mysql-bin '
+                             ' --report-host={0} '
+                             '--report-port={1}"').format('localhost',
+                                                          new_port)
+            self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
                                             name, mysqld_params)
         if not res:
@@ -221,14 +223,11 @@ class test(mutlib.System_test):
         for port in self.port_repl:
             self.replace_substring("%s" % port, "PORT%d" % i)
             i += 1
-        self.replace_result("Error connecting to a slave",
-                            "Error connecting to a slave ...\n")
-        self.replace_result("Error 2002: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server"
-                            "\n")
-        self.replace_result("Error 2003: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server"
-                            "\n")
+        # Remove non-deterministic messages (do not appear on all platfoms)
+        self.remove_result("Error connecting to a slave")
+        self.remove_result("Error 2002: Can't connect to")
+        self.remove_result("Error 2003: Can't connect to")
+        self.remove_result("WARNING: There are slaves")
 
     def get_result(self):
         return self.compare(__name__, self.results)

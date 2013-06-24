@@ -148,6 +148,5 @@ Test case 30 - Switchover using a wrong slave and with --force
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 31 - Switchover using with --force and user does not have grant priv
-NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 # ERROR: ERROR: Cannot grant replication slave to replication user.
 Error found in log file. 

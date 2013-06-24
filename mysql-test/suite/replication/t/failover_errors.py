@@ -134,6 +134,8 @@ class test(rpl_admin_gtid.test):
         self.replace_substring(str(self.s3_port), "PORT4")
         self.replace_substring(str(self.s4_port), "PORT5")
 
+        self.remove_result("NOTE: Log file")
+
         return True
 
     def get_result(self):

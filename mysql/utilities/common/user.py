@@ -27,7 +27,7 @@ from mysql.utilities.exception import FormatError
 
 def parse_user_host(user_name):
     """Parse user, passwd, host, port from user:passwd@host
-    
+
     user_name[in]      MySQL user string (user:passwd@host)
     """
 
@@ -37,7 +37,7 @@ def parse_user_host(user_name):
     except FormatError:
         raise UtilError("Cannot parse user:pass@host : %s." %
                         no_ticks)
-    return (conn_values['user'], conn_values['passwd'], conn_values['host']) 
+    return (conn_values['user'], conn_values['passwd'], conn_values['host'])
 
 
 class User(object):
@@ -49,11 +49,11 @@ class User(object):
         - Create, Drop user
         - Check to see if user exists
         - Retrieving and printing grants for user
-    """   
+    """
 
     def __init__(self, server1, user, verbosity=0):
         """Constructor
-        
+
         server1[in]        Server class
         user[in]           MySQL user credentials string (user@host:passwd)
         verbose[in]        print extra data during operations (optional)
@@ -70,10 +70,10 @@ class User(object):
 
     def create(self, new_user=None):
         """Create the user
-                
+
         Attempts to create the user. If the operation fails, an error is
         generated and printed.
-        
+
         new_user[in]       MySQL user string (user@host:passwd)
                            (optional) If omitted, operation is performed
                            on the class instance user name.
@@ -111,7 +111,7 @@ class User(object):
             query_str += "'%s'@'%s' " % (user, host)
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
-            
+
         if self.verbosity > 0:
             print query_str
 
@@ -119,7 +119,7 @@ class User(object):
 
     def exists(self, user_name=None):
         """Check to see if the user exists
-        
+
         user_name[in]      MySQL user string (user@host:passwd)
                            (optional) If omitted, operation is performed
                            on the class instance user name.
@@ -141,7 +141,7 @@ class User(object):
         """Retrieve the grants for the current user
 
         globals[in]        Include global privileges in clone (i.e. user@%)
-        
+
         returns result set or None if no grants defined
         """
         # Get the users' connection user@host if not retrieved
@@ -157,31 +157,40 @@ class User(object):
                 self.current_user = "'%s'@'%s'" % (parts[0], parts[1])
         grants = []
         try:
-            res = self.server1.exec_query("SHOW GRANTS FOR %s" % 
-                                          self.current_user)
+            res = self.server1.exec_query("SHOW GRANTS FOR "
+                                          "{0}".format(self.current_user))
             for grant in res:
                 grants.append(grant)
         except UtilDBError, e:
             pass # Error here is ok - no grants found.
         if globals:
             try:
-                res = self.server1.exec_query("SHOW GRANTS FOR '%s'" % \
-                                              self.user + "@'%'")
+                res = self.server1.exec_query("SHOW GRANTS FOR "
+                                              "'{0}'{1}".format(self.user,
+                                                                "@'%'"))
                 for grant in res:
                     grants.append(grant)
             except UtilDBError, e:
                 pass # Error here is ok - no grants found.
         return grants
 
-    def has_privilege(self, db, obj, access):
+    def has_privilege(self, db, obj, access, allow_skip_grant_tables=True):
         """Check to see user has a specific access to a db.object.
 
         db[in]             Name of database
         obj[in]            Name of object
         access[in]         MySQL privilege to check (e.g. SELECT, SUPER, DROP)
+        allow_skip_grant_tables[in]  If True, allow silent failure for
+                           cases where the server is started with
+                           --skip-grant-tables. Default=True
 
         Returns True if user has access, False if not
         """
+        grants_enabled = self.server1.grant_tables_enabled()
+        # If grants are disabled and it is Ok to allow skipped grant tables,
+        # return True - privileges disabled so user can do anything.
+        if allow_skip_grant_tables and not grants_enabled:
+            return True
         # Convert privilege to upper cases.
         access = access.upper()
         # Create regexp to match SHOW GRANTS.
@@ -213,16 +222,16 @@ class User(object):
 
     def clone(self, new_user, destination=None, globals=False):
         """Clone the current user to the new user
-        
+
         Operation will create the new user account copying all of the
         grants for the current user to the new user. If operation fails,
         an error message is generated and the process halts.
-        
+
         new_name[in]       MySQL user string (user@host:passwd)
         destination[in]    A connection to a new server to clone the user
                            (default is None)
         globals[in]        Include global privileges in clone (i.e. user@%)
-        
+
         Note: Caller must ensure the new user account does not exist.
         """
 
@@ -251,8 +260,8 @@ class User(object):
             if start > 0:
                 end = grant.index("'", start + len(search_str) + 2) + 2
                 grant = grant[0:start] + grant[end:]
-                
+
             if self.verbosity > 0:
                 print grant
-                
+
             res = server.exec_query(grant, self.query_options)

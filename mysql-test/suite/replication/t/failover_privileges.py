@@ -232,6 +232,8 @@ class test(failover.test):
         else:
             raise MUTLibError("{0}: failed".format(test_case[4]))
 
+        self.remove_result("NOTE: Log file")
+
         return True
 
     def get_result(self):
