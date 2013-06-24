@@ -16,9 +16,7 @@
 #
 import os
 import mutlib
-from mysql.utilities import PYTHON_MAX_VERSION
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.common.tools import check_python_version
 
 _BASE_COMMENT = "Test Case %d: "
 
@@ -31,10 +29,6 @@ class test(mutlib.System_test):
 
     def check_prerequisites(self):
         self.server0 = None
-        try:
-            check_python_version((2, 7, 0), PYTHON_MAX_VERSION, True)
-        except:
-            raise MUTLibError("Test requires Python 2.7 or higher.")
         return self.check_num_servers(1)
 
     def setup(self):

@@ -21,7 +21,16 @@ This file contains the methods for reading the audit log.
 
 import os
 import xml.etree.ElementTree as xml
+
 from mysql.utilities.exception import UtilError
+
+# Import appropriate XML exception to be compatible with python 2.6.
+try:
+    # Exception only available from python 2.7 (i.e., ElementTree 1.3)
+    from xml.etree.ElementTree import ParseError
+except ImportError:
+    # Instead use ExpatError for earlier python versions.
+    from xml.parsers.expat import ExpatError as ParseError
 
 _MANDATORY_FIELDS = ['NAME', 'TIMESTAMP']
 _OPTIONAL_FIELDS = ['CONNECTION_ID', 'DB', 'HOST', 'IP', 'MYSQL_VERSION',
@@ -99,7 +108,10 @@ class AuditLogReader(object):
             next_line = ""
             try:
                 yield (self._make_record(xml.fromstring(log_entry)), log_entry)
-            except xml.ParseError:
+            except (ParseError, SyntaxError):
+                # SyntaxError is also caught for compatibility reasons with
+                # python 2.6. In case an ExpatError which does not inherits
+                # from SyntaxError is used as a ParseError.
                 if not self._validXML(log_entry):
                     raise UtilError("Malformed XML - Cannot parse log file: "
                                     "'{0}'\nInvalid XML element: "

@@ -25,7 +25,7 @@ log file rotation, and copy log files to other locations).
 from mysql.utilities.common.tools import check_python_version
 
 # Check Python version compatibility
-check_python_version(min_version=(2, 7, 0), max_version=(3, 0, 0))
+check_python_version()
 
 import os.path
 import sys

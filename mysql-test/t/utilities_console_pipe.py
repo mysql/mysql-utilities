@@ -16,9 +16,7 @@
 #
 import os
 import utilities_console_base
-from mysql.utilities import PYTHON_MAX_VERSION
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.common.tools import check_python_version
 
 _BASE_COMMENT = "Test Case %d: "
 
@@ -29,10 +27,6 @@ class test(utilities_console_base.test):
     """
 
     def check_prerequisites(self):
-        try:
-            check_python_version((2, 7, 0), PYTHON_MAX_VERSION, True)
-        except:
-            raise MUTLibError("Test requires Python 2.7 or higher.")
         return True
 
     def setup(self):
