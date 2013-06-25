@@ -196,7 +196,8 @@ class Database(object):
             op_ok = True
         return op_ok
 
-    def create(self, server, db_name=None):
+    def create(self, server, db_name=None, charset_name=None,
+               collation_name=None):
         """Create the database
 
         server[in]         A Server object
@@ -213,11 +214,17 @@ class Database(object):
                     else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
-        op_ok = False
-        res = server.exec_query("CREATE DATABASE %s" % (db),
-                                self.query_options)
-        op_ok = True
-        return op_ok
+
+        specification = ""
+        if charset_name:
+            specification = " DEFAULT CHARACTER SET {0}".format(charset_name)
+        if collation_name:
+            specification = "{0} DEFAULT COLLATE {0}".format(specification,
+                                                             collation_name)
+        query_create_db = "CREATE DATABASE {0} {1}".format(db, specification)
+        server.exec_query(query_create_db, self.query_options)
+
+        return True
 
     def __make_create_statement(self, obj_type, obj):
         """Construct a CREATE statement for a database object.
@@ -476,12 +483,17 @@ class Database(object):
                                       "--force to overwrite existing "
                                       "database.", -1, new_db)
 
+        db_name = self.db_name
+        definition = self.get_object_definition(db_name, db_name, _DATABASE)
+        schema_name, character_set, collation, sql_path = definition[0]
         # Create new database first
         if not self.skip_create:
             if self.cloning:
-                self.create(self.source, new_db)
+                self.create(self.source, new_db, character_set,
+                            collation)
             else:
-                self.create(self.destination, new_db)
+                self.create(self.destination, new_db, character_set,
+                            collation)
 
         # Create the objects in the new database
         for obj in self.objects:
