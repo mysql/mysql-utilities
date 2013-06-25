@@ -29,12 +29,48 @@ import subprocess
 
 from mysql.utilities import AVAILABLE_UTILITIES
 from mysql.utilities.common.format import print_dictionary_list
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import UtilError
+
 
 _MAX_WIDTH = 78
 
 # These utilities should not be used with the console
 _EXCLUDE_UTILS = ['mysqluc',]
+
+RE_USAGE = (
+    "(?P<Version>.*?)"
+    "(?P<Usage>Usage:\s.*?)\w+\s\-\s"  # This match first
+    # section <Usage> matching all till find a " - "
+    "(?P<Description>.*?)"  # Description is the text next
+    # to " - " and till next match.
+    "(?P<O>\w*):"  # This is beginning of Options section
+    "(?P<Options>.*(?=^Introduction.\-{12})|.*$)"
+    # match Options till end or till find Introduction -.
+    "(?:^Introduction.\-{12}){0,1}"  # not catching group
+    "(?P<Introduction>.*(?=^Helpful\sHints.\-{13})|.*$)"
+    # captures Introduction (optional)
+    # it will match Introduction till end or till Hints -
+    "(?:^Helpful\sHints.\-{13}){0,1}"  # Not catching group
+    "(?P<Helpful_Hints>.*)"
+    # captures Helpful Hints (optional)
+)
+
+RE_OPTIONS = (
+    "^(?P<Alias>\s\s\-.*?)\s{2,}"  # Option Alias
+    # followed by 2 o more spaces is his description
+    "(?P<Desc>.*?)(?=^\s\s\-)"  # description is all
+    # text till not found other alias in the form
+    # <-|--Alias> at the begin of the line.
+)
+
+RE_OPTION = "\s+\-\-(.*?)\s"  # match Alias of the form <--Alias>
+
+RE_ALIAS = "\s+\-(\w+)\s*"  # match Alias of the form <-Alias>
+
+WARNING_FAIL_TO_READ_OPTIONS = ("WARNING: {0} failed to read options."
+    " This utility will not be shown in 'help utilities' and cannot be "
+    "accessed from the console.")
 
 
 def get_util_path(default_path=''):
@@ -117,8 +153,39 @@ class Utilities(object):
         self.util_list = []
         self.width = options.get('width', _MAX_WIDTH)
         self.util_path = get_util_path(options.get('utildir', ''))
-        self.find_utilities()
 
+        self.program_usage = re.compile(RE_USAGE, re.S | re.M)
+        self.program_options = re.compile(RE_OPTIONS, re.S | re.M)
+        self.program_option = re.compile(RE_OPTION)
+        self.program_name = re.compile(RE_ALIAS)
+
+        self.util_cmd_dict = {}
+
+        utility_names = sorted(AVAILABLE_UTILITIES.keys())
+        self.available_utilities = list(utility_names)
+        for util_name, ver_compatibility in AVAILABLE_UTILITIES.iteritems():
+            name_utility = "{0} utility".format(util_name)
+            if ver_compatibility:
+                min_v, max_v = ver_compatibility
+                res = check_python_version(min_version=min_v,
+                                           max_version=max_v,
+                                           name=name_utility,
+                                           print_on_fail=False,
+                                           exit_on_fail=False,
+                                           return_error_msg=True)
+            else:
+                res = check_python_version(name=name_utility,
+                                           print_on_fail=False,
+                                           exit_on_fail=False,
+                                           return_error_msg=True) 
+            if isinstance(res, tuple):
+                is_compat, error_msg = res
+                if not is_compat:
+                    self.available_utilities.remove(util_name)
+                    print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
+                    print("ERROR: {0}\n".format(error_msg))
+                    continue
+            self._find_utility_cmd(util_name)
 
     def find_executable(self, util_name):
         """Search the system path for an executable matching the utility
@@ -135,97 +202,115 @@ class Utilities(object):
                 return os.path.split(found_path[0])[1]
         return util_name
 
-
-    def find_utilities(self):
+    def _find_utility_cmd(self, util_name):
         """ Locate the utility scripts
+
+        util_name[in]   utility to find
+
+        This method builds a dict of commands for invoke the utilities.
+        """
+
+        parts = os.path.splitext(self.find_executable(util_name))
+        # Only accept python files - not .pyc and others
+        # Parts returns second as empty if does not have ext, so len is 2
+        exts = ['.py', '.exe', '']
+        if (parts[0] not in _EXCLUDE_UTILS and
+            (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
+            util_name = str(parts[0])
+            file_ext = parts[1]
+            # Give priority to '.py' files
+            if not file_ext:
+                file_ext = '.py'
+            command = "{0}{1}".format(util_name, file_ext)
+            util_path = os.path.normpath(os.path.join(os.getcwd(),
+                                                      self.util_path))
+            utility_path = os.path.join(util_path, command)
+
+            if (not os.path.exists(utility_path) and
+                not os.path.exists(os.path.join(os.getcwd(), utility_path))):
+                utility_path = os.path.join(util_path, util_name)
+
+            if not os.path.exists(utility_path):
+                print("WARNING: Unable to locate utility {0}."
+                      "".format(util_name))
+                print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
+                return
+
+            # Check for running against .exe
+            if utility_path.endswith(".exe"):
+                cmd = []
+            # Not using .exe
+            else:
+                cmd = [sys.executable]
+
+            cmd.extend([utility_path])
+            self.util_cmd_dict[util_name] = cmd
+
+    def find_utilities(self, this_utils=None):
+        """ Locate the utility scripts
+        this_utils[in]   list of utilities to find, default None to find all.
 
         This method builds a list of utilities.
         """
-        pattern_usage = ("(?P<Version>.*?)"
-                         "(?P<Usage>Usage:\s.*?)\w+\s\-\s" #this match first
-                         # section <Usage> matching all till find a " - "
-                         "(?P<Description>.*?)" # Description is the text next
-                         # to " - " and till next match.
-                         "(?P<O>\w*):"  # This is beginning of Options section
-                         "(?P<Options>.*)" # this match  the utility options
-                         )
-        self.program_usage = re.compile(pattern_usage, re.S)
 
-        pattern_options = ("^(?P<Alias>\s\s\-.*?)\s{2,}" # Option Alias
-                           # followed by 2 o more spaces is his description
-                           "(?P<Desc>.*?)(?=^\s\s\-)" # description is all
-                           # text till not found other alias in the form
-                           # <-|--Alias> at the begining of the line.
-                           )
-        self.program_options = re.compile(pattern_options, re.S|re.M)
+        if not this_utils:
+            # Not utilities name to find was passed, find help for all those
+            # utilities not previously found in a previos call. 
+            utils = self.available_utilities
+            working_utils = [util['name'] for util in self.util_list]
+            if not len(working_utils) < len(self.util_list):
+                utils = [name for name in utils if not name in working_utils]
+            if len(utils) < 1:
+                return
+        else:
+            # utilities name given to find for, find help for all these which
+            # was not previously found in a previos call. 
+            working_utils = [util['name'] for util in self.util_list]
+            utils = [util for util in this_utils if util not in working_utils]
+            if len(utils) < 1:
+                return
 
-        pattern_option = "\s+\-\-(.*?)\s" # match Alias of the form <--Alias>
-        self.program_option = re.compile(pattern_option)
-        pattern_alias = "\s+\-(\w+)\s*" # match Alias of the form <-Alias>
-        self.program_name = re.compile(pattern_alias)
-
-        files = AVAILABLE_UTILITIES
-
-        working_utils = []
-        for file_name in files:
-            parts = os.path.splitext(self.find_executable(file_name))
-            # Only accept python files - not .pyc and others
-            # Parts returns second as empty if does not have ext, so len is 2
-            exts = ['.py', '.exe', '']
-            if (parts[0] not in _EXCLUDE_UTILS and
-                (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
-                util_name = str(parts[0])
-                if util_name not in working_utils:
-                    util_info = self._get_util_info(self.util_path, util_name,
-                                                    file_name, parts[1])
-                    if util_info and util_info["usage"]:
+        # Execute the utility command using _get_util_info()
+        # that returns --help partially parsed.
+        for util_name in utils:
+            if self.util_cmd_dict.has_key(util_name):
+                cmd = self.util_cmd_dict.pop(util_name)
+                util_info = self._get_util_info(cmd, util_name)
+                if util_info and util_info["usage"]:
                         self.util_list.append(util_info)
                         working_utils.append(util_name)
+        
+        self.util_list.sort(key=lambda util_list: util_list['name'])
 
-        self.util_list.sort(key=lambda util_list:util_list['name'])
-
-
-    def _get_util_info(self, util_path, util_name, file_name, file_ext):
+    def _get_util_info(self, cmd, util_name):
         """Get information about utility
 
-        util_path[in]  path to utilities
+        cmd[in]        a list with the elements that conform the command
+                       to invoke the utility
         util_name[in]  name of utility to get information
 
         Returns dictionary - name, description, usage, options
         """
-        # Get the --help output for the utility
-        command = util_name + ".py"
-        utility_path = os.path.join(util_path, command)
-        if not os.path.exists(utility_path):
-            command = file_name
-            
-        # Check for running against .exe
-        if utility_path.endswith(".exe"):
-            cmd = []
-        # Not using .exe
-        else:
-            cmd = [sys.executable]
 
-        cmd.extend([utility_path, " --help"])
-
+        cmd.extend(["--help"])
         # Hide errors from stderr output
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen(" ".join(cmd), shell=True,
-                                stdout=subprocess.PIPE, stderr=out)
 
-        stdout_temp = proc.communicate()[0]
+        try:
+            proc = subprocess.Popen(cmd, shell=False,
+                                    stdout=subprocess.PIPE, stderr=out)
+            stdout_temp = proc.communicate()[0]
+        except OSError:
+            # No such file or directory
+            stdout_temp = ""
+
         # Parse the help output and save the information found
-        alias = None
         usage = None
         description = None
-        options = []
-        option = None
 
         res = self.program_usage.match(stdout_temp.replace("\r", ""))
         if not res:
-            print("WARNING: {0} failed to read options. This utility will "
-                  "not be shown in 'help utilities' and cannot be accessed "
-                  "from the console.".format(util_name))
+            print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
             if "ERROR" in stdout_temp:
                 print(stdout_temp)
             else:
@@ -239,10 +324,30 @@ class Utilities(object):
             usage = res.group("Usage").replace("\n", "")
             desc_clean = res.group("Description").replace("\n", " ").split()
             description = (" ".join(desc_clean)) + " "
-            #standardize string.
-            Options =  res.group("Options") + "\n  -"
+            # standardize string.
+            Options = res.group("Options") + "\n  -"
 
-        res = self.program_options.findall(Options)
+        # Create dictionary for the information
+        utility_data = {
+            'name'        : util_name,
+            'description' : description,
+            'usage'       : usage,
+            'options'     : Options
+        }
+        return utility_data
+
+    def parse_all_options(self, utility):
+        """ Parses all options for the given utility.
+        
+        utility[inout]   that contains the options info to parse
+        """
+        options_info = utility['options']
+        if isinstance(options_info, list):
+            # nothing to do if it is a list.
+            return
+
+        options = []
+        res = self.program_options.findall(options_info)
 
         for opt in res:
             option = {}
@@ -265,15 +370,7 @@ class Utilities(object):
             if option:
                 options.append(option)
 
-        # Create dictionary for the information
-        utility_data = {
-            'name'        : util_name,
-            'description' : description,
-            'usage'       : usage,
-            'options'     : options
-        }
-        return utility_data
-
+        utility['options'] = options
 
     def get_util_matches(self, util_prefix):
         """Get list of utilities that match a prefix
@@ -285,9 +382,12 @@ class Utilities(object):
         matches = []
         if not util_prefix.lower().startswith('mysql'):
             util_prefix = 'mysql' + util_prefix
-        for util in self.util_list:
-            if util['name'][0:len(util_prefix)].lower() == util_prefix:
+        for util in AVAILABLE_UTILITIES:
+            if util[0:len(util_prefix)].lower() == util_prefix:
                 matches.append(util)
+        # make sure the utilities description has been found for the matches.
+        self.find_utilities(matches)
+        matches = [util for util in self.util_list if util['name'] in matches]
         return matches
 
 
@@ -309,6 +409,8 @@ class Utilities(object):
         matches = []
 
         stop = len(option_prefix)
+        if isinstance(util_info['options'], str):
+            self.parse_all_options(util_info)
         for option in util_info['options']:
             if option is None:
                 continue
@@ -324,7 +426,6 @@ class Utilities(object):
 
         return matches
 
-
     def show_utilities(self, list=None):
         """Show list of utilities as a 2-column list.
 
@@ -333,6 +434,8 @@ class Utilities(object):
         """
 
         if list is None:
+            if len(self.util_list) != len(AVAILABLE_UTILITIES):
+                self.find_utilities()
             list_of_utilities = self.util_list
         else:
             list_of_utilities = list
@@ -346,18 +449,26 @@ class Utilities(object):
             print "No utilities match the search term."
         print
 
-
-    def get_options_dictionary(self, options):
+    def get_options_dictionary(self, utility_options):
         """Retrieve the options dictionary.
 
         This method builds a new dictionary that contains the options for the
         utilities read.
 
-        options[in]        list of options for utilities.
+        utility_options[in]   list of options for utilities or the utility.
 
         Return dictionary - list of options for all utilities.
         """
         dictionary_list = []
+
+        if isinstance(utility_options, dict):
+            if isinstance(utility_options['options'], str):
+                # options had not been parsed yet
+                self.parse_all_options(utility_options)
+            options = utility_options['options']
+        else:
+            options = utility_options
+
         for option in options:
             name = option.get('long_name', '')
             if len(name) == 0:

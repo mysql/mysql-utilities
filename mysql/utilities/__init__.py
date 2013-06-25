@@ -15,25 +15,26 @@ PYTHON_MIN_VERSION = (2, 6, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)
 
 # This list has to be updated whenever a utility is added
-AVAILABLE_UTILITIES = (
-    'mysqlauditadmin',
-    'mysqlauditgrep',
-    'mysqldbcompare',
-    'mysqldbcopy',
-    'mysqldbexport',
-    'mysqldbimport',
-    'mysqldiff',
-    'mysqldiskusage',
-    'mysqlfailover',
-    'mysqlindexcheck',
-    'mysqlmetagrep',
-    'mysqlprocgrep',
-    'mysqlreplicate',
-    'mysqlrpladmin',
-    'mysqlrplcheck',
-    'mysqlrplshow',
-    'mysqlserverclone',
-    'mysqlserverinfo',
-    'mysqluc',
-    'mysqluserclone',
-    )
+# '<utility_name>': (<PYTHON_MIN_VERSION>, <PYTHON_MAX_VERSION>)
+AVAILABLE_UTILITIES = {
+    'mysqlauditadmin': (),
+    'mysqlauditgrep': (),
+    'mysqldbcompare': (),
+    'mysqldbcopy': (),
+    'mysqldbexport': (),
+    'mysqldbimport': (),
+    'mysqldiff': (),
+    'mysqldiskusage': (),
+    'mysqlfailover': (),
+    'mysqlindexcheck': (),
+    'mysqlmetagrep': (),
+    'mysqlprocgrep': (),
+    'mysqlreplicate': (),
+    'mysqlrpladmin': (),
+    'mysqlrplcheck': (),
+    'mysqlrplshow': (),
+    'mysqlserverclone': (),
+    'mysqlserverinfo': (),
+    'mysqluc': (),
+    'mysqluserclone': ()
+    }

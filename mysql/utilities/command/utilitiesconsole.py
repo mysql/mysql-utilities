@@ -176,7 +176,7 @@ class UtilitiesConsole(Console):
 
         # if double tab with no option specified, show all options
         if cmd_len == 0 and self.tab_count == 2:
-            self.utils.show_options(utils[0]['options'])
+            self.utils.show_options(utils[0])
             self.cmd_line.display_command()
             self.tab_count = 0
             return
@@ -191,7 +191,7 @@ class UtilitiesConsole(Console):
             option_loc = 1
             find_alias = True
         option = command_text[option_loc:]
-        
+
         matches = self.utils.get_option_matches(utils[0], option, find_alias)
         if self.tab_count == 2:
             if len(matches) > 0:
@@ -225,7 +225,7 @@ class UtilitiesConsole(Console):
         """
         if self.quiet:
             return
-        options = self.utils.get_options_dictionary(utils[0]['options'])
+        options = self.utils.get_options_dictionary(utils[0])
         print "\n%s\n" % utils[0]['usage']
         print "%s - %s\n" % (utils[0]['name'], utils[0]['description'])
         print "Options:"
