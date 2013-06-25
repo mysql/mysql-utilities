@@ -866,24 +866,28 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
     def_engine = options.get("def_engine", None)
     quiet = options.get("quiet", False)
     for statement in statements:
-        if (new_engine is not None or def_engine is not None) and \
-           statement.upper()[0:12] == "CREATE TABLE":
+        st_list = None
+        if ((new_engine is not None or def_engine is not None)
+                and statement.upper()[0:12] == "CREATE TABLE"):
             i = statement.find(' ', 13)
             tbl_name = statement[13:i]
-            statement = destination.substitute_engine(tbl_name, statement,
-                                                      new_engine, def_engine,
-                                                      quiet)
-        try:
-            if dryrun:
-                print statement
-            elif format != "sql" or not _skip_sql(statement, options):
-                res = destination.exec_query(statement)
-        # Here we capture any exception and raise UtilError to communicate to
-        # the script/user. Since all util errors (exceptions) derive from
-        # Exception, this is safe.
-        except Exception, e:
-            raise UtilError("Invalid statement:\n%s" % statement +
-                            "\nERROR: %s" % e.errmsg)
+            st_list = destination.substitute_engine(tbl_name, statement,
+                                                    new_engine, def_engine,
+                                                    quiet)
+        st_list = [statement] if st_list is None else st_list
+        for st in st_list:
+            try:
+                if dryrun:
+                    print(st)
+                elif format != "sql" or not _skip_sql(st, options):
+                    res = destination.exec_query(st)
+
+            # Here we capture any exception and raise UtilError to communicate
+            # to the script/user. Since all util errors (exceptions) derive from
+            # Exception, this is safe.
+            except Exception as err:
+                raise UtilError("Invalid statement:\n{0}"
+                                "\nERROR: {1}".format(st, err.errmsg))
     return True
 
 

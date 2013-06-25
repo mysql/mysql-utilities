@@ -1121,8 +1121,9 @@ class Server(object):
         Returns string CREATE string with replacements if found, else return
                        original string
         """
-
+        res = [create_str]
         exist_engine = ''
+        is_create_like = False
         replace_msg = "# Replacing ENGINE=%s with ENGINE=%s for table %s."
         add_msg = "# Adding missing ENGINE=%s clause for table %s."
         if new_engine is not None or def_engine is not None:
@@ -1130,6 +1131,10 @@ class Server(object):
             if i > 0:
                 j = create_str.find(" ", i)
                 exist_engine = create_str[i+7:j]
+            else:
+                ## Check if it is a CREATE TABLE LIKE statement
+                is_create_like = (create_str.find("CREATE TABLE {0} "
+                                                  "LIKE".format(tbl_name)) == 0)
 
         # Set default engine
         #
@@ -1142,10 +1147,19 @@ class Server(object):
              exist_engine.upper() != def_engine.upper() and \
              self.has_storage_engine(def_engine) and \
              self.has_storage_engine(exist_engine):
+
             # If no ENGINE= clause present, add it
             if len(exist_engine) == 0:
-                i = create_str.find(";")
-                create_str = create_str[0:i] + " ENGINE=%s;"  % def_engine
+                if is_create_like:
+                    alter_str = "ALTER TABLE {0} ENGINE={1}".format(tbl_name,
+                                                                    def_engine)
+                    res = [create_str, alter_str]
+                else:
+                    i = create_str.find(";")
+                    i = len(create_str) if i == -1 else i
+                    create_str = "{0} ENGINE={1};".format(create_str[0:i],
+                                                          def_engine)
+                    res = [create_str]
             # replace the existing storage engine
             else:
                 create_str.replace("ENGINE=%s" % exist_engine,
@@ -1158,23 +1172,30 @@ class Server(object):
             exist_engine = def_engine
 
         # Use new engine
-        if new_engine is not None and \
-           exist_engine.upper() != new_engine.upper() and \
-           self.has_storage_engine(new_engine):
+        if (new_engine is not None and
+                exist_engine.upper() != new_engine.upper() and
+                self.has_storage_engine(new_engine)):
             if len(exist_engine) == 0:
-                i = create_str.find(";")
-                create_str = create_str[0:i] + " ENGINE=%s;"  % new_engine
+                if is_create_like:
+                    alter_str = "ALTER TABLE {0} ENGINE={1}".format(tbl_name,
+                                                                    new_engine)
+                    res = [create_str, alter_str]
+                else:
+                    i = create_str.find(";")
+                    i = len(create_str) if i == -1 else i
+                    create_str = "{0} ENGINE={1};".format(create_str[0:i],
+                                                          new_engine)
+                    res = [create_str]
             else:
                 create_str = create_str.replace("ENGINE=%s" % exist_engine,
                                                 "ENGINE=%s" % new_engine)
+                res = [create_str]
             if not quiet:
                 if len(exist_engine) > 0:
                     print replace_msg % (exist_engine, new_engine, tbl_name)
                 else:
                     print add_msg % (new_engine, tbl_name)
-
-        return create_str
-
+        return res
 
     def get_innodb_stats(self):
         """Return type of InnoDB engine and its version information.

@@ -1,0 +1,36 @@
+Test case 1 - Warning message when there are Foreign Keys pointing to other databases
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test_fk2 renamed as util_test_fk2_copy
+# Copying TABLE util_test_fk2.a2
+# Copying TABLE util_test_fk2.m
+# Copying TABLE util_test_fk2.t2
+# WARNING: The database being copied has external Foreign Key constraint dependencies, util_test_fk2_copy.t2 depends on util_test_fk.a1
+# Copying data for TABLE util_test_fk2.a2
+# Copying data for TABLE util_test_fk2.m
+# Copying data for TABLE util_test_fk2.t2
+#...done.
+Test case 2 - No warning message when there are no Foreign Keys pointing to other databases
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test_fk renamed as util_test_fk_copy
+# Copying TABLE util_test_fk.a1
+# Copying TABLE util_test_fk.t1
+# Copying data for TABLE util_test_fk.a1
+# Copying data for TABLE util_test_fk.t1
+#...done.
+Test case 3 - Warning message when FK constraints are lost because destination engine is not InnoDB
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test_fk2 renamed as util_test_fk2_copy
+# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.a2.
+# Copying TABLE util_test_fk2.a2
+# WARNING: FOREIGN KEY constraints for table util_test_fk2_copy.a2 are missing because the new storage engine for the table is not InnoDB
+# Copying TABLE util_test_fk2.m
+# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.t2.
+# Copying TABLE util_test_fk2.t2
+# WARNING: FOREIGN KEY constraints for table util_test_fk2_copy.t2 are missing because the new storage engine for the table is not InnoDB
+# Copying data for TABLE util_test_fk2.a2
+# Copying data for TABLE util_test_fk2.m
+# Copying data for TABLE util_test_fk2.t2
+#...done.

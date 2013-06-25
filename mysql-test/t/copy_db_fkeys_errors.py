@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,17 +16,17 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+from mysql.utilities.exception import MUTLibError, UtilError, UtilDBError
+
 
 class test(mutlib.System_test):
-    """simple db copy
-    This test executes copy database test cases among two servers with
-    foreign keys defined.
+    """simple db clone
+    This test executes a simple clone of a database on a single server with
+    foreign keys enabled.
     """
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
-        # Need at least one server.
         return self.check_num_servers(1)
 
     def setup(self):
@@ -39,71 +39,78 @@ class test(mutlib.System_test):
                 raise MUTLibError(
                     "Cannot spawn needed servers: {0}".format(err.errmsg)
                 )
-        # Set spawned servers without using the one passed to MUT
+        # Set spawned servers
         self.server1 = self.servers.get_server(1)
         self.server2 = self.servers.get_server(2)
+        data_file = os.path.normpath("./std_data/fkeys.sql")
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
-        data_file = os.path.normpath("./std_data/fkeys.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as e:
-            raise MUTLibError("Failed to read commands from file"
-                              " {0}: {1}".format((data_file, e.errmsg)))
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, e.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
 
-    
     def run(self):
         self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
-       
-        comment = "Test case 1 - copy database with foreign keys"
+
+        conn_str1 = self.build_connection_string(self.server1)
+        conn_str2 = self.build_connection_string(self.server2)
+        from_conn = "--source={0}".format(conn_str1)
+        to_conn = "--destination={0}".format(conn_str2)
+
         cmd_str = ("mysqldbcopy.py --skip-gtid "
                    "{0} {1} ".format(from_conn, to_conn))
-        cmd_opts = "util_test_fk2:util_test_fk2_copy"
-        res = self.exec_util(cmd_str + cmd_opts, self.res_fname)
-        self.results.append(res)
-        if res != 0:
-            raise MUTLibError("{0}: failed".format(comment))
-        return True
-  
+
+        test_num = 1
+        cmd_opts = "util_test_fk:util_test_fk_copy"
+        comment = ("Test Case {0} - copy database with FK and try to delete "
+                   "a referenced row. Error: {1}")
+        try:
+            res = self.exec_util(cmd_str + cmd_opts, self.res_fname)
+            self.results.append(res)
+            return res == 0
+        except UtilDBError as e:
+            raise MUTLibError(comment.format(test_num, e.errmsg))
+
     def get_result(self):
-        msg = None
-        if self.server2 and self.server1 and self.results[0] == 0:
-            query_ori = "SHOW CREATE TABLE `util_test_fk2`.a2"
-            query_clo = "SHOW CREATE TABLE `util_test_fk2_copy`.a2"
+        if self.server2 and self.results[0] == 0:
+            query = "DELETE FROM `util_test_fk_copy`.t1 WHERE d = 1"
             try:
-                res_ori = self.server1.exec_query(query_ori)
-                res_clo = self.server2.exec_query(query_clo)
-                # check if create table statements are equal
-                if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
-                    return (True, msg)
+                res = self.server2.exec_query(query)
+                # If FK constraints were cloned, it it should throw an exception
             except UtilDBError as e:
-                raise MUTLibError(e.errmsg)
-        return (False, ("Result failure.\n", "Create TABLE statements are not"
-                                             " equal\n"))
-    
+                # Check if the reason the deletion failed was because of FK
+                # constraints
+                i = e[0].find("Cannot delete or update a parent row: a foreign")
+                if i != -1:
+                    return (True, None)
+                else:
+                    raise MUTLibError(e.errmsg)
+            return (False, ("Result failure.\n", "FK constraints "
+                                                 "were not copied"))
+        return False, ("Result failure.\n", "Database copy not found.\n")
+
     def record(self):
         # Not a comparative test, returning True
         return True
-    
+
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
         if not res:
             return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("DROP DATABASE {0}".format(db))
+            res2 = server.exec_query("DROP DATABASE {0}".format(db))
         except:
             return False
         return True
-    
+
     def drop_all(self):
-        drop_dbs_s1 = ["util_test_fk", "util_test_fk2", "util_test_fk3"]
-        drop_dbs_s2 = ["util_test_fk2_copy"]
+        drop_dbs_s1 = ["util_test_fk2", "util_test_fk3", "util_test_fk"]
+        drop_dbs_s2 = ["util_test_fk_copy"]
         drop_results_s1 = []
         drop_results_s2 = []
         for db in drop_dbs_s1:
@@ -113,7 +120,7 @@ class test(mutlib.System_test):
             drop_results_s2.append(self.drop_db(self.server2, db))
 
         return all(drop_results_s1) and all(drop_results_s2)
-            
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)

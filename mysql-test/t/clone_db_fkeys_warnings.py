@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 class test(mutlib.System_test):
-    """simple db clone
-    This test executes a simple clone of a database on a single server with
-    foreign keys enabled.
+    """Tests the mysqldbcopy utility in scenarios where databases with
+    foreign key dependencies are cloned.
+
     """
 
     def check_prerequisites(self):
@@ -38,7 +38,6 @@ class test(mutlib.System_test):
                 raise MUTLibError(
                     "Cannot spawn needed servers: {0}".format(err.errmsg)
                 )
-
         # Set spawned servers
         self.server1 = self.servers.get_server(1)
         data_file = os.path.normpath("./std_data/fkeys.sql")
@@ -51,53 +50,67 @@ class test(mutlib.System_test):
                               "{1}".format(data_file, e.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
-    
-    def run(self):
-        self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
-       
-        # Test case 1 - clone a sample database and check if create table
-        # statement from one of the tables is equal to the one from the original
-        # table
-        cmd_opts = ["mysqldbcopy.py", "--skip-gtid",
-                    from_conn, to_conn,
-                    "util_test_fk2:util_test_fk2_clone"]
-        cmd = " ".join(cmd_opts)
-        try:
-            # Must disconnect to avoid deadlock when copying fkey tables
-            # using INSERT ... SELECT
-            self.server1.disconnect()
-            res = self.exec_util(cmd, self.res_fname)
-            self.results.append(res)
-            return res == 0
-        except MUTLibError as e:
-            raise MUTLibError(e.errmsg)
-          
-    def get_result(self):
-        # Reconnect to check status of test case
-        self.server1.connect()
-        msg = None
-        if self.server1 and self.results[0] == 0:
-            query_ori = "SHOW CREATE TABLE `util_test_fk2`.a2"
-            query_clo = "SHOW CREATE TABLE `util_test_fk2_clone`.a2"
-            try:
-                res_ori = self.server1.exec_query(query_ori)
-                res_clo = self.server1.exec_query(query_clo)
 
-                # Check if create table statements are equal
-                if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
-                    return (True, msg)
-            except UtilDBError as e:
-                raise MUTLibError(e.errmsg)
-        return (False, ("Result failure.\n", "Create TABLE statements are not "
-                                             "equal\n"))
-    
-    def record(self):
-        # Not a comparative test, returning True
+    def run(self):
+        # Must disconnect to avoid deadlock when copying fkey tables
+        self.server1.disconnect()
+
+        self.res_fname = "result.txt"
+
+        conn_str = self.build_connection_string(self.server1)
+        from_conn = "--source={0}".format(conn_str)
+        to_conn = "--destination={0}".format(conn_str)
+
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
+                                                               to_conn)
+
+        test_num = 1
+        cmd_opts = "util_test_fk2:util_test_fk2_clone"
+        comment = ("Test case {0} - Warning message when there are Foreign "
+                   "Keys pointing to other databases".format(test_num))
+
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = "util_test_fk:util_test_fk_clone"
+        comment = ("Test case {0} - No warning message when there are no"
+                   " Foreign Keys pointing to other "
+                   "databases".format(test_num))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # Reconnect to drop cloned database
+        self.server1.connect()
+        self.drop_db(self.server1, 'util_test_fk2_clone')
+        self.server1.disconnect()
+        cmd_opts = ("util_test_fk2:util_test_fk2_clone "
+                    "--new-storage-engine=MYISAM")
+        comment = ("Test case {0} - Warning message when FK constraints are "
+                   "lost because destination engine is not "
+                   "InnoDB".format(test_num))
+
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+         # Mask known source and destination host name.
+
+        self.replace_result("# Source on ",
+                            "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result("# Destination on ",
+                            "# Destination on XXXX-XXXX: ... connected.\n")
+
+        self.server1.connect()
+
         return True
-    
+
+    def get_result(self):
+        return self.compare(__name__, self.results)
+
+    def record(self):
+        return self.save_result_file(__name__, self.results)
+
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
@@ -108,10 +121,10 @@ class test(mutlib.System_test):
         except:
             return False
         return True
-    
+
     def drop_all(self):
-        drop_dbs = ['util_test_fk2', 'util_test_fk2_clone', 'util_test_fk',
-                    'util_test_fk3']
+        drop_dbs = ["util_test_fk2",  "util_test_fk2_clone", "util_test_fk",
+                    "util_test_fk_clone", "util_test_fk3"]
         drop_results = []
         for db in drop_dbs:
             drop_results.append(self.drop_db(self.server1, db))
