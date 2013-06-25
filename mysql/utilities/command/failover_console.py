@@ -274,7 +274,10 @@ class FailoverConsole(object):
             self.comment = _MASTER_GTID_LIST
             rows = self.master_gtids
         elif self.get_gtid_data:
-            gtid_data = self.get_gtid_data()
+            try:
+                gtid_data = self.get_gtid_data()
+            except Exception as err:
+                raise UtilRplError("Cannot get GTID data: {0}".format(err))
             self.comment = _GTID_LISTS[self.gtid_list - 1]
             rows = gtid_data[self.gtid_list - 1]
             
@@ -298,7 +301,10 @@ class FailoverConsole(object):
 
         # Get health information
         if self.get_health_data is not None:
-            health_data = self.get_health_data()
+            try:
+                health_data = self.get_health_data()
+            except Exception as err:
+                raise UtilRplError("Cannot get health data: {0}".format(err))
             self.start_list = 0
             self.end_list = len(health_data[1])
             self.report_mode = 'H'
@@ -319,7 +325,10 @@ class FailoverConsole(object):
         # Get UUID information
         if self.get_uuid_data is not None:
             self.comment = _UUID_LIST
-            rows = self.get_uuid_data()
+            try:
+                rows = self.get_uuid_data()
+            except Exception as err:
+                raise UtilRplError("Cannot get UUID data: {0}".format(err))
 
         self.start_list = 0
         self.end_list = len(rows)
@@ -470,8 +479,8 @@ class FailoverConsole(object):
             if self.logging:
                 logging.info("Master status: binlog: %s, position:%s" %
                              (status[0], status[1]))
-        except:
-            raise UtilRplError("Cannot get master status")
+        except Exception as err:
+            raise UtilRplError("Cannot get master status: {0}".format(err))
         print "Master Information"
         print "------------------"
         cols = ("Binary Log File", "Position",
