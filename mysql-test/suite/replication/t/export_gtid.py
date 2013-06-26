@@ -228,7 +228,9 @@ class test(mutlib.System_test):
         except:
             pass
 
-        return self.drop_all()
+        # Kill the servers that are no longer used
+        kill_list = ['with_gtids_1', 'with_gtids_2', 'no_gtids']
+        return (self.drop_all() and self.kill_server_list(kill_list))
 
     def drop_db(self, server, db):
         # Check before you drop to avoid warning

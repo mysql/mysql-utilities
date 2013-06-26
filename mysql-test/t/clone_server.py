@@ -133,8 +133,10 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
-        if self.new_server:
+        is_clean = True
+        if self.new_server:  # Add server to server list and then kill it
             self.servers.add_new_server(self.new_server, True)
+            is_clean = self.kill_server('cloned_server')
         else:
             self.servers.clear_last_port()
         if os.path.exists("start.txt"):
@@ -143,5 +145,4 @@ class test(mutlib.System_test):
             except:
                 pass
 
-        return True
-
+        return is_clean

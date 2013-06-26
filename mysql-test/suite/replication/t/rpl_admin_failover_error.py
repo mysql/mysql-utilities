@@ -179,6 +179,8 @@ class test(rpl_admin.test):
                             "_GTIDS(XXXXXXXXX)\n")
         self.replace_result("# Return Code =", "# Return Code = XXX\n")
 
+        self.remove_result("NOTE: Log file")
+
         return True
 
     def wait_for_slave(self, master, slave):
@@ -204,4 +206,7 @@ class test(rpl_admin.test):
             os.unlink(_LOGNAME)
         except:
             pass
-        return rpl_admin.test.cleanup(self)
+        # kill servers that are only used in this test
+        kill_list = ['rep_slave4_gtid_off']
+        return (rpl_admin.test.cleanup(self)
+                and self.kill_server_list(kill_list))

@@ -248,4 +248,7 @@ class test(mutlib.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        return True
+        # Kill the servers that are only for this test.
+        kill_list = ['rep_relay_slave', 'multi_master1', 'rep_master_show',
+                    'multi_master2', 'rep_slave_show']
+        return self.kill_server_list(kill_list)

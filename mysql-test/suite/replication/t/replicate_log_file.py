@@ -246,6 +246,9 @@ class test(replicate.test):
         return True
             
     def cleanup(self):
-        return replicate.test.cleanup(self)
+        # Kill servers that are only used in this test
+        kill_list = ['rep_slave_log']
+        return (replicate.test.cleanup(self)
+                and self.kill_server_list(kill_list))
 
 

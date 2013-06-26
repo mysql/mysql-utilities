@@ -214,4 +214,7 @@ class test(rpl_admin.test):
             os.rmdir("watchout_here_too")
         except:
             pass
-        return rpl_admin.test.cleanup(self)
+        # Kill the servers that are only for this test.
+        kill_list = ['no_slaved']
+        return (rpl_admin.test.cleanup(self)
+                and self.kill_server_list(kill_list))

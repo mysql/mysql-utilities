@@ -158,4 +158,6 @@ class test(check_rpl.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return check_rpl.test.cleanup(self)
+        kill_list = ['rep_slave_ignore']
+        return (check_rpl.test.cleanup(self)
+                and self.kill_server_list(kill_list))

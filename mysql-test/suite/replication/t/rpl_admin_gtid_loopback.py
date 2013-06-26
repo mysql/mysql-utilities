@@ -257,9 +257,8 @@ class test(rpl_admin.test):
         # Restoring cloning Server_List host value
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
-        self.kill_server("rep_master_gtid_loopback")
-        self.kill_server("rep_slave1_gtid_loopback")
-        self.kill_server("rep_slave2_gtid_loopback")
-        self.kill_server("rep_slave3_gtid_loopback")
-        return rpl_admin.test.cleanup(self)
+        kill_list = ['rep_master_gtid_loopback', 'rep_slave1_gtid_loopback',
+                    'rep_slave2_gtid_loopback', 'rep_slave3_gtid_loopback']
+        return (rpl_admin.test.cleanup(self)
+                and self.kill_server_list(kill_list))
 

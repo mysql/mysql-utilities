@@ -157,7 +157,8 @@ class test(show_rpl.test):
     
     def cleanup(self):
         self.server_list[2].exec_query("DROP USER 'josh'@'localhost'")
-        return show_rpl.test.cleanup(self)
-
-
+        if self.res_fname:
+            os.unlink(self.res_fname)
+        kill_list = ['rep_master_show', 'rep_slave_show']
+        return self.kill_server_list(kill_list)
 

@@ -145,5 +145,7 @@ class test(failover.test):
                 os.unlink(self.res_fname)
             except:
                 pass
-        return True
+        # Kill servers that are only used in this test
+        kill_list = ['rep_master_no_pass', 'rep_slave1_no_pass']
+        return self.kill_server_list(kill_list)
 

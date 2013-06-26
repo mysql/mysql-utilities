@@ -168,7 +168,7 @@ class test(replicate.test):
         return self.save_result_file(__name__, self.results)
     
     def cleanup(self):
-        return replicate.test.cleanup(self)
-
-
-
+        # Kill the servers that are only for this test.
+        kill_list = ['rep_slave_table']
+        return (replicate.test.cleanup(self)
+                and self.kill_server_list(kill_list))
