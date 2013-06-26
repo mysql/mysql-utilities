@@ -1,5 +1,5 @@
 # Major, Minor, Patch, Status
-VERSION = (1, 2, 3, "", 5, 2, 47)
+VERSION = (1, 2, 4, "", 5, 2, 47)
 VERSION_STRING = "%s.%s.%s%s - MySQL Workbench Distribution %s.%s.%s" % VERSION
 RELEASE_STRING = "%s.%s.%s%s - MySQL Workbench Distribution %s.%s.%s" % VERSION
 COPYRIGHT = "2010, 2013 Oracle and/or its affiliates. All rights reserved."
