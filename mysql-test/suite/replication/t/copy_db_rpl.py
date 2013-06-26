@@ -340,4 +340,6 @@ class test(replicate.test):
         if self.res_fname:
             os.unlink(self.res_fname)
         self._drop_all()
-        return True
+        # kill servers that are only used in this test
+        kill_list = ['new_slave']
+        return self.kill_server_list(kill_list)

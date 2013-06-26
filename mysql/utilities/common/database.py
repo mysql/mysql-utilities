@@ -21,6 +21,8 @@ multiple utilities.
 """
 
 import re
+from collections import deque
+from operator import itemgetter
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.sql_transform import quote_with_backticks
@@ -80,6 +82,26 @@ _COLUMN_QUERY = """
   WHERE TABLE_SCHEMA = '%(db)s' AND TABLE_NAME = '%(name)s'
 """
 
+_FK_CONSTRAINT_QUERY = """
+SELECT TABLE_NAME, CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
+REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, UPDATE_RULE, DELETE_RULE
+FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+USING (CONSTRAINT_SCHEMA, CONSTRAINT_NAME, TABLE_NAME, REFERENCED_TABLE_NAME)
+WHERE CONSTRAINT_SCHEMA = '{DATABASE!s}'
+AND TABLE_NAME = '{TABLE!s}'
+"""
+
+_ALTER_TABLE_ADD_FK_CONSTRAINT = """
+ALTER TABLE {DATABASE!s}.{TABLE!s} add CONSTRAINT `{CONSTRAINT_NAME!s}`
+FOREIGN KEY (`{COLUMN_NAMES}`)
+REFERENCES `{REFERENCED_DATABASE}`.`{REFERENCED_TABLE!s}`
+(`{REFERENCED_COLUMNS!s}`)
+ON UPDATE {UPDATE_RULE}
+ON DELETE {DELETE_RULE}
+"""
+
+
 class Database(object):
     """
     The Database class encapsulates a database. The class has the following
@@ -131,6 +153,8 @@ class Database(object):
         self.query_options = {  # Used for skipping fetch of rows
             'fetch' : False
         }
+        self.constraints = deque()  # Used to store constraints to execute after
+                                    # table creation, deque is thread-safe
 
         self.objects = []
         self.new_objects = []
@@ -196,7 +220,8 @@ class Database(object):
             op_ok = True
         return op_ok
 
-    def create(self, server, db_name=None):
+    def create(self, server, db_name=None, charset_name=None,
+               collation_name=None):
         """Create the database
 
         server[in]         A Server object
@@ -213,11 +238,17 @@ class Database(object):
                     else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
-        op_ok = False
-        res = server.exec_query("CREATE DATABASE %s" % (db),
-                                self.query_options)
-        op_ok = True
-        return op_ok
+
+        specification = ""
+        if charset_name:
+            specification = " DEFAULT CHARACTER SET {0}".format(charset_name)
+        if collation_name:
+            specification = "{0} DEFAULT COLLATE {0}".format(specification,
+                                                             collation_name)
+        query_create_db = "CREATE DATABASE {0} {1}".format(db, specification)
+        server.exec_query(query_create_db, self.query_options)
+
+        return True
 
     def __make_create_statement(self, obj_type, obj):
         """Construct a CREATE statement for a database object.
@@ -367,20 +398,40 @@ class Database(object):
 
         Note: will handle exception and print error if query fails
         """
-
-        create_str = None
         if obj_type == _TABLE and self.cloning:
-            create_str = "CREATE TABLE %s.%s LIKE %s.%s" % \
-                         (self.q_new_db, obj[0], self.q_db_name, obj[0])
+            create_list = ["CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}".format(
+                self.q_new_db, obj[0], self.q_db_name)
+            ]
         else:
-            create_str = self.__make_create_statement(obj_type, obj)
+            create_list = [self.__make_create_statement(obj_type, obj)]
         if obj_type == _TABLE:
+            may_skip_fk = False  # Check possible issues with FK Constraints
             tbl_name = "%s.%s" % (self.q_new_db, obj[0])
-            create_str = self.destination.substitute_engine(tbl_name,
-                                                            create_str,
-                                                            new_engine,
-                                                            def_engine,
-                                                            quiet)
+            create_list = self.destination.substitute_engine(tbl_name,
+                                                             create_list[0],
+                                                             new_engine,
+                                                             def_engine,
+                                                             quiet)
+
+            # Get storage engines from the source table and destination table
+            # If the source table's engine is INNODB and the destination is
+            # not we will loose any FK constraints that may exist
+            src_eng = self.get_object_definition(self.q_db_name,
+                                                 obj[0], obj_type)[0][0][2]
+            dest_eng = None
+
+            # Information about the engine is always in the last statement of
+            # the list, be it a regular create table statement or a create
+            # table; alter table statement.
+            i = create_list[-1].find("ENGINE=")
+            if i > 0:
+                j = create_list[-1].find(" ", i)
+                dest_eng = create_list[-1][i+7:j]
+            dest_eng = dest_eng or src_eng
+
+            if src_eng.upper() == 'INNODB' and dest_eng.upper() != 'INNODB':
+                may_skip_fk = True
+
         str = "# Copying"
         if not quiet:
             if obj_type == _GRANT:
@@ -390,19 +441,120 @@ class Database(object):
                 print "%s %s %s.%s" % \
                       (str, obj_type, self.db_name, obj[0])
             if self.verbose:
-                print create_str
+                print("; ".join(create_list))
         res = None
         try:
             res = self.destination.exec_query("USE %s" % self.q_new_db,
                                               self.query_options)
         except:
             pass
-        try:
-            res = self.destination.exec_query(create_str, self.query_options)
-        except Exception, e:
-            raise UtilDBError("Cannot operate on %s object. Error: %s" %
-                              (obj_type, e.errmsg), -1, self.db_name)
+        for stm in create_list:
+            try:
+                res = self.destination.exec_query(stm, self.query_options)
+            except Exception as e:
+                raise UtilDBError("Cannot operate on {0} object."
+                                  " Error: {1}".format(obj_type, e.errmsg),
+                                  -1, self.db_name)
 
+        # Look for FK constraints
+        if obj_type == _TABLE:
+            params = {'DATABASE': self.db_name,
+                      'TABLE': obj[0],
+                      }
+            try:
+                query = _FK_CONSTRAINT_QUERY.format(**params)
+                fk_constr = self.source.exec_query(query)
+            except Exception as e:
+                raise UtilDBError("Unable to obtain FK constraint information "
+                                  "for table {0}.{1}. Error: {2}".format(
+                                  self.db_name, obj[0], e.errmsg), -1,
+                                  self.db_name
+                                  )
+
+            #Get information about foreign keys of the table being copied/cloned
+            if fk_constr and not may_skip_fk:
+                c = fk_constr[0]
+                # Extract FK Parameters
+                params = {'DATABASE': self.new_db,
+                          'TABLE': c[0],
+                          'CONSTRAINT_NAME': c[1],
+                          'REFERENCED_DATABASE': c[3],
+                          'REFERENCED_TABLE': c[4],
+                          'UPDATE_RULE': c[6],
+                          'DELETE_RULE': c[7],
+                          }
+
+                if self.cloning:  # if it is a cloning table operation
+
+                    # In case FK is composit we need to join the columns to use
+                    # in in alter table query. Only useful when cloning
+                    params['COLUMN_NAMES'] = '`,`'.join(map(itemgetter(2),
+                                                            fk_constr))
+                    params['REFERENCED_COLUMNS'] = '`,`'.join(map(itemgetter(5),
+                                                                  fk_constr))
+
+                    # If the FK points to a table under the database being
+                    # cloned, change the referenced database name to the new
+                    # cloned database
+                    if params['REFERENCED_DATABASE'] == self.db_name:
+                        params['REFERENCED_DATABASE'] = self.new_db
+                    else:
+                        print("# WARNING: The database being cloned has "
+                              "external Foreign Key constraint dependencies,"
+                              " {0}.{1} depends on {2}."
+                              "{3}".format(params['DATABASE'], params['TABLE'],
+                                           params['REFERENCED_DATABASE'],
+                                           params['REFERENCED_TABLE'])
+                              )
+                    query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
+
+                    # Store constraint query for later execution
+                    self.constraints.append(query)
+                    if self.verbose:
+                        print(query)
+                else:  # if we are copying
+                    if params['REFERENCED_DATABASE'] != self.db_name:
+                        # if the table being copied has dependencies to external
+                        # databases
+                        print("# WARNING: The database being copied has "
+                              "external Foreign Key constraint dependencies,"
+                              " {0}.{1} depends on {2}."
+                              "{3}".format(params['DATABASE'], params['TABLE'],
+                                           params['REFERENCED_DATABASE'],
+                                           params['REFERENCED_TABLE'])
+                              )
+            elif fk_constr and may_skip_fk:
+                print("# WARNING: FOREIGN KEY constraints for table {0}.{1} "
+                      "are missing because the new storage engine for "
+                      "the table is not InnoDB".format(self.new_db, obj[0]))
+
+    def __apply_constraints(self):
+        """This method applies to the database the constraints stored in the
+        self.constraints instance variable
+        """
+
+        # Enable Foreign Key Checks to prevent the swapping of
+        # RESTRICT referential actions with NO ACTION
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1")
+
+        # while constraint queue is not empty
+        while self.constraints:
+            try:
+                query = self.constraints.pop()
+            except IndexError:
+                #queue is empty, exit while statement
+                break
+            if self.verbose:
+                print(query)
+            try:
+                self.destination.exec_query(query)
+            except Exception as err:
+                raise UtilDBError("Unable to execute constraint query "
+                                  "{0}. Error: {1}".format(query, err.errmsg),
+                                  -1, self.new_db)
+
+        # Turn Foreign Key Checks off again
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=0")
 
     def copy_objects(self, new_db, options, new_server=None,
                      connections=1, check_exists=True):
@@ -423,7 +575,7 @@ class Database(object):
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
-        check_exists[in]   If True, check for database existance before copy
+        check_exists[in]   If True, check for database existence before copy
                            Default is True
         """
 
@@ -476,12 +628,17 @@ class Database(object):
                                       "--force to overwrite existing "
                                       "database.", -1, new_db)
 
+        db_name = self.db_name
+        definition = self.get_object_definition(db_name, db_name, _DATABASE)
+        schema_name, character_set, collation, sql_path = definition[0]
         # Create new database first
         if not self.skip_create:
             if self.cloning:
-                self.create(self.source, new_db)
+                self.create(self.source, new_db, character_set,
+                            collation)
             else:
-                self.create(self.destination, new_db)
+                self.create(self.destination, new_db, character_set,
+                            collation)
 
         # Create the objects in the new database
         for obj in self.objects:
@@ -499,7 +656,8 @@ class Database(object):
 
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
-
+        # After object creation, add the constraints
+        self.__apply_constraints()
 
     def copy_data(self, new_db, options, new_server=None, connections=1):
         """Copy the data for the tables.

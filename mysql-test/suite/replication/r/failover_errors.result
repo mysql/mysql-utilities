@@ -15,7 +15,6 @@ Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --c
 
 mysqlfailover.py: error: Failover mode = 'elect' reqiures at least one candidate.
 Test case 5 - FILE/TABLE mix and missing --rpl-user
-NOTE: Log file 'a.txt' does not exist. Will be created.
 # Checking privileges.
 ERROR: Failover requires --master-info-repository=TABLE for all slaves.
 Test case 6 - Master listed as a slave - literal

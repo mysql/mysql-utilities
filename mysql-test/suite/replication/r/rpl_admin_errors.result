@@ -147,3 +147,6 @@ Test case 30 - Switchover using a wrong slave and with --force
 | localhost  | PORT5  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
+Test case 31 - Switchover using with --force and user does not have grant priv
+# ERROR: ERROR: Cannot grant replication slave to replication user.
+Error found in log file. 

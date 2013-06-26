@@ -56,10 +56,10 @@ _DEFAULT_OPTIONS = {
 class _CompareDBReport:
     """Print compare database report
     """
-    
+
     def __init__(self, options):
         """Constructor
-        
+
         options[in]    options for class
             width[in]      Width of report
             quiet[in]      If true, do not print commentary
@@ -90,10 +90,10 @@ class _CompareDBReport:
                                  "Check", self.oper_width)
         print "# %s" % ('-' * self.width),
 
-    
+
     def report_object(self, obj_type, description):
         """Print the object type and description field
-        
+
         obj_type[in]      type of the object(s) described
         description[in]   description of object(s)
         """
@@ -102,11 +102,11 @@ class _CompareDBReport:
             return
         print "\n#", _RPT_FORMAT.format(obj_type, self.type_width,
                                         description, self.desc_width),
-    
-    
+
+
     def report_state(self, state):
         """Print the results of a test.
-        
+
         state[in]         state of the test
         """
         # Skip if quiet
@@ -117,7 +117,7 @@ class _CompareDBReport:
 
     def report_errors(self, errors):
         """Print any errors encountered.
-        
+
         errors[in]        list of strings to print
         """
         if len(errors) > 0:
@@ -128,13 +128,13 @@ class _CompareDBReport:
 
 def _check_databases(server1, server2, db1, db2, options):
     """Check databases
-    
+
     server1[in]       first server Server instance
     server2[in]       second server Server instance
     db1[in]           first database
     db2[in]           second database
     options[in]       options dictionary
-    
+
     Returns tuple - Database class instances for databases
     """
 
@@ -152,8 +152,8 @@ def _check_databases(server1, server2, db1, db2, options):
             print
             if not options['run_all_tests']:
                 raise UtilError(_ERROR_DB_DIFF)
-    
-    
+
+
 def _check_objects(server1, server2, db1, db2,
                    db1_conn, db2_conn, options):
     """Check number of objects
@@ -165,7 +165,7 @@ def _check_objects(server1, server2, db1, db2,
     db1_conn[in]      first Database instance
     db2_conn[in]      second Database instance
     options[in]       options dictionary
-    
+
     Returns list of objects in both databases
     """
 
@@ -220,7 +220,7 @@ def _check_objects(server1, server2, db1, db2,
 def _compare_objects(server1, server2, obj1, obj2, reporter, options,
                      object_type):
     """Compare object definitions and produce difference
-    
+
     server1[in]       first server Server instance
     server2[in]       second server Server instance
     obj1[in]          first object
@@ -229,7 +229,7 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options,
     options[in]       options dictionary
     object_type[in]   type of the objects to be compared (e.g., TABLE,
                       PROCEDURE, etc.).
-    
+
     Returns list of errors
     """
 
@@ -257,14 +257,14 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options,
 
 def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
     """Compare row counts for tables
-    
+
     server1[in]       first server Server instance
     server2[in]       second server Server instance
     obj1[in]          first object
     obj2[in]          second object
     reporter[in]      database compare reporter class instance
     options[in]       options dictionary
-    
+
     Returns list of errors
     """
     errors = []
@@ -288,14 +288,14 @@ def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
 
 def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     """Check data consistency
-    
+
     server1[in]       first server Server instance
     server2[in]       second server Server instance
     obj1[in]          first object
     obj2[in]          second object
     reporter[in]      database compare reporter class instance
     options[in]       options dictionary
-    
+
     Returns list of errors
     """
     from mysql.utilities.common.dbcompare import check_consistency, \
@@ -304,7 +304,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     direction = options.get('changes-for', 'server1')
     difftype = options.get('difftype', 'unified')
     reverse = options.get('reverse', False)
-    
+
     errors = []
     diff_server1 = []
     diff_server2 = []
@@ -319,7 +319,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
             if direction == 'server2' or reverse:
                 diff_server2 = check_consistency(server2, server1,
                                                  obj2, obj1, options)
-                
+
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
                (not reverse and direction == 'server1' and \
@@ -328,7 +328,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                 diff_server2 is None):
                 reporter.report_state('pass')
                 return errors
-                    
+
             # Build diff list
             new_opts = options.copy()
             new_opts['data_diff'] = True
@@ -348,7 +348,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
         except UtilError, e:
             if e.errmsg == "No primary key found.":
                 reporter.report_state('SKIP')
-                errors.append(e.errmsg)
+                errors.append("# {0}".format(e.errmsg))
             else:
                 reporter.report_state('FAIL')
                 if not options['run_all_tests']:
@@ -364,11 +364,11 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
 
 def _check_option_defaults(options):
     """Set the defaults for options if they are not set.
-    
+
     This prevents users from calling the method and its subordinates
     with missing options.
     """
-    
+
     for opt_name in _DEFAULT_OPTIONS:
         if not opt_name in options:
             options[opt_name] = _DEFAULT_OPTIONS[opt_name]
@@ -381,24 +381,24 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     ensures the databases exist, the objects match in number and type, the row
     counts match for all tables, and the data for each matching tables is
     consistent.
-    
+
     If any errors or differences are found, the operation stops and the
     difference is printed.
-    
+
     The following steps are therefore performed:
-    
+
     1) check to make sure the databases exist and are the same definition
-    2) check to make sure the same objects exist in each database    
+    2) check to make sure the same objects exist in each database
     3) for each object, ensure the object definitions match among the databases
     4) for each table, ensure the row counts are the same
     5) for each table, ensure the data is the same
-    
+
     By default, the operation stops on any failure of any test. The caller can
     override this behavior by specifying run_all_tests = True in the options
     dictionary.
-    
+
     TODO:   allow the user to skip object types (e.g. --skip-triggers, et. al.)
-    
+
     server1_val[in]    a dictionary containing connection information for the
                        first server including:
                        (user, password, host, port, socket)
@@ -414,7 +414,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     """
 
     _check_option_defaults(options)
-    
+
     # Connect to servers
     server1, server2 = server_connect(server1_val, server2_val,
                                       db1, db2, options)
@@ -500,4 +500,3 @@ def database_compare(server1_val, server2_val, db1, db2, options):
             success = False
 
     return success
-

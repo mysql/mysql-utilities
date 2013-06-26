@@ -15,8 +15,33 @@ error_log.err,XXXX
 
 Total size of logs = XXXX
 
-# Binary logging is turned off on the server.
+# Binary log information:
+Current binary log file = XXXX
+log_file,size
+clone-bin.000001,XXXX
+clone-bin.index,XXXX
+
+Total size of binary logs = XXXX
+
 # Server is not an active slave - no relay log information.
 # InnoDB is disabled on this server.
 #...done.
 
+Test Case 2 : Using a user without privileges.
+# Source on localhost: ... connected.
+# Database totals:
+
+Total database disk usage = XXXXXXX
+
+# Log information.
+# The general_log is turned off on the server.
+# The slow_query_log is turned off on the server.
+log_name,size
+error_log.err,XXXX
+
+Total size of logs = XXXX
+
+# Binary log information not accessible. User must have the SUPER or REPLICATION CLIENT privilege.
+# Relay log information not accessible. User must have the SUPER or REPLICATION CLIENT privilege.
+# InnoDB is disabled on this server.
+#...done.

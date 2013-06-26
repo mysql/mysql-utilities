@@ -15,12 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
+import time
+
 import failover
 import rpl_admin_gtid
-import subprocess
-import signal
-import time
+
+from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.exception import MUTLibError
 
 _FAILOVER_LOG = "fail_log.txt"
@@ -164,10 +164,15 @@ class test(failover.test):
             print "# Terminating server", self.server1.port, "via pid =", pid
         pid_file.close()
 
+        # Get server datadir to clean directory after kill.
+        res = self.server1.show_server_variable("datadir")
+        datadir = res[0][1]
+
         # Stop the server 
         self.server1.disconnect()
         failover.test.kill(self, pid, True)
 
+        delete_directory(datadir)
         self.servers.remove_server(self.server1.role)
         
         # Now wait for interval to occur.

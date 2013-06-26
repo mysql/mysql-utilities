@@ -86,13 +86,13 @@ class test(utilities_console_base.test):
         test_num += 1
         comment = "Show help utilities with custom utildir"
         cmd_str = 'mysqluc.py --width=77'
-        cmd_str += ' --utildir=%s' % self.tmp_dir + ' --execute="%s"'
+        cmd_str += ' --utildir={0} {1}'.format(self.tmp_dir, '--execute="%s"')
         cmd = "help utilities"
         self.do_test(test_num, comment, cmd_str % cmd)
 
         test_num += 1
         comment = "Execute an utility --help on a custom utildir"
-        cmd = self.util_test + " --help"
+        cmd = self.util_test + " --help; help utilities"
         return self.do_test(test_num, comment, cmd_str % cmd)
 
     def get_result(self):

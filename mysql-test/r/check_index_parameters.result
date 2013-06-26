@@ -26,18 +26,18 @@ Test case 2 - show drops for a table with dupe indexes
 # Getting indexes for util_test_a.t1
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # DROP statements:
 #
-ALTER TABLE util_test_a.t1 DROP INDEX s4;
-ALTER TABLE util_test_a.t1 DROP INDEX s2;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s4`;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s2`;
 #
 #
 # ...done.
@@ -45,18 +45,18 @@ Test case 3 - show drops for a table with dupe indexes
 # Source on XXXX-XXXX: ... connected.
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # DROP statements:
 #
-ALTER TABLE util_test_a.t1 DROP INDEX s4;
-ALTER TABLE util_test_a.t1 DROP INDEX s2;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s4`;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s2`;
 #
 Test case 4 - show drops for a table without dupe indexes
 # Source on XXXX-XXXX: ... connected.
@@ -69,18 +69,18 @@ Test case 5 - same as test case 2 but quiet
 # Source on XXXX-XXXX: ... connected.
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # DROP statements:
 #
-ALTER TABLE util_test_a.t1 DROP INDEX s4;
-ALTER TABLE util_test_a.t1 DROP INDEX s2;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s4`;
+ALTER TABLE `util_test_a`.`t1` DROP INDEX `s2`;
 #
 Test case 6 - same as test case 4 but quiet
 # Source on XXXX-XXXX: ... connected.
@@ -99,13 +99,13 @@ Test case 7 - show indexes
 #
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 Test case 8 - show indexes with -i
 # Source on XXXX-XXXX: ... connected.
 # Showing indexes from util_test_a.t1:
@@ -121,10 +121,10 @@ Test case 8 - show indexes with -i
 #
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #
-CREATE INDEX s2 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
-CREATE INDEX s4 ON util_test_a.t1 (d(32)) 
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 

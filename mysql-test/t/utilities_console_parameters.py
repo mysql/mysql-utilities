@@ -16,9 +16,7 @@
 #
 import os
 import mutlib
-from mysql.utilities import PYTHON_MAX_VERSION
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.common.tools import check_python_version
 
 _BASE_COMMENT = "Test Case %d: "
 
@@ -31,10 +29,6 @@ class test(mutlib.System_test):
 
     def check_prerequisites(self):
         self.server0 = None
-        try:
-            check_python_version((2, 7, 0), PYTHON_MAX_VERSION, True)
-        except:
-            raise MUTLibError("Test requires Python 2.7 or higher.")
         return self.check_num_servers(1)
 
     def setup(self):
@@ -93,6 +87,27 @@ class test(mutlib.System_test):
         self.do_test(test_num, "Replacement", cmd_str % cmd_opt)
         test_num += 1
 
+        # Long variables
+        cmd_opt = '-e "show variables" longvariable{0}=test'.format('e' * 80)
+        self.do_test(test_num, "Long variables",
+                     "mysqluc.py {0}".format(cmd_opt))
+        test_num += 1
+
+        # Unbalanced arguments
+        comment = "Unbalanced arguments"
+        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c", "Test Case "
+                                 "{0}: {1}".format(test_num, comment))
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Invalid assigning in arguments
+        comment = "Invalid assigning in arguments"
+        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c==3", "Test Case "
+                                 "{0}: {1}".format(test_num, comment))
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.replace_result("Quiet mode, saving output to",
@@ -100,8 +115,7 @@ class test(mutlib.System_test):
         self.remove_result("Launching console ...")
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqluc.py "
-                                           "version", 6)
+        self.remove_result("MySQL Utilities mysqluc.py version")
 
         self.replace_substring(".py", "")
 

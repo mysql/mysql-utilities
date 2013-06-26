@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(mutlib.System_test):
     """Disk usage
@@ -72,12 +73,21 @@ class test(mutlib.System_test):
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
-        return True
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
 
+        # Create a new user 'repl:repl' (without privileges).
+        try:
+            self.server1.exec_query("CREATE USER 'repl'@'{0}' IDENTIFIED BY "
+                                    "'repl'".format(self.server1.host))
+        except UtilError as err:
+            raise MUTLibError("Failed to create user 'repl'@'{0}' (with "
+                              "password 'repl'): {1}".format(self.server1.host,
+                                                             err.errmsg))
+
+        return True
 
     def mask(self):
         # Do masking
@@ -121,6 +131,10 @@ class test(mutlib.System_test):
         self.replace_result("Tablespace ibdata1:10M:autoextend",
                             "Tablespace ibdata1:10M:autoextend...\n")
 
+        # Mask size of binary log files
+        self.replace_result("clone-bin.000001,", "clone-bin.000001,XXXX\n")
+        self.replace_result("clone-bin.index,", "clone-bin.index,XXXX\n")
+
     def run(self):
         self.res_fname = "result.txt"
 
@@ -153,21 +167,26 @@ class test(mutlib.System_test):
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
+            res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
         except:
-            return True # Ok to exit here as there weren't any dbs to drop
+            return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            res = server.exec_query("DROP DATABASE {0}".format(db))
         except:
             return False
         return True
 
     def drop_all(self):
+        # Drop user.
         try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
-        return True
+            self.server1.exec_query(
+                "DROP USER 'repl'@'{0}'".format(self.server1.host)
+            )
+        except UtilError:
+            pass  # Ignore DROP USER failure in case user does not exist.
+
+        # Drop database.
+        return self.drop_db(self.server1, "util_test")
 
     def cleanup(self):
         if self.res_fname:

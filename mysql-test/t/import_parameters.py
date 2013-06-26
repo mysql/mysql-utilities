@@ -168,4 +168,7 @@ class test(import_basic.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return import_basic.test.cleanup(self)
+        # Kill servers that won't be used anymore
+        kill_list = ['export_basic', 'import_basic']
+        return (import_basic.test.cleanup(self)
+                and self.kill_server_list(kill_list))

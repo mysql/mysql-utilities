@@ -17,7 +17,7 @@
 
 """
 This module contains an abstraction of a MySQL server object used
-by multiple utlities. It also contains helper methods for common
+by multiple utilities. It also contains helper methods for common
 server operations used in multiple utilities.
 """
 
@@ -40,8 +40,10 @@ from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
                                               clean_IPv6, format_IPv6)
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
+_AUTOCOMMIT_SET = "SET AUTOCOMMIT = {0}"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
+
 
 def get_connection_dictionary(conn_info):
     """Get the connection dictionary.
@@ -533,14 +535,14 @@ class Server(object):
             verbose        print extra data during operations (optional)
                            default value = False
             charset        Default character set for the connection.
-                           (default latin1)
+                           (default utf8)
         """
         assert not options.get("conn_info") == None
 
         self.verbose = options.get("verbose", False)
         self.db_conn = None
         self.host = None
-        self.charset = options.get("charset", "latin1")
+        self.charset = options.get("charset", "utf8")
         self.role = options.get("role", "Server")
         conn_values = get_connection_dictionary(options.get("conn_info"))
         try:
@@ -559,8 +561,10 @@ class Server(object):
         # Set to TRUE when foreign key checks are ON. Check with
         # foreign_key_checks_enabled.
         self.fkeys = None
+        self.autocommit = None
         self.read_only = False
         self.aliases = []
+        self.grants_enabled = None
 
     def is_alive(self):
         """Determine if connection to server is still alive.
@@ -583,7 +587,6 @@ class Server(object):
             res = False
         return res
 
-
     def is_alias(self, host_or_ip):
         """Determine if host_or_ip is an alias for this host
 
@@ -600,7 +603,7 @@ class Server(object):
                     my_host = socket.gethostbyaddr(clean_IPv6(host))
                     aliases.append(my_host[0])
                     # socket.gethostbyname_ex() does not work with ipv6
-                    if (not my_host[0].count(":") < 1 or 
+                    if (not my_host[0].count(":") < 1 or
                         not my_host[0] == "ip6-localhost"):
                         host_ip = socket.gethostbyname_ex(my_host[0])
                     else:
@@ -624,7 +627,7 @@ class Server(object):
                         print("WARNING: hostname: {0} may not be reachable, "
                               "reason: {1}".format(host, err.strerror))
                     return aliases
-                aliases.append(host_ip[0])
+                extend_aliases(aliases, [host_ip[0]])
                 addrinfo = socket.getaddrinfo(host, None)
                 local_ip = None
                 error = None
@@ -655,11 +658,11 @@ class Server(object):
             Returns List of no repeated elements from the two list
             """
             if als_new:
+                als_new = set(als_new)  # Create a set to remove duplicates.
                 als_new = [alias for alias in als_new if (alias and
                                                           alias not in aliases
                                                           )]
                 aliases.extend(als_new)
-
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
 
@@ -668,7 +671,7 @@ class Server(object):
             if host_or_ip.lower() in self.aliases:
                 return True
             else:
-                # get the alias for the given host_or_ip 
+                # get the alias for the given host_or_ip
                 host_or_ip_aliases = get_aliases(host_or_ip)
                 host_or_ip_aliases.append(host_or_ip)
                 for alias in host_or_ip_aliases:
@@ -700,28 +703,33 @@ class Server(object):
         # Get the aliases for this server host
         self.aliases = get_aliases(self.host)
         # Check if this server is local
-        if self.host in local_aliases:
-            # save the local aliases for future.
-            extend_aliases(self.aliases, local_aliases)
-            # check if the host_or_ip is alias 
-            if host_or_ip in self.aliases:
-                return True
-        else:
-            # server host is not local, do not use local aliases
-            # check if the given host_or_ip is alias of the host. 
-            if host_or_ip in self.aliases:
-                return True
+        for host in self.aliases:
+            if host in local_aliases:
+                # Is local then save the local aliases for future.
+                extend_aliases(self.aliases, local_aliases)
+                break
+            # Handle special ".local" hostnames.
+            if host.endswith('.local'):
+                # Remove '.local' and attempt to match with local aliases.
+                host, _ = host.rsplit('.', 1)
+                if host in local_aliases:
+                    # Is local then save the local aliases for future.
+                    extend_aliases(self.aliases, local_aliases)
+                    break
 
-        # lastly get the alias for the given host_or_ip 
+        # Check if the given host_or_ip is alias of the server host.
+        if host_or_ip in self.aliases:
+            return True
+
+        # lastly get the alias for the given host_or_ip
         host_or_ip_aliases = get_aliases(host_or_ip)
-        host_or_ip_aliases.append(host_or_ip)
+        extend_aliases(host_or_ip_aliases, [host_or_ip])
         for alias in host_or_ip_aliases:
             if alias in self.aliases:
                 #save the aliases for future
                 extend_aliases(self.aliases, host_or_ip_aliases)
                 return True
         return False
-
 
     def user_host_exists(self, user, host_or_ip):
         """Check to see if a user, host exists
@@ -784,7 +792,7 @@ class Server(object):
                 parameters['passwd'] = self.passwd
             parameters['charset'] = self.charset
             parameters['host'] = parameters['host'].replace("[", "")
-            parameters['host'] = parameters['host'].replace("]", "") 
+            parameters['host'] = parameters['host'].replace("]", "")
             self.db_conn = mysql.connector.connect(**parameters)
         except mysql.connector.Error, e:
             # Reset any previous value if the connection cannot be established,
@@ -1196,8 +1204,9 @@ class Server(object):
         Returns string CREATE string with replacements if found, else return
                        original string
         """
-
+        res = [create_str]
         exist_engine = ''
+        is_create_like = False
         replace_msg = "# Replacing ENGINE=%s with ENGINE=%s for table %s."
         add_msg = "# Adding missing ENGINE=%s clause for table %s."
         if new_engine is not None or def_engine is not None:
@@ -1205,6 +1214,10 @@ class Server(object):
             if i > 0:
                 j = create_str.find(" ", i)
                 exist_engine = create_str[i+7:j]
+            else:
+                ## Check if it is a CREATE TABLE LIKE statement
+                is_create_like = (create_str.find("CREATE TABLE {0} "
+                                                  "LIKE".format(tbl_name)) == 0)
 
         # Set default engine
         #
@@ -1217,10 +1230,19 @@ class Server(object):
              exist_engine.upper() != def_engine.upper() and \
              self.has_storage_engine(def_engine) and \
              self.has_storage_engine(exist_engine):
+
             # If no ENGINE= clause present, add it
             if len(exist_engine) == 0:
-                i = create_str.find(";")
-                create_str = create_str[0:i] + " ENGINE=%s;"  % def_engine
+                if is_create_like:
+                    alter_str = "ALTER TABLE {0} ENGINE={1}".format(tbl_name,
+                                                                    def_engine)
+                    res = [create_str, alter_str]
+                else:
+                    i = create_str.find(";")
+                    i = len(create_str) if i == -1 else i
+                    create_str = "{0} ENGINE={1};".format(create_str[0:i],
+                                                          def_engine)
+                    res = [create_str]
             # replace the existing storage engine
             else:
                 create_str.replace("ENGINE=%s" % exist_engine,
@@ -1233,22 +1255,30 @@ class Server(object):
             exist_engine = def_engine
 
         # Use new engine
-        if new_engine is not None and \
-           exist_engine.upper() != new_engine.upper() and \
-           self.has_storage_engine(new_engine):
+        if (new_engine is not None and
+                exist_engine.upper() != new_engine.upper() and
+                self.has_storage_engine(new_engine)):
             if len(exist_engine) == 0:
-                i = create_str.find(";")
-                create_str = create_str[0:i] + " ENGINE=%s;"  % new_engine
+                if is_create_like:
+                    alter_str = "ALTER TABLE {0} ENGINE={1}".format(tbl_name,
+                                                                    new_engine)
+                    res = [create_str, alter_str]
+                else:
+                    i = create_str.find(";")
+                    i = len(create_str) if i == -1 else i
+                    create_str = "{0} ENGINE={1};".format(create_str[0:i],
+                                                          new_engine)
+                    res = [create_str]
             else:
                 create_str = create_str.replace("ENGINE=%s" % exist_engine,
                                                 "ENGINE=%s" % new_engine)
+                res = [create_str]
             if not quiet:
                 if len(exist_engine) > 0:
                     print replace_msg % (exist_engine, new_engine, tbl_name)
                 else:
                     print add_msg % (new_engine, tbl_name)
-
-        return create_str
+        return res
 
 
     def get_innodb_stats(self):
@@ -1397,6 +1427,46 @@ class Server(object):
         if value is not None:
             res = self.exec_query(_FOREIGN_KEY_SET % value, {'fetch':'false'})
 
+    def autocommit_set(self):
+        """Check autocommit status for the connection.
+
+        Returns bool - True if autocommit is enabled and False otherwise.
+        """
+        if self.autocommit is None:
+            res = self.show_server_variable('autocommit')
+            self.autocommit = (res and res[0][1] == '1')
+        return self.autocommit
+
+    def toggle_autocommit(self, enable=None):
+        """Enable or disable autocommit for the connection.
+
+        This method switch the autocommit value or enable/disable it according
+        to the given parameter.
+
+        enable[in]         if True, turn on autocommit (set to 1)
+                           else if False turn autocommit off (set to 0).
+        """
+        if enable is None:
+             # Switch autocommit value.
+            if self.autocommit is None:
+                # Get autocommit value if unknown
+                self.autocommit_set()
+            if self.autocommit:
+                value = '0'
+                self.autocommit = False
+            else:
+                value = '1'
+                self.autocommit = True
+        else:
+            # Set AUTOCOMMIT according to provided value.
+            if enable:
+                value = '1'
+                self.autocommit = True
+            else:
+                value = '0'
+                self.autocommit = False
+        # Change autocommit value.
+        self.exec_query(_AUTOCOMMIT_SET.format(value), {'fetch': 'false'})
 
     def get_server_id(self):
         """Retrieve the server id.
@@ -1463,3 +1533,21 @@ class Server(object):
             return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
                                    "ON" if on else "OFF")
         return None
+
+
+    def grant_tables_enabled(self):
+        """Check to see if grant tables are enabled
+
+        Returns bool - True = grant tables are enabled, False = disabled
+        """
+        if self.grants_enabled is None:
+            try:
+                self.exec_query("SHOW GRANTS FOR 'snuffles'@'host'")
+                self.grants_enabled = True
+            except UtilError as error:
+                if "--skip-grant-tables" in error.errmsg:
+                    self.grants_enabled = False
+                # Ignore other errors as they are not pertinent to the check
+                else:
+                    self.grants_enabled = True
+        return self.grants_enabled

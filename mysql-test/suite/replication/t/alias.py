@@ -75,34 +75,34 @@ class test(mutlib.System_test):
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
-            
+
         self.server1.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % self.server1.host)
-            
+
         host_ip = socket.gethostbyname_ex(socket.gethostname())
         _MASTER_ALIASES.append(host_ip[2][0])
         _MASTER_ALIASES.append(host_ip[0])
-        
+
         for ip in host_ip[2]:
             self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % ip)
             self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'%s' IDENTIFIED BY 'rpl'" % ip)
-        
+
         for alias in _MASTER_ALIASES:
             self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % alias)
             self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'%s' IDENTIFIED BY 'rpl'" % alias)
 
         return True
-    
+
     def run_test_case(self, master_host, comment):
-        
+
         from mysql.utilities.common.server import Server
 
         master_str = "--master=root:root@%s:%s" % (master_host, self.server2.port)
         slave_str = " --slave=root:root@%s:%s" % (self.server1.host, self.server1.port)
         conn_str = master_str + slave_str
-        
+
         if self.debug:
             print comment
-            
+
         # Stop and reset the slave
         try:
             res = self.server1.exec_query("STOP SLAVE")
@@ -118,7 +118,7 @@ class test(mutlib.System_test):
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
             return False
-        
+
         # Run check replication
         cmd = "mysqlrplcheck.py %s " % conn_str
         self.results.append(cmd+'\n')
@@ -130,10 +130,10 @@ class test(mutlib.System_test):
             return False
 
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         test_num = 1
         for alias in _MASTER_ALIASES:
             comment = "Test case %s - master as %s." % (test_num, alias)
@@ -141,29 +141,22 @@ class test(mutlib.System_test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
-                    
+
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_substring(str(self.server2.port), "PORT2")
         self.replace_substring("127.0.0.1", "HOSTNAME")
         self.replace_substring(_MASTER_ALIASES[2], "HOSTNAME")
         self.replace_substring(_MASTER_ALIASES[3], "HOSTNAME")
-        
-        # Get rid of the servers
-        self.servers.stop_server(self.server1, 10, False)
-        self.servers.remove_server(self.server1.role)
-        self.servers.stop_server(self.server2, 10, False)
-        self.servers.remove_server(self.server2.role)
-        
+
         return True
-   
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        return True
-
+        return self.kill_server_list(['rep_master', 'rep_slave'])

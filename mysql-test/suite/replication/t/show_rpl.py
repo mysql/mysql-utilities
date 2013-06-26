@@ -30,13 +30,15 @@ class test(mutlib.System_test):
         self.port_repl = []
         return self.check_num_servers(1)
 
-    def get_server(self, name):
+    def get_server(self, name, mysqld_params=None):
         serverid = self.servers.get_next_id()
-        new_port = self.servers.get_next_port()
-        mysqld_params = (' --mysqld="--log-bin=mysql-bin '
-                         ' --report-host={0} '
-                         '--report-port={1}"').format('localhost', new_port)
-        self.servers.clear_last_port()
+        if not mysqld_params:
+            new_port = self.servers.get_next_port()
+            mysqld_params = (' --mysqld="--log-bin=mysql-bin '
+                             ' --report-host={0} '
+                             '--report-port={1}"').format('localhost',
+                                                          new_port)
+            self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
                                             name, mysqld_params)
         if not res:
@@ -221,6 +223,7 @@ class test(mutlib.System_test):
         for port in self.port_repl:
             self.replace_substring("%s" % port, "PORT%d" % i)
             i += 1
+        # Remove non-deterministic messages (do not appear on all platfoms)
         self.replace_result("Error connecting to a slave",
                             "Error connecting to a slave ...\n")
         self.replace_result("Error 2002: Can't connect to",
@@ -245,4 +248,7 @@ class test(mutlib.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        return True
+        # Kill the servers that are only for this test.
+        kill_list = ['rep_relay_slave', 'multi_master1', 'rep_master_show',
+                    'multi_master2', 'rep_slave_show']
+        return self.kill_server_list(kill_list)

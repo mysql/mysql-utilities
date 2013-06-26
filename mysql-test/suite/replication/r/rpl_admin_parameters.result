@@ -171,7 +171,6 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # ...done.
 Test case 4 - switchover with quiet
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
-NOTE: Log file 'temp_log.txt' does not exist. Will be created.
 # Discovering slave at localhost:PORT1
 # Found slave: localhost:PORT1
 # Discovering slave at localhost:PORT3

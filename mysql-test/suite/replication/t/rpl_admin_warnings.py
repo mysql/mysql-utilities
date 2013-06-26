@@ -211,4 +211,7 @@ class test(rpl_admin.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return rpl_admin.test.cleanup(self)
+        kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
+                    'rep_slave3_gtid', 'rep_slave4_gtid']
+        return (rpl_admin.test.cleanup(self)
+                and self.kill_server_list(kill_list))

@@ -54,20 +54,20 @@ class test(replicate.test):
                 raise MUTLibError("Cannot spawn replication new server.")
             self.server3 = res[0]
             self.servers.add_new_server(self.server3, True)
-            
+
         try:
             self.server1.exec_query("DROP DATABASE util_test")
         except:
             pass
 
         return result
-    
+
     def run(self):
         self.res_fname = "result.txt"
         from_conn = "--server=" + self.build_connection_string(self.server1)
 
         test_num = 1
-        # Check --rpl option errors    
+        # Check --rpl option errors
         for option in _RPL_OPTIONS:
             cmd_str = "mysqldbexport.py %s util_test " % from_conn
             comment = "Test case %s - error: %s but no --rpl" % \
@@ -77,7 +77,7 @@ class test(replicate.test):
             if not res:
                 raise MUTLibError("%s: failed" % comment)
             test_num += 1
-            
+
         all_options = " ".join(_RPL_OPTIONS)
         comment = "Test case %s - error: %s but no --rpl" % \
                   (test_num, all_options)
@@ -86,7 +86,7 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         cmd_str = "mysqldbexport.py util_test --export=both " + \
                   "--rpl-user=rpl:rpl %s " % from_conn
 
@@ -97,7 +97,7 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         self.server1.exec_query("CREATE DATABASE util_test")
         self.server1.exec_query("CREATE USER imnotamouse@localhost")
 
@@ -140,7 +140,7 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-        
+
         from_conn = "--server=" + self.build_connection_string(self.server3)
 
         cmd_str = "mysqldbexport.py util_test --export=both " + \
@@ -168,5 +168,7 @@ class test(replicate.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return replicate.test.cleanup(self)
-
+        # Kill the servers that are only used in this test.
+        kill_list = ['new_server1']
+        return (replicate.test.cleanup(self)
+                and self.kill_server_list(kill_list))

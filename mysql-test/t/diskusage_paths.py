@@ -109,4 +109,7 @@ class test(diskusage_basic.test):
             name, ext = os.path.splitext(item)
             if name.upper() == "MYSQL-BIN":
                 os.unlink(item)
-        return diskusage_basic.test.cleanup(self)
+
+        kill_list = ['diskusage_paths']
+        res = diskusage_basic.test.cleanup(self)
+        return (res and self.kill_server_list(kill_list))

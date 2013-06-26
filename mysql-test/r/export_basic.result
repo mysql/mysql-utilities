@@ -702,3 +702,39 @@ INSERT INTO `db``:db`.```t``.``export_2` VALUES (1, '@`var`.`var`');
 INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
 INSERT INTO `db``:db`.```t``export_1` VALUES (2, '\0\'\"\b\n\r\t\Z\\\%\_');
 #...done.
+Test case 9 - export data with unicode characters
+# Source on localhost: ... connected.
+USE `util_test`;
+# Exporting data from util_test
+# Data for table `util_test`.`t1`: 
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`: 
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
+# Data for table `util_test`.`t3`: 
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
+# Data for table `util_test`.`t4`: 
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
+USE `import_test`;
+# Exporting data from import_test
+# Data for table `import_test`.`customers`: 
+INSERT INTO `import_test`.`customers` VALUES (1, 'Customer 1');
+INSERT INTO `import_test`.`customers` VALUES (2, 'Customer 2');
+INSERT INTO `import_test`.`customers` VALUES (3, 'Customer 3');
+INSERT INTO `import_test`.`customers` VALUES (4, 'Customer 4');
+INSERT INTO `import_test`.`customers` VALUES (5, 'Customer 5');
+INSERT INTO `import_test`.`customers` VALUES (6, '客户6');
+INSERT INTO `import_test`.`customers` VALUES (7, '中国简体，客户7');
+INSERT INTO `import_test`.`customers` VALUES (8, 'Клиент 8');
+#...done.

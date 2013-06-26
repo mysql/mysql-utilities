@@ -49,3 +49,23 @@ Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE
 mysqlauditgrep.py: error: The --pattern option is required if REGEXP option is set.
 Test case 13 - Invalid regexp pattern
 ERROR: Invalid Pattern: *.
+Test case 14 - Invalid --status option value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: The value for the option --status is not valid: ',,'.
+Test case 15 - Invalid STATUS value
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid status value 'HY000' (must be a non-negative integer).
+Test case 16 - Invalid STATUS interval format
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid format for status interval (a single dash must be used): '200-250-300'.
+Test case 17 - Invalid STATUS interval lower bound
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid status value '1.0' (must be a non-negative integer) for interval '1.0-100'.
+Test case 18 - Invalid STATUS interval upper bound
+Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
+
+mysqlauditgrep.py: error: Invalid status value '' (must be a non-negative integer) for interval '1-'.

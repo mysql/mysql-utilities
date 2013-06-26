@@ -290,7 +290,8 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
                          max_version=PYTHON_MAX_VERSION,
                          raise_exception_on_fail=False,
                          name=None, print_on_fail=True,
-                         exit_on_fail=True):
+                         exit_on_fail=True,
+                         return_error_msg=False):
     """Check the Python version compatibility.
 
     By default this method uses constants to define the minimum and maximum
@@ -312,6 +313,8 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
                                   error on failure.
     exit_on_fail[in]              If True, issue exit() else do not exit()
                                   on failure.
+    return_error_msg[in]          If True, and is not compatible 
+                                  returns (result, error_msg) tuple.
     """
 
     # Only use the fields: major, minor and micro
@@ -362,6 +365,9 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
 
         if exit_on_fail:
             sys.exit(1)
+
+        if return_error_msg:
+            return is_compat, error_msg
 
     return is_compat
 

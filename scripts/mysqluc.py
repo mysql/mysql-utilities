@@ -36,7 +36,7 @@ if not check_connector_python():
 
 try:
     from mysql.utilities.command.utilitiesconsole import UtilitiesConsole
-    from mysql.utilities import VERSION_FRM, VERSION_STRING
+    from mysql.utilities import VERSION_FRM, VERSION_STRING, COPYRIGHT_FULL
     from mysql.utilities.common.options import add_verbosity, check_verbosity
     from mysql.utilities.exception import UtilError
 except:
@@ -49,11 +49,15 @@ NAME = "MySQL Utilities Client - mysqluc "
 DESCRIPTION = "mysqluc - Command line client for running MySQL Utilities"
 USAGE = "%prog "
 WELCOME_MESSAGE = """
+<<<<<<< TREE
 Welcome to the MySQL Utilities Client (mysqluc) version %s
 Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.\n
 Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
 Other names may be trademarks of their respective owners.
 
+=======
+Welcome to the MySQL Utilities Client (mysqluc) version {0}\n{1}
+>>>>>>> MERGE-SOURCE
 Type 'help' for a list of commands or press TAB twice for list of utilities.
 """
 GOODBYE_MESSAGE = "\nThanks for using the MySQL Utilities Client!\n"
@@ -67,13 +71,19 @@ def build_variable_dictionary_list(args):
     """
     variables = []
     arguments = list(args)
-    for i, arg in enumerate(arguments):
+    for arg in arguments[:]:
         if '=' in arg:
-            name, value = arg.split('=')
+            try:
+                name, value = arg.split('=')
+                if not value:
+                    raise ValueError
+            except ValueError:
+                parser.error("Invalid argument assignment: {0}. Please check "
+                             "your command.".format(arg))
             variables.append({'name': name, 'value': value})
-            arguments.pop(i)
+            arguments.remove(arg)
 
-    if len(arguments) % 2:
+    if len(arguments) > 0:
         parser.error("Unbalanced arguments. Please check your command.")
     for i in range(0, len(arguments), 2):
         variables.append({'name': arguments[i], 'value': arguments[i+1]})
@@ -132,7 +142,7 @@ options = {
     'utildir'   : opt.utildir,
     'variables' : build_variable_dictionary_list(args),
     'prompt'    : 'mysqluc> ',
-    'welcome'   : WELCOME_MESSAGE % VERSION_STRING,
+    'welcome'   : WELCOME_MESSAGE.format(VERSION_STRING, COPYRIGHT_FULL),
     'goodbye'   : GOODBYE_MESSAGE,
     'commands'  : opt.commands,
     'custom'    : True, # We are using custom commands

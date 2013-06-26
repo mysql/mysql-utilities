@@ -27,30 +27,29 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         self.check_gtid_unsafe()
         # Need at least one server.
-        self.server1 = None
-        self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(2):
-            self.need_server = True
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
-        if self.need_server:
+        # Spawn required servers
+        num_servers = self.servers.num_servers()
+        if num_servers < 3:
             try:
-                self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
-        self.server2 = self.servers.get_server(1)
+                self.servers.spawn_new_servers(3)
+            except MUTLibError as err:
+                raise MUTLibError(
+                    "Cannot spawn needed servers: {0}".format(err.errmsg)
+                )
+        # Set spawned servers without using the one passed to MUT
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
         data_file = os.path.normpath("./std_data/fkeys.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: %s" % \
-                               (data_file, e.errmsg))
+        except UtilError as e:
+            raise MUTLibError("Failed to read commands from file"
+                              " {0}: {1}".format((data_file, e.errmsg)))
         self.server1.disable_foreign_key_checks(False)
         return True
 
@@ -62,33 +61,30 @@ class test(mutlib.System_test):
         to_conn = "--destination=" + self.build_connection_string(self.server2)
        
         comment = "Test case 1 - copy database with foreign keys"
-        cmd = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
-        res = self.exec_util(cmd + " util_test_fk:util_db_clone_fk",
-                             self.res_fname)
+        cmd_str = ("mysqldbcopy.py --skip-gtid "
+                   "{0} {1} ".format(from_conn, to_conn))
+        cmd_opts = "util_test_fk2:util_test_fk2_copy"
+        res = self.exec_util(cmd_str + cmd_opts, self.res_fname)
         self.results.append(res)
         if res != 0:
-            raise MUTLibError("%s: failed" % comment)
-
+            raise MUTLibError("{0}: failed".format(comment))
         return True
   
     def get_result(self):
         msg = None
-        if self.server2 and self.results[0] == 0:
-            query = "SHOW DATABASES LIKE 'util_db_clone_fk'"
+        if self.server2 and self.server1 and self.results[0] == 0:
+            query_ori = "SHOW CREATE TABLE `util_test_fk2`.a2"
+            query_clo = "SHOW CREATE TABLE `util_test_fk2_copy`.a2"
             try:
-                res = self.server2.exec_query(query)
-                if res and res[0][0] == 'util_db_clone_fk':
+                res_ori = self.server1.exec_query(query_ori)
+                res_clo = self.server2.exec_query(query_clo)
+                # check if create table statements are equal
+                if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
                     return (True, msg)
-            except UtilDBError, e:
+            except UtilDBError as e:
                 raise MUTLibError(e.errmsg)
-            query = "SHOW DATABASES LIKE 'util_test_fk'"
-            try:
-                res = self.server2.exec_query(query)
-                if res and res[0][0] == 'util_test_fk':
-                    return (True, msg)
-            except UtilDBError, e:
-                raise MUTLibError(e.errmsg)
-        return (False, ("Result failure.\n", "Database copy not found.\n"))
+        return (False, ("Result failure.\n", "Create TABLE statements are not"
+                                             " equal\n"))
     
     def record(self):
         # Not a comparative test, returning True
@@ -96,35 +92,31 @@ class test(mutlib.System_test):
     
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
+        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
+        if not res:
+            return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_db_clone_fk'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            res = server.exec_query("DROP DATABASE {0}".format(db))
         except:
             return False
         return True
     
     def drop_all(self):
-        res1, res2, res3 = True, True, True
-        try:
-            self.drop_db(self.server1, "util_test_fk")
-        except:
-            res1 = False
-        try:
-            self.drop_db(self.server2, "util_test_fk")
-        except:
-            res2 = False
-        try:
-            self.drop_db(self.server2, "util_db_clone_fk")
-        except:
-            res3 = False
-        return res1 and res2 and res3
+        drop_dbs_s1 = ["util_test_fk", "util_test_fk2", "util_test_fk3"]
+        drop_dbs_s2 = ["util_test_fk2_copy"]
+        drop_results_s1 = []
+        drop_results_s2 = []
+        for db in drop_dbs_s1:
+            drop_results_s1.append(self.drop_db(self.server1, db))
+
+        for db in drop_dbs_s2:
+            drop_results_s2.append(self.drop_db(self.server2, db))
+
+        return all(drop_results_s1) and all(drop_results_s2)
             
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        return self.drop_all()
-
-
+        # Drop databases and kill spawned servers
+        return (self.drop_all() and self.kill_server(self.server1.role) and
+                self.kill_server(self.server2.role))

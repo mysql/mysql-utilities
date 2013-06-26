@@ -134,6 +134,8 @@ class test(rpl_admin_gtid.test):
         self.replace_substring(str(self.s3_port), "PORT4")
         self.replace_substring(str(self.s4_port), "PORT5")
 
+        self.remove_result("NOTE: Log file")
+
         return True
 
     def get_result(self):
@@ -149,5 +151,8 @@ class test(rpl_admin_gtid.test):
                 os.unlink("a.txt")
             except:
                 pass
-        return True
 
+        # Kill the servers that are only used for this test
+        kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
+                    'rep_slave3_gtid', 'rep_slave4_gtid']
+        return self.kill_server_list(kill_list)

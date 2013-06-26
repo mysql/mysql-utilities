@@ -29,15 +29,26 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
+        # Spawn required servers
+        num_servers = self.servers.num_servers()
+        if num_servers < 2:
+            try:
+                self.servers.spawn_new_servers(2)
+            except MUTLibError as err:
+                raise MUTLibError(
+                    "Cannot spawn needed servers: {0}".format(err.errmsg)
+                )
+
+        # Set spawned servers
+        self.server1 = self.servers.get_server(1)
         data_file = os.path.normpath("./std_data/fkeys.sql")
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: %s" % \
-                               (data_file, e.errmsg))
+        except UtilError as e:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, e.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
     
@@ -47,10 +58,12 @@ class test(mutlib.System_test):
         from_conn = "--source=" + self.build_connection_string(self.server1)
         to_conn = "--destination=" + self.build_connection_string(self.server1)
        
-        # Test case 1 - clone a sample database
+        # Test case 1 - clone a sample database and check if create table
+        # statement from one of the tables is equal to the one from the original
+        # table
         cmd_opts = ["mysqldbcopy.py", "--skip-gtid",
                     from_conn, to_conn,
-                    "util_test_fk:util_db_clone_fk"]
+                    "util_test_fk2:util_test_fk2_clone"]
         cmd = " ".join(cmd_opts)
         try:
             # Must disconnect to avoid deadlock when copying fkey tables
@@ -59,7 +72,7 @@ class test(mutlib.System_test):
             res = self.exec_util(cmd, self.res_fname)
             self.results.append(res)
             return res == 0
-        except MUTLibError, e:
+        except MUTLibError as e:
             raise MUTLibError(e.errmsg)
           
     def get_result(self):
@@ -67,14 +80,19 @@ class test(mutlib.System_test):
         self.server1.connect()
         msg = None
         if self.server1 and self.results[0] == 0:
-            query = "SHOW DATABASES LIKE 'util_db_clone_fk'"
+            query_ori = "SHOW CREATE TABLE `util_test_fk2`.a2"
+            query_clo = "SHOW CREATE TABLE `util_test_fk2_clone`.a2"
             try:
-                res = self.server1.exec_query(query)
-                if res and res[0][0] == 'util_db_clone_fk':
-                    return (True, None)
-            except UtilDBError, e:
+                res_ori = self.server1.exec_query(query_ori)
+                res_clo = self.server1.exec_query(query_clo)
+
+                # Check if create table statements are equal
+                if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
+                    return (True, msg)
+            except UtilDBError as e:
                 raise MUTLibError(e.errmsg)
-        return (False, ("Result failure.\n", "Database clone not found.\n"))
+        return (False, ("Result failure.\n", "Create TABLE statements are not "
+                                             "equal\n"))
     
     def record(self):
         # Not a comparative test, returning True
@@ -82,33 +100,25 @@ class test(mutlib.System_test):
     
     def drop_db(self, server, db):
         # Check before you drop to avoid warning
+        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
+        if not res:
+            return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_db_clone_fk'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
+            res = server.exec_query("DROP DATABASE {0}".format(db))
         except:
             return False
         return True
     
     def drop_all(self):
-        res1, res2 = True, True
-        try:
-            self.drop_db(self.server1, "util_test_fk")
-        except:
-            res1 = False
-        try:
-            self.drop_db(self.server1, "util_db_clone_fk")
-        except:
-            res2 = False
-        return res1 and res2
+        drop_dbs = ['util_test_fk2', 'util_test_fk2_clone', 'util_test_fk',
+                    'util_test_fk3']
+        drop_results = []
+        for db in drop_dbs:
+            drop_results.append(self.drop_db(self.server1, db))
+        return all(drop_results)
 
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        return self.drop_all()
-
-
-
-
+        # Drop databases and kill spawned servers
+        return self.drop_all() and self.kill_server(self.server1.role)

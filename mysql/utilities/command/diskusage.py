@@ -23,6 +23,9 @@ import locale
 import os
 import sys
 
+from mysql.utilities.common.format import print_list
+from mysql.utilities.common.tools import encode
+from mysql.utilities.common.user import User
 from mysql.utilities.exception import UtilError
 
 # Constants
@@ -43,32 +46,35 @@ _QUERY_DBSIZE = """
     GROUP BY db_name
 """
 
+
 def _print_size(prefix, total):
     """Print size formatted with commas and estimated to the largest XB.
 
     prefix[in]        The preamble to the size. e.g. "Total XXX ="
     total[in]         Integer value to format.
     """
+    msg = "{0}{1} bytes".format(prefix, locale.format("%d", total,
+                                                      grouping=True))
 
     # Calculate largest XByte...
     if total > _TB:
-        converted = total/_TB
-        print prefix + "%s bytes or {0:.2f} TB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _TB
+        print("{0} or {1} TB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _GB:
-        converted = total/_GB
-        print prefix + "%s bytes or {0:.2f} GB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _GB
+        print("{0} or {1} GB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _MB:
-        converted = total/_MB
-        print prefix + "%s bytes or {0:.2f} MB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _MB
+        print("{0} or {1} MB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     elif total > _KB:
-        converted = total/_KB
-        print prefix + "%s bytes or {0:.2f} KB".format(converted) % \
-              locale.format("%d", total, grouping=True)
+        converted = total / _KB
+        print("{0} or {1} KB".format(msg, locale.format("%.2f", converted,
+                                                        grouping=True)))
     else:
-        print prefix + "%s bytes" % locale.format("%d", total, grouping=True)
+        print(msg)
 
 
 def _get_formatted_max_width(rows, columns, col):
@@ -368,8 +374,11 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
     for row in rows:
         # If user can read the datadir, calculate actual and misc file totals
         if have_read:
-            dbdir_size = _get_folder_size(os.path.join(datadir, row[0]))
-            misc_files = _get_db_dir_size(os.path.join(datadir, row[0]))
+            # Encode database name (with strange characters) to the
+            # corresponding directory name.
+            db_dir = encode(row[0])
+            dbdir_size = _get_folder_size(os.path.join(datadir, db_dir))
+            misc_files = _get_db_dir_size(os.path.join(datadir, db_dir))
         else:
             dbdir_size = 0
             misc_files = 0
@@ -608,6 +617,45 @@ def show_logfile_usage(server, options):
     return True
 
 
+def _print_logs(logs, total, options):
+    """Display list of log files.
+
+    logs[in]        List of log rows;
+    total[in]       Total logs size;
+    options[in]     Dictionary with the options used to print the log files,
+                    namely: format, no_headers and quiet.
+    """
+    out_format = options.get("format", "grid")
+    no_headers = options.get("no_headers", False)
+    log_type = options.get("log_type", "binary log")
+    quiet = options.get("quiet", False)
+
+    columns = ['log_file']
+    fmt_logs = []
+    if out_format == 'GRID':
+        max_col = _get_formatted_max_width(logs, ('log_file', 'size'), 1)
+        if max_col < len('size'):
+            max_col = len('size')
+        size = "{0:>{1}}".format('size', max_col)
+        columns.append(size)
+
+        for row in logs:
+            # Add commas
+            size = locale.format("%d", row[1], grouping=True)
+            # Make justified strings
+            size = "{0:>{1}}".format(size, max_col)
+            fmt_logs.append((row[0], size))
+
+    else:
+        fmt_logs = logs
+        columns.append('size')
+
+    print_list(sys.stdout, out_format, columns, fmt_logs, no_headers)
+    if not quiet:
+        _print_size("\nTotal size of {0}s = ".format(log_type), total)
+        print
+
+
 def show_log_usage(server, datadir, options):
     """Show binary or relay log disk space usage.
 
@@ -622,101 +670,129 @@ def show_log_usage(server, datadir, options):
 
     return True or raise exception on error
     """
-    from mysql.utilities.common.format import print_list
-
-    format = options.get("format", "grid")
-    no_headers = options.get("no_headers", False)
-    verbosity = options.get("verbosity", 0)
-    have_read = options.get("have_read", False)
     log_type = options.get("log_type", "binary log")
     quiet = options.get("quiet", False)
 
-    current_log = None
+    # Check privileges to execute required queries: SUPER or REPLICATION CLIENT
+    user_inst = User(server, "{0}@{1}".format(server.user, server.host))
+    has_super = user_inst.has_privilege("*", "*", "SUPER")
+    has_rpl_client = user_inst.has_privilege("*", "*", "REPLICATION CLIENT")
 
-    # Check for binlog on first.
+    # Verify necessary permissions (access to filesystem) and privileges
+    # (execute queries) to get logs usage information.
     if log_type == 'binary log':
+        # Check for binlog ON first.
         res = server.show_server_variable('log_bin')
-        if res != [] and res[0][1].upper() == 'OFF':
-            print "# Binary logging is turned off on the server."
+        if res and res[0][1].upper() == 'OFF':
+            print("# Binary logging is turned off on the server.")
             return True
+        # Check required privileges according to the access to the datadir.
+        if os.access(datadir, os.R_OK):
+            # Requires SUPER or REPLICATION CLIENT to execute:
+            # SHOW MASTER STATUS.
+            if not has_super and not has_rpl_client:
+                print("# {0} information not accessible. User must have the "
+                      "SUPER or REPLICATION CLIENT "
+                      "privilege.".format(log_type.capitalize()))
+                return True
+        else:
+            # Requires SUPER for server < 5.6.6 or also REPLICATION CLIENT for
+            # server >= 5.6.6 to execute: SHOW BINARY LOGS.
+            if (server.check_version_compat(5, 6, 6)
+                and not has_super and not has_rpl_client):
+                print("# {0} information not accessible. User must have the "
+                      "SUPER or REPLICATION CLIENT "
+                      "privilege.".format(log_type.capitalize()))
+                return True
+            elif not has_super:
+                print("# {0} information not accessible. User must have the "
+                      "SUPER "
+                      "privilege.".format(log_type.capitalize()))
+                return True
+    else:  # relay log
+        # Requires SUPER or REPLICATION CLIENT to execute SHOW SLAVE STATUS.
+        if not has_super and not has_rpl_client:
+            print("# {0} information not accessible. User must have the "
+                  "SUPER or REPLICATION CLIENT "
+                  "privilege.".format(log_type.capitalize()))
+            return True
+        # Can only retrieve usage information from the localhost filesystem.
+        if not os.access(datadir, os.R_OK):
+            if not server.is_alias("localhost"):
+                print("# {0} information not accessible from a remote "
+                      "host.".format(log_type.capitalize()))
+            else:
+                print("# {0} information not accessible. Check your "
+                      "permissions to {1}.".format(log_type.capitalize(),
+                                                   datadir))
+            return True
+
+    # Check server status and availability of specified log file type.
+    if log_type == 'binary log':
+        try:
+            res = server.exec_query("SHOW MASTER STATUS")
+            if res:
+                current_log = res[0][0]
+            else:
+                print("# Cannot access files - no binary log information")
+                return True
+        except:
+            raise UtilError("Cannot get {0} information.".format(log_type))
     else:
         try:
             res = server.exec_query("SHOW SLAVE STATUS")
-            if res != [] and res is not None:
+            if res:
                 current_log = res[0][7]
+            else:
+                print("# Server is not an active slave - no relay log "
+                      "information.")
+                return True
         except:
-            raise UtilError("Cannot get relay log information")
-        if res == []:
-            print "# Server is not an active slave - no relay log information."
-            return True
+            raise UtilError("Cannot get {0} information.".format(log_type))
 
-    if os.access(datadir, os.R_OK):
-        if not quiet:
-            print "# %s information:" % log_type
+    # Enough permissions and privileges, get the usage information.
+    if not quiet:
+        print("# {0} information:".format(log_type.capitalize()))
+        print("Current {0} file = {1}".format(log_type, current_log))
 
-        if log_type == 'binary log':
-            try:
-                res = server.exec_query("SHOW MASTER STATUS")
-                if res != []:
-                    current_log = res[0][0]
-            except:
-                raise UtilError("Cannot get binary log information.")
-
-        if current_log is None:
-            print "# Cannot access %s files.\n" % log_type
-            return False
-        
-        if not quiet:
-            print "Current %s file = %s" % (log_type, current_log)
-
-        # As of 5.6.2, users can specify location of binlog and relaylog.
+    if log_type == 'binary log' and not os.access(datadir, os.R_OK):
+        # Retrieve binlog usage info from SHOW BINARY LOGS.
+        try:
+            logs = server.exec_query("SHOW BINARY LOGS")
+            if logs:
+                # Calculate total size.
+                total = sum([int(item[1]) for item in logs])
+            else:
+                print("# No binary logs data available.")
+                return True
+        except:
+            raise UtilError("Cannot get {0} information.".format(log_type))
+    else:
+        # Retrieve usage info from localhost filesystem.
+        # Note: as of 5.6.2, users can specify location of binlog and relaylog.
         if server.check_version_compat(5, 6, 2):
             if log_type == 'binary log':
                 res = server.show_server_variable("log_bin_basename")[0]
             else:
                 res = server.show_server_variable("relay_log_basename")[0]
-            parts = os.path.split(res[1])
-            log_path = os.path.join(parts[:len(parts) - 1])[0]
-            log_prefix = parts[len(parts) - 1]
+            log_path, log_prefix = os.path.split(res[1])
+            # In case log_path and log_prefix are '' (not defined) set them
+            # to the default value.
+            if not log_path:
+                log_path = datadir
+            if not log_prefix:
+                log_prefix = os.path.splitext(current_log)[0]
         else:
             log_path = datadir
             log_prefix = os.path.splitext(current_log)[0]
-        if log_path == '':
-            log_path = datadir
-            
+
         logs, total = _build_log_list(log_path, log_prefix)
-        if logs == []:
-            raise UtilError("The %s are missing." % log_type)
 
-        columns = ['log_file']
-        size = 'size'
-        fmt_logs = []
-        if format == 'GRID':
-            max_col = _get_formatted_max_width(logs, ('log_file', 'size'), 1)
-            if max_col < len('size'):
-                max_col = len('size')
-            size = "{0:>{1}}".format('size', max_col)
-            columns.append(size)
+    if not logs:
+        raise UtilError("The {0}s are missing.".format(log_type))
 
-            for row in logs:
-                # Add commas
-                size = locale.format("%d", row[1], grouping=True)
-                # Make justified strings
-                size = "{0:>{1}}".format(size, max_col)
-                fmt_logs.append((row[0], size))
-
-        else:
-            fmt_logs = logs
-            columns.append('size')
-
-        print_list(sys.stdout, format, columns, fmt_logs, no_headers)
-        if not quiet:
-            _print_size("\nTotal size of %ss = " % log_type, total)
-            print
-
-    else:
-        print "# Binlog information not accessible. " + \
-              "Check your permissions."
+    # Print logs usage information.
+    _print_logs(logs, total, options)
 
     return True
 
@@ -784,7 +860,7 @@ def show_innodb_usage(server, datadir, options):
                                            datadir, tablespaces, verbosity)
         if innodb == []:
             raise UtilError("InnoDB is enabled but there is a problem "
-                                 "reading the tablespace files.")
+                            "reading the tablespace files.")
 
         columns = ['innodb_file', 'size']
         if verbosity > 0:
@@ -792,7 +868,7 @@ def show_innodb_usage(server, datadir, options):
             columns.append('specificaton')
         size = 'size'
         fmt_innodb = []
-        if format == 'GRID':
+        if format.upper() == 'GRID':
             max_col = _get_formatted_max_width(innodb, columns, 1)
             if max_col < len('size'):
                 max_col = len('size')

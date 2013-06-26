@@ -120,6 +120,24 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Add two tables without primary keys
+        self.server1.exec_query("CREATE DATABASE inventory")
+        self.server1.exec_query("CREATE TABLE inventory.box (a int) "
+                                "ENGINE=INNODB")
+        self.server1.exec_query("INSERT INTO inventory.box VALUES (1)")
+        self.server2.exec_query("CREATE DATABASE inventory")
+        self.server2.exec_query("CREATE TABLE inventory.box (a int) "
+                                "ENGINE=INNODB")
+        self.server2.exec_query("INSERT INTO inventory.box VALUES (2)")
+        test_num += 1
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+        comment = ("Test case {0} - No pri key".format(test_num, cmd_opts))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+
         self.replace_result("mysqldbcompare.py: error: Server1 connection "
                             "values invalid",
                             "mysqldbcompare.py: error: Server1 connection "
@@ -140,4 +158,12 @@ class test(compare_db.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        try:
+            self.server1.exec_query("DROP DATABASE inventory")
+        except:
+            pass
+        try:
+            self.server2.exec_query("DROP DATABASE inventory")
+        except:
+            pass
         return compare_db.test.cleanup(self)

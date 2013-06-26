@@ -25,3 +25,7 @@ ERROR: Server is offline. To connect, you must also provide datadir and the star
 
 Test case 8 - offline server without start option
 ERROR: Server is offline. To connect, you must also provide start option
+Test case 9 - Invalid --start-timeout value
+Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo.py: error: option --start-timeout: invalid integer value: '1.5'

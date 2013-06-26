@@ -1,0 +1,14 @@
+Test case 1 - show topology
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- localhost:PORT2 - (SLAVE)
+   |
+   +--- localhost:PORT3 - (SLAVE)
+
+Master,Slave
+localhost:PORT1,localhost:PORT2
+localhost:PORT1,localhost:PORT3

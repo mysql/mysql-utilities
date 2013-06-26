@@ -7,3 +7,4 @@
 # main.example, This is a test (bug#xxxxx)
 #
 main.copy_db_multithreaded, Does not run on all platforms. Need to move to an optional performance suite.
+main.utilities_console_warnings, Made obsolete by removing requirement for Python 2.7. See BUG#16953933. 

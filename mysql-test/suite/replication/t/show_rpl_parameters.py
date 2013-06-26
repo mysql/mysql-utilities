@@ -146,4 +146,8 @@ class test(show_rpl.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return show_rpl.test.cleanup(self)
+        if self.res_fname:
+            os.unlink(self.res_fname)
+        # Kill the show_rpl_servers that are no longer used
+        kill_list = ['rep_slave_show', 'rep_master_show']
+        return self.kill_server_list(kill_list)

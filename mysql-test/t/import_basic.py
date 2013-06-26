@@ -167,7 +167,7 @@ class test(mutlib.System_test):
                 "CREATE TABLE `import_test`.`customers` "
                 "(`id` int(10) unsigned NOT NULL, "
                 "`name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) "
-                "ENGINE=InnoDB;"
+                "ENGINE=InnoDB DEFAULT CHARSET=utf8"
             )
         except UtilDBError as err:
             raise MUTLibError(err.errmsg)

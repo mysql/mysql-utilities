@@ -1137,6 +1137,17 @@ class System_test(object):
             return False
 
 
+    def kill_server_list(self, servers):
+        """Stop (kill) a list of servers and remove from list.
+
+        servers[in]     List of servers (by role) to kill
+
+        Returns - results of calling kill_server() for each server in list
+        """
+        kill_results = [self.kill_server(srv_role) for srv_role in servers]
+        return all(kill_results)
+
+
     @abstractmethod
     def check_prerequisites(self):
         """Check preprequisites for test.
