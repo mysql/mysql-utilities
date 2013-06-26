@@ -26,7 +26,9 @@
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="CompanyMenu" Name="MySQL">
-          <Directory Id="UtilsMenu" Name="MySQL Utilities"/>
+          <Directory Id="UtilsMenu" Name="MySQL Utilities">
+            <Directory Id="DocMenu" Name="Documentation"/>
+          </Directory>
         </Directory>
       </Directory>
     </Directory>
@@ -156,8 +158,32 @@
     </DirectoryRef>
 
     <DirectoryRef Id="UtilsMenu">
-      <Component Id="UtilsManuals" Guid="0ee2012b-0f38-45e1-9b62-a18ec82879a4">
+      <Component Id="UtilsShortcuts" Guid="6eb1d27b-7be1-41da-a3e2-616b3494c1dc">
         <RemoveFolder Id="UtilsMenu" On="uninstall"/>
+        <RegistryKey Root="HKCU"    
+         Key="Software\MySQL\MySQL Utilities"
+         Action="createAndRemoveOnUninstall">
+          <RegistryValue Type="string" Name="Version" Value="$(var.Version)"
+           KeyPath="yes"/>
+          <RegistryValue Type="string" Name="Location" Value="[INSTALLDIR]"/>
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+         Key="Software\MySQL AB\MySQL Utilities"
+         Action="createAndRemoveOnUninstall">
+          <RegistryValue Type="string" Name="Version" Value="$(var.Version)"/>
+          <RegistryValue Type="string" Name="Location" Value="[INSTALLDIR]"/>
+        </RegistryKey>
+        <Shortcut Id="exec_mysqluc"
+                  Name="MySQL Utilities Console"
+                  Description="MySQL Utilities Console"
+                  Target="[INSTALLDIR]mysqluc.exe"
+                  WorkingDirectory="INSTALLDIR"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DocMenu">
+      <Component Id="UtilsManuals" Guid="0ee2012b-0f38-45e1-9b62-a18ec82879a4">
+        <RemoveFolder Id="DocMenu" On="uninstall"/>
         <RegistryKey Root="HKCU"
          Key="Software\MySQL\MySQL Utilities"
          Action="createAndRemoveOnUninstall">
@@ -248,6 +274,7 @@
         <ComponentRef Id="UtilsPyLib"/>
         <ComponentRef Id="UtilsDocs"/>
         <ComponentRef Id="UtilsManuals"/>
+        <ComponentRef Id="UtilsShortcuts"/>
         <ComponentRef Id="CompanyMenuComponent"/>
       </Feature>
     </Feature>
@@ -256,19 +283,30 @@
       <!--<RemoveExistingProducts After="InstallInitialize"/>-->
     </InstallExecuteSequence>
 
+    <!-- Launch mysqluc after installation -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="!(loc.ExitDialogOptionalText)"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="0"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"
+     Value="Launch MySQL Utilities Console"/>
+    <CustomAction Id="LaunchApplication" Directory="INSTALLDIR"
+     ExeCommand="[SystemFolder]cmd.exe /C start mysqluc.exe" />
+
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-    <Property Id="WorkbenchReleaseNotice" Value="$(var.ReleaseString)"/>
     <UI>
       <UIRef Id="WixUI_InstallDir"/>
       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog"
        Value="InstallDirDlg" Order="2">1</Publish>
       <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog"
        Value="WelcomeDlg" Order="2">1</Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" 
+       Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
     </UI>
     <WixVariable Id="WixUIBannerBmp"
      Value="$(var.BitmapDir)\WixUIBanner_Utilities.bmp"/>
     <WixVariable Id="WixUIDialogBmp"
      Value="$(var.BitmapDir)\WixUIDialog_Utilities.bmp"/>
-    <!--<WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseRtf)" />-->
+
+    <Property Id="Version" Value="$(var.Version)"/>
+    <Property Id="WorkbenchReleaseNotice" Value="$(var.ReleaseString)"/>
   </Product>
 </Wix>
