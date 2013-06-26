@@ -15,12 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
 import show_rpl
 from mysql.utilities.exception import MUTLibError, UtilError
 
 MASTER_MYSQLD = "--skip-grant-tables --log-bin"
 SLAVE_MYSQLD = "{0} --report-port={1} --report-host=localhost"
+
 
 class test(show_rpl.test):
     """test replication utility with --skip-grant-tables server option
@@ -40,14 +40,16 @@ class test(show_rpl.test):
             return False
         next_port = self.servers.get_next_port()
         self.servers.clear_last_port()
-        self.server_list[2] = self.get_server("slave1_no_grants",
-            SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port))
+        self.server_list[2] = self.get_server(
+            "slave1_no_grants", SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port)
+        )
         if self.server_list[2] is None:
             return False
         next_port = self.servers.get_next_port()
         self.servers.clear_last_port()
-        self.server_list[3] = self.get_server("slave2_no_grants",
-            SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port))
+        self.server_list[3] = self.get_server(
+            "slave2_no_grants", SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port)
+        )
         if self.server_list[3] is None:
             return False
 
@@ -73,12 +75,10 @@ class test(show_rpl.test):
 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0} {1}"
         try:
-            res = self.exec_util(cmd.format(master_str, slave1_str),
-                                 self.res_fname)
-            res = self.exec_util(cmd.format(master_str, slave2_str),
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd.format(master_str, slave1_str), self.res_fname)
+            self.exec_util(cmd.format(master_str, slave2_str), self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         comment = "Test case {0} - show topology".format(test_num)
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
@@ -86,8 +86,6 @@ class test(show_rpl.test):
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-
-        test_num += 1
 
         show_rpl.test.do_replacements(self)
         
@@ -105,11 +103,5 @@ class test(show_rpl.test):
         self.kill_server("master_no_grants")
         self.kill_server("slave1_no_grants")
         self.kill_server("slave2_no_grants")
-
-        # Remove log file (here to delete the file even if some test fails)
-        try:
-            os.unlink(_LOGNAME)
-        except:
-            pass
 
         return True

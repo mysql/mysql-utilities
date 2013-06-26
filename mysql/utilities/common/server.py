@@ -1450,7 +1450,6 @@ class Server(object):
                                    "ON" if on else "OFF")
         return None
 
-
     def grant_tables_enabled(self):
         """Check to see if grant tables are enabled
 
@@ -1458,15 +1457,12 @@ class Server(object):
         """
         if self.grants_enabled is None:
             try:
-                res = self.exec_query("CREATE USER 'snuffles'@'host' "
-                                      "IDENTIFIED BY 'sniff'")
-                res = self.exec_query("DROP USER 'snuffles'@'host'")
+                self.exec_query("SHOW GRANTS FOR 'snuffles'@'host'")
                 self.grants_enabled = True
             except UtilError as error:
                 if "--skip-grant-tables" in error.errmsg:
                     self.grants_enabled = False
                 # Ignore other errors as they are not pertinent to the check
                 else: 
-                    return True
+                    self.grants_enabled = True
         return self.grants_enabled
-

@@ -131,6 +131,10 @@ Test case 7 : SHOW SLAVE HOSTS contains 1 row.
 Test case 7 - show topology with phantom slave
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT3
+Error connecting to a slave ...
+Error ####: Can't connect to local MySQL server
+
+WARNING: There are slaves that had connection errors.
 
 # Replication Topology Graph
 No slaves found.

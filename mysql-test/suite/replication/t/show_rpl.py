@@ -224,10 +224,14 @@ class test(mutlib.System_test):
             self.replace_substring("%s" % port, "PORT%d" % i)
             i += 1
         # Remove non-deterministic messages (do not appear on all platfoms)
-        self.remove_result("Error connecting to a slave")
-        self.remove_result("Error 2002: Can't connect to")
-        self.remove_result("Error 2003: Can't connect to")
-        self.remove_result("WARNING: There are slaves")
+        self.replace_result("Error connecting to a slave",
+                            "Error connecting to a slave ...\n")
+        self.replace_result("Error 2002: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server"
+                            "\n")
+        self.replace_result("Error 2003: Can't connect to",
+                            "Error ####: Can't connect to local MySQL server"
+                            "\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)
