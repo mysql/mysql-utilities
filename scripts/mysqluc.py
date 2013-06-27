@@ -49,15 +49,7 @@ NAME = "MySQL Utilities Client - mysqluc "
 DESCRIPTION = "mysqluc - Command line client for running MySQL Utilities"
 USAGE = "%prog "
 WELCOME_MESSAGE = """
-<<<<<<< TREE
-Welcome to the MySQL Utilities Client (mysqluc) version %s
-Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.\n
-Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
-Other names may be trademarks of their respective owners.
-
-=======
 Welcome to the MySQL Utilities Client (mysqluc) version {0}\n{1}
->>>>>>> MERGE-SOURCE
 Type 'help' for a list of commands or press TAB twice for list of utilities.
 """
 GOODBYE_MESSAGE = "\nThanks for using the MySQL Utilities Client!\n"

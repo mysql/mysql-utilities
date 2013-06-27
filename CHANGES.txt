@@ -2,6 +2,7 @@ Release 1.3.3 (Released June 26, 2013)
 --------------------------------------
 - BUG#16748143 Improve MSI with shortcut to mysqluc
 - WL#6814: Debian Packaging mechanism
+- BUG#17021113 mysqluc crashes on init due to missing code from branch
 
 Release 1.2.4 (Released June 26, 2013)
 --------------------------------------
@@ -71,13 +72,10 @@ Release 1.2.3 (Released June 07, 2013)
 - BUG#16745042: output of mysqldbcompare has syntax errors
 - BUG#16859970: mysqluc throws an error even when run with Python 2.7
 
-<<<<<<< TREE
 Release 1.3.1 (Released April 19, 2013)
 ---------------------------------------
 No changes.
 
-=======
->>>>>>> MERGE-SOURCE
 Release 1.2.2 (Released April 19, 2013)
 ---------------------------------------
 
