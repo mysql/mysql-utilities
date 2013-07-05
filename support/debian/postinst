@@ -4,10 +4,10 @@
 # postinst script for mysql-utilities
 
 echo "postinst script for mysql-utilities"
-PYVERS=`pyversions -s`
+PYVERS=`pyversions -i`
 
 echo $PYVERS
-for PYVER in $(pyversions -s)
+for PYVER in $(pyversions -i)
 do
 	echo "found"
 	echo $PYVER
