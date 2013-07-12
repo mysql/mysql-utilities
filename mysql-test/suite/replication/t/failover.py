@@ -153,6 +153,30 @@ class test(rpl_admin_gtid.test):
                 raise MUTLibError("{0}: failed - timeout waiting for "
                                   "console to start.".format(comment))
 
+        # Wait for the failover console to register on master and start
+        # its monitoring process
+
+        phrase = "Failover console started"
+        if self.debug:
+            print("Waiting for failover console to register master and start "
+                  "its monitoring process")
+        i = 0
+        with open(log_filename, 'r') as file_:
+            while i < _TIMEOUT:
+                line = file_.readline()
+                if not line:
+                    i += 1
+                    time.sleep(1)
+                elif phrase in line:
+                    break
+            else:
+                if self.debug:
+                    print("# Timeout waiting for failover console to register "
+                          "master and start its monitoring process")
+                raise MUTLibError("{0}: failed - timeout waiting for console "
+                                  "to register master and start its "
+                                  "monitoring process".format(comment))
+
         # Now, kill the master - wha-ha-ha!
         res = server.show_server_variable('pid_file')
         pid_file = open(res[0][1])
@@ -266,15 +290,9 @@ class test(rpl_admin_gtid.test):
         master_str = "--master=" + master_conn
         slaves_str = "--slaves=" + \
                      ",".join([slave1_conn, slave2_conn, slave3_conn])
-        candidates_str = "--candidates=" + \
-                         ",".join([slave1_conn, slave2_conn, slave3_conn])
 
         self.test_results = []
         self.test_cases = []
-
-
-        post_fail_opt = ('--exec-post-failover='
-                         '"{0}"').format(self.fail_event_script)
 
         failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
                        " --discover-slaves-login=root:root %s --failover-" + \
