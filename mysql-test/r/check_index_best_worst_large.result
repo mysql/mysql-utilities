@@ -2,7 +2,7 @@ Test case 1 - show best indexes
 # Source on localhost: ... connected.
 # Checking indexes...
 # Getting indexes for employees.dept_emp
-# The following indexes are duplicates or redundant for table employees.dept_emp:
+# The following index is a duplicate or redundant for table employees.dept_emp:
 #
 CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
@@ -19,7 +19,7 @@ Test case 2 - show worst indexes
 # Source on localhost: ... connected.
 # Checking indexes...
 # Getting indexes for employees.dept_emp
-# The following indexes are duplicates or redundant for table employees.dept_emp:
+# The following index is a duplicate or redundant for table employees.dept_emp:
 #
 CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
@@ -36,7 +36,7 @@ Test case 3 - show only best index
 # Source on localhost: ... connected.
 # Checking indexes...
 # Getting indexes for employees.dept_emp
-# The following indexes are duplicates or redundant for table employees.dept_emp:
+# The following index is a duplicate or redundant for table employees.dept_emp:
 #
 CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:
@@ -52,7 +52,7 @@ Test case 4 - show only worst index
 # Source on localhost: ... connected.
 # Checking indexes...
 # Getting indexes for employees.dept_emp
-# The following indexes are duplicates or redundant for table employees.dept_emp:
+# The following index is a duplicate or redundant for table employees.dept_emp:
 #
 CREATE INDEX `emp_no` ON `employees`.`dept_emp` (`emp_no`) USING BTREE
 #     may be redundant or duplicate of:

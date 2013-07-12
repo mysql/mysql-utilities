@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(mutlib.System_test):
     """check indexes for duplicates and redundancies
@@ -31,50 +32,76 @@ class test(mutlib.System_test):
         data_file = "std_data/index_test.sql"
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
         return True
     
     def run(self):
         self.res_fname = "result.txt"
-        from_conn = "--server=" + self.build_connection_string(self.server1)
 
-        cmd_str = "mysqlindexcheck.py %s " % from_conn
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1)
+        )
 
-        comment = "Test case 1 - check a table without indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6 -vv", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
-        comment = "Test case 2 - check a list of tables and databases"
-        res = self.run_test_case(0, cmd_str + "util_test_c util_test_a.t1" + \
-                                 " util_test_b -vv", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
-        comment = "Test case 3 - check all tables for a single database"
-        res = self.run_test_case(0, cmd_str + "util_test_a -vv", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+        cmd_str = "mysqlindexcheck.py {0}".format(from_conn)
 
-        comment = "Test case 4 - check tables for a non-existant database"
-        res = self.run_test_case(1, cmd_str + "util_test_X -vv", comment)
+        test_num = 1
+        comment = ("Test case {0} - check a table without "
+                   "indexes").format(test_num)
+        cmd = "{0} util_test_c.t6 -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 5 - check indexes for a non-existant table"
-        res = self.run_test_case(1, cmd_str + "nosuch.nosuch -vv", comment)
+        test_num += 1
+        comment = ("Test case {0} - check a list of tables and "
+                   "databases").format(test_num)
+        cmd = "{0} util_test_c util_test_a.t1 util_test_b -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 6 - check indexes for a non-existant table " + \
-                  "with skip option"
-        res = self.run_test_case(0, cmd_str + "nosuch.nosuch -vv --skip",
-                                 comment)
+        test_num += 1
+        comment = ("Test case {0} - check all tables for a single "
+                   "database").format(test_num)
+        cmd = "{0} util_test_a -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - check tables for a non-existant "
+                   "database").format(test_num)
+        cmd = "{0} util_test_X -vv".format(cmd_str)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - check indexes for a non-existant "
+                   "table").format(test_num)
+        cmd = "{0} nosuch.nosuch -vv".format(cmd_str)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - check indexes for a non-existant table "
+                   "with skip option").format(test_num)
+        cmd = "{0} nosuch.nosuch -vv --skip".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - check clustered indexes "
+                   "redundancies").format(test_num)
+        cmd = "{0} util_test_d -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source host name.
         self.replace_result("# Source on ",
@@ -99,6 +126,10 @@ class test(mutlib.System_test):
             pass
         try:
             self.server1.exec_query("DROP DATABASE util_test_c")
+        except:
+            pass
+        try:
+            self.server1.exec_query("DROP DATABASE util_test_d")
         except:
             pass
 

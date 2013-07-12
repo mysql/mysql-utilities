@@ -20,7 +20,7 @@ Options:
   --worst=WORST         limit index statistics to the worst N indexes
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-Test case 2 - show drops for a table with dupe indexes
+Test case 2 - show drops for a table with dupe (-vv) indexes
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_a.t1
@@ -58,7 +58,7 @@ CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32))
 ALTER TABLE `util_test_a`.`t1` DROP INDEX `s4`;
 ALTER TABLE `util_test_a`.`t1` DROP INDEX `s2`;
 #
-Test case 4 - show drops for a table without dupe indexes
+Test case 4 - show drops for a table without dupe (-vv) indexes
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_c.t6
@@ -128,3 +128,107 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
 #     may be redundant or duplicate of:
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
+Test case 9 - find redundancy with the clustered index (InnoDB)
+# Source on XXXX-XXXX: ... connected.
+# Checking indexes...
+# Getting indexes for util_test_d.cluster_idx
+# Showing indexes from util_test_d.cluster_idx:
+#
++--------------+--------------+------------+--------+-----------+
+| database     | table        | name       | type   | columns   |
++--------------+--------------+------------+--------+-----------+
+| util_test_d  | cluster_idx  | PRIMARY    | BTREE  | id        |
+| util_test_d  | cluster_idx  | col2       | BTREE  | col2      |
+| util_test_d  | cluster_idx  | redundant  | BTREE  | col2, id  |
++--------------+--------------+------------+--------+-----------+
+#
+# The following index is a duplicate or redundant for table util_test_d.cluster_idx:
+#
+CREATE INDEX `col2` ON `util_test_d`.`cluster_idx` (`col2`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `redundant` ON `util_test_d`.`cluster_idx` (`col2`, `id`) USING BTREE
+#
+# DROP statement:
+#
+ALTER TABLE `util_test_d`.`cluster_idx` DROP INDEX `col2`;
+#
+# The following index for table util_test_d.cluster_idx contains the clustered index and might be redundant:
+#
+CREATE INDEX `redundant` ON `util_test_d`.`cluster_idx` (`col2`, `id`) USING BTREE
+#
+# DROP/ADD statement:
+#
+ALTER TABLE `util_test_d`.`cluster_idx` DROP INDEX `redundant`, ADD INDEX `redundant` (col2);
+#
+#
+# ...done.
+Test case 10 - not find redundancy with the clustered index (not InnoDB)
+# Source on XXXX-XXXX: ... connected.
+# Checking indexes...
+# Getting indexes for util_test_d.no_cluster_idx
+# Showing indexes from util_test_d.no_cluster_idx:
+#
++--------------+-----------------+------------+--------+-----------+
+| database     | table           | name       | type   | columns   |
++--------------+-----------------+------------+--------+-----------+
+| util_test_d  | no_cluster_idx  | PRIMARY    | BTREE  | id        |
+| util_test_d  | no_cluster_idx  | col2       | BTREE  | col2      |
+| util_test_d  | no_cluster_idx  | redundant  | BTREE  | col2, id  |
++--------------+-----------------+------------+--------+-----------+
+#
+# The following index is a duplicate or redundant for table util_test_d.no_cluster_idx:
+#
+CREATE INDEX `col2` ON `util_test_d`.`no_cluster_idx` (`col2`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `redundant` ON `util_test_d`.`no_cluster_idx` (`col2`, `id`) USING BTREE
+#
+# DROP statement:
+#
+ALTER TABLE `util_test_d`.`no_cluster_idx` DROP INDEX `col2`;
+#
+#
+# ...done.
+Test case 11 - find various redundancies (and duplicates) with the clustered index (InnoDB)
+# Source on XXXX-XXXX: ... connected.
+# Checking indexes...
+# Getting indexes for util_test_d.various_cluster_idx
+# Showing indexes from util_test_d.various_cluster_idx:
+#
++--------------+----------------------+--------------------+--------+-----------+
+| database     | table                | name               | type   | columns   |
++--------------+----------------------+--------------------+--------+-----------+
+| util_test_d  | various_cluster_idx  | PRIMARY            | BTREE  | id        |
+| util_test_d  | various_cluster_idx  | col2               | BTREE  | col2      |
+| util_test_d  | various_cluster_idx  | col2_2             | BTREE  | col2      |
+| util_test_d  | various_cluster_idx  | redundant          | BTREE  | col2, id  |
+| util_test_d  | various_cluster_idx  | another_redundant  | BTREE  | col3, id  |
++--------------+----------------------+--------------------+--------+-----------+
+#
+# The following indexes are duplicates or redundant for table util_test_d.various_cluster_idx:
+#
+CREATE INDEX `col2_2` ON `util_test_d`.`various_cluster_idx` (`col2`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `col2` ON `util_test_d`.`various_cluster_idx` (`col2`) USING BTREE
+#
+CREATE INDEX `col2` ON `util_test_d`.`various_cluster_idx` (`col2`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `redundant` ON `util_test_d`.`various_cluster_idx` (`col2`, `id`) USING BTREE
+#
+# DROP statements:
+#
+ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `col2_2`;
+ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `col2`;
+#
+# The following indexes for table util_test_d.various_cluster_idx contain the clustered index and might be redundant:
+#
+CREATE INDEX `redundant` ON `util_test_d`.`various_cluster_idx` (`col2`, `id`) USING BTREE
+#
+CREATE INDEX `another_redundant` ON `util_test_d`.`various_cluster_idx` (`col3`, `id`) USING BTREE
+#
+# DROP/ADD statements:
+#
+ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `redundant`, ADD INDEX `redundant` (col2);
+ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `another_redundant`, ADD INDEX `another_redundant` (col3);
+#
+#
+# ...done.

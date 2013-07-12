@@ -157,7 +157,6 @@ class Index(object):
             return True
         return False
 
-
     def is_duplicate(self, index):
         """Compare this index with another
 
@@ -167,11 +166,29 @@ class Index(object):
         """
 
         # Don't compare the same index - no two indexes can have the same name
-        if (self.name == index.name):
+        if self.name == index.name:
             return False
         else:
             return self.__check_column_list(index)
-        return False
+
+    def contains_columns(self, col_names):
+        """Check if the current index contains the columns of the given index.
+
+        Returns True if it contains all the columns of the given index,
+        otherwise False.
+        """
+        if len(self.columns) < len(col_names):
+            # If has less columns than given index it does not contain all.
+            return False
+        else:
+            this_col_names = [col[0] for col in self.columns]
+            # Check if all index column are included in current one..
+            for col_name in col_names:
+                if col_name not in this_col_names:
+                    return False  # found one column not included.
+
+        # Pass previous verification; contains all the columns of given index.
+        return True
 
 
     def add_column(self, column, sub_part):
@@ -198,6 +215,31 @@ class Index(object):
         query_str = "ALTER TABLE {db}.{table} DROP INDEX {name}".format(
             db=self.q_db, table=self.q_table, name=self.q_name
         )
+        return query_str
+
+    def get_remove_columns_statement(self, col_names):
+        """Get the ALTER TABLE statement to remove columns for this index.
+
+        col_names[in]   list of columns names to remove from the index.
+
+        Returns the ALTER TABLE statement (DROP/ADD) to remove the given
+        columns names from the index.
+        """
+        # Create the new columns list for the index.
+        idx_cols = [col[0] for col in self.columns if col[0] not in col_names]
+        if not idx_cols:
+            # Return a DROP statement if no columns are left.
+            query_str = "ALTER TABLE {db}.{table} DROP INDEX {name}".format(
+                db=self.q_db, table=self.q_table, name=self.q_name
+            )
+        else:
+            # Otherwise, return a DROP/ADD statement with remaining columns.
+            idx_cols_str = ', '.join(idx_cols)
+            query_str = ("ALTER TABLE {db}.{table} DROP INDEX {name}, "
+                         "ADD INDEX {name} ({cols})").format(db=self.q_db,
+                                                             table=self.q_table,
+                                                             name=self.q_name,
+                                                             cols=idx_cols_str)
         return query_str
 
     def __get_column_list(self, backtick_quoting=True):
@@ -312,6 +354,7 @@ class Table(object):
         if options.get('get_cols', False):
             self.get_column_metadata()
         self.dest_vals = None
+        self.storage_engine = None
 
         # Get max allowed packet
         res = self.server.exec_query("SELECT @@session.max_allowed_packet")
@@ -566,6 +609,23 @@ class Table(object):
 
         return (data_inserts, blob_inserts)
 
+    def get_storage_engine(self):
+        """Get the storage engine (in UPPERCASE) for the table.
+
+        Returns the name in UPPERCASE of the storage engine use for the table
+        or None if the information is not found.
+        """
+        self.server.exec_query("USE {0}".format(self.q_db_name),
+                               self.query_options)
+        res = self.server.exec_query(
+            "SHOW TABLE STATUS WHERE name = '{0}'".format(self.tbl_name)
+        )
+        try:
+            # Return store engine converted to UPPER cases.
+            return res[0][1].upper() if res[0][1] else None
+        except IndexError:
+            # Return None if table status information is not available.
+            return None
 
     def get_segment_size(self, num_conn=1):
         """Get the segment size based on number of connections (threads).
@@ -926,6 +986,26 @@ class Table(object):
                 duplicate_list.extend(res[1])
         return (duplicates_found, duplicate_list)
 
+    def __check_clustered_index_list(self, indexes):
+        """ Check for indexes containing the clustered index from the list.
+
+        indexes[in]     list of indexes instances to check.
+
+        Returns the list of indexes that contain the clustered index or
+        None (if none found).
+        """
+        redundant_indexes = []
+        if not self.pri_idx:
+            self.get_primary_index()
+        pri_idx_cols = [col[0] for col in self.pri_idx]
+        for index in indexes:
+            if index.name == 'PRIMARY':
+                # Skip primary key.
+                continue
+            elif index.contains_columns(pri_idx_cols):
+                redundant_indexes.append(index)
+
+        return redundant_indexes if redundant_indexes else None
 
     def _get_index_list(self):
         """Get the list of indexes for a table.
@@ -1023,23 +1103,65 @@ class Table(object):
         if res[0]:
             dupes.extend(res[1])
 
+        # Check if secondary keys contains the clustered index (i.e. Primary
+        # key). In InnoDB, each record in a secondary index contains the
+        # primary key columns. Therefore the use of keys that include the
+        # primary key might be redundant.
+        redundant_idxs = None
+        if not self.storage_engine:
+            self.storage_engine = self.get_storage_engine()
+        if self.storage_engine == 'INNODB':
+            all_indexes = self.btree_indexes
+            all_indexes.extend(self.hash_indexes)
+            all_indexes.extend(self.rtree_indexes)
+            all_indexes.extend(self.fulltext_indexes)
+            redundant_idxs = self.__check_clustered_index_list(all_indexes)
+
+        # Print duplicate and redundant keys on composite indexes.
         if len(dupes) > 0:
-            print("# The following indexes are duplicates or redundant "
-                  "for table {0}:".format(self.table))
+            plural_1, verb_conj, plural_2 = (
+                ('', 'is a', '') if len(dupes) == 1 else ('es', 'are', 's')
+            )
+            print("# The following index{0} {1} duplicate{2} or redundant "
+                  "for table {3}:".format(plural_1, verb_conj, plural_2,
+                                          self.table))
             for index in dupes:
                 print("#")
                 index.print_index_sql()
                 print("#     may be redundant or duplicate of:")
                 index.duplicate_of.print_index_sql()
             if show_drops:
-                print("#\n# DROP statements:\n#")
+                print("#\n# DROP statement{0}:\n#".format(plural_2))
                 for index in dupes:
                     print("{0};".format(index.get_drop_statement()))
                 print("#")
-        else:
-            if not self.quiet:
-                print("# Table {0} has no duplicate indexes."
-                      "".format(self.table))
+
+        # Print redundant indexes containing clustered key.
+        if redundant_idxs:
+            plural, verb_conj, plural_2 = (
+                ('', 's', '') if len(redundant_idxs) == 1 else ('es', '', 's')
+            )
+
+            print("# The following index{0} for table {1} contain{2} the "
+                  "clustered index and might be redundant:".format(plural,
+                                                                   self.table,
+                                                                   verb_conj))
+            for index in redundant_idxs:
+                print("#")
+                index.print_index_sql()
+            if show_drops:
+                print("#\n# DROP/ADD statement{0}:\n#".format(plural_2))
+                # Get columns from primary key to be removed.
+                pri_idx_cols = [col[0] for col in self.pri_idx]
+                for index in redundant_idxs:
+                    print("{0};".format(
+                        index.get_remove_columns_statement(pri_idx_cols)
+                    ))
+                print("#")
+
+        if not self.quiet and not dupes and not redundant_idxs:
+            print("# Table {0} has no duplicate nor redundant "
+                  "indexes.".format(self.table))
 
     def show_special_indexes(self, format, limit, best=False):
         """Display a list of the best or worst queries for this table.
