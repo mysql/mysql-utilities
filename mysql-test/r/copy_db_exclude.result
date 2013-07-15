@@ -13,7 +13,22 @@ Test case 1 - exclude by name
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
-Test case 2 - exclude by regex
+Test case 2 - exclude by name using backticks.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
+#...done.
+Test case 3 - exclude using SQL LIKE pattern.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
@@ -28,7 +43,22 @@ Test case 2 - exclude by regex
 # Copying data for TABLE util_test.t3
 # Copying TRIGGER util_test.trg
 #...done.
-Test case 3 - exclude by name and regex
+Test case 4 - exclude using REGEXP pattern.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying VIEW util_test.v1
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying TRIGGER util_test.trg
+#...done.
+Test case 5 - exclude by name and SQL LIKE pattern.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
@@ -40,4 +70,50 @@ Test case 3 - exclude by name and regex
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
+#...done.
+Test case 6 - exclude by name and REGEXP pattern.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+#...done.
+Test case 7 - exclude everything using SQL LIKE pattern.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+#...done.
+Test case 8 - exclude everything using REGEXP pattern.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+#...done.
+Test case 9a - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere in value).
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying VIEW util_test.v1
+# Copying PROCEDURE util_test.p1
+# Copying FUNCTION util_test.f1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
+#...done.
+Test case 9b - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere in value).
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
 #...done.

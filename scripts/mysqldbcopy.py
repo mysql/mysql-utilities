@@ -164,6 +164,14 @@ check_all(parser, opt, args, "databases")
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
 
+# Process --exclude values to remove unnecessary quotes (when used) in order
+# to avoid further matching issues.
+if opt.exclude:
+    # Remove unnecessary outer quotes.
+    exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
+else:
+    exclude_list = opt.exclude
+
 # Set options for database operations.
 options = {
     "skip_tables"      : "tables" in skips,
@@ -180,7 +188,7 @@ options = {
     "quiet"            : opt.quiet,
     "threads"          : opt.threads,
     "debug"            : opt.verbosity == 3,
-    "exclude_patterns" : opt.exclude,
+    "exclude_patterns" : exclude_list,
     "new_engine"       : opt.new_engine,
     "def_engine"       : opt.def_engine,
     "all"              : opt.all,

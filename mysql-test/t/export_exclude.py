@@ -14,9 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
 import os
+
 import export_parameters_def
 from mysql.utilities.exception import MUTLibError
+
 
 class test(export_parameters_def.test):
     """check exclude parameter for export utility
@@ -34,35 +37,105 @@ class test(export_parameters_def.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=" + self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1)
+        )
 
-        cmd_str = "mysqldbexport.py --skip=events,grants --no-headers " + \
-                  " %s --format=CSV util_test --skip-gtid " % from_conn
+        cmd_str = ("mysqldbexport.py --skip=events,grants --no-headers {0} "
+                   "--format=CSV util_test --skip-gtid").format(from_conn)
 
-        comment = "Test case 1 - exclude by name"
-        cmd_opts = "--exclude=util_test.v1 --exclude=util_test.t4"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num = 1
+        comment = "Test case {0} - exclude by name.".format(test_num)
+        cmd_opts = ("{0} --exclude=util_test.v1 "
+                    "--exclude=util_test.t4").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - exclude by regex"
-        cmd_opts = "-x ^f -x 4$ --regexp"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - exclude by name using "
+                   "backticks.").format(test_num)
+        if os.name == 'posix':
+            cmd_opts = ("{0} --exclude='`util_test`.`v1`' "
+                        "--exclude='`util_test`.`t4`'").format(cmd_str)
+        else:
+            cmd_opts = ('{0} --exclude="`util_test`.`v1`" '
+                        '--exclude="`util_test`.`t4`"').format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - exclude by name and regex"
-        cmd_opts = "--exclude=^f --exclude=4$ -x ^p " + \
-                   "--exclude=v1 --exclude=util_test.trg --regexp"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - exclude using SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} -x f% -x _4".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - exclude everything by regex"
-        cmd_opts = "-x 1 -x t --exclude=util_test.trg --regexp"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - exclude using REGEXP "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} -x ^f -x 4$ --regexp".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude by name and SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = ("{0} --exclude=f% --exclude=_4 -x p% --exclude=v1 "
+                    "--exclude=util_test.trg").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude by name and REGEXP "
+                   "pattern.").format(test_num)
+        cmd_opts = ("{0} --exclude=^f --exclude=4$ -x ^p --exclude=v1 "
+                    "--exclude=util_test.trg --regexp").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude everything using SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} -x % ".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude everything using REGEXP "
+                   "pattern.").format(test_num)
+        if os.name == 'posix':
+            cmd_opts = "{0} -x '.*' --regexp".format(cmd_str)
+        else:
+            cmd_opts = '{0} -x ".*" --regexp'.format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Note: Unlike SQL LIKE pattern that matches the entire value, with a
+        # SQL REGEXP pattern match succeeds if the pattern matches anywhere in
+        # the value being tested.
+        # See: http://dev.mysql.com/doc/en/pattern-matching.html
+        test_num += 1
+        comment = ("Test case {0}a - SQL LIKE VS REGEXP pattern (match entire "
+                   "value VS match anywhere in value).").format(test_num)
+        cmd_opts = "{0} -x 1 -x t".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0}b - SQL LIKE VS REGEXP pattern (match entire "
+                   "value VS match anywhere in value).").format(test_num)
+        cmd_opts = "{0} -x 1 -x t --regexp".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         export_parameters_def.test._mask_csv(self)
 

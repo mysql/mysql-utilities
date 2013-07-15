@@ -864,7 +864,6 @@ class Database(object):
         for obj in self.objects:
             yield obj
 
-
     def __build_exclude_patterns(self, exclude_param):
         """Return a string to add to where clause to exclude objects.
 
@@ -881,16 +880,25 @@ class Database(object):
         oper = 'NOT REGEXP' if self.use_regexp else 'NOT LIKE'
         str = ""
         for pattern in self.exclude_patterns:
-            value = None
+            # Check use of qualified object names (with backtick support).
             if pattern.find(".") > 0:
-                db, name = pattern.split(".")
-                if db == self.db_name:
-                    value = name
+                use_backtick = is_quoted_with_backticks(pattern)
+                db, name = Database.parse_object_name(pattern)
+                if use_backtick:
+                    # Remove backtick quotes.
+                    db = remove_backtick_quoting(db)
+                    name = remove_backtick_quoting(name)
+                if db == self.db_name:  # Check if database name matches.
+                    value = name  # Only use the object name to exclude.
+                else:
+                    value = pattern
+            # Otherwise directly use the specified pattern.
             else:
                 value = pattern
-            if value is not None:
-                str += " AND {0} {1} {2}".format(exclude_param, oper,
-                                                 obj2sql(value))
+            if value:
+                # Append exclude condition to previous one(s).
+                str = "{0} AND {1} {2} {3}".format(str, exclude_param, oper,
+                                                   obj2sql(value))
 
         return str
 
@@ -1199,8 +1207,8 @@ class Database(object):
                     pos_to_quote = minimal_pos_to_quote
             # Form exclusion string
             exclude_str = ""
-            if self.exclude_patterns is not None:
-                exclude_str += self.__build_exclude_patterns(exclude_param)
+            if self.exclude_patterns:
+                exclude_str = self.__build_exclude_patterns(exclude_param)
             query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
             res = self.source.exec_query(query, col_options)
 

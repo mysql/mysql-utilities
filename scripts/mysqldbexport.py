@@ -189,6 +189,14 @@ if "data" in skips and opt.export == "data":
           "table data.")
     sys.exit(1)
 
+# Process --exclude values to remove unnecessary quotes (when used) in order
+# to avoid further matching issues.
+if opt.exclude:
+    # Remove unnecessary outer quotes.
+    exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
+else:
+    exclude_list = opt.exclude
+
 # Set options for database operations.
 options = {
     "skip_tables"      : "tables" in skips,
@@ -209,7 +217,7 @@ options = {
     "verbosity"        : opt.verbosity,
     "debug"            : opt.verbosity >= 3,
     "file_per_tbl"     : opt.file_per_tbl,
-    "exclude_patterns" : opt.exclude,
+    "exclude_patterns" : exclude_list,
     "all"              : opt.all,
     "use_regexp"       : opt.use_regexp,
     "locking"          : opt.locking,
