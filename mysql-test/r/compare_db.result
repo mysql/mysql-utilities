@@ -521,7 +521,20 @@ Test case 10 - compare two empty databases
 # Databases are consistent.
 #
 # ...done
-Test case 11 - compare a database with objects of different type with the same name (no differences)
+Test case 11 - diff a sample database containing tables with weird names (no backticks).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 12 - compare a database with objects of different types with the same name (no differences)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
@@ -537,7 +550,7 @@ Test case 11 - compare a database with objects of different type with the same n
 # Databases are consistent.
 #
 # ...done
-Test case 12 - compare a database with objects of different type with the same name (with differences)
+Test case 13 - compare a database with objects of different types with the same name (with differences)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2

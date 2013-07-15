@@ -92,6 +92,7 @@ def object_diff(server1_val, server2_val, object1, object2, options,
         return diff_objects(server1, server2, object1, object2, options,
                             object_type)
 
+
 def database_diff(server1_val, server2_val, db1, db2, options):
     """Find differences among objects from two databases.
     
@@ -125,9 +126,13 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     in_both.sort()
     if (len(in_db1) > 0 or len(in_db2) > 0) and not force:
         return False
-    
+
+    # Quote database names with backticks.
+    q_db1 = db1 if is_quoted_with_backticks(db1) else quote_with_backticks(db1)
+    q_db2 = db2 if is_quoted_with_backticks(db2) else quote_with_backticks(db2)
+
     # Do the diff for the databases themselves
-    result = object_diff(server1, server2, db1, db2, options, 'DATABASE')
+    result = object_diff(server1, server2, q_db1, q_db2, options, 'DATABASE')
     if result is not None:
         success = False
         if not force:
@@ -136,12 +141,11 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     # For each that match, do object diff
     success = True
     for item in in_both:
-        obj_name1 = quote_with_backticks(item[1][0]) \
-                        if is_quoted_with_backticks(db1) else item[1][0]
-        obj_name2 = quote_with_backticks(item[1][0]) \
-                        if is_quoted_with_backticks(db2) else item[1][0]
-        object1 = "%s.%s" % (db1, obj_name1)
-        object2 = "%s.%s" % (db2, obj_name2)
+        # Quote object name with backticks (both have the same name).
+        q_obj_name = item[1][0] if is_quoted_with_backticks(item[1][0]) \
+            else quote_with_backticks(item[1][0])
+        object1 = "{0}.{1}".format(q_db1, q_obj_name)
+        object2 = "{0}.{1}".format(q_db2, q_obj_name)
         result = object_diff(server1, server2, object1, object2, options,
                              item[0])
         if result is not None:
@@ -149,4 +153,4 @@ def database_diff(server1_val, server2_val, db1, db2, options):
             if not force:
                 return False
 
-    return success    
+    return success
