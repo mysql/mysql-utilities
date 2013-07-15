@@ -31,6 +31,7 @@ import datetime
 import optparse
 import os
 import re
+import termios
 import time
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.tools import get_tool_path
@@ -555,8 +556,11 @@ print("=" * opt.width)
 
 # Protect against interactive consoles that fail: save terminal settings.
 if os.name == "posix":
-    import termios
-    old_terminal_settings = termios.tcgetattr(sys.stdin)
+    restore_terminal = True
+    try:  # Guard against non supported tty devices
+        old_terminal_settings = termios.tcgetattr(sys.stdin)
+    except termios.error as err:
+        restore_terminal = False
 
 # Run the tests selected
 num_tests_run = 0
@@ -761,8 +765,7 @@ del server_list
 sys.stdout.write("\n")
 
 # Protect against interactive consoles that fail: restore terminal settings.
-if os.name == "posix":
-    import termios
+if os.name == "posix" and restore_terminal:
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
                       old_terminal_settings)
 
