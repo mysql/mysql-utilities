@@ -480,6 +480,29 @@ class Server(object):
         self.aliases = []
         self.grants_enabled = None
 
+    @classmethod
+    def fromServer(cls, server):
+        """ Create a new server instance from an existing one
+
+        Factory method that will allow the creation of a new server instance
+        from an existing server.
+
+        server[in] - instance object that must be instance of the Server class
+                     or a subclass.
+
+        Returns an instance of the calling class as a result.
+        """
+
+        if isinstance(server, Server):
+            options = {"conn_info": server.get_connection_values(),
+                       "role": server.role,
+                       "verbose": server.verbose,
+                       "charset": server.charset}
+            return cls(options)
+        else:
+            raise TypeError("The server argument's type is neither Server nor "
+                            "a subclass of Server")
+
     def is_alive(self):
         """Determine if connection to server is still alive.
 

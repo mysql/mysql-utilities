@@ -771,6 +771,19 @@ class Master(Server):
 
         return rows
 
+    def get_binlog_info(self):
+        """Return the master's binary log information (file name and position).
+
+        Returns a tuple with the binary log filename and position, or None if
+        the server is not acting as a master.
+        """
+        res = self.get_status()
+        if res:
+            # Return binlog_file and binlog_pos.
+            return res[0][0], res[0][1]
+        else:
+            # Status data is empty, server is not acting as a master.
+            return None
 
     def get_rpl_users(self, options={}):
         """Attempts to find the users who have the REPLICATION SLAVE privilege

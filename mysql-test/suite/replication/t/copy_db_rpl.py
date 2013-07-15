@@ -18,6 +18,7 @@ import os
 import time
 import replicate
 from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.common.replication import Master, Slave
 
 _MASTER_DB_CMDS = [
     "DROP DATABASE IF EXISTS master_db1",
@@ -46,6 +47,8 @@ _TEST_CASE_RESULTS = [
 ]
 
 _MAX_ATTEMPTS = 10   # Max tries to wait for slave before failing.
+_SYNC_TIMEOUT = 30   # Number of seconds to wait for slaves to sync with master
+
 
 class test(replicate.test):
     """test mysqldbcopy replication features
@@ -125,9 +128,25 @@ class test(replicate.test):
         except MUTLibError, e:
             raise MUTLibError(e.errmsg)
 
+        # server1 is now a master server, lets treat it accordingly
+        self.server1 = Master.fromServer(self.server1)
+        try:
+            self.server1.connect()
+        except UtilError as err:
+            raise MUTLibError("Cannot connect to spawned "
+                              "server: {0}".format(err.errmsg))
+
+        # server2 is now a slave, lets treat it accordingly
+        self.server2 = Slave.fromServer(self.server2)
+        try:
+            self.server2.connect()
+        except UtilError as err:
+            raise MUTLibError("Cannot connect to spawned "
+                              "server: {0}".format(err.errmsg))
+
         return result
     
-    def wait_for_slave(self, slave, attempts):
+    def wait_for_slave_connection(self, slave, attempts):
         # Wait for slave to successfully connect to the master, waiting for
         # events from him
         i = 0
@@ -178,7 +197,25 @@ class test(replicate.test):
                 res = self.exec_util(cmd, self.res_fname)
             except MUTLibError, e:
                 raise MUTLibError(e.errmsg)
-        
+
+            # Convert object instance of master server to Master, if needed
+            if not isinstance(master, Master):
+                master = Master.fromServer(master)
+                try:
+                    master.connect()
+                except UtilError as err:
+                    raise MUTLibError("Cannot connect to spawned "
+                                      "server: {0}".format(err.errmsg))
+
+            # Convert object instance of destination server to Slave, if needed
+            if not isinstance(destination, Slave):
+                destination = Slave.fromServer(destination)
+                try:
+                    destination.connect()
+                except UtilError as err:
+                    raise MUTLibError("Cannot connect to spawned "
+                                      "server: {0}".format(err.errmsg))
+
         # Check databases on slave and save results for 'BEFORE' check
         results.append(self._check_result(destination, "SHOW DATABASES LIKE 'util_test'"))
         results.append(self._check_result(destination, "SELECT COUNT(*) FROM util_test.t1"))
@@ -195,14 +232,12 @@ class test(replicate.test):
             except MUTLibError, e:
                 raise MUTLibError(e.errmsg)
 
-        # Wait for slave to catch up
+        # Wait for slave to connect to master
         if not skip_wait:
             if self.debug:
-                print "# Waiting for slave to sync",
+                print "# Waiting for slave to connect to master",
             try:
-                # Note: wait_for_slave will only guaranty that the slave is
-                # connected to the master (not that it is fully synced.
-                self.wait_for_slave(destination, _MAX_ATTEMPTS)
+                self.wait_for_slave_connection(destination, _MAX_ATTEMPTS)
             except MUTLibError, e:
                 raise MUTLibError(e.errmsg)
             if self.debug:
@@ -220,17 +255,20 @@ class test(replicate.test):
         if not skip_wait:
             if self.debug:
                 print "# Waiting for slave to sync",
-            try:
-                # Wait 5 seconds for the slave to catch-up with the master
-                time.sleep(5)
-                # Note: the use of wait_for_slave() is useless here, since the
-                # slave is already connected to the master and waiting for
-                # events.
-                # TODO: Implement an accurate method to wait for the slave to
-                # sync with the master (i.e., process remaining transactions).
-                #self.wait_for_slave(destination, _MAX_ATTEMPTS)
-            except MUTLibError, e:
-                raise MUTLibError(e.errmsg)
+
+            bin_info = master.get_binlog_info()
+            if bin_info is None:  # server is no longer acting as a master
+                raise MUTLibError("The server '{0}' is no longer a master"
+                                  "server".format(master.role))
+
+            binlog_file, binlog_pos = bin_info
+
+            # Wait for slave to catch up with master, using the binlog
+            # Note: This test requires servers without GTIDs (prior to 5.6.5)
+            synced = destination.wait_for_slave(binlog_file, binlog_pos,
+                                                _SYNC_TIMEOUT)
+            if not synced:
+                raise MUTLibError("Slave did not catch up with master")
             if self.debug:
                 print "done."
 
