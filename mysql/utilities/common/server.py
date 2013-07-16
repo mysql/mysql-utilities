@@ -639,20 +639,26 @@ class Server(object):
 
         # Get the aliases for this server host
         self.aliases = get_aliases(self.host)
+
+        # List of possible suffixes
+        suffixes = ('.local', '.lan',)
+
         # Check if this server is local
         for host in self.aliases:
             if host in local_aliases:
                 # Is local then save the local aliases for future.
                 extend_aliases(self.aliases, local_aliases)
                 break
-            # Handle special ".local" hostnames.
-            if host.endswith('.local'):
-                # Remove '.local' and attempt to match with local aliases.
-                host, _ = host.rsplit('.', 1)
-                if host in local_aliases:
-                    # Is local then save the local aliases for future.
-                    extend_aliases(self.aliases, local_aliases)
-                    break
+            # Handle special suffixes in hostnames.
+            for suffix in suffixes:
+                if host.endswith(suffix):
+                    # Remove special suffix and attempt to match with local
+                    # aliases.
+                    host, _ = host.rsplit('.', 1)
+                    if host in local_aliases:
+                        # Is local then save the local aliases for future.
+                        extend_aliases(self.aliases, local_aliases)
+                        break
 
         # Check if the given host_or_ip is alias of the server host.
         if host_or_ip in self.aliases:

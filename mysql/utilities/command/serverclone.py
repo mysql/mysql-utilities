@@ -88,6 +88,9 @@ def clone_server(conn_val, options):
         }
         server1 = Server(server1_options)
         server1.connect()
+        if not server1.is_alias("localhost"):
+            raise UtilError("mysqlserverclone does not work with remote "
+                            "hosts.")
 
         if not quiet:
             print "# Cloning the MySQL server running on %s." % conn_val["host"]
