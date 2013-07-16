@@ -30,10 +30,11 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_format_option
+from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED
+from mysql.utilities.common.options import (add_format_option, add_verbosity,
+                                            check_verbosity,
+                                            setup_common_options)
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
@@ -86,7 +87,7 @@ parser.add_option("--include-global-privileges", action="store_true",
                   "base_user@% as well as base_user@host", default=False)
 
 # List mode
-parser.add_option("--list", action="store_true", dest="list_users",
+parser.add_option("-l","--list", action="store_true", dest="list_users",
                   help="list all users on the source - does not require "
                   "a destination", default=False)
 
@@ -123,6 +124,13 @@ except UtilError:
     _, err, _ = sys.exc_info()
     parser.error("Source connection values invalid: %s." % err.errmsg)
 
+if opt.list_users and opt.destination:
+    print(WARN_OPT_NOT_REQUIRED.format(opt='--destination', cmd="--list"))
+    opt.destination = None
+
+if opt.dump and opt.destination:
+    print(WARN_OPT_NOT_REQUIRED.format(opt='--destination', cmd="--dump"))
+    opt.destination = None
 
 if opt.list_users:
     userclone.show_users(source_values, opt.verbosity, opt.format, opt.dump)

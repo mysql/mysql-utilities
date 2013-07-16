@@ -62,3 +62,31 @@ Test case 8 - clone a single user joe_pass@user to a single user: jill@user with
 # Cloning 1 users...
 # Cloning joe_pass@user to user jill:duh@user 
 # ...done.
+Test case 9 - mysqluserclone --list with --destination
+WARNING: The --destination option is not required for '--list' (option ignored).
+# Source on XXXX-XXXX: ... connected.
+# All Users:
++---------------+------------+
+| user          | host       |
++---------------+------------+
+| joe_pass      | %          |
+| joe_wildcard  | %          |
+| root          | xxxxxxxxxx |
+| root          | xxxxxxxxxx |
+| root          | xxxxxxxxxx |
+| root          | xxxxxxxxxx |
+| amy_nopass    | user       |
+| jack          | user       |
+| jill          | user       |
+| joe_nopass    | user       |
+| joe_pass      | user       |
+| john          | user       |
++---------------+------------+
+Test case 10 - mysqluserclone --dump with --destination
+WARNING: The --destination option is not required for '--dump' (option ignored).
+# Source on XXXX-XXXX: ... connected.
+# Dumping grants for user joe_pass@user
+GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC20231681AB7287BB201D08136A9A7369'
+GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
+GRANT USAGE ON *.* TO 'joe_pass'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'

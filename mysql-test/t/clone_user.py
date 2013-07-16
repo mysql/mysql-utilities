@@ -142,11 +142,30 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        test_case = 9
+        comment = ("Test case {0} - mysqluserclone --list with --destination"
+                   "".format(test_case))
+        cmd_str = "mysqluserclone.py -l {0} {1}".format(from_conn, to_conn)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_case += 1
+        comment = ("Test case {0} - mysqluserclone --dump with --destination"
+                   "".format(test_case))
+        cmd_str = ("mysqluserclone.py -d joe_pass@user {0} {1}"
+                   "").format(from_conn, to_conn)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Destination on ",
                             "# Destination on XXXX-XXXX: ... connected.\n")
+        self.replace_result("| root          |",
+                            "| root          | xxxxxxxxxx |\n")
 
         return True
 
