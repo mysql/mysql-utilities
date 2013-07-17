@@ -241,6 +241,17 @@ class FailoverConsole(object):
         
         return self.mode
 
+    def unregister_slaves(self, topology):
+        """Unregister the daemon as running on the slaves.
+
+        This method will unregister the daemon that was previously registered
+        on the slaves, for failover modes auto or elect.
+        """
+        if self.master is None or self.mode == 'fail':
+            return
+
+        for slave_dict in topology.slaves:
+            slave_dict["instance"].exec_query(_DROP_FC_TABLE)
 
     def _reset_interval(self, interval=15):
         """Reset the interval timing

@@ -35,6 +35,8 @@ class test(rpl_admin_gtid.test):
     It uses the rpl_admin_gtid test for setup and teardown methods.
     """
 
+    log_range = range(1, 5)
+
     # TODO: Perform analysis as to whether any of these methods need to be
     #       generalized and placed in the mutlib for all tests to access.
 
@@ -58,7 +60,6 @@ class test(rpl_admin_gtid.test):
         self.fail_event_script = os.path.normpath("./std_data/fail_event.bat")
         # Directory created by the post failover script.
         self.failover_dir = os.path.normpath("./fail_event")
-        self.log_range = range(1, 5)
 
         # Remove log files (leftover from previous test).
         for log in self.log_range:
@@ -122,6 +123,15 @@ class test(rpl_admin_gtid.test):
         log_filename = test_case[3]
         comment = test_case[4]
         key_phrase = test_case[5]
+        unregister = test_case[6]
+
+        if unregister:
+            # Unregister any failover instance from server
+            try:
+                server.exec_query("DROP TABLE IF EXISTS "
+                                  "mysql.failover_console")
+            except UtilError:
+                pass
 
         # Since this test case expects the console to stop, we can launch it
         # via a subprocess and wait for it to finish.
@@ -305,7 +315,7 @@ class test(rpl_admin_gtid.test):
         self.test_cases.append(
             (self.server1, str, True, _FAILOVER_LOG.format('1'),
              "Test case 1 - Simple failover with --failover=auto.",
-             "Failover complete")
+             "Failover complete", False)
         )
         str = failover_cmd % ("--master=%s" % slave1_conn, 'elect',
                               _FAILOVER_LOG.format('2'))
@@ -313,14 +323,14 @@ class test(rpl_admin_gtid.test):
         self.test_cases.append(
             (self.server2, str, True, _FAILOVER_LOG.format('2'),
              "Test case 2 - Simple failover with --failover=elect.",
-             "Failover complete")
+             "Failover complete", True)
         )
         str = failover_cmd % ("--master=%s" % slave2_conn, 'fail',
                               _FAILOVER_LOG.format('3'))
         self.test_cases.append(
             (self.server3, str, False, _FAILOVER_LOG.format('3'),
              "Test case 3 - Simple failover with --failover=fail.",
-             "Master has failed and automatic")
+             "Master has failed and automatic", True)
         )
 
         for test_case in self.test_cases:
@@ -423,6 +433,3 @@ class test(rpl_admin_gtid.test):
                 pass
 
         return rpl_admin_gtid.test.cleanup(self)
-
-
-

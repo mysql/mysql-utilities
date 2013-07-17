@@ -13,7 +13,7 @@ mysqlfailover.py: error: The --interval option requires a value greater than or 
 Test case 4 - elect mode but no candidates
 Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
-mysqlfailover.py: error: Failover mode = 'elect' reqiures at least one candidate.
+mysqlfailover.py: error: Failover mode = 'elect' requires at least one candidate.
 Test case 5 - FILE/TABLE mix and missing --rpl-user
 # Checking privileges.
 ERROR: Failover requires --master-info-repository=TABLE for all slaves.

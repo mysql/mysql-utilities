@@ -40,7 +40,7 @@ class test(failover.test):
             return False
 
         # Range used for log filename (one for each test).
-        self.log_range = range(1, 7)
+        self.log_range = range(1, 8)
 
         # Create replication user and grant REPLICATION SLAVE privilege.
         grants = ['REPLICATION SLAVE']
@@ -125,7 +125,7 @@ class test(failover.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Grant all required privileges except SUPER to user on slaves.
-        grants = ['GRANT OPTION', 'SELECT', 'RELOAD']
+        grants = ['GRANT OPTION', 'SELECT', 'RELOAD', 'DROP', 'CREATE']
         for slave in [self.server2, self.server3, self.server4]:
             self.change_user_privileges(slave, 'repl', 'repl',
                                         self.server1.host,
@@ -143,8 +143,48 @@ class test(failover.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Grant all required privileges except GRANT OPTION to user on slaves.
+        # Grant all required privileges except DROP to user on slaves.
         grants = ['SUPER']
+        revokes = ['DROP']
+        for slave in [self.server2, self.server3, self.server4]:
+            self.change_user_privileges(slave, 'repl', 'repl',
+                                        self.server1.host,
+                                        grant_list=grants, revoke_list=revokes,
+                                        disable_binlog=True, create_user=False)
+
+        # Test failover using a user with missing privilege: DROP.
+        test_num += 1
+        comment = ("Test case {0} - failover (fail) using 'repl' without: "
+                   "DROP.").format(test_num)
+        log_file = failover._FAILOVER_LOG.format(test_num)
+        cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
+                              self.fail_event_script, log_file)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Grant all required privileges except CREATE to user on slaves.
+        grants = ['DROP']
+        revokes = ['CREATE']
+        for slave in [self.server2, self.server3, self.server4]:
+            self.change_user_privileges(slave, 'repl', 'repl',
+                                        self.server1.host,
+                                        grant_list=grants, revoke_list=revokes,
+                                        disable_binlog=True, create_user=False)
+
+        # Test failover using a user with missing privilege: CREATE.
+        test_num += 1
+        comment = ("Test case {0} - failover (fail) using 'repl' without: "
+                   "CREATE.").format(test_num)
+        log_file = failover._FAILOVER_LOG.format(test_num)
+        cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
+                              self.fail_event_script, log_file)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Grant all required privileges except GRANT OPTION to user on slaves.
+        grants = ['CREATE']
         revokes = ['GRANT OPTION']
         for slave in [self.server2, self.server3, self.server4]:
             self.change_user_privileges(slave, 'repl', 'repl',
@@ -225,7 +265,8 @@ class test(failover.test):
         key_phrase = "Failover complete"
         cmd = base_cmd.format('python ../scripts/', master_conn, slaves_str,
                               'auto', self.fail_event_script, log_file)
-        test_case = (self.server1, cmd, True, log_file, comment, key_phrase)
+        test_case = (self.server1, cmd, True, log_file, comment, key_phrase,
+                     False)
         res = self.test_failover_console(test_case)
         if res:
             self.test_results.append(res)
