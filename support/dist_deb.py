@@ -18,9 +18,10 @@
 packages
 """
 
-import os
-import subprocess
 import fnmatch
+import os
+import platform
+import subprocess
 import time
 
 from distutils.core import Command
@@ -40,6 +41,13 @@ class BuildDistDebian(Command):
          "creating the distribution archive"),
         ('dist-dir=', 'd',
          "directory to put final built distributions in"),
+        ('platform=', 'p',
+         "name of the platform in resulting file "
+         "(default '{0}')".format(platform.linux_distribution()[0].lower())),
+        ('platform-version=', 'v',
+         "version of the platform in resulting file "
+         "(default '{0}')".format('.'.join(
+             platform.linux_distribution()[1].split('.', 2)[0:2])))
     ]
 
     def initialize_options(self):
@@ -57,6 +65,9 @@ class BuildDistDebian(Command):
         self.dist_dir = None
         self.deb_build_cmd = 'debuild'
         self.started_dir = os.getcwd()
+        self.platform = platform.linux_distribution()[0].lower()
+        self.platform_version = '.'.join(
+            platform.linux_distribution()[1].split('.', 2)[0:2])
 
     def finalize_options(self):
         """Finalize the options"""
@@ -143,13 +154,17 @@ class BuildDistDebian(Command):
         self.spawn(cmd)
 
         for base, dirs, files in os.walk(self.started_dir):
-                for filename in files:
-                    if filename.endswith('.deb'):
-                        filepath = os.path.join(base, filename)
-                        filedest = os.path.join(self.started_dir,
-                                                self.dist_dir, filename)
-                        copy_file(filepath, filedest)
-
+            for filename in files:
+                if filename.endswith('.deb'):
+                    newname = filename.replace(
+                        '{0}_all'.format(self.version),
+                        '{0}{1}{2}_all'.format(self.version, self.platform,
+                                               self.platform_version)
+                        )
+                    filepath = os.path.join(base, filename)
+                    filedest = os.path.join(self.started_dir,
+                                            self.dist_dir, newname)
+                    copy_file(filepath, filedest)
 
     def run(self):
         """Run the distutils command"""
@@ -172,4 +187,3 @@ class BuildDistDebian(Command):
 
         if not self.keep_temp:
             remove_tree(self.deb_base, dry_run=self.dry_run)
-
