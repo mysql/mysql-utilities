@@ -238,13 +238,13 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         options = self.utils.get_options_dictionary(utils[0])
-        print("\n(0)\n".format(utils[0]['usage']))
+        print("\n{0}\n".format(utils[0]['usage']))
         print("{0} - {1}\n".format(utils[0]['name'], utils[0]['description']))
         print("Options:")
         print_dictionary_list(['Option', 'Description'],
                               ['long_name', 'description'],
                               options, self.width, False)
-        print()
+        print
 
 
     def is_valid_custom_command(self, command_text):
@@ -287,7 +287,7 @@ class UtilitiesConsole(Console):
                 else:
                     proc = subprocess.Popen(" ".join(cmd), shell=True,
                                             stderr=subprocess.PIPE)
-                    print()
+                    print
 
                 # check the output for errors
                 stdout_temp, stderr_temp = proc.communicate()
@@ -320,10 +320,10 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         if not self.errors:
-            print()
+            print
             print("No errors to display.\n")
         for error in self.errors:
-            print()
+            print
             print("{0}\n".format(error))
 
     def clear_errors(self):
@@ -334,7 +334,7 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         self.errors = []
-        print()
+        print
 
     def show_last_error(self):
         """Show errors
@@ -344,10 +344,10 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         if not self.errors:
-            print()
+            print
             print("None error to display.\n")
         else:
-            print()
+            print
             print("{0}\n".format(self.errors[-1]))
 
     def show_custom_options(self):
@@ -375,10 +375,10 @@ class UtilitiesConsole(Console):
                 }
                 dictionary_list.append(item)
 
-        print()
-        print()
+        print
+        print
         print_dictionary_list(['Option', 'Value'], ['name', 'value'],
                               dictionary_list, self.width)
-        print()
+        print
 
 
