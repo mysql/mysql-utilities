@@ -1,5 +1,27 @@
+Release 1.3.4 (Released July 18, 2013)
+--------------------------------------
+
+- BUG#17064771: Add platform name and version to deb package.
+
+Release 1.2.5 (Released July 18, 2013)
+--------------------------------------
+
+- BUG#12889758: use db pattern for --exclude in mysqldbcopy and mysqldbexport
+- BUG#13103450: mysqldbimport fails to import sakila database
+- BUG#13577018: mysqluserclone silently ignores destination, if not needed
+- BUG#13773197: mysqlserverclone complains it can't find mysqld
+- BUG#16003529: The test import_rpl runs inconsistently on windows
+- BUG#16005010: Test failover does not run consistently on windows
+- BUG#16900862: mysqlindexcheck not finding all redundancies
+- BUG#16918106: let mysqlfailover run as daemon
+- BUG#17019115: mysqluc search "error" string instead of check return code
+- BUG#17062943: query failed error in mysqldiff
+- BUG#17086766: MUT is unable to run in Jenkins
+
+
 Release 1.3.3 (Released June 26, 2013)
 --------------------------------------
+
 - BUG#16748143 Improve MSI with shortcut to mysqluc
 - WL#6814: Debian Packaging mechanism
 - BUG#17021113 mysqluc crashes on init due to missing code from branch
