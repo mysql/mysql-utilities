@@ -1,0 +1,80 @@
+Test case 1 - Test --hide-utils missing --add-util=mysqlfakeutility option
+Usage: mysqluc.py 
+
+mysqluc.py: error: You can only use --hide_utils option along the --add-util option.
+Test case 2 - Test --hide-utils with --add-util=mysqlfakeutility option
+Launching console ...
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqlfakeutility  a mysqlutility mock to test mysqluc                        
+
+Test case 3 - Test --add-util=mysqlfakeutility option without --hide-utils
+Launching console ...
+WARNING: Unable to locate utility mysqldbcopy.
+WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrpladmin.
+WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbcompare.
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplcheck.
+WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlauditgrep.
+WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbexport.
+WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplshow.
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlfailover.
+WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldiff.
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlindexcheck.
+WARNING: mysqlindexcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlserverclone.
+WARNING: mysqlserverclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlmetagrep.
+WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlserverinfo.
+WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlprocgrep.
+WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqluserclone.
+WARNING: mysqluserclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbimport.
+WARNING: mysqldbimport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldiskusage.
+WARNING: mysqldiskusage failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlauditadmin.
+WARNING: mysqlauditadmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+
+Utility           Description                                                
+----------------  -----------------------------------------------------------
+mysqlfakeutility  a mysqlutility mock to test mysqluc                        
+mysqlreplicate    establish replication with a master                        
+
+Test case 4 - Test --add-util=mysqlfakeutility execute --help option
+Usage: mysqlfakeutility.py --return-code=<return_code> --message-error=<path>
+
+mysqlfakeutility - a mysqlutility mock to test mysqluc
+
+Options:
+  --version             show program's version number and exit
+  --help                
+  -e RETURN_CODE, --return-code=RETURN_CODE
+                        the code to return at the program end.
+  -m MESSAGE_ERROR, --message-error=MESSAGE_ERROR
+                        an error message to show in stderr, if it's required
+Launching console ...
+
+
+Test case 5 - Test fakeutility --return-code=1
+Launching console ...
+
+An error was found, while executing the command, use "show last error" command to display details
+
+Test case 6 - Test fakeutility --return-code=2 and no message
+Launching console ...
+
+An error was found, while executing the command, use "show last error" command to display details
+

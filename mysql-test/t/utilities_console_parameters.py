@@ -107,6 +107,34 @@ class test(mutlib.System_test):
                                  "{0}: {1}".format(test_num, comment))
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # show last error command
+        comment = "show last error command"
+        test_case = "Test Case {0}: {1}".format(test_num, comment)
+        cmd_opt = 'mysqluc.py -e "procgrep; show last error" --width=77'
+        res = self.run_test_case(0, cmd_opt, test_case)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # show last error command
+        comment = "clear errors command"
+        test_case = "Test Case {0}: {1}".format(test_num, comment)
+        cmd_opt = ('mysqluc.py -e "procgrep; clear errors; show last error"'
+                   ' --width=77')
+        res = self.run_test_case(0, cmd_opt, test_case)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # show errors command
+        comment = "show errors command"
+        test_case = "Test Case {0}: {1}".format(test_num, comment)
+        cmd_opt = 'mysqluc.py -e "procgrep; procgrep; show errors" --width=77'
+        res = self.run_test_case(0, cmd_opt, test_case)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
@@ -118,6 +146,14 @@ class test(mutlib.System_test):
         self.remove_result("MySQL Utilities mysqluc.py version")
 
         self.replace_substring(".py", "")
+
+        diff_ret = ("mysqldiff: error: No objects specified to compare.")
+        self.remove_result_and_lines_before(diff_ret, 1)
+
+        diff_ret = ("mysqlprocgrep: error: You need at least one server")
+        self.remove_result_and_lines_before(diff_ret, 1)
+
+        self.replace_substring("\r\n","\n")
 
         return True
 

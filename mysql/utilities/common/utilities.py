@@ -153,6 +153,8 @@ class Utilities(object):
         self.util_list = []
         self.width = options.get('width', _MAX_WIDTH)
         self.util_path = get_util_path(options.get('utildir', ''))
+        self.extra_utilities = options.get('add_util', {})
+        self.hide_utils = options.get('hide_util', False)
 
         self.program_usage = re.compile(RE_USAGE, re.S | re.M)
         self.program_options = re.compile(RE_OPTIONS, re.S | re.M)
@@ -160,10 +162,14 @@ class Utilities(object):
         self.program_name = re.compile(RE_ALIAS)
 
         self.util_cmd_dict = {}
-
-        utility_names = sorted(AVAILABLE_UTILITIES.keys())
-        self.available_utilities = list(utility_names)
-        for util_name, ver_compatibility in AVAILABLE_UTILITIES.iteritems():
+        self.posible_utilities = {}
+        self.posible_utilities.update(AVAILABLE_UTILITIES)
+        if self.extra_utilities and self.hide_utils:
+            self.posible_utilities = self.extra_utilities
+        else:
+            self.posible_utilities.update(self.extra_utilities)
+        self.available_utilities = self.posible_utilities
+        for util_name, ver_compatibility in self.posible_utilities.iteritems():
             name_utility = "{0} utility".format(util_name)
             if ver_compatibility:
                 min_v, max_v = ver_compatibility
@@ -275,10 +281,11 @@ class Utilities(object):
         for util_name in utils:
             if self.util_cmd_dict.has_key(util_name):
                 cmd = self.util_cmd_dict.pop(util_name)
-                util_info = self._get_util_info(cmd, util_name)
+                util_info = self._get_util_info(list(cmd), util_name)
                 if util_info and util_info["usage"]:
-                        self.util_list.append(util_info)
-                        working_utils.append(util_name)
+                    util_info["cmd"] = cmd
+                    self.util_list.append(util_info)
+                    working_utils.append(util_name)
         
         self.util_list.sort(key=lambda util_list: util_list['name'])
 
@@ -291,34 +298,39 @@ class Utilities(object):
 
         Returns dictionary - name, description, usage, options
         """
-
         cmd.extend(["--help"])
-        # Hide errors from stderr output
-        out = open(os.devnull, 'w')
 
         try:
             proc = subprocess.Popen(cmd, shell=False,
-                                    stdout=subprocess.PIPE, stderr=out)
-            stdout_temp = proc.communicate()[0]
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            stdout_temp, stderr_temp = proc.communicate()
+            returncode = proc.returncode
         except OSError:
+            # always OS error if not found.
             # No such file or directory
             stdout_temp = ""
+            returncode = 0
 
         # Parse the help output and save the information found
         usage = None
         description = None
+        
+        if stderr_temp or returncode:
+            print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
+            if stderr_temp:
+                print("The execution of the command returned: {0}"
+                      "".format(stderr_temp))
+            else:
+                print("UNKNOWN. To diagnose, exit mysqluc and attempt the "
+                      "command: {0} --help".format(util_name))
+            return None
 
         res = self.program_usage.match(stdout_temp.replace("\r", ""))
         if not res:
             print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
-            if "ERROR" in stdout_temp:
-                print(stdout_temp)
-            else:
-                print("UNKNOWN. To diagnose, exit mysqluc and attempt the "
-                      "command: {0} --help".format(util_name))
-
-        Options = ""
-        if not res:
+            print("An error occurred while trying to parse the options "
+                  "from the utility")
             return None
         else:
             usage = res.group("Usage").replace("\n", "")
@@ -382,7 +394,7 @@ class Utilities(object):
         matches = []
         if not util_prefix.lower().startswith('mysql'):
             util_prefix = 'mysql' + util_prefix
-        for util in AVAILABLE_UTILITIES:
+        for util in self.available_utilities:
             if util[0:len(util_prefix)].lower() == util_prefix:
                 matches.append(util)
         # make sure the utilities description has been found for the matches.
@@ -434,7 +446,7 @@ class Utilities(object):
         """
 
         if list is None:
-            if len(self.util_list) != len(AVAILABLE_UTILITIES):
+            if len(self.util_list) != len(self.available_utilities):
                 self.find_utilities()
             list_of_utilities = self.util_list
         else:

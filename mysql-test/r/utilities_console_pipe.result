@@ -4,6 +4,11 @@ Command                 Description
 ----------------------  -----------------------------------------------------
 help utilities          Display list of all utilities supported.             
 help <utility>          Display help for a specific utility.                 
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+clear errors            clear captured errors.                               
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
 help | help commands    Show this list.                                      
 exit | quit             Exit the console.                                    
 set <variable>=<value>  Store a variable for recall in commands.             
@@ -25,6 +30,11 @@ Command                 Description
 ----------------------  -----------------------------------------------------
 help utilities          Display list of all utilities supported.             
 help <utility>          Display help for a specific utility.                 
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+clear errors            clear captured errors.                               
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
 help | help commands    Show this list.                                      
 exit | quit             Exit the console.                                    
 set <variable>=<value>  Store a variable for recall in commands.             
@@ -46,6 +56,11 @@ Command                 Description
 ----------------------  -----------------------------------------------------
 help utilities          Display list of all utilities supported.             
 help <utility>          Display help for a specific utility.                 
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+clear errors            clear captured errors.                               
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
 help | help commands    Show this list.                                      
 exit | quit             Exit the console.                                    
 set <variable>=<value>  Store a variable for recall in commands.             
@@ -91,13 +106,15 @@ Test Case 5: Show Options
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-width      77                                                                
-commands   None                                                              
 prompt     mysqluc>                                                          
+hide_util  False                                                             
+add_util                                                                     
 utildir    XXXXXXXXXXXXXX
+commands   None                                                              
 verbosity  0                                                                 
 quiet      False                                                             
 custom     True                                                              
+width      77                                                                
 
 Test Case 6: Do Exit
 
@@ -132,6 +149,11 @@ Command                 Description
 ----------------------  -----------------------------------------------------
 help utilities          Display list of all utilities supported.             
 help <utility>          Display help for a specific utility.                 
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+clear errors            clear captured errors.                               
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
 help | help commands    Show this list.                                      
 exit | quit             Exit the console.                                    
 set <variable>=<value>  Store a variable for recall in commands.             
@@ -200,13 +222,15 @@ mysqluserclone    clone a MySQL user account to one or more new users
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-width      77                                                                
-commands   None                                                              
 prompt     mysqluc>                                                          
+hide_util  False                                                             
+add_util                                                                     
 utildir    XXXXXXXXXXXXXX
+commands   None                                                              
 verbosity  0                                                                 
 quiet      False                                                             
 custom     True                                                              
+width      77                                                                
 
 Test Case 12: Show Utilities + Options + NULL
 
@@ -237,13 +261,15 @@ mysqluserclone    clone a MySQL user account to one or more new users
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-width      77                                                                
-commands   None                                                              
 prompt     mysqluc>                                                          
+hide_util  False                                                             
+add_util                                                                     
 utildir    XXXXXXXXXXXXXX
+commands   None                                                              
 verbosity  0                                                                 
 quiet      False                                                             
 custom     True                                                              
+width      77                                                                
 
 
 Test Case 13: Do Exit + Quit
