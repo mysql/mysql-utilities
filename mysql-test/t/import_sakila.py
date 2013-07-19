@@ -80,6 +80,10 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Replace schema file path for test to pass on Windows.
+        self.replace_substring(import_file,
+                               _IMPORT_FILES_PATH.format(_IMPORT_FILES[0]))
+
         # Import sakila data (and remaining definitions).
         test_num += 1
         comment = "Test case {0} - Import sakila data.".format(test_num)
@@ -91,6 +95,10 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        # Replace data file path for test to pass on Windows.
+        self.replace_substring(import_file,
+                               _IMPORT_FILES_PATH.format(_IMPORT_FILES[1]))
 
         # Confirm import success as suggested in the sakila guide (section 4):
         # http://dev.mysql.com/doc/sakila/en/sakila-installation.html
