@@ -8,6 +8,22 @@ Test Case 2: Show help utilities with custom utildir
 Launching console ...
 WARNING: Unable to locate utility mysqldbcopy.
 WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrpladmin.
+WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbcompare.
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplcheck.
+WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlauditgrep.
+WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbexport.
+WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplshow.
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlfailover.
+WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldiff.
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlindexcheck.
 WARNING: mysqlindexcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlserverclone.
@@ -16,32 +32,16 @@ WARNING: Unable to locate utility mysqlfrm.
 WARNING: mysqlfrm failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlmetagrep.
 WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrplshow.
-WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlserverinfo.
 WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrplcheck.
-WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrpladmin.
-WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlauditgrep.
-WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldbexport.
-WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlprocgrep.
+WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqluserclone.
 WARNING: mysqluserclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldbimport.
 WARNING: mysqldbimport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldbcompare.
-WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldiskusage.
 WARNING: mysqldiskusage failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlfailover.
-WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlprocgrep.
-WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldiff.
-WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlauditadmin.
 WARNING: mysqlauditadmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 
@@ -84,6 +84,22 @@ Options:
 Launching console ...
 WARNING: Unable to locate utility mysqldbcopy.
 WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrpladmin.
+WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbcompare.
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplcheck.
+WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlauditgrep.
+WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbexport.
+WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplshow.
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlfailover.
+WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldiff.
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlindexcheck.
 WARNING: mysqlindexcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlserverclone.
@@ -92,32 +108,16 @@ WARNING: Unable to locate utility mysqlfrm.
 WARNING: mysqlfrm failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlmetagrep.
 WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrplshow.
-WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlserverinfo.
 WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrplcheck.
-WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrpladmin.
-WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlauditgrep.
-WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldbexport.
-WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlprocgrep.
+WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqluserclone.
 WARNING: mysqluserclone failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldbimport.
 WARNING: mysqldbimport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldbcompare.
-WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldiskusage.
 WARNING: mysqldiskusage failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlfailover.
-WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlprocgrep.
-WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldiff.
-WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlauditadmin.
 WARNING: mysqlauditadmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 

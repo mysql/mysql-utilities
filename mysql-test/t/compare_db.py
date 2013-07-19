@@ -119,103 +119,127 @@ class test(mutlib.System_test):
         except UtilError as err:
             raise MUTLibError("Failed to execute query: %s" % err.errmsg)
 
-    
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
         
-        s1_conn = "--server1=" + self.build_connection_string(self.server1)
-        s2_conn = "--server2=" + self.build_connection_string(self.server2)
-        s2_conn_dupe = "--server2=" + self.build_connection_string(self.server1)
-       
-        cmd_str = "mysqldbcompare.py %s %s " % (s1_conn, s2_conn)
+        s1_conn = "--server1={0}".format(
+            self.build_connection_string(self.server1)
+        )
+        s2_conn = "--server2={0}".format(
+            self.build_connection_string(self.server2)
+        )
+        s2_conn_dupe = "--server2={0}".format(
+            self.build_connection_string(self.server1)
+        )
 
-        comment = "Test case 1 - check a sample database"
-        res = self.run_test_case(0, cmd_str + "inventory:inventory -a",
-                                 comment)
+        cmd_base = "mysqldbcompare.py {0} {1} ".format(s1_conn, s2_conn)
+
+        test_num = 1
+        comment = "Test case {0} - check a sample database".format(test_num)
+        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.create_extra_table()
 
-        comment = ("Test case 2 - check database with known differences "
-                   "(extra table)")
-        res = self.run_test_case(1, "{0} {1}".format(cmd_str,
-                                                     "inventory:inventory -a"),
-                                 comment)
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "(extra table)").format(test_num)
+        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         self.drop_extra_table()
         self.alter_data()
 
-        comment = ("Test case 3 - check database with known differences "
-                   "direction = server1 (default)")
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
-                                 "--format=CSV", comment)
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "direction = server1 (default)").format(test_num)
+        cmd = "{0} inventory:inventory -a --format=CSV".format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = ("Test case 4 - check database with known differences "
-                   "direction = server2")
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
-                                 "--format=CSV --changes-for=server2", comment)
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "direction = server2").format(test_num)
+        cmd = ("{0} inventory:inventory -a --format=CSV "
+               "--changes-for=server2").format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = ("Test case 5 - check database with known differences "
-                   "direction = server1 and reverse")
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
-                                 "--format=CSV --changes-for=server1 "
-                                 "--show-reverse", comment)
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "direction = server1 and reverse").format(test_num)
+        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server1 "
+               "--show-reverse").format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = ("Test case 6 - check database with known differences "
-                   "direction = server2 and reverse")
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
-                                 "--format=CSV --changes-for=server2 "
-                                 "--show-reverse", comment)
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "direction = server2 and reverse").format(test_num)
+        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server2 "
+               "--show-reverse").format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # execute a compare on the same server to test messages
-        
+
         self.server1.exec_query("CREATE DATABASE inventory2")
-        
-        comment = ("Test case 7 - compare two databases on same server "
-                   "w/server2")
-        cmd_str = "mysqldbcompare.py %s %s " % (s1_conn, s2_conn_dupe)
-        res = self.run_test_case(1, cmd_str + "inventory:inventory2 -a ",
-                                 comment)
+
+        test_num += 1
+        comment = ("Test case {0} - compare two databases on same server "
+                   "w/server2").format(test_num)
+        cmd = ("mysqldbcompare.py {0} {1} inventory:inventory2 "
+               "-a").format(s1_conn, s2_conn_dupe)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-            
-        comment = "Test case 8 - compare two databases on same server"
-        cmd_str = "mysqldbcompare.py %s " % s1_conn
-        res = self.run_test_case(1, cmd_str + "inventory:inventory2 -a ",
-                                 comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare two databases on same "
+                   "server").format(test_num)
+        cmd = "mysqldbcompare.py {0} inventory:inventory2 -a".format(s1_conn)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db.``:db`:`db.``:db`' -a"
         else:
             cmd_arg = '"`db.``:db`:`db.``:db`" -a'
-        cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_arg)
-        comment = ("Test case 9 - compare a database with weird names "
-                   "(backticks)")
-        res = self.run_test_case(0, cmd_str, comment)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        test_num += 1
+        comment = ("Test case {0} - compare a database with weird names "
+                   "(backticks)").format(test_num)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 10 - compare two empty databases"
-        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(
+        test_num += 1
+        comment = "Test case {0} - compare two empty databases".format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(
             s1_conn, s2_conn, "empty_db:empty_db -a"
         )
-        res = self.run_test_case(0, cmd_str, comment)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - diff a sample database containing tables "
+                    "with weird names (no backticks).").format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(
+            s1_conn, s2_conn, "db_diff_test:db_diff_test"
+        )
+        res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -228,11 +252,12 @@ class test(mutlib.System_test):
         self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
                                 "SELECT 1")
         # Execute test (no differences expected)
-        comment = ("Test case 11 - compare a database with objects of "
-                   "different type with the same name (no differences)")
-        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
-                                                         cmd_arg)
-        res = self.run_test_case(0, cmd_str, comment)
+        test_num += 1
+        comment = ("Test case {0} - compare a database with objects of "
+                   "different types with the same name "
+                   "(no differences)").format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -242,11 +267,12 @@ class test(mutlib.System_test):
         self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
                                 "SELECT 2")
         # Execute test (differences expected)
-        comment = ("Test case 12 - compare a database with objects of "
-                   "different type with the same name (with differences)")
-        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
-                                                         cmd_arg)
-        res = self.run_test_case(1, cmd_str, comment)
+        test_num += 1
+        comment = ("Test case {0} - compare a database with objects of "
+                   "different types with the same name "
+                   "(with differences)").format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -296,6 +322,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, "inventory")
         self.drop_db(self.server1, 'db.`:db')
         self.drop_db(self.server2, 'db.`:db')
+        self.drop_db(self.server1, 'db_diff_test')
+        self.drop_db(self.server2, 'db_diff_test')
         self.drop_db(self.server1, "empty_db")
         self.drop_db(self.server2, "empty_db")
         return True

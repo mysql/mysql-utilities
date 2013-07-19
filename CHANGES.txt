@@ -18,7 +18,6 @@ Release 1.2.5 (Released July 18, 2013)
 - BUG#17062943: query failed error in mysqldiff
 - BUG#17086766: MUT is unable to run in Jenkins
 
-
 Release 1.3.3 (Released June 26, 2013)
 --------------------------------------
 

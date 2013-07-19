@@ -14,10 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
 import os
+
 import copy_db
 
 from mysql.utilities.exception import MUTLibError
+
 
 class test(copy_db.test):
     """check exclude parameter for clone db
@@ -33,38 +36,129 @@ class test(copy_db.test):
         return copy_db.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1)
+        )
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2)
+        )
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s --skip=grants " % \
-                  (from_conn, to_conn)
-        cmd_str += "util_test:util_db_clone "
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} --skip=grants "
+                   "{2}").format(from_conn, to_conn,
+                                 "util_test:util_db_clone")
 
-        comment = "Test case 1 - exclude by name"
-        cmd_opts = "--exclude=util_test.v1 --exclude=util_test.t4"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num = 1
+        comment = "Test case {0} - exclude by name".format(test_num)
+        cmd_opts = ("{0} --exclude=util_test.v1 "
+                    "--exclude=util_test.t4").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         copy_db.test.drop_db(self, self.server2, 'util_db_clone')
 
-        comment = "Test case 2 - exclude by regex"
-        cmd_opts = "--exclude=^e --exclude=4$ --regexp "
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - exclude by name using "
+                   "backticks.").format(test_num)
+        if os.name == 'posix':
+            cmd_opts = ("{0} --exclude='`util_test`.`v1`' "
+                        "--exclude='`util_test`.`t4`'").format(cmd_str)
+        else:
+            cmd_opts = ('{0} --exclude="`util_test`.`v1`" '
+                        '--exclude="`util_test`.`t4`"').format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         copy_db.test.drop_db(self, self.server2, 'util_db_clone')
 
-        comment = "Test case 3 - exclude by name and regex"
-        cmd_opts = "--exclude=^e --exclude=4$ --regexp " + \
-                   "--exclude=v1 --exclude=util_test.trg"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - exclude using SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} --exclude=e% --exclude=_4".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        test_num += 1
+        comment = ("Test case {0} - exclude using REGEXP "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} --exclude=^e --exclude=4$ --regexp".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        test_num += 1
+        comment = ("Test case {0} - exclude by name and SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = ("{0} --exclude=e% --exclude=_4 "
+                    "--exclude=v1 --exclude=util_test.trg").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        test_num += 1
+        comment = ("Test case {0} - exclude by name and REGEXP "
+                   "pattern.").format(test_num)
+        cmd_opts = ("{0} --exclude=^e --exclude=4$ --regexp "
+                    "--exclude=v1 --exclude=util_test.trg").format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        test_num += 1
+        comment = ("Test case {0} - exclude everything using SQL LIKE "
+                   "pattern.").format(test_num)
+        cmd_opts = "{0} -x % ".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        test_num += 1
+        comment = ("Test case {0} - exclude everything using REGEXP "
+                   "pattern.").format(test_num)
+        if os.name == 'posix':
+            cmd_opts = "{0} -x '.*' --regexp".format(cmd_str)
+        else:
+            cmd_opts = '{0} -x ".*" --regexp'.format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        # Note: Unlike SQL LIKE pattern that matches the entire value, with a
+        # SQL REGEXP pattern match succeeds if the pattern matches anywhere in
+        # the value being tested.
+        # See: http://dev.mysql.com/doc/en/pattern-matching.html
+        test_num += 1
+        comment = ("Test case {0}a - SQL LIKE VS REGEXP pattern (match entire "
+                   "value VS match anywhere in value).").format(test_num)
+        cmd_opts = "{0} -x 1 -x t".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+
+        comment = ("Test case {0}b - SQL LIKE VS REGEXP pattern (match entire "
+                   "value VS match anywhere in value).").format(test_num)
+        cmd_opts = "{0} -x 1 -x t --regexp".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source and destination host name.
         self.replace_result("# Source on ",

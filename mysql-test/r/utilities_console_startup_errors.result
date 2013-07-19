@@ -1,0 +1,16 @@
+Test case 1 - Test error with non-existent utility
+WARNING: mysqlnotexst failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+The execution of the command returned: python: can't open file ...
+
+Test case 2 - Test error with wrong parameter
+WARNING: mysqldiff failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+The execution of the command returned: Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff.py: error: no such option: --unreal_option
+
+Test case 3 - Test errorcode returned, and no message.
+WARNING: mysqlfakeutil failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+UNKNOWN. To diagnose, exit mysqluc and attempt the command: mysqlfakeutil --help
+Test case 4 - Test error trying to parse help from the utility
+WARNING: mysqlfakeutil failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+An error occurred while trying to parse the options from the utility

@@ -18,3 +18,5 @@ USE `db.``:db`;
 
 CREATE VIEW `db.``:db`.```v``export_1` as SELECT * FROM `db.``:db`.```t``export_1`;
 
+CREATE DATABASE db_diff_test;
+CREATE TABLE `db_diff_test`.`table-dash` (`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1;

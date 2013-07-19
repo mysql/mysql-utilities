@@ -566,6 +566,29 @@ class Server(object):
         self.aliases = []
         self.grants_enabled = None
 
+    @classmethod
+    def fromServer(cls, server):
+        """ Create a new server instance from an existing one
+
+        Factory method that will allow the creation of a new server instance
+        from an existing server.
+
+        server[in] - instance object that must be instance of the Server class
+                     or a subclass.
+
+        Returns an instance of the calling class as a result.
+        """
+
+        if isinstance(server, Server):
+            options = {"conn_info": server.get_connection_values(),
+                       "role": server.role,
+                       "verbose": server.verbose,
+                       "charset": server.charset}
+            return cls(options)
+        else:
+            raise TypeError("The server argument's type is neither Server nor "
+                            "a subclass of Server")
+
     def is_alive(self):
         """Determine if connection to server is still alive.
 
@@ -702,20 +725,26 @@ class Server(object):
 
         # Get the aliases for this server host
         self.aliases = get_aliases(self.host)
+
+        # List of possible suffixes
+        suffixes = ('.local', '.lan',)
+
         # Check if this server is local
         for host in self.aliases:
             if host in local_aliases:
                 # Is local then save the local aliases for future.
                 extend_aliases(self.aliases, local_aliases)
                 break
-            # Handle special ".local" hostnames.
-            if host.endswith('.local'):
-                # Remove '.local' and attempt to match with local aliases.
-                host, _ = host.rsplit('.', 1)
-                if host in local_aliases:
-                    # Is local then save the local aliases for future.
-                    extend_aliases(self.aliases, local_aliases)
-                    break
+            # Handle special suffixes in hostnames.
+            for suffix in suffixes:
+                if host.endswith(suffix):
+                    # Remove special suffix and attempt to match with local
+                    # aliases.
+                    host, _ = host.rsplit('.', 1)
+                    if host in local_aliases:
+                        # Is local then save the local aliases for future.
+                        extend_aliases(self.aliases, local_aliases)
+                        break
 
         # Check if the given host_or_ip is alias of the server host.
         if host_or_ip in self.aliases:

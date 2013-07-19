@@ -70,9 +70,7 @@ class test(copy_db_rpl.test):
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
-        if os.name == "nt":
-            raise MUTLibError("Test does not run correctly on Windows. "
-                              "See BUG#16003529.")
+
         return copy_db_rpl.test.check_prerequisites(self)
         
     def setup(self):

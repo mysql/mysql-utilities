@@ -154,6 +154,26 @@ parser.add_option("--no-keyboard", action="store_true", default=False,
                   dest="no_keyboard", help="start with no keyboard input "
                   "support.")
 
+# Add option to run as daemon
+parser.add_option("--daemon", action="store", dest="daemon", default=None,
+                  help="run on daemon mode. It can be start, stop, restart "
+                  "or nodetach.",
+                  type="choice", choices=("start", "stop", "restart",
+                                          "nodetach"))
+
+# Add pidfile for the daemon option
+parser.add_option("--pidfile", action="store", dest="pidfile",
+                  type="string", default=None, help="pidfile for running "
+                  "mysqlfailover as a daemon.")
+
+# Add report values for daemon mode
+parser.add_option("--report-values", action="store", dest="report_values",
+                  type="string", default="health",
+                  help="report values used in mysqlfailover running as a "
+                  "daemon. It can be health, gtid or uuid. Multiple values "
+                  "can be used separated by comma. By default all values are "
+                  "reported.")
+
 # Add verbosity mode
 add_verbosity(parser, False)
 
@@ -164,7 +184,8 @@ add_rpl_user(parser, None)
 opt, args = parser.parse_args()
 
 # Check slaves list
-check_server_lists(parser, opt.master, opt.slaves)
+if opt.daemon != "stop":
+    check_server_lists(parser, opt.master, opt.slaves)
 
 # Check for errors
 if int(opt.interval) < 5:
@@ -178,15 +199,16 @@ try:
 except ValueError:
     parser.error("The --timeout option requires an integer value.")
 
-if opt.master is None:
+# if opt.master is None and opt.daemon and opt.daemon != "stop":
+if opt.master is None and opt.daemon != "stop":
     parser.error("You must specify a master to monitor.")
 
-if opt.slaves is None and opt.discover is None:
+if opt.slaves is None and opt.discover is None and opt.daemon != "stop":
     parser.error("You must supply a list of slaves or the "
                  "--discover-slaves-login option.")
 
 if opt.failover_mode == 'elect' and opt.candidates is None:
-    parser.error("Failover mode = 'elect' reqiures at least one candidate.")
+    parser.error("Failover mode = 'elect' requires at least one candidate.")
 
 # Parse the master, slaves, and candidates connection parameters
 try:
@@ -226,6 +248,9 @@ options = {
     'rediscover'       : opt.rediscover,
     'pedantic'         : opt.pedantic,
     'no_keyboard'      : opt.no_keyboard,
+    'daemon'           : opt.daemon,
+    'pidfile'          : opt.pidfile,
+    'report_values'    : opt.report_values,
     'script_threshold' : opt.script_threshold,
 }
 
@@ -242,9 +267,67 @@ logging.basicConfig(filename=opt.log_file, level=logging.INFO,
 if opt.script_threshold:
     print(SCRIPT_THRESHOLD_WARNING)
 
+# Check if the values specified for the --report-values option are valid.
+for report in opt.report_values.split(','):
+    if report.lower() not in ("health", "gtid", "uuid"):
+        parser.error("The value for the option --report-values is not valid: "
+                     "'{0}', the values allowed are 'health', 'gitd' or 'uuid'"
+                     "".format(opt.report_values))
+
+# Check the daemon options
+if opt.daemon:
+    # Check if a POSIX system
+    if os.name != "posix":
+        parser.error("Running mysqlfailover with --daemon is only available "
+                     "for POSIX systems.")
+
+    # Check the presence of --log
+    if opt.daemon != "stop" and not opt.log_file:
+        parser.error("The option --log is required when using --daemon.")
+
+    # Test pidfile
+    if opt.daemon != "nodetach":
+        pidfile = opt.pidfile or "./failover_daemon.pid"
+        pidfile = os.path.realpath(os.path.normpath(pidfile))
+        if opt.daemon == "start":
+            # Test if pidfile exists
+            if os.path.exists(pidfile):
+                parser.error("pidfile {0} already exists. The daemon is "
+                             "already running?".format(pidfile))
+            # Test if pidfile is writable
+            try:
+                with open(pidfile, "w") as f:
+                    f.write("{0}\n".format(0))
+                # Delete temporary pidfile
+                os.remove(pidfile)
+            except IOError as err:
+                parser.error("Unable to write pidfile: {0}"
+                             "".format(err.strerror))
+        else:
+            # opt.daemon == stop/restart, test if pidfile is readable
+            pid = None
+            try:
+                if not os.path.exists(pidfile):
+                    parser.error("pidfile {0} does not exist.".format(pidfile))
+                with open(pidfile, "r") as f:
+                    pid = int(f.read().strip())
+            except IOError:
+                pid = None
+            except ValueError:
+                pid = None
+            # Test pid presence
+            if not pid:
+                parser.error("Can not read pid from pidfile.")
+
+if opt.pidfile and not opt.daemon:
+    parser.error("The option --daemon is required when using --pidfile.")
+
 try:
     rpl_cmds = RplCommands(master_val, slaves_val, options)
-    rpl_cmds.auto_failover(opt.interval)
+    if opt.daemon:
+        rpl_cmds.auto_failover_as_daemon()
+    else:
+        rpl_cmds.auto_failover(opt.interval)
 except UtilError:
     _, e, _ = sys.exc_info()
     # log the error in case it was an usual exception

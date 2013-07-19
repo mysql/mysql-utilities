@@ -23,9 +23,18 @@ simple master-to-slaves topology.
 import logging
 import os
 import sys
+import time
+
+from datetime import datetime, timedelta
+
 from mysql.utilities.exception import UtilRplError
 from mysql.utilities.common.ip_parser import hostname_is_ip
 from mysql.utilities.common.messages import ERROR_SAME_MASTER
+from mysql.utilities.common.tools import ping_host, execute_script
+from mysql.utilities.common.format import print_list
+from mysql.utilities.common.topology import Topology
+from mysql.utilities.command.failover_console import FailoverConsole
+from mysql.utilities.command.failover_daemon import FailoverDaemon
 
 _VALID_COMMANDS_TEXT = """
 Available Commands:
@@ -100,9 +109,6 @@ def purge_log(filename, age):
 
     Returns bool - True = success, Fail = error reading/writing log file
     """
-    import time
-    from datetime import datetime, timedelta
-
     if not os.path.exists(filename):
         print "NOTE: Log file '%s' does not exist. Will be created." % filename
         return True
@@ -164,7 +170,22 @@ class RplCommands(object):
         skip_conn_err[in]  if True, do not fail on connection failure
                            Default = True
         """
-        from mysql.utilities.common.topology import Topology
+        # A sys.stdout copy, that can be used later to turn on/off stdout
+        self.stdout_copy = sys.stdout
+        self.stdout_devnull = open(os.devnull, "w")
+
+        # Disable stdout when running --daemon with start, stop or restart
+        daemon = options.get("daemon")
+        if daemon:
+            if daemon in ("start", "nodetach"):
+                print("Starting failover daemon...")
+            elif daemon == "stop":
+                print("Stopping failover daemon...")
+            else:
+                print("Restarting failover daemon...")
+            # Disable stdout if daemon not nodetach
+            if daemon != "nodetach":
+                sys.stdout = self.stdout_devnull
 
         self.master_vals = master_vals
         self.options = options
@@ -173,9 +194,14 @@ class RplCommands(object):
         self.candidates = self.options.get("candidates", None)
 
         self.rpl_user = self.options.get("rpl_user", None)
-        self.topology = Topology(master_vals, slave_vals, self.options,
-                                 skip_conn_err)
-
+        try:
+            self.topology = Topology(master_vals, slave_vals, self.options,
+                                     skip_conn_err)
+        except Exception as err:
+            if daemon and daemon != "nodetach":
+                # Turn on sys.stdout
+                sys.stdout = self.stdout_copy
+            raise UtilRplError(str(err))
 
     def _report(self, message, level=logging.INFO, print_msg=True):
         """Log message if logging is on
@@ -194,7 +220,6 @@ class RplCommands(object):
         # Now log message if logging turned on
         if self.logging:
             logging.log(int(level), message.strip("#").strip(' '))
-
 
     def _show_health(self):
         """Run a command on a list of slaves.
@@ -227,8 +252,6 @@ class RplCommands(object):
               IO_Thread, SQL_Thread, Secs_Behind, Remaining_Delay,
               IO_Error_Num, IO_Error
         """
-        from mysql.utilities.common.format import print_list
-
         format = self.options.get("format", "grid")
         quiet = self.options.get("quiet", False)
 
@@ -243,7 +266,6 @@ class RplCommands(object):
 
         return
 
-
     def _show_gtid_data(self):
         """Display the GTID lists from the servers.
 
@@ -251,8 +273,6 @@ class RplCommands(object):
         server is listed with its entries in each list. If a list has no
         entries, that list is not printed.
         """
-        from mysql.utilities.common.format import print_list
-
         if not self.topology.gtid_enabled():
             self._report("# WARNING: GTIDs are not supported on this topology.",
                          logging.WARN)
@@ -282,7 +302,6 @@ class RplCommands(object):
             print "# Transactions owned by another server:"
             print_list(sys.stdout, format, _GTID_COLS, owned)
 
-
     def _check_host_references(self):
         """Check to see if using all host or all IP addresses
 
@@ -302,7 +321,6 @@ class RplCommands(object):
                     return False
         return True
 
-
     def _switchover(self):
         """Perform switchover from master to candidate slave
 
@@ -321,8 +339,8 @@ class RplCommands(object):
                                                self.master_vals['port'])
             self._report(err_msg, logging.WARN)
             self._report(err_msg, logging.CRITICAL)
-            raise UtilRplError(err_msg) 
-        
+            raise UtilRplError(err_msg)
+
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():
             return False
@@ -347,7 +365,6 @@ class RplCommands(object):
             return False
 
         return True
-
 
     def _elect_slave(self):
         """Perform best slave election
@@ -380,7 +397,6 @@ class RplCommands(object):
 
         self._report("# Best slave found is located on %s:%s." %
                      (best_slave['host'], best_slave['port']))
-
 
     def _failover(self, strict=False, options={}):
         """Perform failover
@@ -436,7 +452,6 @@ class RplCommands(object):
             return False
         return True
 
-
     def _check_master_info_type(self, halt=True):
         """Check for master information set to TABLE if rpl_user not provided
 
@@ -456,7 +471,6 @@ class RplCommands(object):
                 self._report(error, logging.ERROR)
                 return False
         return True
-
 
     def execute_command(self, command, options={}):
         """Execute a replication admin command
@@ -517,7 +531,6 @@ class RplCommands(object):
 
         return True
 
-
     def auto_failover(self, interval):
         """Automatic failover
 
@@ -531,9 +544,6 @@ class RplCommands(object):
 
         Returns bool - True = success, raises exception on error
         """
-        import time
-        from mysql.utilities.command.failover_console import FailoverConsole
-
         failover_mode = self.options.get("failover_mode", "auto")
         force = self.options.get("force", False)
 
@@ -543,6 +553,11 @@ class RplCommands(object):
                                   self.topology.get_gtid_data,
                                   self.topology.get_server_uuids,
                                   self.options)
+
+        # Unregister existing instances from slaves
+        self._report("Unregistering existing instances from slaves.",
+                     logging.INFO, False)
+        console.unregister_slaves(self.topology)
 
         # Register instance
         self._report("Registering instance on master.", logging.INFO, False)
@@ -565,7 +580,7 @@ class RplCommands(object):
             time.sleep(1)
 
         try:
-            res = self.run_auto_failover(console, interval)
+            res = self.run_auto_failover(console, interval, failover_mode)
         except:
             raise
         finally:
@@ -580,8 +595,44 @@ class RplCommands(object):
 
         return res
 
+    def auto_failover_as_daemon(self):
+        """Automatic failover
 
-    def run_auto_failover(self, console, interval):
+        Wrapper class for running automatic failover as daemon.
+
+        This method ensures the registration/deregistration occurs
+        regardless of exception or errors.
+
+        Returns bool - True = success, raises exception on error
+        """
+        # Initialize failover daemon
+        failover_daemon = FailoverDaemon(self)
+        res = None
+
+        try:
+            action = self.options.get("daemon")
+            if action == "start":
+                res = failover_daemon.start()
+            elif action == "stop":
+                res = failover_daemon.stop()
+            elif action == "restart":
+                res = failover_daemon.restart()
+            else:
+                # Start failover deamon in foreground
+                res = failover_daemon.start(detach_process=False)
+        except:
+            try:
+                # Unregister instance
+                self._report("Unregistering instance on master.", logging.INFO,
+                             False)
+                failover_daemon.register_instance(False, False)
+                self._report("Failover daemon stopped.", logging.INFO, False)
+            except:
+                pass
+
+        return res
+
+    def run_auto_failover(self, console, interval, failover_mode="auto"):
         """Run automatic failover
 
         This method implements the automatic failover facility. It uses the
@@ -600,11 +651,6 @@ class RplCommands(object):
 
         Returns bool - True = success, raises exception on error
         """
-        import time
-        from mysql.utilities.common.tools import ping_host
-        from mysql.utilities.common.tools import execute_script
-
-        failover_mode = self.options.get("failover_mode", "auto")
         pingtime = self.options.get("pingtime", 3)
         timeout = int(self.options.get("timeout", 300))
         exec_fail = self.options.get("exec_fail", None)
@@ -771,6 +817,16 @@ class RplCommands(object):
                 self.topology.run_script(post_fail, False,
                                          [old_host, old_port,
                                           self.master.host, self.master.port])
+
+                # Unregister existing instances from slaves
+                self._report("Unregistering existing instances from slaves.",
+                             logging.INFO, False)
+                console.unregister_slaves(self.topology)
+
+                # Register instance on the new master
+                self._report("Registering instance on master.", logging.INFO,
+                             False)
+                failover_mode = console.register_instance()
 
             # discover slaves if option was specified at startup
             elif self.options.get("discover", None) is not None and \

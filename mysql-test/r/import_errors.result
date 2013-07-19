@@ -66,7 +66,7 @@ Test case 12 - error: bad SQL statements
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions from std_data/bad_sql.sql.
 ERROR: Invalid statement:
-CREATE TABLES util_test.t1 (a char(30)) ENGINE=MEMORY;
+CREATE TABLES util_test.t1 (a char(30)) ENGINE=MEMORY
 ERROR: Query failed.
 Test case 13 - error: --skip=create_db & --drop-first
 ERROR: You cannot combine --drop-first and --skip=create_db.

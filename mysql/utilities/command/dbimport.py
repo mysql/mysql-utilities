@@ -21,7 +21,6 @@ table data.
 """
 
 import csv
-import re
 
 from itertools import imap
 
@@ -73,7 +72,12 @@ def _read_row(file, format, skip_comments=False):
                 warnings_found.append(row)
                 continue
             if not (row.startswith('#') or row.startswith('--')):
-                yield row.strip('\n')
+                # Handle multi-line statements (do not strip).
+                # Note: delimiters have to be handled outside this function.
+                if len(row.strip()) == 0:
+                    yield ''  # empty row
+                else:
+                    yield row  # do not strip (can be multi-line)
     elif format == "vertical":
         # This format is a bit trickier. We need to read a set of rows that
         # encompass the data row. They will appear in this format:
@@ -250,61 +254,97 @@ def read_next(file, format, no_headers=False):
     """
     cmd_type = ""
     multiline = False
+    delimiter = ';'
     if format == "sql":
         sql_cmd = ""
         for row in _read_row(file, "sql", True):
-            first_word = row[0:row.find(' ')].upper() # find first word
-            # Skip these nonsense rows
+            first_word = row[0:row.find(' ')].upper()  # find first word
+            stripped_row = row.strip()  # Avoid repeating strip() operation.
+            # Skip these nonsense rows.
             if len(row) == 0 or row[0] == "#"or row[0:2] == "||":
                 continue
-            # Test for new statement
-            elif row[0:len("DELIMITER ;")].upper() == "DELIMITER ;":
-                yield (cmd_type, sql_cmd)
-                sql_cmd = ""
-                multiline = False
-            elif multiline: # save multiple line statements
-                sql_cmd += "\n%s" % row
-            elif row[0:len("DELIMITER ||")].upper() == "DELIMITER ||":
+            # Handle DELIMITER
+            elif stripped_row.upper().startswith('DELIMITER'):
                 if len(sql_cmd) > 0:
-                    #yield goes here
+                    # Yield previous SQL command.
                     yield (cmd_type, sql_cmd)
-                    sql_cmd = ""
+                sql_cmd = ''  # Reset SQL command (i.e. remove DELIMITER).
+                # Get delimiter from statement "DELIMITER <delimiter>".
+                delimiter = stripped_row[10:]
                 cmd_type = "sql"
-                multiline = True
-            elif len(row) > _GTID_PREFIX and \
-                  row[0:_GTID_PREFIX] in _GTID_COMMANDS:
-                #yield goes here
+                # Enable/disable multi-line according to the found delimiter.
+                if delimiter != ';':
+                    multiline = True
+                else:
+                    multiline = False
+            elif multiline and stripped_row.endswith(delimiter):
+                # Append last line to previous multi-line SQL and retrieve it,
+                # removing trailing whitespaces and delimiter.
+                sql_cmd = "{0}{1}".format(sql_cmd,
+                                          row.rstrip()[0:-len(delimiter)])
                 yield (cmd_type, sql_cmd)
+                sql_cmd = ''
+            elif multiline:  # Save multiple line statements.
+                sql_cmd = "{0}{1}".format(sql_cmd, row)
+            # Identify specific statements (command types).
+            elif (len(row) > _GTID_PREFIX
+                  and row[0:_GTID_PREFIX] in _GTID_COMMANDS):
+                # Remove trailing whitespaces and delimiter.
+                sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
+                if len(sql_cmd) > 0:
+                    # Yield previous SQL command.
+                    yield (cmd_type, sql_cmd)
                 cmd_type = "GTID_COMMAND"
                 sql_cmd = row
             elif first_word in _BASIC_COMMANDS:
+                # Remove trailing whitespaces and delimiter.
+                sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
                 if len(sql_cmd) > 0:
-                    #yield goes here
+                    # Yield previous sql command.
                     yield (cmd_type, sql_cmd)
                 cmd_type = "sql"
                 sql_cmd = row
             elif first_word in _RPL_COMMANDS:
+                # Remove trailing whitespaces and delimiter.
+                sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
                 if len(sql_cmd) > 0:
-                    #yield goes here
+                    # Yield previous SQL command.
                     yield (cmd_type, sql_cmd)
                 cmd_type = "RPL_COMMAND"
                 sql_cmd = row
             elif first_word in _DATA_COMMANDS:
-                cmd_type = "DATA"
+                # Remove trailing whitespaces and delimiter.
+                sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
                 if len(sql_cmd) > 0:
-                    #yield goes here
+                    # Yield previous sql command.
                     yield (cmd_type, sql_cmd)
+                cmd_type = "DATA"
                 sql_cmd = row
+            # If does not match previous conditions but ends with the delimiter
+            # then return the current SQL command.
+            elif stripped_row.endswith(delimiter):
+                # First, yield previous SQL command if it ends with delimiter.
+                if sql_cmd.strip().endswith(delimiter):
+                    yield (cmd_type, sql_cmd.rstrip()[0:-len(delimiter)])
+                    sql_cmd = ''
+                # Then, append SQL command to previous and retrieve it.
+                sql_cmd = "{0}{1}".format(sql_cmd,
+                                          row.rstrip()[0:-len(delimiter)])
+                # Yield current SQL command.
+                yield (cmd_type, sql_cmd)
+                sql_cmd = ''
+            # If does not end with the delimiter then append the SQL command.
             else:
-                sql_cmd += row
-        yield (cmd_type, sql_cmd) # need last row.
+                sql_cmd = "{0}{1}".format(sql_cmd, row)
+        # Remove trailing whitespaces and delimiter from last line.
+        sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
+        yield (cmd_type, sql_cmd)  # Need last row.
     elif format == "raw_csv":
         csv_reader = csv.reader(file, delimiter=",")
         for row in csv_reader:
             if row:
                 yield row
     else:
-        table_rows = []
         found_obj = ""
         for row in _read_row(file, format, False):
             # find first word
@@ -313,8 +353,7 @@ def read_next(file, format, no_headers=False):
                                                                  _RPL)].upper()
             else:
                 first_word = ""
-            if row[0][0:_RPL] == _RPL_PREFIX and \
-                first_word in _RPL_COMMANDS:
+            if row[0][0:_RPL] == _RPL_PREFIX and first_word in _RPL_COMMANDS:
                 # join the parts if CSV or TAB
                 if format in ['csv', 'tab']:
                     yield("RPL_COMMAND", ", ".join(row).strip("--"))
@@ -353,7 +392,8 @@ def read_next(file, format, no_headers=False):
                 continue
             else:
                 # We're reading rows here
-                if len(row[0]) > 0 and (row[0][0] == "#" or row[0][0:2] == "--"):
+                if (len(row[0]) > 0
+                    and (row[0][0] == "#" or row[0][0:2] == "--")):
                     continue
                 else:
                     yield (cmd_type, row)
@@ -367,15 +407,19 @@ def _get_db(row):
     Returns (string) database name or None if not found
     """
     db_name = None
-    if (row[0] in _DEFINITION_LIST or row[0] == "sql"):
+    if row[0] in _DEFINITION_LIST or row[0] == "sql":
         if row[0] == "sql":
             # Need crude parse here for database statement.
-            parts = ()
-            parts = row[1].split(" ")
-            if parts[0] == "DROP":
-                db_name = parts[4].strip(";")
-            else:
-                db_name = parts[1].strip(";")
+            parts = row[1].split()
+            # Identify the database name in statements:
+            # DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
+            # CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
+            if (parts[0] in ('DROP', 'CREATE')
+                and parts[1] in ('DATABASE', 'SCHEMA')):
+                db_name = parts[len(parts)-1].rstrip().strip(";")
+            # USE db_name
+            elif parts[0] == 'USE':
+                db_name = parts[1].rstrip().strip(";")
         else:
             if row[0] == "GRANT":
                 db_name = row[1][2]
@@ -1022,7 +1066,7 @@ def import_file(dest_val, file_name, options):
     if format == "sql":
         skip_header = False
     get_db = True
-    check_privileges = False
+    check_privileges = True
     db_name = None
     file = open(file_name)
     columns = []
@@ -1067,6 +1111,7 @@ def import_file(dest_val, file_name, options):
 
         # Check user permissions for write
         dest_db.check_write_access(dest_val['user'], dest_val['host'], options)
+        check_privileges = False  # No need to check privileges again.
 
         # Check table existence
         tbl = Table(destination, tbl_name)
@@ -1114,7 +1159,7 @@ def import_file(dest_val, file_name, options):
             if import_type != "data":
                 statements.append(row[1])
             continue
-        # If this is the first pass, get the database name from the file
+        # In the first pass, try to get the database name from the file
         if get_db:
             if skip_header:
                 skip_header = False
@@ -1123,7 +1168,8 @@ def import_file(dest_val, file_name, options):
                 # quote db_name with backticks if needed
                 if db_name and not is_quoted_with_backticks(db_name):
                     db_name = quote_with_backticks(db_name)
-                get_db = False
+                # No need to get the db_name when found.
+                get_db = False if db_name else get_db
                 if do_drop and import_type != "data":
                     statements.append("DROP DATABASE IF EXISTS %s;" % db_name)
                 if import_type != "data":
@@ -1133,7 +1179,7 @@ def import_file(dest_val, file_name, options):
 
         # This is the first time through the loop so we must
         # check user permissions on source for all databases
-        if db_name is not None:
+        if check_privileges and db_name:
             dest_db = Database(destination, db_name)
 
             # Make a dictionary of the options
@@ -1141,6 +1187,7 @@ def import_file(dest_val, file_name, options):
 
             dest_db.check_write_access(dest_val['user'], dest_val['host'],
                                        access_options)
+            check_privileges = False  # No need to check privileges again.
 
         # Now check to see if we want definitions, data, or both:
         if row[0] == "sql" or row[0] in _DEFINITION_LIST:
@@ -1217,7 +1264,6 @@ def import_file(dest_val, file_name, options):
     if len(table_rows) > 0:
         _process_data(tbl_name, statements, columns, table_col_list,
                       table_rows, skip_blobs, use_columns_names)
-        table_rows = []
     elif import_type == "data" and not has_data:
         print("# WARNING: No data was found.")
 

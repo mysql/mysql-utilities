@@ -1465,11 +1465,13 @@ class Topology(Replication):
                     not user_inst.has_privilege("*", "*", "GRANT OPTION") or
                     not user_inst.has_privilege("*", "*", "SELECT") or
                     not user_inst.has_privilege("*", "*", "RELOAD") or
+                    not user_inst.has_privilege("*", "*", "DROP") or
+                    not user_inst.has_privilege("*", "*", "CREATE") or
                     not user_inst.has_privilege("*", "*",
                                                 "REPLICATION SLAVE")):
                     errors.append((server.user, server.host, server.port,
                                    'SUPER, GRANT OPTION, REPLICATION SLAVE, '
-                                   'SELECT, RELOAD'))
+                                   'SELECT, RELOAD, DROP, CREATE'))
 
         # Disconnect if we connected to any candidates
         for slave in candidate_slaves:

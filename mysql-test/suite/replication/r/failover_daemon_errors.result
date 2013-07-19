@@ -1,0 +1,16 @@
+Test case 1 - Missing --log when using --daemon
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The option --log is required when using --daemon.
+Test case 2 - Missing --daemon when using --pidfile
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The option --daemon is required when using --pidfile.
+Test case 3 - Invalid --report-values value
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: The value for the option --report-values is not valid: 'unknown', the values allowed are 'health', 'gitd' or 'uuid'
+Test case 4 - Pidfile does not exist
+Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover.py: error: pidfile ###### does not exist.

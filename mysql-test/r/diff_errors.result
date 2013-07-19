@@ -1,10 +1,10 @@
 Test case 1 - Use diff  --difftype=differ
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# Comparing util_test to util_test                                 [PASS]
-# Comparing util_test.f1 to util_test.f1                           [PASS]
-# Comparing util_test.p1 to util_test.p1                           [PASS]
-# Comparing util_test.t1 to util_test.t1                           [FAIL]
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
 #
 

@@ -79,6 +79,14 @@ Options:
   -p, --pedantic        fail if some inconsistencies are found (e.g. errant
                         transactions on slaves).
   --no-keyboard         start with no keyboard input support.
+  --daemon=DAEMON       run on daemon mode. It can be start, stop, restart or
+                        nodetach.
+  --pidfile=PIDFILE     pidfile for running mysqlfailover as a daemon.
+  --report-values=REPORT_VALUES
+                        report values used in mysqlfailover running as a
+                        daemon. It can be health, gtid or uuid. Multiple
+                        values can be used separated by comma. By default all
+                        values are reported.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user

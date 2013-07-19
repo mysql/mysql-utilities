@@ -36,12 +36,23 @@ from mysql.utilities.exception import UtilError
 # The list includes a tuple for each command that contains the name of the
 # command, alias (if available) and its help text.
 _NEW_BASE_COMMANDS = [
-    { 'name' : 'help utilities',
-      'alias' : '',
-      'text' : 'Display list of all utilities supported.' },
-    { 'name' : 'help <utility>',
-      'alias' : '',
-      'text' : 'Display help for a specific utility.' },
+    {'name' : 'help utilities',
+     'alias': '',
+     'text' : 'Display list of all utilities supported.' },
+    {'name' : 'help <utility>',
+     'alias': '',
+     'text' : 'Display help for a specific utility.' },
+    {'name' : 'show errors',
+     'alias': '',
+     'text' : 'Display errors captured during the execution of the '
+              'utilities.' },
+    {'name' : 'clear errors',
+     'alias': '',
+     'text' : 'clear captured errors.' },
+    {'name' : 'show last error',
+     'alias': '',
+     'text' : 'Display the last error captured during the execution of the'
+              ' utilities' }
 ]
 
 _UTILS_MISSING = "MySQL Utilities are either not installed or " + \
@@ -71,15 +82,16 @@ class UtilitiesConsole(Console):
         Console.__init__(self, _NEW_BASE_COMMANDS, options)
         try:
             from mysql.utilities.common.utilities import get_util_path
-            path =  get_util_path(options.get("utildir", ""))
-            if path is None:
+            self.path =  get_util_path(options.get("utildir", ""))
+            if self.path is None:
                 raise
         except:
             raise UtilError(_UTILS_MISSING)
         self.utils = Utilities(options)
+        self.errors = []
         if self.quiet:
             self.f_out = tempfile.NamedTemporaryFile(delete=False)
-            print "Quiet mode, saving output to %s" % self.f_out.name
+            print("Quiet mode, saving output to {0}".format(self.f_out.name))
         else:
             self.f_out = None
 
@@ -104,7 +116,7 @@ class UtilitiesConsole(Console):
             elif len(matches) == 1:
                 self.show_utility_help(matches)
             else:
-                print "\n\nCannot find utility '%s'.\n" % arg
+                print("\n\nCannot find utility '{0}'.\n".format(arg))
 
 
     def do_custom_tab(self, prefix):
@@ -226,9 +238,9 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         options = self.utils.get_options_dictionary(utils[0])
-        print "\n%s\n" % utils[0]['usage']
-        print "%s - %s\n" % (utils[0]['name'], utils[0]['description'])
-        print "Options:"
+        print("\n{0}\n".format(utils[0]['usage']))
+        print("{0} - {1}\n".format(utils[0]['name'], utils[0]['description']))
+        print("Options:")
         print_dictionary_list(['Option', 'Description'],
                               ['long_name', 'description'],
                               options, self.width, False)
@@ -261,43 +273,82 @@ class UtilitiesConsole(Console):
         """
         if not command.lower().startswith('mysql'):
             command = 'mysql' + command
-        
-        # Search for the utility to execute (matching the command)
-        path = os.path.normpath(self.utils.util_path)
-        utility_path = os.path.join(path, command)
-        util_found = False
-        # If not exist without ext we try adding one.
-        if os.path.isfile(utility_path):
-            util_found = True
-        else:
-            parts = os.path.splitext(command)
-            if parts[1] == "":
-                exts = [command+'.py', command+'.exe']
-                for ext in exts:
-                    utility_path = os.path.join(path, ext)
-                    if os.path.isfile(utility_path):
-                        util_found = True
-                        break
+        # look in to the collected utilities
+        for util_info in self.utils.util_list:
+            if util_info["name"] == command:
+                # Get the command used to obtain the help from the utility
+                cmd = util_info["cmd"]
+                cmd.extend([parameters])
 
-        if not util_found:
-            raise UtilError("The utility %s is not accessible (from the path: "
-                            "%s)." % (command, path))
+                if self.quiet:
+                    proc = subprocess.Popen(cmd, shell=False,
+                                            stdout=self.f_out,
+                                            stderr=self.f_out)
+                else:
+                    proc = subprocess.Popen(" ".join(cmd), shell=True,
+                                            stderr=subprocess.PIPE)
+                    print
 
-        cmd = []
-        # In cases where the utility does not have permissions to execute,
-        # the use of the interpreter is necessary
-        if '.py' in utility_path or not '.exe' in utility_path:
-            cmd.append("{0} ".format(sys.executable))
+                # check the output for errors
+                stdout_temp, stderr_temp = proc.communicate()
+                return_code = proc.returncode
+                err_msg = ('An error was found, while executing the command, '
+                           'use "show last error" command to display details')
+                if not self.quiet and return_code and stderr_temp:
+                    print(err_msg)
+                    msg = ("Execution of utility: {0} {1} \nreturned "
+                           "errorcode: {2} with error message: \n{3}"
+                           "".format(command, parameters, return_code,
+                                     stderr_temp))
+                    self.errors.append(msg)
+                elif not self.quiet and return_code:
+                    print(err_msg)
+                    msg = ("Execution of utility: {0} {1} \nreturned "
+                           "errorcode: {2} and none error message"
+                           "".format(command, parameters, return_code))
+                    self.errors.append(msg)
+                return
+        # if got here, is because the utility was not found.
+        raise UtilError("The utility {0} is not accessible (from the path: "
+                        "{0}).".format(command, self.path))
 
-        cmd += ['"', utility_path, '"', ' ', parameters]
+    def show_errors(self):
+        """Show errors
 
+        Displays the errors captured when executing an utility.
+        """
         if self.quiet:
-            proc = subprocess.Popen("".join(cmd), shell=True,
-                                    stdout=self.f_out, stderr=self.f_out)
+            return
+        if not self.errors:
+            print
+            print("No errors to display.\n")
+        for error in self.errors:
+            print
+            print("{0}\n".format(error))
+
+    def clear_errors(self):
+        """Clear errors
+
+        Clears captured errors occurring while executing an utility.
+        """
+        if self.quiet:
+            return
+        self.errors = []
+        print
+
+    def show_last_error(self):
+        """Show errors
+
+        Displays the last error occurred when executing an utility.
+        """
+        if self.quiet:
+            return
+        if not self.errors:
+            print
+            print("None error to display.\n")
         else:
             print
-            proc = subprocess.Popen("".join(cmd), shell=True)
-        res = proc.wait()
+            print("{0}\n".format(self.errors[-1]))
 
     def show_custom_options(self):
         """Show all of the options for the mysqluc utility.
@@ -309,7 +360,7 @@ class UtilitiesConsole(Console):
         if self.quiet:
             return
         if len(self.options) == 0:
-            print "\n\nNo options specified.\n"
+            print("\n\nNo options specified.\n")
             return
 
         # Build a new list that normalizes the options as a dictionary

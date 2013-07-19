@@ -44,4 +44,4 @@ AVAILABLE_UTILITIES = {
     'mysqlserverinfo': (),
     'mysqluc': (),
     'mysqluserclone': (),
-    }
+}

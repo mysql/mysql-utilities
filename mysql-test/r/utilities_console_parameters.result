@@ -18,6 +18,13 @@ Options:
                         execute commands and exit. Multiple commands are
                         separated with semi-colons. Note: some platforms may
                         require double quotes around command list.
+  --add-utility=ADD_UTIL
+                        append an utility in the formatmysql<utility_name>.
+                        The mysql<utility_name> must be located inside the
+                        folder given by the utildir option
+  --hide-utils          when this option is given, the default utilities will
+                        not be available, must be used only along of --add-
+                        utility option
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
@@ -213,9 +220,6 @@ Option                     Description
                            annotated and marked as comments.      
 
 Test Case 7: Replacement
-Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
-
-mysqldiff: error: No objects specified to compare.
 
 
 
@@ -224,6 +228,7 @@ Variable  Value
 SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
 
 
+An error was found, while executing the command, use "show last error" command to display details
 
 Test Case 8: Long variables
 
@@ -240,3 +245,40 @@ Test Case 10: Invalid assigning in arguments
 Usage: mysqluc 
 
 mysqluc: error: Invalid argument assignment: c==3. Please check your command.
+Test Case 11: show last error command
+
+An error was found, while executing the command, use "show last error" command to display details
+
+
+Execution of utility: mysqlprocgrep  
+returned errorcode: 2 with error message: 
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+
+Test Case 12: clear errors command
+
+An error was found, while executing the command, use "show last error" command to display details
+
+
+
+None error to display.
+
+Test Case 13: show errors command
+
+An error was found, while executing the command, use "show last error" command to display details
+
+
+An error was found, while executing the command, use "show last error" command to display details
+
+
+Execution of utility: mysqlprocgrep  
+returned errorcode: 2 with error message: 
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+
+
+Execution of utility: mysqlprocgrep  
+returned errorcode: 2 with error message: 
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+

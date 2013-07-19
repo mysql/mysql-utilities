@@ -109,6 +109,19 @@ parser.add_option("-e", "--execute", action="store", dest="commands",
                   "platforms may require double quotes around command list.",
                   default=None)
 
+# Add utility extra_utilities option
+parser.add_option("--add-utility", action="append", dest="add_util",
+                  help="append an utility in the format"
+                  "mysql<utility_name>. The mysql<utility_name>.py must be "
+                  "located inside the folder given by the utildir option",
+                  default=[])
+
+# Add utility extra_utilities option
+parser.add_option("--hide-utils", action="store_true",
+                  dest="hide_util", help="when this option is given,"
+                  " the default utilities will not be available, must be used"
+                  " only along of --add-utility option", default=False)
+
 # Add verbosity mode
 add_verbosity(parser, True)
 
@@ -127,6 +140,16 @@ quiet = opt.quiet
 if opt.quiet is None:
     quiet = False
 
+if opt.hide_util and not opt.add_util:
+    # TODO: move to common/messages.py
+    parser.error("You can only use --hide_utils option along the "
+                 "--add-util option.")
+
+extra_utils_dict = {}
+for utility in opt.add_util:
+    extra_utils_dict[utility] = ()
+
+
 options = {
     'verbosity' : verbosity,
     'quiet'     : quiet,
@@ -138,6 +161,8 @@ options = {
     'goodbye'   : GOODBYE_MESSAGE,
     'commands'  : opt.commands,
     'custom'    : True, # We are using custom commands
+    'hide_util' : opt.hide_util,
+    'add_util'  : extra_utils_dict
 }
 
 try:

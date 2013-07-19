@@ -3,8 +3,8 @@ Test case 1 - create transform for objects for --changes-for=server1
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #        EVENT: e1
-# Comparing util_test to util_test                                 [PASS]
-# Comparing util_test.f1 to util_test.f1                           [FAIL]
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -14,7 +14,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `util_test`.`f1` () RETURNS int(11) C
 DELIMITER ;
 
 
-# Comparing util_test.p1 to util_test.p1                           [FAIL]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -24,9 +24,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `util_test`.`p1` (p1 CHAR(20)) CONTA
 DELIMITER ;
 
 
-# Comparing util_test.t1 to util_test.t1                           [PASS]
-# Comparing util_test.t2 to util_test.t2                           [PASS]
-# Comparing util_test.t3 to util_test.t3                           [FAIL]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [PASS]
+# Comparing `util_test`.`t2` to `util_test`.`t2`                   [PASS]
+# Comparing `util_test`.`t3` to `util_test`.`t3`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -37,7 +37,7 @@ ALTER TABLE `util_test`.`t3`
   ADD COLUMN d char(30) NULL AFTER a, 
 ENGINE=MyISAM, AUTO_INCREMENT=4;
 
-# Comparing util_test.t4 to util_test.t4                           [FAIL]
+# Comparing `util_test`.`t4` to `util_test`.`t4`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -46,14 +46,14 @@ ALTER TABLE `util_test`.`t4`
   DROP INDEX ref_t3, 
 ENGINE=MyISAM;
 
-# Comparing util_test.trg to util_test.trg                         [FAIL]
+# Comparing `util_test`.`trg` to `util_test`.`trg`                 [FAIL]
 # Transformation for --changes-for=server1:
 #
 
 DROP TRIGGER IF EXISTS `util_test`.`trg`;
 CREATE DEFINER=root@localhost TRIGGER util_test.trg BEFORE UPDATE ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t1 VALUES('Wax on, wax off');
 
-# Comparing util_test.v1 to util_test.v1                           [FAIL]
+# Comparing `util_test`.`v1` to `util_test`.`v1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -66,8 +66,8 @@ Test case 2 - create transform for objects for --changes-for=server2
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #        EVENT: e1
-# Comparing util_test to util_test                                 [PASS]
-# Comparing util_test.f1 to util_test.f1                           [FAIL]
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -77,7 +77,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `util_test`.`f1` () RETURNS int(11) C
 DELIMITER ;
 
 
-# Comparing util_test.p1 to util_test.p1                           [FAIL]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -87,9 +87,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `util_test`.`p1` (p1 CHAR(20)) CONTA
 DELIMITER ;
 
 
-# Comparing util_test.t1 to util_test.t1                           [PASS]
-# Comparing util_test.t2 to util_test.t2                           [PASS]
-# Comparing util_test.t3 to util_test.t3                           [FAIL]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [PASS]
+# Comparing `util_test`.`t2` to `util_test`.`t2`                   [PASS]
+# Comparing `util_test`.`t3` to `util_test`.`t3`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -100,7 +100,7 @@ ALTER TABLE `util_test`.`t3`
   ADD COLUMN b varchar(30) NULL AFTER a, 
 ENGINE=InnoDB, AUTO_INCREMENT=5;
 
-# Comparing util_test.t4 to util_test.t4                           [FAIL]
+# Comparing `util_test`.`t4` to `util_test`.`t4`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -109,14 +109,14 @@ ADD CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES `util_test`.`t3`(a),
   ADD INDEX ref_t3 (c), 
 ENGINE=InnoDB;
 
-# Comparing util_test.trg to util_test.trg                         [FAIL]
+# Comparing `util_test`.`trg` to `util_test`.`trg`                 [FAIL]
 # Transformation for --changes-for=server2:
 #
 
 DROP TRIGGER IF EXISTS `util_test`.`trg`;
 CREATE DEFINER=root@localhost TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 
-# Comparing util_test.v1 to util_test.v1                           [FAIL]
+# Comparing `util_test`.`v1` to `util_test`.`v1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -129,8 +129,8 @@ Test case 3 - create transform for objects for --changes-for=server1 with revers
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #        EVENT: e1
-# Comparing util_test to util_test                                 [PASS]
-# Comparing util_test.f1 to util_test.f1                           [FAIL]
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -150,7 +150,7 @@ DELIMITER ;
 # 
 #
 
-# Comparing util_test.p1 to util_test.p1                           [FAIL]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -170,9 +170,9 @@ DELIMITER ;
 # 
 #
 
-# Comparing util_test.t1 to util_test.t1                           [PASS]
-# Comparing util_test.t2 to util_test.t2                           [PASS]
-# Comparing util_test.t3 to util_test.t3                           [FAIL]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [PASS]
+# Comparing `util_test`.`t2` to `util_test`.`t2`                   [PASS]
+# Comparing `util_test`.`t3` to `util_test`.`t3`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -194,7 +194,7 @@ ENGINE=MyISAM, AUTO_INCREMENT=4;
 # ENGINE=InnoDB, AUTO_INCREMENT=5;
 #
 
-# Comparing util_test.t4 to util_test.t4                           [FAIL]
+# Comparing `util_test`.`t4` to `util_test`.`t4`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -212,7 +212,7 @@ ENGINE=MyISAM;
 # ENGINE=InnoDB;
 #
 
-# Comparing util_test.trg to util_test.trg                         [FAIL]
+# Comparing `util_test`.`trg` to `util_test`.`trg`                 [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -226,7 +226,7 @@ CREATE DEFINER=root@localhost TRIGGER util_test.trg BEFORE UPDATE ON util_test.t
 # CREATE DEFINER=root@localhost TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 #
 
-# Comparing util_test.v1 to util_test.v1                           [FAIL]
+# Comparing `util_test`.`v1` to `util_test`.`v1`                   [FAIL]
 # Transformation for --changes-for=server1:
 #
 
@@ -246,8 +246,8 @@ Test case 4 - create transform for objects for --changes-for=server2 with revers
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #        EVENT: e1
-# Comparing util_test to util_test                                 [PASS]
-# Comparing util_test.f1 to util_test.f1                           [FAIL]
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -267,7 +267,7 @@ DELIMITER ;
 # 
 #
 
-# Comparing util_test.p1 to util_test.p1                           [FAIL]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -287,9 +287,9 @@ DELIMITER ;
 # 
 #
 
-# Comparing util_test.t1 to util_test.t1                           [PASS]
-# Comparing util_test.t2 to util_test.t2                           [PASS]
-# Comparing util_test.t3 to util_test.t3                           [FAIL]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [PASS]
+# Comparing `util_test`.`t2` to `util_test`.`t2`                   [PASS]
+# Comparing `util_test`.`t3` to `util_test`.`t3`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -311,7 +311,7 @@ ENGINE=InnoDB, AUTO_INCREMENT=5;
 # ENGINE=MyISAM, AUTO_INCREMENT=4;
 #
 
-# Comparing util_test.t4 to util_test.t4                           [FAIL]
+# Comparing `util_test`.`t4` to `util_test`.`t4`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -329,7 +329,7 @@ ENGINE=InnoDB;
 # ENGINE=MyISAM;
 #
 
-# Comparing util_test.trg to util_test.trg                         [FAIL]
+# Comparing `util_test`.`trg` to `util_test`.`trg`                 [FAIL]
 # Transformation for --changes-for=server2:
 #
 
@@ -343,7 +343,7 @@ CREATE DEFINER=root@localhost TRIGGER util_test.trg AFTER INSERT ON util_test.t1
 # CREATE DEFINER=root@localhost TRIGGER util_test.trg BEFORE UPDATE ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t1 VALUES('Wax on, wax off');
 #
 
-# Comparing util_test.v1 to util_test.v1                           [FAIL]
+# Comparing `util_test`.`v1` to `util_test`.`v1`                   [FAIL]
 # Transformation for --changes-for=server2:
 #
 

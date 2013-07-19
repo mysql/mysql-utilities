@@ -10,7 +10,7 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 #     may be redundant or duplicate of:
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 # Getting indexes for util_test_a.t2
-# Table util_test_a.t2 has no duplicate indexes.
+# Table util_test_a.t2 has no duplicate nor redundant indexes.
 Test case 2 - show worst indexes on small database
 # Getting indexes for util_test_a.t1
 # The following indexes are duplicates or redundant for table util_test_a.t1:
@@ -23,4 +23,4 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 #     may be redundant or duplicate of:
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 # Getting indexes for util_test_a.t2
-# Table util_test_a.t2 has no duplicate indexes.
+# Table util_test_a.t2 has no duplicate nor redundant indexes.

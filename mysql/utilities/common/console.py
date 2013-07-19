@@ -702,6 +702,12 @@ class Console(object):
             self._add_variable(command[4:])
             if not self.quiet:
                 print
+        elif command[0:11].lower() == 'show errors':
+            self.show_errors()
+        elif command[0:12].lower() == 'clear errors':
+            self.clear_errors()
+        elif command[0:15].lower() == 'show last error':
+            self.show_last_error()
         elif command[0:14].lower() == 'show variables':
             self.variables.show_variables()
         elif self.custom_commands and \

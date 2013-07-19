@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import check_index
 from mysql.utilities.exception import MUTLibError
+
 
 class test(check_index.test):
     """check parameters for the check_index utility
@@ -32,60 +33,101 @@ class test(check_index.test):
 
     def run(self):
         self.res_fname = "result.txt"
-        from_conn = "--server=" + self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1)
+        )
 
-        cmd_str = "mysqlindexcheck.py %s " % from_conn
+        cmd_str = "mysqlindexcheck.py {0}".format(from_conn)
 
-        comment = "Test case 1 - do the help"
-        res = self.run_test_case(0, cmd_str + "--help", comment)
+        test_num = 1
+        comment = "Test case {0} - do the help".format(test_num)
+        cmd = "{0} --help".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlindexcheck.py"
                                            " version", 6)
 
-        comment = "Test case 2 - show drops for a table with dupe indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops "
-                                 "-vv", comment)
+        test_num += 1
+        comment = ("Test case {0} - show drops for a table with dupe (-vv) "
+                   "indexes").format(test_num)
+        cmd = "{0} util_test_a.t1 --show-drops -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - show drops for a table with dupe indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 -d",
-                                 comment)
+        test_num += 1
+        comment = ("Test case {0} - show drops for a table with dupe "
+                   "indexes").format(test_num)
+        cmd = "{0} util_test_a.t1 -d".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - show drops for a table without dupe indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6 --show-drops "
-                                 "-vv", comment)
+        test_num += 1
+        comment = ("Test case {0} - show drops for a table without dupe (-vv) "
+                   "indexes").format(test_num)
+        cmd = "{0} util_test_c.t6 --show-drops -vv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 5 - same as test case 2 but quiet"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-drops ",
-                                 comment)
+        test_num += 1
+        comment = ("Test case {0} - same as test case 2 but "
+                   "quiet").format(test_num)
+        cmd = "{0} util_test_a.t1 --show-drops".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 6 - same as test case 4 but quiet"
-        res = self.run_test_case(0, cmd_str + "util_test_c.t6 -d ",
-                                 comment)
+        test_num += 1
+        comment = ("Test case {0} - same as test case 4 but "
+                   "quiet").format(test_num)
+        cmd = "{0} util_test_c.t6 -d".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 7 - show indexes"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 --show-indexes",
-                                 comment)
+        test_num += 1
+        comment = "Test case {0} - show indexes".format(test_num)
+        cmd = "{0} util_test_a.t1 --show-indexes".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 8 - show indexes with -i"
-        res = self.run_test_case(0, cmd_str + "util_test_a.t1 -i ",
-                                 comment)
+        test_num += 1
+        comment = "Test case {0} - show indexes with -i".format(test_num)
+        cmd = "{0} util_test_a.t1 -i".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            return False
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - find redundancy with the clustered "
+                   "index (InnoDB)").format(test_num)
+        cmd = "{0} util_test_d.cluster_idx -d -i --stats -vvv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - not find redundancy with the clustered "
+                   "index (not InnoDB)").format(test_num)
+        cmd = "{0} util_test_d.no_cluster_idx -d -i --stats -vvv".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - find various redundancies (and duplicates) "
+                   "with the clustered index (InnoDB)").format(test_num)
+        cmd = ("{0} util_test_d.various_cluster_idx -d -i --stats "
+               "-vvv").format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source host name.
         self.replace_result("# Source on ",
