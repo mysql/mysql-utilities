@@ -31,7 +31,6 @@ import datetime
 import optparse
 import os
 import re
-import termios
 import time
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.tools import get_tool_path
@@ -556,6 +555,7 @@ print("=" * opt.width)
 
 # Protect against interactive consoles that fail: save terminal settings.
 if os.name == "posix":
+    import termios
     restore_terminal = True
     try:  # Guard against non supported tty devices
         old_terminal_settings = termios.tcgetattr(sys.stdin)
