@@ -28,7 +28,17 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
+        # Check available cloned servers and spawn one if needed.
+        if self.servers.num_servers() < 2:
+            try:
+                self.servers.spawn_new_servers(2)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
+        # Get first cloned server (only one needed).
+        self.server1 = self.servers.get_server(1)
+
+        # Load users data for test.
         data_file = "./std_data/basic_users.sql"
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
@@ -145,7 +155,8 @@ class test(mutlib.System_test):
         test_case = 9
         comment = ("Test case {0} - mysqluserclone --list with --destination"
                    "".format(test_case))
-        cmd_str = "mysqluserclone.py -l {0} {1}".format(from_conn, to_conn)
+        cmd_str = ("mysqluserclone.py --list --format=csv {0} {1}"
+                   "").format(from_conn, to_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -164,8 +175,12 @@ class test(mutlib.System_test):
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Destination on ",
                             "# Destination on XXXX-XXXX: ... connected.\n")
-        self.replace_result("| root          |",
-                            "| root          | xxxxxxxxxx |\n")
+        # Mask root,localhost (should exist on all MySQL server versions).
+        self.replace_result("root,localhost", "ROOT,LOCALHOST\n")
+        # Remove all other root users with different hosts (not localhost).
+        self.remove_result("root,")
+        # Remove possible leftovers from other tests.
+        self.remove_result("joe_wildcard,")
 
         return True
 
@@ -210,6 +225,9 @@ class test(mutlib.System_test):
         if not res:
             return False
         res = self.drop_user("'john'@'user'", self.server1)
+        if not res:
+            return False
+        res = self.drop_user("'joe_wildcard'@'%'", self.server1)
         if not res:
             return False
         return True

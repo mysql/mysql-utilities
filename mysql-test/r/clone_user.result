@@ -66,22 +66,15 @@ Test case 9 - mysqluserclone --list with --destination
 WARNING: The --destination option is not required for '--list' (option ignored).
 # Source on XXXX-XXXX: ... connected.
 # All Users:
-+---------------+------------+
-| user          | host       |
-+---------------+------------+
-| joe_pass      | %          |
-| joe_wildcard  | %          |
-| root          | xxxxxxxxxx |
-| root          | xxxxxxxxxx |
-| root          | xxxxxxxxxx |
-| root          | xxxxxxxxxx |
-| amy_nopass    | user       |
-| jack          | user       |
-| jill          | user       |
-| joe_nopass    | user       |
-| joe_pass      | user       |
-| john          | user       |
-+---------------+------------+
+user,host
+joe_pass,%
+ROOT,LOCALHOST
+amy_nopass,user
+jack,user
+jill,user
+joe_nopass,user
+joe_pass,user
+john,user
 Test case 10 - mysqluserclone --dump with --destination
 WARNING: The --destination option is not required for '--dump' (option ignored).
 # Source on XXXX-XXXX: ... connected.

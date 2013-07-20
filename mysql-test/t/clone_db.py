@@ -139,10 +139,13 @@ class test(mutlib.System_test):
             self.drop_db(self.server1, "db`:db_clone")
         except:
             res = res and False
-        try:
-            self.server1.exec_query("DROP USER 'joe'@'user'")
-        except:
-            pass
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
+        for drop in drop_user:
+            try:
+                self.server1.exec_query(drop)
+                self.server2.exec_query(drop)
+            except:
+                pass
         return res
 
     def cleanup(self):

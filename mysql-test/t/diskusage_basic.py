@@ -184,7 +184,12 @@ class test(mutlib.System_test):
             )
         except UtilError:
             pass  # Ignore DROP USER failure in case user does not exist.
-
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
+        for drop in drop_user:
+            try:
+                self.server1.exec_query(drop)
+            except:
+                pass
         # Drop database.
         return self.drop_db(self.server1, "util_test")
 
