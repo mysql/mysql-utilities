@@ -159,6 +159,13 @@ class test(mutlib.System_test):
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server2, "util_test")
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
+        for drop in drop_user:
+            try:
+                self.server1.exec_query(drop)
+                self.server2.exec_query(drop)
+            except:
+                pass
         return True
 
     def cleanup(self):
