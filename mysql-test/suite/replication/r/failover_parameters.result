@@ -85,8 +85,8 @@ Options:
   --report-values=REPORT_VALUES
                         report values used in mysqlfailover running as a
                         daemon. It can be health, gtid or uuid. Multiple
-                        values can be used separated by comma. By default is
-                        'health'.
+                        values can be used separated by commas. The default is
+                        health.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user
