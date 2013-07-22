@@ -171,7 +171,7 @@ parser.add_option("--report-values", action="store", dest="report_values",
                   type="string", default="health",
                   help="report values used in mysqlfailover running as a "
                   "daemon. It can be health, gtid or uuid. Multiple values "
-                  "can be used separated by comma. By default is 'health'.")
+                  "can be used separated by commas. The default is health.")
 
 # Add verbosity mode
 add_verbosity(parser, False)
