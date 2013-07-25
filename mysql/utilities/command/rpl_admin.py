@@ -588,7 +588,7 @@ class RplCommands(object):
                 # Unregister instance
                 self._report("Unregistering instance on master.", logging.INFO,
                              False)
-                console.register_instance(False, False)
+                console.register_instance(True, False)
                 self._report("Failover console stopped.", logging.INFO, False)
             except:
                 pass
@@ -625,7 +625,7 @@ class RplCommands(object):
                 # Unregister instance
                 self._report("Unregistering instance on master.", logging.INFO,
                              False)
-                failover_daemon.register_instance(False, False)
+                failover_daemon.register_instance(True, False)
                 self._report("Failover daemon stopped.", logging.INFO, False)
             except:
                 pass
