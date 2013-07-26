@@ -25,8 +25,10 @@ import re
 import subprocess
 import sys
 import tempfile
+import uuid
 
 from mysql.utilities.command import serverclone
+from mysql.utilities.command.serverclone import user_change_as_root
 from mysql.utilities.common.frm_reader import FrmReader
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.server import stop_running_server
@@ -123,7 +125,17 @@ def _spawn_server(options):
     start_timeout = int(options.get("start_timeout", 10))
 
     # 1) create a directory to use for new datadir
-    temp_datadir = tempfile.mkdtemp()
+
+    # If the user is not the same as the user running the script...
+    if user_change_as_root(options):
+        # Since Python libraries correctly restrict temporary folders to
+        # the user who runs the script and /tmp is protected on some
+        # platforms, we must create the folder in the current folder
+        temp_datadir = os.path.join(os.getcwd(), str(uuid.uuid4()))
+        os.mkdir(temp_datadir)
+    else:
+        temp_datadir = tempfile.mkdtemp()
+
     if verbosity > 1 and not quiet:
         print "# Creating a temporary datadir =", temp_datadir
 
@@ -215,7 +227,7 @@ def _get_create_statement(server, temp_datadir,
     read_frm_files_diagnostic() above.
 
     server[in]          Server instance
-    temp_daradir[in]    New data directory
+    temp_datadir[in]    New data directory
     frm_file[in]        Tuple containing (db, table, path) for .frm file
     version[in]         Version string for the current server
     options[in]         Options from user
@@ -225,6 +237,7 @@ def _get_create_statement(server, temp_datadir,
     verbosity = int(options.get("verbosity", 0))
     quiet = options.get("quiet", False)
     new_engine = options.get("new_engine", None)
+    user = options.get('user', 'root')
 
     if not quiet:
         print "#\n# Reading the %s.frm file." % frm_file[1]
@@ -255,6 +268,11 @@ def _get_create_statement(server, temp_datadir,
                 copy(frm_file[2], new_path)
         except Exception, e:
             print("ERROR: {0}".format(e))
+
+        # Set permissons on copied file if user context in play
+        if user_change_as_root(options):
+            subprocess.call(['chown', '-R', user, new_path])
+            subprocess.call(['chgrp', '-R', user, new_path])
 
         server.exec_query("CREATE DATABASE IF NOT EXISTS %s" % db_name)
 
@@ -426,6 +444,11 @@ def read_frm_files(file_names, options):
         if verbosity > 1 and not quiet:
             print "# Shutting down spawned server"
             print "# Removing the temporary datadir"
+        if user_change_as_root(options):
+            try:
+                os.unlink(temp_datadir)
+            except OSError:
+                pass  # ignore if we cannot delete
 
         stop_running_server(server)
 

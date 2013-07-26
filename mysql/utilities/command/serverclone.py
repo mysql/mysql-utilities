@@ -20,6 +20,7 @@ This file contains the clone server utility which launches a new instance
 of an existing server.
 """
 
+import getpass
 import os
 import re
 import subprocess
@@ -229,6 +230,12 @@ def clone_server(conn_val, options):
     if not quiet:
         print "# Starting new instance of the server..."
 
+    # If the user is not the same as the user running the script...
+    # and this is a Posix system... and we are running as root
+    if user_change_as_root(options):
+        subprocess.call(['chown', '-R', user, new_data])
+        subprocess.call(['chgrp', '-R', user, new_data])
+
     cmd = [mysqld_path, '--no-defaults']
     cmd.extend([
         '--datadir={0}'.format(new_data),
@@ -239,6 +246,8 @@ def clone_server(conn_val, options):
         '--basedir={0}'.format(mysql_basedir),
         '--socket={0}'.format(os.path.join(new_data, 'mysql.sock')),
         ])
+    if user:
+        cmd.append('--user={0}'.format(user))
 
     if mysqld_options:
         if isinstance(mysqld_options, (list, tuple)):
@@ -257,7 +266,6 @@ def clone_server(conn_val, options):
                 cmd.append(mysqld_options)
             else:
                 cmd.extend(shlex.split(new_opts))
-        cmd.append('--user=root')
 
     # Strip spaces from each option
     cmd = [opt.strip(' ') for opt in cmd]
@@ -321,7 +329,7 @@ def clone_server(conn_val, options):
 
     if i == start_timeout:
         raise UtilError("Unable to communicate with new instance. "
-                        "Process id = {0}.".format(proc_id))
+                        "Process id = {0}.".format(proc.pid))
     elif not quiet:
         print "# Success!"
 
@@ -357,3 +365,24 @@ def clone_server(conn_val, options):
         print "#...done."
 
     fnull.close()
+
+
+def user_change_as_root(options):
+    """ Detect if the user context must change for spawning server as root
+
+    This method checks to see if the current user executing the utility is
+    root and there is a different user being requested. If the user being
+    requested is None or is root and we are running as root or the user
+    being requested is the same as the current user, the method returns False.
+
+    Note: This method only works for POSIX systems. It returns False for
+          non-POSIX systems.
+
+    options[in]         Option dictionary
+
+    Returns bool - user context must occur
+    """
+    user = options.get('user', 'root')
+    if not user or not os.name == 'posix':
+        return False
+    return not getpass.getuser() == user and getpass.getuser() == 'root'
