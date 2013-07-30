@@ -1,7 +1,7 @@
 MySQL Utilities 1.3 (part of MySQL Workbench Distribution 5.2)
 
-This is a release of MySQL Utilities, the dual-license, 
-complete database modeling, administration and development
+This is a release of MySQL Utilities (part of MySQL Workbench Distribution),
+the dual-license, complete database modeling, administration and development
 program for MySQL. For the avoidance of doubt, this 
 particular copy of the software is released under the 
 version 2 of the GNU General Public License. MySQL Utilities

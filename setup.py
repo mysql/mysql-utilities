@@ -30,7 +30,7 @@ from distutils.command.install import install as _install
 from distutils.command.install_scripts import \
     install_scripts as _install_scripts
 from distutils.util import change_root
-from distutils.file_util import write_file
+from distutils.file_util import DistutilsFileError, write_file
 from distutils import log, dir_util
 
 from info import META_INFO, INSTALL
@@ -47,22 +47,36 @@ COMMANDS = {
 
 # Custom bdist_rpm DistUtils command
 try:
-    from support.dist_rpm import BuiltDistRPM, SourceRPM
+    from support.dist_rpm import BuiltDistRPM, BuiltCommercialRPM, SourceRPM
 except ImportError:
     pass # Use default when not available
 else:
     COMMANDS['cmdclass'].update({
         'bdist_rpm': BuiltDistRPM,
         'sdist_rpm': SourceRPM,
+        'bdist_com_rpm': BuiltCommercialRPM
     })
 
 try:
-    from support.dist_deb import BuildDistDebian
+    from support.distribution.commands import build, bdist, sdist
+except ImportError:
+    pass # Use default when not available
+else:
+    COMMANDS['cmdclass'].update({
+        'build': build.Build,
+        'sdist_com': sdist.SourceCommercial,
+        'bdist_com': bdist.BuiltCommercial
+    })
+
+try:
+    from support.dist_deb import BuildDistDebian, BuildCommercialDistDebian
+                                  
 except ImportError:
     pass
 else:
     COMMANDS['cmdclass'].update({
-        'bdist_deb': BuildDistDebian
+        'bdist_deb': BuildDistDebian,
+        'bdist_com_deb': BuildCommercialDistDebian
     })
 ARGS = {
 }
@@ -283,7 +297,13 @@ class build_scripts(_build_scripts):
         # distutils is compatible with 2.1 so we cannot use super() to
         # call it.
         _build_scripts.run(self)
+        self.outfiles = self.scripts
         self.scripts = saved_scripts
+        
+
+    def get_outputs(self):
+        """Get installed files"""
+        return self.outfiles
 
 COMMANDS['cmdclass'].update({
         'install': install,

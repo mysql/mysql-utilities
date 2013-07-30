@@ -30,6 +30,7 @@ META_INFO = {
     'version': mysql.utilities.VERSION_STRING,
     'url': 'http://dev.mysql.com',
     'license': 'GNU GPLv2 (with FOSS License Exception)',
+    'keywords': "mysql db",
     'classifiers': [
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 2.6',

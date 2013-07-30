@@ -22,7 +22,7 @@ import subprocess
 import fnmatch
 
 from distutils.core import Command
-from distutils.dir_util import remove_tree, copy_tree
+from distutils.dir_util import remove_tree, mkpath
 from distutils.file_util import copy_file
 from distutils import log
 from distutils.errors import DistutilsError
@@ -173,4 +173,133 @@ class BuiltExeRPM(BuiltDistRPM):
         bdist.run()
 
         self._create_rpm()
+
+class _RPMDist(Command):
+    """Create a RPM distribution"""
+    def _populate_topdir(self):
+        """Create and populate the RPM topdir"""
+        mkpath(self.topdir)
+        dirs = ['BUILD', 'RPMS', 'SOURCES', 'SPECS', 'SRPMS']
+        self._rpm_dirs = {}
+        for dirname in dirs:
+            self._rpm_dirs[dirname] = os.path.join(self.topdir, dirname)
+            self.mkpath(self._rpm_dirs[dirname])
+    
+    def _prepare_distribution(self):
+        raise NotImplemented
+
+    def eval(self, expr):
+        """Returns macro expansion
+
+        This method uses the --eval option of the rpm command line
+        tool to return the macro expansion of expr.
+
+        For example, to learn the value of %_prefix:
+          self.eval('%_prefix')
+
+        Returns a string.
+        """
+        cmd = ['rpm', '--eval', "'{0}'".format(expr)]
+        prc = subprocess.Popen(' '.join(cmd),
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               shell=True)
+        (stdoutdata, stderrdata) = prc.communicate()
+        return stdoutdata.strip()
+
+    def _create_rpm(self, rpm_name):
+        log.info("creating RPM using rpmbuild")
+        macro_bdist_dir = "bdist_dir " + os.path.join(rpm_name, '')
+        cmd = ['rpmbuild',
+            '-bb',
+            '--define', macro_bdist_dir,
+            '--define', "_topdir " + os.path.abspath(self.topdir),
+            self.rpm_spec
+            ]
+        #if not self.verbose:
+        #   cmd.append('--quiet')
+
+        self.spawn(cmd)
+
+        rpms = os.path.join(self.topdir, 'RPMS')
+        for base, dirs, files in os.walk(rpms):
+            for filename in files:
+                if filename.endswith('.rpm'):
+                    filepath = os.path.join(base, filename)
+                    copy_file(filepath, self.dist_dir)
+
+    def run(self):
+        """Run the distutils command"""
+        # check whether we can execute rpmbuild
+        if not self.dry_run:
+            try:
+                devnull = open(os.devnull, 'w')
+                subprocess.Popen(['rpmbuild', '--version'],
+                                 stdin=devnull, stdout=devnull)
+            except OSError:
+                raise DistutilsError("Cound not execute rpmbuild. Make sure "
+                                     "it is installed and in your PATH")
+        
+        # build command: to get the build_base
+        cmdbuild = self.get_finalized_command("build")
+        cmdbuild.verbose = self.verbose 
+        self.build_base = cmdbuild.build_base
+        self.topdir = os.path.join(self.build_base, 'rpmtopdir')
+
+        self._prepare_distribution()
+        self._populate_topdir()
+        log.info("self.bdist_dir {0}".format(self.bdist_dir))
+        log.info("self.dist_dir {0}".format(self.bdist_dir))
+        self._create_rpm(rpm_name=self.target_rpm)
+
+        if not self.keep_temp:
+            remove_tree(self.build_base, dry_run=self.dry_run)
+
+
+class BuiltCommercialRPM(_RPMDist):
+    """Create a Built Commercial RPM distribution"""
+    description = 'create a commercial built RPM distribution'
+    user_options = [
+        ('bdist-dir=', 'd',
+         "temporary directory for creating the distribution"),
+        ('keep-temp', 'k',
+         "keep the pseudo-installation tree around after "
+         "creating the distribution archive"),
+        ('dist-dir=', 'd',
+         "directory to put final built distributions in"),
+        ('include-sources', None,
+         "exclude sources built distribution (default: True)"),
+    ]
+
+    boolean_options = [
+        'keep-temp', 'include-sources'
+    ]
+
+    def initialize_options(self):
+        """Initialize the options"""
+        self.bdist_dir = None
+        self.keep_temp = 0
+        self.dist_dir = None
+        self.include_sources = False
+    
+    def finalize_options(self):
+        """Finalize the options"""
+        self.set_undefined_options('bdist',
+                                   ('dist_dir', 'dist_dir'))
+
+        mkpath(self.dist_dir)
+        self.rpm_spec = 'support/RPM/mysql_utilities_com.spec'
+    
+    def _prepare_distribution(self):
+        """Prepare the distribution"""
+        cmd = self.get_finalized_command("bdist_com")
+        cmd.dry_run = self.dry_run
+        cmd.dist_dir = os.path.join(self.topdir, 'BUILD')
+        cmd.keep_temp = True
+        #cmd.formats = ['gztar']
+        self.run_command("bdist_com")
+        self.bdist_dir = cmd.bdist_dir
+        #self.dist_dir = cmd.dist_dir
+        self.target_rpm = cmd.dist_name
+
 

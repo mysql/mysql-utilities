@@ -66,6 +66,8 @@ class _MSIDist(bdist):
         self.plat_name = None
         self.dist_dir = None
         self.keep_temp = False
+        self.dist_type = None
+        self.dist_target = None
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -135,6 +137,10 @@ class _MSIDist(bdist):
                         install=self.wix_install)
         
         # WiX preprocessor variables
+        if self.dist_type == 'com':
+            liscense_file = 'License_com.rtf'
+        else:
+            liscense_file = 'License.rtf'
         params = {
             'ProductName': 'MySQL Utilities',
             'ReleaseString': RELEASE_STRING,
@@ -149,14 +155,12 @@ class _MSIDist(bdist):
             'Patch_Version': patch,
             'PythonInstallDir': 'Python%s' % pyver.replace('.', ''),
             'BuildDir': os.path.abspath(self.bdist_base),
+            #'BDist': os.path.abspath(self.dist_target),
+            'PyExt': 'pyc' if not self.include_sources else 'py',
             'BitmapDir': os.path.join(os.getcwd(), 'support', 'MSWindows'),
             'UpgradeCode': upgrade_code,
-            'ManualPDF': os.path.abspath(os.path.join('docs',
-                                                      'mysql-utilities.pdf')),
-            'ManualHTML': os.path.abspath(os.path.join('docs',
-                                                       'mysql-utilities.html')),
             'LicenseRtf': os.path.abspath(
-                os.path.join('support', 'MSWindows', 'License.rtf')),
+                os.path.join('support', 'MSWindows', liscense_file)),
         }
         
         wixer.set_parameters(params)
@@ -216,6 +220,7 @@ class MSIBuiltDist(_MSIDist):
         """Initialize the options"""
         _MSIDist.initialize_options(self)
         self.wix_install = None
+        self.include_sources = False
     
     def finalize_options(self):
         """Finalize the options"""
@@ -246,5 +251,82 @@ class MSIBuiltDist(_MSIDist):
             log.info("creating and fixing text file %s", txtfile)
             builttxt = os.path.join(self.bdist_base, txtfile)
             open(builttxt, 'w').write(open(txtfile).read())
+
+
+class BuiltCommercialMSI(_MSIDist):
+    """Create a Built Commercial MSI distribution"""
+    description = 'create a commercial built MSI distribution'
+    user_options = [
+        ('bdist-base=', 'd',
+         "temporary directory for creating the distribution"),
+        ('keep-temp', 'k',
+         "keep the pseudo-installation tree around after " +
+         "creating the distribution archive"),
+        ('dist-dir=', 'd',
+         "directory to put final built distributions in"),
+        ('include-sources', None,
+         "exclude sources built distribution (default: True)"),
+        ('wix-install', None,
+         "location of the Windows Installer XML installation"
+         "(default: %s)" % wix.WIX_INSTALL_PATH),
+    ]
+
+    boolean_options = [
+        'keep-temp', 'include-sources'
+    ]
+    
+    def initialize_options (self):
+        """Initialize the options"""
+        self.bdist_base = None
+        self.keep_temp = 0
+        self.dist_dir = None
+        self.plat_name = None
+        self.include_sources = False
+        self.wix_install = wix.WIX_INSTALL_PATH
+        self.python_version = get_python_version()
+        self.dist_type =''#'com'
+    
+    def finalize_options(self):
+        """Finalize the options"""
+        self.set_undefined_options('bdist',
+                                   ('dist_dir', 'dist_dir'),
+                                   ('plat_name', 'plat_name'))
+
+        self.wxs = 'support/MSWindows/mysql_utilities.xml'
+        self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
+
+    def _get_wixobj_name(self, app_version=None, python_version=None):
+        """Get the name for the wixobj-file
+
+        Return string
+        """
+        appver = app_version or self.distribution.metadata.version
+        pyver = python_version or self.python_version
+#        try:
+        if self.plat_name:
+            platform = '-' + self.plat_name
+#        except AttributeError:
+#            platform = None
+        return "mysql-utilities-commercial-{app_version}{platform}.wixobj".format(
+            app_version=appver, python_version=pyver, platform=platform)
+
+    def _prepare_distribution(self):
+        """Prepare the distribution"""
+        cmdbdist = self.get_finalized_command("bdist_com")
+        cmdbdist.dry_run = self.dry_run
+        cmdbdist.keep_temp = True
+        self.run_command("bdist_com")
+
+        log.info("building exes at {0}".format(cmdbdist.bdist_dir))
+        buildexe = self.get_finalized_command('build_exe')
+        buildexe.build_exe = cmdbdist.bdist_dir 
+        buildexe.run()
+        docfiles = [
+            os.path.join(cmdbdist.dist_target, 'LICENSE.txt'),
+            os.path.join(cmdbdist.dist_target, 'README.txt'),
+        ]
+        for docfile in docfiles:
+            self.copy_file(docfile, cmdbdist.bdist_dir)
+        self.bdist_base = cmdbdist.bdist_dir
 
 

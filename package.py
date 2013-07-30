@@ -156,6 +156,16 @@ SETUP_ARGS.update({
         },
     'cmdclass': {},
     })
+INSTALL_COPY = INSTALL.copy()
+cpy_packages = [
+    'mysql',
+    'mysql.connector', 
+    'mysql.connector.locales',
+    'mysql.connector.locales.eng',
+    ]
+INSTALL_COPY['packages'].extend(cpy_packages)
+print("INSTALL_COPY['packages'] {0}".format(INSTALL_COPY['packages']))
+SETUP_ARGS.update(INSTALL_COPY)
 
 
 class NotSupportedCommand(distutils.core.Command):
@@ -277,7 +287,8 @@ elif os.name == 'nt':
         'bdist_rpm': NotSupportedCommand,
         })
     try:
-        from support.dist_msi import MSIBuiltDist
+        from support.dist_msi import BuiltCommercialMSI, MSIBuiltDist
+        from support.distribution.commands import bdist, build
         import mysql.connector
     except ImportError as err:
         log.error("Can not make Windows packages. cx_Freeze and WiX 3.5 "
@@ -287,7 +298,9 @@ elif os.name == 'nt':
         log.error("Latest error: {0}".format(err))
         sys.exit(1)
     else:
-        SETUP_ARGS['cmdclass'].update({'bdist_msi': MSIBuiltDist})
+        SETUP_ARGS['cmdclass'].update({'bdist_msi': MSIBuiltDist,
+                                       'bdist_com_msi': BuiltCommercialMSI,
+                                       'bdist_com': bdist.BuiltCommercial})
 
 # Custom commands
 SETUP_ARGS['cmdclass'].update({
