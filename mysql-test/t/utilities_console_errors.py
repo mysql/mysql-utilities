@@ -150,6 +150,7 @@ class test(mutlib.System_test):
                              "python: can't open file ...\n"))
 
         self.replace_substring("\r", "")
+        self.replace_substring("tmp_scripts\mysql", "tmp_scripts/mysql")
         return True
 
     def get_result(self):

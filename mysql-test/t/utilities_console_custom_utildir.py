@@ -93,7 +93,11 @@ class test(utilities_console_base.test):
         test_num += 1
         comment = "Execute an utility --help on a custom utildir"
         cmd = self.util_test + " --help; help utilities"
-        return self.do_test(test_num, comment, cmd_str % cmd)
+
+        self.do_test(test_num, comment, cmd_str % cmd)
+
+        self.replace_substring("tmp_scripts\mysql", "tmp_scripts/mysql")
+        return True
 
     def get_result(self):
         return self.compare(__name__, self.results)

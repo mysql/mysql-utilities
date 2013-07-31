@@ -247,7 +247,10 @@ class BuiltCommercial(bdist):
                 commercial.remove_gpl(pyfile, dry_run=self.dry_run)
 
         log.info("setting copyright notice in utilities __init__")
-        commercial.remove_full_gpl_cr(self.bdist_dir, self.dry_run)
+        if os.name == 'nt':
+            commercial.remove_full_gpl_cr(os.path.curdir, self.dry_run)
+        else:
+            commercial.remove_full_gpl_cr(self.bdist_dir, self.dry_run)
 
         # compile and remove sources
         if not self.include_sources:

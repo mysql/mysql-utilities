@@ -203,42 +203,51 @@ class Utilities(object):
         """
         paths = os.getenv("PATH").split(os.pathsep)
         for path in paths:
-            found_path = glob.glob(os.path.join(path, util_name + "*"))
+            new_path = os.path.join(path, util_name + "*")
+            if os.name == "nt":
+                new_path = '"{0}"'.format(new_path)
+            found_path = glob.glob(new_path)
             if found_path:
                 return os.path.split(found_path[0])[1]
         return util_name
 
-    def _find_utility_cmd(self, util_name):
+    def _find_utility_cmd(self, utility_name):
         """ Locate the utility scripts
 
         util_name[in]   utility to find
 
         This method builds a dict of commands for invoke the utilities.
         """
-
-        parts = os.path.splitext(self.find_executable(util_name))
-        # Only accept python files - not .pyc and others
-        # Parts returns second as empty if does not have ext, so len is 2
-        exts = ['.py', '.exe', '']
+        util_path = self.find_executable(os.path.join(self.util_path,
+                                                      utility_name))
+        util_path_parts = os.path.split(util_path)
+        parts = os.path.splitext(util_path_parts[len(util_path_parts) - 1])
+        # filter extensions
+        exts = ['.py', '.exe', '', 'pyc']
         if (parts[0] not in _EXCLUDE_UTILS and
             (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
             util_name = str(parts[0])
             file_ext = parts[1]
-            # Give priority to '.py' files
-            if not file_ext:
-                file_ext = '.py'
             command = "{0}{1}".format(util_name, file_ext)
-            util_path = os.path.normpath(os.path.join(os.getcwd(),
-                                                      self.util_path))
-            utility_path = os.path.join(util_path, command)
 
-            if (not os.path.exists(utility_path) and
-                not os.path.exists(os.path.join(os.getcwd(), utility_path))):
-                utility_path = os.path.join(util_path, util_name)
+            util_path = self.util_path
+            utility_path = command
+            if not os.path.exists(command):
+                utility_path = os.path.join(util_path, utility_name)
+
+            # Now try the extensions
+            if not os.path.exists(utility_path):
+                if file_ext:
+                    utility_path = "{0}{1}".format(utility_path, file_ext)
+                else:
+                    for ext in exts:
+                        try_path = "{0}{1}".format(utility_path, ext)
+                        if os.path.exists(try_path):
+                            utility_path = try_path
 
             if not os.path.exists(utility_path):
                 print("WARNING: Unable to locate utility {0}."
-                      "".format(util_name))
+                      "".format(utility_name))
                 print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
                 return
 
@@ -250,7 +259,7 @@ class Utilities(object):
                 cmd = [sys.executable]
 
             cmd.extend([utility_path])
-            self.util_cmd_dict[util_name] = cmd
+            self.util_cmd_dict[utility_name] = cmd
 
     def find_utilities(self, this_utils=None):
         """ Locate the utility scripts
@@ -299,7 +308,7 @@ class Utilities(object):
         Returns dictionary - name, description, usage, options
         """
         cmd.extend(["--help"])
-
+        # rmv print('executing ==> {0}'.format(cmd))
         try:
             proc = subprocess.Popen(cmd, shell=False,
                                     stdout=subprocess.PIPE,
@@ -315,7 +324,7 @@ class Utilities(object):
         # Parse the help output and save the information found
         usage = None
         description = None
-        
+
         if stderr_temp or returncode:
             print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
             if stderr_temp:

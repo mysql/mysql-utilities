@@ -279,6 +279,12 @@ class UtilitiesConsole(Console):
                 # Get the command used to obtain the help from the utility
                 cmd = util_info["cmd"]
                 cmd.extend([parameters])
+                
+                # Add quotes for Windows
+                if (os.name == "nt") and (" " in cmd[0]):
+                    cmd[0] = '"{0}"'.format(cmd[0])
+                if (os.name == "nt") and (" " in cmd[1]):
+                    cmd[1] = '"{0}"'.format(cmd[1])
 
                 if self.quiet:
                     proc = subprocess.Popen(cmd, shell=False,
