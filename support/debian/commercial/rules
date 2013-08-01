@@ -11,18 +11,19 @@ export DH_VERBOSE=1
 
 DH_OPTIONS=--buildsystem=python_distutils
 
-doverride_dh_compress:
+override_dh_compress:
 	echo 'dh_compress override'
+	ls
 	echo `pwd`
-	ls mysql/
+	ls debian/mysql-utilities-commercial/usr/lib/
 	echo 'removing mysql/__init__.pyc'
-	if [ -L debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql/__init__.py ] ; then \
-		rm debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql/__init__.pyc ; \
-		ls debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql ; fi
-	if [ -L debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql/__init__.py ] ; then \
-		rm debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql/__init__.pyc ; \
-		ls debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql; fi
-	#
+	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql/__init__.pyc ] ; then \
+		rm debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql/__init__.pyc ; \
+		ls debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql ; fi
+	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql/__init__.pyc ] ; then \
+		rm debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql/__init__.pyc ; \
+		ls debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql; fi
+	# continue normal dh_compress
 	dh_compress -O--buildsystem=python_distutils -O--build-purelib=build/python2
 
 override_dh_link:
@@ -34,54 +35,28 @@ override_dh_auto_clean:
 	
 
 override_dh_auto_build:
-	echo 'dh_auto_build override'
-	# The mysql/__init__.py modules are removed and recreated in the
-	# postinst script.
-	# Build Python v2
-	#set -xe; /python2/usr build --build-base=build --build-lib=build/python2/usr  \
-	#	--build-scripts=build
-#	DESTDIR=$(CURDIR)/debian/mysql-utilities-commercial/usr; \
-#	BUILDDIR=$(CURDIR); \
-#	echo $$DESTDIR; \
-#	for pyvers in $(shell pyversions -sv); do \
-#		python$$pyvers setup.py \
-#			install_lib --install-dir=$$DESTDIR/lib/python2.7/site-packages/mysql \
-#			--skip-build --build-dir=$$BUILDDIR/mysql \
-#			install_scripts --install-dir=$$DESTDIR/bin \
-#			--build-dir=$$BUILDDIR/scripts --skip-build \
-#			install_man --root=$$DESTDIR --srcdir=$$BUILDDIR/ \
-#			--prefix=/share/man \
-#			install_egg_info --install-dir=$$DESTDIR/lib/python2.7/site-packages/mysql; \
-#		#rm build/python2/mysql/__init__.py; \
-#	done
+	echo 'dh_auto_build override Already built.'
+	# we already built.
 
 override_dh_pysupport:
 	echo 'override_dh_pysupport'
+	# nothing to do here.
 
 override_dh_auto_install:
 	echo 'dh_auto_install override'
-	# We make sure we do not build again, since mysql/__init__.py has
-	# to be removed, which is done in dh_auto_build
-	#set -xe; \ /usr/lib/pymodules/python $$pyver
-	#	DESTDIR=$(CURDIR)/debian/mysql-utilities-commercial/usr; \
-	#	echo $$DESTDIR; \
-	#	for pyver in $(shell pyversions -sv); do \
-	#	python$$pyver setup.py \
-	#		install_lib -f  --build-dir=build/python$$pyver  \
-	#		--install-dir=$$DESTDIR --skip-build;  \
-	#	done
+	# We make sure we do not build again, just install built code
 	DESTDIR=$(CURDIR)/debian/mysql-utilities-commercial/usr; \
 	BUILDDIR=$(CURDIR); \
 	echo $$DESTDIR; \
 	for pyvers in $(shell pyversions -sv); do \
 		python$$pyvers setup.py \
-			install_lib --install-dir=$$DESTDIR/lib/python2.7/site-packages/mysql \
+			install_lib --install-dir=$$DESTDIR/lib/python$$pyvers/site-packages/mysql \
 			--skip-build --build-dir=$$BUILDDIR/mysql \
 			install_scripts --install-dir=$$DESTDIR/bin \
-			--build-dir=$$BUILDDIR/scripts --skip-build \
+			--build-dir=$$BUILDDIR/usr/bin --skip-build \
 			install_man --root=$$DESTDIR --srcdir=$$BUILDDIR/ \
 			--prefix=/share/man \
-			install_egg_info --install-dir=$$DESTDIR/lib/python2.7/site-packages/mysql; \
+			install_egg_info --install-dir=$$DESTDIR/lib/python$$pyvers/site-packages/mysql; \
 		#rm build/python2/mysql/__init__.py; \
 	done
 %:

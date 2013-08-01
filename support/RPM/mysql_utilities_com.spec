@@ -69,7 +69,7 @@ mkdir -p %{buildroot}%{python_sitelib}
 mkdir -p %{buildroot}%{_mandir}
 cp -a %{bdist_dir}mysql %{buildroot}%{python_sitelib}
 cp -p %{bdist_dir}*.egg-info %{buildroot}%{python_sitelib}
-cp -a %{bdist_dir}/scripts %{buildroot}%{_exec_prefix}/bin
+cp -a %{bdist_dir}/usr/bin %{buildroot}%{_exec_prefix}/bin
 cp -a %{bdist_dir}/docs %{buildroot}%{_mandir}
 rm %{buildroot}%{python_sitelib}/mysql/__init__.pyc
 
@@ -77,8 +77,8 @@ rm %{buildroot}%{python_sitelib}/mysql/__init__.pyc
 
 %files
 %defattr(-,root,root,-)
-%doc %{bdist_dir}README.txt
-%doc %{bdist_dir}LICENSE.txt
+%doc %{bdist_dir}README_com.txt
+%doc %{bdist_dir}LICENSE_com.txt
 %{python_sitelib}/mysql*egg-info
 %{python_sitelib}/mysql/utilities
 %{_mandir}/*

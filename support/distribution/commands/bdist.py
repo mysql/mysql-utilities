@@ -198,31 +198,40 @@ class BuiltCommercial(bdist):
 
         installed_files = install.get_outputs()
 
-        # copy scripts
-        scripts_base = "scripts"
-        copy_tree(scripts_base, os.path.join(self.dist_target, scripts_base))
-
-        #installed_files.extend(install.scripts)
-        scripts_dir = os.path.join(self.dist_target, scripts_base)
-        if not os.path.exists(scripts_dir):
-            log.error("scripts not found at {0}".format(self.dist_target))
-        else:
-            installed_sripts = [os.path.join(scripts_dir, script)
-                                for script in os.listdir(scripts_dir)] 
-            installed_files.extend(installed_sripts)
-        log.debug("installed_files {0}".format(installed_files))
-
-        # install MAN pages
+        #install MAN pages
         install_man = self.reinitialize_command('install_man',
-                                            reinit_subcommands=1)
+                                                reinit_subcommands=1)
         install_man.root = self.bdist_dir # + "/usr/bin/"
 
         log.info("installing to %s" % self.bdist_dir)
         self.run_command('install_man')
         log.info('install_man finish')
 
+        #installing scripts
+        log.info('===== installing script =====')
+        install_scripts = self.reinitialize_command('install_scripts',
+                                                     reinit_subcommands=1)
+        #install_scripts.root = self.bdist_dir # + "/usr/bin/"
+        #install_scripts.build_dir = self.bdist_dir
+        scripts_instal_dir = os.path.join(self.bdist_dir, "usr", "bin") #scripts_dir
+        install_scripts.install_dir = scripts_instal_dir 
+        #install_scripts.get_outputs()
+        
+        log.info("installing to %s" % scripts_instal_dir)
+        self.run_command('install_scripts')
+        log.info('install_scripts finish')
+
+        if not os.path.exists(scripts_instal_dir):
+            log.error("scripts not found at {0}".format(self.dist_target))
+        else:
+            installed_sripts = [os.path.join(scripts_instal_dir, script)
+                                for script in os.listdir(scripts_instal_dir)]
+            installed_files.extend(installed_sripts)
+        log.debug("installed_scripts {0}".format(installed_sripts))
+
         # install_egg_info command
-        cmd_egginfo = self.get_finalized_command('install_egg_info')
+        cmd_egginfo = self.reinitialize_command('install_egg_info',
+                                                reinit_subcommands=1)
         cmd_egginfo.install_dir = self.bdist_dir
         self.run_command('install_egg_info')
 
@@ -255,7 +264,7 @@ class BuiltCommercial(bdist):
         # compile and remove sources
         if not self.include_sources:
             files_to_compile = [file for file in installed_files
-                                if not file.startswith(scripts_dir)]
+                                if not file.startswith(scripts_instal_dir)]
             byte_compile(files_to_compile, optimize=0,
                          force=True, prefix=install.install_dir)
             self._remove_sources()
@@ -264,8 +273,8 @@ class BuiltCommercial(bdist):
 
         # create distribution
         info_files = [
-            ('README_com.txt', 'README.txt'),
-            ('LICENSE_com.txt', 'LICENSE.txt')
+            ('README_com.txt', 'README_com.txt'),
+            ('LICENSE_com.txt', 'LICENSE_com.txt')
         ]
         copy_tree(self.bdist_dir, self.dist_target)
         pkg_info = mkpath(os.path.join(self.dist_target))
