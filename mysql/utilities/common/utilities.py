@@ -259,7 +259,7 @@ class Utilities(object):
                 cmd = [sys.executable]
 
             cmd.extend([utility_path])
-            self.util_cmd_dict[utility_name] = cmd
+            self.util_cmd_dict[utility_name] = tuple(cmd)
 
     def find_utilities(self, this_utils=None):
         """ Locate the utility scripts
@@ -292,7 +292,7 @@ class Utilities(object):
                 cmd = self.util_cmd_dict.pop(util_name)
                 util_info = self._get_util_info(list(cmd), util_name)
                 if util_info and util_info["usage"]:
-                    util_info["cmd"] = cmd
+                    util_info["cmd"] = tuple(cmd)
                     self.util_list.append(util_info)
                     working_utils.append(util_name)
 

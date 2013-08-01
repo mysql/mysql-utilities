@@ -277,14 +277,17 @@ class UtilitiesConsole(Console):
         for util_info in self.utils.util_list:
             if util_info["name"] == command:
                 # Get the command used to obtain the help from the utility
-                cmd = util_info["cmd"]
+                cmd = list(util_info["cmd"])
                 cmd.extend([parameters])
-                
+
                 # Add quotes for Windows
-                if (os.name == "nt") and (" " in cmd[0]):
-                    cmd[0] = '"{0}"'.format(cmd[0])
-                if (os.name == "nt") and (" " in cmd[1]):
-                    cmd[1] = '"{0}"'.format(cmd[1])
+                if (os.name == "nt"):
+                    # If there is a space in the command, quote it!
+                    if (" " in cmd[0]):
+                        cmd[0] = '"{0}"'.format(cmd[0])
+                    # If the second part has .py in it and spaces, quote it!
+                    if (" " in cmd[1]) and ('.py' in cmd[0]):
+                        cmd[1] = '"{0}"'.format(cmd[1])
 
                 if self.quiet:
                     proc = subprocess.Popen(cmd, shell=False,
@@ -310,13 +313,13 @@ class UtilitiesConsole(Console):
                 elif not self.quiet and return_code:
                     print(err_msg)
                     msg = ("Execution of utility: {0} {1} \nreturned "
-                           "errorcode: {2} and none error message"
+                           "errorcode: {2} and no error message"
                            "".format(command, parameters, return_code))
                     self.errors.append(msg)
                 return
         # if got here, is because the utility was not found.
         raise UtilError("The utility {0} is not accessible (from the path: "
-                        "{0}).".format(command, self.path))
+                        "{1}).".format(command, self.path))
 
     def show_errors(self):
         """Show errors
