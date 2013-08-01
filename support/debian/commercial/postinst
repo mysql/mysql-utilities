@@ -14,10 +14,10 @@ do
 	PYSHARED="/usr/share/pyshared"
 	PYDIST=`$PYVER -c "from distutils.sysconfig import get_python_lib; print (get_python_lib(standard_lib=True, plat_specific=True))"`
 	echo $PYDIST
-	MYSQLINIT="/site-packages/mysql/__init__.py"
-	if [ -d $PYDIST/site-packages/mysql ];
+	MYSQLINIT="/dist-packages/mysql/__init__.py"
+	if [ -d $PYDIST/dist-packages/mysql ];
 	then	
-		if [ -d $PYDIST/site-packages/mysql ];
+		if [ -d $PYDIST/dist-packages/mysql ];
 		then
 			#ls $PYSHARED$MYSQLINIT
 			touch $PYDIST$MYSQLINIT
@@ -26,7 +26,7 @@ do
 		
 	else
 		# we should not reach this point.
-		echo "WARNING: $PYDIST/site-packages/mysql not found, nothing to do."
+		echo "WARNING: $PYDIST/dist-packages/mysql not found, nothing to do."
 	fi
 done
 

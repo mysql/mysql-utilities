@@ -7,17 +7,17 @@ do
 	echo "found"$PYVER
 	PYDIST=`$PYVER -c "from distutils.sysconfig import get_python_lib; print (get_python_lib(standard_lib=True, plat_specific=True))"`
 	echo $PYDIST
-	MYSQLINIT="/site-packages/mysql/__init__.py"
-	if [ -d $PYDIST"/site-packages/mysql" ];
+	MYSQLINIT="/dist-packages/mysql/__init__.py"
+	if [ -d $PYDIST"/dist-packages/mysql" ];
 	then
 		SUBPKGS=`ls --ignore=*.pyc --ignore=*.pyo -m $PYDIST/mysql`
 		if [ "$SUBPKGS" = "__init__.py" ];
 		then
 			rm $PYDIST$MYSQLINIT
-			rmdir $PYDIST/site-packages/mysql/
+			rmdir $PYDIST/dist-packages/mysql/
 		fi
 	else
-		echo "not found /site-packages/mysql"
+		echo "not found /dist-packages/mysql"
 	fi
 done
 

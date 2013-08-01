@@ -17,12 +17,12 @@ override_dh_compress:
 	echo `pwd`
 	ls debian/mysql-utilities-commercial/usr/lib/
 	echo 'removing mysql/__init__.pyc'
-	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql/__init__.pyc ] ; then \
-		rm debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql/__init__.pyc ; \
-		ls debian/mysql-utilities-commercial/usr/lib/python2.6/site-packages/mysql ; fi
-	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql/__init__.pyc ] ; then \
-		rm debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql/__init__.pyc ; \
-		ls debian/mysql-utilities-commercial/usr/lib/python2.7/site-packages/mysql; fi
+	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql/__init__.pyc ] ; then \
+		rm debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql/__init__.pyc ; \
+		ls debian/mysql-utilities-commercial/usr/lib/python2.6/dist-packages/mysql ; fi
+	if [ -f debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql/__init__.pyc ] ; then \
+		rm debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql/__init__.pyc ; \
+		ls debian/mysql-utilities-commercial/usr/lib/python2.7/dist-packages/mysql; fi
 	# continue normal dh_compress
 	dh_compress -O--buildsystem=python_distutils -O--build-purelib=build/python2
 
@@ -50,13 +50,13 @@ override_dh_auto_install:
 	echo $$DESTDIR; \
 	for pyvers in $(shell pyversions -sv); do \
 		python$$pyvers setup.py \
-			install_lib --install-dir=$$DESTDIR/lib/python$$pyvers/site-packages/mysql \
+			install_lib --install-dir=$$DESTDIR/lib/python$$pyvers/dist-packages/mysql \
 			--skip-build --build-dir=$$BUILDDIR/mysql \
 			install_scripts --install-dir=$$DESTDIR/bin \
 			--build-dir=$$BUILDDIR/usr/bin --skip-build \
 			install_man --root=$$DESTDIR --srcdir=$$BUILDDIR/ \
 			--prefix=/share/man \
-			install_egg_info --install-dir=$$DESTDIR/lib/python$$pyvers/site-packages/mysql; \
+			install_egg_info --install-dir=$$DESTDIR/lib/python$$pyvers/dist-packages; \
 		#rm build/python2/mysql/__init__.py; \
 	done
 %:

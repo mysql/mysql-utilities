@@ -322,11 +322,13 @@ class BuiltCommercialMSI(_MSIDist):
         buildexe.build_exe = cmdbdist.bdist_dir 
         buildexe.run()
         docfiles = [
-            os.path.join(cmdbdist.dist_target, 'LICENSE.txt'),
-            os.path.join(cmdbdist.dist_target, 'README.txt'),
+            (os.path.join(cmdbdist.dist_target, 'LICENSE_com.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'LICENSE.txt')),
+            (os.path.join(cmdbdist.dist_target, 'README_com.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'README.txt'))
         ]
-        for docfile in docfiles:
-            self.copy_file(docfile, cmdbdist.bdist_dir)
+        for src, dst in docfiles:
+            self.copy_file(src, dst)
         self.bdist_base = cmdbdist.bdist_dir
 
 
