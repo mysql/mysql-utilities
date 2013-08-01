@@ -17,6 +17,7 @@
 
 # Major, Minor, Patch, Status
 VERSION = (1, 3, 4, 'GA', 0)
+# Future versions will have to include only the X, Y (no Z).
 WORKBENCH_VERSION = (5, 2, 47)
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
