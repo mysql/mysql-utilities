@@ -99,9 +99,15 @@ parser.add_option("--skip-data-check", action="store_true",
                   dest="no_data",
                   help="skip data consistency check")
 
+# Skip check of table options.
+parser.add_option("--skip-table-options", action="store_true",
+                  dest="skip_tbl_opts",
+                  help="skip check of all table options (e.g., "
+                       "AUTO_INCREMENT, ENGINE, CHARSET, etc.).")
+
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
-                  type = "int", help="display width",
+                  type="int", help="display width",
                   default=PRINT_WIDTH)
 
 # run-all-tests mode
@@ -124,7 +130,7 @@ parser.add_option(
     " for compare table contents. A higher value can help to get more "
     "accurate results comparing large databases, but may slow the algorithm."
     " Default value is {0}.".format(DEFAULT_SPAN_KEY_SIZE)
-    )
+)
 
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
@@ -159,7 +165,8 @@ options = {
     "toggle_binlog"    : opt.toggle_binlog,
     "changes-for"      : opt.changes_for,
     "reverse"          : opt.reverse,
-    "span_key_size"    : opt.span_key_size
+    "span_key_size"    : opt.span_key_size,
+    "skip_table_opts"  : opt.skip_tbl_opts,
 }
 
 # Parse server connection values
@@ -254,8 +261,8 @@ if not opt.quiet:
         print("# Database consistency check failed.")
     else:
         sys.stdout.write("# Databases are consistent")
-        if opt.no_object_check or opt.no_diff or \
-           opt.no_row_count or opt.no_data:
+        if (opt.no_object_check or opt.no_diff or
+            opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
             sys.stdout.write(" given skip options specified")
         print(".")
     print("#\n# ...done")

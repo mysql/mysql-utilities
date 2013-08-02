@@ -145,6 +145,7 @@ class Database(object):
         self.skip_data = options.get("skip_data", False)
         self.exclude_patterns = options.get("exclude_patterns", None)
         self.use_regexp = options.get("use_regexp", False)
+        self.skip_table_opts = options.get("skip_table_opts", False)
         self.new_db = None
         self.q_new_db = None
         self.init_called = False
@@ -712,7 +713,6 @@ class Database(object):
                                   -1, self.db_name)
             tbl.copy_data(self.destination, self.cloning, new_db, connections)
 
-
     def get_create_statement(self, db, name, obj_type):
         """Return the create statement for the object
 
@@ -723,19 +723,20 @@ class Database(object):
 
         Returns create statement
         """
-
-        row = None
-        q_name = name if is_quoted_with_backticks(name) \
-                                    else quote_with_backticks(name)
+        # Quote database and object name with backticks.
+        q_name = (name if is_quoted_with_backticks(name)
+                  else quote_with_backticks(name))
         if obj_type == _DATABASE:
             name_str = q_name
         else:
-            q_db = db if is_quoted_with_backticks(db) \
-                                    else quote_with_backticks(db)
+            q_db = (db if is_quoted_with_backticks(db)
+                    else quote_with_backticks(db))
             name_str = q_db + "." + q_name
-        row = self.source.exec_query("SHOW CREATE %s %s" % (obj_type,
-                                                            name_str))
 
+        # Retrieve the CREATE statement.
+        row = self.source.exec_query(
+            "SHOW CREATE {0} {1}".format(obj_type, name_str)
+        )
         create_statement = None
         if row:
             if obj_type == _TABLE or obj_type == _VIEW or \
@@ -745,8 +746,109 @@ class Database(object):
                 create_statement = row[0][3]
             else:
                 create_statement = row[0][2]
+
+        # Remove all table options from the CREATE statement (if requested).
+        if self.skip_table_opts and obj_type == _TABLE:
+            # First, get partition options.
+            create_tbl, sep, part_opts = create_statement.rpartition('\n/*')
+            # Handle situation where no partition options are found.
+            if not create_tbl:
+                create_tbl = part_opts
+                part_opts = ''
+            else:
+                part_opts = "{0}{1}".format(sep, part_opts)
+            # Then, separate table definitions from table options.
+            create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+            # Reconstruct CREATE statement without table options.
+            create_statement = "{0}{1}{2}".format(create_tbl, sep, part_opts)
+
         return create_statement
 
+    def get_create_table(self, db, table):
+        """Return the create table statement for the given table.
+
+        This method returns the CREATE TABLE statement for the given table with
+        or without the table options, according to the Database object
+        property 'skip_table_opts'.
+
+        db[in]             Database name.
+        table[in]          Table name.
+
+        Returns a tuple with the CREATE TABLE statement and table options
+        (or None). If skip_table_opts=True the CREATE statement does not
+        include the table options that are returned separately, otherwise the
+        table options are included in the CREATE statement and None is returned
+        as the second tuple element.
+        """
+        # Quote database and table name with backticks.
+        q_table = (table if is_quoted_with_backticks(table)
+                   else quote_with_backticks(table))
+        q_db = db if is_quoted_with_backticks(db) else quote_with_backticks(db)
+
+        # Retrieve CREATE TABLE.
+        try:
+            row = self.source.exec_query(
+                "SHOW CREATE TABLE {0}.{1}".format(q_db, q_table)
+            )
+            create_tbl = row[0][1]
+        except UtilError as err:
+            raise UtilDBError("Error retrieving CREATE TABLE for {0}.{1}: "
+                              "{2}".format(q_db, q_table, err.errmsg))
+
+        # Separate table options from table definition.
+        tbl_opts = None
+        if self.skip_table_opts:
+            # First, get partition options.
+            create_tbl, sep, part_opts = create_tbl.rpartition('\n/*')
+            # Handle situation where no partition options are found.
+            if not create_tbl:
+                create_tbl = part_opts
+                part_opts = ''
+            else:
+                part_opts = "{0}{1}".format(sep, part_opts)
+            # Then, separate table definitions from table options.
+            create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+            # Reconstruct CREATE TABLE without table options.
+            create_tbl = "{0}{1}{2}".format(create_tbl, sep, part_opts)
+
+        return create_tbl, tbl_opts
+
+    def get_table_options(self, db, table):
+        """Return the table options.
+
+        This method returns the list of used table options (from the CREATE
+        TABLE statement).
+
+        db[in]             Database name.
+        table[in]          Table name.
+
+        Returns a list of table options.
+        For example: ['AUTO_INCREMENT=5','ENGINE=InnoDB']
+        """
+        # Quote database and table name with backticks.
+        q_table = (table if is_quoted_with_backticks(table)
+                   else quote_with_backticks(table))
+        q_db = db if is_quoted_with_backticks(db) else quote_with_backticks(db)
+
+        # Retrieve CREATE TABLE statement.
+        try:
+            row = self.source.exec_query(
+                "SHOW CREATE TABLE {0}.{1}".format(q_db, q_table)
+            )
+            create_tbl = row[0][1]
+        except UtilError as err:
+            raise UtilDBError("Error retrieving CREATE TABLE for {0}.{1}: "
+                              "{2}".format(q_db, q_table, err.errmsg))
+
+        # First, separate partition options.
+        create_tbl, sep, part_opts = create_tbl.rpartition('\n/*')
+        # Handle situation where no partition options are found.
+        create_tbl = part_opts if not create_tbl else create_tbl
+        # Then, separate table options from table definition.
+        create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+        table_options = tbl_opts.split()
+
+        return table_options
 
     def get_object_definition(self, db, name, obj_type):
         """Return a list of the object's creation metadata.
