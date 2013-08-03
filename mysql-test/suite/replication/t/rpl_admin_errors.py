@@ -15,10 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+import os
+import socket
+
 import mutlib
 import rpl_admin
-import socket
-from mysql.utilities.exception import MUTLibError, UtilError
+
+from mysql.utilities.exception import MUTLibError
 
 _LOGNAME = "temp_log.txt"
 
@@ -319,7 +322,7 @@ class test(rpl_admin.test):
         # Remove log file (here to delete the file even if some test fails)
         try:
             os.unlink(_LOGNAME)
-        except:
+        except OSError:
             pass
 
         return rpl_admin.test.cleanup(self)

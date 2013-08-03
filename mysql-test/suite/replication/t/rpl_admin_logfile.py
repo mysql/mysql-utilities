@@ -75,9 +75,12 @@ class test(rpl_admin.test):
             self, 2, ' '.join(cmd), comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
+        # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
-        
+        self.remove_result("NOTE: Log file 'temp_log.txt' does not exist. "
+                           "Will be created.")
+
         return True
 
     def get_result(self):
@@ -90,7 +93,7 @@ class test(rpl_admin.test):
         try:
             os.chmod(_LOGNAME, stat.S_IWRITE)
             os.unlink(_LOGNAME)
-        except:
+        except OSError:
             if self.debug:
                 print "# failed removing temporary log file " + _LOGNAME
         return rpl_admin.test.cleanup(self)

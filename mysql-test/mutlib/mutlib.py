@@ -906,6 +906,32 @@ class System_test(object):
                 self.results.insert(linenum, replace_line)
             linenum += 1
 
+    def replace_substring_portion(self, substring_start, substring_end,
+                                  replacement):
+        """Replace a sub-string in all results specifying its start and end.
+
+        This method replaces a sub-string portion in all result lines,
+        specifying its start and end (without requiring any specific prefix).
+        This allow the substitution of non deterministic sub-strings, with a
+        variable value/text in the middle but surrounded by known and fixed
+        sub-strings.
+
+        substring_start[in] start of the substring to be replaced.
+        substring_end[in]   end of the substring to be replaced.
+        replacement[in]     replacing string.
+        """
+        for i, line in enumerate(self.results):
+            # Search for the substring portion start.
+            start_idx = line.find(substring_start)
+            if start_idx != -1:  # Substring start found
+                # Search for the substring portion end.
+                next_search_idx = start_idx + len(substring_start)
+                substr_end_idx = line.find(substring_end, next_search_idx)
+                if substr_end_idx != -1:  # Substring end found.
+                    # Get substring portion and replace it.
+                    end_idx = substr_end_idx + len(substring_end)
+                    substr_portion = line[start_idx:end_idx]
+                    self.results[i] = line.replace(substr_portion, replacement)
 
     def mask_result(self, prefix, target, mask):
         """Mask out a portion of a string for the results.

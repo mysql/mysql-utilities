@@ -167,7 +167,6 @@ class test(rpl_admin.test):
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(",
                             "# QUERY = SELECT "
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
-        #self.replace_substring("localhost", "XXXXXXXXX")
 
         self.remove_result_and_lines_before("WARNING: There are slaves that"
                                             " had connection errors.")
@@ -230,12 +229,24 @@ class test(rpl_admin.test):
         # It happens sometimes on windows in a non-deterministic way.
         self.replace_substring("+--------------------------------------------"
                                "--+", "+---------+")
+        self.replace_substring("+--------------------------------------------"
+                               "---+", "+---------+")
         self.replace_substring("| health                                     "
                                "  |", "| health  |")
+        self.replace_substring("| health                                     "
+                               "   |", "| health  |")
         self.replace_substring("| OK                                         "
                                "  |", "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., "
-                               "No  |", "| OK      |")
+        self.replace_substring("| OK                                         "
+                               "   |", "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No  |",
+                                       "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.    "
+                               "  |", "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.    "
+                               "   |", "| OK      |")
+
         self.replace_substring("+------------------------------------------+",
                                "+---------+")
         self.replace_substring("| health                                   |",
@@ -243,6 +254,35 @@ class test(rpl_admin.test):
         self.replace_substring("| OK                                       |",
                                "| OK      |")
         self.replace_substring("| Slave has 1 transactions behind master.  |",
+                               "| OK      |")
+
+        self.replace_substring("+----------------------------------------------"
+                               "-----------------------------------------+",
+                               "+---------+")
+        self.replace_substring("+----------------------------------------------"
+                               "------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                       "
+                               "                                         |",
+                               "| health  |")
+        self.replace_substring("| health                                       "
+                               "                                          |",
+                               "| health  |")
+        self.replace_substring("| OK                                           "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| OK                                           "
+                               "                                          |",
+                               "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                          |",
                                "| OK      |")
 
         return True
@@ -258,7 +298,7 @@ class test(rpl_admin.test):
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
         kill_list = ['rep_master_gtid_loopback', 'rep_slave1_gtid_loopback',
-                    'rep_slave2_gtid_loopback', 'rep_slave3_gtid_loopback']
+                     'rep_slave2_gtid_loopback', 'rep_slave3_gtid_loopback']
         return (rpl_admin.test.cleanup(self)
                 and self.kill_server_list(kill_list))
 

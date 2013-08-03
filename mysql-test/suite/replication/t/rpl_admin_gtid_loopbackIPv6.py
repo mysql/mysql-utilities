@@ -164,7 +164,6 @@ class test(rpl_admin.test):
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(",
                             "# QUERY = SELECT "
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
-        #self.replace_substring("localhost", "XXXXXXXXX")
 
         self.remove_result_and_lines_before("WARNING: There are slaves that"
                                             " had connection errors.")
@@ -228,15 +227,32 @@ class test(rpl_admin.test):
         self.replace_substring("+----------------------------------------------"
                                "-----------------------------------------+",
                                "+---------+")
+        self.replace_substring("+----------------------------------------------"
+                               "------------------------------------------+",
+                               "+---------+")
         self.replace_substring("| health                                       "
                                "                                         |",
+                               "| health  |")
+        self.replace_substring("| health                                       "
+                               "                                          |",
                                "| health  |")
         self.replace_substring("| OK                                           "
                                "                                         |",
                                "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., No, "
-                               "Slave has 1 transactions behind master.  |",
+        self.replace_substring("| OK                                           "
+                               "                                          |",
                                "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                          |",
+                               "| OK      |")
+
         self.replace_substring("+------------------------------------------+",
                                "+---------+")
         self.replace_substring("| health                                   |",
