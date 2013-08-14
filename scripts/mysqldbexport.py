@@ -154,6 +154,10 @@ parser.add_option("--comment-rpl", action="store_true", default=False,
                   dest="comment_rpl", help="place the replication statements "
                   "in comment statements. Valid only with --rpl option.")
 
+parser.add_option("--skip-fkey-checks", action="store_true", default=False,
+                  dest="skip_fkeys", help="skip creation of foreign key "
+                  "disable/enable statements.")
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
@@ -209,6 +213,7 @@ options = {
     "skip_create"      : "create_db" in skips,
     "skip_data"        : "data" in skips,
     "skip_blobs"       : opt.skip_blobs,
+    "skip_fkeys"       : opt.skip_fkeys,
     "format"           : opt.format,
     "no_headers"       : opt.no_headers,
     "display"          : opt.display,

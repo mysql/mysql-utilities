@@ -1,5 +1,6 @@
 Test case 1 - export with default locking
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -141,8 +142,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - export data with no-locks locking
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -166,8 +169,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - export data with lock-all locking
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -191,8 +196,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - export data with snapshot locking
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -216,3 +223,4 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

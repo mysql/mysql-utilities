@@ -1,5 +1,6 @@
 Test case 1 - SQL single rows
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -28,8 +29,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - SQL bulk insert
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -46,8 +49,10 @@ INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys')
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES  (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - skip blobs
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -72,8 +77,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - sql format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -102,8 +109,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - csv format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -130,8 +139,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - tab format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -158,8 +169,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - GRID format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 +---------------------------------+
@@ -198,8 +211,10 @@ Test case 7 - GRID format
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - VERTICAL format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 *************************       1. row *************************
@@ -251,8 +266,10 @@ Test case 8 - VERTICAL format
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - sql format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -281,8 +298,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - csv format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -309,8 +328,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 11 - tab format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -337,8 +358,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 12 - GRID format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 +---------------------------------+
@@ -377,8 +400,10 @@ Test case 12 - GRID format no headers
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 13 - VERTICAL format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 *************************       1. row *************************
@@ -430,8 +455,10 @@ Test case 13 - VERTICAL format no headers
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 14 - SQ format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -460,8 +487,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 15 - CS format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -488,8 +517,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 16 - ta format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -516,8 +547,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 17 - g format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 +---------------------------------+
@@ -556,8 +589,10 @@ Test case 17 - g format
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 18 - v format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 *************************       1. row *************************
@@ -609,8 +644,10 @@ Test case 18 - v format
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 19 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 +---------------------------------+
@@ -649,8 +686,10 @@ Test case 19 - GRID format with BRIEF display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 20 - GRID format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -690,8 +729,10 @@ Test case 20 - GRID format with FULL display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 21 - GRID format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -731,8 +772,10 @@ Test case 21 - GRID format with NAMES display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 22 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -759,8 +802,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 23 - CSV format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -788,8 +833,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 24 - CSV format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -817,8 +864,10 @@ NULL,This is a blob.
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 25 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 `a`
@@ -845,8 +894,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 26 - TAB format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -874,8 +925,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 27 - TAB format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -903,8 +956,10 @@ NULL	This is a blob.
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 28 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
 *************************       1. row *************************
@@ -956,8 +1011,10 @@ Test case 28 - VERTICAL format with BRIEF display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 29 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -1010,8 +1067,10 @@ Test case 29 - VERTICAL format with FULL display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 30 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -1064,8 +1123,10 @@ Test case 30 - VERTICAL format with NAMES display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 31 - multiple blobs
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -1098,3 +1159,4 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

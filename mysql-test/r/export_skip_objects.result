@@ -1,5 +1,6 @@
 Test case 1 - baseline
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -61,8 +62,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - no data,,grants
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -86,8 +89,10 @@ NAME
 NAME
 `e1`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - no data,,grants,events
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -108,8 +113,10 @@ NAME
 NAME
 `f1`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - no data,,grants,events,functions
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -127,8 +134,10 @@ TRIGGER_NAME
 NAME
 `p1`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - no data,,grants,events,functions,procedures
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -143,8 +152,10 @@ TABLE_NAME
 TRIGGER_NAME
 `trg`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - no data,,grants,events,functions,procedures,triggers
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -156,8 +167,10 @@ TABLE_NAME
 TABLE_NAME
 `v1`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -166,7 +179,10 @@ TABLE_NAME
 `t3`
 `t4`
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - no data,,grants,events,functions,procedures,triggers,views,tables
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

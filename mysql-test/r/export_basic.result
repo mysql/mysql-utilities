@@ -1,5 +1,6 @@
 Test case 1 - export metadata only
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -118,8 +119,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - export data only - single rows
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -143,8 +146,10 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - export data only - bulk insert
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -156,8 +161,10 @@ INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys')
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES  (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - export data and metadata
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -299,7 +306,9 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - export data and metadata with quiet
+SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
@@ -392,8 +401,12 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - export data and metadata with debug
 # Source on localhost: ... connected.
+#
+SET FOREIGN_KEY_CHECKS=0;
+#
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -535,6 +548,9 @@ INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
 #...done.
+#
+SET FOREIGN_KEY_CHECKS=1;
+#
 Time:       XXXXXX
 
 Test case 7 - export database with weird names (backticks)
@@ -704,6 +720,7 @@ INSERT INTO `db``:db`.```t``export_1` VALUES (2, '\0\'\"\b\n\r\t\Z\\\%\_');
 #...done.
 Test case 9 - export data with unicode characters
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
 # Data for table `util_test`.`t1`: 
@@ -738,3 +755,4 @@ INSERT INTO `import_test`.`customers` VALUES (6, '客户6');
 INSERT INTO `import_test`.`customers` VALUES (7, '中国简体，客户7');
 INSERT INTO `import_test`.`customers` VALUES (8, 'Клиент 8');
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

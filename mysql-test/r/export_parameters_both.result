@@ -1,5 +1,6 @@
 Test case 1 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -122,8 +123,10 @@ Test case 1 - GRID format with BRIEF display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - GRID format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -247,8 +250,10 @@ Test case 2 - GRID format with FULL display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - GRID format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +-------------+
@@ -370,8 +375,10 @@ Test case 3 - GRID format with NAMES display
 | 3  | 2  |
 +----+----+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -461,8 +468,10 @@ NULL
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - CSV format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -553,8 +562,10 @@ NULL
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - CSV format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -643,8 +654,10 @@ NULL
 `c`,`d`
 3,2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -734,8 +747,10 @@ NULL
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - TAB format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -826,8 +841,10 @@ NULL
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - TAB format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -916,8 +933,10 @@ NULL
 `c`	`d`
 3	2
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -1427,8 +1446,10 @@ Test case 10 - VERTICAL format with BRIEF display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 11 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -2072,8 +2093,10 @@ Test case 11 - VERTICAL format with FULL display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 12 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -2408,6 +2431,7 @@ Test case 12 - VERTICAL format with NAMES display
  d: 2
 1 row.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 13 - copy all databases
 # Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test

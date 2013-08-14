@@ -20,8 +20,6 @@ import mutlib
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 
-_TABLES = ['t1', 't2', 't3']
-
 
 class test(mutlib.System_test):
     """Import Data
@@ -32,6 +30,7 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         self.check_gtid_unsafe()
         # Need at least one server.
+        self.tables = []
         self.server1 = None
         self.server2 = None
         self.need_servers = False
@@ -87,6 +86,7 @@ class test(mutlib.System_test):
             self.servers.add_new_server(self.server2, True)
 
         self.drop_all()
+
         data_file = os.path.normpath("./std_data/multiple_keys.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
@@ -94,12 +94,24 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file, err.errmsg))
 
+        # In case other tests disable it, enable foreign key checks so
+        # that the server can record the checks are on at start.
+        self.server1.exec_query("SET foreign_key_checks=1")
+        self.server1.disable_foreign_key_checks(True)
+        data_file = os.path.normpath("./std_data/fkeys.sql")
+        try:
+            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, err.errmsg))
+        self.server1.disable_foreign_key_checks(False)
+
         return True
 
-    def _check_tables(self, server):
-        for tbl in _TABLES:
+    def _check_tables(self, server, db):
+        for tbl in self.tables:
             res = server.exec_query("SHOW CREATE TABLE "
-                                    "util_test_keys.{0}".format(tbl))
+                                    "{0}.{1}".format(db, tbl))
             self.results.append(" ".join(res[0][1].split("\n")) + "\n")
 
     def run_import_test(self, expected_res, from_conn, to_conn, db, frmt,
@@ -129,7 +141,7 @@ class test(mutlib.System_test):
 
         # Precheck: check db and save the results.
         self.results.append("BEFORE:\n")
-        self._check_tables(self.server1)
+        self._check_tables(self.server1, db)
 
         # First run the export to a file.
         res = self.run_test_case(0, export_cmd, "Running export...")
@@ -142,8 +154,9 @@ class test(mutlib.System_test):
             raise MUTLibError("IMPORT: {0}: failed".format(comment))
 
         # Now, check db and save the results.
-        self.results.append("AFTER:\n")
-        self._check_tables(self.server2)
+        if expected_res == 0:
+            self.results.append("AFTER:\n")
+            self._check_tables(self.server2, db)
 
     def run(self):
         self.res_fname = "result.txt"
@@ -154,6 +167,7 @@ class test(mutlib.System_test):
         to_conn = "--server={0}".format(conn2)
 
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
+        self.tables = ['t1', 't2', 't3']
         test_num = 1
         for frmt in _FORMATS:
             comment = ("Test Case {0} : Testing import with {1} format and "
@@ -165,6 +179,26 @@ class test(mutlib.System_test):
             test_num += 1
 
         self.drop_db(self.server2, 'db`:db')
+
+        # Now test foreign keys
+        self.tables = ['t1', 'a1']
+        comment = ("Test Case {0} : Testing import with foreign "
+                   "keys".format(test_num))
+        self.run_import_test(0, from_conn, to_conn, 'util_test_fk',
+                             "SQL", "BOTH", comment)
+        self.drop_db(self.server2, "util_test_fk")
+        test_num += 1
+
+        # Now test foreign keys but this time skip them.
+        # But this will fail because the table has fkeys!
+        comment = ("Test Case {0} : Testing import with foreign "
+                   "keys and --skip-fkey-checks".format(test_num))
+        self.run_import_test(1, from_conn, to_conn, 'util_test_fk',
+                             "SQL", "BOTH", comment, " --skip-fkey-checks ")
+        self.replace_result("ERROR: Query failed. ",
+                            "ERROR: Query failed. "
+                            "Cannot add foreign key constraint\n")
+        test_num += 1
 
         return True
 
@@ -185,6 +219,10 @@ class test(mutlib.System_test):
     def drop_all(self):
         self.drop_db(self.server1, "util_test_keys")
         self.drop_db(self.server2, "util_test_keys")
+        self.drop_db(self.server1, "util_test_fk")
+        self.drop_db(self.server2, "util_test_fk")
+        self.drop_db(self.server1, "util_test_fk2")
+        self.drop_db(self.server1, "util_test_fk3")
         return True
 
     def cleanup(self):

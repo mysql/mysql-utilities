@@ -43,6 +43,11 @@ _GTID_BACKUP_WARNING = "# WARNING: A partial export from a server that has " + \
     "don't want to generate the GTID statement, use the --skip-gtid " + \
     "option. To export all databases, use the --all and --export=both " + \
     "options."
+_FKEYS = ("SELECT DISTINCT constraint_schema "
+          "FROM INFORMATION_SCHEMA.referential_constraints "
+          "WHERE constraint_schema in ({0})")
+_FKEYS_SWITCH = "SET FOREIGN_KEY_CHECKS={0};"
+
 
 def export_metadata(source, src_val, db_list, options):
     """Produce rows to be used to recreate objects in a database.
@@ -101,7 +106,7 @@ def export_metadata(source, src_val, db_list, options):
 
         source_db.check_read_access(src_val["user"], src_val["host"],
                                     access_options)
-    
+
     for db_name in db_list:
 
         # Get a Database class instance
@@ -131,7 +136,7 @@ def export_metadata(source, src_val, db_list, options):
                     if dbobj[1][3]:
                         create_str = "GRANT %s ON %s.%s TO %s;" % \
                                      (dbobj[1][1], q_db_name,
-                                      quote_with_backticks(dbobj[1][3]), 
+                                      quote_with_backticks(dbobj[1][3]),
                                       dbobj[1][0])
                     else:
                         create_str = "GRANT %s ON %s.* TO %s;" % \
@@ -332,7 +337,7 @@ def export_data(source, src_val, db_list, options):
         for row in rows:
             if row[0] not in db_list:
                 db_list.append(row[0])
-                
+
     # Check if database exists and user permissions on source for all databases
     table_lock_list = []
     table_list = []
@@ -352,7 +357,7 @@ def export_data(source, src_val, db_list, options):
         if not source_db.exists():
             raise UtilDBError("Source database does not exist - %s" % db_name,
                               -1, db_name)
-            
+
         source_db.check_read_access(src_val["user"], src_val["host"],
                                     access_options)
 
@@ -360,7 +365,7 @@ def export_data(source, src_val, db_list, options):
         tables = source_db.get_db_objects("TABLE")
         for table in tables:
             table_list.append((db_name, table[0]))
-        
+
     old_db = ""
     for table in table_list:
         db_name = table[0]
@@ -408,10 +413,10 @@ def export_data(source, src_val, db_list, options):
                         skip_blobs, first, no_headers, outfile)
             if first:
                first = False
- 
+
         if file_per_table:
             outfile.close()
-  
+
     if not quiet:
         print "#...done."
 
@@ -420,37 +425,37 @@ def export_data(source, src_val, db_list, options):
 
 def get_change_master_command(source, options={}):
     """Get the CHANGE MASTER command for export or copy of databases
-    
+
     This method creates the replication commands based on the options chosen.
     This includes the stop and start slave commands as well as the change
     master command as follows.
-    
+
     To create the CHANGE MASTER command for connecting to the existing server
     as the master, set rpl_mode = 'master'.
-    
+
     To create the CHANGE MASTER command for using the existing server as the
     master, set rpl_mode = 'master'.
-    
+
     You can also get both CHANGE MASTER commands by setting rpl_mode = 'both'.
     In this case, the second change master command (rpl_mode = 'slave') will
     be commented out.
-    
+
     The method also checks the rpl_file option. If a file name is provided, it
     is checked to see if file exists or the user does not have access, an error
     is thrown. If no file is provided, the method writes the commands to
     stdout.
-    
+
     The user may also comment the replication commands by specifying the
     comment_rpl option (True = comment).
-                   
+
     The method calls the negotiate_rpl_connection method of the replication
     module to create the CHANGE MASTER command. Additional error checking is
     performed in that method as follows. See the negotiate_rpl_connection
     method documentation for complete specifics.
-    
+
       - binary log must be ON for a master
-      - the rpl_user must exist   
-            
+      - the rpl_user must exist
+
     source[in]         Server instance
     options[in]        option dictionary
 
@@ -461,11 +466,11 @@ def get_change_master_command(source, options={}):
 
     rpl_file = None
     rpl_cmds = []
-    
+
     rpl_filename = options.get("rpl_file", None)
     rpl_mode = options.get("rpl_mode", "master")
     quiet = options.get("quiet", False)
-    
+
     # Check for rpl_file and empty it
     if rpl_filename:
         rpl_file = rpl_filename
@@ -479,36 +484,36 @@ def get_change_master_command(source, options={}):
     strict = rpl_mode == 'both' or options.get("strict", False)
     # Get change master as if this server was a master
     if rpl_mode in ["master", "both"]:
-        
+
         if not quiet:
             rpl_cmds.append("# Connecting to the current server as master")
-            
+
         change_master = negotiate_rpl_connection(source, True, strict, options)
 
         rpl_cmds.extend(change_master)
 
-    # Get change master using this slave's master information            
+    # Get change master using this slave's master information
     if rpl_mode in ["slave", "both"]:
 
         if not quiet:
             rpl_cmds.append("# Connecting to the current server's master")
-        
+
         change_master = negotiate_rpl_connection(source, False, strict, options)
-            
+
         rpl_cmds.extend(change_master)
-    
+
     return (rpl_cmds, rpl_file)
 
 
 def get_gtid_commands(master, options):
     """Get the GTID commands for beginning and ending operations
-        
+
     This method returns those commands needed at the start of an export/copy
     operation (turn off session binlog, setting GTIDs) and those needed at
     the end of an export/copy operation (turn on binlog sesson).
-    
+
     master[in]         Master connection information
-    
+
     Returns tuple - ([],"") = list of commands for start, command for end or
                               None if GTIDs are not enabled.
     """
@@ -521,24 +526,24 @@ def get_gtid_commands(master, options):
         return None
     return ([_SESSION_BINLOG_OFF1, _SESSION_BINLOG_OFF2,
              _SET_GTID_PURGED % master_gtids], _SESSION_BINLOG_ON)
-    
+
 
 def write_commands(file, rows, options):
     """Write commands to file or stdout
-    
+
     This method writes the rows passed to either a file specified in the
     rpl_file option or stdout if no file is specified.
-    
+
     file[in]           filename to use or None for sys.stdout
     rows[in]           rows to write
     options[in]        replication options
     """
-    
+
     format = options.get("format", "sql")
     rpl_filename = options.get("rpl_file", None)
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
-    
+
     # if using --rpl_file then open the file for append
     if rpl_filename:
         rpl_file = open(rpl_filename, "a")
@@ -555,16 +560,17 @@ def write_commands(file, rows, options):
         prefix_str = "# "
     else:
         prefix_str = ""
-        
+
     # write rows
     for row in rows:
         if row[0] == '#':
             rpl_file.write("{0}\n".format(row))
         else:
-            if format != 'sql':
+            # Don't make the rpl command prefix for fkey settings
+            if format != 'sql' and not row.startswith("SET FOREIGN"):
                 prefix_str = _RPL_PREFIX
             rpl_file.write("{0}{1}\n".format(prefix_str, row))
-        
+
     if not quiet:
         if verbosity:
             rpl_file.write("#\n")
@@ -572,46 +578,48 @@ def write_commands(file, rows, options):
     # if using --rpl_file then close the file
     if rpl_filename:
         rpl_file.close()
-    
+
 
 def export_databases(server_values, db_list, options):
     """Export one or more databases
-    
+
     This method performs the export of a list of databases first dumping the
     definitions then the data. It supports dumping replication commands (STOP
     SLAVE, CHANGE MASTER, START SLAVE) for exporting data for use in
     replication scenarios.
-    
+
     server_values[in]      server connection value dictionary
     db_list[in]            list of database names
     options[in]            option dictionary
                            Must include the skip_* options for copy and export
     """
-    
+
     from mysql.utilities.command.dbcopy import get_copy_lock
     from mysql.utilities.common.server import connect_servers
 
+    fkeys_present = False
     export = options.get("export", "definitions")
     rpl_mode = options.get("rpl_mode", "master")
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
     locking = options.get("locking", "snapshot")
     skip_gtids = options.get("skip_gtid", False) # default is to generate GTIDs
-        
+    skip_fkeys = options.get("skip_fkeys", False) # default: gen fkeys stmts
+
     conn_options = {
         'quiet'     : quiet,
         'version'   : "5.1.30",
     }
     servers = connect_servers(server_values, None, conn_options)
     source = servers[0]
-    
+
     # Check for GTID support
     supports_gtid = servers[0].supports_gtid()
     if not skip_gtids and not supports_gtid == 'ON':
         skip_gtids = True
     elif skip_gtids and supports_gtid == 'ON':
         print _GTID_WARNING
-        
+
     if not skip_gtids and supports_gtid == 'ON':
         # Check GTID version for complete feature support
         servers[0].check_gtid_version()
@@ -627,7 +635,20 @@ def export_databases(server_values, db_list, options):
             if not db[0] in db_list:
                 print _GTID_BACKUP_WARNING
                 warning_printed = True
-    
+
+    # Check for existence of foreign keys
+    fkeys_enabled = servers[0].foreign_key_checks_enabled()
+    if fkeys_enabled and skip_fkeys:
+        print("# WARNING: Output contains tables with foreign key "
+              "contraints. You should disable foreign key checks prior "
+              "to importing this stream.")
+    elif fkeys_enabled and db_list:
+        db_name_list = ["'{0}'".format(db) for db in db_list]
+        res = source.exec_query(_FKEYS.format(",".join(db_name_list)))
+        if res and res[0]:
+            fkeys_present = True
+            write_commands(sys.stdout, [_FKEYS_SWITCH.format("0")], options)
+
     # Lock tables first
     my_lock = get_copy_lock(source, db_list, options, True)
 
@@ -645,17 +666,17 @@ def export_databases(server_values, db_list, options):
 
     if gtid_info:
         write_commands(sys.stdout, gtid_info[0], options)
-        
+
     # dump metadata
     if export in ("definitions", "both"):
         export_metadata(source, server_values, db_list, options)
-        
+
     # dump data
     if export in ("data", "both"):
         if options.get("display", "brief") != "brief":
             print "# NOTE : --display is ignored for data export."
         export_data(source, server_values, db_list, options)
-        
+
     # if GTIDs enabled, write the GTID-related commands
     if gtid_info:
         write_commands(sys.stdout, [gtid_info[1]], options)
@@ -667,4 +688,5 @@ def export_databases(server_values, db_list, options):
 
     my_lock.unlock()
 
-
+    if fkeys_present and fkeys_enabled and not skip_fkeys:
+        write_commands(sys.stdout, [_FKEYS_SWITCH.format("1")], options)
