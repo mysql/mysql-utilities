@@ -30,18 +30,18 @@ import os
 import re
 import sys
 
-from mysql.utilities.command.dbcompare import database_compare
+from mysql.utilities.command.dbcompare import (database_compare,
+                                               compare_all_databases)
 from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
 from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
                                              PARSE_ERR_DB_PAIR_EXT,
-                                             PARSE_ERR_DB_MISSING_CMP,
                                              PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW)
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_difftype
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_changes_for, add_reverse
-from mysql.utilities.common.options import add_format_option
-from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import (add_difftype, add_verbosity,
+                                            check_verbosity, add_changes_for,
+                                            add_reverse, add_format_option,
+                                            setup_common_options, add_regexp,
+                                            check_all)
 from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
 from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.sql_transform import remove_backtick_quoting
@@ -105,9 +105,18 @@ parser.add_option("--width", action="store", dest="width",
                   default=PRINT_WIDTH)
 
 # run-all-tests mode
-parser.add_option("-a", "--run-all-tests", action="store_true",
+parser.add_option("-t", "--run-all-tests", action="store_true",
                   dest="run_all_tests",
                   help="do not abort when a diff test fails")
+
+# Add the exclude database option
+parser.add_option("-x", "--exclude", action="append", dest="exclude",
+                  type="string", default=None, help="exclude one or more "
+                  "databases from the operation using either a specific name "
+                  "(e.g. db1), a LIKE pattern (e.g. db%) or a REGEXP "
+                  "search pattern. To use a REGEXP search pattern for all "
+                  "exclusions, you must also specify the --regexp option. "
+                  "Repeat the --exclude option for multiple exclusions.")
 
 # turn off binlog mode
 parser.add_option("--disable-binary-logging", action="store_true",
@@ -126,6 +135,10 @@ parser.add_option(
     " Default value is {0}.".format(DEFAULT_SPAN_KEY_SIZE)
     )
 
+# Add the all database options
+parser.add_option("-a", "--all", action="store_true", dest="all",
+                  default=False, help="include all databases")
+
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
@@ -138,11 +151,25 @@ add_changes_for(parser)
 # Add show reverse option
 add_reverse(parser)
 
+# Add regexp
+add_regexp(parser)
+
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
+
+# Fail if we have arguments and all databases option listed.
+check_all(parser, opt, args, "databases")
+
+# Process --exclude values to remove unnecessary quotes (when used) in order
+# to avoid further matching issues.
+if opt.exclude:
+    # Remove unnecessary outer quotes.
+    exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
+else:
+    exclude_list = opt.exclude
 
 # Set options for database operations.
 options = {
@@ -159,7 +186,10 @@ options = {
     "toggle_binlog"    : opt.toggle_binlog,
     "changes-for"      : opt.changes_for,
     "reverse"          : opt.reverse,
-    "span_key_size"    : opt.span_key_size
+    "span_key_size"    : opt.span_key_size,
+    "all"              : opt.all,
+    "use_regexp"       : opt.use_regexp,
+    "exclude_patterns" : exclude_list,
 }
 
 # Parse server connection values
@@ -183,10 +213,10 @@ if opt.server2:
         _, err, _ = sys.exc_info()
         parser.error("Server2 connection values invalid: %s." % err.errmsg)
 
-# Check for arguments
-if len(args) == 0:
-    parser.error(PARSE_ERR_DB_MISSING_CMP)
-
+# Fail if no db arguments or all
+if len(args) == 0 and not opt.all:
+    parser.error("You must specify at least one database to compare or "
+                 "use the --all option to compare all databases.")
 
 if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
     parser.error(
@@ -201,56 +231,67 @@ if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
 
 res = True
 check_failed = False
-arg_regexp = re.compile('{0}(?:(?:\:){0})?'.format(REGEXP_OBJ_NAME))
-for db in args:
-    # Split the database names considering backtick quotes
-    grp = arg_regexp.match(db)
-    if not grp:
-        parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
-                                              db1_label='db1',
-                                              db2_label='db2'))
-    parts = grp.groups()
-    matched_size = len(parts[0])
-    if not parts[1]:
-        parts = (parts[0], parts[0])
-    else:
-        # add 1 for the separator ':'
-        matched_size = matched_size + 1
-        matched_size = matched_size + len(parts[1])
-    # Verify if the size of the databases matched by the REGEX is equal to the
-    # initial specified string. In general, this identifies the missing use
-    # of backticks.
-    if matched_size != len(db):
-        parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
-                                                  db1_label='db1',
-                                                  db2_label='db2',
-                                                  db1_value=parts[0],
-                                                  db2_value=parts[1]))
 
-    # Remove backtick quotes (handled later)
-    db1 = remove_backtick_quoting(parts[0]) \
-                if is_quoted_with_backticks(parts[0]) else parts[0]
-    db2 = remove_backtick_quoting(parts[1]) \
-                if is_quoted_with_backticks(parts[1]) else parts[1]
-
-    try:
-        res = database_compare(server1_values, server2_values,
-                               db1, db2, options)
-        print
-    except UtilError:
-        _, e, _ = sys.exc_info()
-        print("ERROR: %s" % e.errmsg)
-        sys.exit(1)
-
-    if not res:
+if opt.all:
+    res = compare_all_databases(server1_values, server2_values,
+                                exclude_list, options)
+    if res is None:
+        check_failed = None
+    elif not res:
         check_failed = True
+else:
+    arg_regexp = re.compile('{0}(?:(?:\:){0})?'.format(REGEXP_OBJ_NAME))
+    for db in args:
+        # Split the database names considering backtick quotes
+        grp = arg_regexp.match(db)
+        if not grp:
+            parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
+                                                  db1_label='db1',
+                                                  db2_label='db2'))
+        parts = grp.groups()
+        matched_size = len(parts[0])
+        if not parts[1]:
+            parts = (parts[0], parts[0])
+        else:
+            # add 1 for the separator ':'
+            matched_size = matched_size + 1
+            matched_size = matched_size + len(parts[1])
+        # Verify if the size of the databases matched by the REGEX is equal
+        # to the initial specified string. In general, this identifies the
+        # missing use of backticks.
+        if matched_size != len(db):
+            parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+                                                      db1_label='db1',
+                                                      db2_label='db2',
+                                                      db1_value=parts[0],
+                                                      db2_value=parts[1]))
 
-    if check_failed and not opt.run_all_tests:
-        break
+        # Remove backtick quotes (handled later)
+        db1 = remove_backtick_quoting(parts[0]) \
+            if is_quoted_with_backticks(parts[0]) else parts[0]
+        db2 = remove_backtick_quoting(parts[1]) \
+            if is_quoted_with_backticks(parts[1]) else parts[1]
+
+        try:
+            res = database_compare(server1_values, server2_values,
+                                   db1, db2, options)
+            print
+        except UtilError:
+            _, e, _ = sys.exc_info()
+            print("ERROR: {0}".format(e.errmsg))
+            sys.exit(1)
+
+        if not res:
+            check_failed = True
+
+        if check_failed and not opt.run_all_tests:
+            break
 
 if not opt.quiet:
     print
-    if check_failed:
+    if check_failed is None:
+        print("# No databases to compare.")
+    elif check_failed:
         print("# Database consistency check failed.")
     else:
         sys.stdout.write("# Databases are consistent")

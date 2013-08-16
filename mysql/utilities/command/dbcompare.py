@@ -28,7 +28,7 @@ from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
-
+from mysql.utilities.common.server import connect_servers
 
 _PRINT_WIDTH = 75
 _ROW_FORMAT = "# {0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
@@ -38,6 +38,7 @@ _ERROR_DB_DIFF = "The object definitions do not match."
 _ERROR_DB_MISSING = "The database {0} does not exist."
 _ERROR_OBJECT_LIST = "The list of objects differs among database {0} and {1}."
 _ERROR_ROW_COUNT = "Row counts are not the same among {0} and {1}.\n#"
+_ERROR_DB_MISSING_ON_SERVER = "The database {0} on {1} does not exist on {2}."
 
 _DEFAULT_OPTIONS = {
     "quiet"           : False,
@@ -497,6 +498,84 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
         # Fail if errors are found
         if error_list:
+            success = False
+
+    return success
+
+
+def compare_all_databases(server1_val, server2_val, exclude_list, options):
+    """Perform a consistency check among all common databases on the servers
+
+    This method gets all databases from the servers, prints any missing
+    databases and performs a consistency check among all common databases.
+
+    If any errors or differences are found, the operation will print the
+    difference and continue.
+
+    This method will return None if no databases to compare.
+    """
+
+    success = True
+
+    # Connect to servers
+    conn_options = {
+        "quiet": options.get("quiet", False),
+        "src_name": "server1",
+        "dest_name": "server2",
+
+    }
+    server1, server2 = connect_servers(server1_val, server2_val, conn_options)
+
+    # Get all databases, except those used in --exclude
+    get_dbs_query = """
+        SELECT SCHEMA_NAME
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
+        AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
+        AND SCHEMA_NAME != 'mysql'
+        {0}"""
+    conditions = ""
+    if exclude_list:
+        # Add extra where to exclude databases in exclude_list
+        operator = 'REGEXP' if options['use_regexp'] else 'LIKE'
+        conditions = "AND {0}".format(" AND ".join(
+            ["SCHEMA_NAME NOT {0} '{1}'".format(operator, db)
+             for db in exclude_list])
+        )
+
+    server1_dbs = set(
+        [db[0] for db in server1.exec_query(get_dbs_query.format(conditions))]
+    )
+    server2_dbs = set(
+        [db[0] for db in server2.exec_query(get_dbs_query.format(conditions))]
+    )
+
+    # Check missing databases
+    if options['changes-for'] == 'server1':
+        diff_dbs = server1_dbs.difference(server2_dbs)
+        for db in diff_dbs:
+            msg = _ERROR_DB_MISSING_ON_SERVER.format(db, "server1", "server2")
+            print("# {0}".format(msg))
+    else:
+        diff_dbs = server2_dbs.difference(server1_dbs)
+        for db in diff_dbs:
+            msg = _ERROR_DB_MISSING_ON_SERVER.format(db, "server2", "server1")
+            print("# {0}".format(msg))
+
+    # Compare databases in common
+    common_dbs = server1_dbs.intersection(server2_dbs)
+    if common_dbs:
+        print("# Comparing databases: {0}".format(", ".join(common_dbs)))
+    else:
+        success = None
+    for db in common_dbs:
+        try:
+            res = database_compare(server1_val, server2_val, db, db, options)
+            if not res:
+                success = False
+            print("\n")
+        except UtilError as err:
+            print("ERROR: {0}\n".format(err.errmsg))
             success = False
 
     return success

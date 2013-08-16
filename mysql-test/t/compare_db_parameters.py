@@ -61,7 +61,7 @@ class test(compare_db.test):
         for diff in _DIFF_FORMATS:
             for format in _OUTPUT_FORMATS:
                 test_num += 1
-                cmd_opts = " -a --difftype=%s --format=%s" % (diff, format)
+                cmd_opts = " -t --difftype=%s --format=%s" % (diff, format)
                 comment = "Test case %d - Use %s" % (test_num, cmd_opts)
                 res = self.run_test_case(1, cmd_str + cmd_opts, comment)
                 if not res:
@@ -75,14 +75,14 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts += " --quiet -a"
+        cmd_opts += " --quiet -t"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -a"
+        cmd_opts = " --format=csv -t"
         cmd_opts += " --width=65"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -90,7 +90,7 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -a"
+        cmd_opts = " --format=csv -t"
         cmd_opts += " --width=55"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -98,24 +98,40 @@ class test(compare_db.test):
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a"
+        cmd_opts = " --format=csv -vvv -t"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a --disable-binary-logging"
+        cmd_opts = " --format=csv -vvv -t --disable-binary-logging"
         comment = "Test case %d - %s" % (test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a --span-key-size=16"
+        cmd_opts = " --format=csv -vvv -t --span-key-size=16"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
-        cmd = "{0}{1}".format(cmd_str, cmd_opts) 
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " --all"
+        comment = "Test case {0} - Use{1}".format(test_num, cmd_opts)
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " --all inventory"
+        comment = "Test case {0} - Use{1}".format(test_num, cmd_opts)
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(2, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -41,7 +41,7 @@ class test(compare_db.test):
         cmd_str = "mysqldbcompare.py %s %s " % (s1_conn, s2_conn)
 
         comment = "Test case 1 - check a sample database generate SQL"
-        res = self.run_test_case(0, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(0, cmd_str + "inventory:inventory -t "
                                  "--difftype=sql", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -50,14 +50,14 @@ class test(compare_db.test):
 
         comment = "Test case 2 - check database with known differences " + \
                   "generate SQL direction = server1 (default)"
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                  "--difftype=sql --format=CSV", comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
             
         comment = "Test case 3 - check database with known differences " + \
                   "generate SQL direction = server2"
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                  "--difftype=sql --format=CSV "
                                  "--changes-for=server2", comment)
         if not res:
@@ -65,7 +65,7 @@ class test(compare_db.test):
 
         comment = "Test case 4 - check database with known differences " + \
                   "generate SQL direction = server1 with reverse"
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                  "--difftype=sql --format=CSV "
                                  "--changes-for=server1 --show-reverse",
                                  comment)
@@ -74,7 +74,7 @@ class test(compare_db.test):
 
         comment = "Test case 5 - check database with known differences " + \
                   "generate SQL direction = server2 with reverse"
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                  "--difftype=sql --format=CSV "
                                  "--changes-for=server2 --show-reverse",
                                  comment)

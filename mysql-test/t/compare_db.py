@@ -137,7 +137,7 @@ class test(mutlib.System_test):
 
         test_num = 1
         comment = "Test case {0} - check a sample database".format(test_num)
-        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        cmd = "{0} inventory:inventory -t".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -147,7 +147,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "(extra table)").format(test_num)
-        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        cmd = "{0} inventory:inventory -t".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -158,7 +158,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server1 (default)").format(test_num)
-        cmd = "{0} inventory:inventory -a --format=CSV".format(cmd_base)
+        cmd = "{0} inventory:inventory -t --format=CSV".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -166,7 +166,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server2").format(test_num)
-        cmd = ("{0} inventory:inventory -a --format=CSV "
+        cmd = ("{0} inventory:inventory -t --format=CSV "
                "--changes-for=server2").format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -175,7 +175,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server1 and reverse").format(test_num)
-        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server1 "
+        cmd = ("{0} inventory:inventory -t --format=CSV --changes-for=server1 "
                "--show-reverse").format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -184,7 +184,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server2 and reverse").format(test_num)
-        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server2 "
+        cmd = ("{0} inventory:inventory -t --format=CSV --changes-for=server2 "
                "--show-reverse").format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -198,7 +198,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - compare two databases on same server "
                    "w/server2").format(test_num)
         cmd = ("mysqldbcompare.py {0} {1} inventory:inventory2 "
-               "-a").format(s1_conn, s2_conn_dupe)
+               "-t").format(s1_conn, s2_conn_dupe)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -206,16 +206,16 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare two databases on same "
                    "server").format(test_num)
-        cmd = "mysqldbcompare.py {0} inventory:inventory2 -a".format(s1_conn)
+        cmd = "mysqldbcompare.py {0} inventory:inventory2 -t".format(s1_conn)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db.``:db`:`db.``:db`' -a"
+            cmd_arg = "'`db.``:db`:`db.``:db`' -t"
         else:
-            cmd_arg = '"`db.``:db`:`db.``:db`" -a'
+            cmd_arg = '"`db.``:db`:`db.``:db`" -t'
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         test_num += 1
         comment = ("Test case {0} - compare a database with weird names "
@@ -227,7 +227,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = "Test case {0} - compare two empty databases".format(test_num)
         cmd = "mysqldbcompare.py {0} {1} {2}".format(
-            s1_conn, s2_conn, "empty_db:empty_db -a"
+            s1_conn, s2_conn, "empty_db:empty_db -t"
         )
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -276,6 +276,33 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - compare all databases").format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} --all".format(s1_conn, s2_conn)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare all databases with --exclude "
+                   "option and LIKE pattern").format(test_num)
+        cmd_arg = ('--all --exclude=inventory --exclude=db%')
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare all databases with --exclude "
+                   "option and REGEXP pattern").format(test_num)
+        cmd_arg = ('--all --exclude=inventory --exclude=^db* --regexp')
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.remove_result("# The database world on server1 does not exist on "
+                           "server2.")
         self.do_replacements()
 
         return True

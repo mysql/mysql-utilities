@@ -47,7 +47,7 @@ class test(compare_db.test):
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
 
         test_num = 1
-        cmd_str = "mysqldbcompare.py -a -vvv inventory:inventory "
+        cmd_str = "mysqldbcompare.py -t -vvv inventory:inventory "
         cmd_opts = "--server1=joeunk:@:dooer " + s2_conn
         comment = "Test case {0} - Invalid --server1 ".format(test_num)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
@@ -94,7 +94,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         cmd_opts = "--span-key-size=A"
         comment = ("Test case {0} - invalid value for {1} "
                    "").format(test_num, cmd_opts)
@@ -104,7 +104,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         cmd_opts = "--span-key-size=-4"
         comment = ("Test case {0} - size too low for {1} "
                    "".format(test_num, cmd_opts))
@@ -131,7 +131,7 @@ class test(compare_db.test):
         self.server2.exec_query("INSERT INTO inventory.box VALUES (2)")
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - No pri key".format(test_num, cmd_opts))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:

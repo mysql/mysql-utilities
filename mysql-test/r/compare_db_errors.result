@@ -29,7 +29,7 @@ mysqldbcompare.py: error: The value -4 specified for option --span-key-size is t
 Test case 8 - no options
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: No databases specified to compare.
+mysqldbcompare.py: error: You must specify at least one database to compare or use the --all option to compare all databases.
 Test case 9 - No pri key
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
