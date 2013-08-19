@@ -68,6 +68,7 @@ class _MSIDist(bdist):
         self.keep_temp = False
         self.dist_type = None
         self.dist_target = None
+        self.product_name = 'MySQL Utilities'
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -142,7 +143,7 @@ class _MSIDist(bdist):
         else:
             liscense_file = 'License.rtf'
         params = {
-            'ProductName': 'MySQL Utilities',
+            'ProductName': self.product_name,
             'ReleaseString': RELEASE_STRING,
             'Copyright': COPYRIGHT,
             'Version': '.'.join([major, minor, patch]),
@@ -292,7 +293,7 @@ class BuiltCommercialMSI(_MSIDist):
                                    ('dist_dir', 'dist_dir'),
                                    ('plat_name', 'plat_name'))
 
-        self.wxs = 'support/MSWindows/mysql_utilities.xml'
+        self.wxs = 'support/MSWindows/mysql_utilities_com.xml'
         self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
 
     def _get_wixobj_name(self, app_version=None, python_version=None):
@@ -323,12 +324,12 @@ class BuiltCommercialMSI(_MSIDist):
         buildexe.run()
         docfiles = [
             (os.path.join(cmdbdist.dist_target, 'LICENSE_com.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'LICENSE.txt')),
+             os.path.join(cmdbdist.bdist_dir, 'LICENSE_com.txt')),
             (os.path.join(cmdbdist.dist_target, 'README_com.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'README.txt'))
+             os.path.join(cmdbdist.bdist_dir, 'README_com.txt'))
         ]
         for src, dst in docfiles:
             self.copy_file(src, dst)
         self.bdist_base = cmdbdist.bdist_dir
-
-
+        # This sets name for various items as install directory.
+        self.product_name = 'MySQL Utilities commercial'
