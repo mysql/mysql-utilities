@@ -274,10 +274,13 @@ class SourceCommercial(sdist):
                 filelist.remove(afile)
                 log.info("removing from distribution '%s'" % afile)
 
-        copy_file('LICENSE_com.txt', os.path.join(pkgdir, 'LICENSE.txt'))
-        filelist.append('LICENSE.txt')
-        copy_file('README_com.txt', os.path.join(pkgdir, 'README.txt'))
-        filelist.append('README.txt')
+        comm_path = os.path.join('support', 'commercial_docs')
+        copy_file(os.path.join(comm_path, 'LICENSE_com.txt'),
+                  os.path.join(pkgdir, 'LICENSE_com.txt'))
+        filelist.append('LICENSE_com.txt')
+        copy_file(os.path.join(comm_path, 'README_com.txt'),
+                  os.path.join(pkgdir, 'README_com.txt'))
+        filelist.append('README_com.txt')
 
 #        log.info("setting license information in version.py")
 #        loc_version_py = os.path.join(pkgdir, 'version.py')
