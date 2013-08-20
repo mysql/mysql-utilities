@@ -28,7 +28,7 @@ _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
 class test(mutlib.System_test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
-    
+
     Note: this test will run against servers without GTID enabled.
     See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
@@ -73,7 +73,7 @@ class test(mutlib.System_test):
                                   "'{0}'.".format(name))
             self.servers.add_new_server(res[0], True)
             server = res[0]
-            
+
         return server
 
     def setup(self):
@@ -104,23 +104,23 @@ class test(mutlib.System_test):
         return self.reset_topology()
 
     def run(self):
-        
+
         cmd_str = "mysqlrpladmin.py %s " % self.master_str
-        
+
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        
+
         slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        
+
         comment = "Test case 1 - show health before switchover"
         cmd_opts = " --slaves=%s --format=vertical health" % slaves_str
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         # Build connection string with loopback address instead of localhost
         slave_ports = [self.server2.port, self.server3.port, self.server4.port]
         slaves_loopback = "root:root@127.0.0.1:%s," % self.server2.port
@@ -295,6 +295,12 @@ class test(mutlib.System_test):
 
         servers = [self.server1]
         servers.extend(slaves)
+
+        # Check if all servers are alive, and if they are not,
+        # spawn a new instance
+        for index, server in enumerate(servers[:]):
+            servers[index] = self.spawn_server(server.role)
+
         for slave in servers:
             try:
                 slave.exec_query("STOP SLAVE")
@@ -315,10 +321,10 @@ class test(mutlib.System_test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             try:
