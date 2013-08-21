@@ -1,7 +1,17 @@
+Release 1.3.5 (Released August 21, 2013)
+----------------------------------------
+
+- BUG#17061126: mysqldiff needs an auto_increment ignoring option
+- BUG#17205680: non-deterministic failure of rpl_admin tests
+- BUG#17256821: Commercial and GPL msi distro shares build descriptor
+- BUG#17271100: mysqldbexport does not export fkeys
+- BUG#17316515: Community distros contain both GPL and Commercial license
+
 Release 1.3.4 (Released July 18, 2013)
 --------------------------------------
 
 - BUG#17064771: Add platform name and version to deb package.
+- WL#7191: Commercial Distribution of MySQL Utilities
 
 Release 1.2.5 (Released July 18, 2013)
 --------------------------------------
