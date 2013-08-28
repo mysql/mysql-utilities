@@ -1,27 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
   xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
+
+  <?define RTMProductVersion="1.3.0" ?>
+
+  <?define PackageCode="*"?>
+
   <Product Id="*"
-   Name="$(var.ProductName)"
+   Name="MySQL Utilities"
    Version="$(var.Version)"
    Manufacturer="Oracle"
    Language="1033"
    UpgradeCode="$(var.UpgradeCode)">
 
-    <Package Compressed="yes" InstallerVersion="200"
-     Description="$(var.ProductName) Installer"
-     Comments="$(var.Copyright)"
-     InstallScope="perMachine"/>
+    <Package Id='$(var.PackageCode)'
+             Compressed="yes" InstallerVersion="200"
+             Description="MySQL Utilities Installer"
+             Comments="$(var.Copyright)"
+             InstallScope="perMachine" />
 
-    <MajorUpgrade AllowDowngrades="no" Disallow="no"
-     DowngradeErrorMessage="A later version of $(var.ProductName) is already installed."/>
+    <!-- <MajorUpgrade AllowDowngrades="no" Disallow="no" AllowSameVersionUpgrades="yes"
+     DowngradeErrorMessage="A later version of $(var.ProductName) is already installed."/> -->
+
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Upgrade Id="$(var.UpgradeCode)">  
+    <!-- <UpgradeVersion
+      Minimum="1.0.0"
+      Property="OLDVERSIONFOUND"
+      OnlyDetect="no"
+      IncludeMinimum="yes" IncludeMaximum="no" />
+    </Upgrade> -->
+    <UpgradeVersion Minimum="$(var.Version)"
+                    IncludeMinimum="no"
+                    OnlyDetect="no"
+                    Language="1033"
+                    Property="NEWPRODUCTFOUND" />
+    <UpgradeVersion Minimum="$(var.RTMProductVersion)"
+                    IncludeMinimum="yes"
+                    Maximum="$(var.Version)"
+                    IncludeMaximum="yes"
+                    Language="1033"
+                    Property="UPGRADEFOUND" />
+    </Upgrade>
 
     <Media Id="1" Cabinet="ConnectorPython_Python.cab" EmbedCab="yes"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="ProgFilesFolder">
         <Directory Id="CompanyDir" Name="MySQL">
-          <Directory Id="INSTALLDIR" Name="$(var.ProductName)"/>
+          <Directory Id="INSTALLDIR" Name="MySQL Utilities"/>
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs">
@@ -264,7 +291,7 @@
     </DirectoryRef>
 
     <Feature Id="Complete" Level="1" ConfigurableDirectory="INSTALLDIR"
-      Title="$(var.ProductName) $(var.Version)" Description="Complete">
+      Title="MySQL Utilities $(var.Version)" Description="Complete">
       <Feature Id="Install" Level="1">
         <ComponentRef Id="SetupRegistry"/>
         <ComponentRef Id="SetupEnv"/>
@@ -279,8 +306,13 @@
       </Feature>
     </Feature>
 
+    <!-- Prevent downgrading -->
+    <CustomAction Id="PreventDowngrading" Error="Newer version already installed." />
+
     <InstallExecuteSequence>
-      <!--<RemoveExistingProducts After="InstallInitialize"/>-->
+      <LaunchConditions After='AppSearch' />
+      <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
+      <RemoveExistingProducts After='InstallValidate' />
     </InstallExecuteSequence>
 
     <!-- Launch mysqluc after installation -->
