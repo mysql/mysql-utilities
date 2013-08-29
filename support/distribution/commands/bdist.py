@@ -48,10 +48,12 @@ class BuiltCommercial(bdist):
          "exclude sources built distribution (default: True)"),
         ('formats=', None,
          "formats for source distribution (comma-separated list)"),
+        ('hide-pyver', 'h',
+         "do not add the python version to the package name"),
     ]
 
     boolean_options = [
-        'keep-temp', 'include-sources'
+        'keep-temp', 'include-sources', 'hide_pyver'
     ]
 
     help_options = [
@@ -63,6 +65,7 @@ class BuiltCommercial(bdist):
         """Initialize the options"""
         self.bdist_dir = None
         self.keep_temp = 0
+        self.hide_pyver = 0
         self.dist_dir = None
         self.include_sources = False
         self.plat_name = ''
@@ -94,6 +97,8 @@ class BuiltCommercial(bdist):
         self.dist_name = get_dist_name(
             self.distribution,
             source_only_dist=self.include_sources,
+            # Hide python version for package name
+            hide_pyver=self.hide_pyver,
             commercial=True)
         
         commercial_license = 'Other/Proprietary License'

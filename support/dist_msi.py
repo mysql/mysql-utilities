@@ -56,6 +56,9 @@ class _MSIDist(bdist):
         ('keep-temp', 'k',
          "keep the pseudo-installation tree around after " +
          "creating the distribution"),
+        ('sub-version=', 's',
+         "adds a subversion after the current version, "
+         "(default: %s)" % "-1"),
         ]
 
     boolean_options = ['keep-temp']
@@ -69,6 +72,7 @@ class _MSIDist(bdist):
         self.dist_type = None
         self.dist_target = None
         self.product_name = 'MySQL Utilities'
+        self.sub_version = "-1"
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -238,8 +242,9 @@ class MSIBuiltDist(_MSIDist):
         pyver = python_version or self.python_version
         if self.plat_name:
             platform = '-' + self.plat_name
-        return "mysql-utilities-{app_version}{platform}.wixobj".format(
-            app_version=appver, python_version=pyver, platform=platform)
+        return ("mysql-utilities-{app_version}{sub_version}{platform}.wixobj"
+                "").format(app_version=appver, sub_version=self.sub_version,
+                           python_version=pyver, platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
@@ -303,13 +308,15 @@ class BuiltCommercialMSI(_MSIDist):
         """
         appver = app_version or self.distribution.metadata.version
         pyver = python_version or self.python_version
-#        try:
+
         if self.plat_name:
             platform = '-' + self.plat_name
-#        except AttributeError:
-#            platform = None
-        return "mysql-utilities-commercial-{app_version}{platform}.wixobj".format(
-            app_version=appver, python_version=pyver, platform=platform)
+
+        return ("mysql-utilities-commercial-{app_version}{sub_version}"
+                "{platform}.wixobj").format(app_version=appver,
+                                            sub_version=self.sub_version,
+                                            python_version=pyver,
+                                            platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""

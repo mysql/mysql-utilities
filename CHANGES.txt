@@ -6,6 +6,7 @@ Release 1.3.5 (Released August 21, 2013)
 - BUG#17256821: Commercial and GPL msi distro shares build descriptor
 - BUG#17271100: mysqldbexport does not export fkeys
 - BUG#17316515: Community distros contain both GPL and Commercial license
+- BUG#17353571: GPL & Commercial msi installers create separate installs
 
 Release 1.3.4 (Released July 18, 2013)
 --------------------------------------

@@ -30,6 +30,7 @@ Packager:       %{packager}
 URL:            http://dev.mysql.com/downloads/
 Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+BuildArch:      noarch
 Conflicts:      mysql-utilities
 
 Prefix:			/usr
