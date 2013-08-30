@@ -275,6 +275,9 @@ class BuiltCommercialMSI(_MSIDist):
         ('wix-install', None,
          "location of the Windows Installer XML installation"
          "(default: %s)" % wix.WIX_INSTALL_PATH),
+        ('sub-version=', 's',
+         "adds a subversion after the current version, "
+         "(default: %s)" % "-1"),
     ]
 
     boolean_options = [
@@ -283,6 +286,7 @@ class BuiltCommercialMSI(_MSIDist):
     
     def initialize_options (self):
         """Initialize the options"""
+        self.sub_version = "-1"
         self.bdist_base = None
         self.keep_temp = 0
         self.dist_dir = None
