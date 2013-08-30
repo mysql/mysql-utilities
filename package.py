@@ -90,16 +90,20 @@ Installing cx_Freeze
 
 """
 
-
+import ConfigParser
+import fnmatch
 import sys
 import os
 from glob import glob
 import platform
 import distutils.core
 from distutils.command.bdist_dumb import bdist_dumb
+from distutils.command.install_data import install_data as _install_data
 from distutils import log
 from distutils.dir_util import remove_tree, ensure_relative
 from distutils.util import change_root
+
+from info import find_packages
 
 _REQUIRED_PYTHON = (2, 7, 3) # Exact version
 _REQUIRED_CX_FREEZE = (4, 3, 1) # Or later
@@ -271,6 +275,70 @@ class InstallMan(distutils.core.Command):
             dest_man = os.path.join(dest_dir, man)
             self.copy_file(src_man, dest_man)
 
+# We need to edit the configuration file before installing it
+class install_data(_install_data):
+    def run(self):
+        from itertools import groupby
+
+        # Set up paths to write to config file
+        install_dir = self.install_dir
+        install_logdir = '/var/log'
+        if os.name == 'posix':
+            install_sysconfdir = '/etc'
+        elif os.name == 'nt':
+            install_sysconfdir = '%LocalAppData%/MySQL/MySQL Utilities'
+        else:
+            install_sysconfdir = '/etc'
+
+        if not self.data_files:
+            return
+        # Go over all entries in data_files and process it if needed
+        for df in self.data_files:
+            # Figure out what the entry contain and collect a list of files.
+            if isinstance(df, str):
+                # This was just a file name, so it will be installed
+                # in the install_dir location. This is a copy of the
+                # behaviour inside distutils intall_data.
+                directory = install_dir
+                filenames = [df]
+            else:
+                directory = df[0]
+                filenames = df[1]
+
+            # Process all the files for the entry and build a list of
+            # tuples (directory, file)
+            data_files = []
+            for filename in filenames:
+                # It was a config file template, add install
+                # directories to the config file.
+                if fnmatch.fnmatch(filename, 'data/*.cfg.in'):
+                    config = ConfigParser.RawConfigParser({
+                           'prefix': '', # install_dir,
+                            'logdir': install_logdir,
+                            'sysconfdir': install_sysconfdir,
+                            })
+                    config.readfp(open(filename))
+                    #filename = os.path.split(os.path.splitext(filename)[0])[1]
+                    filename = os.path.splitext(filename)[0]
+                    config.write(open(filename, "w"))
+                    # change directory 'fabric'to mysql 
+                    directory = os.path.join(install_sysconfdir, 'mysql')
+                    if os.name == 'nt':
+                        directory = install_sysconfdir
+                data_files.append((directory, filename))
+
+        # Re-construct the data_files entry from what was provided by
+        # merging all tuples with same directory and provide a list of
+        # files as second item, e.g.:
+        #   [('foo', 1), ('bar', 2), ('foo', 3), ('foo', 4), ('bar', 5)]
+        #   --> [('bar', [2, 5]), ('foo', [1, 3, 4])]
+        data_files.sort()
+        data_files = [
+            (d, [ f[1] for f in fs ]) for d, fs in groupby(data_files, key=lambda x: x[0])
+            ]
+        self.data_files = data_files
+        _install_data.run(self)
+
 
 # Specific packaging for Unix platforms
 if os.name != 'nt':
@@ -307,6 +375,7 @@ SETUP_ARGS['cmdclass'].update({
     'bdist_dumb': BDistDumb,
     'install': Install,
     'install_man': InstallMan,
+    'install_data': install_data,
     })
 
 # Disable commands

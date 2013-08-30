@@ -94,6 +94,10 @@ class BuildDistDebian(Command):
            ("mysql", os.path.join(self.deb_base, "mysql")),
            ("scripts", os.path.join(self.deb_base, "scripts"))
            ]
+        # Hack for Fabric, copy data dir if exist
+        if os.path.exists('data'):
+            copy_tree_src_dst.append(("data",
+                                      os.path.join(self.deb_base, "data")))
         for src, dst in copy_tree_src_dst:
             copy_tree(src, dst)
 

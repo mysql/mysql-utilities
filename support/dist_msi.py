@@ -38,6 +38,7 @@ from distutils.file_util import copy_file
 
 from mysql.utilities import RELEASE_STRING, COPYRIGHT
 from support import wix
+from support.distribution.msi_descriptor_parser import add_features
 
 WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
 
@@ -68,6 +69,7 @@ class _MSIDist(bdist):
         self.keep_temp = False
         self.dist_type = None
         self.dist_target = None
+        self.product_name = 'MySQL Utilities'
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -142,7 +144,7 @@ class _MSIDist(bdist):
         else:
             liscense_file = 'License.rtf'
         params = {
-            'ProductName': 'MySQL Utilities',
+            'ProductName': self.product_name,
             'ReleaseString': RELEASE_STRING,
             'Copyright': COPYRIGHT,
             'Version': '.'.join([major, minor, patch]),
@@ -227,6 +229,26 @@ class MSIBuiltDist(_MSIDist):
         _MSIDist.finalize_options(self)
         if not self.wix_install:
             self.wix_install = WIX_INSTALL
+        pck_fabric = False
+        add_doczip = False
+        for pck_name in self.distribution.packages:
+            if 'fabric' in pck_name:
+                pck_fabric = True
+                log.info('-Adding Fabric')
+        for dest, data_files in self.distribution.data_files:
+            for data_file in data_files:
+                log.info('data_file: {0}'.format(data_file))
+                if 'docphp.zip' in data_file:
+                    add_doczip = True
+                    log.info('-Adding doctrine extensions')
+        if pck_fabric or add_doczip:
+            base_xml_path = "support/MSWindows/mysql_utilities.xml"
+            result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
+            add_features(base_xml_path, result_xml_path,
+                         add_fabric=pck_fabric,
+                         add_doczip=add_doczip)
+
+            self.wxs = result_xml_path
 
     def _get_wixobj_name(self, app_version=None, python_version=None):
         """Get the name for the wixobj-file
@@ -242,6 +264,14 @@ class MSIBuiltDist(_MSIDist):
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
+        log.info('===== installing data =====')
+        install_data = self.reinitialize_command('install_data',
+                                                     reinit_subcommands=1)
+        install_data.install_dir = self.bdist_base
+        log.info("installing to %s" % self.bdist_base)
+        self.run_command('install_data')
+        log.info('install_data finish')
+        
         buildexe = self.get_finalized_command('build_exe')
         buildexe.build_exe = self.bdist_base 
         buildexe.run()
@@ -330,5 +360,7 @@ class BuiltCommercialMSI(_MSIDist):
         for src, dst in docfiles:
             self.copy_file(src, dst)
         self.bdist_base = cmdbdist.bdist_dir
+        # This sets name for various items as install directory.
+        self.product_name = 'MySQL Utilities Commercial'
 
 
