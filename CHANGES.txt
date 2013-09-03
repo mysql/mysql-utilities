@@ -1,3 +1,9 @@
+Release 1.4.0 (Released September 3, 2013)
+------------------------------------------
+
+- BUG#14059317: features for mysqldbcompare
+- WL#7212: Bundling Fabric with MySQL Utilities
+
 Release 1.3.4 (Released July 18, 2013)
 --------------------------------------
 
