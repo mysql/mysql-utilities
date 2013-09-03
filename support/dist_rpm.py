@@ -43,6 +43,8 @@ class BuiltDistRPM(Command):
          "creating the distribution archive"),
         ('dist-dir=', 'd',
          "directory to put final built distributions in"),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     rpm_spec = 'support/RPM/mysql_utilities_src.spec'
@@ -53,6 +55,7 @@ class BuiltDistRPM(Command):
         self.rpm_base = None
         self.keep_temp = 0
         self.dist_dir = None
+        self.tag = ''
     
     def finalize_options(self):
         """Finalize the options"""
@@ -62,6 +65,8 @@ class BuiltDistRPM(Command):
 
         if not self.rpm_base:
             self.rpm_base = os.path.join(self.bdist_base, 'rpm')
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def _populate_rpmbase(self):
         """Create and populate the RPM base directory"""
@@ -112,8 +117,14 @@ class BuiltDistRPM(Command):
             for base, dirs, files in os.walk(rpms):
                 for filename in files:
                     if filename.endswith('.rpm'):
+                        newname = filename.replace(
+                            '{0}-1'.format(META_INFO['version']),
+                            '{0}-1{1}'.format(META_INFO['version'],
+                                                        self.tag)
+                        )
                         filepath = os.path.join(base, filename)
-                        copy_file(filepath, self.dist_dir)
+                        filedest = os.path.join(self.dist_dir, newname)
+                        copy_file(filepath, filedest)
 
     def run(self):
         """Run the distutils command"""
@@ -225,8 +236,14 @@ class _RPMDist(Command):
         for base, dirs, files in os.walk(rpms):
             for filename in files:
                 if filename.endswith('.rpm'):
+                    newname = filename.replace(
+                        '{0}-1'.format(META_INFO['version']),
+                        '{0}-1{1}'.format(META_INFO['version'],
+                                                    self.tag)
+                    )
                     filepath = os.path.join(base, filename)
-                    copy_file(filepath, self.dist_dir)
+                    filedest = os.path.join(self.dist_dir, newname)
+                    copy_file(filepath, filedest)
 
     def run(self):
         """Run the distutils command"""
@@ -269,6 +286,8 @@ class BuiltCommercialRPM(_RPMDist):
          "directory to put final built distributions in"),
         ('include-sources', None,
          "exclude sources built distribution (default: True)"),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     boolean_options = [
@@ -281,6 +300,7 @@ class BuiltCommercialRPM(_RPMDist):
         self.keep_temp = 0
         self.dist_dir = None
         self.include_sources = False
+        self.tag = ''
     
     def finalize_options(self):
         """Finalize the options"""

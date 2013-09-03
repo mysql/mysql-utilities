@@ -59,6 +59,8 @@ comp_doczip_menu = ('<Component>'
     '</Component>'
 )
 
+docphp = "mysql-fabric-doctrine-0.4.0.zip"
+
 dirref_doczip = ('<Product><DirectoryRef Id="DOCTRINEZIP">'
     '<Component Guid="cadd4711-6c3d-426f-a646-ad4f3a62f885" Id="SetupRegistryDocZip">'
     '<RegistryKey Action="createAndRemoveOnUninstall" Key="Software\MySQL\MySQL Utilities\[DOCTRINEZIP]" Root="HKCU">'
@@ -75,10 +77,10 @@ dirref_doczip = ('<Product><DirectoryRef Id="DOCTRINEZIP">'
     '<Environment Action="set" Id="SystemPathDocZip" Name="PATH" Part="last" Permanent="no" System="yes" Value="[DOCTRINEZIP]"/>'
     '</Component>'
     '<Component Guid="d8069f9b-5d6b-4643-9273-78e2ab016edd" Id="DocZip">'
-    '<File Checksum="yes" Id="docphp.zip" Source="$(var.BuildDir)\data\docphp.zip"/>'
+    '<File Checksum="yes" Id="{docphp_id}" Source="$(var.BuildDir)\\%LocalAppData%\\MySQL\\MySQL Utilities\\{docphp}"/>'
     '</Component>'
     '</DirectoryRef></Product>'
-)
+).format(docphp_id=docphp.replace('-', '_'), docphp=docphp)
 
 dir_docphp = '<Directory Id="DocMenu" Name="Documentation"/>'
 

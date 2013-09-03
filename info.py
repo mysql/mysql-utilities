@@ -112,17 +112,14 @@ def add_optional_resources(*args, **kwrds):
         otherfiles = []
         for src in data_files:
             name, ext = os.path.splitext(src)
-            datafiles.append(os.path.join('data', src))
-#            if ext == '.in':
-#                datafiles.append(os.path.join('data', src))
-#            elif ext == '.zip':
-#                zipfiles.append(os.path.join('zip', src))
-#            else:
-#                otherfiles.append(os.path.join('other', src))
+            if ext == '.zip' and os.name != 'nt':
+                zipfiles.append(os.path.join('data', src))
+            else:
+                datafiles.append(os.path.join('data', src))
         if datafiles:
             data_files_found.append(('data', datafiles))
         if zipfiles:
-            data_files_found.append(('zip', zipfiles))
+            data_files_found.append(('/etc/mysql', zipfiles))
         if otherfiles:
             data_files_found.append(('other', otherfiles))
 

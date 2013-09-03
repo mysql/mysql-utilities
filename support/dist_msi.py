@@ -21,11 +21,11 @@ This module implements custom DistUtils commands for the Microsoft
 Windows platform. WiX 3.5 and py2exe are required.
 """
 
-import sys
-import os
-import subprocess
+import fnmatch
 import json
+import os
 import re
+import sys
 from distutils import log
 from distutils.errors import DistutilsError
 from distutils.dir_util import remove_tree
@@ -57,6 +57,8 @@ class _MSIDist(bdist):
         ('keep-temp', 'k',
          "keep the pseudo-installation tree around after " +
          "creating the distribution"),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
         ]
 
     boolean_options = ['keep-temp']
@@ -69,6 +71,7 @@ class _MSIDist(bdist):
         self.keep_temp = False
         self.dist_type = None
         self.dist_target = None
+        self.tag = ''
         self.product_name = 'MySQL Utilities'
 
     def finalize_options(self):
@@ -83,6 +86,9 @@ class _MSIDist(bdist):
 
         if self.dist_dir is None:
             self.dist_dir = "dist"
+
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def _get_wixobj_name(self, myc_version=None, python_version=None):
         """Get the name for the wixobj-file
@@ -235,12 +241,13 @@ class MSIBuiltDist(_MSIDist):
             if 'fabric' in pck_name:
                 pck_fabric = True
                 log.info('-Adding Fabric')
-        for dest, data_files in self.distribution.data_files:
-            for data_file in data_files:
-                log.info('data_file: {0}'.format(data_file))
-                if 'docphp.zip' in data_file:
-                    add_doczip = True
-                    log.info('-Adding doctrine extensions')
+        if self.distribution.data_files:
+            for dest, data_files in self.distribution.data_files:
+                for data_file in data_files:
+                    log.info('data_file: {0}'.format(data_file))
+                    if fnmatch.fnmatch(data_file, 'data/mysql-fabric-doctrine-?.?.?.zip'):
+                        add_doczip = True
+                        log.info('-Adding doctrine extensions')
         if pck_fabric or add_doczip:
             base_xml_path = "support/MSWindows/mysql_utilities.xml"
             result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
@@ -259,8 +266,9 @@ class MSIBuiltDist(_MSIDist):
         pyver = python_version or self.python_version
         if self.plat_name:
             platform = '-' + self.plat_name
-        return "mysql-utilities-{app_version}{platform}.wixobj".format(
-            app_version=appver, python_version=pyver, platform=platform)
+        return "mysql-utilities-{app_version}{tag}{platform}.wixobj".format(
+            app_version=appver, python_version=pyver, 
+            tag=self.tag, platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
@@ -299,6 +307,8 @@ class BuiltCommercialMSI(_MSIDist):
         ('wix-install', None,
          "location of the Windows Installer XML installation"
          "(default: %s)" % wix.WIX_INSTALL_PATH),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     boolean_options = [
@@ -308,6 +318,7 @@ class BuiltCommercialMSI(_MSIDist):
     def initialize_options (self):
         """Initialize the options"""
         self.bdist_base = None
+        self.tag = ''
         self.keep_temp = 0
         self.dist_dir = None
         self.plat_name = None
@@ -324,6 +335,8 @@ class BuiltCommercialMSI(_MSIDist):
 
         self.wxs = 'support/MSWindows/mysql_utilities.xml'
         self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def _get_wixobj_name(self, app_version=None, python_version=None):
         """Get the name for the wixobj-file
@@ -332,13 +345,13 @@ class BuiltCommercialMSI(_MSIDist):
         """
         appver = app_version or self.distribution.metadata.version
         pyver = python_version or self.python_version
-#        try:
+
         if self.plat_name:
             platform = '-' + self.plat_name
-#        except AttributeError:
-#            platform = None
-        return "mysql-utilities-commercial-{app_version}{platform}.wixobj".format(
-            app_version=appver, python_version=pyver, platform=platform)
+
+        return ("mysql-utilities-commercial-{app_version}{tag}{platform}."
+                "wixobj").format(app_version=appver, python_version=pyver,
+                                 tag=self.tag, platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""

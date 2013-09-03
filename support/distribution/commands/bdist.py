@@ -48,6 +48,8 @@ class BuiltCommercial(bdist):
          "exclude sources built distribution (default: True)"),
         ('formats=', None,
          "formats for source distribution (comma-separated list)"),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     boolean_options = [
@@ -68,6 +70,7 @@ class BuiltCommercial(bdist):
         self.plat_name = ''
         self.formats = None
         self.archive_files = None
+        self.tag = ''
 
     def finalize_options(self):
         """Finalize the options"""
@@ -118,6 +121,9 @@ class BuiltCommercial(bdist):
         self.distribution.metadata.classifiers = new_classifiers
         self.distribution.metadata.long_description = (
             commercial.COMMERCIAL_LICENSE_NOTICE)
+
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def _remove_sources(self):
         """Remove Python source files from the build directory"""
@@ -297,8 +303,13 @@ class BuiltCommercial(bdist):
             log.debug("bdist_dir {0}".format(self.bdist_dir))
             log.debug("dist_dir {0}".format(self.dist_dir))
             log.debug("dist_name {0}".format(self.dist_name))
+            dist_ver = self.distribution.metadata.version
+            newname = self.dist_target.replace(
+                          '{0}'.format(dist_ver),
+                          '{0}{1}'.format(dist_ver, self.tag)
+                      )
 
-            afile = self.make_archive(self.dist_target, fmt,
+            afile = self.make_archive(newname, fmt,
                                       root_dir=self.dist_dir,
                                       base_dir=self.dist_name)
             self.archive_files.append(afile)

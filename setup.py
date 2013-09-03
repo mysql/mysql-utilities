@@ -66,6 +66,7 @@ except ImportError:
     pass # Use default when not available
 else:
     COMMANDS['cmdclass'].update({
+        'sdist': sdist.GenericSourceGPL,
         'build': build.Build,
         'sdist_com': sdist.SourceCommercial,
         'bdist_com': bdist.BuiltCommercial
@@ -329,6 +330,7 @@ class install_data(_install_data):
         install_sysconfdir = '/etc'
 
         # Go over all entries in data_files and process it if needed
+	new_data_files = []
         for df in self.data_files:
             # Figure out what the entry contain and collect a list of files.
             if isinstance(df, str):
@@ -360,6 +362,7 @@ class install_data(_install_data):
                     # change directory 'fabric'to mysql 
                     directory = os.path.join(install_sysconfdir, 'mysql')
                 data_files.append((directory, filename))
+            new_data_files.extend(data_files)
 
         # Re-construct the data_files entry from what was provided by
         # merging all tuples with same directory and provide a list of
@@ -368,7 +371,8 @@ class install_data(_install_data):
         #   --> [('bar', [2, 5]), ('foo', [1, 3, 4])]
         data_files.sort()
         data_files = [
-            (d, [ f[1] for f in fs ]) for d, fs in groupby(data_files, key=lambda x: x[0])
+            (d, [ f[1] for f in fs ]) for d, fs in 
+                groupby(new_data_files, key=lambda x: x[0])
             ]
         self.data_files = data_files
         _install_data.run(self)

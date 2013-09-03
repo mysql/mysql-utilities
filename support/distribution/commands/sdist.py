@@ -23,7 +23,8 @@ import sys
 import os
 
 from distutils import log
-from distutils.dir_util import create_tree, remove_tree, mkpath, copy_tree
+from distutils.dir_util import (create_tree, remove_tree, mkpath, copy_tree,
+                                remove_tree)
 from distutils.file_util import copy_file, move_file
 from distutils.sysconfig import get_python_version
 from distutils.command.sdist import sdist
@@ -60,6 +61,8 @@ class GenericSourceGPL(sdist):
          "Owner name used when creating a tar file [default: current user]"),
         ('group=', 'g',
          "Group name used when creating a tar file [default: current group]"),
+	('tag=', 't',
+         "Adds a tag name after the release version"),
         ]
 
     boolean_options = ['prune',
@@ -71,14 +74,15 @@ class GenericSourceGPL(sdist):
     default_format = {'posix': 'gztar',
                       'nt': 'zip' }
 
+    def initialize_options(self):
+        self.tag = ''
+        self.owner = None
+        self.group = None
+        sdist.initialize_options(self)
+
     def copy_extra_files(self, base_dir):
         extra_files = [
-            ('version.py', 
-                os.path.join(base_dir,
-                             os.path.normpath('python2/mysql/connector/'))),
-            ('version.py', 
-                os.path.join(base_dir,
-                             os.path.normpath('python3/mysql/connector/'))),
+           
         ]
         for src, dest in extra_files:
             self.copy_file(src, dest)
@@ -103,6 +107,44 @@ class GenericSourceGPL(sdist):
         self.copy_extra_files(base_dir)
 
         self.distribution.metadata.write_pkg_info(base_dir)
+
+    def make_distribution(self):
+        """Create the source distribution(s).  First, we create the release
+        tree with 'make_release_tree()'; then, we create all required
+        archive files (according to 'self.formats') from the release tree.
+        Finally, we clean up by blowing away the release tree (unless
+        'self.keep_temp' is true).  The list of archive files created is
+        stored so it can be retrieved later by 'get_archive_files()'.
+        """
+        # Don't warn about missing meta-data here -- should be (and is!)
+        # done elsewhere.
+        base_dir = self.distribution.get_fullname()
+        base_name = os.path.join(self.dist_dir, base_dir)
+
+        self.make_release_tree(base_dir, self.filelist.files)
+        archive_files = []              # remember names of files we create
+        # tar archive must be created last to avoid overwrite and remove
+        if 'tar' in self.formats:
+            self.formats.append(self.formats.pop(self.formats.index('tar')))
+
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
+
+        for fmt in self.formats:
+            dist_ver = self.distribution.metadata.version
+            newname = base_name.replace(
+                          '{0}'.format(dist_ver),
+                          '{0}{1}'.format(dist_ver, self.tag)
+                      )
+            file = self.make_archive(newname, fmt, base_dir=base_dir)
+
+            archive_files.append(file)
+            self.distribution.dist_files.append(('sdist', '', file))
+
+        self.archive_files = archive_files
+
+        if not self.keep_temp:
+            remove_tree(base_dir, dry_run=self.dry_run)
 
     def run(self):
         self.distribution.data_files = None
@@ -130,6 +172,8 @@ class SourceGPL(sdist):
          "creating the distribution archive"),
         ('dist-dir=', 'd',
          "directory to put final built distributions in"),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     boolean_options = [
@@ -144,6 +188,7 @@ class SourceGPL(sdist):
         self.keep_temp = 0
         self.dist_dir = None
         self.plat_name = ''
+        self.tag = None
 
     def finalize_options(self):
         """Finalize the options"""
@@ -169,6 +214,8 @@ class SourceGPL(sdist):
 
         license = open('README', 'r').read()
         self.distribution.metadata.long_description += "\n" + license
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def run(self):
         """Run the distutils command"""
@@ -214,8 +261,8 @@ class SourceGPL(sdist):
         
         # create distribution
         info_files = [
-            ('README', 'README.txt'),
-            ('COPYING', 'COPYING.txt')
+            ('README.txt', 'README.txt'),
+            ('LICENSE.txt', 'LICENSE.txt')
         ]
         copy_tree(self.bdist_dir, self.dist_target)
         pkg_info = mkpath(os.path.join(self.dist_target))
@@ -335,7 +382,12 @@ class SourceCommercial(sdist):
             self.formats.append(self.formats.pop(self.formats.index('tar')))
 
         for fmt in self.formats:
-            afile = self.make_archive(pkg_dir, fmt,
+            dist_ver = self.distribution.metadata.version
+            newname = pkg_dir.replace(
+                          '{0}'.format(dist_ver),
+                          '{0}{1}'.format(dist_ver, self.tag)
+                      )
+            afile = self.make_archive(newname, fmt,
                                       root_dir=self.dist_dir,
                                       base_dir=dist_name)
             self.archive_files.append(afile)

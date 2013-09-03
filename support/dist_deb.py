@@ -48,7 +48,9 @@ class BuildDistDebian(Command):
         ('platform-version=', 'v',
          "version of the platform in resulting file "
          "(default '{0}')".format('.'.join(
-             platform.linux_distribution()[1].split('.', 2)[0:2])))
+             platform.linux_distribution()[1].split('.', 2)[0:2]))),
+        ('tag=', 't',
+         "Adds a tag name after the release version"),
     ]
 
     def initialize_options(self):
@@ -71,12 +73,14 @@ class BuildDistDebian(Command):
             platform.linux_distribution()[1].split('.', 2)[0:2])
         self.debian_support_dir = 'debian' #omit the /gpl for now.
         self.debug = True
+        self.tag = ''
 
     def finalize_options(self):
         """Finalize the options"""
         self.set_undefined_options('bdist', 
                                    ('dist_dir', 'dist_dir'))
-        pass
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
 
     def _populate_deb_base(self):
         """Create and populate the deb base directory"""
@@ -171,8 +175,9 @@ class BuildDistDebian(Command):
                 if filename.endswith('.deb'):
                     newname = filename.replace(
                         '{0}_all'.format(self.version),
-                        '{0}-1{1}{2}_all'.format(self.version, self.platform,
-                                               self.platform_version)
+                        '{0}-1{1}{2}{3}_all'.format(self.version, self.tag, 
+                                                  self.platform,
+                                                  self.platform_version)
                         )
                     filepath = os.path.join(base, filename)
                     filedest = os.path.join(self.started_dir,

@@ -21,7 +21,7 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="ProgFilesFolder">
         <Directory Id="CompanyDir" Name="MySQL">
-          <Directory Id="INSTALLDIR" Name="$(var.ProductName)"/>
+          <Directory Id="INSTALLDIR" Name="MySQL Utilities"/>
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs">
