@@ -99,6 +99,12 @@ parser.add_option("--skip-data-check", action="store_true",
                   dest="no_data",
                   help="skip data consistency check")
 
+# Skip check of table options.
+parser.add_option("--skip-table-options", action="store_true",
+                  dest="skip_tbl_opts",
+                  help="skip check of all table options (e.g., "
+                       "AUTO_INCREMENT, ENGINE, CHARSET, etc.).")
+
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
                   type = "int", help="display width",
@@ -190,6 +196,7 @@ options = {
     "all"              : opt.all,
     "use_regexp"       : opt.use_regexp,
     "exclude_patterns" : exclude_list,
+    "skip_table_opts"  : opt.skip_tbl_opts,
 }
 
 # Parse server connection values
@@ -295,8 +302,8 @@ if not opt.quiet:
         print("# Database consistency check failed.")
     else:
         sys.stdout.write("# Databases are consistent")
-        if opt.no_object_check or opt.no_diff or \
-           opt.no_row_count or opt.no_data:
+        if (opt.no_object_check or opt.no_diff or
+            opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
             sys.stdout.write(" given skip options specified")
         print(".")
     print("#\n# ...done")

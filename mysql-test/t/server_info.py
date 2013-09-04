@@ -86,7 +86,7 @@ class test(mutlib.System_test):
 
     def remove_logs_from_server(self, datadir):
         # restarting server fails if log is different, from the original
-        # so we will delete them.  
+        # so we will delete them.
         logs = ["ib_logfile0", "ib_logfile1"]
         while(logs):
             for log in tuple(logs):
@@ -120,7 +120,7 @@ class test(mutlib.System_test):
         # NOTICE: Cannot test the -d option with a comparative result file
         #         because it is going to be different on every machine.
         #         Thus, this test case will have to be checked independently.
-     
+
         self.res_fname_temp = "result2.txt"
 
         test_num += 1
@@ -138,9 +138,9 @@ class test(mutlib.System_test):
 
         cmd_str = self.start_stop_newserver()
         test_num += 1
-        cmd_opts = (' --format=vertical --basedir=%s --datadir=%s --start' % 
+        cmd_opts = (' --format=vertical --basedir=%s --datadir=%s --start' %
                     (self.basedir, self.datadir3))
-        comment = ("Test case %d - re-started server %s " % 
+        comment = ("Test case %d - re-started server %s " %
                    (test_num, "prints results"))
         #cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
@@ -171,13 +171,12 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         if self.res_fname:
-            os.unlink(self.res_fname)
+            try:
+                os.unlink(self.res_fname)
+            except:
+                pass
         from mysql.utilities.common.tools import delete_directory
         if self.server3:
             delete_directory(self.datadir3)
             self.server3 = None
         return True
-
-
-
-

@@ -7,6 +7,8 @@ CREATE DATABASE `util_test_mt`;
 USE `util_test_mt`;
 #...done.
 Test case 2 - sql format with --file-per-table
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #       util_test.t1.sql ................. [PASS]
 #       util_test.t2.sql ................. [PASS]
@@ -14,6 +16,8 @@ Test case 2 - sql format with --file-per-table
 #       util_test.t4.sql ................. [PASS]
 
 Test case 3 - grid format with --file-per-table
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #      util_test.t1.grid ................. [PASS]
 #      util_test.t2.grid ................. [PASS]
@@ -21,6 +25,8 @@ Test case 3 - grid format with --file-per-table
 #      util_test.t4.grid ................. [PASS]
 
 Test case 4 - csv format with --file-per-table
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #       util_test.t1.csv ................. [PASS]
 #       util_test.t2.csv ................. [PASS]
@@ -28,6 +34,8 @@ Test case 4 - csv format with --file-per-table
 #       util_test.t4.csv ................. [PASS]
 
 Test case 5 - tab format with --file-per-table
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #       util_test.t1.tab ................. [PASS]
 #       util_test.t2.tab ................. [PASS]
@@ -35,6 +43,8 @@ Test case 5 - tab format with --file-per-table
 #       util_test.t4.tab ................. [PASS]
 
 Test case 6 - vertical format with --file-per-table
+SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #  util_test.t1.vertical ................. [PASS]
 #  util_test.t2.vertical ................. [PASS]

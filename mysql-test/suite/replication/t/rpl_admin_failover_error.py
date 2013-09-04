@@ -15,7 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+import os
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 
@@ -204,7 +207,7 @@ class test(rpl_admin.test):
         # Remove log file (here to delete the file even if some test fails)
         try:
             os.unlink(_LOGNAME)
-        except:
+        except OSError:
             pass
         # kill servers that are only used in this test
         kill_list = ['rep_slave4_gtid_off']

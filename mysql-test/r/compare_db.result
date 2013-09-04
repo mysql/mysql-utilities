@@ -521,7 +521,7 @@ Test case 10 - compare two empty databases
 # Databases are consistent.
 #
 # ...done
-Test case 11 - diff a sample database containing tables with weird names (no backticks).
+Test case 11 - compare a sample database containing tables with weird names (no backticks) and different table options.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -529,12 +529,38 @@ Test case 11 - diff a sample database containing tables with weird names (no bac
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    pass    pass   
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Object definitions differ. (--changes-for=server1)
+#
 
-# Databases are consistent.
+--- `db_diff_test`.`table-dash`
++++ `db_diff_test`.`table-dash`
+@@ -1,4 +1,4 @@
+ CREATE TABLE `table-dash` (
+   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   PRIMARY KEY (`id`)
+-) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
++) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
 #
 # ...done
-Test case 12 - compare a database with objects of different types with the same name (no differences)
+Test case 12 - compare a sample database containing tables with weird names (no backticks) and skipping table options.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 13 - compare a database with objects of different types with the same name (no differences)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
@@ -550,7 +576,7 @@ Test case 12 - compare a database with objects of different types with the same 
 # Databases are consistent.
 #
 # ...done
-Test case 13 - compare a database with objects of different types with the same name (with differences)
+Test case 14 - compare a database with objects of different types with the same name (with differences)
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
@@ -577,7 +603,7 @@ Test case 13 - compare a database with objects of different types with the same 
 # Database consistency check failed.
 #
 # ...done
-Test case 14 - compare all databases
+Test case 15 - compare all databases
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
@@ -612,13 +638,13 @@ ERROR: The list of objects differs among database inventory and inventory.
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    pass    pass    
+# TABLE     table-dash                              FAIL    ERROR: The object definitions do not match.
 
 
 # Database consistency check failed.
 #
 # ...done
-Test case 15 - compare all databases with --exclude option and LIKE pattern
+Test case 16 - compare all databases with --exclude option and LIKE pattern
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
@@ -635,7 +661,7 @@ Test case 15 - compare all databases with --exclude option and LIKE pattern
 # Databases are consistent.
 #
 # ...done
-Test case 16 - compare all databases with --exclude option and REGEXP pattern
+Test case 17 - compare all databases with --exclude option and REGEXP pattern
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing databases: empty_db

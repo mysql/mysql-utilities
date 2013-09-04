@@ -16,15 +16,19 @@
 #
 import os
 import time
-import mutlib
-from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --report-host=localhost --report-port=%s "'
+import mutlib
+
+from mysql.utilities.exception import MUTLibError, UtilError
+
+_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
+                       '--report-port=%s "')
+
 
 class test(mutlib.System_test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
-    
+
     Note: this test will run against servers without GTID enabled.
     See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
@@ -53,9 +57,9 @@ class test(mutlib.System_test):
             server = self.servers.get_server(index)
             try:
                 res = server.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication server " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication server 'server_id': "
+                                  "{0}".format(err.errmsg))
         else:
             if self.debug:
                 print "# Cloning server0."
@@ -65,11 +69,11 @@ class test(mutlib.System_test):
             res = self.servers.spawn_new_server(self.server0, serverid,
                                                 name, mysqld)
             if not res:
-                raise MUTLibError("Cannot spawn replication server '%s'." &
-                                  name)
+                raise MUTLibError("Cannot spawn replication server "
+                                  "'{0}'.".format(name))
             self.servers.add_new_server(res[0], True)
             server = res[0]
-            
+
         return server
 
     def setup(self):
@@ -92,32 +96,31 @@ class test(mutlib.System_test):
 
         for slave in [self.server2, self.server3, self.server4]:
             slave.exec_query("SET SQL_LOG_BIN= 0")
-            slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                              "'rpl'@'%s' IDENTIFIED BY 'rpl'" %
-                              self.server1.host)
+            slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'{0}' "
+                             "IDENTIFIED BY 'rpl'".format(self.server1.host))
             slave.exec_query("SET SQL_LOG_BIN= 1")
 
         # Form replication topology - 1 master, 3 slaves
         return self.reset_topology()
 
     def run(self):
-        
+
         cmd_str = "mysqlrpladmin.py %s " % self.master_str
-        
+
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        
+
         slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        
+
         comment = "Test case 1 - show health before switchover"
         cmd_opts = " --slaves=%s --format=vertical health" % slaves_str
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
-            
+
         # Build connection string with loopback address instead of localhost
         slave_ports = [self.server2.port, self.server3.port, self.server4.port]
         slaves_loopback = "root:root@127.0.0.1:%s," % self.server2.port
@@ -134,15 +137,17 @@ class test(mutlib.System_test):
              slave2_conn, "slave2", [slave1_conn, slave3_conn, master_conn]),
             (slave2_conn, [slave1_conn, slave3_conn, master_conn],
              slave3_conn, "slave3", [slave2_conn, slave1_conn, master_conn]),
-            (slave3_conn_ip, ["root:root@127.0.0.1:%s" % self.server3.port,
-                           slave1_conn, master_conn],
+            (slave3_conn_ip, ["root:root@127.0.0.1:"
+                              "{0}".format(self.server3.port),
+                              slave1_conn, master_conn],
              master_conn, "master", [slave1_conn, slave2_conn, slave3_conn]),
         ]
         test_num = 2
         for case in test_cases:
             slaves_str = ",".join(case[1])
             comment = "Test case %s - switchover to %s" % (test_num, case[3])
-            cmd_str = "mysqlrpladmin.py --master=%s --rpl-user=rpl:rpl " % case[0]
+            cmd_str = ("mysqlrpladmin.py --master={0} "
+                       "--rpl-user=rpl:rpl ").format(case[0])
             cmd_opts = " --new-master=%s --demote-master " % case[2]
             cmd_opts += " --slaves=%s switchover" % slaves_str
             res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
@@ -249,20 +254,22 @@ class test(mutlib.System_test):
         # It happens sometimes on windows in a non-deterministic way.
         self.replace_substring("+--------------------------------------------"
                                "--+", "+---------+")
+        self.replace_substring("+--------------------------------------------"
+                               "---+", "+---------+")
         self.replace_substring("| health                                     "
                                "  |", "| health  |")
+        self.replace_substring("| health                                     "
+                               "   |", "| health  |")
         self.replace_substring("| OK                                         "
                                "  |", "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., "
-                               "No  |", "| OK      |")
-        self.replace_substring("| Slave delay is 2 seconds behind master., "
-                               "No  |", "| OK      |")
-        self.replace_substring("| Slave delay is 3 seconds behind master., "
-                               "No  |", "| OK      |")
-        self.replace_substring("| Slave delay is 4 seconds behind master., "
-                               "No  |", "| OK      |")
+        self.replace_substring("| OK                                         "
+                               "   |", "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No  |",
+                                       "| OK      |")
 
-    def reset_master(self, servers_list=[]):
+    def reset_master(self, servers_list=None):
+        servers_list = [] if servers_list is None else servers_list
         # Clear binary log and GTID_EXECUTED of given servers
         if servers_list:
             servers = servers_list
@@ -288,11 +295,17 @@ class test(mutlib.System_test):
 
         servers = [self.server1]
         servers.extend(slaves)
+
+        # Check if all servers are alive, and if they are not,
+        # spawn a new instance
+        for index, server in enumerate(servers[:]):
+            servers[index] = self.spawn_server(server.role)
+
         for slave in servers:
             try:
                 slave.exec_query("STOP SLAVE")
                 slave.exec_query("RESET SLAVE")
-            except:
+            except UtilError:
                 pass
 
         for slave in slaves:
@@ -308,15 +321,18 @@ class test(mutlib.System_test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
+        # Kill all spawned servers.
+        self.kill_server_list(
+            ['rep_master', 'rep_slave1', 'rep_slave2', 'rep_slave3']
+        )
         return True
-

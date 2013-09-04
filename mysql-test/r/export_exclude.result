@@ -1,5 +1,6 @@
 Test case 1 - exclude by name.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -14,8 +15,10 @@ Test case 1 - exclude by name.
 # FUNCTIONS in util_test:
 `f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - exclude by name using backticks.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -30,8 +33,10 @@ Test case 2 - exclude by name using backticks.
 # FUNCTIONS in util_test:
 `f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - exclude using SQL LIKE pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -46,8 +51,10 @@ Test case 3 - exclude using SQL LIKE pattern.
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - exclude using REGEXP pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -62,8 +69,10 @@ Test case 4 - exclude using REGEXP pattern.
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - exclude by name and SQL LIKE pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -75,8 +84,10 @@ Test case 5 - exclude by name and SQL LIKE pattern.
 # PROCEDURES in util_test: (none found)
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - exclude by name and REGEXP pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -88,8 +99,10 @@ Test case 6 - exclude by name and REGEXP pattern.
 # PROCEDURES in util_test: (none found)
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - exclude everything using SQL LIKE pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test: (none found)
 # VIEWS in util_test: (none found)
@@ -97,8 +110,10 @@ Test case 7 - exclude everything using SQL LIKE pattern.
 # PROCEDURES in util_test: (none found)
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - exclude everything using REGEXP pattern.
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test: (none found)
 # VIEWS in util_test: (none found)
@@ -106,8 +121,10 @@ Test case 8 - exclude everything using REGEXP pattern.
 # PROCEDURES in util_test: (none found)
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9a - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere in value).
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -125,8 +142,10 @@ Test case 9a - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere 
 # FUNCTIONS in util_test:
 `f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9b - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere in value).
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test: (none found)
 # VIEWS in util_test: (none found)
@@ -134,3 +153,4 @@ Test case 9b - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere 
 # PROCEDURES in util_test: (none found)
 # FUNCTIONS in util_test: (none found)
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

@@ -69,8 +69,11 @@ Options:
   --skip-gtid           skip creation of GTID_PURGED statements.
   --comment-rpl         place the replication statements in comment
                         statements. Valid only with --rpl option.
+  --skip-fkey-checks    skip creation of foreign key disable/enable
+                        statements.
 Test case 2 - no grants
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -122,8 +125,10 @@ CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ||
 DELIMITER ;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - no events
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -170,8 +175,10 @@ RETURN (SELECT 1);
 ||
 DELIMITER ;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - no functions
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -211,8 +218,10 @@ INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - no procedures
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -246,8 +255,10 @@ CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_tes
 ||
 DELIMITER ;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - no triggers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -276,8 +287,10 @@ CREATE TABLE `t4` (
 # VIEW: util_test.v1
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no views
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -304,25 +317,33 @@ CREATE TABLE `t4` (
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - no tables
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - no create_db
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 USE `util_test`;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - no data
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 USE `util_test`;
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 11 - SQL single rows
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -446,8 +467,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 12 - SQL bulk insert
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -571,8 +594,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 13 - sql format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -696,8 +721,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 14 - csv format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -761,8 +788,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 15 - tab format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -826,8 +855,10 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 16 - GRID format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -912,8 +943,10 @@ Test case 16 - GRID format
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 17 - VERTICAL format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -1376,8 +1409,10 @@ Test case 17 - VERTICAL format
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 18 - sql format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -1501,8 +1536,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 19 - csv format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -1559,8 +1596,10 @@ Test case 19 - csv format no headers
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 20 - tab format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
@@ -1617,8 +1656,10 @@ Test case 20 - tab format no headers
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 21 - GRID format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -1703,8 +1744,10 @@ Test case 21 - GRID format no headers
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 22 - VERTICAL format no headers
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -2167,8 +2210,10 @@ Test case 22 - VERTICAL format no headers
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 23 - SQ format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -2292,8 +2337,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 24 - CS format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -2357,8 +2404,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 25 - ta format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -2422,8 +2471,10 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 26 - g format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -2508,8 +2559,10 @@ Test case 26 - g format
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 27 - v format
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -2972,8 +3025,10 @@ Test case 27 - v format
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 28 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +---------------+-------------+---------+-------------------+--------------+--------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -3058,8 +3113,10 @@ Test case 28 - GRID format with BRIEF display
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 29 - GRID format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+--------------+--------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-----------+--------------------------+-------------------------+
@@ -3144,8 +3201,10 @@ Test case 29 - GRID format with FULL display
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 30 - GRID format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 +-------------+
@@ -3228,8 +3287,10 @@ Test case 30 - GRID format with NAMES display
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 31 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -3293,8 +3354,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 32 - CSV format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
@@ -3358,8 +3421,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 33 - CSV format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -3421,8 +3486,10 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 34 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -3486,8 +3553,10 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 35 - TAB format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
@@ -3551,8 +3620,10 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 36 - TAB format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 TABLE_NAME
@@ -3614,8 +3685,10 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 37 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -4078,8 +4151,10 @@ Test case 37 - VERTICAL format with BRIEF display
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 38 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -4675,8 +4750,10 @@ Test case 38 - VERTICAL format with FULL display
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;
 Test case 39 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
 *************************       1. row *************************
@@ -4963,3 +5040,4 @@ Test case 39 - VERTICAL format with NAMES display
    ROUTINE_NAME: None
 36 rows.
 #...done.
+SET FOREIGN_KEY_CHECKS=1;

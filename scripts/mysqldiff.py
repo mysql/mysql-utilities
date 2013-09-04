@@ -84,6 +84,12 @@ parser.add_option("--width", action="store", dest="width",
 parser.add_option("--force", action="store_true", dest="force",
                   help="do not abort when a diff test fails")
 
+# Skip check of table options.
+parser.add_option("--skip-table-options", action="store_true",
+                  dest="skip_tbl_opts",
+                  help="skip check of all table options (e.g., "
+                       "AUTO_INCREMENT, ENGINE, CHARSET, etc.).")
+
 # Add verbosity and quiet (silent) mode
 add_verbosity(parser, True)
 
@@ -111,6 +117,7 @@ options = {
     "width"            : opt.width,
     "changes-for"      : opt.changes_for,
     "reverse"          : opt.reverse,
+    "skip_table_opts"  : opt.skip_tbl_opts,
 }
 
 # Parse server connection values

@@ -59,15 +59,24 @@ class test(mutlib.System_test):
 
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath(
-                                        "./std_data/db_compare_backtick.sql")
+            "./std_data/db_compare_backtick.sql"
+        )
         try:
-            res = self.server1.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
-            res = self.server2.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
+            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
+            self.server2.read_and_exec_SQL(data_file_backticks, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file_backticks, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file_backticks, err.errmsg))
+
+        # Add some data to server1 to change AUTO_INCREMENT value.
+        try:
+            for count in range(5):
+                self.server1.exec_query("INSERT INTO "
+                                        "`db_diff_test`.`table-dash` "
+                                        "VALUES (NULL)")
+        except UtilError as err:
+            raise MUTLibError("Failed to insert data on server1: "
+                              "{0}".format(err.errmsg))
 
         return True
 
@@ -234,11 +243,23 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case {0} - diff a sample database containing tables "
-                    "with weird names (no backticks).").format(test_num)
-        cmd = "mysqldbcompare.py {0} {1} {2}".format(
-            s1_conn, s2_conn, "db_diff_test:db_diff_test"
-        )
+        comment = ("Test case {0} - compare a sample database containing "
+                   "tables with weird names (no backticks) and different "
+                   "table options.").format(test_num)
+        cmd_arg = ("db_diff_test:db_diff_test -t "
+                   "--skip-row-count --skip-data-check")
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare a sample database containing "
+                   "tables with weird names (no backticks) and skipping "
+                   "table options.").format(test_num)
+        cmd_arg = ("db_diff_test:db_diff_test -t --skip-table-options "
+                   "--skip-row-count --skip-data-check")
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -251,6 +272,10 @@ class test(mutlib.System_test):
                                 "SELECT 1")
         self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
                                 "SELECT 1")
+        if os.name == 'posix':
+            cmd_arg = "'`db.``:db`:`db.``:db`' -t"
+        else:
+            cmd_arg = '"`db.``:db`:`db.``:db`" -t'
         # Execute test (no differences expected)
         test_num += 1
         comment = ("Test case {0} - compare a database with objects of "

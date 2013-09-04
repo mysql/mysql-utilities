@@ -20,10 +20,10 @@ import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
-                           '--log-slave-updates --gtid-mode=on '
-                           '--enforce-gtid-consistency '
-                           '--report-host=localhost --report-port=%s '
-                           '--master-info-repository=file"')
+                            '--log-slave-updates --gtid-mode=on '
+                            '--enforce-gtid-consistency '
+                            '--report-host=localhost --report-port=%s '
+                            '--master-info-repository=file"')
 
 
 class test(rpl_admin.test):
@@ -79,7 +79,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -92,7 +92,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -111,7 +111,7 @@ class test(rpl_admin.test):
         cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
         cmd_opts.append("--rpl-user=rpl:rpl ")
         cmd_opts.append("--demote-master switchover -vvv")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -124,7 +124,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -136,7 +136,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -154,7 +154,7 @@ class test(rpl_admin.test):
         cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
         cmd_opts.append("--rpl-user=rpluser:hispassword ")
         cmd_opts.append("--demote-master switchover -vvv")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -168,7 +168,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -181,7 +181,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -201,7 +201,7 @@ class test(rpl_admin.test):
         cmd_opts.append("--rpl-user=rpluser:hispassword ")
         cmd_opts.append("--demote-master switchover -vvv ")
         cmd_opts.append("--force")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -214,7 +214,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -226,7 +226,7 @@ class test(rpl_admin.test):
         #  --master=root:root@localhost:13091 --disco=root:root -r
         cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
         cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
+        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
                                  comment)
         if not res:
             raise MUTLibError("%s: failed" % comment)
@@ -242,6 +242,11 @@ class test(rpl_admin.test):
                             "# QUERY = SELECT "
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
         self.replace_substring("localhost", "XXXXXXXXX")
+
+        # Mask column first to use this mask in next replacements.
+        self.mask_column_result("| version", "|", 2, " XXXXXXXX ")
+        self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
+        self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
 
         self.remove_result_and_lines_before("WARNING: There are slaves that "
                                             "had connection errors.")
@@ -325,10 +330,7 @@ class test(rpl_admin.test):
                             "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
                             "\n")
 
-        self.mask_column_result("| version", "|", 2, " XXXXXXXX ")
-        self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
-        self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
-        self.replace_result("# Return Code = 0",
+        self.replace_result("# Return Code = ",
                             "# Return Code = NNN\n")
 
         # Mask slaves behind master.
@@ -336,15 +338,32 @@ class test(rpl_admin.test):
         self.replace_substring("+----------------------------------------------"
                                "-----------------------------------------+",
                                "+---------+")
+        self.replace_substring("+----------------------------------------------"
+                               "------------------------------------------+",
+                               "+---------+")
         self.replace_substring("| health                                       "
                                "                                         |",
+                               "| health  |")
+        self.replace_substring("| health                                       "
+                               "                                          |",
                                "| health  |")
         self.replace_substring("| OK                                           "
                                "                                         |",
                                "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., No, "
-                               "Slave has 1 transactions behind master.  |",
+        self.replace_substring("| OK                                           "
+                               "                                          |",
                                "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                          |",
+                               "| OK      |")
+
         self.replace_substring("+------------------------------------------+",
                                "+---------+")
         self.replace_substring("| health                                   |",

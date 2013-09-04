@@ -49,6 +49,8 @@ Option                     Description
                            or <login-path>[:<port>][:<socket>].            
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
+--skip-table-options       skip check of all table options (e.g.,          
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
 -v, --verbose              control how much information is displayed. e.g.,
                            -v = verbose, -vv = more verbose, -vvv = debug  
 -q, --quiet                turn off all messages for quiet execution.      
@@ -92,6 +94,8 @@ Option                     Description
                            or <login-path>[:<port>][:<socket>].            
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
+--skip-table-options       skip check of all table options (e.g.,          
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
 -v, --verbose              control how much information is displayed. e.g.,
                            -v = verbose, -vv = more verbose, -vvv = debug  
 -q, --quiet                turn off all messages for quiet execution.      
@@ -140,6 +144,10 @@ Option                     Description
 --width=WIDTH              display width               
 --force                    do not abort when a diff    
                            test fails                  
+--skip-table-options       skip check of all table     
+                           options (e.g.,              
+                           AUTO_INCREMENT, ENGINE,     
+                           CHARSET, etc.).             
 -v, --verbose              control how much information
                            is displayed. e.g., -v =    
                            verbose, -vv = more verbose,
@@ -194,6 +202,8 @@ Option                     Description
                            path>[:<port>][:<socket>].             
 --width=WIDTH              display width                          
 --force                    do not abort when a diff test fails    
+--skip-table-options       skip check of all table options (e.g., 
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).
 -v, --verbose              control how much information is        
                            displayed. e.g., -v = verbose, -vv =   
                            more verbose, -vvv = debug             

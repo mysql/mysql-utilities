@@ -20,6 +20,8 @@ Options:
   --skip-row-count      skip row count step
   --skip-diff           skip the object diff step
   --skip-data-check     skip data consistency check
+  --skip-table-options  skip check of all table options (e.g., AUTO_INCREMENT,
+                        ENGINE, CHARSET, etc.).
   --width=WIDTH         display width
   -t, --run-all-tests   do not abort when a diff test fails
   -x EXCLUDE, --exclude=EXCLUDE
@@ -1772,11 +1774,249 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 21 - Use --all
+Test case 21a - Changes for server1  (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `db_diff_test`.`table-dash`
++++ `db_diff_test`.`table-dash`
+@@ -1,4 +1,4 @@
+ CREATE TABLE `table-dash` (
+   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   PRIMARY KEY (`id`)
+-) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
++) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 21b - Changes for server1  (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 22a - Changes for server2  (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Object definitions differ. (--changes-for=server2)
+#
+
+--- `db_diff_test`.`table-dash`
++++ `db_diff_test`.`table-dash`
+@@ -1,4 +1,4 @@
+ CREATE TABLE `table-dash` (
+   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   PRIMARY KEY (`id`)
+-) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
++) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 22b - Changes for server2  (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 23a - Changes for server1 --difftype=context (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+*** `db_diff_test`.`table-dash`
+--- `db_diff_test`.`table-dash`
+***************
+*** 1,4 ****
+  CREATE TABLE `table-dash` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+--- 1,4 ----
+  CREATE TABLE `table-dash` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 23b - Changes for server1 --difftype=context (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 24a - Changes for server2 --difftype=context (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Object definitions differ. (--changes-for=server2)
+#
+
+*** `db_diff_test`.`table-dash`
+--- `db_diff_test`.`table-dash`
+***************
+*** 1,4 ****
+  CREATE TABLE `table-dash` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+--- 1,4 ----
+  CREATE TABLE `table-dash` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 24b - Changes for server2 --difftype=context (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 25a - Changes for server1 --difftype=sql (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Transformation for --changes-for=server1:
+#
+
+ALTER TABLE `db_diff_test`.`table-dash` 
+  DROP PRIMARY KEY, 
+  ADD PRIMARY KEY(`id`), 
+AUTO_INCREMENT=50000005;
+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 25b - Changes for server1 --difftype=sql (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 26a - Changes for server2 --difftype=sql (not skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    SKIP    SKIP    
+#
+# Transformation for --changes-for=server2:
+#
+
+ALTER TABLE `db_diff_test`.`table-dash` 
+  DROP PRIMARY KEY, 
+  ADD PRIMARY KEY(`id`), 
+AUTO_INCREMENT=50000010;
+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 26b - Changes for server2 --difftype=sql (skipping table options).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              pass    SKIP    SKIP   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 27 - Use --all
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
 mysqldbcompare.py: error: You cannot use the --all option with a list of databases.
-Test case 22 - Use --all inventory
+Test case 28 - Use --all inventory
 Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
 mysqldbcompare.py: error: You cannot use the --all option with a list of databases.

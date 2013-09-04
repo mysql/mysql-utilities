@@ -40,6 +40,7 @@ _MYSQL_OPTS_INFO_REPO_TABLE = ('"--log-bin=mysql-bin --skip-slave-start '
                                '--master-info-repository=TABLE '
                                '--relay-log-info-repository=TABLE"')
 
+
 class test(rpl_admin.test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
@@ -275,26 +276,37 @@ class test(rpl_admin.test):
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.
-        self.replace_substring("+--------------------------------------------"
-                               "--+", "+---------+")
-        self.replace_substring("| health                                     "
-                               "  |", "| health  |")
-        self.replace_substring("| OK                                         "
-                               "  |", "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., "
-                               "No  |", "| OK      |")
+        self.replace_result("    health: Slave delay is ",
+                            "    health: OK")
         self.replace_substring("+----------------------------------------------"
                                "-----------------------------------------+",
+                               "+---------+")
+        self.replace_substring("+----------------------------------------------"
+                               "------------------------------------------+",
                                "+---------+")
         self.replace_substring("| health                                       "
                                "                                         |",
                                "| health  |")
+        self.replace_substring("| health                                       "
+                               "                                          |",
+                               "| health  |")
         self.replace_substring("| OK                                           "
                                "                                         |",
                                "| OK      |")
-        self.replace_substring("| Slave delay is 1 seconds behind master., No, "
-                               "Slave has 1 transactions behind master.  |",
+        self.replace_substring("| OK                                           "
+                               "                                          |",
                                "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                         |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.      "
+                               "                                          |",
+                               "| OK      |")
+
         self.replace_substring("+------------------------------------------+",
                                "+---------+")
         self.replace_substring("| health                                   |",
@@ -303,7 +315,6 @@ class test(rpl_admin.test):
                                "| OK      |")
         self.replace_substring("| Slave has 1 transactions behind master.  |",
                                "| OK      |")
-
 
         return True
 
@@ -314,4 +325,9 @@ class test(rpl_admin.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        # Kill all spawned servers.
+        self.kill_server_list(
+            ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
+             'rep_slave3_gtid', 'rep_slave4_gtid']
+        )
         return rpl_admin.test.cleanup(self)

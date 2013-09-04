@@ -1,5 +1,6 @@
 Test case 1 - rpl = master and lock_type = no-locks
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -58,8 +59,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - rpl = master and lock_type = lock-all
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -118,8 +121,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - rpl = master and lock_type = snapshot
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -178,8 +183,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - rpl = slave and lock_type = no-locks
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -238,8 +245,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - rpl = slave and lock_type = lock-all
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -298,8 +307,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - rpl = slave and lock_type = snapshot
 # Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -358,8 +369,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
 START SLAVE;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - rpl = both and lock_type = no-locks
 # Source on localhost: ... connected.
+# SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -420,8 +433,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
+# SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - rpl = both and lock_type = lock-all
 # Source on localhost: ... connected.
+# SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -482,8 +497,10 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
+# SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - rpl = both and lock_type = snapshot
 # Source on localhost: ... connected.
+# SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -544,3 +561,4 @@ INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
+# SET FOREIGN_KEY_CHECKS=1;

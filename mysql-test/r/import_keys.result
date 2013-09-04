@@ -54,3 +54,35 @@ AFTER:
 CREATE TABLE `t1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 CREATE TABLE `t2` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) NOT NULL DEFAULT '0',   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`,`b`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 CREATE TABLE `t3` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) NOT NULL DEFAULT '0',   `c` int(11) NOT NULL DEFAULT '0',   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`,`b`,`c`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+Test Case 5 : Testing import with foreign keys
+BEFORE:
+CREATE TABLE `t1` (   `d` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   PRIMARY KEY (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+CREATE TABLE `a1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   PRIMARY KEY (`a`),   KEY `c` (`c`),   CONSTRAINT `c` FOREIGN KEY (`c`) REFERENCES `t1` (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+CREATE TABLE `t1` (   `d` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   PRIMARY KEY (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+CREATE TABLE `a1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   PRIMARY KEY (`a`),   KEY `c` (`c`),   CONSTRAINT `c` FOREIGN KEY (`c`) REFERENCES `t1` (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+Test Case 6 : Testing import with foreign keys and --skip-fkey-checks
+BEFORE:
+CREATE TABLE `t1` (   `d` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   PRIMARY KEY (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+CREATE TABLE `a1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   PRIMARY KEY (`a`),   KEY `c` (`c`),   CONSTRAINT `c` FOREIGN KEY (`c`) REFERENCES `t1` (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following 1 warning messages were included in the import file:
+# WARNING: Output contains tables with foreign key contraints. You should disable foreign key checks prior to importing this stream.
+ERROR: Invalid statement:
+CREATE TABLE `a1` (
+  `a` int(11) NOT NULL DEFAULT '0',
+  `b` char(20) DEFAULT NULL,
+  `c` int(11) DEFAULT NULL,
+  PRIMARY KEY (`a`),
+  KEY `c` (`c`),
+  CONSTRAINT `c` FOREIGN KEY (`c`) REFERENCES `t1` (`d`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+ERROR: Query failed. Cannot add foreign key constraint

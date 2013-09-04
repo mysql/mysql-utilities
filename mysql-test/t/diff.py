@@ -44,42 +44,51 @@ class test(mutlib.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
-                raise MUTLibError("Cannot spawn needed servers: %s"
-                                  % err.errmsg)
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-            res = self.server2.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server2.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
         try:
             # Now do some alterations...
-            res = self.server2.exec_query("ALTER TABLE util_test.t1 ADD "
-                                          "COLUMN b int")
-            res = self.server2.exec_query("ALTER TABLE util_test.t2 "
-                                          "ENGINE = MEMORY")
+            self.server2.exec_query("ALTER TABLE util_test.t1 ADD "
+                                    "COLUMN b int")
+            self.server2.exec_query("ALTER TABLE util_test.t2 ENGINE = MEMORY")
             # Event has time in its definition. Remove for deterministic return
-            res = self.server1.exec_query("USE util_test;")
-            res = self.server1.exec_query("DROP EVENT util_test.e1")
-            res = self.server2.exec_query("USE util_test;")
-            res = self.server2.exec_query("DROP EVENT util_test.e1")
+            self.server1.exec_query("USE util_test;")
+            self.server1.exec_query("DROP EVENT util_test.e1")
+            self.server2.exec_query("USE util_test;")
+            self.server2.exec_query("DROP EVENT util_test.e1")
         except UtilError as err:
-            raise MUTLibError("Failed to execute query: %s" % err.errmsg)
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
 
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath(
-                                        "./std_data/db_compare_backtick.sql")
+            "./std_data/db_compare_backtick.sql"
+        )
         try:
-            res = self.server1.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
-            res = self.server2.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
+            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
+            self.server2.read_and_exec_SQL(data_file_backticks, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file_backticks, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file_backticks, err.errmsg))
+
+        # Add some data to server1 to change AUTO_INCREMENT value.
+        try:
+            for count in range(5):
+                self.server1.exec_query("INSERT INTO "
+                                        "`db_diff_test`.`table-dash` "
+                                        "VALUES (NULL)")
+        except UtilError as err:
+            raise MUTLibError("Failed to insert data on server1: "
+                              "{0}".format(err.errmsg))
 
         return True
 
@@ -191,8 +200,19 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff a sample database containing tables "
-                   "with weird names (no backticks).").format(test_num)
+                   "with weird names (no backticks) and different table "
+                   "options.").format(test_num)
         cmd_arg = "db_diff_test:db_diff_test"
+        cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - diff a sample database containing tables "
+                   "with weird names (no backticks) and skipping "
+                   "table options.").format(test_num)
+        cmd_arg = "db_diff_test:db_diff_test --skip-table-options"
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:

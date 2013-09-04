@@ -26,12 +26,13 @@ from mysql.utilities.exception import MUTLibError, UtilDBError
 # (comment, def1, def2, expected result, error_codes)
 _TABLE_TESTS = [
     ("Table partition test placeholder",
-     "CREATE TABLE diff_table.t1(a int, b int, c char(33)) " + \
+     "CREATE TABLE diff_table.t1(a int, b int, c char(33)) ENGINE=InnoDB "
      "PARTITION BY KEY(a);",
-     "CREATE TABLE diff_table.t1(a int, b int, c char(33)) " + \
-     "PARTITION BY KEY(b);", 
-     0, [1,0,1,1,0,1,1,1]),
+     "CREATE TABLE diff_table.t1(a int, b int, c char(33)) ENGINE=InnoDB "
+     "PARTITION BY KEY(b);",
+     0, [1, 0, 1, 1, 0, 1, 1, 1]),
 ]
+
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for table partition changes

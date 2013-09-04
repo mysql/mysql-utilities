@@ -459,10 +459,11 @@ def stop_running_server(server, wait=10, drop=True):
     cmd += " shutdown --user=%s --host=%s " % (server.user, server.host)
     if server.passwd:
         cmd += "--password=%s " % server.passwd
-    if server.socket:
-        cmd += "--socket=%s " % (server.socket)
+    # Use of server socket only works with 'localhost' (not with 127.0.0.1).
+    if server.socket and server.host == 'localhost':
+        cmd += "--socket=%s " % server.socket
     else:
-        cmd += "--port=%s " % (server.port)
+        cmd += "--port=%s " % server.port
     res = server.show_server_variable("datadir")
     datadir = res[0][1]
 

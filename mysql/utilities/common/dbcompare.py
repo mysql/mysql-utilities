@@ -366,22 +366,24 @@ def _get_transform(server1, server2, object1, object2, options,
 
 
 def _check_tables_structure(server1, server2, object1, object2, options,
-                            object_type):
-    """Check if the tables have the same structure
+                            diff_type):
+    """Check if the tables have the same structure.
 
-    This method compares the tables structure, ignoring the order of the
-    definitions.
+    This method compares the tables structure ignoring the order of the
+    columns and retrieves the differences between the table options.
 
-    server1[in]        first server connection
-    server2[in]        second server connection
-    object1            the first object in the compare in the form: (db.name)
-    object2            the second object in the compare in the form: (db.name)
+    server1[in]        first server connection.
+    server2[in]        second server connection.
+    object1            the first object in the compare in the form: (db.name).
+    object2            the second object in the compare in the form: (db.name).
     options[in]        a dictionary containing the options for the operation:
-                       (quiet, verbosity, difftype, width, suppress_sql)
-    object_type[in]    type of the objects to be compared (e.g., TABLE,
-                       PROCEDURE, etc.).
+                       (quiet, verbosity, difftype, width, suppress_sql).
+    diff_type[in]      difference type.
 
-    Returns bool - True if tables have the same structure
+    Returns a tuple (bool, list, bool) - The first tuple value is a boolean
+    that indicates if both tables have the same structure (i.e. column
+    definitions). The second returns the table options differences. Finally,
+    the third is a boolean indicating if the partition options are the same.
     """
     try:
         m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
@@ -389,43 +391,41 @@ def _check_tables_structure(server1, server2, object1, object2, options,
         m_obj2 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object2)
         db2, name2 = m_obj2.groups()
     except:
-        raise UtilError("Invalid object name arguments for diff_objects"
-                        "(): %s, %s." % (object1, object2))
+        raise UtilError("Invalid object name arguments for diff_objects(): "
+                        "{0}, {1}.".format(object1, object2))
 
     # If the second part of the object qualified name is None, then the format
     # is not 'db_name.obj_name' for object1 and therefore must treat it as a
     # database name.
     if not name1:
-        return False
+        return None, None, None
 
     db_1 = Database(server1, db1, options)
     db_2 = Database(server2, db2, options)
 
-    if object_type != "TABLE":
-        # Objects are not tables
-        return False
+    # Get tables definitions.
+    table_1 = db_1.get_object_definition(db1, name1, 'TABLE')[0]
+    table_2 = db_2.get_object_definition(db2, name2, 'TABLE')[0]
 
-    # Get tables definition
-    table_1 = db_1.get_object_definition(db1, name1, object_type)[0]
-    table_2 = db_2.get_object_definition(db2, name2, object_type)[0]
+    # Check table options.
+    table1_opts = db_1.get_table_options(db1, name1)
+    table2_opts = db_2.get_table_options(db2, name2)
+    diff = _get_diff(table1_opts, table2_opts, object1, object2, diff_type)
 
-    # Check tables info, discard TABLE_SCHEMA, AUTO_INCREMENT and AVG_ROW_LENGTH
-    for i in range(10):
-        if i not in (0, 3, 4) and table_1[0][i] != table_2[0][i]:
-            return False
-
-    # Check if both tables have the same columns definition
-    # Discard column order
+    # Check if both tables have the same columns definition.
+    # Discard column order.
     table_1_cols = [col[1:] for col in table_1[1]]
     table_2_cols = [col[1:] for col in table_2[1]]
-    if not set(table_1_cols) == set(table_2_cols):
-        return False
+    same_cols_def = set(table_1_cols) == set(table_2_cols)
 
-    # Check if both tables have the same partitions definition
-    # Discard part name
+    # Check if both tables have the same partition options.
+    # Discard partition name.
     table_1_part = [part[1:] for part in table_1[2]]
     table_2_part = [part[1:] for part in table_2[2]]
-    return set(table_1_part) == set(table_2_part)
+    same_partition_opts = set(table_1_part) == set(table_2_part)
+
+    # Return tables check results.
+    return same_cols_def, diff, same_partition_opts
 
 
 def build_diff_list(diff1, diff2, transform1, transform2,
@@ -523,10 +523,13 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     width = options.get("width", 75)
     direction = options.get("changes-for", None)
     reverse = options.get("reverse", False)
+    skip_table_opts = options.get("skip_table_opts", False)
 
+    # Get object CREATE statement.
+    # Note: Table options are discarded if option skip_table_opts=True.
     object1_create = get_create_object(server1, object1, options, object_type)
     object2_create = get_create_object(server2, object2, options, object_type)
-    
+
     if not quiet:
         msg = "# Comparing {0} to {1} ".format(object1, object2)
         print msg,
@@ -572,24 +575,29 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
                                     transform_server2, transform_server1,
                                     'server2', 'server1', options)
 
-    same_table_structure = _check_tables_structure(server1, server2,
-                                                   object1, object2, options,
-                                                   object_type)
+    # Note: table structure check ignores columns order.
+    same_tbl_def = None
+    tbl_opts_diff = None
+    same_part_def = None
+    if object_type == 'TABLE':
+        same_tbl_def, tbl_opts_diff, same_part_def = _check_tables_structure(
+            server1, server2, object1, object2, options, difftype
+        )
 
-    # Check if ALTER TABLE statement have changes. If not, is probably because
-    # there are differences but they have no influence on the create table,
-    # such as different order on indexes.
-    if diff_list and same_table_structure and \
-       re.match(_RE_EMPTY_ALTER_TABLE, diff_list[1]):
+    # Check if ALTER TABLE statement have changes. If not, it is probably
+    # because there are differences but they have no influence on the create
+    # table, such as different order on indexes.
+    if (diff_list and same_tbl_def and same_part_def
+        and re.match(_RE_EMPTY_ALTER_TABLE, diff_list[1])):
         print("[PASS]")
         return None
 
-    if diff_list and direction is None and same_table_structure:
+    if diff_list and direction is None and same_tbl_def and not tbl_opts_diff:
         if not quiet:
             print("[PASS]")
-            print("# WARNING: The tables structure is the same, but the order "
-                  "of some definitions is different. Use --change-for to "
-                  "take the order into account.")
+            print("# WARNING: The tables structure is the same, but the "
+                  "columns order is different. Use --change-for to take the "
+                  "order into account.")
         return None
 
     # Check for failure to generate SQL statements
@@ -608,7 +616,10 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
 
         for line in diff_list:
             print line
-        
+
+        print("# WARNING: Could not generate changes for {0}. No changes "
+              "required or not supported difference.")
+
         return diff_list
 
     if len(diff_list) > 0:
@@ -620,10 +631,21 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
             for line in diff_list:
                 print line
 
+            # Full ALTER TABLE for partition difference cannot be generated
+            # (not supported). Notify the user.
+            if same_part_def is False:
+                print("# WARNING: Partition changes were not generated "
+                      "(not supported).")
+
         return diff_list
     
     if not quiet:
-        print "[PASS]"
+        print("[PASS]")
+        if skip_table_opts and tbl_opts_diff:
+            print("# WARNING: Table options are ignored and differences were "
+                  "found:")
+            for diff in tbl_opts_diff:
+                print("# {0}".format(diff))
 
     return None
 
