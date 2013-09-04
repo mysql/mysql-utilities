@@ -106,14 +106,22 @@ class BuildDistDebian(Command):
             copy_tree(src, dst)
 
         copy_file(os.path.join(os.getcwd(), "README.txt"),
-                  os.path.join(self.deb_base, "README"))
+                  os.path.join(self.deb_base, "README.txt"))
         copy_file(os.path.join(os.getcwd(), "LICENSE.txt"),
                   os.path.join(self.deb_base, "LICENSE.txt"))
         copy_file(os.path.join(os.getcwd(), "setup.py"),
                   os.path.join(self.deb_base, "setup.py"))
         copy_file(os.path.join(os.getcwd(), "info.py"),
                   os.path.join(self.deb_base, "info.py"))
-        
+
+        # debian/files
+        log.info("creating debian/docs file")
+        f_compat = open(os.path.join(deb_dir, 'docs'), mode='w')
+        f_compat.write('README.txt\n')
+        f_compat.write('LICENSE.txt\n')
+        f_compat.flush()
+        f_compat.close()
+
         # debian/compat set to 8 for Debian 6 compatibility
         log.info("creating debian/compat file")
         f_compat = open(os.path.join(deb_dir, 'compat'), mode='w')
@@ -246,6 +254,14 @@ class BuildCommercialDistDebian(BuildDistDebian):
         copy_tree_src_dst = [(os.path.join("support", deb_lic_dir), deb_dir)]
         for src, dst in copy_tree_src_dst:
             copy_tree(src, dst, self.verbose, self.dry_run)
+
+        # debian/files
+        log.info("creating debian/docs file")
+        f_compat = open(os.path.join(deb_dir, 'docs'), mode='w')
+        f_compat.write('README_com.txt\n')
+        f_compat.write('LICENSE_com.txt\n')
+        f_compat.flush()
+        f_compat.close()
 
         # debian/compat set to 8 for Debian 6 compatibility
         log.info("creating debian/compat file")

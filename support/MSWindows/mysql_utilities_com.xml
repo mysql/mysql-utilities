@@ -176,10 +176,10 @@
       </Component>
 
       <Component Id="UtilsDocs" Guid="68608e06-d064-4909-9e3e-a60bd6f3f09b">
-        <File Id="README" Name="README.txt"
-         Source="$(var.BuildDir)\README.txt" DiskId="1"/>
-        <File Id="LICENSE" Name="LICENSE.txt"
-         Source="$(var.BuildDir)\LICENSE.txt" DiskId="1"/>
+        <File Id="README" Name="README_com.txt"
+         Source="$(var.BuildDir)\README_com.txt" DiskId="1"/>
+        <File Id="LICENSE" Name="LICENSE_com.txt"
+         Source="$(var.BuildDir)\LICENSE_com.txt" DiskId="1"/>
       </Component>
 
     </DirectoryRef>

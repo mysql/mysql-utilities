@@ -24,7 +24,7 @@ import tarfile
 from distutils.sysconfig import get_python_version
 
 def get_dist_name(distribution, source_only_dist=False, platname=None,
-                  python_version=None, commercial=False):
+                  python_version=None, commercial=False, hide_pyver=False):
     """Get the distribution name
     
     Get the distribution name usually used for creating the egg file. The
@@ -37,7 +37,7 @@ def get_dist_name(distribution, source_only_dist=False, platname=None,
     if commercial:
         name += '-commercial'
     name += '-' + distribution.metadata.version
-    if not source_only_dist or python_version:
+    if not hide_pyver and (not source_only_dist or python_version):
         pyver = python_version or get_python_version()
         name += '-py' + pyver
     if platname:

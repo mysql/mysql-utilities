@@ -59,6 +59,9 @@ class _MSIDist(bdist):
          "creating the distribution"),
         ('tag=', 't',
          "Adds a tag name after the release version"),
+        ('sub-version=', 's',
+         "adds a subversion after the current version, "
+         "(default: %s)" % "-1"),
         ]
 
     boolean_options = ['keep-temp']
@@ -73,6 +76,7 @@ class _MSIDist(bdist):
         self.dist_target = None
         self.tag = ''
         self.product_name = 'MySQL Utilities'
+        self.sub_version = "-1"
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -266,9 +270,12 @@ class MSIBuiltDist(_MSIDist):
         pyver = python_version or self.python_version
         if self.plat_name:
             platform = '-' + self.plat_name
-        return "mysql-utilities-{app_version}{tag}{platform}.wixobj".format(
-            app_version=appver, python_version=pyver, 
-            tag=self.tag, platform=platform)
+        return ("mysql-utilities-{app_version}{sub_version}{tag}"
+                "{platform}.wixobj").format(app_version=appver, 
+                                            sub_version=self.sub_version,
+                                            python_version=pyver,
+                                            tag=self.tag,
+                                            platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
@@ -309,6 +316,9 @@ class BuiltCommercialMSI(_MSIDist):
          "(default: %s)" % wix.WIX_INSTALL_PATH),
         ('tag=', 't',
          "Adds a tag name after the release version"),
+        ('sub-version=', 's',
+         "adds a subversion after the current version, "
+         "(default: %s)" % "-1"),
     ]
 
     boolean_options = [
@@ -326,6 +336,7 @@ class BuiltCommercialMSI(_MSIDist):
         self.wix_install = wix.WIX_INSTALL_PATH
         self.python_version = get_python_version()
         self.dist_type =''#'com'
+        self.sub_version = "-1"
     
     def finalize_options(self):
         """Finalize the options"""
@@ -333,7 +344,7 @@ class BuiltCommercialMSI(_MSIDist):
                                    ('dist_dir', 'dist_dir'),
                                    ('plat_name', 'plat_name'))
 
-        self.wxs = 'support/MSWindows/mysql_utilities.xml'
+        self.wxs = 'support/MSWindows/mysql_utilities_com.xml'
         self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
         if self.tag:
             self.tag = "-{0}".format(self.tag)
@@ -349,9 +360,12 @@ class BuiltCommercialMSI(_MSIDist):
         if self.plat_name:
             platform = '-' + self.plat_name
 
-        return ("mysql-utilities-commercial-{app_version}{tag}{platform}."
-                "wixobj").format(app_version=appver, python_version=pyver,
-                                 tag=self.tag, platform=platform)
+        return ("mysql-utilities-commercial-{app_version}{sub_version}{tag}"
+                "{platform}.wixobj").format(app_version=appver,
+                                            sub_version=self.sub_version,
+                                            python_version=pyver,
+                                            tag=self.tag,
+                                            platform=platform)
 
     def _prepare_distribution(self):
         """Prepare the distribution"""
@@ -366,14 +380,14 @@ class BuiltCommercialMSI(_MSIDist):
         buildexe.run()
         docfiles = [
             (os.path.join(cmdbdist.dist_target, 'LICENSE_com.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'LICENSE.txt')),
+             os.path.join(cmdbdist.bdist_dir, 'LICENSE_com.txt')),
             (os.path.join(cmdbdist.dist_target, 'README_com.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'README.txt'))
+             os.path.join(cmdbdist.bdist_dir, 'README_com.txt'))
         ]
         for src, dst in docfiles:
             self.copy_file(src, dst)
         self.bdist_base = cmdbdist.bdist_dir
         # This sets name for various items as install directory.
-        self.product_name = 'MySQL Utilities Commercial'
+        self.product_name = 'MySQL Utilities commercial'
 
 
