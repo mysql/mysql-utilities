@@ -257,8 +257,16 @@ class MSIBuiltDist(_MSIDist):
             result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
             add_features(base_xml_path, result_xml_path,
                          add_fabric=pck_fabric,
-                         add_doczip=add_doczip)
-
+                         add_doczip=add_doczip,
+                         log=log)
+            for root, _dirs, files in os.walk('support/MSWindows/'):
+                log.info('Checking for new msi descriptor at: {0}'.format(root))
+                for afile in files:
+                    log.info('file: {0}'.format(afile))
+                if 'mysql_utilities_fab-doc.xml' in files:
+                    log.info('new msi descriptor found')
+                else:
+                    log.info('new msi descriptor not found')
             self.wxs = result_xml_path
 
     def _get_wixobj_name(self, app_version=None, python_version=None):

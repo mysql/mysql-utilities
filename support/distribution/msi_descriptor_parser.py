@@ -1,7 +1,22 @@
-
+#
+# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
 
 from xml.dom.minidom import parse, parseString
-
+import os
 
 dir_fab_conf = ('<Directory>'
     '<Directory Id="LocalAppDataFolder" Name="LocalAppData">'
@@ -159,13 +174,29 @@ def add_doczip_elements(dom_msi):
     append_childs_from_unparsed_xml(feature, compref_doczip)
 
 
-def add_features(xml_path, result_path, add_fabric=False, add_doczip=False):
+def _print(log, msg):
+    if log:
+        log.info(msg)
+    print(msg)
+
+def add_features(xml_path, result_path, add_fabric=False, add_doczip=False,
+                 log=None):
+    """Adds the nessesary entries to the msi build descriptor to include 
+       Fabric and Doctrine.
+
+       xml_path[in]       The original xml msi descriptor path
+       result_path[in]    Path to save the resulting xml
+       add_fabric[in]     If True, fabric information will be added
+       add_doczip[in]     If True, Doctrine information will be added
+       log[in]            build command log instance
+    """
     dom_msi = parse(xml_path)
     if add_fabric:
         add_fabric_elements(dom_msi)
     if add_doczip:
         add_doczip_elements(dom_msi)
-
+    _print(log, "Saving xml to:{0} working directory:{1}"
+           "".format(result_path, os.getcwd()))
     f = open(result_path, "w+")
     f.write(dom_msi.toprettyxml())
     f.flush()

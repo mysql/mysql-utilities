@@ -93,19 +93,17 @@ def add_optional_resources(*args, **kwrds):
     print("packages found: {0}".format(pkgs))
     packages_found.extend(pkgs)
 
-    #if os.path.exists('scripts/mysqlfabric'):
-    #    os.rename('scripts/mysqlfabric', 'scripts/mysqlfabric.py')
-
     scripts_found = []
     for root, _dirs, scripts in os.walk('scripts'):
         for script in scripts:
             script_path = os.path.join('scripts', script)
             if (not script_path.endswith('.py') and 
-                not os.path.exists(script_path)):
+                not os.path.exists('{0}.py'.format(script_path))):
                 os.rename(script_path, '{0}.py'.format(script_path))
                 script_path = '{0}.py'.format(script_path)
             if script_path.endswith('.py'):
                 scripts_found.append(script_path)
+    print("scripts found: {0}".format(scripts_found))
 
     data_files_found = []
     for root, _dirs, data_files in os.walk('data'):
