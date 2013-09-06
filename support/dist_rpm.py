@@ -119,7 +119,7 @@ class BuiltDistRPM(Command):
                     if filename.endswith('.rpm'):
                         newname = filename.replace(
                             '{0}-1'.format(META_INFO['version']),
-                            '{0}-1{1}'.format(META_INFO['version'],
+                            '{0}{1}'.format(META_INFO['version'],
                                                         self.tag)
                         )
                         filepath = os.path.join(base, filename)
@@ -232,13 +232,16 @@ class _RPMDist(Command):
 
         self.spawn(cmd)
 
+        if self.tag:
+            self.tag = "-{0}".format(self.tag)
+
         rpms = os.path.join(self.topdir, 'RPMS')
         for base, dirs, files in os.walk(rpms):
             for filename in files:
                 if filename.endswith('.rpm'):
                     newname = filename.replace(
                         '{0}-1'.format(META_INFO['version']),
-                        '{0}-1{1}'.format(META_INFO['version'],
+                        '{0}{1}'.format(META_INFO['version'],
                                                     self.tag)
                     )
                     filepath = os.path.join(base, filename)

@@ -60,8 +60,7 @@ class _MSIDist(bdist):
         ('tag=', 't',
          "Adds a tag name after the release version"),
         ('sub-version=', 's',
-         "adds a subversion after the current version, "
-         "(default: %s)" % "-1"),
+         "adds a subversion after the current version"),
         ]
 
     boolean_options = ['keep-temp']
@@ -76,7 +75,7 @@ class _MSIDist(bdist):
         self.dist_target = None
         self.tag = ''
         self.product_name = 'MySQL Utilities'
-        self.sub_version = "-1"
+        self.sub_version = ''
 
     def finalize_options(self):
         """Finalize opitons"""
@@ -325,8 +324,7 @@ class BuiltCommercialMSI(_MSIDist):
         ('tag=', 't',
          "Adds a tag name after the release version"),
         ('sub-version=', 's',
-         "adds a subversion after the current version, "
-         "(default: %s)" % "-1"),
+         "adds a subversion after the current version"),
     ]
 
     boolean_options = [
@@ -344,7 +342,7 @@ class BuiltCommercialMSI(_MSIDist):
         self.wix_install = wix.WIX_INSTALL_PATH
         self.python_version = get_python_version()
         self.dist_type =''#'com'
-        self.sub_version = "-1"
+        self.sub_version = ''
     
     def finalize_options(self):
         """Finalize the options"""
