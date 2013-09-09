@@ -25,3 +25,7 @@ Test case 7 - error: cannot parser destination connection
 Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone.py: error: Destination connection values invalid
+Test case 8 - error: missing source option
+Usage: mysqluserclone.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
+
+mysqluserclone.py: error: Option '--source' is required.
