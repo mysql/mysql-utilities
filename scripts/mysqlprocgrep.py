@@ -27,7 +27,8 @@ import sys
 from mysql.utilities.command.proc import KILL_CONNECTION
 from mysql.utilities.command.proc import KILL_QUERY
 from mysql.utilities.command.proc import PRINT_PROCESS
-from mysql.utilities.command.proc import USER, HOST, DB, COMMAND, INFO, STATE
+from mysql.utilities.command.proc import (ID, USER, HOST, DB, COMMAND, INFO,
+                                          STATE)
 from mysql.utilities.command.proc import ProcessGrep
 
 from mysql.utilities.exception import EmptyResultError
@@ -89,18 +90,18 @@ add_format_option(parser, "display the output in either grid (default), "
 add_verbosity(parser, False)
 
 # Adding the --match-* options
-for col in USER, HOST, DB, COMMAND, INFO, STATE:
+for col in (ID, USER, HOST, DB, COMMAND, INFO, STATE):
     parser.add_option(
         "--match-" + col.lower(),
         action="callback", callback=add_pattern, callback_args=(col,),
         dest="matches", type="string", metavar="PATTERN", default=[],
-        help="match the '{0}' column of the PROCESSLIST table".format(col))
+        help="match the '{0}' column of the PROCESSLIST table.".format(col))
 
 parser.add_option(
     "--age",
     dest="age", default=None,
     help="show only processes that have been in the current state more than "
-         "a given time")
+         "a given time.")
 
 (options, args) = parser.parse_args()
 
@@ -126,7 +127,7 @@ try:
         command.execute(options.server, format=options.format)
 except EmptyResultError:
     _, details, _ = sys.exc_info()
-    sys.stderr.write("No matches")
+    sys.stderr.write("No matches\n")
     sys.exit(1)
 except Exception:
     _, details, _ = sys.exc_info()

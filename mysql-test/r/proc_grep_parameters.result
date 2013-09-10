@@ -26,16 +26,17 @@ Options:
                         or vertical format
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  --match-user=PATTERN  match the 'USER' column of the PROCESSLIST table
-  --match-host=PATTERN  match the 'HOST' column of the PROCESSLIST table
-  --match-db=PATTERN    match the 'DB' column of the PROCESSLIST table
+  --match-id=PATTERN    match the 'ID' column of the PROCESSLIST table.
+  --match-user=PATTERN  match the 'USER' column of the PROCESSLIST table.
+  --match-host=PATTERN  match the 'HOST' column of the PROCESSLIST table.
+  --match-db=PATTERN    match the 'DB' column of the PROCESSLIST table.
   --match-command=PATTERN
-                        match the 'COMMAND' column of the PROCESSLIST table
-  --match-info=PATTERN  match the 'INFO' column of the PROCESSLIST table
+                        match the 'COMMAND' column of the PROCESSLIST table.
+  --match-info=PATTERN  match the 'INFO' column of the PROCESSLIST table.
   --match-state=PATTERN
-                        match the 'STATE' column of the PROCESSLIST table
+                        match the 'STATE' column of the PROCESSLIST table.
   --age=AGE             show only processes that have been in the current
-                        state more than a given time
+                        state more than a given time.
 Test case 2 - do the SQL for a simple search
 SELECT
   Id, User, Host, Db, Command, Time, State, Info
