@@ -37,6 +37,10 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.create_login_path_data('test_mylogin', 'test_user', 'localhost')
+        self.create_login_path_data('test-hyphen1234#', 'test_user2',
+                                    'localhost')
+        self.create_login_path_data("test' \\\"-hyphen", 'test_user3',
+                                    'localhost')
         return True
 
     def run(self):
@@ -46,7 +50,10 @@ class test(mutlib.System_test):
                      "test_user@localhost:1000:/my.socket",
                      "test_mylogin:1000:/my.socket",
                      "test_user@localhost:/my.socket",
-                     "test_mylogin:/my.socket"]
+                     "test_mylogin:/my.socket", "test-hyphen1234#",
+                     "test-hyphen1234#:13000:my.socket", "test' \\\"-hyphen",
+                     "test' \\\"-hyphen:my.socket",
+                     "test' \\\"-hyphen:13001:my.socket"]
         for test in con_tests:
             con_dic = parse_connection(test)
             self.results.append(con_dic)
@@ -57,6 +64,10 @@ class test(mutlib.System_test):
         for test in user_pass_tests:
             user_pass = parse_user_password(test)
             self.results.append(user_pass)
+
+        # Transform list of dictionaries into list of strings
+        self.results = ["{0!s}\n".format(con_dic) for con_dic in self.results]
+
         return True
 
     def get_result(self):
@@ -67,4 +78,6 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         self.remove_login_path_data('test_mylogin')
+        self.remove_login_path_data('test-hyphen1234#')
+        self.remove_login_path_data("test' \\\"-hyphen")
         return True

@@ -1089,7 +1089,7 @@ class System_test(object):
                 if str[0] in ['-', '+', '?']:
                     rej_list.append(str)
                 rej_file.write(str)
-        except:
+        except StopIteration:
             pass
         rej_file.close()
 

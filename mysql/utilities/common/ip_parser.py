@@ -65,7 +65,7 @@ _CONN_QUOTEDHOST = re.compile(
     )
 
 _CONN_LOGINPATH = re.compile(
-    r"(\w+)"                     # login-path
+    r"((?:\\\"|[^:])+|(?:\\\'|[^:])+)"  # login-path
     r"(?:\:(\d+))?"              # Optional port number
     r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
     )

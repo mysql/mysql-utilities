@@ -37,7 +37,7 @@ from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
 from mutlib.mutlib import Server_list
 
 # Constants
@@ -451,6 +451,8 @@ else:
     for server in opt.servers:
         try:
             conn_val = parse_connection(server)
+        except UtilError as err:
+            parser.error(err.errmsg)
         except:
             parser.error("Problem parsing server connection '%s'" % server)
 
