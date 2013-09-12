@@ -9,7 +9,7 @@
   <Product Id="*"
    Name="MySQL Utilities"
    Version="$(var.Version)"
-   Manufacturer="Oracle"
+   Manufacturer="Oracle Corporation"
    Language="1033"
    UpgradeCode="$(var.UpgradeCode)">
 
