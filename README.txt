@@ -1,4 +1,4 @@
-MySQL Utilities 1.3 (part of MySQL Workbench Distribution 5.2)
+MySQL Utilities 1.4 (part of MySQL Workbench Distribution 6.0)
 
 This is a release of MySQL Utilities (part of MySQL Workbench Distribution),
 the dual-license, complete database modeling, administration and development
