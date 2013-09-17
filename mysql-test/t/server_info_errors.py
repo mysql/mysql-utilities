@@ -29,8 +29,6 @@ class test(server_info.test):
     """
 
     def check_prerequisites(self):
-        if os.name == "nt":
-            raise MUTLibError("Test does not execute correctly on Windows.")
         return server_info.test.check_prerequisites(self)
 
     def setup(self):

@@ -385,8 +385,9 @@ def show_server_info(servers, options):
                 er = res.groups()
 
             if (re.search("refused", "".join(er)) or
-                re.search("Can't connect to local MySQL server through socket",
-                           "".join(er))):
+               re.search("Can't connect to local MySQL server through socket",
+                           "".join(er)) or
+               re.search("Can't connect to MySQL server on", "".join(er))):
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
 
