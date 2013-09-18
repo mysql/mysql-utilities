@@ -1368,7 +1368,6 @@ class Server(object):
 
         return (inno_type, version[0], version[1], have_innodb)
 
-
     def read_and_exec_SQL(self, input_file, verbose=False):
         """Read an input file containing SQL statements and execute them.
 
@@ -1386,7 +1385,7 @@ class Server(object):
         while True:
             cmd = file.readline()
             if not cmd:
-                break;
+                break
             i += 1
             res = None
             if len(cmd) > 1:
@@ -1394,12 +1393,11 @@ class Server(object):
                     if verbose:
                         print cmd
                     query_options = {
-                        'fetch' : False
+                        'fetch': False
                     }
                     res = self.exec_query(cmd, query_options)
         file.close()
         return res
-
 
     def binlog_enabled(self):
         """Check binary logging status for the client.

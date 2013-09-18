@@ -14,10 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
-import mutlib
+
 import meta_grep
 from mysql.utilities.exception import MUTLibError
+
 
 class test(meta_grep.test):
     """Process grep
@@ -33,34 +33,45 @@ class test(meta_grep.test):
 
     def run(self):
         self.res_fname = "result.txt"
-        from_conn = self.build_connection_string(self.server1)
-        conn_val = self.get_connection_values(self.server1)
 
-        cmd_str = "mysqlmetagrep.py --server=%s " % from_conn + \
-                  "--database=util_test --format=CSV "
+        cmd_base = "mysqlmetagrep.py "
 
-        comment = "Test case 1 - do the help"
-        res = self.run_test_case(0, cmd_str + "--help", comment)
+        test_num = 1
+        comment = "Test case {0} - do the help".format(test_num)
+        cmd = "{0} --help".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlmetagrep.py "
                                            "version", 6)
 
-        comment = "Test case 2 - do the SQL for a simple search"
-        cmd_str = "mysqlmetagrep.py --sql "
-        cmd_str += " -Gb --pattern=t2"
-        res = self.run_test_case(0, cmd_str, comment)
+        test_num += 1
+        comment = ("Test case {0} - do the SQL for a simple "
+                   "search").format(test_num)
+        cmd = "{0} --sql -Gb --pattern=t2".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - do the SQL for a simple search with type"
-        cmd_str = "mysqlmetagrep.py --sql --search-objects=table"
-        cmd_str += " -Gb --pattern=t2"
-        res = self.run_test_case(0, cmd_str, comment)
+        test_num += 1
+        comment = ("Test case {0} - do the SQL for a simple search with "
+                   "type").format(test_num)
+        cmd = ("{0} --sql --search-objects=table -Gb "
+               "--pattern=t2").format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - do the SQL for a body search with type "
+                   "(VIEW).").format(test_num)
+        cmd = ("{0} --sql --search-objects=view -Gb "
+               "--pattern=%t1%").format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
 

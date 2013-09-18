@@ -56,21 +56,21 @@ _OBJMAP = {
         'object_type': "'TABLE'",
         'schema_field': 'table_schema',
         'table_name': 'partitions',
-        },
+    },
     'column': {
         'field_name': 'column_name',
         'object_name': 'table_name',
         'table_name': 'columns',
         'object_type': "'TABLE'",
         'schema_field': 'table_schema',
-        },
+    },
     'table': {
         'field_name': 'table_name',
         'object_name': 'table_name',
         'table_name': 'tables',
         'object_type': "'TABLE'",
         'schema_field': 'table_schema',
-        },
+    },
     'event': {
         'field_name': 'event_name',
         'object_name': 'event_name',
@@ -78,7 +78,7 @@ _OBJMAP = {
         'object_type': "'EVENT'",
         'schema_field': 'event_schema',
         'body_field': 'event_body',
-        },
+    },
     'routine': {
         'field_name': 'routine_name',
         'object_name': 'routine_name',
@@ -86,7 +86,7 @@ _OBJMAP = {
         'object_type': 'routine_type',
         'schema_field': 'routine_schema',
         'body_field': 'routine_body',
-        },
+    },
     'trigger': {
         'field_name': 'trigger_name',
         'object_name': 'trigger_name',
@@ -94,21 +94,22 @@ _OBJMAP = {
         'object_type': "'TRIGGER'",
         'schema_field': 'trigger_schema',
         'body_field': 'action_statement',
-        },
+    },
     'database': {
         'field_name': 'schema_name',
         'object_name': 'schema_name',
         'table_name': 'schemata',
         'object_type': "'SCHEMA'",
         'schema_field': 'schema_name',
-        },        
+    },
     'view': {
         'field_name': 'table_name',
         'object_name': 'table_name',
         'table_name': 'views',
         'object_type': "'VIEW'",
         'schema_field': 'table_schema',
-        },
+        'body_field': 'view_definition',
+    },
     'user': {
         'select_option': 'DISTINCT',
         'field_name': 'grantee',
@@ -117,7 +118,7 @@ _OBJMAP = {
         'object_type': "'USER'",
         'schema_field': 'table_schema',
         'body_field': 'privilege_type',
-        },
+    },
 }
 
 _GROUP_MATCHES_FRM = """

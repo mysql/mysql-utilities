@@ -134,7 +134,7 @@ UNION
   FROM
     information_schema.views
   WHERE
-    table_name REGEXP 't2'
+    table_name REGEXP 't2' OR view_definition REGEXP 't2'
 ) AS all_results
   GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
 Test case 3 - do the SQL for a simple search with type
@@ -153,5 +153,23 @@ FROM (
     information_schema.tables
   WHERE
     table_name REGEXP 't2'
+) AS all_results
+  GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
+Test case 4 - do the SQL for a body search with type (VIEW).
+
+SELECT 
+  `Object Type`, `Object Name`, `Database`,
+  `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
+FROM (
+  SELECT 
+    'VIEW' AS `Object Type`,
+    table_name AS `Object Name`,
+    table_schema AS `Database`,
+    'VIEW' AS `Field Type`,
+    table_name AS `Field`
+  FROM
+    information_schema.views
+  WHERE
+    table_name REGEXP '%t1%' OR view_definition REGEXP '%t1%'
 ) AS all_results
   GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
