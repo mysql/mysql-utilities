@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     for fname in test_files:
         (base, ext) = os.path.splitext(fname)
-        name = '.'.join(base.split('/'))
+        name = '.'.join(base.split(os.sep))
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(name))
 
     result = unittest.TextTestRunner(verbosity=2).run(suite)

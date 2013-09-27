@@ -856,7 +856,9 @@ class Console(object):
                 # Windows does things oddly for some keys
                 if not os.name == 'posix' and cmd_key == 'SPECIAL_WIN':
                     key = getch()
-                    cmd_key = _WIN_COMMAND_KEY[key]
+                    cmd_key = _WIN_COMMAND_KEY.get(key)
+                    if cmd_key is None:
+                        continue
                 self._process_command_keys(cmd_key)
                 cmd_string = self.cmd_line.get_command()
             # else add key to command buffer
