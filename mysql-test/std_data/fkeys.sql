@@ -13,7 +13,9 @@ INSERT INTO util_test_fk.a1 VALUES (4, 'four', 1), (5, 'five', 2), (6, 'six', 3)
 CREATE DATABASE util_test_fk2;
 CREATE TABLE util_test_fk2.a2 (a int, b char(20), fc int, fd int, PRIMARY KEY(a), CONSTRAINT `fk_fc_fd` FOREIGN KEY (fc,fd) REFERENCES `util_test_fk2`.`t2`(c,d) ON UPDATE CASCADE) ENGINE=INNODB;
 CREATE TABLE util_test_fk2.t2 (c int, d int, a int, PRIMARY KEY (c,d), CONSTRAINT `fk_t1_a` FOREIGN KEY (a) REFERENCES `util_test_fk`.`a1`(a)) ENGINE=INNODB;
+CREATE TABLE util_test_fk2.t3 (x int, c int , d int, a int, PRIMARY KEY (x), CONSTRAINT `fk_a1_1` FOREIGN KEY (a) references `util_test_fk`.`a1`(a), CONSTRAINT `fk2_t2_cd` FOREIGN KEY (c,d) REFERENCES `util_test_fk2`.`t2`(c,d)) ENGINE=INNODB;
 INSERT INTO util_test_fk2.t2 VALUES(1,1,3);
+INSERT INTO util_test_fk2.t3 VALUES(23,1,1,1);
 INSERT INTO util_test_fk2.a2 VALUES('20','bar',1,1);
 
 CREATE DATABASE util_test_fk3;

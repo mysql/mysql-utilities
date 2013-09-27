@@ -6,9 +6,12 @@ Test case 1 - Warning message when there are Foreign Keys pointing to other data
 # Copying TABLE util_test_fk2.m
 # Copying TABLE util_test_fk2.t2
 # WARNING: The database being cloned has external Foreign Key constraint dependencies, util_test_fk2_clone.t2 depends on util_test_fk.a1
+# Copying TABLE util_test_fk2.t3
+# WARNING: The database being cloned has external Foreign Key constraint dependencies, util_test_fk2_clone.t3 depends on util_test_fk.a1
 # Copying data for TABLE util_test_fk2.a2
 # Copying data for TABLE util_test_fk2.m
 # Copying data for TABLE util_test_fk2.t2
+# Copying data for TABLE util_test_fk2.t3
 #...done.
 Test case 2 - No warning message when there are no Foreign Keys pointing to other databases
 # Source on XXXX-XXXX: ... connected.
@@ -31,7 +34,11 @@ Test case 3 - Warning message when FK constraints are lost because destination e
 # Adding missing ENGINE=MYISAM clause for table `util_test_fk2_clone`.t2.
 # Copying TABLE util_test_fk2.t2
 # WARNING: FOREIGN KEY constraints for table util_test_fk2_clone.t2 are missing because the new storage engine for the table is not InnoDB
+# Adding missing ENGINE=MYISAM clause for table `util_test_fk2_clone`.t3.
+# Copying TABLE util_test_fk2.t3
+# WARNING: FOREIGN KEY constraints for table util_test_fk2_clone.t3 are missing because the new storage engine for the table is not InnoDB
 # Copying data for TABLE util_test_fk2.a2
 # Copying data for TABLE util_test_fk2.m
 # Copying data for TABLE util_test_fk2.t2
+# Copying data for TABLE util_test_fk2.t3
 #...done.

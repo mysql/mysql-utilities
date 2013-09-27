@@ -22,7 +22,6 @@ multiple utilities.
 
 import re
 from collections import deque
-from operator import itemgetter
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.sql_transform import quote_with_backticks
@@ -457,74 +456,104 @@ class Database(object):
                                   " Error: {1}".format(obj_type, e.errmsg),
                                   -1, self.db_name)
 
-        # Look for FK constraints
+        # Look for foreign key constraints
         if obj_type == _TABLE:
             params = {'DATABASE': self.db_name,
                       'TABLE': obj[0],
                       }
             try:
                 query = _FK_CONSTRAINT_QUERY.format(**params)
-                fk_constr = self.source.exec_query(query)
+                fkey_constr = self.source.exec_query(query)
             except Exception as e:
-                raise UtilDBError("Unable to obtain FK constraint information "
-                                  "for table {0}.{1}. Error: {2}".format(
+                raise UtilDBError("Unable to obtain Foreign Key constraint "
+                                  "information for table {0}.{1}. "
+                                  "Error: {2}".format(
                                   self.db_name, obj[0], e.errmsg), -1,
                                   self.db_name
                                   )
 
-            #Get information about foreign keys of the table being copied/cloned
-            if fk_constr and not may_skip_fk:
-                c = fk_constr[0]
-                # Extract FK Parameters
-                params = {'DATABASE': self.new_db,
-                          'TABLE': c[0],
-                          'CONSTRAINT_NAME': c[1],
-                          'REFERENCED_DATABASE': c[3],
-                          'REFERENCED_TABLE': c[4],
-                          'UPDATE_RULE': c[6],
-                          'DELETE_RULE': c[7],
-                          }
+            # Get information about the foreign keys of the table being
+            # copied/cloned.
+            if fkey_constr and not may_skip_fk:
 
-                if self.cloning:  # if it is a cloning table operation
+                # Create a constraint dictionary with the constraint
+                # name as key
+                constr_dict = {}
 
-                    # In case FK is composit we need to join the columns to use
-                    # in in alter table query. Only useful when cloning
-                    params['COLUMN_NAMES'] = '`,`'.join(map(itemgetter(2),
-                                                            fk_constr))
-                    params['REFERENCED_COLUMNS'] = '`,`'.join(map(itemgetter(5),
-                                                                  fk_constr))
+                # This list is used to ensure the same constraints are applied
+                # in the same order, because iterating the dictionary doesn't
+                # offer any guarantees regarding order, and Python 2.6 has
+                # no ordered_dict
+                constr_lst = []
 
-                    # If the FK points to a table under the database being
-                    # cloned, change the referenced database name to the new
-                    # cloned database
-                    if params['REFERENCED_DATABASE'] == self.db_name:
-                        params['REFERENCED_DATABASE'] = self.new_db
-                    else:
-                        print("# WARNING: The database being cloned has "
-                              "external Foreign Key constraint dependencies,"
-                              " {0}.{1} depends on {2}."
-                              "{3}".format(params['DATABASE'], params['TABLE'],
-                                           params['REFERENCED_DATABASE'],
-                                           params['REFERENCED_TABLE'])
-                              )
-                    query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
+                for fkey in fkey_constr:
+                    params = constr_dict.get(fkey[1])
+                    # in case the constraint entry already exists, it means it
+                    # is composite, just update the columns names and
+                    # referenced column fields
+                    if params:
+                        params['COLUMN_NAMES'].append(fkey[2])
+                        params['REFERENCED_COLUMNS'].append(fkey[5])
+                    else:  # else create a new entry
+                        constr_lst.append(fkey[1])
+                        constr_dict[fkey[1]] = {
+                            'DATABASE': self.new_db,
+                            'TABLE': fkey[0],
+                            'CONSTRAINT_NAME': fkey[1],
+                            'COLUMN_NAMES': [fkey[2]],
+                            'REFERENCED_DATABASE': fkey[3],
+                            'REFERENCED_TABLE': fkey[4],
+                            'REFERENCED_COLUMNS': [fkey[5]],
+                            'UPDATE_RULE': fkey[6],
+                            'DELETE_RULE': fkey[7],
+                        }
+                # Iterate all the constraints and get the necessary parameters
+                # to create the query
+                for constr in constr_lst:
+                    params = constr_dict[constr]
+                    if self.cloning:  # if it is a cloning table operation
 
-                    # Store constraint query for later execution
-                    self.constraints.append(query)
-                    if self.verbose:
-                        print(query)
-                else:  # if we are copying
-                    if params['REFERENCED_DATABASE'] != self.db_name:
-                        # if the table being copied has dependencies to external
-                        # databases
-                        print("# WARNING: The database being copied has "
-                              "external Foreign Key constraint dependencies,"
-                              " {0}.{1} depends on {2}."
-                              "{3}".format(params['DATABASE'], params['TABLE'],
-                                           params['REFERENCED_DATABASE'],
-                                           params['REFERENCED_TABLE'])
-                              )
-            elif fk_constr and may_skip_fk:
+                        # In case the foreign key is composite we need to join
+                        # the columns to use in in alter table query. Only
+                        # useful when cloning
+                        params['COLUMN_NAMES'] = '`,`'.join(
+                            params['COLUMN_NAMES'])
+                        params['REFERENCED_COLUMNS'] = '`,`'.join(
+                            params['REFERENCED_COLUMNS'])
+
+                        # If the foreign key points to a table under the
+                        # database being cloned, change the referenced database
+                        #  name to the new cloned database
+                        if params['REFERENCED_DATABASE'] == self.db_name:
+                            params['REFERENCED_DATABASE'] = self.new_db
+                        else:
+                            print("# WARNING: The database being cloned has "
+                                  "external Foreign Key constraint "
+                                  "dependencies, {0}.{1} depends on {2}."
+                                  "{3}".format(params['DATABASE'],
+                                               params['TABLE'],
+                                               params['REFERENCED_DATABASE'],
+                                               params['REFERENCED_TABLE'])
+                                  )
+                        query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
+
+                        # Store constraint query for later execution
+                        self.constraints.append(query)
+                        if self.verbose:
+                            print(query)
+                    else:  # if we are copying
+                        if params['REFERENCED_DATABASE'] != self.db_name:
+                            # if the table being copied has dependencies
+                            # to external databases
+                            print("# WARNING: The database being copied has "
+                                  "external Foreign Key constraint "
+                                  "dependencies, {0}.{1} depends on {2}."
+                                  "{3}".format(params['DATABASE'],
+                                               params['TABLE'],
+                                               params['REFERENCED_DATABASE'],
+                                               params['REFERENCED_TABLE'])
+                                  )
+            elif fkey_constr and may_skip_fk:
                 print("# WARNING: FOREIGN KEY constraints for table {0}.{1} "
                       "are missing because the new storage engine for "
                       "the table is not InnoDB".format(self.new_db, obj[0]))
