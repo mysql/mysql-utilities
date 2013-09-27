@@ -38,9 +38,9 @@ _MAXAVERAGE_CALC = 100
 
 _FOREIGN_KEY_QUERY = """
   SELECT CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
-         REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME 
-  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
-  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND 
+         REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND
         REFERENCED_TABLE_SCHEMA IS NOT NULL
 """
 
@@ -313,7 +313,7 @@ class Table(object):
         server[in]         A Server object
         name[in]           Name of table in the form (db.table)
         options[in]        options for class: verbose, quiet, get_cols,
-            quiet     If True, do not print information messages    
+            quiet     If True, do not print information messages
             verbose   print extra data during operations (optional)
                       (default is False)
             get_cols  If True, get the column metadata on construction
@@ -398,10 +398,10 @@ class Table(object):
 
     def get_column_metadata(self, columns=None):
         """Get information about the table for the bulk insert operation.
-        
+
         This method builds lists that describe the metadata of the table. This
         includes lists for:
-        
+
           column names
           column format for building VALUES clause
           blob fields - for use in generating INSERT/UPDATE for blobs
@@ -472,7 +472,7 @@ class Table(object):
         blob_col[in]       number of the column containing the blob
 
         Returns tuple (UPDATE string, blob data)
-        """        
+        """
         from mysql.connector.conversion import MySQLConverter
 
         if self.column_format is None:
@@ -513,7 +513,7 @@ class Table(object):
 
         Returns (string) column list
         """
-        
+
         if self.column_format is None:
             self.get_column_metadata()
 
@@ -702,7 +702,7 @@ class Table(object):
         # Issue the write lock
         lock_list = [("%s.%s" % (new_db, self.q_tbl_name), 'WRITE')]
         my_lock = Lock(dest, lock_list, {'locking':'lock-all',})
-                    
+
         # First, turn off foreign keys if turned on
         dest.disable_foreign_key_checks(True)
 
@@ -822,7 +822,7 @@ class Table(object):
                 if p is not None:
                     p.start()
                     pthreads.append(p)
-    
+
             if num_conn > 1:
                 # Wait for all to finish
                 num_complete = 0
@@ -913,11 +913,11 @@ class Table(object):
         """
         res = self.server.exec_query("SHOW INDEXES FROM %s" % self.q_table)
         return res
-    
-    
+
+
     def get_tbl_foreign_keys(self):
         """Return a result set containing all foreign keys for the table
-        
+
         Returns result set
         """
         res = self.server.exec_query(_FOREIGN_KEY_QUERY % (self.db_name,
@@ -1005,7 +1005,7 @@ class Table(object):
             elif index.contains_columns(pri_idx_cols):
                 redundant_indexes.append(index)
 
-        return redundant_indexes if redundant_indexes else None
+        return redundant_indexes if redundant_indexes else []
 
     def _get_index_list(self):
         """Get the list of indexes for a table.
@@ -1013,26 +1013,26 @@ class Table(object):
         """
         rows = self.get_tbl_indexes()
         return rows
-    
-    
+
+
     def get_primary_index(self):
         """Retrieve the primary index columns for this table.
         """
         pri_idx = []
-        
+
         rows = self.server.exec_query("EXPLAIN " + self.q_table)
 
         # Return False if no indexes found.
         if not rows:
             return pri_idx
-        
+
         for row in rows:
             if row[3] == 'PRI':
                 pri_idx.append(row)
 
         self.pri_idx = pri_idx
-        
-        return pri_idx            
+
+        return pri_idx
 
 
     def get_indexes(self):
@@ -1107,7 +1107,7 @@ class Table(object):
         # key). In InnoDB, each record in a secondary index contains the
         # primary key columns. Therefore the use of keys that include the
         # primary key might be redundant.
-        redundant_idxs = None
+        redundant_idxs = []
         if not self.storage_engine:
             self.storage_engine = self.get_storage_engine()
         if self.storage_engine == 'INNODB':
@@ -1235,6 +1235,9 @@ class Table(object):
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")
             print_list(sys.stdout, format, cols, rows)
+        else:
+            print("# WARNING: Not enough data to calculate "
+                  "best/worst indexes.")
 
 
     def __print_index_list(self, indexes, format, no_header=False):

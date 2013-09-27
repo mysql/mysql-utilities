@@ -160,6 +160,7 @@ CREATE INDEX `redundant` ON `util_test_d`.`cluster_idx` (`col2`, `id`) USING BTR
 #
 ALTER TABLE `util_test_d`.`cluster_idx` DROP INDEX `redundant`, ADD INDEX `redundant` (col2);
 #
+# WARNING: Not enough data to calculate best/worst indexes.
 #
 # ...done.
 Test case 10 - not find redundancy with the clustered index (not InnoDB)
@@ -186,6 +187,7 @@ CREATE INDEX `redundant` ON `util_test_d`.`no_cluster_idx` (`col2`, `id`) USING 
 #
 ALTER TABLE `util_test_d`.`no_cluster_idx` DROP INDEX `col2`;
 #
+# WARNING: Not enough data to calculate best/worst indexes.
 #
 # ...done.
 Test case 11 - find various redundancies (and duplicates) with the clustered index (InnoDB)
@@ -230,5 +232,6 @@ CREATE INDEX `another_redundant` ON `util_test_d`.`various_cluster_idx` (`col3`,
 ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `redundant`, ADD INDEX `redundant` (col2);
 ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `another_redundant`, ADD INDEX `another_redundant` (col3);
 #
+# WARNING: Not enough data to calculate best/worst indexes.
 #
 # ...done.

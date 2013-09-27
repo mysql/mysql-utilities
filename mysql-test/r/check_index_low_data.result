@@ -1,0 +1,58 @@
+Test case 1 - best indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 2 - worst indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 3 - best indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 4 - worst indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 5 - best indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 6 - worst indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+# WARNING: Not enough data to calculate best/worst indexes.
+Test case 7 - best indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+#
+# Showing the top 5 best performing indexes from util_test_a.test_low:
+#
+*************************       1. row *************************
+    database: util_test_a
+       table: test_low
+        name: str_text
+      column: str_text
+    sequence: 1
+ num columns: 1
+ cardinality: 16
+   est. rows: 16
+     percent: 100.00
+1 row.
+Test case 8 - worst indexes - low data
+# Getting indexes for util_test_a.test_low
+# Table util_test_a.test_low has no duplicate nor redundant indexes.
+#
+# Showing the top 5 worst performing indexes from util_test_a.test_low:
+#
+*************************       1. row *************************
+    database: util_test_a
+       table: test_low
+        name: str_text
+      column: str_text
+    sequence: 1
+ num columns: 1
+ cardinality: 16
+   est. rows: 16
+     percent: 100.00
+1 row.
