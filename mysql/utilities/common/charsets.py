@@ -20,20 +20,19 @@ This module contains the charset_info class designed to read character set
 and collation information from /share/charsets/index.xml.
 """
 
-import os
 import sys
 
-from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
 
 _CHARSET_INDEXES = ID, CHARACTER_SET_NAME, COLLATION_NAME, MAXLEN, IS_DEFAULT \
-                   = range(0,5)
+    = range(0, 5)
 
 _CHARSET_QUERY = """
 SELECT CL.ID,CL.CHARACTER_SET_NAME,CL.COLLATION_NAME,CS.MAXLEN, CL.IS_DEFAULT
 FROM INFORMATION_SCHEMA.CHARACTER_SETS CS, INFORMATION_SCHEMA.COLLATIONS CL
 WHERE CS.CHARACTER_SET_NAME=CL.CHARACTER_SET_NAME ORDER BY CHARACTER_SET_NAME
 """
+
 
 class CharsetInfo(object):
     """
@@ -46,11 +45,13 @@ class CharsetInfo(object):
 
     """
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
         """Constructor
 
         options[in]        array of general options
         """
+        if options is None:
+            options = {}
         self.verbosity = options.get("verbosity", 0)
         self.format = options.get("format", "grid")
         self.server = options.get("server", None)
@@ -59,7 +60,6 @@ class CharsetInfo(object):
 
         if self.server:
             self.charset_map = self.server.exec_query(_CHARSET_QUERY)
-
 
     def print_charsets(self):
         """Print the character set list
@@ -70,32 +70,29 @@ class CharsetInfo(object):
                    self.charset_map)
         print len(self.charset_map), "rows in set."
 
-
-    def get_name(self, id):
+    def get_name(self, chr_id):
         """Get the character set name for the given id
 
-        id[in]         id for character set (as read from .frm file)
+        chr_id[in]     id for character set (as read from .frm file)
 
         Returns string - character set name or None if not found.
         """
         for cs in self.charset_map:
-            if int(id) == int(cs[ID]):
+            if int(chr_id) == int(cs[ID]):
                 return cs[CHARACTER_SET_NAME]
         return None
 
-
-    def get_collation(self, id):
+    def get_collation(self, col_id):
         """Get the collation name for the given id
 
-        id[in]         id for collation (as read from .frm file)
+        col_id[in]     id for collation (as read from .frm file)
 
         Returns string - collation name or None if not found.
         """
         for cs in self.charset_map:
-            if int(id) == int(cs[ID]):
+            if int(col_id) == int(cs[ID]):
                 return cs[COLLATION_NAME]
         return None
-
 
     def get_name_by_collation(self, colname):
         """Get the character set name for the given collation
@@ -109,31 +106,29 @@ class CharsetInfo(object):
                 return cs[CHARACTER_SET_NAME]
         return None
 
-
-    def get_default_collation(self, id):
+    def get_default_collation(self, col_id):
         """Get the default collation for the character set
 
-        id[in]         id for collation (as read from .frm file)
+        col_id[in]     id for collation (as read from .frm file)
 
         Returns tuple - (default collation id, name) or None if not found.
         """
         # Exception for utf8
-        if id == 83:
+        if col_id == 83:
             return "utf8_bin"
         for cs in self.charset_map:
-            if int(cs[ID]) == int(id) and cs[IS_DEFAULT].upper() == "YES":
+            if int(cs[ID]) == int(col_id) and cs[IS_DEFAULT].upper() == "YES":
                 return cs[COLLATION_NAME]
         return None
 
-
-    def get_maxlen(self, id):
+    def get_maxlen(self, col_id):
         """Get the maximum length for the character set
 
-        id[in]         id for collation (as read from .frm file)
+        col_id[in]     id for collation (as read from .frm file)
 
         Returns int - max length or 1 if not found.
         """
         for cs in self.charset_map:
-            if int(cs[ID]) == int(id):
+            if int(cs[ID]) == int(col_id):
                 return int(cs[MAXLEN])
         return int(1)

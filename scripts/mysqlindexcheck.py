@@ -31,14 +31,13 @@ check_python_version()
 import os.path
 import sys
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import indexcheck
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import (add_verbosity, add_format_option,
+                                            setup_common_options)
+
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"
@@ -140,18 +139,18 @@ if (worst is not None or best is not None) and not opt.stats:
 
 # Build dictionary of options
 options = {
-    "show-drops"    : opt.show_drops,
-    "skip"          : opt.skip,
-    "verbosity"     : opt.verbosity,
-    "show-indexes"  : opt.show_indexes,
-    "index-format"  : opt.format,
-    "stats"         : opt.stats,
-    "best"          : best,
-    "worst"         : worst
+    "show-drops": opt.show_drops,
+    "skip": opt.skip,
+    "verbosity": opt.verbosity,
+    "show-indexes": opt.show_indexes,
+    "index-format": opt.format,
+    "stats": opt.stats,
+    "best": best,
+    "worst": worst
 }
 
 try:
-    res = indexcheck.check_index(source_values, args, options)
+    indexcheck.check_index(source_values, args, options)
 except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

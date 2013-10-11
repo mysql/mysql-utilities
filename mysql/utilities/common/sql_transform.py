@@ -23,46 +23,48 @@ differences.
 import re
 
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.connector.conversion import MySQLConverter
+
 
 _IGNORE_COLUMN = -1  # Ignore column in comparisons and transformations
 _FORCE_COLUMN = -2   # Force column to be included in build phase
 
 # Define column control symbols
-_DROP_COL, _ADD_COL, _CHANGE_COL_TYPE, _CHANGE_COL_ORDER = range(0,4)
+_DROP_COL, _ADD_COL, _CHANGE_COL_TYPE, _CHANGE_COL_ORDER = range(0, 4)
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
     "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
 
 # Define database INFORMATION_SCHEMA column numbers
-_DB_NAME, _DB_CHARSET, _DB_COLLATION, _DB_SQL_PATH = range(0,4)
+_DB_NAME, _DB_CHARSET, _DB_COLLATION, _DB_SQL_PATH = range(0, 4)
 
 # Define table INFORMATION_SCHEMA column numbers and index values
 _COLUMN_ORDINAL_POSITION, _COLUMN_NAME, _COLUMN_TYPE, _COLUMN_IS_NULLABLE, \
-    _COLUMN_DEFAULT, _COLUMN_EXTRA, _COLUMN_COMMENT, _COLUMN_KEY = range(0,8)
+    _COLUMN_DEFAULT, _COLUMN_EXTRA, _COLUMN_COMMENT, _COLUMN_KEY = range(0, 8)
 
-_TABLE_DEF, _COLUMN_DEF, _PART_DEF = range(0,3)
+_TABLE_DEF, _COLUMN_DEF, _PART_DEF = range(0, 3)
 _TABLE_DB, _TABLE_NAME, _TABLE_ENGINE, _TABLE_AUTO_INCREMENT, \
     _TABLE_AVG_ROW_LENGTH, _TABLE_CHECKSUM, _TABLE_COLLATION, _TABLE_COMMENT, \
-    _TABLE_ROW_FORMAT, _TABLE_CREATE_OPTIONS = range(0,10)
+    _TABLE_ROW_FORMAT, _TABLE_CREATE_OPTIONS = range(0, 10)
 
 # Define view INFORMATION_SCHEMA column numbers
 _VIEW_DB, _VIEW_NAME, _VIEW_BODY, _VIEW_CHECK, _VIEW_DEFINER, \
-    _VIEW_SECURITY = range(0,6)
+    _VIEW_SECURITY = range(0, 6)
 
 # Define trigger INFORMATION_SCHEMA column numbers
 _TRIGGER_DB, _TRIGGER_NAME, _TRIGGER_EVENT, _TRIGGER_TABLE, _TRIGGER_BODY, \
-    _TRIGGER_TIME,  _TRIGGER_DEFINER = range(0,7)
+    _TRIGGER_TIME,  _TRIGGER_DEFINER = range(0, 7)
 
 # Define routine INFORMATION_SCHEMA column numbers
 _ROUTINE_DB, _ROUTINE_NAME, _ROUTINE_BODY, _ROUTINE_SQL_DATA_ACCESS, \
     _ROUTINE_SECURITY_TYPE, _ROUTINE_COMMENT, _ROUTINE_DEFINER, \
-    _ROUTINE_PARAMS, _ROUTINE_RETURNS, _ROUTINE_IS_DETERMINISTIC = range(0,10)
+    _ROUTINE_PARAMS, _ROUTINE_RETURNS, _ROUTINE_IS_DETERMINISTIC = range(0, 10)
 
 # Define event INFORMATION_SCHEMA column numbers
 _EVENT_DB, _EVENT_NAME, _EVENT_DEFINER, _EVENT_BODY, _EVENT_TYPE, \
     _EVENT_INTERVAL_FIELD, _EVENT_INTERVAL_VALUE, _EVENT_STATUS, \
-    _EVENT_ON_COMPLETION, _EVENT_STARTS, _EVENT_ENDS = range(0,11)
+    _EVENT_ON_COMPLETION, _EVENT_STARTS, _EVENT_ENDS = range(0, 11)
 
 # Get the constraints but ignore primary keys
 _CONSTRAINT_QUERY = """
@@ -73,6 +75,7 @@ _CONSTRAINT_QUERY = """
         and CONSTRAINT_TYPE != 'UNIQUE'
 """
 
+
 def to_sql(obj):
     """Convert a value to a suitable SQL value placing quotes where needed.
 
@@ -80,7 +83,6 @@ def to_sql(obj):
 
     Returns (string) converted value
     """
-    from mysql.connector.conversion import MySQLConverter
     return MySQLConverter().quote(obj)
 
 
@@ -211,7 +213,7 @@ def build_set_clauses(table, table_cols, dest_row, src_row):
     # do SETs
     set_str = ""
     do_comma = False
-    for col_idx in range(0,len(table_cols)):
+    for col_idx in range(0, len(table_cols)):
         if dest_row[col_idx] != src_row[col_idx]:
             # do comma
             if do_comma:
@@ -225,7 +227,7 @@ def build_set_clauses(table, table_cols, dest_row, src_row):
                 set_str += "%s = %s" % (table_cols[col_idx], "NULL")
             else:
                 set_str += "%s = %s" % (table_cols[col_idx],
-                                       to_sql(src_row[col_idx]))
+                                        to_sql(src_row[col_idx]))
 
     return set_str
 
@@ -256,8 +258,8 @@ def transform_data(destination, source, operation, rows):
     # We cannot do the data changes if the columns are different in the
     # destination and source!
     if dest_cols != src_cols:
-        return ["WARNING: Cannot generate SQL UPDATE commands for " \
-                "tables whose definitions are different. Check the " \
+        return ["WARNING: Cannot generate SQL UPDATE commands for "
+                "tables whose definitions are different. Check the "
                 "table definitions for changes."]
     data_op = operation.upper()
     if data_op == "INSERT":
@@ -340,7 +342,8 @@ class SQLTransformer(object):
         self.source = source
         self.obj_type = obj_type.upper()
         self.verbosity = verbosity
-
+        self.dest_tbl = None
+        self.src_tbl = None
 
     def transform_definition(self):
         """Transform an object definition
@@ -355,20 +358,19 @@ class SQLTransformer(object):
         Returns list - SQL statement(s) for transforming the object
         """
         trans_method = {
-            _DATABASE : self._transform_database,
-            _TABLE    : self._transform_table,
-            _VIEW     : self._transform_view,
-            _TRIG     : self._transform_trigger,
-            _PROC     : self._transform_routine,
-            _FUNC     : self._transform_routine,
-            _EVENT    : self._transform_event,
+            _DATABASE: self._transform_database,
+            _TABLE: self._transform_table,
+            _VIEW: self._transform_view,
+            _TRIG: self._transform_trigger,
+            _PROC: self._transform_routine,
+            _FUNC: self._transform_routine,
+            _EVENT: self._transform_event,
         }
         try:
             return trans_method[self.obj_type]()
         except IndexError:
             raise UtilDBError("Unknown object type '%s' for transformation." %
                               self.obj_type)
-
 
     def _transform_database(self):
         """Transform a database definition
@@ -384,14 +386,14 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "ALTER DATABASE" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': "ALTER DATABASE"},
             # object name
-            { 'fmt' : " %s", 'col' : _IGNORE_COLUMN,
-              'val' : self.destination[_DB_NAME] },
+            {'fmt': " %s", 'col': _IGNORE_COLUMN,
+             'val': self.destination[_DB_NAME]},
             # charset
-            { 'fmt' : " CHARACTER SET %s", 'col' : _DB_CHARSET, 'val' : "" },
+            {'fmt': " CHARACTER SET %s", 'col': _DB_CHARSET, 'val': ""},
             # collation
-            { 'fmt' : " COLLATE = %s", 'col' : _DB_COLLATION, 'val' : "" },
+            {'fmt': " COLLATE = %s", 'col': _DB_COLLATION, 'val': ""},
         ]
 
         # if no changes, return None
@@ -403,8 +405,8 @@ class SQLTransformer(object):
 
         return statements
 
-
-    def _convert_option_values(self, option_values):
+    @staticmethod
+    def _convert_option_values(option_values):
         """Convert a list of option=value to a list of names and name, value
         pairs.
 
@@ -435,8 +437,8 @@ class SQLTransformer(object):
                 name_values.append(name_value)
         return (names, name_values)
 
-
-    def _find_value(self, name, name_values):
+    @staticmethod
+    def _find_value(name, name_values):
         """Find a value for a name in a list of tuple (name, value)
 
         name[in]           name of pair
@@ -453,7 +455,6 @@ class SQLTransformer(object):
                     return None
 
         return None
-
 
     def _parse_table_options(self, destination, source):
         """Parse the table options into a list and compare.
@@ -484,7 +485,7 @@ class SQLTransformer(object):
         src_opts_names, src_opts_val = self._convert_option_values(src_opts)
         src_opts_names.sort()
         in_both, in_dest_not_src, in_src_not_dest = \
-                    get_common_lists(dest_opts_names, src_opts_names)
+            get_common_lists(dest_opts_names, src_opts_names)
 
         # Whoops! There are things set in the destination that aren't in the
         # source so we don't know if these are Ok or if we need to do
@@ -508,7 +509,6 @@ class SQLTransformer(object):
 
         return ', '.join(changes)
 
-
     def _get_table_defns(self, destination, source):
         """Get the transform fpr the general options for a table
 
@@ -529,19 +529,19 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # rename
-            { 'fmt' : "RENAME TO %s.%s \n", 'col' : _IGNORE_COLUMN, 'val' : "" },
+            {'fmt': "RENAME TO %s.%s \n", 'col': _IGNORE_COLUMN, 'val': ""},
             # engine
-            { 'fmt' : "ENGINE=%s", 'col' : _TABLE_ENGINE, 'val' : "" },
+            {'fmt': "ENGINE=%s", 'col': _TABLE_ENGINE, 'val': ""},
             # auto increment
-            { 'fmt' : "AUTO_INCREMENT=%s", 'col' : _TABLE_AUTO_INCREMENT,
-              'val' : "" },
+            {'fmt': "AUTO_INCREMENT=%s", 'col': _TABLE_AUTO_INCREMENT,
+             'val': ""},
             # collation
-            { 'fmt' : "COLLATE=%s", 'col' : _TABLE_COLLATION, 'val' : "" },
+            {'fmt': "COLLATE=%s", 'col': _TABLE_COLLATION, 'val': ""},
             # comment - always include to ensure comments can be removed
-            { 'fmt' : "COMMENT='%s'", 'col' : _IGNORE_COLUMN,
-              'val' : source[_TABLE_COMMENT] },
+            {'fmt': "COMMENT='%s'", 'col': _IGNORE_COLUMN,
+             'val': source[_TABLE_COMMENT]},
             # create options - will be completed later
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': ""},
         ]
 
         dest_create = destination[_TABLE_CREATE_OPTIONS]
@@ -550,9 +550,9 @@ class SQLTransformer(object):
             create = statement_parts[5]
             opt_val = self._parse_table_options(dest_create, src_create)
             if opt_val is None:
-                return "# WARNING: the destination table contains options that " + \
-                       "are not in the source.\n# Cannot generate ALTER " + \
-                       "statement."
+                return ("# WARNING: the destination table contains options "
+                        "that are not in the source.\n# Cannot generate ALTER "
+                        "statement.")
             else:
                 create['val'] = "%s" % opt_val
                 changes = True
@@ -581,8 +581,8 @@ class SQLTransformer(object):
 
         return self._build_statement(statement_parts)
 
-
-    def _get_column_format(self, col_data):
+    @staticmethod
+    def _get_column_format(col_data):
         """Build the column data type format string
 
         col_data[in]       the row containing the column definition
@@ -593,11 +593,11 @@ class SQLTransformer(object):
             return ""
         col_fmt = "%(type)s%(null)s%(default)s%(extra)s%(comment)s"
         values = {
-            'type'    : col_data[_COLUMN_TYPE],
-            'null'    : "",
-            'default' : "",
-            'extra'   : "",
-            'comment' : "",
+            'type': col_data[_COLUMN_TYPE],
+            'null': "",
+            'default': "",
+            'extra': "",
+            'comment': "",
         }
         if col_data[_COLUMN_IS_NULLABLE].upper() == "NO":
             values['null'] = " NOT NULL"
@@ -617,9 +617,9 @@ class SQLTransformer(object):
             values['comment'] = " COMMENT '%s'" % col_data[_COLUMN_COMMENT]
         return col_fmt % values
 
-
-    def _get_column_position(self, destination_def, source_def,
-                             destination, source, drop_cols, add_cols):
+    @staticmethod
+    def _get_column_position(destination_def, source_def, destination, source,
+                             drop_cols, add_cols):
         """Get the column position in the list
 
         destination_def[in] destination column definition
@@ -655,13 +655,14 @@ class SQLTransformer(object):
 
         # Check to see if previous column has been dropped. If it has,
         # don't include the BEFORE|AFTER - it will be ordered correctly.
-        if dest_loc_idx is not None and dest_loc_idx-1 >= 0 and \
-           destination[dest_loc_idx-1][_COLUMN_NAME] in drop_cols:
+        if dest_loc_idx is not None and dest_loc_idx - 1 >= 0 and \
+           destination[dest_loc_idx - 1][_COLUMN_NAME] in drop_cols:
             return ""
 
         # Check to see if previous column has been added. If it has,
         # don't include the BEFORE|AFTER - it will be ordered correctly.
-        if src_loc_idx-1 >= 0 and source[src_loc_idx-1][_COLUMN_NAME] in add_cols:
+        if (src_loc_idx - 1 >= 0
+           and source[src_loc_idx - 1][_COLUMN_NAME] in add_cols):
             return ""
 
         # compare ordinal position - if not the same find where it goes
@@ -673,8 +674,8 @@ class SQLTransformer(object):
                     return " AFTER %s" % col[_COLUMN_NAME]
         return ""
 
-
-    def _find_column(self, name, columns):
+    @staticmethod
+    def _find_column(name, columns):
         """Find a column in a list by name
 
         name[in]           name of the column
@@ -686,7 +687,6 @@ class SQLTransformer(object):
             if name == col_def[_COLUMN_NAME]:
                 return col_def
         return None
-
 
     def _get_column_change(self, column, destination, source,
                            drop_cols, add_cols):
@@ -738,14 +738,13 @@ class SQLTransformer(object):
             elif operation == _ADD_COL:
                 colstr = "  ADD COLUMN %s %s%s" % (source_def[_COLUMN_NAME],
                                                    col_fmt, col_pos)
-            else: # must be change
+            else:  # must be change
                 colstr = "  CHANGE COLUMN %s %s " % \
                          (destination_def[_COLUMN_NAME],
                           destination_def[_COLUMN_NAME])
                 colstr += "%s%s" % (col_fmt, col_pos)
 
         return colstr
-
 
     def _get_columns(self, destination, source):
         """Get the column definition changes
@@ -783,14 +782,14 @@ class SQLTransformer(object):
         #   - we need to check those that the column order changes to see
         #     if they are actually extra col def changes
 
-        dest_min = [item[1:3] for item in destination] # name, type
-        src_min = [item[1:3] for item in source] # name, type
+        dest_min = [item[1:3] for item in destination]  # name, type
+        src_min = [item[1:3] for item in source]  # name, type
 
         # find matches by name + type
-        both_min, dest_src_min, src_dest_min = get_common_lists(dest_min,
-                                                                src_min)
-        dest_src_names = [item[0] for item in dest_min] # only name
-        src_dest_names = [item[0] for item in src_min] # only name
+        # <both_min>, <dest_src_min>, <src_dest_min> = get_common_lists
+        (both_min, _, _,) = get_common_lists(dest_min, src_min)
+        dest_src_names = [item[0] for item in dest_min]  # only name
+        src_dest_names = [item[0] for item in src_min]  # only name
 
         # find matches by name only
         both_names = [item[0] for item in both_min]   # only name
@@ -804,7 +803,7 @@ class SQLTransformer(object):
         both_change_order = list(set(both_names) - set(both_change_type))
 
         column_drops = []
-        column_changes = [] # a list of tuples in form (col_name, operation)
+        column_changes = []  # a list of tuples in form (col_name, operation)
 
         # Form drops
         for col in dest_drop:
@@ -846,7 +845,6 @@ class SQLTransformer(object):
 
         return (drop_clauses, add_clauses)
 
-
     def _get_foreign_keys(self, src_db, src_name, dest_db, dest_name):
         """Get the foreign key constraints
 
@@ -860,8 +858,8 @@ class SQLTransformer(object):
 
         Returns tuple - (drop, add/changes)
         """
-        from mysql.utilities.common.dbcompare import get_common_lists
         from mysql.utilities.common.table import Table
+        from mysql.utilities.common.dbcompare import get_common_lists
 
         # Get the Table instances
         self.dest_tbl = Table(self.destination_db.source, "%s.%s" %
@@ -877,7 +875,8 @@ class SQLTransformer(object):
         src_fkeys = self.src_tbl.get_tbl_foreign_keys()
 
         # Now we determine the foreign keys we need to add and those to drop
-        both, drop_rows, add_rows = get_common_lists(dest_fkeys, src_fkeys)
+        # <both_min>, <dest_src_min>, <src_dest_min> = get_common_lists
+        _, drop_rows, add_rows = get_common_lists(dest_fkeys, src_fkeys)
 
         # Generate DROP foreign key clauses
         for fkey in drop_rows:
@@ -893,8 +892,8 @@ class SQLTransformer(object):
 
         return (drop_constraints, add_constraints)
 
-
-    def _get_index_sql_clauses(self, rows):
+    @staticmethod
+    def _get_index_sql_clauses(rows):
         """Return the ALTER TABLE index clauses for the table.
 
         This method returns the SQL index clauses for use in ALTER or CREATE
@@ -905,7 +904,6 @@ class SQLTransformer(object):
         Returns list - list of SQL index clause statements or
                        [] if no indexes
         """
-        alter_stmt = None
         index_clauses = []
 
         if rows != []:
@@ -945,7 +943,7 @@ class SQLTransformer(object):
 
             # Build SQL statement clause
             if len(pri_key_cols) > 0:
-                index_clauses.append("  ADD PRIMARY KEY(%s)" % \
+                index_clauses.append("  ADD PRIMARY KEY(%s)" %
                                      ','.join(pri_key_cols))
             if len(unique_indexes) > 0:
                 for idx in unique_indexes:
@@ -965,7 +963,6 @@ class SQLTransformer(object):
 
         return index_clauses
 
-
     def _get_indexes(self, src_db, src_name, dest_db, dest_name):
         """Get the index constraints
 
@@ -979,8 +976,8 @@ class SQLTransformer(object):
 
         Returns tuple - (drop, add/changes)
         """
-        from mysql.utilities.common.dbcompare import get_common_lists
         from mysql.utilities.common.table import Table
+        from mysql.utilities.common.dbcompare import get_common_lists
 
         # Get the Table instances
         self.dest_tbl = Table(self.destination_db.source, "%s.%s" %
@@ -999,12 +996,12 @@ class SQLTransformer(object):
                    for idx in self.src_tbl.get_tbl_indexes()]
 
         # Now we determine the indexes we need to add and those to drop
-        both, drop_idx, add_idx = get_common_lists(dest_idx, src_idx)
+        _, drop_idx, add_idx = get_common_lists(dest_idx, src_idx)
         if not drop_idx and not add_idx:
             return ([], [])
 
         # Generate DROP index clauses
-        drop_idx_recorded = [] # used to avoid duplicate index drops
+        drop_idx_recorded = []  # used to avoid duplicate index drops
         for index in drop_idx:
             if index[2] == "PRIMARY":
                 drop_indexes.append("  DROP PRIMARY KEY")
@@ -1018,8 +1015,8 @@ class SQLTransformer(object):
 
         return (drop_indexes, add_indexes)
 
-
-    def _check_for_partitions(self, destination_row, source_row):
+    @staticmethod
+    def _check_for_partitions(destination_row, source_row):
         """Determine if there are transformations involving partitions
 
         This method returns TRUE if the destination and source differ in
@@ -1040,18 +1037,18 @@ class SQLTransformer(object):
         elif len(destination_row) == 0:
             return None
         elif len(destination_row) == 1:
-            if not (destination_row[0][3] == None and source_row[0][3] == None):
+            if not (destination_row[0][3] is None
+                    and source_row[0][3] is None):
                 part_changes_found = True
         else:
             part_stop = len(destination_row)
             row_stop = len(destination_row[0])
-            for i in range(0,part_stop):
-                for j in range(0,row_stop):
+            for i in range(0, part_stop):
+                for j in range(0, row_stop):
                     if destination_row[i][j] != source_row[i][j]:
                         part_changes_found = True
                         break
         return part_changes_found
-
 
     def _transform_table(self):
         """Transform a table definition
@@ -1096,12 +1093,12 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "ALTER TABLE" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': "ALTER TABLE"},
             # object name
-            { 'fmt' : " %s.%s", 'col' : _IGNORE_COLUMN,
-              'val' : (q_dest_db_name, q_dest_tbl_name) },
+            {'fmt': " %s.%s", 'col': _IGNORE_COLUMN,
+             'val': (q_dest_db_name, q_dest_tbl_name)},
             # alter clauses - will be completed later
-            { 'fmt' : " \n%s", 'col' : _IGNORE_COLUMN, 'val' : "" },
+            {'fmt': " \n%s", 'col': _IGNORE_COLUMN, 'val': ""},
         ]
 
         # For foreign key changes, we need two collections: drop statements,
@@ -1114,14 +1111,13 @@ class SQLTransformer(object):
         indexes = self._get_indexes(q_src_db_name, q_src_tbl_name,
                                     q_dest_db_name, q_dest_tbl_name)
 
-
         # For column changes, we need two collections: drop statements, add and
         # change statements. Method returns tuple of (drop, add/change).
         columns = self._get_columns(self.destination[_COLUMN_DEF],
                                     self.source[_COLUMN_DEF])
 
         # Now add drops then add/changes
-        for i in range(0,2):
+        for i in range(0, 2):
             statements.extend(fkeys[i])
             statements.extend(indexes[i])
             statements.extend(columns[i])
@@ -1150,7 +1146,6 @@ class SQLTransformer(object):
 
         return sql_stmts
 
-
     def _transform_view(self):
         """Transform a view definition
 
@@ -1168,20 +1163,20 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN,
-              'val' : "CREATE" if do_create else "ALTER" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN,
+             'val': "CREATE" if do_create else "ALTER"},
             # definer
-            { 'fmt' : " DEFINER=%s", 'col' : _VIEW_DEFINER, 'val' : "" },
+            {'fmt': " DEFINER=%s", 'col': _VIEW_DEFINER, 'val': ""},
             # security
-            { 'fmt' : " SQL SECURITY %s", 'col' : _VIEW_SECURITY, 'val' : "" },
+            {'fmt': " SQL SECURITY %s", 'col': _VIEW_SECURITY, 'val': ""},
             # object type and name
-            { 'fmt' : " VIEW %s.%s", 'col' : _IGNORE_COLUMN,
-              'val' : (self.destination[_VIEW_DB],
-                       self.destination[_VIEW_NAME]) },
+            {'fmt': " VIEW %s.%s", 'col': _IGNORE_COLUMN,
+             'val': (self.destination[_VIEW_DB],
+                     self.destination[_VIEW_NAME])},
             # definition
-            { 'fmt' : " AS \n  %s", 'col' : _VIEW_BODY, 'val' : "" },
+            {'fmt': " AS \n  %s", 'col': _VIEW_BODY, 'val': ""},
             # check option (will be updated later)
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "" }
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': ""}
         ]
 
         changes = False
@@ -1204,7 +1199,7 @@ class SQLTransformer(object):
 
         # form the drop if we do a create
         if do_create:
-            statements.append("DROP VIEW IF EXISTS `%s`.`%s`;" % \
+            statements.append("DROP VIEW IF EXISTS `%s`.`%s`;" %
                               (self.destination[_VIEW_DB],
                                self.destination[_VIEW_NAME]))
 
@@ -1212,7 +1207,6 @@ class SQLTransformer(object):
         statements.append(sql_stmt)
 
         return statements
-
 
     def _transform_trigger(self):
         """Transform a trigger definition
@@ -1228,23 +1222,23 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "CREATE" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': "CREATE"},
             # definer
-            { 'fmt' : " DEFINER=%s", 'col' : _TRIGGER_DEFINER, 'val' : "" },
+            {'fmt': " DEFINER=%s", 'col': _TRIGGER_DEFINER, 'val': ""},
             # object name
-            { 'fmt' : " TRIGGER %s.%s", 'col' : _IGNORE_COLUMN,
-              'val' : (self.destination[_TRIGGER_DB],
-                       self.destination[_TRIGGER_NAME]) },
+            {'fmt': " TRIGGER %s.%s", 'col': _IGNORE_COLUMN,
+             'val': (self.destination[_TRIGGER_DB],
+                     self.destination[_TRIGGER_NAME])},
             # trigger timing
-            { 'fmt' : " %s", 'col' : _TRIGGER_TIME, 'val' : "" },
+            {'fmt': " %s", 'col': _TRIGGER_TIME, 'val': ""},
             # trigger event
-            { 'fmt' : " %s", 'col' : _TRIGGER_EVENT, 'val' : "" },
+            {'fmt': " %s", 'col': _TRIGGER_EVENT, 'val': ""},
             # trigger table
-            { 'fmt' : " ON %s." % self.destination[_TRIGGER_DB] + \
-                      "%s FOR EACH ROW",
-              'col' : _TRIGGER_TABLE, 'val' : "" },
+            {'fmt': " ON %s." % self.destination[_TRIGGER_DB] +
+             "%s FOR EACH ROW",
+             'col': _TRIGGER_TABLE, 'val': ""},
             # trigger body
-            { 'fmt' : " %s;", 'col' : _TRIGGER_BODY, 'val' : "" },
+            {'fmt': " %s;", 'col': _TRIGGER_BODY, 'val': ""},
         ]
 
         # Triggers don't have ALTER SQL so we just pass back a drop + create.
@@ -1252,7 +1246,7 @@ class SQLTransformer(object):
         if not self._fill_values(statement_parts, True):
             return None
 
-        statements.append("DROP TRIGGER IF EXISTS `%s`.`%s`;" % \
+        statements.append("DROP TRIGGER IF EXISTS `%s`.`%s`;" %
                           (self.destination[_TRIGGER_DB],
                            self.destination[_TRIGGER_NAME]))
 
@@ -1333,7 +1327,7 @@ class SQLTransformer(object):
         # Only when doing create or modifications to the body
         if self.obj_type.upper() == "FUNCTION":
             if (do_create or
-                self.destination[_ROUTINE_BODY] != self.source[_ROUTINE_BODY]):
+               self.destination[_ROUTINE_BODY] != self.source[_ROUTINE_BODY]):
                 statement_parts[5]['val'] = self.source[_ROUTINE_RETURNS]
             # Add deterministic
             if do_create:
@@ -1376,27 +1370,27 @@ class SQLTransformer(object):
         # build a list of the parts
         statement_parts = [
             # preamble
-            { 'fmt' : "%s", 'col' : _IGNORE_COLUMN, 'val' : "ALTER" },
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': "ALTER"},
             # definer
-            { 'fmt' : " DEFINER=%s", 'col' : _EVENT_DEFINER, 'val' : "" },
+            {'fmt': " DEFINER=%s", 'col': _EVENT_DEFINER, 'val': ""},
             # type
-            { 'fmt' : " %s", 'col' : _IGNORE_COLUMN, 'val' : "EVENT" },
+            {'fmt': " %s", 'col': _IGNORE_COLUMN, 'val': "EVENT"},
             # object name
-            { 'fmt' : " %s.%s", 'col' : _IGNORE_COLUMN,
-              'val' : (self.destination[_EVENT_DB],
-                       self.destination[_EVENT_NAME]) },
+            {'fmt': " %s.%s", 'col': _IGNORE_COLUMN,
+             'val': (self.destination[_EVENT_DB],
+                     self.destination[_EVENT_NAME])},
             # schedule - will be filled in later
-            { 'fmt' : " %s", 'col' : _IGNORE_COLUMN, 'val' : "" },
+            {'fmt': " %s", 'col': _IGNORE_COLUMN, 'val': ""},
             # complete
-            { 'fmt' : " ON COMPLETION %s", 'col' : _EVENT_ON_COMPLETION,
-              'val' : "" },
+            {'fmt': " ON COMPLETION %s", 'col': _EVENT_ON_COMPLETION,
+             'val': ""},
             # rename
-            { 'fmt' : " RENAME TO %s", 'col' : _EVENT_NAME, 'val' : "" },
+            {'fmt': " RENAME TO %s", 'col': _EVENT_NAME, 'val': ""},
             # status
-            { 'fmt' : " %s", 'col' : _EVENT_STATUS,
-              'val' : self.source[_EVENT_STATUS] },
+            {'fmt': " %s", 'col': _EVENT_STATUS,
+             'val': self.source[_EVENT_STATUS]},
             # event body
-            { 'fmt' : " DO %s", 'col' : _EVENT_BODY, 'val' : "" },
+            {'fmt': " DO %s", 'col': _EVENT_BODY, 'val': ""},
         ]
 
         # We can only do the columns we know about and must ignore the others
@@ -1440,7 +1434,6 @@ class SQLTransformer(object):
 
         return statements
 
-
     def _check_columns(self, col_list, destination=None, source=None):
         """Check for special column changes to trigger a CREATE
 
@@ -1464,7 +1457,6 @@ class SQLTransformer(object):
             if destination[column_num] != source[column_num]:
                 return True
         return False
-
 
     def _fill_values(self, stmt_parts, create=False,
                      destination=None, source=None):
@@ -1502,8 +1494,8 @@ class SQLTransformer(object):
 
         return changes_found
 
-
-    def _build_statement(self, stmt_parts):
+    @staticmethod
+    def _build_statement(stmt_parts):
         """Build the object definition statement
 
         This method will build a completed statement based on the list of parts

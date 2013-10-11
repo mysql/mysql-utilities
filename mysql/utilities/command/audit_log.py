@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +21,15 @@ searching and displaying the results.
 """
 
 import sys
+
+from shutil import copy
+
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.audit_log_parser import AuditLogParser
 from mysql.utilities.common.format import convert_dictionary_list, print_list
 from mysql.utilities.common.server import Server
+from mysql.utilities.common.tools import show_file_statistics, remote_copy
+
 
 _PRINT_WIDTH = 75
 
@@ -52,15 +57,16 @@ Available Commands:
 VALID_COMMANDS = ["COPY", "POLICY", "ROTATE", "ROTATE_ON_SIZE"]
 
 EVENT_TYPES = ["Audit", "Binlog Dump", "Change user", "Close stmt",
-    "Connect Out", "Connect", "Create DB", "Daemon", "Debug", "Delayed insert",
-    "Drop DB", "Execute", "Fetch", "Field List", "Init DB", "Kill",
-    "Long Data", "NoAudit", "Ping", "Prepare", "Processlist", "Query", "Quit",
-    "Refresh", "Register Slave", "Reset stmt", "Set option", "Shutdown",
-     "Sleep", "Statistics", "Table Dump", "Time"]
+               "Connect Out", "Connect", "Create DB", "Daemon", "Debug",
+               "Delayed insert", "Drop DB", "Execute", "Fetch", "Field List",
+               "Init DB", "Kill", "Long Data", "NoAudit", "Ping", "Prepare",
+               "Processlist", "Query", "Quit", "Refresh", "Register Slave",
+               "Reset stmt", "Set option", "Shutdown", "Sleep", "Statistics",
+               "Table Dump", "Time"]
 
 QUERY_TYPES = ["CREATE", "ALTER", "DROP", "TRUNCATE", "RENAME", "GRANT",
-                "REVOKE", "SELECT", "INSERT", "UPDATE", "DELETE", "COMMIT",
-                "SHOW", "SET", "CALL", "PREPARE", "EXECUTE", "DEALLOCATE"]
+               "REVOKE", "SELECT", "INSERT", "UPDATE", "DELETE", "COMMIT",
+               "SHOW", "SET", "CALL", "PREPARE", "EXECUTE", "DEALLOCATE"]
 
 
 def command_requires_log_name(command):
@@ -196,7 +202,6 @@ class AuditLog(object):
         log_name = self.options.get("log_name", None)
         # Print file statistics:
         print "#\n# Audit Log File Statistics:\n#"
-        from mysql.utilities.common.tools import show_file_statistics
         show_file_statistics(log_name, False, out_format)
 
         # Print audit log 'AUDIT' entries
@@ -229,15 +234,14 @@ class AuditLog(object):
         log_name = self.options.get("log_name", None)
         copy_location = self.options.get("copy_location", None)
         if not rlogin:
-            from shutil import copy
             copy(log_name, copy_location)
         else:
-            from mysql.utilities.common.tools import remote_copy
             user, host = rlogin.split(":", 1)
             remote_copy(log_name, user, host, copy_location,
                         self.options.get("verbosity", 0))
 
-    def _rotate_log(self, server):
+    @staticmethod
+    def _rotate_log(server):
         """Rotate the log.
 
         To rotate the log, first discover the value of rotate_on_size
@@ -248,13 +252,12 @@ class AuditLog(object):
 
         # Get the current rotation size
         rotate_size = server.show_server_variable(
-                                            "audit_log_rotate_on_size")[0][1]
+            "audit_log_rotate_on_size")[0][1]
         min_rotation_size = 4096
 
         # If needed, set rotation size to the minimum allowed value.
         if int(rotate_size) != min_rotation_size:
-            #
-            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %d" % \
+            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %d" %
                               min_rotation_size)
 
         # Flush the audit_log forcing the rotation if the file size is greater
@@ -264,7 +267,7 @@ class AuditLog(object):
         # If needed, restore the rotation size to what it was initially.
         if int(rotate_size) != min_rotation_size:
             server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %s" %
-                          rotate_size)
+                              rotate_size)
 
     def do_command(self):
         """ Check and execute the audit log command (previously set by the the
@@ -278,9 +281,9 @@ class AuditLog(object):
         command_value = self.options.get("value", None)
         # Check for valid value if needed
         if (command_requires_value(command)
-            and not check_command_value(command, command_value)):
+           and not check_command_value(command, command_value)):
             raise UtilError("Please provide the correct value for the %s "
-                             "command." % command)
+                            "command." % command)
 
         # Copy command does not need the server
         if command == "COPY":

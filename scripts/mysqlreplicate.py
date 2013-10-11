@@ -29,16 +29,16 @@ check_python_version()
 import os.path
 import sys
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.setup_rpl import setup_replication
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
-                                             WARN_OPT_USING_DEFAULT)
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity, add_rpl_user
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import (setup_common_options, add_rpl_user,
+                                            add_verbosity)
+from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
+                                             WARN_OPT_USING_DEFAULT)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlreplicate "
@@ -154,17 +154,16 @@ if ((opt.master_log_pos >= 0) or (opt.master_log_file is not None)) and \
 
 # Create dictionary of options
 options = {
-    'verbosity'       : opt.verbosity,
-    'pedantic'        : opt.pedantic,
-    'quiet'           : False,
-    'master_log_file' : opt.master_log_file,
-    'master_log_pos'  : opt.master_log_pos,
-    'from_beginning'  : opt.from_beginning,
+    'verbosity': opt.verbosity,
+    'pedantic': opt.pedantic,
+    'quiet': False,
+    'master_log_file': opt.master_log_file,
+    'master_log_pos': opt.master_log_pos,
+    'from_beginning': opt.from_beginning,
 }
 
 try:
-    res = setup_replication(m_values, s_values, opt.rpl_user,
-                            options, opt.test_db)
+    setup_replication(m_values, s_values, opt.rpl_user, options, opt.test_db)
 except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

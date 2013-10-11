@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2011, 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2012, 2013, Oracle and/or its affiliates. All rights
+# reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,12 +22,13 @@ This file contains the methods for checking consistency among two databases.
 
 from mysql.utilities.exception import UtilError, UtilDBError
 
+
 # The following are the queries needed to perform table locking.
 
 LOCK_TYPES = ['READ', 'WRITE']
 
 _SESSION_ISOLATION_LEVEL = \
-  "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+    "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ"
 
 _START_TRANSACTION = "START TRANSACTION WITH CONSISTENT SNAPSHOT"
 
@@ -35,14 +37,16 @@ _LOCK_WARNING = "WARNING: Lock in progress. You must call unlock() " + \
 
 _FLUSH_TABLES_READ_LOCK = "FLUSH TABLES WITH READ LOCK"
 
+
 class Lock(object):
-    
-    def __init__(self, server, table_list, options={}):
+    """Lock
+    """
+    def __init__(self, server, table_list, options=None):
         """Constructor
-        
+
         Lock a list of tables based on locking type. Locking types and their
         behavior is as follows:
-        
+
            - (default) use consistent read with a single transaction
            - lock all tables without consistent read and no transaction
            - no locks, no transaction, no consistent read
@@ -56,6 +60,8 @@ class Lock(object):
                            silent bool
                            rpl_mode string
         """
+        if options is None:
+            options = {}
         self.locked = False
         self.silent = options.get('silent', False)
         # Determine locking type
@@ -65,14 +71,14 @@ class Lock(object):
             self.verbosity = 0
         else:
             self.verbosity = int(self.verbosity)
-        
+
         self.server = server
         self.table_list = table_list
-  
+
         # If no locking, we're done
         if self.locking == 'no-locks':
             return
-        
+
         elif self.locking == 'lock-all':
             # Check lock requests for validity
             table_locks = []
@@ -87,16 +93,16 @@ class Lock(object):
 
             if self.verbosity >= 3 and not self.silent:
                 print '# LOCK STRING:', lock_str
-    
+
             # Execute the lock
             self.server.exec_query(lock_str)
-    
+
             self.locked = True
 
         elif self.locking == 'snapshot':
             self.server.exec_query(_SESSION_ISOLATION_LEVEL)
             self.server.exec_query(_START_TRANSACTION)
-            
+
         # Execute a FLUSH TABLES WITH READ LOCK for replication uses only
         elif self.locking == 'flush' and options.get("rpl_mode", None):
             if self.verbosity >= 3 and not self.silent:
@@ -106,18 +112,16 @@ class Lock(object):
         else:
             raise UtilError("Invalid locking type: '%s'." % self.locking)
 
-    
     def __del__(self):
         """Destructor
-        
+
         Returns string - warning if the lock has not been disengaged.
         """
         if self.locked:
             return _LOCK_WARNING
 
         return None
-    
-    
+
     def unlock(self, abort=False):
         """Release the table lock.
         """
@@ -133,7 +137,7 @@ class Lock(object):
                 print "UNLOCK TABLES"
             self.server.exec_query("UNLOCK TABLES")
             self.locked = False
-        
+
         # Stop transaction if locking == 0
         elif self.locking == 'snapshot':
             if not abort:
@@ -144,4 +148,3 @@ class Lock(object):
                 self.server.exec_queery("ROLLBACK")
                 if self.verbosity >= 3 and not self.silent:
                     print "ROLLBACK"
-                

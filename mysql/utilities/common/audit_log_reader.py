@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,23 +32,27 @@ except ImportError:
     # Instead use ExpatError for earlier python versions.
     from xml.parsers.expat import ExpatError as ParseError
 
+
 _MANDATORY_FIELDS = ['NAME', 'TIMESTAMP']
 _OPTIONAL_FIELDS = ['CONNECTION_ID', 'DB', 'HOST', 'IP', 'MYSQL_VERSION',
-    'OS_LOGIN', 'OS_VERSION', 'PRIV_USER', 'PROXY_USER', 'SERVER_ID',
-    'SQLTEXT', 'STARTUP_OPTIONS', 'STATUS', 'USER', 'VERSION']
+                    'OS_LOGIN', 'OS_VERSION', 'PRIV_USER', 'PROXY_USER',
+                    'SERVER_ID', 'SQLTEXT', 'STARTUP_OPTIONS', 'STATUS',
+                    'USER', 'VERSION']
 
 
 class AuditLogReader(object):
-    """ The AuditLogReader class is used to read the data stored in the audit
+    """The AuditLogReader class is used to read the data stored in the audit
     log file. This class provide methods to open the audit log, get the next
     record, and close the file.
     """
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
         """Constructor
 
         options[in]       dictionary of options (e.g. log_name and verbosity)
         """
+        if options is None:
+            options = {}
         self.verbosity = options.get('verbosity', 0)
         self.log_name = options.get('log_name', None)
         self.log = None
@@ -78,7 +82,8 @@ class AuditLogReader(object):
         """
         self.log.close()
 
-    def _validXML(self, line):
+    @staticmethod
+    def _validXML(line):
         """Check if line is a valid XML element, apart from audit records.
         """
         if ('<?xml ' in line) or ('<AUDIT>' in line) or ('</AUDIT>' in line):
@@ -117,7 +122,8 @@ class AuditLogReader(object):
                                     "'{0}'\nInvalid XML element: "
                                     "{1!r}".format(self.log_name, log_entry))
 
-    def _do_replacements(self, old_str):
+    @staticmethod
+    def _do_replacements(old_str):
         """Replace special masked characters.
         """
         new_str = old_str.replace("&lt;", "<")

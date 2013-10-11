@@ -15,12 +15,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+This file contains grep for objects.
+"""
 import sys
 
 import mysql.connector
 
+from mysql.utilities.exception import FormatError, EmptyResultError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.format import print_list
+from mysql.utilities.common.options import obj2sql
+
 
 # Mapping database object to information schema names and fields. I
 # wish that the tables would have had simple names and not qualify the
@@ -32,7 +38,7 @@ from mysql.utilities.common.format import print_list
 #
 # field_name
 #   The name of the column in the table where the field name to match
-#   can be found. 
+#   can be found.
 # field_type
 #   The name of the type of the field. Usually a string.
 # object_name
@@ -122,7 +128,7 @@ _OBJMAP = {
 }
 
 _GROUP_MATCHES_FRM = """
-SELECT 
+SELECT
   `Object Type`, `Object Name`, `Database`,
   `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
 FROM ({0}) AS all_results
@@ -141,17 +147,16 @@ _SELECT_TYPE_FRM = """
     {condition}
 """
 
+
 def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
     """Generate a SELECT statement for finding an object.
     """
-    from mysql.utilities.common.options import obj2sql
-
     options = {
         'pattern': obj2sql(pattern),
         'regex': 'REGEXP' if use_regexp else 'LIKE',
         'select_option': '',
         'field_type': "'" + objtype.upper() + "'",
-        }
+    }
     options.update(_OBJMAP[objtype])
 
     # Build a condition for inclusion in the select
@@ -160,10 +165,12 @@ def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
         condition += " OR {body_field} {regex} {pattern}".format(**options)
     if database_pattern:
         options['database_pattern'] = obj2sql(database_pattern)
-        condition = "({0}) AND {schema_field} {regex} {database_pattern}".format(condition, **options)
+        condition = ("({0}) AND {schema_field} {regex} {database_pattern}"
+                     "".format(condition, **options))
     options['condition'] = condition
 
     return _SELECT_TYPE_FRM.format(**options)
+
 
 def _spec(info):
     """Create a server specification string from an info structure.
@@ -172,6 +179,7 @@ def _spec(info):
     if "unix_socket" in info:
         result += ":" + info["unix_socket"]
     return result
+
 
 def _join_words(words, delimiter=",", conjunction="and"):
     """Join words together for nice printout.
@@ -188,27 +196,29 @@ def _join_words(words, delimiter=",", conjunction="and"):
     elif len(words) == 2:
         return ' {0} '.format(conjunction).join(words)
     else:
-        return '{0} '.format(delimiter).join(words[0:-1]) + "%s %s %s" % (delimiter, conjunction, words[-1])
+        return '{0} '.format(delimiter).join(words[0:-1]) + \
+            "%s %s %s" % (delimiter, conjunction, words[-1])
 
-ROUTINE =  'routine'
-EVENT =  'event'
-TRIGGER =  'trigger'
-TABLE =  'table'
-DATABASE =  'database'
-VIEW =  'view'
+ROUTINE = 'routine'
+EVENT = 'event'
+TRIGGER = 'trigger'
+TABLE = 'table'
+DATABASE = 'database'
+VIEW = 'view'
 USER = 'user'
 COLUMN = 'column'
 
 OBJECT_TYPES = _OBJMAP.keys()
 
+
 class ObjectGrep(object):
     """Grep for objects
     """
-    
+
     def __init__(self, pattern, database_pattern=None, types=OBJECT_TYPES,
                  check_body=False, use_regexp=False):
         """Constructor
-        
+
         pattern[in]          pattern to match
         database_pattern[in] database pattern to match (if present)
                              default - None = do not match database
@@ -218,27 +228,28 @@ class ObjectGrep(object):
         use_regexp[in]       if True, use regexp for compare
                              default = False
         """
-        stmts = [_make_select(t, pattern, database_pattern, check_body, use_regexp) for t in types]
+        stmts = [_make_select(t, pattern, database_pattern, check_body,
+                              use_regexp) for t in types]
         self.__sql = _GROUP_MATCHES_FRM.format("UNION".join(stmts))
 
         # Need to save the pattern for informative error messages later
-        self.__pattern = pattern 
+        self.__pattern = pattern
         self.__types = types
 
     def sql(self):
         """Get the SQL command
-        
+
         Returns string - SQL statement
         """
-        return self.__sql;
+        return self.__sql
 
-    def execute(self, connections, output=sys.stdout, connector=mysql.connector,
-                **kwrds):
+    def execute(self, connections, output=sys.stdout,
+                connector=mysql.connector, **kwrds):
         """Execute the search for objects
-        
+
         This method searches for objects that match a search criteria for
         one or more servers.
-        
+
         connections[in]    list of connection parameters
         output[in]         file stream to display information
                            default = sys.stdout
@@ -248,9 +259,7 @@ class ObjectGrep(object):
           format           format for display
                            default = GRID
         """
-        from mysql.utilities.exception import FormatError, EmptyResultError
-
-        format = kwrds.get('format', "grid")
+        fmt = kwrds.get('format', "grid")
         entries = []
         for info in connections:
             conn = parse_connection(info)
@@ -258,17 +267,19 @@ class ObjectGrep(object):
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
             info = conn
-            conn['host'] = conn['host'].replace("[","")
-            conn['host'] = conn['host'].replace("]","")
+            conn['host'] = conn['host'].replace("[", "")
+            conn['host'] = conn['host'].replace("]", "")
             connection = connector.connect(**info)
             cursor = connection.cursor()
             cursor.execute(self.__sql)
-            entries.extend([tuple([_spec(info)] + list(row)) for row in cursor])
+            entries.extend([tuple([_spec(info)] + list(row))
+                            for row in cursor])
 
         headers = ["Connection"]
         headers.extend(col[0].title() for col in cursor.description)
         if len(entries) > 0 and output:
-            print_list(output, format, headers, entries)
+            print_list(output, fmt, headers, entries)
         else:
-            msg = "Nothing matches '%s' in any %s" % (self.__pattern, _join_words(self.__types, conjunction="or"))
+            msg = "Nothing matches '%s' in any %s" % \
+                (self.__pattern, _join_words(self.__types, conjunction="or"))
             raise EmptyResultError(msg)

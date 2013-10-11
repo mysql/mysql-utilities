@@ -21,13 +21,17 @@ multiple utilities.
 """
 
 import re
+
 from collections import deque
 
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.options import obj2sql
+from mysql.utilities.common.user import User
+from mysql.utilities.common.sql_transform import (quote_with_backticks,
+                                                  remove_backtick_quoting,
+                                                  is_quoted_with_backticks)
+
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -114,7 +118,7 @@ class Database(object):
     """
     obj_type = _DATABASE
 
-    def __init__(self, source, name, options={}):
+    def __init__(self, source, name, options=None):
         """Constructor
 
         source[in]         A Server object
@@ -124,6 +128,8 @@ class Database(object):
         options[in]        Array of options for controlling what is included
                            and how operations perform (e.g., verbose)
         """
+        if options is None:
+            options = {}
         self.source = source
         # Keep database identifier considering backtick quotes
         if is_quoted_with_backticks(name):
@@ -148,13 +154,14 @@ class Database(object):
         self.new_db = None
         self.q_new_db = None
         self.init_called = False
-        self.destination = None # Used for copy mode
+        self.destination = None  # Used for copy mode
         self.cloning = False    # Used for clone mode
         self.query_options = {  # Used for skipping fetch of rows
-            'fetch' : False
+            'fetch': False
         }
-        self.constraints = deque()  # Used to store constraints to execute after
-                                    # table creation, deque is thread-safe
+        self.constraints = deque()  # Used to store constraints to execute
+                                    # after table creation, deque is
+                                    # thread-safe
 
         self.objects = []
         self.new_objects = []
@@ -187,7 +194,6 @@ class Database(object):
         res = server.exec_query(_QUERY % db)
         return (res is not None and len(res) >= 1)
 
-
     def drop(self, server, quiet, db_name=None):
         """Drop the database
 
@@ -203,20 +209,20 @@ class Database(object):
         db = None
         if db_name:
             db = db_name if is_quoted_with_backticks(db_name) \
-                    else quote_with_backticks(db_name)
+                else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
         op_ok = False
         if quiet:
             try:
-                res = server.exec_query("DROP DATABASE %s" % (db),
-                                        self.query_options)
+                server.exec_query("DROP DATABASE %s" % (db),
+                                  self.query_options)
                 op_ok = True
             except:
                 pass
         else:
-            res = server.exec_query("DROP DATABASE %s" % (db),
-                                    self.query_options)
+            server.exec_query("DROP DATABASE %s" % (db),
+                              self.query_options)
             op_ok = True
         return op_ok
 
@@ -235,7 +241,7 @@ class Database(object):
         db = None
         if db_name:
             db = db_name if is_quoted_with_backticks(db_name) \
-                    else quote_with_backticks(db_name)
+                else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
 
@@ -304,7 +310,6 @@ class Database(object):
                 )
         return create_str
 
-
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.
 
@@ -317,9 +322,8 @@ class Database(object):
         rows = self.get_db_objects(obj_type)
         if rows:
             for row in rows:
-                tuple = (obj_type, row)
-                self.objects.append(tuple)
-
+                tup = (obj_type, row)
+                self.objects.append(tup)
 
     def init(self):
         """Get all objects for the database based on options set.
@@ -382,7 +386,6 @@ class Database(object):
             except:
                 pass
 
-
     def __create_object(self, obj_type, obj, show_grant_msg,
                         quiet=False, new_engine=None, def_engine=None):
         """Create a database object.
@@ -426,31 +429,31 @@ class Database(object):
             i = create_list[-1].find("ENGINE=")
             if i > 0:
                 j = create_list[-1].find(" ", i)
-                dest_eng = create_list[-1][i+7:j]
+                dest_eng = create_list[-1][i + 7:j]
             dest_eng = dest_eng or src_eng
 
             if src_eng.upper() == 'INNODB' and dest_eng.upper() != 'INNODB':
                 may_skip_fk = True
 
-        str = "# Copying"
+        string = "# Copying"
         if not quiet:
             if obj_type == _GRANT:
                 if show_grant_msg:
-                    print "%s GRANTS from %s" % (str, self.db_name)
+                    print "%s GRANTS from %s" % (string, self.db_name)
             else:
                 print "%s %s %s.%s" % \
-                      (str, obj_type, self.db_name, obj[0])
+                      (string, obj_type, self.db_name, obj[0])
             if self.verbose:
                 print("; ".join(create_list))
-        res = None
+
         try:
-            res = self.destination.exec_query("USE %s" % self.q_new_db,
-                                              self.query_options)
+            self.destination.exec_query("USE %s" % self.q_new_db,
+                                        self.query_options)
         except:
             pass
         for stm in create_list:
             try:
-                res = self.destination.exec_query(stm, self.query_options)
+                self.destination.exec_query(stm, self.query_options)
             except Exception as e:
                 raise UtilDBError("Cannot operate on {0} object."
                                   " Error: {1}".format(obj_type, e.errmsg),
@@ -458,19 +461,19 @@ class Database(object):
 
         # Look for foreign key constraints
         if obj_type == _TABLE:
-            params = {'DATABASE': self.db_name,
-                      'TABLE': obj[0],
-                      }
+            params = {
+                'DATABASE': self.db_name,
+                'TABLE': obj[0],
+            }
             try:
                 query = _FK_CONSTRAINT_QUERY.format(**params)
                 fkey_constr = self.source.exec_query(query)
             except Exception as e:
                 raise UtilDBError("Unable to obtain Foreign Key constraint "
                                   "information for table {0}.{1}. "
-                                  "Error: {2}".format(
-                                  self.db_name, obj[0], e.errmsg), -1,
-                                  self.db_name
-                                  )
+                                  "Error: {2}".format(self.db_name, obj[0],
+                                                      e.errmsg), -1,
+                                  self.db_name)
 
             # Get information about the foreign keys of the table being
             # copied/cloned.
@@ -609,8 +612,6 @@ class Database(object):
                            Default is True
         """
 
-        from mysql.utilities.common.table import Table
-
         # Must call init() first!
         # Guard for init() prerequisite
         assert self.init_called, "You must call db.init() before " + \
@@ -639,7 +640,6 @@ class Database(object):
         if self.cloning:
             self.destination = self.source
 
-
         # Check to see if database exists
         if check_exists:
             exists = False
@@ -660,7 +660,7 @@ class Database(object):
 
         db_name = self.db_name
         definition = self.get_object_definition(db_name, db_name, _DATABASE)
-        schema_name, character_set, collation, sql_path = definition[0]
+        _, character_set, collation, _ = definition[0]
         # Create new database first
         if not self.skip_create:
             if self.cloning:
@@ -702,12 +702,11 @@ class Database(object):
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
         """
-
         from mysql.utilities.common.table import Table
 
         # Must call init() first!
         # Guard for init() prerequisite
-        assert self.init_called, "You must call db.init() before "+ \
+        assert self.init_called, "You must call db.init() before " + \
                                  "db.copy_data()."
 
         if self.skip_data:
@@ -724,9 +723,9 @@ class Database(object):
         quiet = options.get("quiet", False)
 
         tbl_options = {
-            'verbose'  : self.verbose,
-            'get_cols' : True,
-            'quiet'    : quiet
+            'verbose': self.verbose,
+            'get_cols': True,
+            'quiet': quiet
         }
 
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
@@ -787,7 +786,7 @@ class Database(object):
             else:
                 part_opts = "{0}{1}".format(sep, part_opts)
             # Then, separate table definitions from table options.
-            create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+            create_tbl, sep, _ = create_tbl.rpartition(') ')
             # Reconstruct CREATE statement without table options.
             create_statement = "{0}{1}{2}".format(create_tbl, sep, part_opts)
 
@@ -870,11 +869,11 @@ class Database(object):
                               "{2}".format(q_db, q_table, err.errmsg))
 
         # First, separate partition options.
-        create_tbl, sep, part_opts = create_tbl.rpartition('\n/*')
+        create_tbl, _, part_opts = create_tbl.rpartition('\n/*')
         # Handle situation where no partition options are found.
         create_tbl = part_opts if not create_tbl else create_tbl
         # Then, separate table options from table definition.
-        create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+        create_tbl, _, tbl_opts = create_tbl.rpartition(') ')
         table_options = tbl_opts.split()
 
         return table_options
@@ -899,9 +898,9 @@ class Database(object):
 
         # Remove objects backticks if needed
         db = remove_backtick_quoting(db) \
-                    if is_quoted_with_backticks(db) else db
+            if is_quoted_with_backticks(db) else db
         name = remove_backtick_quoting(name) \
-                    if is_quoted_with_backticks(name) else name
+            if is_quoted_with_backticks(name) else name
 
         if obj_type == _DATABASE:
             columns = 'SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, ' + \
@@ -914,20 +913,20 @@ class Database(object):
                       'TABLE_COMMENT, ROW_FORMAT, CREATE_OPTIONS'
             from_name = 'TABLES'
             condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _VIEW:
             columns = 'TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, ' + \
                       'CHECK_OPTION, DEFINER, SECURITY_TYPE'
             from_name = 'VIEWS'
             condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _TRIG:
             columns = 'TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ' + \
                       'EVENT_OBJECT_TABLE, ACTION_STATEMENT, ' + \
                       'ACTION_TIMING, DEFINER'
             from_name = 'TRIGGERS'
             condition = "TRIGGER_SCHEMA = '%s' AND TRIGGER_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _PROC or obj_type == _FUNC:
             columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
                       'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
@@ -938,28 +937,28 @@ class Database(object):
                         'ROUTINES.ROUTINE_NAME = proc.name AND ' + \
                         'ROUTINES.ROUTINE_TYPE = proc.type '
             condition = "ROUTINE_SCHEMA = '%s' AND ROUTINE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
             if obj_type == _PROC:
-                type = 'PROCEDURE'
+                typ = 'PROCEDURE'
             else:
-                type = 'FUNCTION'
-            condition += " AND ROUTINE_TYPE = '%s'" % type
+                typ = 'FUNCTION'
+            condition += " AND ROUTINE_TYPE = '%s'" % typ
         elif obj_type == _EVENT:
-            columns = 'EVENT_SCHEMA, EVENT_NAME, DEFINER, EVENT_DEFINITION, ' + \
-                      'EVENT_TYPE, INTERVAL_FIELD, INTERVAL_VALUE, STATUS, '+ \
-                      'ON_COMPLETION, STARTS, ENDS'
+            columns = ('EVENT_SCHEMA, EVENT_NAME, DEFINER, EVENT_DEFINITION, '
+                       'EVENT_TYPE, INTERVAL_FIELD, INTERVAL_VALUE, STATUS, '
+                       'ON_COMPLETION, STARTS, ENDS')
             from_name = 'EVENTS'
             condition = "EVENT_SCHEMA = '%s' AND EVENT_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
 
         if from_name is None:
             raise UtilError('Attempting to get definition from unknown object '
                             'type = %s.' % obj_type)
 
         values = {
-            'columns'    : columns,
-            'table_name' : from_name,
-            'conditions' : condition,
+            'columns': columns,
+            'table_name': from_name,
+            'conditions': condition,
         }
         rows = self.source.exec_query(_DEFINITION_QUERY % values)
         if rows != []:
@@ -970,14 +969,12 @@ class Database(object):
                 values['db'] = db
                 basic_def = rows[0]
                 col_def = self.source.exec_query(_COLUMN_QUERY % values)
-                part_def = self.source.exec_query(_PARTITION_QUERY % \
-                                                  values)
+                part_def = self.source.exec_query(_PARTITION_QUERY % values)
                 definition.append((basic_def, col_def, part_def))
             else:
                 definition.append(rows[0])
 
         return definition
-
 
     def get_next_object(self):
         """Retrieve the next object in the database list.
@@ -1006,10 +1003,8 @@ class Database(object):
 
         Returns (string) String to add to where clause or ""
         """
-        from mysql.utilities.common.options import obj2sql
-
         oper = 'NOT REGEXP' if self.use_regexp else 'NOT LIKE'
-        str = ""
+        string = ""
         for pattern in self.exclude_patterns:
             # Check use of qualified object names (with backtick support).
             if pattern.find(".") > 0:
@@ -1028,10 +1023,10 @@ class Database(object):
                 value = pattern
             if value:
                 # Append exclude condition to previous one(s).
-                str = "{0} AND {1} {2} {3}".format(str, exclude_param, oper,
-                                                   obj2sql(value))
+                string = "{0} AND {1} {2} {3}".format(string, exclude_param,
+                                                      oper, obj2sql(value))
 
-        return str
+        return string
 
     def get_object_type(self, object_name):
         """Return the object type of an object
@@ -1316,7 +1311,7 @@ class Database(object):
             return None
 
         col_options = {
-            'columns' : get_columns
+            'columns': get_columns
         }
         pos_to_quote = ()
         if obj_type == _GRANT:
@@ -1346,8 +1341,8 @@ class Database(object):
             # Quote required identifiers with backticks
             if need_backtick:
                 # function to quote row elements at a given positions
-                #quote = lambda pos, obj: quote_with_backticks(obj) \
-                #                        if obj and pos in pos_to_quote else obj
+                # quote = lambda pos, obj: quote_with_backticks(obj) \
+                #         if obj and pos in pos_to_quote else obj
                 new_rows = []
                 for row in res[1]:
                     # recreate row tuple quoting needed elements with backticks
@@ -1362,7 +1357,6 @@ class Database(object):
 
             return res
 
-
     def _check_user_permissions(self, uname, host, access):
         """Check user permissions for a given privilege
 
@@ -1372,13 +1366,9 @@ class Database(object):
 
         Returns True if user has permission, False if not
         """
-
-        from mysql.utilities.common.user import User
-
-        user = User(self.source, uname+'@'+host)
+        user = User(self.source, uname + '@' + host)
         result = user.has_privilege(access[0], '*', access[1])
         return result
-
 
     def check_read_access(self, user, host, options):
         """Check access levels for reading database objects
@@ -1426,12 +1416,11 @@ class Database(object):
             if not self._check_user_permissions(user, host, priv):
                 raise UtilDBError("User %s on the %s server does not have "
                                   "permissions to read all objects in %s. " %
-                                   (user, self.source.role, self.db_name) +
-                                   "User needs %s privilege on %s." %
-                                   (priv[1], priv[0]), -1, priv[0])
+                                  (user, self.source.role, self.db_name) +
+                                  "User needs %s privilege on %s." %
+                                  (priv[1], priv[0]), -1, priv[0])
 
         return True
-
 
     def check_write_access(self, user, host, options):
         """Check access levels for creating and writing database objects

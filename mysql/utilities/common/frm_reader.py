@@ -30,6 +30,7 @@ from mysql.utilities.common.charsets import CharsetInfo
 from mysql.utilities.exception import UtilError
 from pprint import pprint
 
+
 #
 # Definitions and types for interpreting the .frm file values.
 #
@@ -80,44 +81,44 @@ _MYSQL_TYPE_GEOMETRY = 255
 
 # Mapping of field data types to data type names
 _col_types = [
-    {'value' : _MYSQL_TYPE_DECIMAL, 'text' : 'decimal', 'size' : None},
-    {'value' : _MYSQL_TYPE_TINY, 'text' : 'tinyint', 'size' : 1 },
-    {'value' : _MYSQL_TYPE_SHORT, 'text' : 'smallint', 'size' : 2 },
-    {'value' : _MYSQL_TYPE_LONG, 'text' : 'int', 'size' : 4 },
-    {'value' : _MYSQL_TYPE_FLOAT, 'text' : 'float', 'size' : 4 },
-    {'value' : _MYSQL_TYPE_DOUBLE, 'text' : 'double', 'size' : 8 },
-    {'value' : _MYSQL_TYPE_NULL, 'text' : 'NULL', 'size' : 0 },
-    {'value' : _MYSQL_TYPE_TIMESTAMP, 'text' : 'timestamp', 'size' : 4 },
-    {'value' : _MYSQL_TYPE_LONGLONG, 'text' : 'bigint', 'size' : 8 },
-    {'value' : _MYSQL_TYPE_INT24, 'text' : 'mediumint', 'size' : 3 },
-    {'value' : _MYSQL_TYPE_DATE, 'text' : 'date', 'size' : 4 },
-    {'value' : _MYSQL_TYPE_TIME, 'text' : 'time', 'size' : 3 },
-    {'value' : _MYSQL_TYPE_DATETIME, 'text' : 'datetime', 'size' : 8 },
-    {'value' : _MYSQL_TYPE_YEAR, 'text' : 'year', 'size' : 1 },
-    {'value' : _MYSQL_TYPE_NEWDATE, 'text' : 'date', 'size' : 3 },
+    {'value': _MYSQL_TYPE_DECIMAL, 'text': 'decimal', 'size': None},
+    {'value': _MYSQL_TYPE_TINY, 'text': 'tinyint', 'size': 1},
+    {'value': _MYSQL_TYPE_SHORT, 'text': 'smallint', 'size': 2},
+    {'value': _MYSQL_TYPE_LONG, 'text': 'int', 'size': 4},
+    {'value': _MYSQL_TYPE_FLOAT, 'text': 'float', 'size': 4},
+    {'value': _MYSQL_TYPE_DOUBLE, 'text': 'double', 'size': 8},
+    {'value': _MYSQL_TYPE_NULL, 'text': 'NULL', 'size': 0},
+    {'value': _MYSQL_TYPE_TIMESTAMP, 'text': 'timestamp', 'size': 4},
+    {'value': _MYSQL_TYPE_LONGLONG, 'text': 'bigint', 'size': 8},
+    {'value': _MYSQL_TYPE_INT24, 'text': 'mediumint', 'size': 3},
+    {'value': _MYSQL_TYPE_DATE, 'text': 'date', 'size': 4},
+    {'value': _MYSQL_TYPE_TIME, 'text': 'time', 'size': 3},
+    {'value': _MYSQL_TYPE_DATETIME, 'text': 'datetime', 'size': 8},
+    {'value': _MYSQL_TYPE_YEAR, 'text': 'year', 'size': 1},
+    {'value': _MYSQL_TYPE_NEWDATE, 'text': 'date', 'size': 3},
     # Size must be calculated
-    {'value' : _MYSQL_TYPE_VARCHAR, 'text' : 'varchar', 'size' : -1 },
+    {'value': _MYSQL_TYPE_VARCHAR, 'text': 'varchar', 'size': -1},
     # Size must be calculated
-    {'value' : _MYSQL_TYPE_BIT, 'text' : 'bit', 'size' : -2 },
-    {'value' : _MYSQL_TYPE_TIMESTAMP2, 'text' : 'timestamp', 'size' : 4 },
-    {'value' : _MYSQL_TYPE_DATETIME2, 'text' : 'datetime', 'size' : 8 },
-    {'value' : _MYSQL_TYPE_TIME2, 'text' : 'time', 'size' : 3 },
-    {'value' : _MYSQL_TYPE_NEWDECIMAL, 'text' : 'decimal', 'size' : None },
-    {'value' : _MYSQL_TYPE_ENUM, 'text' : 'enum', 'size' : 0 },
-    {'value' : _MYSQL_TYPE_SET, 'text' : 'set', 'size' : 0 },
-    {'value' : _MYSQL_TYPE_TINY_BLOB, 'text' : 'tinyblob',
-     'size' : 1 + _PORTABLE_SIZEOF_CHAR_PTR },
-    {'value' : _MYSQL_TYPE_MEDIUM_BLOB, 'text' : 'mediumblob',
-     'size' : 3 + _PORTABLE_SIZEOF_CHAR_PTR },
-    {'value' : _MYSQL_TYPE_LONG_BLOB, 'text' : 'longblob',
-     'size' : 4 + _PORTABLE_SIZEOF_CHAR_PTR },
-    {'value' : _MYSQL_TYPE_BLOB, 'text' : 'blob',
-     'size' : 2 + _PORTABLE_SIZEOF_CHAR_PTR },
+    {'value': _MYSQL_TYPE_BIT, 'text': 'bit', 'size': -2},
+    {'value': _MYSQL_TYPE_TIMESTAMP2, 'text': 'timestamp', 'size': 4},
+    {'value': _MYSQL_TYPE_DATETIME2, 'text': 'datetime', 'size': 8},
+    {'value': _MYSQL_TYPE_TIME2, 'text': 'time', 'size': 3},
+    {'value': _MYSQL_TYPE_NEWDECIMAL, 'text': 'decimal', 'size': None},
+    {'value': _MYSQL_TYPE_ENUM, 'text': 'enum', 'size': 0},
+    {'value': _MYSQL_TYPE_SET, 'text': 'set', 'size': 0},
+    {'value': _MYSQL_TYPE_TINY_BLOB, 'text': 'tinyblob',
+     'size': 1 + _PORTABLE_SIZEOF_CHAR_PTR},
+    {'value': _MYSQL_TYPE_MEDIUM_BLOB, 'text': 'mediumblob',
+     'size': 3 + _PORTABLE_SIZEOF_CHAR_PTR},
+    {'value': _MYSQL_TYPE_LONG_BLOB, 'text': 'longblob',
+     'size': 4 + _PORTABLE_SIZEOF_CHAR_PTR},
+    {'value': _MYSQL_TYPE_BLOB, 'text': 'blob',
+     'size': 2 + _PORTABLE_SIZEOF_CHAR_PTR},
     # Size must be calculated
-    {'value' : _MYSQL_TYPE_VAR_STRING, 'text' : 'varchar', 'size' : -1 },
-    {'value' : _MYSQL_TYPE_STRING, 'text' : 'char', 'size' : None },
-    {'value' : _MYSQL_TYPE_GEOMETRY, 'text' : 'geometry',
-     'size' : 4 + _PORTABLE_SIZEOF_CHAR_PTR },
+    {'value': _MYSQL_TYPE_VAR_STRING, 'text': 'varchar', 'size': -1},
+    {'value': _MYSQL_TYPE_STRING, 'text': 'char', 'size': None},
+    {'value': _MYSQL_TYPE_GEOMETRY, 'text': 'geometry',
+     'size': 4 + _PORTABLE_SIZEOF_CHAR_PTR},
 ]
 
 _col_keys = [item['value'] for item in _col_types]
@@ -157,37 +158,37 @@ _DB_TYPE_DEFAULT = 127
 
 # Mapping of engine types to engine names
 _engine_types = [
-    { 'value' : _DB_TYPE_UNKNOWN, 'text' : 'UNKNOWN' },
-    { 'value' : _DB_TYPE_DIAB_ISAM, 'text' : 'ISAM' },
-    { 'value' : _DB_TYPE_HASH, 'text' : 'HASH' },
-    { 'value' : _DB_TYPE_MISAM, 'text' : 'MISAM' },
-    { 'value' : _DB_TYPE_PISAM, 'text' : 'PISAM' },
-    { 'value' : _DB_TYPE_RMS_ISAM, 'text' : 'RMS_ISAM' },
-    { 'value' : _DB_TYPE_HEAP, 'text' : 'HEAP' },
-    { 'value' : _DB_TYPE_ISAM, 'text' : 'ISAM' },
-    { 'value' : _DB_TYPE_MRG_ISAM, 'text' : 'MERGE' },
-    { 'value' : _DB_TYPE_MYISAM, 'text' : 'MYISAM' },
-    { 'value' : _DB_TYPE_MRG_MYISAM, 'text' : 'MERGE' },
-    { 'value' : _DB_TYPE_BERKELEY_DB, 'text' : 'BDB' },
-    { 'value' : _DB_TYPE_INNODB, 'text' : 'INNODB' },
-    { 'value' : _DB_TYPE_GEMINI, 'text' : 'GEMINI' },
-    { 'value' : _DB_TYPE_NDBCLUSTER, 'text' : 'NDBCLUSTER' },
-    { 'value' : _DB_TYPE_EXAMPLE_DB, 'text' : 'EXAMPLE' },
-    { 'value' : _DB_TYPE_ARCHIVE_DB, 'text' : 'ARCHIVE' },
-    { 'value' : _DB_TYPE_CSV_DB, 'text' : 'CSV' },
-    { 'value' : _DB_TYPE_FEDERATED_DB, 'text' : 'FEDERATED' },
-    { 'value' : _DB_TYPE_BLACKHOLE_DB, 'text' : 'BLACKHOLE' },
-    { 'value' : _DB_TYPE_PARTITION_DB, 'text' : 'PARTITION' },
-    { 'value' : _DB_TYPE_BINLOG, 'text' : 'BINLOG' },
-    { 'value' : _DB_TYPE_SOLID, 'text' : 'SOLID' },
-    { 'value' : _DB_TYPE_PBXT, 'text' : 'PBXT' },
-    { 'value' : _DB_TYPE_TABLE_FUNCTION, 'text' : 'FUNCTION' },
-    { 'value' : _DB_TYPE_MEMCACHE, 'text' : 'MEMCACHE' },
-    { 'value' : _DB_TYPE_FALCON, 'text' : 'FALCON' },
-    { 'value' : _DB_TYPE_MARIA, 'text' : 'MARIA' },
-    { 'value' : _DB_TYPE_PERFORMANCE_SCHEMA, 'text' : 'PERFORMANCE_SCHEMA' },
-    { 'value' : _DB_TYPE_FIRST_DYNAMIC, 'text' : 'DYNAMIC' },
-    { 'value' : _DB_TYPE_DEFAULT, 'text' : 'DEFAULT' },
+    {'value': _DB_TYPE_UNKNOWN, 'text': 'UNKNOWN'},
+    {'value': _DB_TYPE_DIAB_ISAM, 'text': 'ISAM'},
+    {'value': _DB_TYPE_HASH, 'text': 'HASH'},
+    {'value': _DB_TYPE_MISAM, 'text': 'MISAM'},
+    {'value': _DB_TYPE_PISAM, 'text': 'PISAM'},
+    {'value': _DB_TYPE_RMS_ISAM, 'text': 'RMS_ISAM'},
+    {'value': _DB_TYPE_HEAP, 'text': 'HEAP'},
+    {'value': _DB_TYPE_ISAM, 'text': 'ISAM'},
+    {'value': _DB_TYPE_MRG_ISAM, 'text': 'MERGE'},
+    {'value': _DB_TYPE_MYISAM, 'text': 'MYISAM'},
+    {'value': _DB_TYPE_MRG_MYISAM, 'text': 'MERGE'},
+    {'value': _DB_TYPE_BERKELEY_DB, 'text': 'BDB'},
+    {'value': _DB_TYPE_INNODB, 'text': 'INNODB'},
+    {'value': _DB_TYPE_GEMINI, 'text': 'GEMINI'},
+    {'value': _DB_TYPE_NDBCLUSTER, 'text': 'NDBCLUSTER'},
+    {'value': _DB_TYPE_EXAMPLE_DB, 'text': 'EXAMPLE'},
+    {'value': _DB_TYPE_ARCHIVE_DB, 'text': 'ARCHIVE'},
+    {'value': _DB_TYPE_CSV_DB, 'text': 'CSV'},
+    {'value': _DB_TYPE_FEDERATED_DB, 'text': 'FEDERATED'},
+    {'value': _DB_TYPE_BLACKHOLE_DB, 'text': 'BLACKHOLE'},
+    {'value': _DB_TYPE_PARTITION_DB, 'text': 'PARTITION'},
+    {'value': _DB_TYPE_BINLOG, 'text': 'BINLOG'},
+    {'value': _DB_TYPE_SOLID, 'text': 'SOLID'},
+    {'value': _DB_TYPE_PBXT, 'text': 'PBXT'},
+    {'value': _DB_TYPE_TABLE_FUNCTION, 'text': 'FUNCTION'},
+    {'value': _DB_TYPE_MEMCACHE, 'text': 'MEMCACHE'},
+    {'value': _DB_TYPE_FALCON, 'text': 'FALCON'},
+    {'value': _DB_TYPE_MARIA, 'text': 'MARIA'},
+    {'value': _DB_TYPE_PERFORMANCE_SCHEMA, 'text': 'PERFORMANCE_SCHEMA'},
+    {'value': _DB_TYPE_FIRST_DYNAMIC, 'text': 'DYNAMIC'},
+    {'value': _DB_TYPE_DEFAULT, 'text': 'DEFAULT'},
 ]
 _engine_keys = [item['value'] for item in _engine_types]
 
@@ -246,14 +247,14 @@ _HA_SPATIAL = 1024             # For spatial search
 
 # Row type definitions
 _ROW_TYPE_DEFAULT, _ROW_TYPE_FIXED, _ROW_TYPE_DYNAMIC, _ROW_TYPE_COMPRESSED, \
-    _ROW_TYPE_REDUNDANT, _ROW_TYPE_COMPACT, _ROW_TYPE_PAGE = range(0,7)
+    _ROW_TYPE_REDUNDANT, _ROW_TYPE_COMPACT, _ROW_TYPE_PAGE = range(0, 7)
 
 # enum utypes from field.h
 _NONE, _DATE, _SHIELD, _NOEMPTY, _CASEUP, _PNR, _BGNR, _PGNR, _YES, _NO, \
     _REL, _CHECK, _EMPTY, _UNKNOWN_FIELD, _CASEDN, _NEXT_NUMBER, \
     _INTERVAL_FIELD, _BIT_FIELD, _TIMESTAMP_OLD_FIELD, _CAPITALIZE, \
     _BLOB_FIELD, _TIMESTAMP_DN_FIELD, _TIMESTAMP_UN_FIELD, \
-    _TIMESTAMP_DNUN_FIELD = range(0,24)
+    _TIMESTAMP_DNUN_FIELD = range(0, 24)
 
 # Array of field data types that can be unsigned
 _UNSIGNED_FIELDS = ['TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER',
@@ -389,7 +390,7 @@ def _get_pack_length(col):
         col_len = col['bytes_in_col']
         return col_len / 8, col_len
     if size is None:
-        return size, col['bytes_in_col'] # It's a string of some sort
+        return size, col['bytes_in_col']  # It's a string of some sort
     return 0, size
 
 
@@ -408,9 +409,9 @@ def _get_blob_text(col):
     elif col['field_type'] == _MYSQL_TYPE_LONG_BLOB:
         type_str = "long"
     if col['charset'] == _MY_CHARSET_BIN_NUM:
-        type_str = "".join([type_str,"blob"])
+        type_str = "".join([type_str, "blob"])
     else:
-        type_str = "".join([type_str,"text"])
+        type_str = "".join([type_str, "text"])
 
     return type_str
 
@@ -446,7 +447,7 @@ def _format_default(col, col_flags, length, decimals):
     else:
         if _is_real(col):
             if decimals > 0 and decimals < length:
-                fmt_str = "'" + '%' + "%s" % (length-1) + '.' + \
+                fmt_str = "'" + '%' + "%s" % (length - 1) + '.' + \
                           "%s" % decimals + 'f' + "'"
             elif decimals == 0:
                 fmt_str = "'%d'"
@@ -524,7 +525,6 @@ class FrmReader(object):
         else:
             self.csi = CharsetInfo(options)
 
-
     def _read_header(self):
         """Read the header information from the file
         """
@@ -544,37 +544,36 @@ class FrmReader(object):
         engine_name = _engine_types[bisect.bisect_left(_engine_keys,
                                                        header[1])]['text']
         self.general_data = {
-            'frm_version'      : header[0],
-            'legacy_db_type'   : engine_name,
-            'IO_SIZE'          : header[4],
-            'length'           : header[6],
-            'tmp_key_length'   : header[7],
-            'rec_length'       : header[8],
-            'max_rows'         : header[10],
-            'min_rows'         : header[11],
-            'db_create_pack'   : header[12] >> 8, # only want 1 byte
-            'key_info_length'  : header[13],
-            'create_options'   : header[14],
-            'frm_file_ver'     : header[16],
-            'avg_row_length'   : header[17],
-            'default_charset'  : header[18],
-            'row_type'         : header[20],
-            'charset_low'      : header[21],
-            'table_charset'    : (header[21] << 8) + header[18],
-            'key_length'       : header[24],
-            'MYSQL_VERSION_ID' : header[25],
-            'extra_size'       : header[26],
-            'default_part_eng' : header[29],
-            'key_block_size'   : header[30],
+            'frm_version': header[0],
+            'legacy_db_type': engine_name,
+            'IO_SIZE': header[4],
+            'length': header[6],
+            'tmp_key_length': header[7],
+            'rec_length': header[8],
+            'max_rows': header[10],
+            'min_rows': header[11],
+            'db_create_pack': header[12] >> 8,  # only want 1 byte
+            'key_info_length': header[13],
+            'create_options': header[14],
+            'frm_file_ver': header[16],
+            'avg_row_length': header[17],
+            'default_charset': header[18],
+            'row_type': header[20],
+            'charset_low': header[21],
+            'table_charset': (header[21] << 8) + header[18],
+            'key_length': header[24],
+            'MYSQL_VERSION_ID': header[25],
+            'extra_size': header[26],
+            'default_part_eng': header[29],
+            'key_block_size': header[30],
         }
         # Fix storage engine string if partitioning engine specified
         if self.general_data['default_part_eng'] > 0 and \
            self.new_engine is None:
-            self.engine_str = _engine_types[bisect.bisect_left(_engine_keys,
-                                                           header[29])]['text']
+            self.engine_str = _engine_types[bisect.bisect_left(
+                _engine_keys, header[29])]['text']
 
         return True
-
 
     def _read_keys(self):
         """Read key fields from the file
@@ -604,37 +603,37 @@ class FrmReader(object):
             self.frm_file.read(4)
 
         self.key_data = {
-            'num_keys'      : num_keys,
-            'num_key_parts' : num_key_parts,
-            'key_names'     : [],
-            'keys'          : [],
+            'num_keys': num_keys,
+            'num_key_parts': num_key_parts,
+            'key_names': [],
+            'keys': [],
         }
 
         for i in range(0, self.key_data['num_keys']):
             key_info = {
-                'flags'      : struct.unpack("<H", self.frm_file.read(2))[0],
-                'key_length' : struct.unpack("<H", self.frm_file.read(2))[0],
-                'num_parts'  : struct.unpack("<B", self.frm_file.read(1))[0],
-                'algorithm'  : struct.unpack("<B", self.frm_file.read(1))[0],
-                'block_size' : struct.unpack("<H", self.frm_file.read(2))[0],
-                'key_parts'  : [],
-                'comment'    : "",
+                'flags': struct.unpack("<H", self.frm_file.read(2))[0],
+                'key_length': struct.unpack("<H", self.frm_file.read(2))[0],
+                'num_parts': struct.unpack("<B", self.frm_file.read(1))[0],
+                'algorithm': struct.unpack("<B", self.frm_file.read(1))[0],
+                'block_size': struct.unpack("<H", self.frm_file.read(2))[0],
+                'key_parts': [],
+                'comment': "",
             }
             for j in range(0, key_info['num_parts']):
                 if self.verbosity > 1:
                     print "# Reading key part %s." % j
                 key_part_info = {
-                    'field_num'     : struct.unpack("<H",
-                                      self.frm_file.read(2))[0] &
-                                        _FIELD_NR_MASK,
-                    'offset'        : struct.unpack("<H",
-                                        self.frm_file.read(2))[0]-1,
-                    'key_type'      : struct.unpack("<H",
-                                        self.frm_file.read(2))[0],
-                    'key_part_flag' : struct.unpack("<B",
-                                        self.frm_file.read(1))[0],
-                    'length'        : struct.unpack("<H",
-                                        self.frm_file.read(2))[0],
+                    'field_num': struct.unpack("<H",
+                                               self.frm_file.read(2))[0] &
+                    _FIELD_NR_MASK,
+                    'offset': struct.unpack("<H",
+                                            self.frm_file.read(2))[0] - 1,
+                    'key_type': struct.unpack("<H",
+                                              self.frm_file.read(2))[0],
+                    'key_part_flag': struct.unpack("<B",
+                                                   self.frm_file.read(1))[0],
+                    'length': struct.unpack("<H",
+                                            self.frm_file.read(2))[0],
                 }
                 key_info['key_parts'].append(key_part_info)
             self.key_data['keys'].append(key_info)
@@ -656,11 +655,10 @@ class FrmReader(object):
             if (self.key_data['keys'][i]['flags'] & _HA_USES_COMMENT) == \
                _HA_USES_COMMENT:
                 k_len = struct.unpack("<H", self.frm_file.read(2))[0]
-                com_str = struct.unpack("c"*k_len, self.frm_file.read(k_len))
+                com_str = struct.unpack("c" * k_len, self.frm_file.read(k_len))
                 self.key_data['keys'][i]['comment'] = "".join(com_str)
 
         return True
-
 
     def _read_comment(self):
         """Read the table comments.
@@ -668,9 +666,9 @@ class FrmReader(object):
         # Fields can be found 1 IO_SIZE more than what has been read to date
         # plus 46 bytes.
         io_size = self.general_data['IO_SIZE']
-        record_offset =  io_size + self.general_data['tmp_key_length'] + \
-                        self.general_data['rec_length']
-        offset = (((record_offset/io_size) + 1) * io_size) + 46
+        record_offset = io_size + self.general_data['tmp_key_length'] + \
+            self.general_data['rec_length']
+        offset = (((record_offset / io_size) + 1) * io_size) + 46
         try:
             # Skip to column position
             if self.verbosity > 1:
@@ -683,22 +681,22 @@ class FrmReader(object):
             raise UtilError("Cannot read table comment.")
 
         comment_len = struct.unpack("<B", data)[0]
-        com_chars = struct.unpack("c"*comment_len,
+        com_chars = struct.unpack("c" * comment_len,
                                   self.frm_file.read(comment_len))
         self.comment_str = "".join(com_chars)
         return True
-
 
     def _read_default_values(self):
         """Read the default values for all columns
         """
         offset = self.general_data['IO_SIZE'] + \
-                 self.general_data['tmp_key_length']
+            self.general_data['tmp_key_length']
         try:
             # Skip ahead to key section
             if self.verbosity > 1:
-                print "# Skipping to default data at : %0000x" % int(offset+1)
-            self.frm_file.seek(offset+1, 0)
+                print "# Skipping to default data at : %0000x" % \
+                    int(offset + 1)
+            self.frm_file.seek(offset + 1, 0)
         except Exception, error:
             if self.verbosity > 1:
                 print "EXCEPTION:", error
@@ -706,8 +704,7 @@ class FrmReader(object):
 
         num_bytes = self.general_data['rec_length']
         # allow overflow
-        self.default_values = self.frm_file.read(num_bytes+100)
-
+        self.default_values = self.frm_file.read(num_bytes + 100)
 
     def _read_engine_data(self):
         """Read the storage engine data.
@@ -717,13 +714,13 @@ class FrmReader(object):
         # the partition string following that.
 
         offset = self.general_data['IO_SIZE'] + \
-                 self.general_data['tmp_key_length'] + \
-                 self.general_data['rec_length']
+            self.general_data['tmp_key_length'] + \
+            self.general_data['rec_length']
         try:
             # Skip ahead to key section
             if self.verbosity > 1:
-                print "# Skipping to keys at : %0000x" % int(offset+2)
-            self.frm_file.seek(offset+2, 0)
+                print "# Skipping to keys at : %0000x" % int(offset + 2)
+            self.frm_file.seek(offset + 2, 0)
         except Exception, error:
             if self.verbosity > 1:
                 print "EXCEPTION:", error
@@ -731,7 +728,7 @@ class FrmReader(object):
 
         engine_len = struct.unpack("<H", self.frm_file.read(2))[0]
 
-        engine_str = "".join(struct.unpack("c"*engine_len,
+        engine_str = "".join(struct.unpack("c" * engine_len,
                                            self.frm_file.read(engine_len)))
 
         # Save engine name unless user specified a new engine to use
@@ -742,12 +739,11 @@ class FrmReader(object):
                 self.engine_str = self.new_engine
 
         part_len = struct.unpack("<I", self.frm_file.read(4))[0]
-        part_str = "".join(struct.unpack("c"*part_len,
+        part_str = "".join(struct.unpack("c" * part_len,
                                          self.frm_file.read(part_len)))
         self.partition_str = " ".join(part_str.split('\n'))
 
         return True
-
 
     def _read_column_names(self, fields_per_screen):
         """Read the table column names.
@@ -762,11 +758,11 @@ class FrmReader(object):
                 screens_read += 1
                 col_in_screen = 1
                 # Do the skips
-                self.frm_file.read(8) # read ahead 8 bytes
+                self.frm_file.read(8)  # read ahead 8 bytes
                 val = '\x20'
                 while val == '\x20':  # skip the spaces
                     val = self.frm_file.read(1)
-                self.frm_file.read(2) # read past 2 more bytes
+                self.frm_file.read(2)  # read past 2 more bytes
             else:
                 col_in_screen += 1
             # get length byte
@@ -774,16 +770,15 @@ class FrmReader(object):
             col_str = ""
             # Don't copy trailing \x00
             j = 0
-            while j < col_len-1:
+            while j < col_len - 1:
                 char_found = struct.unpack("c", self.frm_file.read(1))[0]
                 col_str += char_found
                 j += 1
             # skip trailing \x00 and extra bits except for last col read
-            if (i < self.num_cols-1):
+            if (i < self.num_cols - 1):
                 self.frm_file.read(3)
             cols.append(col_str)
         return (screens_read, cols)
-
 
     def _get_decimal_value(self, recpos, col):
         """Get a decimal value from the default column data
@@ -800,8 +795,7 @@ class FrmReader(object):
         length = col['bytes_in_col']
         decimals = (col_flags >> _FIELDFLAG_DEC_SHIFT) & _FIELDFLAG_MAX_DEC
         length = length - (1 if decimals else 0) - \
-                    (1 if (col_flags & _FIELDFLAG_DECIMAL) or \
-                     (length == 0) else 0)
+            (1 if (col_flags & _FIELDFLAG_DECIMAL) or (length == 0) else 0)
 
         # algorithm from bin2decimal()
         #int intg=precision-scale,
@@ -812,25 +806,25 @@ class FrmReader(object):
         #       frac0*sizeof(dec1)+dig2bytes[frac0x];
 
         intg = length - decimals
-        intg0 = intg/_DIG_PER_DEC1
-        frac0 = decimals/_DIG_PER_DEC1
+        intg0 = intg / _DIG_PER_DEC1
+        frac0 = decimals / _DIG_PER_DEC1
         intg0x = intg - (intg0 * _DIG_PER_DEC1)
         frac0x = decimals - (frac0 * _DIG_PER_DEC1)
-        int_len = (intg0 * 4 + _DIG2BYTES[intg0x])-1  # len of integer part
+        int_len = (intg0 * 4 + _DIG2BYTES[intg0x]) - 1  # len of integer part
         frac_len = (frac0 * 4 + _DIG2BYTES[frac0x])   # len of fractional part
         int_val = 0
-        shift_num = int_len-1
+        shift_num = int_len - 1
         for i in range(0, int_len):
-            int_val += ord(self.default_values[recpos+i+1]) << (shift_num * 8)
+            int_val += ord(self.default_values[recpos + i + 1]) << \
+                (shift_num * 8)
             shift_num -= 1
         frac_val = 0
-        shift_num = frac_len-1
+        shift_num = frac_len - 1
         for i in range(0, frac_len):
-            frac_val += ord(self.default_values[recpos+int_len+i+1]) << \
-                        (shift_num * 8)
+            frac_val += ord(self.default_values[recpos + int_len + i + 1]) << \
+                (shift_num * 8)
             shift_num -= 1
         return float("%s.%s" % (int_val, frac_val))
-
 
     def _get_field_defaults(self):
         """Retrieve the default values for the columns.
@@ -861,9 +855,9 @@ class FrmReader(object):
                     maxlen = 1
                 size = size / maxlen
             if len_pos is None:
-                value = self.default_values[recpos:recpos+size]
+                value = self.default_values[recpos:recpos + size]
             else:
-                value = self.default_values[recpos:recpos+len_pos+size]
+                value = self.default_values[recpos:recpos + len_pos + size]
 
             # Read default for double type
             if col['field_type'] == _MYSQL_TYPE_DOUBLE:
@@ -895,7 +889,6 @@ class FrmReader(object):
             elif len_pos == 8:
                 col['default'] = struct.unpack("<Q", value[0:8])[0]
 
-
     def _read_column_metadata(self):
         """Read the column metadata (size, flags, etc.).
 
@@ -911,23 +904,23 @@ class FrmReader(object):
                 data_type = _col_types[bisect.bisect_left(_col_keys,
                                                           data[13])]
                 col_def = {
-                    'field_length'    : data[2], # 1, +3
-                    'bytes_in_col'    : int(data[3]) + (int(data[4]) << 8),
-                    'recpos'          : (int(data[6]) << 8) +
-                                        (int(data[5])) + (int(data[4]) << 16),
-                    'unireg'          : data[7], # 1, +8
-                    'flags'           : data[8], # 1, +9
-                    'flags_extra'     : data[9], # 1, +10
-                    'unireg_type'     : data[10], # 1, +11
-                    'charset_low'     : data[11], # 1, +12
-                    'interval_nr'     : data[12], # 1, +13
-                    'field_type'      : data[13], # 1, +14
-                    'field_type_name' : data_type['text'],
-                    'charset'         : data[14], # 1, +15
-                    'comment_length'  : data[15], # 2, +17
-                    'enums'           : [],
-                    'comment'         : "",
-                    'default'         : None,
+                    'field_length': data[2],  # 1, +3
+                    'bytes_in_col': int(data[3]) + (int(data[4]) << 8),
+                    'recpos': (int(data[6]) << 8) +
+                    (int(data[5])) + (int(data[4]) << 16),
+                    'unireg': data[7],  # 1, +8
+                    'flags': data[8],  # 1, +9
+                    'flags_extra': data[9],  # 1, +10
+                    'unireg_type': data[10],  # 1, +11
+                    'charset_low': data[11],  # 1, +12
+                    'interval_nr': data[12],  # 1, +13
+                    'field_type': data[13],  # 1, +14
+                    'field_type_name': data_type['text'],
+                    'charset': data[14],  # 1, +15
+                    'comment_length': data[15],  # 2, +17
+                    'enums': [],
+                    'comment': "",
+                    'default': None,
                 }
                 column_data.append(col_def)
         except Exception, error:
@@ -935,7 +928,6 @@ class FrmReader(object):
                 print "EXCEPTION:", error
             raise UtilError("Cannot locate column data")
         return column_data
-
 
     def _read_column_data(self):
         """Read the column information from the file.
@@ -946,9 +938,9 @@ class FrmReader(object):
         # Fields can be found 1 IO_SIZE more than what has been read to date
         # plus 258 bytes.
         io_size = self.general_data['IO_SIZE']
-        record_offset =  io_size + self.general_data['tmp_key_length'] + \
-                        self.general_data['rec_length']
-        offset = (((record_offset/io_size) + 1) * io_size) + 258
+        record_offset = io_size + self.general_data['tmp_key_length'] + \
+            self.general_data['rec_length']
+        offset = (((record_offset / io_size) + 1) * io_size) + 258
         try:
             # Skip to column position
             if self.verbosity > 1:
@@ -961,15 +953,15 @@ class FrmReader(object):
             raise UtilError("Cannot read column header.")
         self.num_cols = data[0]
         self.col_metadata = {
-            'num_cols'       : data[0],
-            'pos'            : data[1],
-            'unknown'        : data[2],
-            'n_length'       : data[3],
-            'interval_count' : data[4],
-            'interval_parts' : data[5],
-            'int_length'     : data[6],
-            'com_length'     : data[8],
-            'null_fields'    : data[12],
+            'num_cols': data[0],
+            'pos': data[1],
+            'unknown': data[2],
+            'n_length': data[3],
+            'interval_count': data[4],
+            'interval_parts': data[5],
+            'int_length': data[6],
+            'com_length': data[8],
+            'null_fields': data[12],
         }
         if self.verbosity > 1:
             pprint(self.col_metadata)
@@ -982,7 +974,7 @@ class FrmReader(object):
                 print "# Fields per screen =", fields_per_screen
             self.frm_file.read(46)
             col_names = self._read_column_names(fields_per_screen)[1]
-            self.frm_file.read(1) # skip 1 byte
+            self.frm_file.read(1)  # skip 1 byte
             self.column_data = self._read_column_metadata()
         except Exception, error:
             if self.verbosity > 1:
@@ -1000,7 +992,7 @@ class FrmReader(object):
         for colname in col_names:
             col_len += len(colname)
         # Skip to enum section
-        self.frm_file.read(len(col_names)+col_len+2)
+        self.frm_file.read(len(col_names) + col_len + 2)
         intervals = []
         interval_num = 0
         for i in range(0, len(col_names)):
@@ -1023,7 +1015,8 @@ class FrmReader(object):
                         else:
                             col_str += chr(char_found)
                     intervals.append(cols)
-                self.column_data[i]['enums'].extend(intervals[interval_num-1])
+                self.column_data[i]['enums'].extend(
+                    intervals[interval_num - 1])
 
         # Now read column comments
         for i in range(0, len(col_names)):
@@ -1040,7 +1033,6 @@ class FrmReader(object):
                 self.column_data[i]['comment'] = col_str
 
         return True
-
 
     def _get_charset_collation(self, col):
         """Get the character set and collation for column
@@ -1065,7 +1057,7 @@ class FrmReader(object):
             parts.append(" CHARACTER SET `%s`" % field_cs_name)
 
         elif (field_cs_name is None or table_cs_name is None) and \
-             not self.quiet:
+                not self.quiet:
             print "C",
             print "# WARNING: Cannot get character set name for id =", id
             parts.append(" CHARACTER SET <UNKNOWN>")
@@ -1086,7 +1078,6 @@ class FrmReader(object):
             parts.append("")
 
         return parts
-
 
     def _get_column_definitions(self):
         """Build the column definitions
@@ -1111,8 +1102,8 @@ class FrmReader(object):
             # Only convert the length for character type fields
             if _is_cs_enabled(col):
                 length = length / maxlen
-            decimals = int((col_flags >> _FIELDFLAG_DEC_SHIFT) & \
-                _FIELDFLAG_MAX_DEC)
+            decimals = int((col_flags >> _FIELDFLAG_DEC_SHIFT) &
+                           _FIELDFLAG_MAX_DEC)
             col_parts = []
             # name, data type, length
             # If enum or set values, put those in definition
@@ -1134,7 +1125,7 @@ class FrmReader(object):
                 length_str = ""
                 if _is_decimal(col):
                     length = length - (1 if decimals else 0) - \
-                        (1 if (col_flags & _FIELDFLAG_DECIMAL) or \
+                        (1 if (col_flags & _FIELDFLAG_DECIMAL) or
                          (length == 0) else 0)
                 if decimals == _FIELDFLAG_MAX_DEC:
                     if not col['field_type_name'].upper() in \
@@ -1144,8 +1135,8 @@ class FrmReader(object):
                     length_str = "(%s,%s)" % (length, decimals)
                 col_parts.append("  `%s` %s%s" %
                                  (col['name'],
-                                 col['field_type_name'].lower(),
-                                 length_str))
+                                  col['field_type_name'].lower(),
+                                  length_str))
             else:
                 col_parts.append("  `%s` %s(%s)" % (col['name'],
                                  col['field_type_name'].lower(),
@@ -1178,7 +1169,7 @@ class FrmReader(object):
                 col_parts.append(" DEFAULT CURRENT_TIMESTAMP "
                                  "ON UPDATE CURRENT_TIMESTAMP")
             elif col_flags & _FIELDFLAG_NO_DEFAULT == 0 and \
-                default is not None:
+                    default is not None:
                 col_parts.append(_format_default(col, col_flags,
                                                  length, decimals))
 
@@ -1190,13 +1181,12 @@ class FrmReader(object):
                 col_parts.append(" comment '%s'" % col['comment'])
 
             # if not the last column or if there are keys, append comma
-            if i < stop-1 or self.key_data['num_keys'] > 0:
+            if i < stop - 1 or self.key_data['num_keys'] > 0:
                 col_parts.append(",")
             col_parts.append(" ")
             columns.append("".join(col_parts))
 
         return columns
-
 
     def _get_key_size(self, col, key_info, flags):
         """Get the key size option for column
@@ -1215,7 +1205,7 @@ class FrmReader(object):
         if col['field_type_name'].upper() == "VARCHAR":
             field_len = int(col['field_length'])
         elif (_is_real(col) or _is_unsigned(col) or _is_decimal(col)) and \
-            pack_len[0]:
+                pack_len[0]:
             field_len = int(pack_len[0])
         else:
             field_len = int(pack_len[1])
@@ -1233,13 +1223,12 @@ class FrmReader(object):
                 size_info = "(UNKNOWN)"
 
         elif not field_len == key_len and \
-           not int(flags) & _HA_FULLTEXT and not int(flags) & _HA_SPATIAL:
+                not int(flags) & _HA_FULLTEXT and not int(flags) & _HA_SPATIAL:
             if self.csi:
                 size_info = "(%d)" % (key_len / maxlen)
             else:
                 size_info = "(UNKNOWN)"
         return size_info
-
 
     def _get_key_columns(self):
         """Build the key column definitions
@@ -1264,12 +1253,12 @@ class FrmReader(object):
             key_cols = ""
             for k in range(0, len(info['key_parts'])):
                 key_part = info['key_parts'][k]
-                col = self.column_data[key_part['field_num']-1]
+                col = self.column_data[key_part['field_num'] - 1]
                 key_cols += "`%s`" % col['name']
                 size_str = self._get_key_size(col, key_part, info['flags'])
                 if size_str:
                     key_cols += size_str
-                if k < len(info['key_parts'])-1:
+                if k < len(info['key_parts']) - 1:
                     key_cols += ","
             algorithm = _KEY_ALG[info['algorithm']]
             if not algorithm == 'UNDEFINED':
@@ -1279,7 +1268,6 @@ class FrmReader(object):
             keys.append(key_str % (key_prefix, key, key_cols))
             i += 1
         return keys
-
 
     def _get_table_options(self):
         """Read the general table options from the file.
@@ -1327,7 +1315,7 @@ class FrmReader(object):
                           "for table using id =", c_id
                 elif col is None and not self.quiet:
                     print "# WARNING: Cannot find collation for table " + \
-                           "using id =", c_id
+                        "using id =", c_id
 
         row_format = ""
         row_type = int(gen['row_type'])
@@ -1350,7 +1338,6 @@ class FrmReader(object):
         if len(options) > 1:
             return options[0] + " " + ", ".join(options[1:]) + ";"
         return options[0] + ";"
-
 
     def _build_create_statement(self):
         """Build the create statement for the .frm file.
@@ -1385,7 +1372,6 @@ class FrmReader(object):
 
         return "\n".join(parts)
 
-
     def get_type(self):
         """Return the file type - TABLE or VIEW
         """
@@ -1393,7 +1379,7 @@ class FrmReader(object):
         try:
             self.frm_file = open(self.frm_path, "rb")
         except Exception, error:
-            raise UtilError("The file %s cannot be read.\n%s" % \
+            raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
         # Read the file type
@@ -1410,7 +1396,6 @@ class FrmReader(object):
         else:
             return "UNKNOWN"
 
-
     def show_statistics(self):
         """Show general file and table statistics
         """
@@ -1418,11 +1403,11 @@ class FrmReader(object):
         print "# File Statistics:"
         file_stats = os.stat(self.frm_path)
         file_info = {
-           'Size'          : file_stats[stat.ST_SIZE],
-           'Last Modified' : time.ctime(file_stats[stat.ST_MTIME]),
-           'Last Accessed' : time.ctime(file_stats[stat.ST_ATIME]),
-           'Creation Time' : time.ctime(file_stats[stat.ST_CTIME]),
-           'Mode'          : file_stats[stat.ST_MODE],
+            'Size': file_stats[stat.ST_SIZE],
+            'Last Modified': time.ctime(file_stats[stat.ST_MTIME]),
+            'Last Accessed': time.ctime(file_stats[stat.ST_ATIME]),
+            'Creation Time': time.ctime(file_stats[stat.ST_CTIME]),
+            'Mode': file_stats[stat.ST_MODE],
         }
         for value, data in file_info.iteritems():
             print "#%22s : %s" % (value, data)
@@ -1432,7 +1417,7 @@ class FrmReader(object):
         try:
             self.frm_file = open(self.frm_path, "rb")
         except Exception, error:
-            raise UtilError("The file %s cannot be read.\n%s" % \
+            raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
         # Read the file type
@@ -1453,21 +1438,21 @@ class FrmReader(object):
                                 int(version[3:]))
         def_part_eng = 'None'
         if self.general_data['default_part_eng'] > 0:
-            def_part_eng = _engine_types[bisect.bisect_left(_engine_keys,
-                            self.general_data['default_part_eng'])]['text']
+            def_part_eng = _engine_types[bisect.bisect_left(
+                _engine_keys,
+                self.general_data['default_part_eng'])]['text']
         print "# Table Statistics:"
         table_info = {
-            'MySQL Version'        : ver_str,
-            'frm Version'          : self.general_data['frm_version'],
-            'Engine'               : self.general_data['legacy_db_type'],
-            'IO_SIZE'              : self.general_data['IO_SIZE'],
-            'frm File_Version'     : self.general_data['frm_file_ver'],
-            'Def Partition Engine' : def_part_eng,
+            'MySQL Version': ver_str,
+            'frm Version': self.general_data['frm_version'],
+            'Engine': self.general_data['legacy_db_type'],
+            'IO_SIZE': self.general_data['IO_SIZE'],
+            'frm File_Version': self.general_data['frm_file_ver'],
+            'Def Partition Engine': def_part_eng,
         }
         for value, data in table_info.iteritems():
             print "#%22s : %s" % (value, data)
         print
-
 
     def show_create_table_statement(self):
         """Show the CREATE TABLE statement
@@ -1484,7 +1469,7 @@ class FrmReader(object):
         try:
             self.frm_file = open(self.frm_path, "rb")
         except Exception, error:
-            raise UtilError("The file %s cannot be read.\n%s" % \
+            raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
         # Read the file type
@@ -1559,7 +1544,6 @@ class FrmReader(object):
         # Close file and exit
         self.frm_file.close()
 
-
     def change_storage_engine(self):
         """Change the storage engine in an .frm file to MEMORY
 
@@ -1580,7 +1564,7 @@ class FrmReader(object):
         try:
             self.frm_file = open(self.frm_path, "r+b")
         except Exception, error:
-            raise UtilError("The file %s cannot be read.\n%s" % \
+            raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
         # Read the file type
@@ -1596,7 +1580,7 @@ class FrmReader(object):
                             file_type)
 
         # Replace engine value
-        self.frm_file.read(1) # skip 1 byte
+        self.frm_file.read(1)  # skip 1 byte
         engine_type = struct.unpack("<B", self.frm_file.read(1))[0]
 
         # Read general information
@@ -1609,13 +1593,13 @@ class FrmReader(object):
         server_version = str(self.general_data['MYSQL_VERSION_ID'])
 
         offset = self.general_data['IO_SIZE'] + \
-                 self.general_data['tmp_key_length'] + \
-                 self.general_data['rec_length']
+            self.general_data['tmp_key_length'] + \
+            self.general_data['rec_length']
 
-        self.frm_file.seek(offset+2, 0)
+        self.frm_file.seek(offset + 2, 0)
 
         engine_len = struct.unpack("<H", self.frm_file.read(2))[0]
-        engine_str = "".join(struct.unpack("c"*engine_len,
+        engine_str = "".join(struct.unpack("c" * engine_len,
                                            self.frm_file.read(engine_len)))
         if self.verbosity > 1:
             print "# Engine string:", engine_str
@@ -1635,14 +1619,14 @@ class FrmReader(object):
             f_out = open(new_csv[0] + ".MRG", "w")
             f_out.close()
         elif engine_type == _DB_TYPE_BLACKHOLE_DB:
-            pass # Nothing to do for black hole storage engine
+            pass  # Nothing to do for black hole storage engine
         else:
             # Write memory type
             self.frm_file.seek(3)
             self.frm_file.write(struct.pack("<B", 6))
 
             # Write memory name
-            self.frm_file.seek(offset+2, 0)
+            self.frm_file.seek(offset + 2, 0)
             self.frm_file.write(struct.pack("<H", 6))
             self.frm_file.write("MEMORY")
 

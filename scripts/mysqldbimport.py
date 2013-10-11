@@ -31,16 +31,16 @@ import sys
 import time
 import re
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import setup_common_options, add_engines
-from mysql.utilities.common.options import add_skip_options, check_skip_options
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.options import (setup_common_options, add_engines,
+                                            add_skip_options, check_verbosity,
+                                            add_verbosity, check_skip_options,
+                                            add_format_option)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqldbimport "
@@ -52,6 +52,7 @@ _PERMITTED_IMPORTS = ["data", "definitions", "both"]
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
+
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -78,9 +79,9 @@ add_format_option(parser, "the input file format in either sql (default), "
 # Import mode
 parser.add_option("-i", "--import", action="store", dest="import_type",
                   default="definitions", help="control the import of either "
-                  "'data' = only the table data for the tables in the database "
-                  "list, 'definitions' = import only the definitions for "
-                  "the objects in the database list, or 'both' = import "
+                  "'data' = only the table data for the tables in the "
+                  "database list, 'definitions' = import only the definitions "
+                  "for the objects in the database list, or 'both' = import "
                   "the metadata followed by the data "
                   "(default: import definitions)", type="choice",
                   choices=_PERMITTED_IMPORTS)
@@ -157,34 +158,34 @@ if "data" in skips and opt.import_type == "data":
 
 if "create_db" in skips and opt.do_drop:
     print("ERROR: You cannot combine --drop-first and --skip=create_db.")
-    exit (1)
+    exit(1)
 
 # Set options for database operations.
 options = {
-    "skip_tables"   : "tables" in skips,
-    "skip_views"    : "views" in skips,
-    "skip_triggers" : "triggers" in skips,
-    "skip_procs"    : "procedures" in skips,
-    "skip_funcs"    : "functions" in skips,
-    "skip_events"   : "events" in skips,
-    "skip_grants"   : "grants" in skips,
-    "skip_create"   : "create_db" in skips,
-    "skip_data"     : "data" in skips,
-    "skip_blobs"    : opt.skip_blobs,
-    "format"        : opt.format,
-    "no_headers"    : opt.no_headers,
-    "single"        : not opt.bulk_insert,
-    "import_type"   : opt.import_type,
-    "dryrun"        : opt.dryrun,
-    "do_drop"       : opt.do_drop,
-    "quiet"         : opt.quiet,
-    "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3,
-    "new_engine"    : opt.new_engine,
-    "def_engine"    : opt.def_engine,
-    "skip_rpl"      : opt.skip_rpl,
-    "skip_gtid"     : opt.skip_gtid,
-    "table"         : opt.table,
+    "skip_tables": "tables" in skips,
+    "skip_views": "views" in skips,
+    "skip_triggers": "triggers" in skips,
+    "skip_procs": "procedures" in skips,
+    "skip_funcs": "functions" in skips,
+    "skip_events": "events" in skips,
+    "skip_grants": "grants" in skips,
+    "skip_create": "create_db" in skips,
+    "skip_data": "data" in skips,
+    "skip_blobs": opt.skip_blobs,
+    "format": opt.format,
+    "no_headers": opt.no_headers,
+    "single": not opt.bulk_insert,
+    "import_type": opt.import_type,
+    "dryrun": opt.dryrun,
+    "do_drop": opt.do_drop,
+    "quiet": opt.quiet,
+    "verbosity": opt.verbosity,
+    "debug": opt.verbosity >= 3,
+    "new_engine": opt.new_engine,
+    "def_engine": opt.def_engine,
+    "skip_rpl": opt.skip_rpl,
+    "skip_gtid": opt.skip_gtid,
+    "table": opt.table,
 }
 
 # Parse server connection values

@@ -30,24 +30,24 @@ import os
 import re
 import sys
 
+from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.dbcompare import database_compare
+from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
+from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
+from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
                                              PARSE_ERR_DB_PAIR_EXT,
                                              PARSE_ERR_DB_MISSING_CMP,
                                              PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW)
-from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_difftype
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_changes_for, add_reverse
-from mysql.utilities.common.options import add_format_option
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_difftype, add_verbosity,
+                                            check_verbosity,
+                                            add_changes_for, add_reverse,
+                                            add_format_option,
+                                            setup_common_options)
+from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
+                                                  remove_backtick_quoting)
 
-from mysql.utilities.exception import UtilError, FormatError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcompare "
@@ -152,21 +152,21 @@ check_verbosity(opt)
 
 # Set options for database operations.
 options = {
-    "quiet"            : opt.quiet,
-    "verbosity"        : opt.verbosity,
-    "difftype"         : opt.difftype,
-    "run_all_tests"    : opt.run_all_tests,
-    "width"            : opt.width,
-    "no_object_check"  : opt.no_object_check,
-    "no_diff"          : opt.no_diff,
-    "no_row_count"     : opt.no_row_count,
-    "no_data"          : opt.no_data,
-    "format"           : opt.format,
-    "toggle_binlog"    : opt.toggle_binlog,
-    "changes-for"      : opt.changes_for,
-    "reverse"          : opt.reverse,
-    "span_key_size"    : opt.span_key_size,
-    "skip_table_opts"  : opt.skip_tbl_opts,
+    "quiet": opt.quiet,
+    "verbosity": opt.verbosity,
+    "difftype": opt.difftype,
+    "run_all_tests": opt.run_all_tests,
+    "width": opt.width,
+    "no_object_check": opt.no_object_check,
+    "no_diff": opt.no_diff,
+    "no_row_count": opt.no_row_count,
+    "no_data": opt.no_data,
+    "format": opt.format,
+    "toggle_binlog": opt.toggle_binlog,
+    "changes-for": opt.changes_for,
+    "reverse": opt.reverse,
+    "span_key_size": opt.span_key_size,
+    "skip_table_opts": opt.skip_tbl_opts,
 }
 
 # Parse server connection values
@@ -208,7 +208,7 @@ if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
 
 res = True
 check_failed = False
-arg_regexp = re.compile('{0}(?:(?:\:){0})?'.format(REGEXP_OBJ_NAME))
+arg_regexp = re.compile(r'{0}(?:(?:\:){0})?'.format(REGEXP_OBJ_NAME))
 for db in args:
     # Split the database names considering backtick quotes
     grp = arg_regexp.match(db)
@@ -236,9 +236,9 @@ for db in args:
 
     # Remove backtick quotes (handled later)
     db1 = remove_backtick_quoting(parts[0]) \
-                if is_quoted_with_backticks(parts[0]) else parts[0]
+        if is_quoted_with_backticks(parts[0]) else parts[0]
     db2 = remove_backtick_quoting(parts[1]) \
-                if is_quoted_with_backticks(parts[1]) else parts[1]
+        if is_quoted_with_backticks(parts[1]) else parts[1]
 
     try:
         res = database_compare(server1_values, server2_values,
@@ -262,7 +262,7 @@ if not opt.quiet:
     else:
         sys.stdout.write("# Databases are consistent")
         if (opt.no_object_check or opt.no_diff or
-            opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
+           opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
             sys.stdout.write(" given skip options specified")
         print(".")
     print("#\n# ...done")

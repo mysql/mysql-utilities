@@ -30,20 +30,19 @@ import os
 import re
 import sys
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.diff import object_diff, database_diff
-from mysql.utilities.common.messages import PARSE_ERR_DB_OBJ_MISSING
-from mysql.utilities.common.messages import PARSE_ERR_DB_OBJ_MISSING_MSG
-from mysql.utilities.common.messages import PARSE_ERR_DB_OBJ_PAIR
-from mysql.utilities.common.messages import PARSE_ERR_DB_OBJ_PAIR_EXT
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_difftype
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_changes_for, add_reverse
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.messages import (PARSE_ERR_DB_OBJ_MISSING,
+                                             PARSE_ERR_DB_OBJ_MISSING_MSG,
+                                             PARSE_ERR_DB_OBJ_PAIR,
+                                             PARSE_ERR_DB_OBJ_PAIR_EXT)
+from mysql.utilities.common.options import (add_difftype, add_verbosity,
+                                            check_verbosity, add_changes_for,
+                                            add_reverse, setup_common_options)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqldiff "
@@ -110,14 +109,14 @@ check_verbosity(opt)
 
 # Set options for database operations.
 options = {
-    "quiet"            : opt.quiet,
-    "verbosity"        : opt.verbosity,
-    "difftype"         : opt.difftype,
-    "force"            : opt.force,
-    "width"            : opt.width,
-    "changes-for"      : opt.changes_for,
-    "reverse"          : opt.reverse,
-    "skip_table_opts"  : opt.skip_tbl_opts,
+    "quiet": opt.quiet,
+    "verbosity": opt.verbosity,
+    "difftype": opt.difftype,
+    "force": opt.force,
+    "width": opt.width,
+    "changes-for": opt.changes_for,
+    "reverse": opt.reverse,
+    "skip_table_opts": opt.skip_tbl_opts,
 }
 
 # Parse server connection values
@@ -147,7 +146,7 @@ if len(args) == 0:
 
 # run the diff
 diff_failed = False
-arg_regexp = re.compile('{0}(?:\:){0}'.format(REGEXP_QUALIFIED_OBJ_NAME))
+arg_regexp = re.compile(r'{0}(?:\:){0}'.format(REGEXP_QUALIFIED_OBJ_NAME))
 for argument in args:
     m_obj = arg_regexp.match(argument)
     if not m_obj:

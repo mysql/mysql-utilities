@@ -26,17 +26,18 @@ import sys
 import tempfile
 import time
 
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
 from mysql.utilities.common.server import (connect_servers, get_local_servers,
                                            Server, test_connect)
-from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
-from mysql.utilities.exception import UtilError
 
 
 _COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
             'config_file', 'binary_log', 'binary_log_pos', 'relay_log',
             'relay_log_pos']
+
 
 def _get_binlog(server):
     """Retrieve binary log and binary log position
@@ -70,7 +71,7 @@ def _get_relay_log(server):
     return (relay_log, relay_log_pos)
 
 
-def _server_info(server_val, get_defaults=False, options={}):
+def _server_info(server_val, get_defaults=False, options=None):
     """Show information about a running server
 
     This method gathers information from a running server. This information is
@@ -94,6 +95,8 @@ def _server_info(server_val, get_defaults=False, options={}):
 
     Return tuple - information about server
     """
+    if options is None:
+        options = {}
     # Parse source connection values
     source_values = parse_connection(server_val, None, options)
 
@@ -114,7 +117,7 @@ def _server_info(server_val, get_defaults=False, options={}):
         my_def_search = ["/etc/my.cnf", "/etc/mysql/my.cnf",
                          os.path.join(basedir, "my.cnf"), "~/.my.cnf"]
     else:
-        my_def_search = ["c:\windows\my.ini", "c:\my.ini", "c:\my.cnf",
+        my_def_search = [r"c:\windows\my.ini", r"c:\my.ini", r"c:\my.cnf",
                          os.path.join(os.curdir, "my.ini")]
     my_def_search.append(os.path.join(os.curdir, "my.cnf"))
 
@@ -178,7 +181,7 @@ def _server_info(server_val, get_defaults=False, options={}):
              binlog, binlog_pos, relay_log, relay_log_pos), defaults)
 
 
-def _start_server(server_val, basedir, datadir, options={}):
+def _start_server(server_val, basedir, datadir, options=None):
     """Start an instance of a server in read only mode
 
     This method is used to start the server in read only mode. It will launch
@@ -191,6 +194,8 @@ def _start_server(server_val, basedir, datadir, options={}):
     datadir[in]       the data directory for the server
     options[in]       dictionary of options (verbosity)
     """
+    if options is None:
+        options = {}
     verbosity = options.get("verbosity", 0)
     start_timeout = options.get("start_timeout", 10)
 
@@ -203,7 +208,7 @@ def _start_server(server_val, basedir, datadir, options={}):
     version = get_mysqld_version(mysqld_path)
     print "done."
     post_5_6 = version is not None and \
-               int(version[0]) >= 5 and int(version[1]) >= 6
+        int(version[0]) >= 5 and int(version[1]) >= 6
 
     # Start the instance
     print "# Starting read-only instance of the server ...",
@@ -232,22 +237,22 @@ def _start_server(server_val, basedir, datadir, options={}):
     if socket is not None:
         args.append("--socket=%(unix_socket)s" % server_val)
     if verbosity > 0:
-        proc = subprocess.Popen(args, shell=False)
+        subprocess.Popen(args, shell=False)
     else:
         out = open(os.devnull, 'w')
-        proc = subprocess.Popen(args, shell=False,
-                                stdout=out, stderr=out)
+        subprocess.Popen(args, shell=False, stdout=out, stderr=out)
 
     server_options = {
-        'conn_info' : server_val,
-        'role'      : "read_only",
+        'conn_info': server_val,
+        'role': "read_only",
     }
     server = Server(server_options)
 
     # Try to connect to the server, waiting for the server to become ready
     # (retry start_timeout times and wait 1 sec between each attempt).
     # Note: It can take up to 10 seconds for Windows machines.
-    for retry in range(start_timeout):
+    i = 0
+    while i < start_timeout:
         # Reset error and wait 1 second.
         error = None
         time.sleep(1)
@@ -257,15 +262,16 @@ def _start_server(server_val, basedir, datadir, options={}):
         except UtilError as err:
             # Store exception to raise later (if needed).
             error = err
+        i += 1
     # Raise last known exception (if unable to connect to the server)
     if error:
-        raise error
-
+        raise error  # pylint: disable=E0702
+                     # See: http://www.logilab.org/ticket/3207
     print "done."
     return server
 
 
-def _stop_server(server_val, basedir, options={}):
+def _stop_server(server_val, basedir, options=None):
     """Stop an instance of a server started in read only mode
 
     This method is used to stop the server started in read only mode. It will
@@ -277,6 +283,8 @@ def _stop_server(server_val, basedir, options={}):
     basedir[in]       the base directory for the server
     options[in]       dictionary of options (verbosity)
     """
+    if options is None:
+        options = {}
     verbosity = options.get("verbosity", 0)
     socket = server_val.get("unix_socket", None)
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
@@ -288,7 +296,7 @@ def _stop_server(server_val, basedir, options={}):
             cmd = cmd + " --socket=%s " % socket
     else:
         cmd = mysqladmin_path + " shutdown -uroot " + \
-              " --port=%(port)s" % server_val
+            " --port=%(port)s" % server_val
     if verbosity > 0:
         proc = subprocess.Popen(cmd, shell=True)
     else:
@@ -296,7 +304,7 @@ def _stop_server(server_val, basedir, options={}):
         proc = subprocess.Popen(cmd, shell=True,
                                 stdout=fnull, stderr=fnull)
     # Wait for subprocess to finish
-    res = proc.wait()
+    proc.wait()
     print "done."
 
 
@@ -313,7 +321,7 @@ def _show_running_servers(start=3306, end=3333):
         for process in processes:
             if os.name == "posix":
                 print "#  Process id: %6d, Data path: %s" % \
-                       (int(process[0]), process[1])
+                    (int(process[0]), process[1])
             elif os.name == "nt":
                 print "#  Process id: %6d, Port: %s" % \
                       (int(process[0]), process[1])
@@ -349,12 +357,11 @@ def show_server_info(servers, options):
     Returns tuple ((server information), defaults)
     """
     no_headers = options.get("no_headers", False)
-    format = options.get("format", "grid")
+    fmt = options.get("format", "grid")
     show_defaults = options.get("show_defaults", False)
     basedir = options.get("basedir", None)
     datadir = options.get("datadir", None)
     start = options.get("start", False)
-    verbosity = options.get("verbosity", 0)
     show_servers = options.get("show_servers", 0)
 
     if show_servers:
@@ -372,12 +379,13 @@ def show_server_info(servers, options):
         try:
             test_connect(server, True)
         except UtilError as util_error:
-            if util_error.errmsg.startswith("Server connection values invalid:"):
+            if util_error.errmsg.startswith("Server connection "
+                                            "values invalid:"):
                 raise util_error
             # If we got an exception it may means that the server is offline
             # in that case we will try to turn a clone to extract the info
             # if the user passed the necessary parameters.
-            pattern = ".*?: (.*?)\((.*)\)"
+            pattern = r".*?: (.*?)\((.*)\)"
             res = re.match(pattern, util_error.errmsg, re.S)
             if not res:
                 er = ["error: <%s>" % util_error.errmsg]
@@ -386,7 +394,7 @@ def show_server_info(servers, options):
 
             if (re.search("refused", "".join(er)) or
                re.search("Can't connect to local MySQL server through socket",
-                           "".join(er)) or
+                         "".join(er)) or
                re.search("Can't connect to MySQL server on", "".join(er))):
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
@@ -423,9 +431,9 @@ def show_server_info(servers, options):
         if new_server:
             # Need to stop the server!
             new_server.disconnect()
-            res = _stop_server(server_val, basedir, options)
+            _stop_server(server_val, basedir, options)
 
-    print_list(sys.stdout, format, _COLUMNS, rows, no_headers)
+    print_list(sys.stdout, fmt, _COLUMNS, rows, no_headers)
 
     # Print the default configurations.
     if show_defaults and len(defaults) > 0:

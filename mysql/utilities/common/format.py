@@ -19,8 +19,8 @@
 This module contains helper methods for formatting output.
 
 METHODS
-    format_tabular_list - Format and write row data as a separated-value list or
-                          as a grid layout like mysql client query results
+    format_tabular_list - Format and write row data as a separated-value list
+                          or as a grid layout like mysql client query results
                           Writes to a file specified (e.g. sys.stdout)
 """
 
@@ -28,13 +28,15 @@ import csv
 import os
 import textwrap
 
+
 _MAX_WIDTH = 78
 _TWO_COLUMN_DISPLAY = "{0:{1}}  {2:{3}}"
 
-def _format_col_separator(file, columns, col_widths, quiet=False):
+
+def _format_col_separator(f_out, columns, col_widths, quiet=False):
     """Format a row of the header with column separators
 
-    file[in]           file to print to (e.g. sys.stdout)
+    f_out[in]          file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     col_widths[in]     width of each column
     quiet[in]          if True, do not print
@@ -43,14 +45,15 @@ def _format_col_separator(file, columns, col_widths, quiet=False):
         return
     stop = len(columns)
     for i in range(0, stop):
-        width = int(col_widths[i]+2)
-        file.write('{0}{1:{1}<{2}}'.format("+", "-", width))
-    file.write("+\n")
+        width = int(col_widths[i] + 2)
+        f_out.write('{0}{1:{1}<{2}}'.format("+", "-", width))
+    f_out.write("+\n")
 
-def _format_row_separator(file, columns, col_widths, row, quiet=False):
+
+def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     """Format a row of data with column separators.
 
-    file[in]           file to print to (e.g. sys.stdout)
+    f_out[in]          file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     col_widths[in]     width of each column
     rows[in]           data to print
@@ -59,20 +62,21 @@ def _format_row_separator(file, columns, col_widths, row, quiet=False):
     i = 0
     if len(columns) == 1 and row != columns:
         row = [row]
-    for i, col in enumerate(columns):
+    for i, _ in enumerate(columns):
         if not quiet:
-            file.write("| ")
-        file.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
+            f_out.write("| ")
+        f_out.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
     if not quiet:
-        file.write("|")
-    file.write("\n")
+        f_out.write("|")
+    f_out.write("\n")
 
-def format_tabular_list(file, columns, rows, options={}):
+
+def format_tabular_list(f_out, columns, rows, options=None):
     """Format a list in a pretty grid format.
 
     This method will format and write a list of rows in a grid or ?SV list.
 
-    file[in]           file to print to (e.g. sys.stdout)
+    f_out[in]          file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
     options[in]        options controlling list:
@@ -82,21 +86,22 @@ def format_tabular_list(file, columns, rows, options={}):
         print_footer   if False, do not print footer
         none_to_null   if True converts None values to NULL
     """
-
+    if options is None:
+        options = {}
     print_header = options.get("print_header", True)
     separator = options.get("separator", None)
     quiet = options.get("quiet", False)
     print_footer = options.get("print_footer", True)
     none_to_null = options.get("none_to_null", False)
-    
+
     # do nothing if no rows.
     if len(rows) == 0:
         return
     if separator is not None:
         if os.name == "posix":
-            csv_writer = csv.writer(file, delimiter=separator)
+            csv_writer = csv.writer(f_out, delimiter=separator)
         else:
-            csv_writer = csv.writer(file, delimiter=separator,
+            csv_writer = csv.writer(f_out, delimiter=separator,
                                     lineterminator='\n')
         if print_header:
             csv_writer.writerow(columns)
@@ -110,7 +115,7 @@ def format_tabular_list(file, columns, rows, options={}):
         col_widths = []
         for col in columns:
             size = len(col)
-            col_widths.append(size+1)
+            col_widths.append(size + 1)
 
         stop = len(columns)
         for row in rows:
@@ -127,33 +132,34 @@ def format_tabular_list(file, columns, rows, options={}):
 
         # print header
         if print_header:
-            _format_col_separator(file, columns, col_widths, quiet)
-            _format_row_separator(file, columns, col_widths, columns, quiet)
-        _format_col_separator(file, columns, col_widths, quiet)
+            _format_col_separator(f_out, columns, col_widths, quiet)
+            _format_row_separator(f_out, columns, col_widths, columns, quiet)
+        _format_col_separator(f_out, columns, col_widths, quiet)
         for row in rows:
             if none_to_null:
                 # Convert None values to 'NULL'
                 row = tuple(['NULL' if not val else val for val in row])
                 # Note: list need to be converted to tuple as expected by
                 # next method (to handle single column rows correctly)
-            _format_row_separator(file, columns, col_widths, row, quiet)
+            _format_row_separator(f_out, columns, col_widths, row, quiet)
         if print_footer:
-            _format_col_separator(file, columns, col_widths, quiet)
+            _format_col_separator(f_out, columns, col_widths, quiet)
 
 
-def format_vertical_list(file, columns, rows, options={}):
-    """Format a list in a vertical format.
+def format_vertical_list(f_out, columns, rows, options=None):
+    r"""Format a list in a vertical format.
 
     This method will format and write a list of rows in a vertical format
     similar to the \G format in the mysql monitor.
 
-    file[in]           file to print to (e.g. sys.stdout)
+    f_out[in]          file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
     options[in]        options controlling list:
         none_to_null   if True converts None values to NULL
     """
-
+    if options is None:
+        options = {}
     none_to_null = options.get("none_to_null", False)
 
     # do nothing if no rows.
@@ -170,27 +176,28 @@ def format_vertical_list(file, columns, rows, options={}):
     row_num = 0
     for row in rows:
         row_num += 1
-        file.write('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
-                                                                      row_num,
-                                                                      ' ', 8))
+        f_out.write('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
+                                                                       row_num,
+                                                                       ' ', 8))
         if none_to_null:
             # Convert None values to 'NULL'
             row = ['NULL' if not val else val for val in row]
         for i in range(0, stop):
-            file.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
-                                                row[i]))
+            f_out.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
+                                                 row[i]))
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'
-        file.write("{0} {1}.\n".format(row_num, row_str))
+        f_out.write("{0} {1}.\n".format(row_num, row_str))
 
-def print_list(file, format, columns, rows, no_headers=False, sort=False):
-    """Print a list based on format.
-    
+
+def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False):
+    """Print a list< based on format.
+
     Prints a list of rows in the format chosen. Default is GRID.
 
-    file[in]          file to print to (e.g. sys.stdout)
-    format[in]        Format (GRID, CSV, TAB, VERTICAL)
+    f_out[in]         file to print to (e.g. sys.stdout)
+    fmt[in]           Format (GRID, CSV, TAB, VERTICAL)
     columns[in]       Column headings
     rows[in]          Rows to print
     no_headers[in]    If True, do not print headings (column names)
@@ -200,47 +207,45 @@ def print_list(file, format, columns, rows, no_headers=False, sort=False):
     if sort:
         rows.sort()
     list_options = {
-        'print_header' : not no_headers
+        'print_header': not no_headers
     }
-    if format == "vertical":
-        format_vertical_list(file, columns, rows)
-    elif format == "tab":
+    if fmt == "vertical":
+        format_vertical_list(f_out, columns, rows)
+    elif fmt == "tab":
         list_options['separator'] = '\t'
-        format_tabular_list(file, columns, rows, list_options)
-    elif format == "csv":
+        format_tabular_list(f_out, columns, rows, list_options)
+    elif fmt == "csv":
         list_options['separator'] = ','
-        format_tabular_list(file, columns, rows, list_options)
+        format_tabular_list(f_out, columns, rows, list_options)
     else:  # default to table format
-        format_tabular_list(file, columns, rows, list_options)
+        format_tabular_list(f_out, columns, rows, list_options)
 
 
 def _get_max_key_dict_list(dictionary_list, key, alias_key=None):
     """Get maximum key length for display calculation
-    
+
     dictionary_list[in]   Dictionary to print
     key[in]               Name of the key
     use_alias[in]         If not None, add alias to width too
-    
+
     Returns int - max width of key
     """
     lcal = lambda x: len(str(x or ''))
     dl = dictionary_list
-    tmp = [ (lcal(item[key]), lcal(item.get(alias_key, 0))) for item in dl ]
-    return max([ (x[0]+x[1]+3) if x[1] else x[0] for x in tmp])
+    tmp = [(lcal(item[key]), lcal(item.get(alias_key, 0))) for item in dl]
+    return max([(x[0] + x[1] + 3) if x[1] else x[0] for x in tmp])
 
 
 def print_dictionary_list(column_names, keys, dictionary_list,
                           max_width=_MAX_WIDTH, use_alias=True,
                           show_header=True):
     """Print a multiple-column list with text wrapping
-    
+
     column_names[in]       Column headings
     keys[in]               Keys for dictionary items
     dictionary_list[in]    Dictionary to print (list of)
     max_width[in]          Max width
     use_alias[in]          If True, use keys[2] to print an alias
-    
-
     """
     # max column size for the name
     max_name = _get_max_key_dict_list(dictionary_list, keys[0])
@@ -255,8 +260,8 @@ def print_dictionary_list(column_names, keys, dictionary_list,
     if show_header:
         print(_TWO_COLUMN_DISPLAY.format(column_names[0], max_name,
                                          column_names[1], max_value))
-        print(_TWO_COLUMN_DISPLAY.format('-'*(max_name), max_name,
-                                         '-'*max_value, max_value))
+        print(_TWO_COLUMN_DISPLAY.format('-' * (max_name), max_name,
+                                         '-' * max_value, max_value))
     for item in dictionary_list:
         name = item[keys[0]]
         if len(name) > max_name:
@@ -268,7 +273,7 @@ def print_dictionary_list(column_names, keys, dictionary_list,
             description = ['']
         else:
             description = textwrap.wrap(value, max_value)
-        
+
         if use_alias and len(keys) > 2 and len(item[keys[2]]) > 0:
             name += ' | ' + item[keys[2]]
         print(_TWO_COLUMN_DISPLAY.format(name, max_name,

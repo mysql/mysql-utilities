@@ -30,13 +30,17 @@ import logging
 import os.path
 import sys
 
-from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities import VERSION_FRM
+from mysql.utilities.exception import UtilError, UtilRplError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
-from mysql.utilities.common.options import add_format_option, add_verbosity
-from mysql.utilities.common.options import add_failover_options, add_rpl_user
-from mysql.utilities.common.options import check_server_lists
-from mysql.utilities.common.options import CaseInsensitiveChoicesOption
+from mysql.utilities.common.server import Server, check_hostname_alias
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.topology import parse_failover_connections
+from mysql.utilities.common.options import (UtilitiesParser,
+                                            CaseInsensitiveChoicesOption,
+                                            add_format_option, add_verbosity,
+                                            add_failover_options, add_rpl_user,
+                                            check_server_lists)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
                                              PARSE_ERR_SLAVE_DISCO_REQ,
@@ -45,19 +49,16 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              WARN_OPT_NOT_REQUIRED_ONLY_FOR,
                                              ERROR_SAME_MASTER,
                                              ERROR_MASTER_IN_SLAVES,
-                                             SLAVES, CANDIDATES)
-from mysql.utilities.common.options import UtilitiesParser
-from mysql.utilities.common.server import Server, check_hostname_alias
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.topology import parse_failover_connections
-from mysql.utilities.command.rpl_admin import RplCommands, purge_log
-from mysql.utilities.command.rpl_admin import get_valid_rpl_commands
-from mysql.utilities.command.rpl_admin import get_valid_rpl_command_text
-from mysql.utilities.exception import FormatError
-from mysql.utilities import VERSION_FRM
+                                             SCRIPT_THRESHOLD_WARNING, SLAVES,
+                                             CANDIDATES)
+from mysql.utilities.command.rpl_admin import (RplCommands, purge_log,
+                                               get_valid_rpl_commands,
+                                               get_valid_rpl_command_text)
 
 
 class MyParser(UtilitiesParser):
+    """Custom class to set the epilog.
+    """
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -78,7 +79,8 @@ parser = MyParser(
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=get_valid_rpl_command_text())
+    epilog=get_valid_rpl_command_text()
+)
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
@@ -89,8 +91,9 @@ add_failover_options(parser)
 
 # Connection information for the master
 # Connect information for candidate server for switchover
-parser.add_option("--new-master", action="store", dest="new_master", default=None,
-                  type="string", help="connection information for the "
+parser.add_option("--new-master", action="store", dest="new_master",
+                  default=None, type="string",
+                  help="connection information for the "
                   "slave to be used to replace the master for switchover, "
                   "in the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>]. Valid only with "
@@ -254,8 +257,8 @@ except UtilRplError:
 # Check hostname alias
 if new_master_val:
     if check_hostname_alias(master_val, new_master_val):
-        master = Server({'conn_info' : master_val})
-        new_master = Server({'conn_info' : new_master_val})
+        master = Server({'conn_info': master_val})
+        new_master = Server({'conn_info': new_master_val})
         parser.error(ERROR_SAME_MASTER.format(n_master_host=new_master.host,
                                               n_master_port=new_master.port,
                                               master_host=master.host,
@@ -264,8 +267,8 @@ if new_master_val:
 if master_val:
     for slave_val in slaves_val:
         if check_hostname_alias(master_val, slave_val):
-            master = Server({'conn_info' : master_val})
-            slave = Server({'conn_info' : slave_val})
+            master = Server({'conn_info': master_val})
+            slave = Server({'conn_info': slave_val})
             msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
                                                 master_port=master.port,
                                                 slaves_candidates=SLAVES,
@@ -274,8 +277,8 @@ if master_val:
             parser.error(msg)
     for cand_val in candidates_val:
         if check_hostname_alias(master_val, cand_val):
-            master = Server({'conn_info' : master_val})
-            candidate = Server({'conn_info' : cand_val})
+            master = Server({'conn_info': master_val})
+            candidate = Server({'conn_info': cand_val})
             msg = ERROR_MASTER_IN_SLAVES.format(master_host=master.host,
                                                 master_port=master.port,
                                                 slaves_candidates=CANDIDATES,
@@ -285,25 +288,25 @@ if master_val:
 
 # Create dictionary of options
 options = {
-    'new_master'       : new_master_val,
-    'candidates'       : candidates_val,
-    'ping'             : 3 if opt.ping is None else opt.ping,
-    'format'           : opt.format,
-    'verbosity'        : 0 if opt.verbosity is None else opt.verbosity,
-    'before'           : opt.exec_before,
-    'after'            : opt.exec_after,
-    'force'            : opt.force,
-    'max_position'     : opt.max_position,
-    'max_delay'        : opt.max_delay,
-    'discover'         : opt.discover,
-    'timeout'          : int(opt.timeout),
-    'demote'           : opt.demote,
-    'quiet'            : opt.quiet,
-    'logging'          : opt.log_file is not None,
-    'log_file'         : opt.log_file,
-    'no_health'        : opt.no_health,
-    'rpl_user'         : opt.rpl_user,
-    'script_threshold' : opt.script_threshold,
+    'new_master': new_master_val,
+    'candidates': candidates_val,
+    'ping': 3 if opt.ping is None else opt.ping,
+    'format': opt.format,
+    'verbosity': 0 if opt.verbosity is None else opt.verbosity,
+    'before': opt.exec_before,
+    'after': opt.exec_after,
+    'force': opt.force,
+    'max_position': opt.max_position,
+    'max_delay': opt.max_delay,
+    'discover': opt.discover,
+    'timeout': int(opt.timeout),
+    'demote': opt.demote,
+    'quiet': opt.quiet,
+    'logging': opt.log_file is not None,
+    'log_file': opt.log_file,
+    'no_health': opt.no_health,
+    'rpl_user': opt.rpl_user,
+    'script_threshold': opt.script_threshold,
 }
 
 # If command = HEALTH, turn on --force

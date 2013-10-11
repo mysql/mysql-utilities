@@ -24,20 +24,19 @@ server operations used in multiple utilities.
 import os
 import re
 import socket
-
-import mysql.connector
-import socket
 import string
 import subprocess
 import tempfile
 
+import mysql.connector
+
 from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
-from mysql.utilities.common.tools import delete_directory
-from mysql.utilities.common.tools import execute_script
-from mysql.utilities.common.tools import ping_host
 from mysql.utilities.common.user import User
+from mysql.utilities.common.tools import (delete_directory, execute_script,
+                                          ping_host)
 from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
                                               clean_IPv6, format_IPv6)
+
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
 _AUTOCOMMIT_SET = "SET AUTOCOMMIT = {0}"
@@ -94,7 +93,8 @@ def _print_connection(prefix, conn_info):
     print "# %s on %s: ..." % (prefix, conn_val["host"]),
 
 
-def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
+def get_local_servers(all_proc=False, start=3306, end=3333,
+                      datadir_prefix=None):
     """Check to see if there are any servers running on the local host.
 
     This method attempts to locate all running servers. If provided, it will
@@ -109,7 +109,7 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     For nt, it matches on the port in the range starting_port,
     starting_port + 10.
 
-    all[in]             If True, find all processes else only user processes
+    all_proc[in]        If True, find all processes else only user processes
     start[in]           For Windows/NT systems: Starting port value to search.
                         Default = 3306
     end[in]             For Windows/NT systems: Ending port value to search.
@@ -121,13 +121,13 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
     """
     processes = []
     if os.name == "posix":
-        file = tempfile.TemporaryFile()
-        if all:
-            output = subprocess.call(["ps", "-A"], stdout=file)
+        tmp_file = tempfile.TemporaryFile()
+        if all_proc:
+            subprocess.call(["ps", "-A"], stdout=tmp_file)
         else:
-            output = subprocess.call(["ps", "-f"], stdout=file)
-        file.seek(0)
-        for line in file.readlines():
+            subprocess.call(["ps", "-f"], stdout=tmp_file)
+        tmp_file.seek(0)
+        for line in tmp_file.readlines():
             mysqld_safe = False
             mysqld = False
             datadir = False
@@ -148,7 +148,7 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
             if ((mysqld and datadir) or (mysqld and not grep)) and \
                not mysqld_safe:
                 # If provided, check datadir prefix
-                if all:
+                if all_proc:
                     proc_id = proginfo[0]
                 else:
                     proc_id = proginfo[1]
@@ -159,19 +159,19 @@ def get_local_servers(all=False, start=3306, end=3333, datadir_prefix=None):
                     processes.append((proc_id, datadir_arg[10:]))
     elif os.name == "nt":
         f_out = open("portlist", 'w+')
-        res = execute_script("netstat -anop tcp", "portlist")
+        execute_script("netstat -anop tcp", "portlist")
         f_out = open("portlist", 'r')
         for line in f_out.readlines():
             proginfo = string.split(line)
             if proginfo:
                 # Look for port on either local or foreign address
-                port = proginfo[1][proginfo[1].find(":")+1:]
+                port = proginfo[1][proginfo[1].find(":") + 1:]
                 if proginfo[1][0] == '0' and port.isdigit():
                     if int(port) >= start and int(port) <= end:
                         processes.append((proginfo[4], port))
                         break
                 if len(proginfo) > 2:
-                    port = proginfo[2][proginfo[2].find(":")+1:]
+                    port = proginfo[2][proginfo[2].find(":") + 1:]
                     if port.isdigit() and \
                        int(port) >= int(start) and int(port) <= int(end):
                         processes.append((proginfo[4], port))
@@ -193,8 +193,7 @@ def get_server(name, values, quiet):
 
     Returns Server class instance
     """
-    from mysql.utilities.common.replication import Master
-    from mysql.utilities.common.replication import Slave
+    from mysql.utilities.common.replication import Master, Slave
 
     server_conn = None
 
@@ -203,8 +202,8 @@ def get_server(name, values, quiet):
         _print_connection(name, values)
 
     server_options = {
-        'conn_info' : values,
-        'role'      : name,
+        'conn_info': values,
+        'role': name,
     }
     if name.lower() == 'master':
         server_conn = Master(server_options)
@@ -266,7 +265,7 @@ def get_server_state(server, host, pingtime=3, verbose=False):
     return "DOWN"
 
 
-def connect_servers(src_val, dest_val, options={}):
+def connect_servers(src_val, dest_val, options=None):
     """Connect to a source and destination server.
 
     This method takes two groups of --server=user:password@host:port:socket
@@ -303,7 +302,8 @@ def connect_servers(src_val, dest_val, options={}):
                           if source and destination are same server
             if error, returns (None, None)
     """
-
+    if options is None:
+        options = {}
     quiet = options.get("quiet", False)
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
@@ -315,10 +315,10 @@ def connect_servers(src_val, dest_val, options={}):
     # Get connection dictionaries
     src_dict = get_connection_dictionary(src_val)
     if "]" in src_dict['host']:
-            src_dict['host'] = clean_IPv6(src_dict['host'])
+        src_dict['host'] = clean_IPv6(src_dict['host'])
     dest_dict = get_connection_dictionary(dest_val)
     if dest_dict and "]" in dest_dict['host']:
-            dest_dict['host'] = clean_IPv6(dest_dict['host'])
+        dest_dict['host'] = clean_IPv6(dest_dict['host'])
 
     # Check for uniqueness - dictionary
     if options.get("unique", False) and dest_dict is not None:
@@ -330,7 +330,7 @@ def connect_servers(src_val, dest_val, options={}):
                     (src_dict["host"] == dest_dict["host"])
         if dupes:
             raise UtilError("You must specify two different servers "
-                                 "for the operation.")
+                            "for the operation.")
 
     # If we're cloning so use same server for faster copy
     cloning = dest_dict is None or (src_dict == dest_dict)
@@ -360,7 +360,7 @@ def connect_servers(src_val, dest_val, options={}):
                             "requires version %s or higher." %
                             (dest_name, version))
     elif not quiet and dest_dict is not None and \
-         not isinstance(dest_val, Server):
+            not isinstance(dest_val, Server):
         _print_connection(dest_name, src_dict)
         print "connected."
     return (source, destination)
@@ -391,9 +391,9 @@ def test_connect(conn_info, throw_errors=False):
         raise UtilError("Server connection values invalid: %s." % err.errmsg)
     try:
         conn_options = {
-            'quiet'     : True,
-            'src_name'  : "test",
-            'dest_name' : None,
+            'quiet': True,
+            'src_name': "test",
+            'dest_name': None,
         }
         s = connect_servers(src_val, None, conn_options)
         s[0].disconnect()
@@ -412,8 +412,8 @@ def check_hostname_alias(server1_vals, server2_vals):
 
     Returns bool - true = server1 and server2 are the same host
     """
-    server1 = Server({'conn_info' : server1_vals})
-    server2 = Server({'conn_info' : server2_vals})
+    server1 = Server({'conn_info': server1_vals})
+    server2 = Server({'conn_info': server2_vals})
 
     return (server1.is_alias(server2.host) and
             int(server1.port) == int(server2.port))
@@ -442,19 +442,19 @@ def stop_running_server(server, wait=10, drop=True):
     mysqladmin_client = "mysqladmin"
     if not os.name == "posix":
         mysqladmin_client = "mysqladmin.exe"
-    mysqladmin_path= os.path.normpath(os.path.join(res[0][1], "bin",
-                                               mysqladmin_client))
+    mysqladmin_path = os.path.normpath(os.path.join(res[0][1], "bin",
+                                                    mysqladmin_client))
     if not os.path.exists(mysqladmin_path):
-        mysqladmin_path= os.path.normpath(os.path.join(res[0][1], "client",
-                                                   mysqladmin_client))
+        mysqladmin_path = os.path.normpath(os.path.join(res[0][1], "client",
+                                                        mysqladmin_client))
     if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
-        mysqladmin_path= os.path.normpath(os.path.join(res[0][1],
-                                                   "client/debug",
-                                                   mysqladmin_client))
+        mysqladmin_path = os.path.normpath(os.path.join(res[0][1],
+                                                        "client/debug",
+                                                        mysqladmin_client))
     if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
-        mysqladmin_path= os.path.normpath(os.path.join(res[0][1],
-                                                   "client/release",
-                                                   mysqladmin_client))
+        mysqladmin_path = os.path.normpath(os.path.join(res[0][1],
+                                                        "client/release",
+                                                        mysqladmin_client))
     cmd += mysqladmin_path
     cmd += " shutdown --user=%s --host=%s " % (server.user, server.host)
     if server.passwd:
@@ -473,17 +473,17 @@ def stop_running_server(server, wait=10, drop=True):
         if not row[7] or not row[7].upper().startswith("SHOW PROCESS"):
             try:
                 server.exec_query("KILL CONNECTION %s" % row[0])
-            except UtilDBError: # Ok to ignore KILL failures
+            except UtilDBError:  # Ok to ignore KILL failures
                 pass
 
     # disconnect user
     server.disconnect()
 
     # Stop the server
-    file = os.devnull
-    f_out = open(file, 'w')
+    f_null = os.devnull
+    f_out = open(f_null, 'w')
     proc = subprocess.Popen(cmd, shell=True,
-                            stdout = f_out, stderr = f_out)
+                            stdout=f_out, stderr=f_out)
     ret_val = proc.wait()
     f_out.close()
 
@@ -518,7 +518,7 @@ class Server(object):
         - Read SQL statements from a file and execute
     """
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
         """Constructor
 
         The method accepts one of the following types for options['conn_info']:
@@ -538,7 +538,10 @@ class Server(object):
             charset        Default character set for the connection.
                            (default utf8)
         """
-        assert not options.get("conn_info") == None
+        if options is None:
+            options = {}
+
+        assert not options.get("conn_info") is None
 
         self.verbose = options.get("verbose", False)
         self.db_conn = None
@@ -550,9 +553,9 @@ class Server(object):
             self.host = conn_values["host"]
             self.user = conn_values["user"]
             self.passwd = conn_values["passwd"] \
-                          if "passwd" in conn_values else None
+                if "passwd" in conn_values else None
             self.socket = conn_values["unix_socket"] \
-                          if "unix_socket" in conn_values else None
+                if "unix_socket" in conn_values else None
             self.port = 3306
             if conn_values["port"] is not None:
                 self.port = int(conn_values["port"])
@@ -628,7 +631,7 @@ class Server(object):
                     aliases.append(my_host[0])
                     # socket.gethostbyname_ex() does not work with ipv6
                     if (not my_host[0].count(":") < 1 or
-                        not my_host[0] == "ip6-localhost"):
+                       not my_host[0] == "ip6-localhost"):
                         host_ip = socket.gethostbyname_ex(my_host[0])
                     else:
                         addrinfo = socket.getaddrinfo(my_host[0], None)
@@ -662,7 +665,7 @@ class Server(object):
                     except (socket.gaierror, socket.herror,
                             socket.error) as err:
                         error = err
-                        pass
+
                 if local_ip:
                     host_ip = ([local_ip[0]],
                                [fiveple[4][0] for fiveple in addrinfo],
@@ -774,11 +777,11 @@ class Server(object):
         Returns string - host from server that matches the host_or_ip or
                          None if no match.
         """
-        res = self.exec_query("SELECT host FROM mysql.user WHERE user = '%s' AND '%s' LIKE host " % (user, host_or_ip))
+        res = self.exec_query("SELECT host FROM mysql.user WHERE user = '%s' "
+                              "AND '%s' LIKE host " % (user, host_or_ip))
         if res:
             return res[0][0]
         return None
-
 
     def get_connection_values(self):
         """Return a dictionary of connection values for the server.
@@ -786,8 +789,8 @@ class Server(object):
         Returns dictionary
         """
         conn_vals = {
-            "user"   : self.user,
-            "host"   : self.host
+            "user": self.user,
+            "host": self.host
         }
         if self.passwd:
             conn_vals["passwd"] = self.passwd
@@ -797,7 +800,6 @@ class Server(object):
             conn_vals["port"] = self.port
 
         return conn_vals
-
 
     def connect(self):
         """Connect to server
@@ -815,7 +817,7 @@ class Server(object):
                 'user': self.user,
                 'host': self.host,
                 'port': self.port,
-                }
+            }
             if self.socket and os.name == "posix":
                 parameters['unix_socket'] = self.socket
             if self.passwd and self.passwd != "":
@@ -834,7 +836,6 @@ class Server(object):
         self.connect_error = None
         self.read_only = self.show_server_variable("READ_ONLY")[0][1]
 
-
     def disconnect(self):
         """Disconnect from the server.
         """
@@ -842,7 +843,6 @@ class Server(object):
             self.db_conn.disconnect()
         except:
             pass
-
 
     def get_version(self):
         """Return version number of the server.
@@ -858,7 +858,6 @@ class Server(object):
             pass
 
         return version_str
-
 
     def check_version_compat(self, t_major, t_minor, t_rel):
         """Checks version of the server against requested version.
@@ -883,8 +882,7 @@ class Server(object):
                 return False
         return True
 
-
-    def exec_query(self, query_str, options={}):
+    def exec_query(self, query_str, options=None):
         """Execute a query and return result set
 
         This is the singular method to execute queries. It should be the only
@@ -908,6 +906,8 @@ class Server(object):
 
         Returns result set or cursor
         """
+        if options is None:
+            options = {}
         params = options.get('params', ())
         columns = options.get('columns', False)
         fetch = options.get('fetch', True)
@@ -929,9 +929,9 @@ class Server(object):
 
         try:
             if params == ():
-                res = cur.execute(query_str)
+                cur.execute(query_str)
             else:
-                res = cur.execute(query_str, params)
+                cur.execute(query_str, params)
         except mysql.connector.Error, e:
             cur.close()
             raise UtilDBError("Query failed. " + e.__str__())
@@ -943,13 +943,12 @@ class Server(object):
                 results = cur.fetchall()
             except mysql.connector.errors.InterfaceError, e:
                 if e.msg.lower() == "no result set to fetch from.":
-                    pass # This error means there were no results.
-                else:    # otherwise, re-raise error
+                    pass  # This error means there were no results.
+                else:     # otherwise, re-raise error
                     raise e
 
             if columns:
                 col_headings = cur.column_names
-                stop = len(col_headings)
                 col_names = []
                 for col in col_headings:
                     col_names.append(col)
@@ -970,7 +969,6 @@ class Server(object):
 
         return self.exec_query("SHOW VARIABLES LIKE '%s'" % variable)
 
-
     def get_uuid(self):
         """Return the uuid for this server if it is GTID aware.
 
@@ -981,7 +979,6 @@ class Server(object):
             return res[0][1]
         return None
 
-
     def supports_gtid(self):
         """Determine if server supports GTIDs
 
@@ -990,7 +987,7 @@ class Server(object):
                          'NO' = not supported
         """
         # Check servers for GTID support
-        version_ok = self.check_version_compat(5,6,5)
+        version_ok = self.check_version_compat(5, 6, 5)
         if not version_ok:
             return "NO"
         try:
@@ -999,7 +996,6 @@ class Server(object):
             return "NO"
 
         return res[0][0]
-
 
     def check_gtid_version(self):
         """Determine if server supports latest GTID changes
@@ -1022,7 +1018,6 @@ class Server(object):
             errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
             raise UtilRplError(errors)
 
-
     def check_gtid_executed(self, operation="copy"):
         """Check to see if the gtid_executed variable is clear
 
@@ -1043,7 +1038,6 @@ class Server(object):
                "Once the global gtid_executed value is cleared, you may "
                "retry the {0}.").format(operation)
         raise UtilRplError(err)
-
 
     def get_gtid_status(self):
         """Get the GTID information for the server.
@@ -1067,7 +1061,6 @@ class Server(object):
                      self.exec_query("SELECT @@GLOBAL.GTID_OWNED")[0]]
 
         return gtid_data
-
 
     def check_rpl_user(self, user, host):
         """Check replication user exists and has the correct privileges.
@@ -1112,14 +1105,13 @@ class Server(object):
         _PLUGIN_QUERY = ("SELECT * FROM INFORMATION_SCHEMA.PLUGINS "
                          "WHERE PLUGIN_NAME ")
         res = self.exec_query("".join([_PLUGIN_QUERY, "LIKE ",
-                                        "'%s" % plugin, "%'"]))
+                                       "'%s" % plugin, "%'"]))
         if not res:
             return False
         # Now see if it is active.
         elif res[0][2] != 'ACTIVE':
             return False
         return True
-
 
     def get_all_databases(self):
         """Return a result set containing all databases on the server
@@ -1138,7 +1130,6 @@ class Server(object):
         """
         return self.exec_query(_GET_DATABASES)
 
-
     def get_storage_engines(self):
         """Return list of storage engines on this server.
 
@@ -1151,7 +1142,6 @@ class Server(object):
             ORDER BY engine
         """
         return self.exec_query(_QUERY)
-
 
     def check_storage_engines(self, other_list):
         """Compare storage engines from another server.
@@ -1173,8 +1163,9 @@ class Server(object):
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before check engine lists."
 
-
         def _convert_set_to_list(set_items):
+            """Convert a set to list
+            """
             if len(set_items) > 0:
                 item_list = []
                 for item in set_items:
@@ -1194,7 +1185,6 @@ class Server(object):
 
         return (master_extra, slave_extra)
 
-
     def has_storage_engine(self, target):
         """Check to see if an engine exists and is supported.
 
@@ -1204,7 +1194,7 @@ class Server(object):
                      exist or is not supported/not active/disabled
         """
         if len(target) == 0:
-            return True # This says we will use default engine on the server.
+            return True  # This says we will use default engine on the server.
         if target is not None:
             engines = self.get_storage_engines()
             for engine in engines:
@@ -1212,7 +1202,6 @@ class Server(object):
                    engine[1].upper() in ['YES', 'DEFAULT']:
                     return True
         return False
-
 
     def substitute_engine(self, tbl_name, create_str,
                           new_engine, def_engine, quiet=False):
@@ -1243,11 +1232,11 @@ class Server(object):
             i = create_str.find("ENGINE=")
             if i > 0:
                 j = create_str.find(" ", i)
-                exist_engine = create_str[i+7:j]
+                exist_engine = create_str[i + 7:j]
             else:
                 ## Check if it is a CREATE TABLE LIKE statement
-                is_create_like = (create_str.find("CREATE TABLE {0} "
-                                                  "LIKE".format(tbl_name)) == 0)
+                is_create_like = (create_str.find("CREATE TABLE {0} LIKE"
+                                                  "".format(tbl_name)) == 0)
 
         # Set default engine
         #
@@ -1257,9 +1246,9 @@ class Server(object):
         # engine with the default engine.
         #
         if def_engine is not None and \
-             exist_engine.upper() != def_engine.upper() and \
-             self.has_storage_engine(def_engine) and \
-             self.has_storage_engine(exist_engine):
+                exist_engine.upper() != def_engine.upper() and \
+                self.has_storage_engine(def_engine) and \
+                self.has_storage_engine(exist_engine):
 
             # If no ENGINE= clause present, add it
             if len(exist_engine) == 0:
@@ -1309,7 +1298,6 @@ class Server(object):
                 else:
                     print add_msg % (new_engine, tbl_name)
         return res
-
 
     def get_innodb_stats(self):
         """Return type of InnoDB engine and its version information.
@@ -1379,14 +1367,12 @@ class Server(object):
 
         TODO : Make method read multi-line queries.
         """
-        file = open(input_file)
-        i = 0
+        f_input = open(input_file)
         res = True
         while True:
-            cmd = file.readline()
+            cmd = f_input.readline()
             if not cmd:
                 break
-            i += 1
             res = None
             if len(cmd) > 1:
                 if cmd[0] != '#':
@@ -1396,7 +1382,7 @@ class Server(object):
                         'fetch': False
                     }
                     res = self.exec_query(cmd, query_options)
-        file.close()
+        f_input.close()
         return res
 
     def binlog_enabled(self):
@@ -1410,7 +1396,6 @@ class Server(object):
         if res[0][1] in ("OFF", "0"):
             return False
         return True
-
 
     def toggle_binlog(self, action="disable"):
         """Enable or disable binary logging for the client.
@@ -1427,7 +1412,6 @@ class Server(object):
         elif action.lower() == 'enable':
             self.exec_query("SET SQL_LOG_BIN=1")
 
-
     def foreign_key_checks_enabled(self):
         """Check foreign key status for the connection.
 
@@ -1437,7 +1421,6 @@ class Server(object):
             res = self.show_server_variable("foreign_key_checks")
             self.fkeys = (res is not None) and (res[0][1] == "ON")
         return self.fkeys
-
 
     def disable_foreign_key_checks(self, disable=True):
         """Enable or disable foreign key checks for the connection.
@@ -1453,7 +1436,7 @@ class Server(object):
         elif not self.fkeys:
             value = "ON"
         if value is not None:
-            res = self.exec_query(_FOREIGN_KEY_SET % value, {'fetch':'false'})
+            self.exec_query(_FOREIGN_KEY_SET % value, {'fetch': 'false'})
 
     def autocommit_set(self):
         """Check autocommit status for the connection.
@@ -1509,7 +1492,6 @@ class Server(object):
 
         return int(res[0][1])
 
-
     def get_server_uuid(self):
         """Retrieve the server uuid.
 
@@ -1525,7 +1507,6 @@ class Server(object):
 
         return res[0][1]
 
-
     def get_lctn(self):
         """Get lower_case_table_name setting.
 
@@ -1536,19 +1517,19 @@ class Server(object):
             return res[0][1]
         return None
 
-
-    def get_binary_logs(self, options={}):
+    def get_binary_logs(self, options=None):
         """Return a list of the binary logs.
 
         options[in]        query options
 
         Returns list - binlogs or None if binary logging turned off
         """
+        if options is None:
+            options = {}
         if self.binlog_enabled():
             return self.exec_query("SHOW BINARY LOGS", options)
 
         return None
-
 
     def set_read_only(self, on=False):
         """Turn read only mode on/off
@@ -1561,7 +1542,6 @@ class Server(object):
             return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
                                    "ON" if on else "OFF")
         return None
-
 
     def grant_tables_enabled(self):
         """Check to see if grant tables are enabled

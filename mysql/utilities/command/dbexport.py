@@ -20,11 +20,17 @@ This file contains the export operations that will export object metadata or
 table data.
 """
 
-import re
 import sys
+
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.table import Table
+from mysql.utilities.common.replication import negotiate_rpl_connection
+from mysql.utilities.common.format import (format_tabular_list,
+                                           format_vertical_list)
+
 
 _RPL_COMMANDS, _RPL_FILE = 0, 1
 _RPL_PREFIX = "-- "
@@ -33,16 +39,18 @@ _SESSION_BINLOG_OFF2 = "SET @@SESSION.SQL_LOG_BIN = 0;"
 _SESSION_BINLOG_ON = "SET @@SESSION.SQL_LOG_BIN = @MYSQLUTILS_TEMP_LOG_BIN;"
 _GET_GTID_EXECUTED = "SELECT @@GLOBAL.GTID_EXECUTED"
 _SET_GTID_PURGED = "SET @@GLOBAL.GTID_PURGED = '%s';"
-_GTID_WARNING = "# WARNING: The server supports GTIDs but you have " + \
-    "elected to skip generating the GTID_EXECUTED statement. Please refer " + \
-    "to the MySQL online reference manual for more information about how " + \
-    "to handle GTID enabled servers with backup and restore operations."
-_GTID_BACKUP_WARNING = "# WARNING: A partial export from a server that has " + \
-    "GTIDs enabled will by default include the GTIDs of all transactions, " + \
-    "even those that changed suppressed parts of the database. If you " + \
-    "don't want to generate the GTID statement, use the --skip-gtid " + \
-    "option. To export all databases, use the --all and --export=both " + \
-    "options."
+_GTID_WARNING = ("# WARNING: The server supports GTIDs but you have elected "
+                 "to skip generating the GTID_EXECUTED statement. Please "
+                 "refer to the MySQL online reference manual for more "
+                 "information about how to handle GTID enabled servers with "
+                 "backup and restore operations.")
+_GTID_BACKUP_WARNING = ("# WARNING: A partial export from a server that has "
+                        "GTIDs enabled will by default include the GTIDs of "
+                        "all transactions, even those that changed suppressed "
+                        "parts of the database. If you don't want to generate "
+                        "the GTID statement, use the --skip-gtid option. To "
+                        "export all databases, use the --all and "
+                        "--export=both options.")
 _FKEYS = ("SELECT DISTINCT constraint_schema "
           "FROM INFORMATION_SCHEMA.referential_constraints "
           "WHERE constraint_schema in ({0})")
@@ -69,12 +77,7 @@ def export_metadata(source, src_val, db_list, options):
 
     Returns bool True = success, False = error
     """
-
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.format import format_tabular_list
-    from mysql.utilities.common.format import format_vertical_list
-
-    format = options.get("format", "sql")
+    fmt = options.get("format", "sql")
     no_headers = options.get("no_headers", False)
     column_type = options.get("display", "brief")
     skip_create = options.get("skip_create", False)
@@ -97,11 +100,11 @@ def export_metadata(source, src_val, db_list, options):
         source_db = Database(source, db_name)
         # Make a dictionary of the options
         access_options = {
-            'skip_views'  : skip_views,
-            'skip_procs'  : skip_procs,
-            'skip_funcs'  : skip_funcs,
-            'skip_grants' : skip_grants,
-            'skip_events' : skip_events,
+            'skip_views': skip_views,
+            'skip_procs': skip_procs,
+            'skip_funcs': skip_funcs,
+            'skip_grants': skip_grants,
+            'skip_events': skip_events,
         }
 
         source_db.check_read_access(src_val["user"], src_val["host"],
@@ -121,7 +124,7 @@ def export_metadata(source, src_val, db_list, options):
             print "# Exporting metadata from %s" % db_name
 
         # Perform the extraction
-        if format == "sql":
+        if fmt == "sql":
             db.init()
             # quote database name with backticks
             q_db_name = quote_with_backticks(db_name)
@@ -178,7 +181,7 @@ def export_metadata(source, src_val, db_list, options):
                 objects.append("GRANT")
             for obj_type in objects:
                 sys.stdout.write("# %sS in %s:" % (obj_type, db_name))
-                if format in ('grid', 'vertical'):
+                if fmt in ('grid', 'vertical'):
                     rows = db.get_db_objects(obj_type, column_type, True)
                 else:
                     rows = db.get_db_objects(obj_type, column_type, True, True)
@@ -189,14 +192,14 @@ def export_metadata(source, src_val, db_list, options):
                     # Cannot use print_list here becasue we must manipulate
                     # the behavior of format_tabular_list
                     list_options = {}
-                    if format == "vertical":
+                    if fmt == "vertical":
                         format_vertical_list(sys.stdout, rows[0], rows[1])
-                    elif format == "tab":
+                    elif fmt == "tab":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = '\t'
                         format_tabular_list(sys.stdout, rows[0], rows[1],
                                             list_options)
-                    elif format == "csv":
+                    elif fmt == "csv":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = ','
                         format_tabular_list(sys.stdout, rows[0], rows[1],
@@ -210,7 +213,7 @@ def export_metadata(source, src_val, db_list, options):
     return True
 
 
-def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
+def _export_row(data_rows, cur_table, fmt, single, skip_blobs, first=False,
                 no_headers=False, outfile=None):
     """Export a row
 
@@ -219,7 +222,7 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
 
     datarows[in]       one or more rows for exporting
     cur_table[in]      Table class instance
-    format[in]         desired output format
+    fmt[in]            desired output format
     skip_blobs[in]     if True, skip blob data
     single[in]         if True, generate single INSERT statements (valid
                        only for format=SQL)
@@ -228,17 +231,14 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
     no_headers[in]     if True, do not print headers
     outfile[in]        if is not None, write table data to this file.
     """
-    from mysql.utilities.common.format import format_tabular_list
-    from mysql.utilities.common.format import format_vertical_list
-
     tbl_name = cur_table.tbl_name
     q_db_name = cur_table.q_db_name
     full_name = cur_table.q_table
     list_options = {'none_to_null': True}
     # if outfile is not set, use stdout.
     if outfile is None:
-        outfile = sys.stdout # default file handle
-    if format == 'sql':
+        outfile = sys.stdout  # default file handle
+    if fmt == 'sql':
         if single:
             if single:
                 data = data_rows
@@ -275,16 +275,16 @@ def _export_row(data_rows, cur_table, format, single, skip_blobs, first=False,
 
     # Cannot use print_list here because we must manipulate
     # the behavior of format_tabular_list
-    elif format == "vertical":
+    elif fmt == "vertical":
         format_vertical_list(outfile, cur_table.get_col_names(),
                              data_rows, list_options)
-    elif format == "tab":
+    elif fmt == "tab":
         list_options['print_header'] = first
         list_options['separator'] = '\t'
         list_options['quiet'] = not no_headers
         format_tabular_list(outfile, cur_table.get_col_names(True),
                             data_rows, list_options)
-    elif format == "csv":
+    elif fmt == "csv":
         list_options['print_header'] = first
         list_options['separator'] = ','
         list_options['quiet'] = not no_headers
@@ -315,13 +315,8 @@ def export_data(source, src_val, db_list, options):
 
     Returns bool True = success, False = error
     """
-
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.table import Table
-
-    format = options.get("format", "sql")
+    fmt = options.get("format", "sql")
     no_headers = options.get("no_headers", True)
-    column_type = options.get("display", "brief")
     single = options.get("single", False)
     skip_blobs = options.get("skip_blobs", False)
     quiet = options.get("quiet", False)
@@ -339,18 +334,17 @@ def export_data(source, src_val, db_list, options):
                 db_list.append(row[0])
 
     # Check if database exists and user permissions on source for all databases
-    table_lock_list = []
     table_list = []
     for db_name in db_list:
         source_db = Database(source, db_name)
 
         # Make a dictionary of the options
         access_options = {
-            'skip_views'  : skip_views,
-            'skip_procs'  : skip_procs,
-            'skip_funcs'  : skip_funcs,
-            'skip_grants' : skip_grants,
-            'skip_events' : skip_events,
+            'skip_views': skip_views,
+            'skip_procs': skip_procs,
+            'skip_funcs': skip_funcs,
+            'skip_grants': skip_grants,
+            'skip_events': skip_events,
         }
 
         # Error is source database does not exist
@@ -375,19 +369,19 @@ def export_data(source, src_val, db_list, options):
         q_tbl_name = "%s.%s" % (q_db_name, quote_with_backticks(table[1]))
         if not quiet and old_db != db_name:
             old_db = db_name
-            if format == "sql":
-               print "USE %s;" % q_db_name
+            if fmt == "sql":
+                print "USE %s;" % q_db_name
             print "# Exporting data from %s" % db_name
             if file_per_table:
                 print "# Writing table data to files."
 
         tbl_options = {
-            'verbose'  : False,
-            'get_cols' : True,
-            'quiet'    : quiet
+            'verbose': False,
+            'get_cols': True,
+            'quiet': quiet
         }
         cur_table = Table(source, q_tbl_name, tbl_options)
-        if single and format not in ("sql", "grid", "vertical"):
+        if single and fmt not in ("sql", "grid", "vertical"):
             retrieval_mode = -1
             first = True
         else:
@@ -398,10 +392,10 @@ def export_data(source, src_val, db_list, options):
 
         # switch for writing to files
         if file_per_table:
-            if format == 'sql':
-               file_name = tbl_name + ".sql"
+            if fmt == 'sql':
+                file_name = tbl_name + ".sql"
             else:
-                file_name = tbl_name + ".%s" % format.lower()
+                file_name = tbl_name + ".%s" % fmt.lower()
             outfile = open(file_name, "w")
             outfile.write(message + "\n")
         else:
@@ -409,10 +403,10 @@ def export_data(source, src_val, db_list, options):
             print message
 
         for data_rows in cur_table.retrieve_rows(retrieval_mode):
-            _export_row(data_rows, cur_table, format, single,
+            _export_row(data_rows, cur_table, fmt, single,
                         skip_blobs, first, no_headers, outfile)
             if first:
-               first = False
+                first = False
 
         if file_per_table:
             outfile.close()
@@ -423,7 +417,7 @@ def export_data(source, src_val, db_list, options):
     return True
 
 
-def get_change_master_command(source, options={}):
+def get_change_master_command(source, options=None):
     """Get the CHANGE MASTER command for export or copy of databases
 
     This method creates the replication commands based on the options chosen.
@@ -461,9 +455,8 @@ def get_change_master_command(source, options={}):
 
     Returns tuple - CHANGE MASTER command[s], output file for writing commands
     """
-
-    from mysql.utilities.common.replication import negotiate_rpl_connection
-
+    if options is None:
+        options = {}
     rpl_file = None
     rpl_cmds = []
 
@@ -494,12 +487,10 @@ def get_change_master_command(source, options={}):
 
     # Get change master using this slave's master information
     if rpl_mode in ["slave", "both"]:
-
         if not quiet:
             rpl_cmds.append("# Connecting to the current server's master")
-
-        change_master = negotiate_rpl_connection(source, False, strict, options)
-
+        change_master = negotiate_rpl_connection(source, False, strict,
+                                                 options)
         rpl_cmds.extend(change_master)
 
     return (rpl_cmds, rpl_file)
@@ -528,18 +519,18 @@ def get_gtid_commands(master, options):
              _SET_GTID_PURGED % master_gtids], _SESSION_BINLOG_ON)
 
 
-def write_commands(file, rows, options):
+def write_commands(filename, rows, options):
     """Write commands to file or stdout
 
     This method writes the rows passed to either a file specified in the
     rpl_file option or stdout if no file is specified.
 
-    file[in]           filename to use or None for sys.stdout
+    filename[in        filename to use or None for sys.stdout
     rows[in]           rows to write
     options[in]        replication options
     """
 
-    format = options.get("format", "sql")
+    fmt = options.get("format", "sql")
     rpl_filename = options.get("rpl_file", None)
     quiet = options.get("quiet", False)
     verbosity = options.get("verbosity", 0)
@@ -567,7 +558,7 @@ def write_commands(file, rows, options):
             rpl_file.write("{0}\n".format(row))
         else:
             # Don't make the rpl command prefix for fkey settings
-            if format != 'sql' and not row.startswith("SET FOREIGN"):
+            if fmt != 'sql' and not row.startswith("SET FOREIGN"):
                 prefix_str = _RPL_PREFIX
             rpl_file.write("{0}{1}\n".format(prefix_str, row))
 
@@ -593,22 +584,19 @@ def export_databases(server_values, db_list, options):
     options[in]            option dictionary
                            Must include the skip_* options for copy and export
     """
-
     from mysql.utilities.command.dbcopy import get_copy_lock
-    from mysql.utilities.common.server import connect_servers
 
     fkeys_present = False
     export = options.get("export", "definitions")
     rpl_mode = options.get("rpl_mode", "master")
     quiet = options.get("quiet", False)
-    verbosity = options.get("verbosity", 0)
-    locking = options.get("locking", "snapshot")
-    skip_gtids = options.get("skip_gtid", False) # default is to generate GTIDs
-    skip_fkeys = options.get("skip_fkeys", False) # default: gen fkeys stmts
+    skip_gtids = options.get("skip_gtid", False)  # default is to generate
+                                                  # GTIDs
+    skip_fkeys = options.get("skip_fkeys", False)  # default: gen fkeys stmts
 
     conn_options = {
-        'quiet'     : quiet,
-        'version'   : "5.1.30",
+        'quiet': quiet,
+        'version': "5.1.30",
     }
     servers = connect_servers(server_values, None, conn_options)
     source = servers[0]
@@ -683,7 +671,7 @@ def export_databases(server_values, db_list, options):
     # if --rpl specified, write replication end command
     if rpl_mode:
         write_commands(rpl_info[_RPL_FILE], rpl_info[_RPL_COMMANDS],
-                                options)
+                       options)
         write_commands(rpl_info[_RPL_FILE], ["START SLAVE;"], options)
 
     my_lock.unlock()

@@ -32,21 +32,21 @@ import sys
 
 from datetime import datetime
 
-from mysql.utilities.common import pattern_matching
-
+from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import add_regexp
-from mysql.utilities.common.options import add_format_option_with_extras
-from mysql.utilities.common.options import CaseInsensitiveChoicesOption
-from mysql.utilities.common.options import UtilitiesParser
-from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.command import audit_log
 from mysql.utilities.command.audit_log import AuditLog
-from mysql.utilities import VERSION_FRM
+from mysql.utilities.common import pattern_matching
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_verbosity, add_regexp,
+                                            add_format_option_with_extras,
+                                            CaseInsensitiveChoicesOption,
+                                            UtilitiesParser)
 
 
 class MyParser(UtilitiesParser):
+    """Custom class to set the epilog.
+    """
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -66,7 +66,8 @@ parser = MyParser(
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog="")
+    epilog=""
+)
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
@@ -144,7 +145,8 @@ add_verbosity(parser, False)
 
 
 def exist_search_criteria():
-    # Return true if at least one search criteria is specified
+    """Return true if at least one search criteria is specified.
+    """
     return (opt.users or opt.start_date or opt.end_date or opt.pattern
             or opt.query_type or opt.event_type or opt.status)
 
@@ -204,7 +206,7 @@ if opt.end_date and opt.end_date != "0":
 users = None
 if opt.users:
     users = opt.users.split(",")
-    users = filter(None, users)
+    users = [user for user in users if user]
     if not len(users) > 0:
         parser.error("The value for the option --users is not valid: '"
                      + opt.users + "'")
@@ -214,34 +216,35 @@ query_types = None
 if opt.query_type:
     query_types = opt.query_type.split(",")
     # filter empty values and convert all to lower cases
-    query_types = filter(None, query_types)
-    query_types = map((lambda x: x.lower()), query_types)
+    query_types = [q_type.lower() for q_type in query_types if q_type]
     if not len(query_types) > 0:
         parser.error("The value for the option --query-type is not valid: '"
                      + opt.query_type + "'")
     else:
-        valid_qts = map((lambda x: x.lower()), audit_log.QUERY_TYPES)
+        valid_qts = [q_type.lower() for q_type in audit_log.QUERY_TYPES]
         for qt in query_types:
             if qt not in valid_qts:
                 parser.error("The specified QUERY_TYPE value is not valid: '"
-                     + qt + "'\nSupported values: " + ",".join(valid_qts))
+                             + qt + "'\nSupported values: "
+                             + ",".join(valid_qts))
 
 # Check if the value specified for the --event-type option is valid
 event_types = None
 if opt.event_type:
     # filter empty values and convert all to lower cases
     event_types = opt.event_type.split(",")
-    event_types = filter(None, event_types)
-    event_types = map((lambda x: x.lower()), event_types)
+    event_types = [e_type.lower() for e_type in event_types if e_type]
+
     if not len(event_types) > 0:
         parser.error("The value for the option --event-type is not valid: '"
                      + opt.event_type + "'")
     else:
-        valid_ets = map((lambda x: x.lower()), audit_log.EVENT_TYPES)
+        valid_ets = [e_type.lower() for e_type in audit_log.EVENT_TYPES]
         for et in event_types:
             if et not in valid_ets:
                 parser.error("The specified EVENT_TYPE value is not valid: '"
-                     + et + "'\nSupported values: " + ",".join(valid_ets))
+                             + et + "'\nSupported values: "
+                             + ",".join(valid_ets))
 
 # Check specified pattern
 if opt.use_regexp and not opt.pattern:
@@ -257,7 +260,7 @@ status_list = []
 if opt.status:
     # filter empty values and convert all to integers cases
     status_values = opt.status.split(",")
-    status_values = filter(None, status_values)
+    status_values = [status for status in status_values if status]
     if not len(status_values) > 0:
         parser.error("The value for the option --status is not valid: "
                      "'{0}'.".format(opt.status))

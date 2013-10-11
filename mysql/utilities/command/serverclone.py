@@ -22,14 +22,15 @@ of an existing server.
 
 import getpass
 import os
-import re
 import subprocess
-import sys
 import time
 import shlex
 import shutil
 
-from mysql.utilities.common.tools import check_port_in_use
+from mysql.utilities.common.tools import check_port_in_use, get_tool_path
+from mysql.utilities.common.server import Server
+from mysql.utilities.exception import UtilError
+
 
 def clone_server(conn_val, options):
     """Clone an existing server
@@ -65,11 +66,6 @@ def clone_server(conn_val, options):
       cmd_file[in]        file name to write startup command
       start_timeout[in]   Number of seconds to wait for server to start
     """
-
-    from mysql.utilities.common.server import Server
-    from mysql.utilities.exception import UtilError
-    from mysql.utilities.common.tools import get_tool_path
-
     new_data = os.path.abspath(options.get('new_data', None))
     new_port = options.get('new_port', '3307')
     root_pass = options.get('root_pass', None)
@@ -87,8 +83,8 @@ def clone_server(conn_val, options):
     if conn_val is not None:
         # Try to connect to the MySQL database server.
         server1_options = {
-            'conn_info' : conn_val,
-            'role'      : "source",
+            'conn_info': conn_val,
+            'role': "source",
         }
         server1 = Server(server1_options)
         server1.connect()
@@ -97,7 +93,8 @@ def clone_server(conn_val, options):
                             "hosts.")
 
         if not quiet:
-            print "# Cloning the MySQL server running on %s." % conn_val["host"]
+            print "# Cloning the MySQL server running on %s." % \
+                conn_val["host"]
 
         basedir = ""
         # Get basedir
@@ -126,7 +123,6 @@ def clone_server(conn_val, options):
         except:
             raise UtilError("Unable to create directory '%s'" % new_data)
 
-
     if not quiet:
         print "# Configuring new instance..."
         print "# Locating mysql tools..."
@@ -142,10 +138,10 @@ def clone_server(conn_val, options):
     elif os.path.exists(os.path.join(basedir, "/sql/share/english/")):
         mysql_basedir = os.path.join(mysql_basedir, "/sql/")
     system_tables = get_tool_path(basedir, "mysql_system_tables.sql", False)
-    system_tables_data = get_tool_path(basedir,
-                                        "mysql_system_tables_data.sql", False)
-    test_data_timezone = get_tool_path(basedir,
-                                        "mysql_test_data_timezone.sql", False)
+    system_tables_data = get_tool_path(basedir, "mysql_system_tables_data.sql",
+                                       False)
+    test_data_timezone = get_tool_path(basedir, "mysql_test_data_timezone.sql",
+                                       False)
     help_data = get_tool_path(basedir, "fill_help_tables.sql", False)
 
     if verbosity >= 3 and not quiet:
@@ -182,7 +178,7 @@ def clone_server(conn_val, options):
             line = line.strip()
             # Don't fail when InnoDB is turned off (Bug#16369955) (Ugly hack)
             if (sqlfile == system_tables and
-                "SET @sql_mode_orig==@@SES" in line and innodb_disabled):
+               "SET @sql_mode_orig==@@SES" in line and innodb_disabled):
                 for line in lines:
                     if 'SET SESSION sql_mode=@@sql' in line:
                         break
@@ -196,7 +192,7 @@ def clone_server(conn_val, options):
         "--bootstrap",
         "--datadir={0}".format(new_data),
         "--basedir={0}".format(os.path.abspath(mysql_basedir)),
-        ]
+    ]
     proc = None
     if verbosity >= 1 and not quiet:
         proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
@@ -217,8 +213,8 @@ def clone_server(conn_val, options):
                 pass
         else:
             try:
-                retval = subprocess.Popen("taskkill /F /T /PID %i" % proc.pid,
-                                          shell=True)
+                subprocess.Popen("taskkill /F /T /PID %i" % proc.pid,
+                                 shell=True)
             except:
                 pass
 
@@ -245,7 +241,7 @@ def clone_server(conn_val, options):
         '--server-id={0}'.format(options.get('new_id', 2)),
         '--basedir={0}'.format(mysql_basedir),
         '--socket={0}'.format(os.path.join(new_data, 'mysql.sock')),
-        ])
+    ])
     if user:
         cmd.append('--user={0}'.format(user))
 
@@ -259,7 +255,7 @@ def clone_server(conn_val, options):
                 new_opts = new_opts[9:]
             if new_opts.startswith('"') and new_opts.endswith('"'):
                 cmd.extend(shlex.split(new_opts.strip('"')))
-            elif new_opts.startswith("'")  and new_opts.endswith("'"):
+            elif new_opts.startswith("'") and new_opts.endswith("'"):
                 cmd.extend(shlex.split(new_opts.strip("'")))
             # Special case where there is only 1 option
             elif len(new_opts.split("--")) == 1:
@@ -302,15 +298,15 @@ def clone_server(conn_val, options):
     port_int = int(new_port)
 
     conn = {
-        "user"   : "root",
-        "passwd" : "",
-        "host"   : conn_val["host"] if conn_val is not None else "localhost",
-        "port"   : port_int,
-        "unix_socket" : new_sock
+        "user": "root",
+        "passwd": "",
+        "host": conn_val["host"] if conn_val is not None else "localhost",
+        "port": port_int,
+        "unix_socket": new_sock
     }
     server2_options = {
-        'conn_info' : conn,
-        'role'      : "clone",
+        'conn_info': conn,
+        'role': "clone",
     }
     server2 = Server(server2_options)
 

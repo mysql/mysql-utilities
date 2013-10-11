@@ -29,21 +29,20 @@ check_python_version()
 import os
 import sys
 import time
+
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.dbexport import export_databases
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_regexp
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_skip_options, check_skip_options
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import add_format_option, add_rpl_mode
-from mysql.utilities.common.options import add_all, check_all, add_locking
-from mysql.utilities.common.options import add_rpl_user, check_rpl_options
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_regexp, setup_common_options,
+                                            add_skip_options, check_verbosity,
+                                            check_skip_options, add_verbosity,
+                                            add_format_option, add_rpl_mode,
+                                            add_all, check_all, add_locking,
+                                            add_rpl_user, check_rpl_options)
+from mysql.utilities.common.sql_transform import (remove_backtick_quoting,
+                                                  is_quoted_with_backticks)
 
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbexport "
@@ -56,6 +55,7 @@ _PERMITTED_EXPORTS = ["data", "definitions", "both"]
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
+
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -89,9 +89,9 @@ parser.add_option("-d", "--display", action="store", dest="display",
 # Export mode
 parser.add_option("-e", "--export", action="store", dest="export",
                   default="definitions", help="control the export of either "
-                  "'data' = only the table data for the tables in the database "
-                  "list, 'definitions' = export only the definitions for "
-                  "the objects in the database list, or 'both' = export "
+                  "'data' = only the table data for the tables in the "
+                  "database list, 'definitions' = export only the definitions "
+                  "for the objects in the database list, or 'both' = export "
                   "the metadata followed by the data "
                   "(default: export definitions)", type="choice",
                   choices=_PERMITTED_EXPORTS)
@@ -203,35 +203,35 @@ else:
 
 # Set options for database operations.
 options = {
-    "skip_tables"      : "tables" in skips,
-    "skip_views"       : "views" in skips,
-    "skip_triggers"    : "triggers" in skips,
-    "skip_procs"       : "procedures" in skips,
-    "skip_funcs"       : "functions" in skips,
-    "skip_events"      : "events" in skips,
-    "skip_grants"      : "grants" in skips,
-    "skip_create"      : "create_db" in skips,
-    "skip_data"        : "data" in skips,
-    "skip_blobs"       : opt.skip_blobs,
-    "skip_fkeys"       : opt.skip_fkeys,
-    "format"           : opt.format,
-    "no_headers"       : opt.no_headers,
-    "display"          : opt.display,
-    "single"           : not opt.bulk_import,
-    "quiet"            : opt.quiet,
-    "verbosity"        : opt.verbosity,
-    "debug"            : opt.verbosity >= 3,
-    "file_per_tbl"     : opt.file_per_tbl,
-    "exclude_patterns" : exclude_list,
-    "all"              : opt.all,
-    "use_regexp"       : opt.use_regexp,
-    "locking"          : opt.locking,
-    "rpl_user"         : opt.rpl_user,
-    "rpl_mode"         : opt.rpl_mode,
-    "rpl_file"         : opt.rpl_file,
-    "comment_rpl"      : opt.comment_rpl,
-    "export"           : opt.export,
-    "skip_gtid"        : opt.skip_gtid,
+    "skip_tables": "tables" in skips,
+    "skip_views": "views" in skips,
+    "skip_triggers": "triggers" in skips,
+    "skip_procs": "procedures" in skips,
+    "skip_funcs": "functions" in skips,
+    "skip_events": "events" in skips,
+    "skip_grants": "grants" in skips,
+    "skip_create": "create_db" in skips,
+    "skip_data": "data" in skips,
+    "skip_blobs": opt.skip_blobs,
+    "skip_fkeys": opt.skip_fkeys,
+    "format": opt.format,
+    "no_headers": opt.no_headers,
+    "display": opt.display,
+    "single": not opt.bulk_import,
+    "quiet": opt.quiet,
+    "verbosity": opt.verbosity,
+    "debug": opt.verbosity >= 3,
+    "file_per_tbl": opt.file_per_tbl,
+    "exclude_patterns": exclude_list,
+    "all": opt.all,
+    "use_regexp": opt.use_regexp,
+    "locking": opt.locking,
+    "rpl_user": opt.rpl_user,
+    "rpl_mode": opt.rpl_mode,
+    "rpl_file": opt.rpl_file,
+    "comment_rpl": opt.comment_rpl,
+    "export": opt.export,
+    "skip_gtid": opt.skip_gtid,
 }
 
 # Parse server connection values

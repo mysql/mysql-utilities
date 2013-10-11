@@ -42,7 +42,7 @@ def my_login_config_path():
         return os.path.expanduser('~')
     else:
         # File located in %APPDATA%\MySQL for Windows systems
-        return os.environ['APPDATA'] + '\MySQL'
+        return r'{0}\MySQL'.format(os.environ['APPDATA'])
 
 
 def my_login_config_exists():
@@ -62,7 +62,7 @@ class MyDefaultsReader(object):
     http://dev.mysql.com/doc/en/my-print-defaults.html
     """
 
-    def __init__(self, options={}, find_my_print_defaults_tool=True):
+    def __init__(self, options=None, find_my_print_defaults_tool=True):
         """Constructor
 
         options[in]                 dictionary of options (e.g. basedir). Note,
@@ -72,6 +72,8 @@ class MyDefaultsReader(object):
                                     my_print_defaults should be located upon
                                     initialization of the object.
         """
+        if options is None:
+            options = {}
         # _config_data is a dictionary of option groups containing a dictionary
         # of the options data read from the configuration file.
         self._config_data = {}
@@ -80,13 +82,13 @@ class MyDefaultsReader(object):
         # the case and handle them correctly.
         if isinstance(options, optparse.Values):
             try:
-                self._basedir = options.basedir
+                self._basedir = options.basedir  # pylint: disable=E1103
             except AttributeError:
                 # if the attribute is not found, then set it to None (default).
                 self._basedir = None
             try:
                 # if the attribute is not found, then set it to 0 (default).
-                self._verbosity = options.verbosity
+                self._verbosity = options.verbosity  # pylint: disable=E1103
             except AttributeError:
                 self._verbosity = 0
         else:
@@ -100,11 +102,16 @@ class MyDefaultsReader(object):
 
     @property
     def tool_path(self):
+        """Sets tool_path property
+        """
         return self._tool_path
 
-    def search_my_print_defaults_tool(self, search_paths=[]):
+    def search_my_print_defaults_tool(self, search_paths=None):
         """Search for the tool my_print_defaults.
         """
+        if not search_paths:
+            search_paths = []
+
         # Set the default search paths (i.e., default location of the
         # .mylogin.cnf file).
         default_paths = [my_login_config_path()]

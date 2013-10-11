@@ -30,16 +30,16 @@ check_python_version()
 import os.path
 import sys
 
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.command import userclone
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ
-from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
+                                             WARN_OPT_NOT_REQUIRED)
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             check_verbosity,
                                             setup_common_options)
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
-from mysql.utilities.command import userclone
+
 
 # Constants
 NAME = "MySQL Utilities - mysqluserclone "
@@ -61,14 +61,14 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Connection information for the source server
 parser.add_option("--source", action="store", dest="source",
-                  type = "string", default=None,
+                  type="string", default=None,
                   help="connection information for source server in "
                        "the form: <user>[:<password>]@<host>[:<port>]"
                        "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
-                  type = "string",
+                  type="string",
                   help="connection information for destination server in "
                        "the form: <user>[:<password>]@<host>[:<port>]"
                        "[:<socket>] or <login-path>[:<port>][:<socket>].")
@@ -163,11 +163,11 @@ else:
 
     # Build dictionary of options
     options = {
-        "dump"         : opt.dump,
-        "overwrite"    : opt.overwrite,
-        "quiet"        : opt.quiet,
-        "verbosity"    : opt.verbosity,
-        "global_privs" : opt.global_privs
+        "dump": opt.dump,
+        "overwrite": opt.overwrite,
+        "quiet": opt.quiet,
+        "verbosity": opt.verbosity,
+        "global_privs": opt.global_privs
     }
 
     try:

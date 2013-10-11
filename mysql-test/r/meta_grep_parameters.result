@@ -33,7 +33,7 @@ Options:
                         or vertical format
 Test case 2 - do the SQL for a simple search
 
-SELECT 
+SELECT
   `Object Type`, `Object Name`, `Database`,
   `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
 FROM (
@@ -139,7 +139,7 @@ UNION
   GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
 Test case 3 - do the SQL for a simple search with type
 
-SELECT 
+SELECT
   `Object Type`, `Object Name`, `Database`,
   `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
 FROM (
@@ -157,7 +157,7 @@ FROM (
   GROUP BY `Object Type`, `Database`, `Object Name`, `Field Type`
 Test case 4 - do the SQL for a body search with type (VIEW).
 
-SELECT 
+SELECT
   `Object Type`, `Object Name`, `Database`,
   `Field Type`, GROUP_CONCAT(`Field`) AS `Matches`
 FROM (

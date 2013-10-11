@@ -26,16 +26,18 @@ import os
 import sys
 
 from mysql.utilities import VERSION_FRM
-from mysql.utilities.command.read_frm import read_frm_files
-from mysql.utilities.command.read_frm import read_frm_files_diagnostic
+from mysql.utilities.exception import FormatError, UtilError
+from mysql.utilities.command.read_frm import (read_frm_files,
+                                              read_frm_files_diagnostic)
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import connect_servers
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+
 
 class MyParser(optparse.OptionParser):
+    """Custom class to set the epilog.
+    """
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -160,7 +162,10 @@ parser = MyParser(
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=EXTENDED_HELP)
+    epilog=EXTENDED_HELP
+)
+
+# Add --help option
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:
@@ -270,8 +275,8 @@ if opt.server is not None and not opt.basedir:
 
     try:
         conn_options = {
-            'version'   : "5.1.30",
-            'quiet'     : opt.quiet,
+            'version': "5.1.30",
+            'quiet': opt.quiet,
         }
         servers = connect_servers(source_values, None, conn_options)
     except UtilError as error:
@@ -288,15 +293,15 @@ else:
 
 # Set options for frm operations.
 options = {
-    "basedir"       : basedir,
-    "new_engine"    : opt.new_engine,
-    "show_stats"    : opt.show_stats,
-    "port"          : use_port,
-    "quiet"         : opt.quiet,
-    "server"        : server,
-    "verbosity"     : opt.verbosity if opt.verbosity else 0,
-    "user"          : opt.user,
-    "start_timeout" : opt.start_timeout,
+    "basedir": basedir,
+    "new_engine": opt.new_engine,
+    "show_stats": opt.show_stats,
+    "port": use_port,
+    "quiet": opt.quiet,
+    "server": server,
+    "verbosity": opt.verbosity if opt.verbosity else 0,
+    "user": opt.user,
+    "start_timeout": opt.start_timeout,
 }
 
 # Print disclaimer banner for diagnostic mode

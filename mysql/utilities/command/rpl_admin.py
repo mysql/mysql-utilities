@@ -119,7 +119,7 @@ def purge_log(filename, age):
         log = open(filename, "r")
         log_entries = log.readlines()
         log.close()
-        threshold = datetime.now() -timedelta(days=age)
+        threshold = datetime.now() - timedelta(days=age)
         start = 0
         for row in log_entries:
             # Check age here
@@ -132,12 +132,12 @@ def purge_log(filename, age):
                     return True
                 else:
                     break
-            except Exception, e:
+            except:
                 start += 1    # Remove invalid formatted lines
         log = open(filename, "w")
         log.writelines(log_entries[start:])
         log.close()
-    except Exception, e:
+    except:
         return False
     return True
 
@@ -187,13 +187,15 @@ class RplCommands(object):
             if daemon != "nodetach":
                 sys.stdout = self.stdout_devnull
 
+        self.master = None
         self.master_vals = master_vals
         self.options = options
         self.quiet = self.options.get("quiet", False)
         self.logging = self.options.get("logging", False)
         self.candidates = self.options.get("candidates", None)
-
+        self.verbose = self.options.get("verbose", None)
         self.rpl_user = self.options.get("rpl_user", None)
+
         try:
             self.topology = Topology(master_vals, slave_vals, self.options,
                                      skip_conn_err)
@@ -252,7 +254,7 @@ class RplCommands(object):
               IO_Thread, SQL_Thread, Secs_Behind, Remaining_Delay,
               IO_Error_Num, IO_Error
         """
-        format = self.options.get("format", "grid")
+        fmt = self.options.get("format", "grid")
         quiet = self.options.get("quiet", False)
 
         cols, rows = self.topology.get_health()
@@ -262,7 +264,7 @@ class RplCommands(object):
             print "# Replication Topology Health:"
 
         # Print health report
-        print_list(sys.stdout, format, cols, rows)
+        print_list(sys.stdout, fmt, cols, rows)
 
         return
 
@@ -274,33 +276,34 @@ class RplCommands(object):
         entries, that list is not printed.
         """
         if not self.topology.gtid_enabled():
-            self._report("# WARNING: GTIDs are not supported on this topology.",
-                         logging.WARN)
+            self._report("# WARNING: GTIDs are not supported on this "
+                         "topology.", logging.WARN)
             return
 
-        format = self.options.get("format", "grid")
+        fmt = self.options.get("format", "grid")
 
         # Get UUIDs
         uuids = self.topology.get_server_uuids()
         if len(uuids):
             print "#"
             print "# UUIDS for all servers:"
-            print_list(sys.stdout, format, ['host','port','role','uuid'], uuids)
+            print_list(sys.stdout, fmt, ['host', 'port', 'role', 'uuid'],
+                       uuids)
 
         # Get GTID lists
         executed, purged, owned = self.topology.get_gtid_data()
         if len(executed):
             print "#"
             print "# Transactions executed on the server:"
-            print_list(sys.stdout, format, _GTID_COLS, executed)
+            print_list(sys.stdout, fmt, _GTID_COLS, executed)
         if len(purged):
             print "#"
             print "# Transactions purged from the server:"
-            print_list(sys.stdout, format, _GTID_COLS, purged)
+            print_list(sys.stdout, fmt, _GTID_COLS, purged)
         if len(owned):
             print "#"
             print "# Transactions owned by another server:"
-            print_list(sys.stdout, format, _GTID_COLS, owned)
+            print_list(sys.stdout, fmt, _GTID_COLS, owned)
 
     def _check_host_references(self):
         """Check to see if using all host or all IP addresses
@@ -317,7 +320,7 @@ class RplCommands(object):
                 if host_port:
                     host = host_port[0]
                 if (not host or uses_ip != hostname_is_ip(slave.host) or
-                    uses_ip != hostname_is_ip(host)):
+                   uses_ip != hostname_is_ip(host)):
                     return False
         return True
 
@@ -332,7 +335,7 @@ class RplCommands(object):
         # Check new master is not actual master - need valid candidate
         candidate = self.options.get("new_master", None)
         if (self.topology.master.is_alias(candidate['host']) and
-            self.master_vals['port'] == candidate['port']):
+           self.master_vals['port'] == candidate['port']):
             err_msg = ERROR_SAME_MASTER.format(candidate['host'],
                                                candidate['port'],
                                                self.master_vals['host'],
@@ -358,7 +361,8 @@ class RplCommands(object):
 
         self._report(" ".join(["# Performing switchover from master at",
                      "%s:%s" % (self.master_vals['host'],
-                     self.master_vals['port']), "to slave at %s:%s." %
+                                self.master_vals['port']),
+                               "to slave at %s:%s." %
                      (candidate['host'], candidate['port'])]))
         if not self.topology.switchover(candidate):
             self._report("# Errors found. Switchover aborted.", logging.ERROR)
@@ -398,7 +402,7 @@ class RplCommands(object):
         self._report("# Best slave found is located on %s:%s." %
                      (best_slave['host'], best_slave['port']))
 
-    def _failover(self, strict=False, options={}):
+    def _failover(self, strict=False, options=None):
         """Perform failover
 
         This method executes GTID-enabled failover. If called for a non-GTID
@@ -411,6 +415,8 @@ class RplCommands(object):
 
         Returns bool - True = failover succeeded, False = errors found
         """
+        if options is None:
+            options = {}
         srv_list = self.topology.get_servers_with_gtid_not_on()
         if srv_list:
             print("# ERROR: {0}".format(_GTID_ON_REQ))
@@ -472,7 +478,12 @@ class RplCommands(object):
                 return False
         return True
 
-    def execute_command(self, command, options={}):
+    def check_host_references(self):
+        """Public method to access self.check_host_references()
+        """
+        return self._check_host_references()
+
+    def execute_command(self, command, options=None):
         """Execute a replication admin command
 
         This method executes one of the valid replication administration
@@ -483,6 +494,8 @@ class RplCommands(object):
 
         Returns bool - True = success, raise error on failure
         """
+        if options is None:
+            options = {}
         # Raise error if command is not valid
         if not command in _VALID_COMMANDS:
             msg = "'%s' is not a valid command." % command
@@ -498,7 +511,7 @@ class RplCommands(object):
                   "execute the %s command."
             for error in errors:
                 self._report(msg % (error[0], error[1], command),
-                                    logging.CRITICAL)
+                             logging.CRITICAL)
             raise UtilRplError("Not enough privileges to execute command.")
 
         self._report("Executing %s command..." % command, logging.INFO, False)
@@ -572,10 +585,12 @@ class RplCommands(object):
             print "Failover mode changed to 'FAIL' for this instance. "
             print "Console will start in 10 seconds.",
             sys.stdout.flush()
-            for i in range(0, 9):
+            i = 0
+            while i < 9:
                 time.sleep(1)
                 sys.stdout.write('.')
                 sys.stdout.flush()
+                i += 1
             print "starting Console."
             time.sleep(1)
 
@@ -652,7 +667,6 @@ class RplCommands(object):
         Returns bool - True = success, raises exception on error
         """
         pingtime = self.options.get("pingtime", 3)
-        timeout = int(self.options.get("timeout", 300))
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
         pedantic = self.options.get('pedantic', False)
@@ -716,7 +730,8 @@ class RplCommands(object):
                                    "option.".format(_ERRANT_TNX_ERROR))
 
         self._report("Failover console started.", logging.INFO, False)
-        self._report("Failover mode = %s." % failover_mode, logging.INFO, False)
+        self._report("Failover mode = %s." % failover_mode, logging.INFO,
+                     False)
 
         # Main loop - loop and fire on interval.
         done = False
@@ -728,7 +743,6 @@ class RplCommands(object):
                 old_host = self.master.host
                 old_port = self.master.port
             except:
-                pass
                 old_host = "UNKNOWN"
                 old_port = "UNKNOWN"
 
@@ -789,16 +803,16 @@ class RplCommands(object):
                     self._report("Failover starting in 'elect' mode...")
                     res = self.topology.failover(self.candidates, True)
                 else:
-                    msg = _FAILOVER_ERROR % \
-                          "Master has failed and automatic failover is not enabled. "
+                    msg = _FAILOVER_ERROR % ("Master has failed and automatic "
+                                             "failover is not enabled. ")
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
                     self.topology.run_script(post_fail, False,
                                              [old_host, old_port])
                     raise UtilRplError(msg, _FAILOVER_ERRNO)
                 if not res:
-                    msg = _FAILOVER_ERROR % "An error was encountered " + \
-                          "during failover. "
+                    msg = _FAILOVER_ERROR % ("An error was encountered "
+                                             "during failover. ")
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
                     self.topology.run_script(post_fail, False,
@@ -830,7 +844,7 @@ class RplCommands(object):
 
             # discover slaves if option was specified at startup
             elif self.options.get("discover", None) is not None and \
-                (not first_pass or self.options.get("rediscover", False)):
+                    (not first_pass or self.options.get("rediscover", False)):
                 # Force refresh of health list if new slaves found
                 if self.topology.discover_slaves():
                     console.list_data = None

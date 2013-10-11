@@ -30,6 +30,7 @@ import logging
 from mysql.utilities.common.tools import ping_host, execute_script
 from mysql.utilities.exception import UtilRplError
 
+
 _GTID_LISTS = ["Transactions executed on the servers:",
                "Transactions purged from the servers:",
                "Transactions owned by another server:"]
@@ -86,6 +87,7 @@ class FailoverDaemon(object):
         self.get_health_data = self.rpl.topology.get_health
         self.get_gtid_data = self.rpl.topology.get_gtid_data
         self.get_uuid_data = self.rpl.topology.get_server_uuids
+        self.list_data = None
 
         self.master_gtids = []
         self.report_values = [
@@ -220,7 +222,8 @@ class FailoverDaemon(object):
 
         logging.info("GTID Executed Set: {0}".format(gtid_executed))
 
-    def _log_data(self, title, labels, data):
+    @staticmethod
+    def _log_data(title, labels, data):
         """Helper method to log data.
 
         title[in]     title to log
@@ -278,10 +281,12 @@ class FailoverDaemon(object):
             print("Failover mode changed to 'FAIL' for this instance.")
             print("Daemon will start in 10 seconds.")
             sys.stdout.flush()
-            for i in range(0, 9):
+            i = 0
+            while i < 9:
                 time.sleep(1)
                 sys.stdout.write(".")
                 sys.stdout.flush()
+                i += 1
             print("starting Daemon.")
             # Turn off sys.stdout
             sys.stdout = self.rpl.stdout_devnull
@@ -403,7 +408,7 @@ class FailoverDaemon(object):
             raise UtilRplError(msg)
 
         # Check for mixing IP and hostnames
-        if not self.rpl._check_host_references():
+        if not self.rpl.check_host_references():
             print("# WARNING: {0}".format(_HOST_IP_WARNING))
             self._report(_HOST_IP_WARNING, logging.WARN, False)
             print("#\n# Failover daemon will start in 10 seconds.")
@@ -450,7 +455,6 @@ class FailoverDaemon(object):
                 old_host = self.rpl.master.host
                 old_port = self.rpl.master.port
             except:
-                pass
                 old_host = "UNKNOWN"
                 old_port = "UNKNOWN"
 
@@ -557,7 +561,7 @@ class FailoverDaemon(object):
 
             # discover slaves if option was specified at startup
             elif self.options.get("discover", None) is not None and \
-                 (not first_pass or self.options.get("rediscover", False)):
+                    (not first_pass or self.options.get("rediscover", False)):
                 # Force refresh of health list if new slaves found
                 if self.rpl.topology.discover_slaves():
                     self.list_data = None
@@ -725,7 +729,7 @@ class FailoverDaemon(object):
             try:
                 pid = os.fork()
                 if pid > 0:
-                    os._exit(0)
+                    os._exit(0)  # pylint: disable=W0212
             except OSError as err:
                 msg = "{0}: [{1}] {2}".format(error_message, err.errno,
                                               err.strerror)

@@ -24,10 +24,14 @@ import csv
 
 from itertools import imap
 
-from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
-
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.options import check_engine_options
+from mysql.utilities.common.table import Table
+from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.sql_transform import (quote_with_backticks,
+                                                  is_quoted_with_backticks,
+                                                  to_sql)
 
 
 # List of database objects for enumeration
@@ -43,31 +47,32 @@ _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
 _RPL = len(_RPL_PREFIX)
 _GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", "SET @@SESSION.SQL_LOG_",
-                          "SET @@GLOBAL.GTID_PURG"]
+                  "SET @@GLOBAL.GTID_PURG"]
 _GTID_PREFIX = 22
-_GTID_SKIP_WARNING = "# WARNING: GTID commands are present in the import " + \
-    "file but the server does not support GTIDs. Commands are ignored."
-_GTID_MISSING_WARNING = "# WARNING: GTIDs are enabled on this server but " + \
-    "the import file did not contain any GTID commands."
+_GTID_SKIP_WARNING = ("# WARNING: GTID commands are present in the import "
+                      "file but the server does not support GTIDs. Commands "
+                      "are ignored.")
+_GTID_MISSING_WARNING = ("# WARNING: GTIDs are enabled on this server but the "
+                         "import file did not contain any GTID commands.")
 
 
-def _read_row(file, format, skip_comments=False):
+def _read_row(file_h, fmt, skip_comments=False):
     """Read a row of from the file.
 
     This method reads the file attempting to read and translate the data
     based on the format specified.
 
-    file[in]          Opened file handle
-    format[in]        One of SQL,CSV,TAB,GRID,or VERTICAL
+    file_h[in]        Opened file handle
+    fmt[in]           One of SQL,CSV,TAB,GRID,or VERTICAL
     skip_comments[in] If True, do not return lines starting with '#'
 
     Returns (tuple) - one row of data
     """
 
     warnings_found = []
-    if format == "sql":
+    if fmt == "sql":
         # Easiest - just read a row and return it.
-        for row in file.readlines():
+        for row in file_h.readlines():
             if row.startswith("# WARNING"):
                 warnings_found.append(row)
                 continue
@@ -78,7 +83,7 @@ def _read_row(file, format, skip_comments=False):
                     yield ''  # empty row
                 else:
                     yield row  # do not strip (can be multi-line)
-    elif format == "vertical":
+    elif fmt == "vertical":
         # This format is a bit trickier. We need to read a set of rows that
         # encompass the data row. They will appear in this format:
         #   ****** <header> ******
@@ -93,7 +98,7 @@ def _read_row(file, format, skip_comments=False):
         read_header = False
         header = []
         data_row = []
-        for row in file.readlines():
+        for row in file_h.readlines():
             # Show warnings from file
             if row.startswith("# WARNING"):
                 warnings_found.append(row)
@@ -107,8 +112,7 @@ def _read_row(file, format, skip_comments=False):
                     continue
                 # Check for GTID commands
                 elif len(row) > _GTID_PREFIX + _RPL and \
-                   row[_RPL:_GTID_PREFIX + _RPL] \
-                      in _GTID_COMMANDS:
+                        row[_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                     yield [row.strip('\n')]
                     continue
             # Skip comment rows
@@ -151,8 +155,8 @@ def _read_row(file, format, skip_comments=False):
                 if read_header:
                     header.append(field[0].strip())
                 # strip \n from lines
-                data_row.append(field[1][0:len(field[1])-1].strip())
-            elif len(field) == 4: # date field!
+                data_row.append(field[1][0:len(field[1]) - 1].strip())
+            elif len(field) == 4:  # date field!
                 if read_header:
                     header.append(field[0].strip())
                 date_str = "%s:%s:%s" % (field[1], field[2],
@@ -163,13 +167,13 @@ def _read_row(file, format, skip_comments=False):
     else:
         separator = ","
         # Use CSV reader to read the row
-        if format == "csv":
+        if fmt == "csv":
             separator = ","
-        elif format == "tab":
+        elif fmt == "tab":
             separator = "\t"
-        elif format == "grid":
+        elif fmt == "grid":
             separator = "|"
-        csv_reader = csv.reader(file, delimiter=separator)
+        csv_reader = csv.reader(file_h, delimiter=separator)
         for row in csv_reader:
             # Ignore empty lines
             if not row:
@@ -179,7 +183,8 @@ def _read_row(file, format, skip_comments=False):
                 continue
             # find first word
             if row[0][0:_RPL] == _RPL_PREFIX:
-                first_word = row[0][_RPL:_RPL+row[0][_RPL:].find(' ')].upper()
+                first_word = \
+                    row[0][_RPL:_RPL + row[0][_RPL:].find(' ')].upper()
             else:
                 first_word = ""
             # Process replication commands
@@ -188,26 +193,27 @@ def _read_row(file, format, skip_comments=False):
                     yield row
                 # Check for GTID commands
                 elif len(row[0]) > _GTID_PREFIX + _RPL and \
-                   row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
+                        row[0][_RPL:_GTID_PREFIX + _RPL] in _GTID_COMMANDS:
                     yield row
 
-            elif format == "grid":
+            elif fmt == "grid":
                 if len(row[0]) > 0:
                     if row[0][0] == '+':
                         continue
                     elif (row[0][0] == '#' or row[0][0:2] == "--") and \
-                         not skip_comments:
+                            not skip_comments:
                         yield row
                 else:
                     new_row = []
-                    for col in row[1:len(row)-1]:
+                    for col in row[1:len(row) - 1]:
                         new_row.append(col.strip())
                     yield new_row
             else:
-                if (len(row[0]) == 0 or row[0][0] != '#' or \
-                    row[0][0:2] != "--") or ((row[0][0] == '#' or \
-                    row[0][0:2] == "--") and not skip_comments):
+                if (len(row[0]) == 0 or row[0][0] != '#' or
+                   row[0][0:2] != "--") or ((row[0][0] == '#' or
+                   row[0][0:2] == "--") and not skip_comments):
                     yield row
+
     if warnings_found:
         print "CAUTION: The following %s warning " % len(warnings_found) + \
               "messages were included in the import file:"
@@ -224,7 +230,7 @@ def _check_for_object_list(row, obj_type):
     Returns (bool) - True = object is obj_type
                      False = object is not obj_type
     """
-    if row[0:len(obj_type)+2].upper() == "# %s" % obj_type:
+    if row[0:len(obj_type) + 2].upper() == "# %s" % obj_type:
         if row.find("none found") < 0:
             return True
         else:
@@ -233,7 +239,7 @@ def _check_for_object_list(row, obj_type):
         return False
 
 
-def read_next(file, format, no_headers=False):
+def read_next(file_h, fmt, no_headers=False):
     """Read properly formatted import file and return the statements.
 
     This method reads the next object from the file returning a tuple
@@ -246,8 +252,8 @@ def read_next(file, format, no_headers=False):
     files into lists). This allows the caller to request an object block
     at a time from the file without knowing the format of the file.
 
-    file[in]          Opened file handle
-    format[in]        One of SQL,CSV,TAB,GRID,or VERTICAL
+    file_h[in]        Opened file handle
+    fmt[in]           One of SQL,CSV,TAB,GRID,or VERTICAL
     no_headers[in]    If True, file has headers (we skip them)
 
     Returns (tuple) - ('SQL'|'DATA'|'BEGIN_DATA'|'<object>', <data read>)
@@ -255,9 +261,9 @@ def read_next(file, format, no_headers=False):
     cmd_type = ""
     multiline = False
     delimiter = ';'
-    if format == "sql":
+    if fmt == "sql":
         sql_cmd = ""
-        for row in _read_row(file, "sql", True):
+        for row in _read_row(file_h, "sql", True):
             first_word = row[0:row.find(' ')].upper()  # find first word
             stripped_row = row.strip()  # Avoid repeating strip() operation.
             # Skip these nonsense rows.
@@ -339,23 +345,23 @@ def read_next(file, format, no_headers=False):
         # Remove trailing whitespaces and delimiter from last line.
         sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
         yield (cmd_type, sql_cmd)  # Need last row.
-    elif format == "raw_csv":
-        csv_reader = csv.reader(file, delimiter=",")
+    elif fmt == "raw_csv":
+        csv_reader = csv.reader(file_h, delimiter=",")
         for row in csv_reader:
             if row:
                 yield row
     else:
         found_obj = ""
-        for row in _read_row(file, format, False):
+        for row in _read_row(file_h, fmt, False):
             # find first word
             if row[0][0:_RPL] == _RPL_PREFIX:
-                first_word = row[0][_RPL:_RPL+row[0][_RPL:].find(' ',
-                                                                 _RPL)].upper()
+                first_word = \
+                    row[0][_RPL:_RPL + row[0][_RPL:].find(' ', _RPL)].upper()
             else:
                 first_word = ""
             if row[0][0:_RPL] == _RPL_PREFIX and first_word in _RPL_COMMANDS:
                 # join the parts if CSV or TAB
-                if format in ['csv', 'tab']:
+                if fmt in ['csv', 'tab']:
                     yield("RPL_COMMAND", ", ".join(row).strip("--"))
                 else:
                     yield("RPL_COMMAND", row[0][_RPL:])
@@ -377,9 +383,9 @@ def read_next(file, format, no_headers=False):
                         found_obj = "TABLE_DATA"
                         cmd_type = "DATA"
                         # We have a new table!
-                        str = row[0][len(_DATA_DECORATE)+2:len(row[0])]
-                        str = str.strip()
-                        db_tbl_name = str.strip(":")
+                        name = row[0][len(_DATA_DECORATE) + 2:len(row[0])]
+                        name = name.strip()
+                        db_tbl_name = name.strip(":")
                         yield ("BEGIN_DATA", db_tbl_name)
                     else:
                         found_obj = obj
@@ -393,7 +399,7 @@ def read_next(file, format, no_headers=False):
             else:
                 # We're reading rows here
                 if (len(row[0]) > 0
-                    and (row[0][0] == "#" or row[0][0:2] == "--")):
+                   and (row[0][0] == "#" or row[0][0:2] == "--")):
                     continue
                 else:
                     yield (cmd_type, row)
@@ -415,8 +421,8 @@ def _get_db(row):
             # DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
             # CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
             if (parts[0] in ('DROP', 'CREATE')
-                and parts[1] in ('DATABASE', 'SCHEMA')):
-                db_name = parts[len(parts)-1].rstrip().strip(";")
+               and parts[1] in ('DATABASE', 'SCHEMA')):
+                db_name = parts[len(parts) - 1].rstrip().strip(";")
             # USE db_name
             elif parts[0] == 'USE':
                 db_name = parts[1].rstrip().strip(";")
@@ -426,13 +432,13 @@ def _get_db(row):
             else:
                 if len(row[1][0]) > 0 and \
                    row[1][0].upper() not in ('NONE', 'DEF'):
-                    db_name = row[1][0] # --display=BRIEF
+                    db_name = row[1][0]  # --display=BRIEF
                 else:
-                    db_name = row[1][1] # --display=FULL
+                    db_name = row[1][1]  # --display=FULL
     return db_name
 
 
-def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
+def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
     """Build the CREATE TABLE command for a table.
 
     This method uses the data from the _read_next() method to build a
@@ -446,6 +452,8 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
 
     Returns (string) the CREATE TABLE statement.
     """
+    if col_ref is None:
+        col_ref = {}
     # Quote db_name and tbl_name with backticks if needed
     if not is_quoted_with_backticks(db_name):
         db_name = quote_with_backticks(db_name)
@@ -467,17 +475,18 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
     ref_col_index = col_ref.get("COL_NAME", 13)
     ref_col_ref = col_ref.get("REFERENCED_COLUMN_NAME", 15)
     constraints = []
-    for column in range(0,stop):
+    for column in range(0, stop):
         cur_col = columns[column]
         # Quote column name with backticks if needed
         col_name = cur_col[col_name_index]
         if not is_quoted_with_backticks(col_name):
             col_name = quote_with_backticks(col_name)
         create_str = "%s  %s %s" % (create_str, col_name,
-                                   cur_col[col_type_index])
+                                    cur_col[col_type_index])
         if cur_col[is_null_index].upper() != "YES":
             create_str += " NOT NULL"
-        if len(cur_col[def_index]) > 0 and cur_col[def_index].upper() != "NONE":
+        if len(cur_col[def_index]) > 0 and \
+                cur_col[def_index].upper() != "NONE":
             create_str += " DEFAULT %s" % cur_col[def_index]
         elif cur_col[is_null_index].upper == "YES":
             create_str += " DEFAULT NULL"
@@ -486,7 +495,7 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
                 pri_keys.append(cur_col[col_name_index])
             else:
                 keys.append(cur_col[col_name_index])
-        if column+1 < stop:
+        if column + 1 < stop:
             create_str += ",\n"
     if len(pri_keys) > 0:
         key_list = pri_keys
@@ -503,7 +512,7 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref={}):
     if len(key_str) > 0:
         stop = len(key_list)
         fixed_keys = []
-        for key in range(0,stop):
+        for key in range(0, stop):
             # Quote keys with backticks if needed
             if key_list[key] and not is_quoted_with_backticks(key_list[key]):
                 key_list[key] = quote_with_backticks(key_list[key])
@@ -537,7 +546,7 @@ def _build_column_ref(row):
 
     Returns (dictionary) where dict[col_name] = index position
     """
-    indexes = { }
+    indexes = {}
     i = 0
     for col in row:
         indexes[col.upper()] = i
@@ -568,7 +577,7 @@ def _build_create_objects(obj_type, db, definitions):
     col_ref = {}
     engine = None
     # Now the tricky part.
-    for i in range(0,stop):
+    for i in range(0, stop):
         if skip_header:
             skip_header = False
             col_ref = _build_column_ref(definitions[i])
@@ -576,26 +585,26 @@ def _build_create_objects(obj_type, db, definitions):
         defn = definitions[i]
         # Read engine from first row and save old value.
         old_engine = engine
-        engine = defn[col_ref.get("ENGINE",2)]
+        engine = defn[col_ref.get("ENGINE", 2)]
         create_str = ""
         if obj_type == "TABLE":
             if (obj_db == "" and obj_name == ""):
-                obj_db = defn[col_ref.get("TABLE_SCHEMA",0)]
-                obj_name = defn[col_ref.get("TABLE_NAME",1)]
-            if (obj_db == defn[col_ref.get("TABLE_SCHEMA",0)] and \
-                obj_name == defn[col_ref.get("TABLE_NAME",1)]):
+                obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
+                obj_name = defn[col_ref.get("TABLE_NAME", 1)]
+            if (obj_db == defn[col_ref.get("TABLE_SCHEMA", 0)] and
+               obj_name == defn[col_ref.get("TABLE_NAME", 1)]):
                 col_list.append(defn)
             else:
                 create_str = _build_create_table(obj_db, obj_name,
                                                  old_engine,
                                                  col_list, col_ref)
                 create_strings.append(create_str)
-                obj_db = defn[col_ref.get("TABLE_SCHEMA",0)]
-                obj_name = defn[col_ref.get("TABLE_NAME",1)]
+                obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
+                obj_name = defn[col_ref.get("TABLE_NAME", 1)]
                 col_list = []
                 col_list.append(defn)
             # check for end.
-            if i+1 == stop:
+            if i + 1 == stop:
                 create_str = _build_create_table(obj_db, obj_name,
                                                  engine,
                                                  col_list, col_ref)
@@ -626,26 +635,26 @@ def _build_create_objects(obj_type, db, definitions):
         elif obj_type == "TRIGGER":
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db) \
-                        if not is_quoted_with_backticks(db) else db
+                if not is_quoted_with_backticks(db) else db
 
             if not is_quoted_with_backticks(defn[col_ref.get("TRIGGER_NAME",
                                                              0)]):
-                obj_name = quote_with_backticks(defn[col_ref.get("TRIGGER_NAME",
-                                                                 0)])
+                obj_name = quote_with_backticks(
+                    defn[col_ref.get("TRIGGER_NAME", 0)])
             else:
                 obj_name = defn[col_ref.get("TRIGGER_NAME", 0)]
 
             if not is_quoted_with_backticks(
-                        defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]):
+               defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]):
                 evt_scma = quote_with_backticks(
-                                defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)])
+                    defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)])
             else:
                 evt_scma = defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]
 
             if not is_quoted_with_backticks(
-                        defn[col_ref.get("EVENT_OBJECT_TABLE", 4)]):
+               defn[col_ref.get("EVENT_OBJECT_TABLE", 4)]):
                 evt_tbl = quote_with_backticks(
-                                defn[col_ref.get("EVENT_OBJECT_TABLE", 4)])
+                    defn[col_ref.get("EVENT_OBJECT_TABLE", 4)])
             else:
                 evt_tbl = defn[col_ref.get("EVENT_OBJECT_TABLE", 4)]
 
@@ -670,7 +679,7 @@ def _build_create_objects(obj_type, db, definitions):
         elif obj_type in ("PROCEDURE", "FUNCTION"):
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db) \
-                        if not is_quoted_with_backticks(db) else db
+                if not is_quoted_with_backticks(db) else db
 
             if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)]):
                 obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)])
@@ -696,7 +705,7 @@ def _build_create_objects(obj_type, db, definitions):
         elif obj_type == "EVENT":
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db) \
-                        if not is_quoted_with_backticks(db) else db
+                if not is_quoted_with_backticks(db) else db
 
             if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)]):
                 obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)])
@@ -730,8 +739,8 @@ def _build_create_objects(obj_type, db, definitions):
             try:
                 user, priv, db, tbl = defn[0:4]
             except:
-                raise UtilError("Object data invalid: %s : %s" % \
-                                     (obj_type, defn))
+                raise UtilError("Object data invalid: %s : %s" %
+                                (obj_type, defn))
             if not tbl:
                 tbl = "*"
             elif tbl.upper() == "NONE":
@@ -739,10 +748,9 @@ def _build_create_objects(obj_type, db, definitions):
 
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db) \
-                        if not is_quoted_with_backticks(db) else db
+                if not is_quoted_with_backticks(db) else db
             obj_tbl = quote_with_backticks(tbl) \
-                        if (tbl != '*'
-                            and not is_quoted_with_backticks(tbl)) else tbl
+                if (tbl != '*' and not is_quoted_with_backticks(tbl)) else tbl
 
             # Create GRANT statement
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, obj_db, obj_tbl,
@@ -767,7 +775,6 @@ def _build_col_metadata(obj_type, definitions):
 
     Returns (column_list[(table_name, [(field_name, definition)])])
     """
-    create_strings = []
     skip_header = True
     obj_db = ""
     obj_name = ""
@@ -775,7 +782,7 @@ def _build_col_metadata(obj_type, definitions):
     table_col_list = []
     stop = len(definitions)
     # Now the tricky part.
-    for i in range(0,stop):
+    for i in range(0, stop):
         if skip_header:
             skip_header = False
             continue
@@ -793,7 +800,7 @@ def _build_col_metadata(obj_type, definitions):
                 col_list = []
                 col_list.append((defn[4], defn[5]))
                 # check for end.
-                if i+1 == stop-1:
+                if i + 1 == stop - 1:
                     table_col_list.append((obj_name, col_list))
     return table_col_list
 
@@ -807,10 +814,8 @@ def _build_insert_data(col_names, tbl_name, data):
 
     Returns (string) the INSERT statement.
     """
-    from mysql.utilities.common.sql_transform import to_sql
-
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
-           ") VALUES (" + ','.join(imap(to_sql, data))  + ");"
+           ") VALUES (" + ','.join(imap(to_sql, data)) + ");"
 
 
 def _skip_sql(sql, options):
@@ -870,37 +875,37 @@ def _skip_object(obj_type, options):
 
     Returns (bool) True - skip the object, False - do not skip
     """
-    object = obj_type.upper()
-    if object == "TABLE":
+    obj = obj_type.upper()
+    if obj == "TABLE":
         return options.get("skip_tables", False)
-    elif object == "VIEW":
+    elif obj == "VIEW":
         return options.get("skip_views", False)
-    elif object == "TRIGGER":
+    elif obj == "TRIGGER":
         return options.get("skip_triggers", False)
-    elif object == "PROCEDURE":
+    elif obj == "PROCEDURE":
         return options.get("skip_procs", False)
-    elif object == "FUNCTION":
+    elif obj == "FUNCTION":
         return options.get("skip_funcs", False)
-    elif object == "EVENT":
+    elif obj == "EVENT":
         return options.get("skip_events", False)
-    elif object == "GRANT":
+    elif obj == "GRANT":
         return options.get("skip_grants", False)
-    elif object == "CREATE_DB":
+    elif obj == "CREATE_DB":
         return options.get("skip_create", False)
-    elif object == "DATA":
+    elif obj == "DATA":
         return options.get("skip_data", False)
-    elif object == "BLOB":
+    elif obj == "BLOB":
         return options.get("skip_blobs", False)
     else:
         return False
 
 
-def _exec_statements(statements, destination, format, options, dryrun=False):
+def _exec_statements(statements, destination, fmt, options, dryrun=False):
     """Execute a list of SQL statements
 
     statements[in]    A list of SQL statements to execute
     destination[in]   A connection to the destination server
-    format[in]        Format of import file
+    fmt[in]           Format of import file
     options[in]       Option dictionary containing the --skip_* options
     dryrun[in]        If True, print the SQL statements and do not execute
 
@@ -923,12 +928,12 @@ def _exec_statements(statements, destination, format, options, dryrun=False):
             try:
                 if dryrun:
                     print(st)
-                elif format != "sql" or not _skip_sql(st, options):
-                    res = destination.exec_query(st)
+                elif fmt != "sql" or not _skip_sql(st, options):
+                    destination.exec_query(st)
 
             # Here we capture any exception and raise UtilError to communicate
-            # to the script/user. Since all util errors (exceptions) derive from
-            # Exception, this is safe.
+            # to the script/user. Since all util errors (exceptions) derive
+            # from Exception, this is safe.
             except Exception as err:
                 raise UtilError("Invalid statement:\n{0}"
                                 "\nERROR: {1}".format(st, err.errmsg))
@@ -977,14 +982,9 @@ def import_file(dest_val, file_name, options):
 
     Returns bool True = success, False = error
     """
-
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.options import check_engine_options
-    from mysql.utilities.common.table import Table
-    from mysql.utilities.common.server import connect_servers
-
-    # Helper method to dig through the definitions for create statements
     def _process_definitions(statements, table_col_list, db_name):
+        """Helper method to dig through the definitions for create statements
+        """
         # First, get the SQL strings
         sql_strs = _build_create_objects(obj_type, db_name, definitions)
         statements.extend(sql_strs)
@@ -995,8 +995,9 @@ def import_file(dest_val, file_name, options):
 
     def _process_data(tbl_name, statements, columns, table_col_list,
                       table_rows, skip_blobs, use_columns_names=False):
-        # if there is data here, build bulk inserts
-        # First, create table reference, then call insert_rows()
+        """Process data: If there is data here, build bulk inserts
+        First, create table reference, then call insert_rows()
+        """
         tbl = Table(destination, tbl_name)
         # Need to check to see if table exists!
         if tbl.exists():
@@ -1018,7 +1019,7 @@ def import_file(dest_val, file_name, options):
             col_meta = _get_column_metadata(tbl, fix_cols)
         if not col_meta:
             raise UtilError("Cannot build bulk insert statements without "
-                                 "the table definition.")
+                            "the table definition.")
         columns_names = columns[:] if use_columns_names else None
         ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name,
                                         columns_names)
@@ -1029,7 +1030,7 @@ def import_file(dest_val, file_name, options):
                 statements.append(update)
 
     # Gather options
-    format = options.get("format", "sql")
+    fmt = options.get("format", "sql")
     no_headers = options.get("no_headers", False)
     quiet = options.get("quiet", False)
     import_type = options.get("import_type", "definitions")
@@ -1041,8 +1042,8 @@ def import_file(dest_val, file_name, options):
 
     # Attempt to connect to the destination server
     conn_options = {
-        'quiet'     : quiet,
-        'version'   : "5.1.30",
+        'quiet': quiet,
+        'version': "5.1.30",
     }
     servers = connect_servers(dest_val, None, conn_options)
 
@@ -1056,19 +1057,19 @@ def import_file(dest_val, file_name, options):
 
     if not quiet:
         if import_type == "both":
-            str = "definitions and data"
+            text = "definitions and data"
         else:
-            str = import_type
-        print "# Importing %s from %s." % (str, file_name)
+            text = import_type
+        print "# Importing %s from %s." % (text, file_name)
 
     # Setup variables we will need
     skip_header = not no_headers
-    if format == "sql":
+    if fmt == "sql":
         skip_header = False
     get_db = True
     check_privileges = True
     db_name = None
-    file = open(file_name)
+    file_h = open(file_name)
     columns = []
     read_columns = False
     has_data = False
@@ -1085,7 +1086,7 @@ def import_file(dest_val, file_name, options):
     skip_gtid_warning_printed = False
     gtid_version_checked = False
 
-    if format == "raw_csv":
+    if fmt == "raw_csv":
         # Use the first row as columns
         read_columns = True
 
@@ -1119,9 +1120,9 @@ def import_file(dest_val, file_name, options):
             raise UtilDBError("The table does not exist: {0}".format(table))
 
     # Read the file one object/definition group at a time
-    for row in read_next(file, format):
+    for row in read_next(file_h, fmt):
         # Check if --format=raw_csv
-        if format == "raw_csv":
+        if fmt == "raw_csv":
             if read_columns:
                 # Use the first row as columns names
                 columns = row[:]
@@ -1174,7 +1175,7 @@ def import_file(dest_val, file_name, options):
                     statements.append("DROP DATABASE IF EXISTS %s;" % db_name)
                 if import_type != "data":
                     if not _skip_object("CREATE_DB", options) and \
-                       not format == 'sql':
+                       not fmt == 'sql':
                         statements.append("CREATE DATABASE %s;" % db_name)
 
         # This is the first time through the loop so we must
@@ -1191,12 +1192,12 @@ def import_file(dest_val, file_name, options):
 
         # Now check to see if we want definitions, data, or both:
         if row[0] == "sql" or row[0] in _DEFINITION_LIST:
-            if format != "sql" and len(row[1]) == 1:
+            if fmt != "sql" and len(row[1]) == 1:
                 raise UtilError("Cannot read an import file generated with "
                                 "--display=NAMES")
 
             if import_type in ("definitions", "both"):
-                if format == "sql":
+                if fmt == "sql":
                     statements.append(row[1])
                 else:
                     if obj_type == "":
@@ -1218,7 +1219,7 @@ def import_file(dest_val, file_name, options):
             if import_type in ("data", "both"):
                 if _skip_object("DATA", options):
                     continue  # skip data
-                elif format == "sql":
+                elif fmt == "sql":
                     statements.append(row[1])
                     has_data = True
                 else:
@@ -1232,7 +1233,7 @@ def import_file(dest_val, file_name, options):
                         read_columns = True
                         tbl_name = row[1]
                         if not is_quoted_with_backticks(tbl_name):
-                            db, sep, tbl = tbl_name.partition('.')
+                            db, _, tbl = tbl_name.partition('.')
                             q_db = quote_with_backticks(db)
                             q_tbl = quote_with_backticks(tbl)
                             tbl_name = ".".join([q_db, q_tbl])
@@ -1249,9 +1250,9 @@ def import_file(dest_val, file_name, options):
                                 table_rows.append(data)
                                 has_data = True
                             else:
-                                str = _build_insert_data(columns, tbl_name,
-                                                         row[1])
-                                statements.append(str)
+                                text = _build_insert_data(columns, tbl_name,
+                                                          row[1])
+                                statements.append(text)
 
                                 has_data = True
 
@@ -1268,9 +1269,9 @@ def import_file(dest_val, file_name, options):
         print("# WARNING: No data was found.")
 
     # Now process the statements
-    _exec_statements(statements, destination, format, options, dryrun)
+    _exec_statements(statements, destination, fmt, options, dryrun)
 
-    file.close()
+    file_h.close()
 
     # Check gtid process
     if supports_gtid and not gtid_command_found:

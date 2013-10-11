@@ -20,11 +20,17 @@ This module contains an abstraction of a topolgy map object used to discover
 slaves and down-stream replicants for mapping topologies.
 """
 
+import getpass
+
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Slave
+from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.user import User
 from mysql.utilities.exception import UtilError
 
+
 _START_PORT = 3306
+
 
 class TopologyMap(object):
     """The TopologyMap class can be used to connect to a running MySQL server
@@ -32,19 +38,20 @@ class TopologyMap(object):
     class to discover a replication topology by finding the slaves for each
     slave for the first master requested.
 
-    To generate a topology map, the caller must call the generate_topology_map()
-    method to build the topology. This is left as a separate state because it
-    can be a lengthy process thereby too long for a constructor method.
- 
+    To generate a topology map, the caller must call the
+    generate_topology_map() method to build the topology. This is left as a
+    separate state because it can be a lengthy process thereby too long for a
+    constructor method.
+
     The class also includes methods for printing a graph of the topology
     as well as returning a list of master, slave tuples reporting the
     host name and port for each.
     """
 
-    def __init__(self, seed_server, options={}):
+    def __init__(self, seed_server, options=None):
         """Constructor
 
-        seed_server[in]    Master (seed) server connection dictionary                           
+        seed_server[in]    Master (seed) server connection dictionary
         options[in]        options for controlling behavior:
           recurse          If True, check each slave found for add'l slaves
                            Default = False
@@ -58,8 +65,8 @@ class TopologyMap(object):
           num_retries      Number of times to retry a failed connection attempt
                            Default = 0
         """
-        from mysql.utilities.common.server import get_connection_dictionary
-        
+        if options is None:
+            options = {}
         self.recurse = options.get("recurse", False)
         self.quiet = options.get("quiet", False)
         self.prompt_user = options.get("prompt", False)
@@ -70,46 +77,40 @@ class TopologyMap(object):
         self.topology = []
         self.options = options
 
-
     def _connect(self, conn):
         """Find the attached slaves for a list of server connections.
-        
-        This method connects to each server in the list and retrieves its slaves.
+
+        This method connects to each server in the list and retrieves its
+        slaves.
         It can be called recursively if the recurse parameter is True.
-        
+
         conn[in]           Connection dictionary used to connect to server
-    
+
         Returns tuple - master Server class instance, master:host string
         """
-        import getpass
-        
-        from mysql.utilities.common.server import connect_servers
-    
         conn_options = {
-            'quiet'     : self.quiet,
-            'src_name'  : "master",
-            'dest_name' : None,
-            'version'   : "5.0.0",
-            'unique'    : True,
+            'quiet': self.quiet,
+            'src_name': "master",
+            'dest_name': None,
+            'version': "5.0.0",
+            'unique': True,
         }
 
         master_info = "%s:%s" % (conn['host'],
                                  conn['port'])
         master = None
-        
+
         # Clear socket if used with a local server
-        if (conn['host'] == 'localhost' or 
-            conn['host'] == "127.0.0.1" or
-            conn['host'] == "::1" or
-            conn['host'] == "[::1]"):
+        if (conn['host'] == 'localhost' or conn['host'] == "127.0.0.1" or
+           conn['host'] == "::1" or conn['host'] == "[::1]"):
             conn['unix_socket'] = None
-        
+
         # Increment num_retries if not set when --prompt is used
         if self.prompt_user and self.num_retries == 0:
             self.num_retries += 1
-    
+
         # Attempt to connect to the server given the retry limit
-        for i in range(0,self.num_retries+1):
+        for i in range(0, self.num_retries + 1):
             try:
                 servers = connect_servers(conn, None, conn_options)
                 master = servers[0]
@@ -118,28 +119,26 @@ class TopologyMap(object):
                 print "FAILED.\n"
                 if i < self.num_retries and self.prompt_user:
                     print "Connection to %s has failed.\n" % master_info + \
-                    "Please enter the following information " + \
-                    "to connect to this server."
+                        "Please enter the following information " + \
+                        "to connect to this server."
                     conn['user'] = raw_input("User name: ")
                     conn['passwd'] = getpass.getpass("Password: ")
                 else:
                     # retries expired - re-raise error if still failing
                     raise UtilError(e.errmsg)
-    
+
         return (master, master_info)
-    
-    
-    def _check_permissions(self, server, priv):
+
+    @staticmethod
+    def _check_permissions(server, priv):
         """Check to see if user has permissions to execute.
-        
+
         server[in]     Server class instance
         priv[in]       privilege to check
-        
+
         Returns True if permissions available, raises exception if not
         """
-        from mysql.utilities.common.user import User
-
-        # Check user permissions 
+        # Check user permissions
         user_pass_host = server.user
         if server.passwd is not None and len(server.passwd) > 0:
             user_pass_host += ":" + server.passwd
@@ -149,7 +148,7 @@ class TopologyMap(object):
             raise UtilError("Not enough permissions. The user must have the "
                             "%s privilege." % priv)
 
-    def _get_slaves(self, max_depth, seed_conn=None, masters_found=[]):
+    def _get_slaves(self, max_depth, seed_conn=None, masters_found=None):
         """Find the attached slaves for a list of server connections.
 
         This method connects to each server in the list and retrieves its
@@ -166,6 +165,8 @@ class TopologyMap(object):
 
         Returns list - list of slaves connected to each server in list
         """
+        if not masters_found:
+            masters_found = []
         topology = []
         if seed_conn is None:
             seed_conn = self.seed_server
@@ -174,7 +175,7 @@ class TopologyMap(object):
         if master is None:
             return []
 
-        # Check user permissions 
+        # Check user permissions
         self._check_permissions(master, "REPLICATION SLAVE")
 
         # Save the master for circular replication identification
@@ -250,10 +251,9 @@ class TopologyMap(object):
 
         return topology
 
-
     def generate_topology_map(self, max_depth):
         """Find the attached slaves for a list of server connections.
-        
+
         This method generates the topology for the seed server specified at
         instantiation.
 
@@ -261,23 +261,21 @@ class TopologyMap(object):
         """
         self.topology = self._get_slaves(max_depth)
 
-
     def depth(self):
         """Return depth of the topology tree.
-        
+
         Returns int - depth of topology tree.
         """
         return len(self.topology)
 
-
     def slaves_found(self):
         """Check to see if any slaves were found.
-        
+
         Returns bool - True if slaves found, False if no slaves.
         """
         return not (len(self.topology) and self.topology[0][1] == [])
 
-    def print_graph(self, topology_list=[], masters_found=[],
+    def print_graph(self, topology_list=None, masters_found=None,
                     level=0, preamble=""):
         """Prints a graph of the topology map to standard output.
 
@@ -295,6 +293,10 @@ class TopologyMap(object):
                             set of slaves found in topology
         preamble[in]        prefix calculated during recursion to indent text
         """
+        if not topology_list:
+            topology_list = []
+        if not masters_found:
+            masters_found = []
         # if first iteration, use the topology list generated earlier
         if topology_list == []:
             if self.topology == []:
@@ -339,7 +341,8 @@ class TopologyMap(object):
                         # This should never happened... (done to avoid crash)
                         t_status = " [IO: ??, SQL: ??]"
 
-                print "{0}+--- {1}{2}".format(new_preamble, slave[0], t_status),
+                print "{0}+--- {1}{2}".format(new_preamble, slave[0],
+                                              t_status),
 
                 if (slave[0] in masters_found):
                     print "<-->",
@@ -357,9 +360,9 @@ class TopologyMap(object):
 
     def _get_row(self, topology_list):
         """Get a row (master, slave) for the topology map.
-        
+
         topology_list[in]  The topology list
-        
+
         Returns tuple - a row (master, slave)
         """
         new_row = []
@@ -376,14 +379,12 @@ class TopologyMap(object):
             new_row.extend(self._get_row(new_slave))
         return new_row
 
-
     def get_topology_map(self):
         """Get a list of the topology map suitable for export
-        
+
         Returns list - a list of masters and their slaves in two columns
         """
         # Get a row for the list
         # make a list from the topology
         master_slaves = [self._get_row(row) for row in self.topology]
         return master_slaves[0]
-

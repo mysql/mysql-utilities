@@ -16,6 +16,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+This file contains the procgrep utility which allows users to search process
+information.
+"""
+
 from mysql.utilities.common.tools import check_python_version
 
 # Check Python version compatibility
@@ -24,22 +29,18 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.command.proc import KILL_CONNECTION
-from mysql.utilities.command.proc import KILL_QUERY
-from mysql.utilities.command.proc import PRINT_PROCESS
-from mysql.utilities.command.proc import (ID, USER, HOST, DB, COMMAND, INFO,
-                                          STATE)
-from mysql.utilities.command.proc import ProcessGrep
-
 from mysql.utilities.exception import EmptyResultError
-from mysql.utilities.common.options import add_regexp
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import add_format_option
+from mysql.utilities.command.proc import (ProcessGrep, KILL_CONNECTION,
+                                          KILL_QUERY, PRINT_PROCESS, ID, USER,
+                                          HOST, DB, COMMAND, INFO, STATE)
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_regexp, setup_common_options,
+                                            add_verbosity, add_format_option)
 
 
 def add_pattern(option, opt, value, parser, field):
+    """Callback used in optparse for the --match-<pattern> option.
+    """
     entry = (field, value)
     try:
         getattr(parser.values, option.dest).append(entry)
@@ -61,26 +62,33 @@ add_regexp(parser)
 parser.add_option(
     "-Q", "--print-sql", "--sql",
     dest="print_sql", action="store_true", default=False,
-    help="print the statement instead of sending it to the server. If a kill option is submitted, a procedure will be generated containing the code for executing the kill.")
+    help="print the statement instead of sending it to the server. If a kill "
+    "option is submitted, a procedure will be generated containing the code "
+    "for executing the kill."
+)
 parser.add_option(
     "--sql-body",
     dest="sql_body", action="store_true", default=False,
-    help="only print the body of the procedure.")
+    help="only print the body of the procedure."
+)
 parser.add_option(
     "--kill-connection",
     action="append_const", const=KILL_CONNECTION,
     dest="actions", default=[],
-    help="kill all matching connections.")
+    help="kill all matching connections."
+)
 parser.add_option(
     "--kill-query",
     action="append_const", const=KILL_QUERY,
     dest="actions", default=[],
-    help="kill query for all matching processes.")
+    help="kill query for all matching processes."
+)
 parser.add_option(
     "--print",
     action="append_const", const=PRINT_PROCESS,
     dest="actions", default=[],
-    help="print all matching processes.")
+    help="print all matching processes."
+)
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
@@ -95,13 +103,15 @@ for col in (ID, USER, HOST, DB, COMMAND, INFO, STATE):
         "--match-" + col.lower(),
         action="callback", callback=add_pattern, callback_args=(col,),
         dest="matches", type="string", metavar="PATTERN", default=[],
-        help="match the '{0}' column of the PROCESSLIST table.".format(col))
+        help="match the '{0}' column of the PROCESSLIST table.".format(col)
+    )
 
 parser.add_option(
     "--age",
     dest="age", default=None,
     help="show only processes that have been in the current state more than "
-         "a given time.")
+         "a given time."
+)
 
 (options, args) = parser.parse_args()
 
@@ -109,10 +119,14 @@ parser.add_option(
 if options.sql_body:
     options.print_sql = True
 
-if (options.server is None or len(options.server) == 0) and not options.print_sql:
-    parser.error("You need at least one server if you're not using the --sql option")
-elif options.server is not None and len(options.server) > 0 and options.print_sql:
-    parser.error("You should not include servers in the call if you are using the --sql option")
+if (options.server is None or len(options.server) == 0) \
+        and not options.print_sql:
+    parser.error("You need at least one server if you're not using the --sql "
+                 "option")
+elif options.server is not None and len(options.server) > 0 \
+        and options.print_sql:
+    parser.error("You should not include servers in the call if you are using "
+                 "the --sql option")
 
 # If no option was supplied, we print the processes by default
 if len(options.actions) == 0:

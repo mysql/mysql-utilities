@@ -36,41 +36,42 @@ from mysql.utilities.exception import UtilError
 _MAX_WIDTH = 78
 
 # These utilities should not be used with the console
-_EXCLUDE_UTILS = ['mysqluc',]
+_EXCLUDE_UTILS = ['mysqluc', ]
 
 RE_USAGE = (
-    "(?P<Version>.*?)"
-    "(?P<Usage>Usage:\s.*?)\w+\s\-\s"  # This match first
+    r"(?P<Version>.*?)"
+    r"(?P<Usage>Usage:\s.*?)\w+\s\-\s"  # This match first
     # section <Usage> matching all till find a " - "
-    "(?P<Description>.*?)"  # Description is the text next
+    r"(?P<Description>.*?)"  # Description is the text next
     # to " - " and till next match.
-    "(?P<O>\w*):"  # This is beginning of Options section
-    "(?P<Options>.*(?=^Introduction.\-{12})|.*$)"
+    r"(?P<O>\w*):"  # This is beginning of Options section
+    r"(?P<Options>.*(?=^Introduction.\-{12})|.*$)"
     # match Options till end or till find Introduction -.
-    "(?:^Introduction.\-{12}){0,1}"  # not catching group
-    "(?P<Introduction>.*(?=^Helpful\sHints.\-{13})|.*$)"
+    r"(?:^Introduction.\-{12}){0,1}"  # not catching group
+    r"(?P<Introduction>.*(?=^Helpful\sHints.\-{13})|.*$)"
     # captures Introduction (optional)
     # it will match Introduction till end or till Hints -
-    "(?:^Helpful\sHints.\-{13}){0,1}"  # Not catching group
-    "(?P<Helpful_Hints>.*)"
+    r"(?:^Helpful\sHints.\-{13}){0,1}"  # Not catching group
+    r"(?P<Helpful_Hints>.*)"
     # captures Helpful Hints (optional)
 )
 
 RE_OPTIONS = (
-    "^(?P<Alias>\s\s\-.*?)\s{2,}"  # Option Alias
+    r"^(?P<Alias>\s\s\-.*?)\s{2,}"  # Option Alias
     # followed by 2 o more spaces is his description
-    "(?P<Desc>.*?)(?=^\s\s\-)"  # description is all
+    r"(?P<Desc>.*?)(?=^\s\s\-)"  # description is all
     # text till not found other alias in the form
     # <-|--Alias> at the begin of the line.
 )
 
-RE_OPTION = "\s+\-\-(.*?)\s"  # match Alias of the form <--Alias>
+RE_OPTION = r"\s+\-\-(.*?)\s"  # match Alias of the form <--Alias>
 
-RE_ALIAS = "\s+\-(\w+)\s*"  # match Alias of the form <-Alias>
+RE_ALIAS = r"\s+\-(\w+)\s*"  # match Alias of the form <-Alias>
 
 WARNING_FAIL_TO_READ_OPTIONS = ("WARNING: {0} failed to read options."
-    " This utility will not be shown in 'help utilities' and cannot be "
-    "accessed from the console.")
+                                " This utility will not be shown in 'help "
+                                "utilities' and cannot be accessed from the "
+                                "console.")
 
 
 def get_util_path(default_path=''):
@@ -85,6 +86,8 @@ def get_util_path(default_path=''):
     Returns string - path to utilities or None if not found
     """
     def _search_paths(needles, paths):
+        """Search and return normalized path
+        """
         for path in paths:
             norm_path = os.path.normpath(path)
             hay_stack = [os.path.join(norm_path, n) for n in needles]
@@ -146,10 +149,11 @@ class Utilities(object):
                                 description of each option
     """
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
         """Constructor
         """
-
+        if options is None:
+            options = {}
         self.util_list = []
         self.width = options.get('width', _MAX_WIDTH)
         self.util_path = get_util_path(options.get('utildir', ''))
@@ -193,7 +197,8 @@ class Utilities(object):
                     continue
             self._find_utility_cmd(util_name)
 
-    def find_executable(self, util_name):
+    @staticmethod
+    def find_executable(util_name):
         """Search the system path for an executable matching the utility
 
         util_name[in]  Name of utility
@@ -225,7 +230,7 @@ class Utilities(object):
         # filter extensions
         exts = ['.py', '.exe', '', 'pyc']
         if (parts[0] not in _EXCLUDE_UTILS and
-            (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
+           (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
             util_name = str(parts[0])
             file_ext = parts[1]
             command = "{0}{1}".format(util_name, file_ext)
@@ -288,7 +293,7 @@ class Utilities(object):
         # Execute the utility command using _get_util_info()
         # that returns --help partially parsed.
         for util_name in utils:
-            if self.util_cmd_dict.has_key(util_name):
+            if util_name in self.util_cmd_dict:
                 cmd = self.util_cmd_dict.pop(util_name)
                 util_info = self._get_util_info(list(cmd), util_name)
                 if util_info and util_info["usage"]:
@@ -350,10 +355,10 @@ class Utilities(object):
 
         # Create dictionary for the information
         utility_data = {
-            'name'        : util_name,
-            'description' : description,
-            'usage'       : usage,
-            'options'     : Options
+            'name': util_name,
+            'description': description,
+            'usage': usage,
+            'options': Options
         }
         return utility_data
 
@@ -381,7 +386,7 @@ class Utilities(object):
             else:
                 option['alias'] = None
 
-            desc_clean = opt[1].replace("\n"," ").split()
+            desc_clean = opt[1].replace("\n", " ").split()
             option['description'] = " ".join(desc_clean)
             option['long_name'] = option['name']
             parts = option['name'].split('=')
@@ -411,7 +416,6 @@ class Utilities(object):
         matches = [util for util in self.util_list if util['name'] in matches]
         return matches
 
-
     def get_option_matches(self, util_info, option_prefix, find_alias=False):
         """Get list of option dictionary entries for options that match
         the prefix.
@@ -424,7 +428,7 @@ class Utilities(object):
         """
         # Check type of util_info
         if util_info is None or util_info == {} or \
-           not type(util_info) == type({}):
+                not isinstance(util_info, dict):
             raise UtilError("Empty or invalide utility dictionary.")
 
         matches = []
@@ -447,19 +451,19 @@ class Utilities(object):
 
         return matches
 
-    def show_utilities(self, list=None):
+    def show_utilities(self, print_list=None):
         """Show list of utilities as a 2-column list.
 
-        list[in]       list of utilities to print - default is None
-                       which means print all utilities
+        print_list[in]    list of utilities to print - default is None
+                          which means print all utilities
         """
 
-        if list is None:
+        if print_list is None:
             if len(self.util_list) != len(self.available_utilities):
                 self.find_utilities()
             list_of_utilities = self.util_list
         else:
-            list_of_utilities = list
+            list_of_utilities = print_list
         print
         if len(list_of_utilities) > 0:
             print_dictionary_list(['Utility', 'Description'],
@@ -499,13 +503,12 @@ class Utilities(object):
             if alias is not None:
                 name = '-' + alias + ", " + name
             item = {
-                'long_name'   : name,
-                'description' : option.get('description', '')
+                'long_name': name,
+                'description': option.get('description', '')
             }
             dictionary_list.append(item)
 
         return dictionary_list
-
 
     def show_options(self, options):
         """Show list of options for a utility by name.
@@ -524,8 +527,8 @@ class Utilities(object):
                                   dictionary_list, self.width)
             print
 
-
-    def get_usage(self, util_info):
+    @staticmethod
+    def get_usage(util_info):
         """Get the usage statement for the utility
 
         util_info[in]  dictionary entry for utility information
@@ -534,7 +537,7 @@ class Utilities(object):
         """
         # Check type of util_info
         if util_info is None or util_info == {} or \
-           not type(util_info) == type({}):
+                not isinstance(util_info, dict):
             return False
 
         return util_info['usage']

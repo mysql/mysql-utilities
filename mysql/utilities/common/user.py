@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@ This module contains and abstraction of a MySQL user object.
 """
 
 import re
-from mysql.utilities.exception import UtilError, UtilDBError
+
+from mysql.utilities.exception import UtilError, UtilDBError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
-from mysql.utilities.exception import FormatError
 
 
 def parse_user_host(user_name):
@@ -65,7 +65,7 @@ class User(object):
         self.verbosity = verbosity
         self.current_user = None
         self.query_options = {
-            'fetch' : False
+            'fetch': False
         }
 
     def create(self, new_user=None):
@@ -93,7 +93,7 @@ class User(object):
         if self.verbosity > 0:
             print query_str
 
-        res = self.server1.exec_query(query_str, self.query_options)
+        self.server1.exec_query(query_str, self.query_options)
 
     def drop(self, new_user=None):
         """Drop user from the server
@@ -107,7 +107,7 @@ class User(object):
         """
         query_str = "DROP USER "
         if new_user:
-            user, passwd, host = parse_user_host(new_user)
+            user, _, host = parse_user_host(new_user)
             query_str += "'%s'@'%s' " % (user, host)
         else:
             query_str += "'%s'@'%s' " % (self.user, self.host)
@@ -115,7 +115,7 @@ class User(object):
         if self.verbosity > 0:
             print query_str
 
-        res = self.server1.exec_query(query_str, self.query_options)
+        self.server1.exec_query(query_str, self.query_options)
 
     def exists(self, user_name=None):
         """Check to see if the user exists
@@ -127,20 +127,20 @@ class User(object):
         return True = user exists, False = user does not exist
         """
 
-        user, host, passwd = self.user, self.host, self.passwd
+        user, host, _ = self.user, self.host, self.passwd
         if user_name:
-            user, passwd, host = parse_user_host(user_name)
+            user, _, host = parse_user_host(user_name)
 
         res = self.server1.exec_query("SELECT * FROM mysql.user "
                                       "WHERE user = %s and host = %s",
-                                      {'params':(user, host)})
+                                      {'params': (user, host)})
 
         return (res is not None and len(res) >= 1)
 
-    def get_grants(self, globals=False):
+    def get_grants(self, globals_privs=False):
         """Retrieve the grants for the current user
 
-        globals[in]        Include global privileges in clone (i.e. user@%)
+        globals_privs[in]     Include global privileges in clone (i.e. user@%)
 
         returns result set or None if no grants defined
         """
@@ -161,17 +161,17 @@ class User(object):
                                           "{0}".format(self.current_user))
             for grant in res:
                 grants.append(grant)
-        except UtilDBError, e:
-            pass # Error here is ok - no grants found.
-        if globals:
+        except UtilDBError:
+            pass  # Error here is ok - no grants found.
+        if globals_privs:
             try:
                 res = self.server1.exec_query("SHOW GRANTS FOR "
                                               "'{0}'{1}".format(self.user,
                                                                 "@'%'"))
                 for grant in res:
                     grants.append(grant)
-            except UtilDBError, e:
-                pass # Error here is ok - no grants found.
+            except UtilDBError:
+                pass  # Error here is ok - no grants found.
         return grants
 
     def has_privilege(self, db, obj, access, allow_skip_grant_tables=True):
@@ -220,7 +220,7 @@ class User(object):
         for grant_tuple in res:
             print grant_tuple[0]
 
-    def clone(self, new_user, destination=None, globals=False):
+    def clone(self, new_user, destination=None, globals_privs=False):
         """Clone the current user to the new user
 
         Operation will create the new user account copying all of the
@@ -230,12 +230,12 @@ class User(object):
         new_name[in]       MySQL user string (user@host:passwd)
         destination[in]    A connection to a new server to clone the user
                            (default is None)
-        globals[in]        Include global privileges in clone (i.e. user@%)
+        globals_privs[in]  Include global privileges in clone (i.e. user@%)
 
         Note: Caller must ensure the new user account does not exist.
         """
 
-        res = self.get_grants(globals)
+        res = self.get_grants(globals_privs)
         server = self.server1
         if destination is not None:
             server = destination
@@ -246,7 +246,7 @@ class User(object):
                 user.create()
 
             base_user_ticks = "'" + self.user + "'@'" + self.host + "'"
-            user, passwd, host = parse_user_host(new_user)
+            user, _, host = parse_user_host(new_user)
             new_user_ticks = "'" + user + "'@'" + host + "'"
             grant = row[0].replace(base_user_ticks, new_user_ticks, 1)
 

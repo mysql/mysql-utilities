@@ -31,24 +31,22 @@ import re
 import sys
 import time
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import dbcopy
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_skip_options
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import check_skip_options, add_engines
-from mysql.utilities.common.options import add_all, check_all, add_locking
-from mysql.utilities.common.options import add_regexp, add_rpl_mode
-from mysql.utilities.common.options import check_rpl_options, add_rpl_user
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
+                                             PARSE_ERR_DB_PAIR_EXT)
+from mysql.utilities.common.options import (add_skip_options, add_verbosity,
+                                            check_verbosity, check_rpl_options,
+                                            check_skip_options, add_engines,
+                                            add_all, check_all, add_locking,
+                                            add_regexp, add_rpl_mode,
+                                            add_rpl_user, setup_common_options)
+from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
+                                                  remove_backtick_quoting)
 
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -59,6 +57,7 @@ USAGE = "%prog --source=user:pass@host:port:socket " \
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
+
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -79,15 +78,15 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Connection information for the source server
 parser.add_option("--source", action="store", dest="source",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for source server in " + \
+                  type="string", default="root@localhost:3306",
+                  help="connection information for source server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
-                  type = "string",
-                  help="connection information for destination server in " + \
+                  type="string",
+                  help="connection information for destination server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
 
@@ -174,30 +173,30 @@ else:
 
 # Set options for database operations.
 options = {
-    "skip_tables"      : "tables" in skips,
-    "skip_views"       : "views" in skips,
-    "skip_triggers"    : "triggers" in skips,
-    "skip_procs"       : "procedures" in skips,
-    "skip_funcs"       : "functions" in skips,
-    "skip_events"      : "events" in skips,
-    "skip_grants"      : "grants" in skips,
-    "skip_create"      : "create_db" in skips,
-    "skip_data"        : "data" in skips,
-    "force"            : opt.force,
-    "verbose"          : opt.verbosity >= 1,
-    "quiet"            : opt.quiet,
-    "threads"          : opt.threads,
-    "debug"            : opt.verbosity == 3,
-    "exclude_patterns" : exclude_list,
-    "new_engine"       : opt.new_engine,
-    "def_engine"       : opt.def_engine,
-    "all"              : opt.all,
-    "locking"          : opt.locking,
-    "use_regexp"       : opt.use_regexp,
-    "rpl_user"         : opt.rpl_user,
-    "rpl_mode"         : opt.rpl_mode,
-    "verbosity"        : opt.verbosity,
-    "skip_gtid"        : opt.skip_gtid,
+    "skip_tables": "tables" in skips,
+    "skip_views": "views" in skips,
+    "skip_triggers": "triggers" in skips,
+    "skip_procs": "procedures" in skips,
+    "skip_funcs": "functions" in skips,
+    "skip_events": "events" in skips,
+    "skip_grants": "grants" in skips,
+    "skip_create": "create_db" in skips,
+    "skip_data": "data" in skips,
+    "force": opt.force,
+    "verbose": opt.verbosity >= 1,
+    "quiet": opt.quiet,
+    "threads": opt.threads,
+    "debug": opt.verbosity == 3,
+    "exclude_patterns": exclude_list,
+    "new_engine": opt.new_engine,
+    "def_engine": opt.def_engine,
+    "all": opt.all,
+    "locking": opt.locking,
+    "use_regexp": opt.use_regexp,
+    "rpl_user": opt.rpl_user,
+    "rpl_mode": opt.rpl_mode,
+    "verbosity": opt.verbosity,
+    "skip_gtid": opt.skip_gtid,
 }
 
 # Parse source connection values
@@ -262,9 +261,9 @@ for db in args:
 
     # Remove backtick quotes (handled later)
     orig_db = remove_backtick_quoting(orig_db) \
-                if is_quoted_with_backticks(orig_db) else orig_db
+        if is_quoted_with_backticks(orig_db) else orig_db
     new_db = remove_backtick_quoting(new_db) \
-                if new_db and is_quoted_with_backticks(new_db) else new_db
+        if new_db and is_quoted_with_backticks(new_db) else new_db
     db_entry = (orig_db, new_db)
     db_list.append(db_entry)
 

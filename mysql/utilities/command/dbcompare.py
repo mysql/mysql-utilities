@@ -19,15 +19,16 @@
 This file contains the commands for checking consistency of two databases.
 """
 
+from mysql.utilities.exception import UtilDBError, UtilError
 from mysql.utilities.common.database import Database
+from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
                                               get_create_object,
                                               print_missing_list,
-                                              server_connect)
-from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.exception import UtilDBError
-from mysql.utilities.exception import UtilError
-from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
+                                              server_connect,
+                                              check_consistency,
+                                              build_diff_list,
+                                              DEFAULT_SPAN_KEY_SIZE)
 
 
 _PRINT_WIDTH = 75
@@ -40,20 +41,21 @@ _ERROR_OBJECT_LIST = "The list of objects differs among database {0} and {1}."
 _ERROR_ROW_COUNT = "Row counts are not the same among {0} and {1}.\n#"
 
 _DEFAULT_OPTIONS = {
-    "quiet"           : False,
-    "verbosity"       : 0,
-    "difftype"        : "differ",
-    "run_all_tests"   : False,
-    "width"           : 75,
-    "no_object_check" : False,
-    "no_diff"         : False,
-    "no_row_count"    : False,
-    "no_data"         : False,
-    "transform"       : False,
-    "span_key_size"  : DEFAULT_SPAN_KEY_SIZE
+    "quiet": False,
+    "verbosity": 0,
+    "difftype": "differ",
+    "run_all_tests": False,
+    "width": 75,
+    "no_object_check": False,
+    "no_diff": False,
+    "no_row_count": False,
+    "no_data": False,
+    "transform": False,
+    "span_key_size": DEFAULT_SPAN_KEY_SIZE
 }
 
-class _CompareDBReport:
+
+class _CompareDBReport(object):
     """Print compare database report
     """
 
@@ -65,11 +67,12 @@ class _CompareDBReport:
             quiet[in]      If true, do not print commentary
                            (default = False)
         """
-        self.width = options.get('width', _PRINT_WIDTH) - 2 # for '# '
+        self.width = options.get('width', _PRINT_WIDTH) - 2  # for '# '
         self.quiet = options.get('quiet', False)
         self.type_width = 9
         self.oper_width = 7
-        self.desc_width = self.width - self.type_width - (3 * self.oper_width) - 4
+        self.desc_width = self.width - self.type_width - \
+            (3 * self.oper_width) - 4
 
     def print_heading(self):
         """Print heading for database consistency
@@ -90,7 +93,6 @@ class _CompareDBReport:
                                  "Check", self.oper_width)
         print "# %s" % ('-' * self.width),
 
-
     def report_object(self, obj_type, description):
         """Print the object type and description field
 
@@ -103,7 +105,6 @@ class _CompareDBReport:
         print "\n#", _RPT_FORMAT.format(obj_type, self.type_width,
                                         description, self.desc_width),
 
-
     def report_state(self, state):
         """Print the results of a test.
 
@@ -114,8 +115,8 @@ class _CompareDBReport:
             return
         print "{0:<{1}}".format(state, self.oper_width),
 
-
-    def report_errors(self, errors):
+    @staticmethod
+    def report_errors(errors):
         """Print any errors encountered.
 
         errors[in]        list of strings to print
@@ -198,12 +199,12 @@ def _check_objects(server1, server2, db1, db2,
     # If in verbose mode, show count of object types.
     if options['verbosity'] > 1:
         objects = {
-                'TABLE' : 0,
-                 'VIEW' : 0,
-              'TRIGGER' : 0,
-            'PROCEDURE' : 0,
-             'FUNCTION' : 0,
-                'EVENT' : 0,
+            'TABLE': 0,
+            'VIEW': 0,
+            'TRIGGER': 0,
+            'PROCEDURE': 0,
+            'FUNCTION': 0,
+            'EVENT': 0,
         }
         for item in in_both:
             obj_type = item[0]
@@ -211,8 +212,8 @@ def _check_objects(server1, server2, db1, db2,
         print "Looking for object types table, view, trigger, procedure," + \
               " function, and event."
         print "Object types found common to both databases:"
-        for object in objects:
-            print " {0:>12} : {1}".format(object, objects[object])
+        for obj in objects:
+            print " {0:>12} : {1}".format(obj, objects[obj])
 
     return (in_both, differs)
 
@@ -298,11 +299,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
 
     Returns list of errors
     """
-    from mysql.utilities.common.dbcompare import check_consistency, \
-                                                 build_diff_list
-
     direction = options.get('changes-for', 'server1')
-    difftype = options.get('difftype', 'unified')
     reverse = options.get('reverse', False)
 
     errors = []
@@ -322,10 +319,10 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
 
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
-               (not reverse and direction == 'server1' and \
-                diff_server1 is None) or \
-               (not reverse and direction == 'server2' and \
-                diff_server2 is None):
+                    (not reverse and direction == 'server1' and
+                     diff_server1 is None) or \
+                    (not reverse and direction == 'server2' and
+                     diff_server2 is None):
                 reporter.report_state('pass')
                 return errors
 
@@ -488,10 +485,8 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
         if options['verbosity'] > 0:
             print
-            object1_create = get_create_object(server1, obj1, options,
-                                               obj_type)
-            object2_create = get_create_object(server2, obj2, options,
-                                               obj_type)
+            get_create_object(server1, obj1, options, obj_type)
+            get_create_object(server2, obj2, options, obj_type)
 
         reporter.report_errors(error_list)
 

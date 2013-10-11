@@ -23,11 +23,15 @@ import multiprocessing
 import sys
 
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.sql_transform import convert_special_characters
-from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
+from mysql.connector.conversion import MySQLConverter
+from mysql.utilities.common.format import print_list
 from mysql.utilities.common.database import Database
+from mysql.utilities.common.lock import Lock
+from mysql.utilities.common.server import Server
+from mysql.utilities.common.sql_transform import (convert_special_characters,
+                                                  quote_with_backticks,
+                                                  remove_backtick_quoting,
+                                                  is_quoted_with_backticks)
 
 # Constants
 _MAXPACKET_SIZE = 1024 * 1024
@@ -85,8 +89,8 @@ class Index(object):
         else:
             self.column_subparts = False
 
-
-    def __cmp_columns(self, col_a, col_b):
+    @staticmethod
+    def __cmp_columns(col_a, col_b):
         """Compare two columns on name and subpart lengths if present
 
         col_a[in]          First column to compare
@@ -114,8 +118,7 @@ class Index(object):
             elif sz_this is None and sz_that is None:
                 return True
         else:
-            return False # no longer a duplicate
-
+            return False  # no longer a duplicate
 
     def __check_column_list(self, index):
         """Compare the column list of this index with another
@@ -136,7 +139,7 @@ class Index(object):
         if self.type == "BTREE":
             i = 0
             while (i < num_cols_this) and (i < num_cols_that):
-                if num_cols_same <= i: # Ensures first N cols are the same
+                if num_cols_same <= i:  # Ensures first N cols are the same
                     if self.__cmp_columns(self.columns[i], index.columns[i]):
                         num_cols_same = num_cols_same + 1
                     else:
@@ -190,7 +193,6 @@ class Index(object):
         # Pass previous verification; contains all the columns of given index.
         return True
 
-
     def add_column(self, column, sub_part):
         """Add a column to the list of columns for this index
 
@@ -236,10 +238,10 @@ class Index(object):
             # Otherwise, return a DROP/ADD statement with remaining columns.
             idx_cols_str = ', '.join(idx_cols)
             query_str = ("ALTER TABLE {db}.{table} DROP INDEX {name}, "
-                         "ADD INDEX {name} ({cols})").format(db=self.q_db,
-                                                             table=self.q_table,
-                                                             name=self.q_name,
-                                                             cols=idx_cols_str)
+                         "ADD INDEX {name} ({cols})".format(db=self.q_db,
+                                                            table=self.q_table,
+                                                            name=self.q_name,
+                                                            cols=idx_cols_str))
         return query_str
 
     def __get_column_list(self, backtick_quoting=True):
@@ -307,7 +309,7 @@ class Table(object):
         - Copy table data
     """
 
-    def __init__(self, server1, name, options={}):
+    def __init__(self, server1, name, options=None):
         """Constructor
 
         server[in]         A Server object
@@ -319,7 +321,8 @@ class Table(object):
             get_cols  If True, get the column metadata on construction
                       (default is False)
         """
-
+        if options is None:
+            options = {}
         self.verbose = options.get('verbose', False)
         self.quiet = options.get('quiet', False)
         self.server = server1
@@ -368,9 +371,8 @@ class Table(object):
 
         self._insert = "INSERT INTO %s.%s VALUES "
         self.query_options = {  # Used for skipping fetch of rows
-            'fetch' : False
+            'fetch': False
         }
-
 
     def exists(self, tbl_name=None):
         """Check to see if the table exists
@@ -394,7 +396,6 @@ class Table(object):
                                      " and TABLE_NAME = '%s'" % table)
 
         return (res is not None and len(res) >= 1)
-
 
     def get_column_metadata(self, columns=None):
         """Get information about the table for the bulk insert operation.
@@ -420,12 +421,12 @@ class Table(object):
             for col in range(0, stop):
                 if is_quoted_with_backticks(columns[col][0]):
                     self.column_names.append(
-                                remove_backtick_quoting(columns[col][0]))
+                        remove_backtick_quoting(columns[col][0]))
                     self.q_column_names.append(columns[col][0])
                 else:
                     self.column_names.append(columns[col][0])
                     self.q_column_names.append(
-                                quote_with_backticks(columns[col][0]))
+                        quote_with_backticks(columns[col][0]))
                 col_type_prefix = columns[col][1][0:4].lower()
                 if col_type_prefix in ('varc', 'char', 'enum', 'set('):
                     self.text_columns.append(col)
@@ -439,7 +440,6 @@ class Table(object):
                     col_format_values[col] = "%s"
         self.column_format = "%s%s%s" % \
                              (" (", ', '.join(col_format_values), ")")
-
 
     def get_col_names(self, quote_backticks=False):
         """Get column names for the export operation.
@@ -460,7 +460,6 @@ class Table(object):
 
         return self.q_column_names if quote_backticks else self.column_names
 
-
     def _build_update_blob(self, row, new_db, name, blob_col):
         """Build an UPDATE statement to update blob fields.
 
@@ -473,8 +472,6 @@ class Table(object):
 
         Returns tuple (UPDATE string, blob data)
         """
-        from mysql.connector.conversion import MySQLConverter
-
         if self.column_format is None:
             self.get_column_metadata()
 
@@ -483,7 +480,7 @@ class Table(object):
         do_commas = False
         has_data = False
         stop = len(row)
-        for col in range(0,stop):
+        for col in range(0, stop):
             col_name = self.q_column_names[col]
             if col in self.blob_columns:
                 if row[col] is not None and len(row[col]) > 0:
@@ -503,7 +500,6 @@ class Table(object):
         if has_data:
             return blob_insert + " WHERE " + " AND ".join(where_values) + ";"
         return None
-
 
     def get_column_string(self, row, new_db):
         """Return a formatted list of column data.
@@ -549,7 +545,6 @@ class Table(object):
 
         return (val_str, blob_inserts)
 
-
     def make_bulk_insert(self, rows, new_db, columns_names=None):
         """Create bulk insert statements for the data
 
@@ -594,7 +589,7 @@ class Table(object):
             row_size = len(val_str)
             next_size = data_size + row_size + 3
             if (row_count >= _MAXBULK_VALUES) or \
-                (next_size > (int(self.max_packet_size) - 512)): # add buffer
+               (next_size > (int(self.max_packet_size) - 512)):  # add buffer
                 data_inserts.append(insert_str)
                 row_count = 0
             else:
@@ -604,7 +599,7 @@ class Table(object):
                 insert_str += val_str
                 data_size += row_size + 3
 
-        if row_count > 0 :
+        if row_count > 0:
             data_inserts.append(insert_str)
 
         return (data_inserts, blob_inserts)
@@ -643,9 +638,9 @@ class Table(object):
         try:
             res = self.server.exec_query("USE %s" % self.q_db_name,
                                          self.query_options)
-        except Exception, e:
+        except:
             pass
-        res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" % \
+        res = self.server.exec_query("SHOW TABLE STATUS LIKE '%s'" %
                                      self.tbl_name)
         if res:
             num_rows = int(res[0][4])
@@ -668,7 +663,6 @@ class Table(object):
                   "threads = %d." % max_threads
         return (num_rows / max_threads) + max_threads
 
-
     def _bulk_insert(self, rows, new_db, destination=None):
         """Import data using bulk insert
 
@@ -684,24 +678,20 @@ class Table(object):
         new_db[in]         new database name
         destination[in]    the destination server
         """
-
-        from mysql.utilities.common.lock import Lock
-        from mysql.utilities.common.server import Server
-
         if self.dest_vals is None:
             self.dest_vals = self.get_dest_values(destination)
 
         # Spawn a new connection
         server_options = {
-            'conn_info' : self.dest_vals,
-            'role'      : "thread",
+            'conn_info': self.dest_vals,
+            'role': "thread",
         }
         dest = Server(server_options)
         dest.connect()
 
         # Issue the write lock
         lock_list = [("%s.%s" % (new_db, self.q_tbl_name), 'WRITE')]
-        my_lock = Lock(dest, lock_list, {'locking':'lock-all',})
+        my_lock = Lock(dest, lock_list, {'locking': 'lock-all', })
 
         # First, turn off foreign keys if turned on
         dest.disable_foreign_key_checks(True)
@@ -716,26 +706,25 @@ class Table(object):
         # Insert the data first
         for data_insert in insert_data:
             try:
-                res = dest.exec_query(data_insert, self.query_options)
+                dest.exec_query(data_insert, self.query_options)
             except UtilError, e:
                 raise UtilError("Problem inserting data. "
-                                     "Error = %s" % e.errmsg)
+                                "Error = %s" % e.errmsg)
 
         # Now insert the blob data if there is any
         for blob_insert in blob_data:
             try:
                 # Must convert blob data to a raw string for cursor to handle.
-                res = dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
-                                      self.query_options)
+                dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
+                                self.query_options)
             except UtilError, e:
                 raise UtilError("Problem updating blob field. "
-                                     "Error = %s" % e.errmsg)
+                                "Error = %s" % e.errmsg)
 
         # Now, turn on foreign keys if they were on at the start
         dest.disable_foreign_key_checks(False)
         my_lock.unlock()
         del dest
-
 
     def insert_rows(self, rows, new_db, destination=None, spawn=False):
         """Insert rows in the table using bulk copy.
@@ -767,12 +756,11 @@ class Table(object):
         proc = None
         if spawn:
             proc = multiprocessing.Process(target=self._bulk_insert,
-                                          args=(rows, new_db, destination))
+                                           args=(rows, new_db, destination))
         else:
             self._bulk_insert(rows, new_db, destination)
 
         return proc
-
 
     def _clone_data(self, new_db):
         """Clone table data.
@@ -788,8 +776,8 @@ class Table(object):
             print query_str
         self.server.exec_query(query_str)
 
-
-    def copy_data(self, destination, cloning=False, new_db=None, connections=1):
+    def copy_data(self, destination, cloning=False, new_db=None,
+                  connections=1):
         """Retrieve data from a table and copy to another server and database.
 
         Reads data from a table and inserts the correct INSERT statements into
@@ -830,7 +818,6 @@ class Table(object):
                     for p in pthreads:
                         if not p.is_alive():
                             num_complete += 1
-
 
     def retrieve_rows(self, num_conn=1):
         """Retrieve the table data in rows.
@@ -878,8 +865,7 @@ class Table(object):
 
         cur.close()
 
-
-    def get_dest_values(self, destination = None):
+    def get_dest_values(self, destination=None):
         """Get the destination connection values if not already set.
 
         destination[in]    Connection values for destination server
@@ -889,22 +875,21 @@ class Table(object):
         # Get connection to database
         if destination is None:
             conn_val = {
-                "host"        : self.server.host,
-                "user"        : self.server.user,
-                "passwd"      : self.server.passwd,
-                "unix_socket" : self.server.socket,
-                "port"        : self.server.port
+                "host": self.server.host,
+                "user": self.server.user,
+                "passwd": self.server.passwd,
+                "unix_socket": self.server.socket,
+                "port": self.server.port
             }
         else:
             conn_val = {
-                "host"        : destination.host,
-                "user"        : destination.user,
-                "passwd"      : destination.passwd,
-                "unix_socket" : destination.socket,
-                "port"        : destination.port
+                "host": destination.host,
+                "user": destination.user,
+                "passwd": destination.passwd,
+                "unix_socket": destination.socket,
+                "port": destination.port
             }
         return conn_val
-
 
     def get_tbl_indexes(self):
         """Return a result set containing all indexes for a given table
@@ -913,7 +898,6 @@ class Table(object):
         """
         res = self.server.exec_query("SHOW INDEXES FROM %s" % self.q_table)
         return res
-
 
     def get_tbl_foreign_keys(self):
         """Return a result set containing all foreign keys for the table
@@ -924,8 +908,8 @@ class Table(object):
                                                            self.tbl_name))
         return res
 
-
-    def __append(self, indexes, index):
+    @staticmethod
+    def __append(indexes, index):
         """Encapsulated append() method to ensure the primary key index
         is placed at the front of the list.
         """
@@ -936,8 +920,8 @@ class Table(object):
         else:
             indexes.append(index)
 
-
-    def __check_index(self, index, indexes, master_list):
+    @staticmethod
+    def __check_index(index, indexes, master_list):
         """Check a single index for duplicate or redundancy against a list
         of other Indexes.
 
@@ -963,7 +947,6 @@ class Table(object):
                         idx.duplicate_of = index
                         duplicate_list.append(idx)
         return (duplicates_found, duplicate_list)
-
 
     def __check_index_list(self, indexes):
         """Check a list of Index instances for duplicates.
@@ -1014,7 +997,6 @@ class Table(object):
         rows = self.get_tbl_indexes()
         return rows
 
-
     def get_primary_index(self):
         """Retrieve the primary index columns for this table.
         """
@@ -1033,7 +1015,6 @@ class Table(object):
         self.pri_idx = pri_idx
 
         return pri_idx
-
 
     def get_indexes(self):
         """Retrieve the indexes from the server and load them into lists
@@ -1097,7 +1078,7 @@ class Table(object):
         # We sort the fulltext index columns - easier to do it once here
         for index in self.fulltext_indexes:
             cols = index.columns
-            cols.sort(key=lambda cols:cols[0])
+            cols.sort(key=lambda cols: cols[0])
         res = self.__check_index_list(self.fulltext_indexes)
         # if there are duplicates, add them to the dupes list
         if res[0]:
@@ -1163,13 +1144,13 @@ class Table(object):
             print("# Table {0} has no duplicate nor redundant "
                   "indexes.".format(self.table))
 
-    def show_special_indexes(self, format, limit, best=False):
+    def show_special_indexes(self, fmt, limit, best=False):
         """Display a list of the best or worst queries for this table.
 
         This shows the best (first n) or worst (last n) performing queries
         for a given table.
 
-        format[in]         format out output = sql, table, tab, csv
+        fmt[in]            format out output = sql, table, tab, csv
         limit[in]          number to limit the display
         best[in]           (optional) if True, print best performing indexes
                                       if False, print worst performing indexes
@@ -1207,50 +1188,44 @@ class Table(object):
                 0.01)) <= 1.00
             ORDER BY `sel_percent`
         """
-
-        from mysql.utilities.common.format import print_list
-
         query_options = {
-            'params' : (self.db_name, self.tbl_name,)
+            'params': (self.db_name, self.tbl_name,)
         }
         rows = []
-        type = "best"
+        idx_type = "best"
         if not best:
-            type = "worst"
+            idx_type = "worst"
         if best:
-            rows= self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
-                                         query_options)
+            rows = self.server.exec_query(_QUERY + "DESC LIMIT %s" % limit,
+                                          query_options)
         else:
-            rows= self.server.exec_query(_QUERY + "LIMIT %s" % limit,
-                                         query_options)
+            rows = self.server.exec_query(_QUERY + "LIMIT %s" % limit,
+                                          query_options)
         if rows:
             print("#")
             if limit == 1:
                 print("# Showing the {0} performing index from "
-                      "{1}:".format(type, self.table))
+                      "{1}:".format(idx_type, self.table))
             else:
                 print("# Showing the top {0} {1} performing indexes from "
-                "{2}:".format(limit, type, self.table))
+                      "{2}:".format(limit, idx_type, self.table))
             print("#")
             cols = ("database", "table", "name", "column", "sequence",
                     "num columns", "cardinality", "est. rows", "percent")
-            print_list(sys.stdout, format, cols, rows)
+            print_list(sys.stdout, fmt, cols, rows)
         else:
             print("# WARNING: Not enough data to calculate "
                   "best/worst indexes.")
 
-
-    def __print_index_list(self, indexes, format, no_header=False):
+    @staticmethod
+    def __print_index_list(indexes, fmt, no_header=False):
         """Print the list of indexes
 
         indexes[in]        list of indexes to print
-        format[in]         format out output = sql, table, tab, csv
+        fmt[in]            format out output = sql, table, tab, csv
         no_header[in]      (optional) if True, do not print the header
         """
-
-        from mysql.utilities.common.format import print_list
-
-        if format == "sql":
+        if fmt == "sql":
             for index in indexes:
                 index.print_index_sql()
         else:
@@ -1258,30 +1233,28 @@ class Table(object):
             rows = []
             for index in indexes:
                 rows.append(index.get_row())
-            print_list(sys.stdout, format, cols, rows, no_header)
+            print_list(sys.stdout, fmt, cols, rows, no_header)
 
-
-    def print_indexes(self, format):
+    def print_indexes(self, fmt):
         """Print all indexes for this table
 
-        format[in]         format out output = sql, table, tab, csv
+        fmt[in]         format out output = sql, table, tab, csv
         """
 
         print "# Showing indexes from %s:\n#" % (self.table)
-        if format == "sql":
-            self.__print_index_list(self.btree_indexes, format)
-            self.__print_index_list(self.hash_indexes, format, False)
-            self.__print_index_list(self.rtree_indexes, format, False)
-            self.__print_index_list(self.fulltext_indexes, format, False)
+        if fmt == "sql":
+            self.__print_index_list(self.btree_indexes, fmt)
+            self.__print_index_list(self.hash_indexes, fmt, False)
+            self.__print_index_list(self.rtree_indexes, fmt, False)
+            self.__print_index_list(self.fulltext_indexes, fmt, False)
         else:
             master_indexes = []
             master_indexes.extend(self.btree_indexes)
             master_indexes.extend(self.hash_indexes)
             master_indexes.extend(self.rtree_indexes)
             master_indexes.extend(self.fulltext_indexes)
-            self.__print_index_list(master_indexes, format)
+            self.__print_index_list(master_indexes, fmt)
         print "#"
-
 
     def has_primary_key(self):
         """Check to see if there is a primary key.

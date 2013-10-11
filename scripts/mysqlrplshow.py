@@ -30,13 +30,13 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.exception import UtilError
-from mysql.utilities.common.options import add_verbosity, setup_common_options
-from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_format_option
-from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.show_rpl import show_topology
-from mysql.utilities.exception import FormatError
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_verbosity, add_format_option,
+                                            setup_common_options)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlrplshow "
@@ -58,7 +58,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Connection information for the source server
 parser.add_option("--master", action="store", dest="master",
                   type="string", default="root@localhost:3306",
-                  help="connection information for master server in " + \
+                  help="connection information for master server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
 
@@ -132,21 +132,19 @@ except UtilError:
 
 # Create dictionary of options
 options = {
-    'quiet'          : opt.quiet,
-    'prompt'         : opt.prompt,
-    'num_retries'    : opt.num_retries,
-    'recurse'        : opt.recurse,
-    'show_list'      : opt.show_list,
-    'format'         : opt.format,
-    'max_depth'      : opt.max_depth,
-    'discover'       : opt.discover,
-    'verbosity'      : opt.verbosity
+    'quiet': opt.quiet,
+    'prompt': opt.prompt,
+    'num_retries': opt.num_retries,
+    'recurse': opt.recurse,
+    'show_list': opt.show_list,
+    'format': opt.format,
+    'max_depth': opt.max_depth,
+    'discover': opt.discover,
+    'verbosity': opt.verbosity
 }
 
 try:
-    res = show_topology(m_values, options)
-    if res:
-        sys.exit(1)
+    show_topology(m_values, options)
 except UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

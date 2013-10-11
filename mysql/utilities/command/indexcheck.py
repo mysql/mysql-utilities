@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@ or all tables in all databases except internal databases.
 """
 
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.table import Table
+
 
 def check_index(src_val, table_args, options):
     """Check for duplicate or redundant indexes for one or more tables
@@ -57,14 +61,10 @@ def check_index(src_val, table_args, options):
     first_indexes = options.get("best", None)
     last_indexes = options.get("worst", None)
 
-    from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.table import Table
-
     # Try to connect to the MySQL database server.
     conn_options = {
-        'quiet'     : verbosity == 1,
-        'version'   : "5.0.0",
+        'quiet': verbosity == 1,
+        'version': "5.0.0",
     }
     servers = connect_servers(src_val, None, conn_options)
 
@@ -108,15 +108,15 @@ def check_index(src_val, table_args, options):
     # Check indexes for each table in the list
     for table_name in table_list:
         tbl_options = {
-            'verbose'  : verbosity >= 1,
-            'get_cols' : False,
-            'quiet'    : verbosity is None or verbosity < 1
+            'verbose': verbosity >= 1,
+            'get_cols': False,
+            'quiet': verbosity is None or verbosity < 1
         }
         tbl = Table(source, table_name, tbl_options)
         exists = tbl.exists()
         if not exists and not skip:
             raise UtilError("Table %s does not exist. Use --skip "
-                                 "to skip missing tables." % table_name)
+                            "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():
                 if verbosity > 1:

@@ -27,22 +27,23 @@ import sys
 import tempfile
 import uuid
 
+from shutil import copy
+
+from mysql.utilities.exception import UtilError
 from mysql.utilities.command import serverclone
 from mysql.utilities.command.serverclone import user_change_as_root
 from mysql.utilities.common.frm_reader import FrmReader
-from mysql.utilities.common.server import Server
-from mysql.utilities.common.server import stop_running_server
-from mysql.utilities.common.tools import requires_encoding, encode
-from mysql.utilities.common.tools import requires_decoding, decode
-from mysql.utilities.exception import UtilError
-from shutil import copy
+from mysql.utilities.common.server import Server, stop_running_server
+from mysql.utilities.common.tools import (requires_encoding, encode,
+                                          requires_decoding, decode)
+
 
 # The following are storage engines that cannot be read in default mode
 _CANNOT_READ_ENGINE = ["PARTITION", "PERFORMANCE_SCHEMA"]
-_SPAWN_SERVER_ERROR = ("Spawn server operation failed{0}. To diagnose, run the "
-                       "utility again and use the --verbosity option to view "
-                       "the messages from the spawned server and correct any "
-                       "errors presented then run the utility again.")
+_SPAWN_SERVER_ERROR = ("Spawn server operation failed{0}. To diagnose, run "
+                       "the utility again and use the --verbosity option to "
+                       "view the messages from the spawned server and correct "
+                       "any errors presented then run the utility again.")
 
 
 def _get_frm_path(dbtablename, datadir, new_db=None):
@@ -90,7 +91,7 @@ def _get_frm_path(dbtablename, datadir, new_db=None):
             # find database from path
             folders = path.split(os.path.sep)
             if len(folders):
-                db = folders[len(folders)-1]
+                db = folders[len(folders) - 1]
 
     # Check that the frm_path name has .frm.
     if not frm_path.lower().endswith(".frm"):
@@ -147,17 +148,17 @@ def _spawn_server(options):
         sys.stdout.flush()
 
     bootstrap_options = {
-        'new_data'       : temp_datadir,
-        'new_port'       : new_port,
-        'new_id'         : 101,
-        'root_pass'      : "root",
-        'mysqld_options' : None,
-        'verbosity'      : verbosity if verbosity > 1 else 0,
-        'basedir'        : options.get("basedir"),
-        'delete'         : True,
-        'quiet'          : True if verbosity <= 1 else False,
-        'user'           : user,
-        'start_timeout'  : start_timeout,
+        'new_data': temp_datadir,
+        'new_port': new_port,
+        'new_id': 101,
+        'root_pass': "root",
+        'mysqld_options': None,
+        'verbosity': verbosity if verbosity > 1 else 0,
+        'basedir': options.get("basedir"),
+        'delete': True,
+        'quiet': True if verbosity <= 1 else False,
+        'user': user,
+        'start_timeout': start_timeout,
     }
     if verbosity > 1 and not quiet:
         print
@@ -177,8 +178,8 @@ def _spawn_server(options):
                     pass
             else:
                 try:
-                    retval = subprocess.Popen("taskkill /F /T /PID %i" %
-                                              proc_id, shell=True)
+                    subprocess.Popen("taskkill /F /T /PID %i" %
+                                     proc_id, shell=True)
                 except:
                     pass
             raise UtilError(_SPAWN_SERVER_ERROR.format(err))
@@ -188,14 +189,14 @@ def _spawn_server(options):
     if verbosity > 1 and not quiet:
         print "# Connecting to spawned server"
     conn = {
-        "user"   : "root",
-        "passwd" : "root",
-        "host"   : "127.0.0.1",
-        "port"   : options.get("port"),
+        "user": "root",
+        "passwd": "root",
+        "host": "127.0.0.1",
+        "port": options.get("port"),
     }
     server_options = {
-        'conn_info' : conn,
-        'role'      : "frm_reader_bootstrap",
+        'conn_info': conn,
+        'role': "frm_reader_bootstrap",
     }
     server = Server(server_options)
     try:
@@ -266,7 +267,8 @@ def _get_create_statement(server, temp_datadir,
                 copy(frm_file[2], new_frm)
             else:
                 copy(frm_file[2], new_path)
-        except Exception, e:
+        except:
+            _, e, _ = sys.exc_info()
             print("ERROR: {0}".format(e))
 
         # Set permissons on copied file if user context in play

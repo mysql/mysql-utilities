@@ -30,15 +30,14 @@ import os
 import sys
 import time
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import diskusage
-from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.options import (add_verbosity, add_format_option,
+                                            setup_common_options)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqldiskusage "
@@ -48,6 +47,7 @@ USAGE = "%prog --server=user:pass@host:port:socket db1 --all"
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
+
 
 def print_elapsed_time(start_test):
     """Print the elapsed time to stdout (screen)
@@ -118,7 +118,7 @@ except UtilError:
 
 try:
     conn_options = {
-        'version'   : "5.1.30",
+        'version': "5.1.30",
     }
     servers = connect_servers(source_values, None)
 except UtilError:
@@ -139,14 +139,14 @@ if not os.access(datadir, os.R_OK):
 
 # Set options for database operations.
 options = {
-    "format"        : opt.format,
-    "no_headers"    : opt.no_headers,
-    "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3,
-    "have_read"     : os.access(datadir, os.R_OK),
-    "do_empty"      : opt.do_empty,
-    "do_all"        : opt.do_all,
-    "quiet"         : opt.quiet
+    "format": opt.format,
+    "no_headers": opt.no_headers,
+    "verbosity": opt.verbosity,
+    "debug": opt.verbosity >= 3,
+    "have_read": os.access(datadir, os.R_OK),
+    "do_empty": opt.do_empty,
+    "do_all": opt.do_all,
+    "quiet": opt.quiet
 }
 
 # We do database disk usage by default.

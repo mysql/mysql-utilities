@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""mysql.utilities"""
+
 # Major, Minor, Patch, Status
 VERSION = (1, 3, 6, 'GA', 0)
 # Future versions will have to include only the X, Y (no Z).

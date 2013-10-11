@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ This file contains auxiliary functions to handle pattern matching.
 """
 
 import re
+
 
 # Regular expression to match a database object identifier (support backticks)
 REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+)'
