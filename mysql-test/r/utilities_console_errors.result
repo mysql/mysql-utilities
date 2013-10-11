@@ -73,10 +73,13 @@ Launching console ...
 Test case 5 - Test fakeutility --return-code=1
 Launching console ...
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlfakeutility' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 Test case 6 - Test fakeutility --return-code=2 and no message
 Launching console ...
 
-An error was found, while executing the command, use "show last error" command to display details
+
+Execution of utility: 'mysqlfakeutility -e2 --message-error=' ended with return code '2' but no error message was streamed to the standard error, please review the output from its execution.
 

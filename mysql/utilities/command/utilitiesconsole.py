@@ -295,21 +295,40 @@ class UtilitiesConsole(Console):
                 # check the output for errors
                 _, stderr_temp = proc.communicate()
                 return_code = proc.returncode
-                err_msg = ('An error was found, while executing the command, '
-                           'use "show last error" command to display details')
+                err_msg = ("\nThe console has detected that the utility '{0}' "
+                           "ended with an error code.\nYou can get more "
+                           "information about the error by running the console"
+                           " command 'show last error'.").format(command)
                 if not self.quiet and return_code and stderr_temp:
                     print(err_msg)
-                    msg = ("Execution of utility: {0} {1} \nreturned "
-                           "errorcode: {2} with error message: \n{3}"
-                           "".format(command, parameters, return_code,
-                                     stderr_temp))
+                    if parameters:
+                        msg = ("\nExecution of utility: '{0} {1}' ended with "
+                               "return code '{2}' and with the following "
+                               "error message:\n{3}").format(command,
+                                                             parameters,
+                                                             return_code,
+                                                             stderr_temp)
+                    else:
+                        msg = ("\nExecution of utility: '{0}' ended with "
+                               "return code '{1}' and with the following "
+                               "error message:\n{2}").format(command,
+                                                             return_code,
+                                                             stderr_temp)
                     self.errors.append(msg)
                 elif not self.quiet and return_code:
-                    print(err_msg)
-                    msg = ("Execution of utility: {0} {1} \nreturned "
-                           "errorcode: {2} and no error message"
-                           "".format(command, parameters, return_code))
-                    self.errors.append(msg)
+                    if parameters:
+                        msg = ("\nExecution of utility: '{0} {1}' ended with "
+                               "return code '{2}' but no error message was "
+                               "streamed to the standard error, please review "
+                               "the output from its execution."
+                               "").format(command, parameters, return_code)
+                    else:
+                        msg = ("\nExecution of utility: '{0}' ended with "
+                               "return code '{1}' but no error message was "
+                               "streamed to the standard error, please review "
+                               "the output from its execution."
+                               "").format(command, return_code)
+                    print(msg)
                 return
         # if got here, is because the utility was not found.
         raise UtilError("The utility {0} is not accessible (from the path: "

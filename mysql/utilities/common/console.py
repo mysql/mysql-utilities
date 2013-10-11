@@ -473,7 +473,7 @@ class Console(object):
             return
         if not self.errors:
             print
-            print("None error to display.\n")
+            print("No error to display.\n")
         else:
             print
             print("{0}\n".format(self.errors[-1]))

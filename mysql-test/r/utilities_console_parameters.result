@@ -238,7 +238,9 @@ Variable  Value
 SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
 
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqldiff' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 Test Case 8: Long variables
 
@@ -257,38 +259,46 @@ Usage: mysqluc
 mysqluc: error: Invalid argument assignment: c==3. Please check your command.
 Test Case 11: show last error command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 
 Test Case 12: clear errors command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
 
-None error to display.
+No error to display.
 
 Test Case 13: show errors command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 
