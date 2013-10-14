@@ -58,18 +58,21 @@ class test(mutlib.System_test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
         
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
-       
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1)
+        )
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1)
+        )
+
         # Test case 1 - clone a sample database
-        cmd = "mysqldbcopy.py --skip-gtid %s %s  util_test:util_db_clone " % \
-              (from_conn, to_conn) 
-        try:
-            res = self.exec_util(cmd, self.res_fname)
-            self.results.append(res)
-            return res == 0
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+        cmd_base = "mysqldbcopy.py --skip-gtid {0} {1} {2}"
+        cmd = cmd_base.format(from_conn, to_conn, "util_test:util_db_clone")
+        res = self.exec_util(cmd, self.res_fname)
+        if res:  # i.e., res != 0
+            raise MUTLibError(
+                "'{0}' failed. Return code: {1}".format(cmd, res)
+            )
 
         # Test case 2 - clone a sample database with weird names (backticks)
         # Set input parameter with appropriate quotes for the OS
@@ -77,33 +80,41 @@ class test(mutlib.System_test):
             cmd_arg = "'`db``:db`:`db``:db_clone`'"
         else:
             cmd_arg = '"`db``:db`:`db``:db_clone`"'
-        cmd = ("mysqldbcopy.py --skip-gtid %s %s %s' "
-               % (from_conn, to_conn, cmd_arg))
-        try:
-            res = self.exec_util(cmd, self.res_fname)
-            self.results.append(res)
-            return res == 0
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+        cmd = cmd_base.format(from_conn, to_conn, cmd_arg)
+        res = self.exec_util(cmd, self.res_fname)
+        self.results.append(res)
+        if res:  # i.e., res != 0
+            raise MUTLibError(
+                "'{0}' failed. Return code: {1}".format(cmd, res)
+            )
+
+        return True
 
     def get_result(self):
-        if self.server1 and self.results[0] == 0:
+        if self.server1:
             query = "SHOW DATABASES LIKE 'util_db_clone'"
             try:
                 res = self.server1.exec_query(query)
-                if res and res[0][0] == 'util_db_clone':
-                    return (True, None)
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
+            if not res or res[0][0] != 'util_db_clone':
+                return (False, ("Result failure.\n",
+                                "Database clone 'util_db_clone' not found.\n"))
+
             query = "SHOW DATABASES LIKE 'db`:db_clone'"
             try:
                 res = self.server1.exec_query(query)
-                if res and res[0][0] == 'db`:db_clone':
-                    return (True, None)
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
-        return (False, ("Result failure.\n", "Database clone not found.\n"))
-    
+            if not res and res[0][0] != 'db`:db_clone':
+                return (False, ("Result failure.\n",
+                                "Database clone 'db`:db_clone' not found.\n"))
+        else:
+            return (False, ("Result failure.\n",
+                            "Test server no longer available to verify "
+                            "cloning results.\n"))
+        return True, None
+
     def record(self):
         # Not a comparative test, returning True
         return True

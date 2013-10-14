@@ -96,3 +96,108 @@ Test case 4 - no data
 #...done.
 OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
 Test case 5 - quiet clone
+Test case 6 - verbose clone with drop warnings.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Dropping new object TABLE util_db_clone.`t1`
+# WARNING: Unable to drop `t1` from source database (object may not exist): DROP TABLE `util_db_clone`.`t1`
+# Copying TABLE util_test.t1
+CREATE TABLE `util_db_clone`.`t1` LIKE `util_test`.`t1`
+# Dropping new object TABLE util_db_clone.`t2`
+# WARNING: Unable to drop `t2` from source database (object may not exist): DROP TABLE `util_db_clone`.`t2`
+# Copying TABLE util_test.t2
+CREATE TABLE `util_db_clone`.`t2` LIKE `util_test`.`t2`
+# Dropping new object TABLE util_db_clone.`t3`
+# WARNING: Unable to drop `t3` from source database (object may not exist): DROP TABLE `util_db_clone`.`t3`
+# Copying TABLE util_test.t3
+CREATE TABLE `util_db_clone`.`t3` LIKE `util_test`.`t3`
+# Dropping new object TABLE util_db_clone.`t4`
+# WARNING: Unable to drop `t4` from source database (object may not exist): DROP TABLE `util_db_clone`.`t4`
+# Copying TABLE util_test.t4
+CREATE TABLE `util_db_clone`.`t4` LIKE `util_test`.`t4`
+
+ALTER TABLE util_db_clone.t4 add CONSTRAINT `ref_t3`
+FOREIGN KEY (`c`)
+REFERENCES `util_db_clone`.`t3`
+(`a`)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+
+# Dropping new object VIEW util_db_clone.`v1`
+# WARNING: Unable to drop `v1` from source database (object may not exist): DROP VIEW `util_db_clone`.`v1`
+# Copying VIEW util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_db_clone`.`v1` AS select `util_db_clone`.`t1`.`a` AS `a` from `util_db_clone`.`t1`
+# Dropping new object PROCEDURE util_db_clone.`p1`
+# WARNING: Unable to drop `p1` from source database (object may not exist): DROP PROCEDURE `util_db_clone`.`p1`
+# Copying PROCEDURE util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_db_clone.t1 VALUES ("50")
+# Dropping new object FUNCTION util_db_clone.`f1`
+# WARNING: Unable to drop `f1` from source database (object may not exist): DROP FUNCTION `util_db_clone`.`f1`
+# Copying FUNCTION util_test.f1
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1)
+# Copying GRANTS from util_test
+GRANT ALTER ON `util_db_clone`.* TO 'joe'@'user'
+GRANT ALTER ROUTINE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT CREATE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT CREATE ROUTINE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT CREATE TEMPORARY TABLES ON `util_db_clone`.* TO 'joe'@'user'
+GRANT CREATE VIEW ON `util_db_clone`.* TO 'joe'@'user'
+GRANT DELETE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT DROP ON `util_db_clone`.* TO 'joe'@'user'
+GRANT EVENT ON `util_db_clone`.* TO 'joe'@'user'
+GRANT EXECUTE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT INDEX ON `util_db_clone`.* TO 'joe'@'user'
+GRANT INSERT ON `util_db_clone`.* TO 'joe'@'user'
+GRANT LOCK TABLES ON `util_db_clone`.* TO 'joe'@'user'
+GRANT REFERENCES ON `util_db_clone`.* TO 'joe'@'user'
+GRANT SELECT ON `util_db_clone`.* TO 'joe'@'user'
+GRANT SHOW VIEW ON `util_db_clone`.* TO 'joe'@'user'
+GRANT TRIGGER ON `util_db_clone`.* TO 'joe'@'user'
+GRANT UPDATE ON `util_db_clone`.* TO 'joe'@'user'
+GRANT ALTER ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT ALTER ROUTINE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT CREATE ROUTINE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT CREATE TEMPORARY TABLES ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT CREATE VIEW ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT DELETE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT DROP ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT EVENT ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT EXECUTE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT INDEX ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT INSERT ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT LOCK TABLES ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT REFERENCES ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT SELECT ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT SHOW VIEW ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT TRIGGER ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+GRANT UPDATE ON `util_db_clone`.* TO 'joe_wildcard'@'%'
+
+ALTER TABLE util_db_clone.t4 add CONSTRAINT `ref_t3`
+FOREIGN KEY (`c`)
+REFERENCES `util_db_clone`.`t3`
+(`a`)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+
+# Copying data for TABLE util_test.t1
+INSERT INTO `util_db_clone`.`t1` SELECT * FROM `util_test`.`t1`
+# Copying data for TABLE util_test.t2
+INSERT INTO `util_db_clone`.`t2` SELECT * FROM `util_test`.`t2`
+# Copying data for TABLE util_test.t3
+INSERT INTO `util_db_clone`.`t3` SELECT * FROM `util_test`.`t3`
+# Copying data for TABLE util_test.t4
+INSERT INTO `util_db_clone`.`t4` SELECT * FROM `util_test`.`t4`
+# Dropping new object TRIGGER util_db_clone.`trg`
+# WARNING: Unable to drop `trg` from source database (object may not exist): DROP TRIGGER `util_db_clone`.`trg`
+# Copying TRIGGER util_test.trg
+CREATE DEFINER=`root`@`localhost` TRIGGER util_db_clone.trg AFTER INSERT ON util_db_clone.t1 FOR EACH ROW INSERT INTO util_db_clone.t2 VALUES('Test objects count')
+# Dropping new object EVENT util_db_clone.`e1`
+# WARNING: Unable to drop `e1` from source database (object may not exist): DROP EVENT `util_db_clone`.`e1`
+# Copying EVENT util_test.e1
+CREATE DEFINER=`user`@`host` EVENT `e1` ON SCHEDULE EVERY 1 YEAR STARTS 'YYYY-MM-DD HH:MI:SS' ON COMPLETION NOT PRESERVE DISABLE DO DELETE FROM util_db_clone.t1 WHERE a = "not there"
+#...done.

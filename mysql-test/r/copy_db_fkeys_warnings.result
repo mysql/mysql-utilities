@@ -26,14 +26,14 @@ Test case 3 - Warning message when FK constraints are lost because destination e
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test_fk2 renamed as util_test_fk2_copy
-# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.a2.
+# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.`a2`.
 # Copying TABLE util_test_fk2.a2
 # WARNING: FOREIGN KEY constraints for table util_test_fk2_copy.a2 are missing because the new storage engine for the table is not InnoDB
 # Copying TABLE util_test_fk2.m
-# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.t2.
+# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.`t2`.
 # Copying TABLE util_test_fk2.t2
 # WARNING: FOREIGN KEY constraints for table util_test_fk2_copy.t2 are missing because the new storage engine for the table is not InnoDB
-# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.t3.
+# Replacing ENGINE=InnoDB with ENGINE=MYISAM for table `util_test_fk2_copy`.`t3`.
 # Copying TABLE util_test_fk2.t3
 # WARNING: FOREIGN KEY constraints for table util_test_fk2_copy.t3 are missing because the new storage engine for the table is not InnoDB
 # Copying data for TABLE util_test_fk2.a2

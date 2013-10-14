@@ -378,12 +378,22 @@ class Database(object):
         if self.cloning:
             try:
                 self.source.exec_query(drop_str, self.query_options)
-            except:
+            except UtilError:
+                if self.verbose:
+                    print("# WARNING: Unable to drop {0} from {1} database "
+                          "(object may not exist): {2}".format(name,
+                                                               "source",
+                                                               drop_str))
                 pass
         else:
             try:
                 self.destination.exec_query(drop_str, self.query_options)
-            except:
+            except UtilError:
+                if self.verbose:
+                    print("# WARNING: Unable to drop {0} from {1} database "
+                          "(object may not exist): {2}".format(name,
+                                                               "destination",
+                                                               drop_str))
                 pass
 
     def __create_object(self, obj_type, obj, show_grant_msg,
@@ -402,14 +412,16 @@ class Database(object):
         Note: will handle exception and print error if query fails
         """
         if obj_type == _TABLE and self.cloning:
+            obj_name = quote_with_backticks(obj[0])
             create_list = ["CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}".format(
-                self.q_new_db, obj[0], self.q_db_name)
+                self.q_new_db, obj_name, self.q_db_name)
             ]
         else:
             create_list = [self.__make_create_statement(obj_type, obj)]
         if obj_type == _TABLE:
             may_skip_fk = False  # Check possible issues with FK Constraints
-            tbl_name = "%s.%s" % (self.q_new_db, obj[0])
+            obj_name = quote_with_backticks(obj[0])
+            tbl_name = "%s.%s" % (self.q_new_db, obj_name)
             create_list = self.destination.substitute_engine(tbl_name,
                                                              create_list[0],
                                                              new_engine,
@@ -676,7 +688,8 @@ class Database(object):
             # Drop object if --force specified and database not dropped
             # Grants do not need to be dropped for overwriting
             if options.get("force", False) and obj[0] != _GRANT:
-                self.__drop_object(obj[0], obj[1][0])
+                obj_name = quote_with_backticks(obj[1][0])
+                self.__drop_object(obj[0], obj_name)
 
             # Create the object
             self.__create_object(obj[0], obj[1], not grant_msg_displayed,
