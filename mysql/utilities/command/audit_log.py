@@ -252,22 +252,23 @@ class AuditLog(object):
 
         # Get the current rotation size
         rotate_size = server.show_server_variable(
-            "audit_log_rotate_on_size")[0][1]
+            "audit_log_rotate_on_size"
+        )[0][1]
         min_rotation_size = 4096
 
         # If needed, set rotation size to the minimum allowed value.
         if int(rotate_size) != min_rotation_size:
-            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %d" %
-                              min_rotation_size)
-
-        # Flush the audit_log forcing the rotation if the file size is greater
-        # than the minimum (i.e. 4096).
-        server.exec_query("SET @@GLOBAL.audit_log_flush = ON")
+            server.exec_query(
+                "SET @@GLOBAL.audit_log_rotate_on_size = "
+                "{0}".format(min_rotation_size)
+            )
 
         # If needed, restore the rotation size to what it was initially.
         if int(rotate_size) != min_rotation_size:
-            server.exec_query("SET @@GLOBAL.audit_log_rotate_on_size = %s" %
-                              rotate_size)
+            server.exec_query(
+                "SET @@GLOBAL.audit_log_rotate_on_size = "
+                "{0}".format(rotate_size)
+            )
 
     def do_command(self):
         """ Check and execute the audit log command (previously set by the the

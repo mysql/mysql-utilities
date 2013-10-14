@@ -16,7 +16,7 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.exception import MUTLibError
 
 
 class test(mutlib.System_test):
@@ -42,11 +42,11 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
         else:
-            num_server -= 1 # Get last server in list
+            num_server -= 1  # Get last server in list
         self.server1 = self.servers.get_server(num_server)
 
         # Now install the audit log plugin
@@ -145,6 +145,24 @@ class test(mutlib.System_test):
     def do_replacements(self):
         self.replace_substring("127.0.0.1", "localhost")
         self.replace_result("| audit.log", "| audit.log [...] \n")
+
+        # Remove new audit log variable recently introduced.
+        self.remove_result("| audit_log_format")
+
+        # Mask output of file stats after rotate to support filename changes
+        # (e.g. filename with and without .xml extension).
+        self.replace_substring_portion("+------------------------------",
+                                       "---------------------------+"
+                                       "---------------------------+",
+                                       "+------------------------------+"
+                                       "-------+---------------------------+"
+                                       "---------------------------+")
+        self.replace_substring_portion("| File                             ",
+                                       " Created                   |"
+                                       " Last Modified             |",
+                                       "| File                         "
+                                       "| Size  | Created                   |"
+                                       " Last Modified             |")
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlauditadmin"
