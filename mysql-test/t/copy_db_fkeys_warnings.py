@@ -109,17 +109,6 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        if not res:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE {0}".format(db))
-        except:
-            return False
-        return True
-
     def drop_all(self):
         drop_dbs_s1 = ["util_test_fk2", "util_test_fk", "util_test_fk3"]
         drop_dbs_s2 = ["util_test_fk_copy", "util_test_fk2_copy"]

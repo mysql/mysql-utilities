@@ -17,8 +17,6 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
@@ -269,20 +267,7 @@ class test(mutlib.System_test):
     def record(self):
         # Not a comparative test, returning True
         return True
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE {0}".format(q_db))
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         # this DBs may not be created on subclasses.
         db_drops_on_server1 = ["util_test", 'db`:db', 'views_test',
@@ -303,7 +288,7 @@ class test(mutlib.System_test):
             try:
                 self.server1.exec_query(drop)
                 self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return True
             

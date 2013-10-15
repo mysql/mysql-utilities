@@ -15,10 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import sys
+
 import frm_reader_base
-from mysql.utilities.exception import MUTLibError, UtilDBError
-from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.exception import MUTLibError
+
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -37,7 +37,6 @@ class test(frm_reader_base.test):
 
     def setup(self):
         self.server0 = self.servers.get_server(0)
-        self.drop_all()
         self.frm_output = "frm_output.txt"
         self.s1_serverid = None
 
@@ -59,6 +58,8 @@ class test(frm_reader_base.test):
                 raise MUTLibError("Cannot spawn frm_test server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
+
+        self.drop_all()
 
         return True
 

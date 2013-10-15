@@ -32,15 +32,13 @@ import tempfile
 
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.my_print_defaults import my_login_config_path
 from mysql.utilities.common.server import stop_running_server, Server
-from mysql.utilities.common.tools import get_tool_path, delete_directory
+from mysql.utilities.common.table import quote_with_backticks
+from mysql.utilities.common.tools import get_tool_path
 from mysql.utilities.command.serverclone import clone_server
 
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
-
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -1173,6 +1171,17 @@ class System_test(object):
         kill_results = [self.kill_server(srv_role) for srv_role in servers]
         return all(kill_results)
 
+    def drop_db(self, server, db):
+        # Check before you drop to avoid warning
+        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
+        if not res:
+            return True  # Ok to exit here as there weren't any dbs to drop
+        try:
+            q_db = quote_with_backticks(db)
+            server.exec_query("DROP DATABASE {0}".format(q_db))
+        except UtilError:
+            return False
+        return True
 
     @abstractmethod
     def check_prerequisites(self):

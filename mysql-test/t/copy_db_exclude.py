@@ -57,7 +57,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude by name using "
@@ -72,7 +72,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude using SQL LIKE "
@@ -82,7 +82,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude using REGEXP "
@@ -92,7 +92,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude by name and SQL LIKE "
@@ -103,7 +103,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude by name and REGEXP "
@@ -114,7 +114,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude everything using SQL LIKE "
@@ -124,7 +124,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         test_num += 1
         comment = ("Test case {0} - exclude everything using REGEXP "
@@ -137,7 +137,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         # Note: Unlike SQL LIKE pattern that matches the entire value, with a
         # SQL REGEXP pattern match succeeds if the pattern matches anywhere in
@@ -151,7 +151,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        copy_db.test.drop_db(self, self.server2, 'util_db_clone')
+        self.drop_db(self.server2, 'util_db_clone')
 
         comment = ("Test case {0}b - SQL LIKE VS REGEXP pattern (match entire "
                    "value VS match anywhere in value).").format(test_num)

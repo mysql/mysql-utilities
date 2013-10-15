@@ -15,12 +15,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import mutlib
 import replicate
-from mysql.utilities.exception import MUTLibError
+
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _RPL_MODES = ["master", "slave", "both"]
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
+
 
 class test(replicate.test):
     """check --rpl parameter for export utility
@@ -146,15 +149,7 @@ class test(replicate.test):
 
     def cleanup(self):
         return replicate.test.cleanup(self)
-        
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "master_db1")
@@ -164,14 +159,14 @@ class test(replicate.test):
         self.drop_db(self.server3, "master_db1")
         try:
             self.server1.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         try:
             self.server2.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         try:
             self.server3.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         return True

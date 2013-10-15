@@ -17,6 +17,9 @@
 import os
 import mutlib
 
+from mysql.utilities.exception import MUTLibError
+
+
 class test(mutlib.System_test):
     """simple db copy
     This test executes copy database test cases among two servers using
@@ -76,19 +79,7 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         return self.drop_db(self.server2, "emp_mt")
             
@@ -96,5 +87,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-

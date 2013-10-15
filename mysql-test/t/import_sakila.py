@@ -17,8 +17,7 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.exception import MUTLibError
 
 
 _IMPORT_FILES = ['sakila-schema.sql', 'sakila-data.sql']
@@ -131,20 +130,6 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-
-    # This following method should be moved to mutlib module (to be reused).
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning.
-        try:
-            server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        except UtilError:
-            return True  # Ok to exit here as there weren't any dbs to drop.
-        try:
-            q_db = quote_with_backticks(db)
-            server.exec_query("DROP DATABASE {0}".format(q_db))
-        except UtilError:
-            return False
-        return True
 
     def cleanup(self):
         # Remove temporary result file.

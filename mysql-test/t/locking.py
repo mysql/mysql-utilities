@@ -16,9 +16,10 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+from mysql.utilities.exception import MUTLibError, UtilError
 
-_WARNING = "WARNING: Lock in progress. You must call unlock() to unlock your tables."
+_WARNING = ("WARNING: Lock in progress. You must call unlock() to unlock "
+            "your tables.")
 
 _TABLES = [
     ("util_test.t1", 'READ'),
@@ -32,7 +33,8 @@ _BAD_TABLE = [
 ]
 
 _LOCKTESTS = [
-    # lock_test, tables, Lock() fail?, Unlock() fail? : True = call expected to fail
+    # lock_test, tables, Lock() fail?, Unlock() fail? :
+    # True = call expected to fail.
     ('no-locks', _TABLES, False, False),
     ('lock-all', _TABLES, False, False),
     ('snapshot', _TABLES, False, False),
@@ -42,6 +44,7 @@ _LOCKTESTS = [
     ('SKIP_UNLOCK', _TABLES, False, True),
     ('lock-all', _BAD_TABLE, True, True),
 ]
+
 
 class test(mutlib.System_test):
     """locking
@@ -158,34 +161,17 @@ class test(mutlib.System_test):
     def record(self):
         # Not a comparative test, returning True
         return True
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        res1, res2 = True, True
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            res1 = False
-        try:
-            self.drop_db(self.server1, "util_db_clone")
-        except:
-            res2 = False
+        res1 = self.drop_db(self.server1, "util_test")
+
+        res2 = self.drop_db(self.server1, "util_db_clone")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return res1 and res2
 

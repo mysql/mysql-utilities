@@ -21,6 +21,7 @@ from mysql.utilities.exception import UtilError
 
 _SYSTEM_DATABASES = ['MYSQL', 'INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA']
 
+
 class test(copy_db.test):
     """check parameters for clone db
     This test executes a series of clone database operations on a single
@@ -164,28 +165,11 @@ class test(copy_db.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        try:
-            self.drop_db(self.server1, 'util_test')
-        except:
-            pass
-        try:
-            self.drop_db(self.server1, 'db`:db')
-        except:
-            pass
-        try:
-            self.drop_db(self.server2, 'util_test')
-        except:
-            pass
-        try:
-            self.drop_db(self.server2, 'db`:db')
-        except:
-            pass
-        try:
-            self.drop_db(self.server2, 'wesaysocorp')
-        except:
-            pass
-        try:
-            self.drop_db(self.server3, 'wesaysocorp')
-        except:
-            pass
+        self.drop_db(self.server1, 'util_test')
+        self.drop_db(self.server1, 'db`:db')
+        self.drop_db(self.server2, 'util_test')
+        self.drop_db(self.server2, 'db`:db')
+        self.drop_db(self.server2, 'wesaysocorp')
+        self.drop_db(self.server3, 'wesaysocorp')
+
         return copy_db.test.cleanup(self)

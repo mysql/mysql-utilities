@@ -14,10 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import clone_db
 
 from mysql.utilities.exception import MUTLibError
+
 
 class test(clone_db.test):
     """check exclude parameter for clone db
@@ -49,7 +50,7 @@ class test(clone_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        clone_db.test.drop_db(self, self.server1, 'util_db_clone')
+        self.drop_db(self.server1, 'util_db_clone')
 
         comment = "Test case 2 - exclude by regex"
         cmd_opts = "--exclude=^e --exclude=4$ --regex "
@@ -57,7 +58,7 @@ class test(clone_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
-        clone_db.test.drop_db(self, self.server1, 'util_db_clone')
+        self.drop_db(self.server1, 'util_db_clone')
 
         comment = "Test case 3 - exclude by name and regex"
         cmd_opts = "--exclude=^e --exclude=4$ --regex " + \

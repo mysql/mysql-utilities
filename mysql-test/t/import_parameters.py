@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import import_basic
 from mysql.utilities.exception import MUTLibError, UtilDBError
+
 
 class test(import_basic.test):
     """check parameters for import utility
@@ -47,10 +48,8 @@ class test(import_basic.test):
         else:
             self.results.append("Database was created.\n")
         self.results.append(self.check_objects(self.server2, "util_test"))
-        try:
-            self.drop_db(self.server2, "util_test")
-        except:
-            pass # ok if this fails - it is a spawned server
+
+        self.drop_db(self.server2, "util_test")
 
     def run(self):
         self.res_fname = "result.txt"

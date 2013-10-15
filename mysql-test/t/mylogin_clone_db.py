@@ -100,33 +100,16 @@ class test(mutlib.System_test):
         # Not a comparative test, returning True
         return True
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            server.exec_query("SHOW DATABASES LIKE 'util_%'")
-        except Exception:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            server.exec_query("DROP DATABASE %s" % db)
-        except Exception:
-            return False
-        return True
-
     def drop_all(self):
-        res1, res2 = True, True
-        try:
-            self.drop_db(self.server1, "util_test")
-        except Exception:
-            res1 = False
-        try:
-            self.drop_db(self.server1, "util_db_clone")
-        except Exception:
-            res2 = False
+        res1 = self.drop_db(self.server1, "util_test")
+
+        res2 = self.drop_db(self.server1, "util_db_clone")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return res1 and res2
 

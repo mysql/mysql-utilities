@@ -14,8 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import replicate
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 # Setup expected results.
@@ -25,6 +26,7 @@ _EXPECTED_RESULTS = [
     (2, [('001c',), ('002a',), ('002b',)]),
     (3, [('002a',), ('002b',)]),
 ]
+
 
 class test(replicate.test):
     """check parameters for the replicate utility
@@ -238,17 +240,12 @@ class test(replicate.test):
         return True
     
     def drop_all(self):
-        try:
-            self.drop_db(self.server1, "log_test")
-            self.drop_db(self.server2, "log_test")
-        except:
-            return False
-        return True
+        res1 = self.drop_db(self.server1, "log_test")
+        res2 = self.drop_db(self.server2, "log_test")
+        return res1 and res2
             
     def cleanup(self):
         # Kill servers that are only used in this test
         kill_list = ['rep_slave_log']
         return (replicate.test.cleanup(self)
                 and self.kill_server_list(kill_list))
-
-

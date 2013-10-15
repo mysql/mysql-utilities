@@ -233,14 +233,6 @@ class test(rpl_admin.test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-
     def cleanup(self):
         for server in self.servers_list:
             self.drop_db(server, "test_relay")

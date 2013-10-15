@@ -15,8 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import mutlib
-from mysql.utilities.exception import UtilError, MUTLibError
+
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start ' + \
                       '--log-slave-updates --gtid-mode=on ' + \
@@ -24,6 +26,7 @@ _DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start ' + \
                       '--sync-master-info=1 --master-info-repository=table"'
 
 _FORMATS = ['sql', 'csv', 'tab', 'grid', 'vertical']
+
 
 class test(mutlib.System_test):
     """check gtid operation for export/import utilities
@@ -232,14 +235,6 @@ class test(mutlib.System_test):
         kill_list = ['with_gtids_1', 'with_gtids_2', 'no_gtids']
         return (self.drop_all() and self.kill_server_list(kill_list))
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-
     def drop_all(self):
         servers = [self.server1, self.server2, self.server3]
         for server in servers:
@@ -247,6 +242,6 @@ class test(mutlib.System_test):
                 self.drop_db(server, "util_test")
                 self.drop_db(server, "util_test2")
                 server.exec_query("DROP USER 'joe'@'user'")
-            except:
+            except UtilError:
                 pass
         return True

@@ -16,7 +16,9 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(mutlib.System_test):
     """simple db diff
@@ -144,18 +146,6 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server2, "util_test")
@@ -164,7 +154,7 @@ class test(mutlib.System_test):
             try:
                 self.server1.exec_query(drop)
                 self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return True
 

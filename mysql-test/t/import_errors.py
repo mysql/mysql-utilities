@@ -18,6 +18,7 @@ import os
 import import_basic
 from mysql.utilities.exception import MUTLibError
 
+
 class test(import_basic.test):
     """Import Data
     This test executes the import utility on a single server.

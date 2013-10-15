@@ -17,8 +17,6 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
@@ -118,44 +116,18 @@ class test(mutlib.System_test):
     def record(self):
         # Not a comparative test, returning True
         return True
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE %s" % q_db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        res = True
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            res = res and False
-        try:
-            self.drop_db(self.server1, 'db`:db')
-        except:
-            res = res and False
-        try:
-            self.drop_db(self.server1, "util_db_clone")
-        except:
-            res = res and False
-        try:
-            self.drop_db(self.server1, "db`:db_clone")
-        except:
-            res = res and False
+        res = self.drop_db(self.server1, "util_test")
+        res = res and self.drop_db(self.server1, 'db`:db')
+        res = res and self.drop_db(self.server1, "util_db_clone")
+        res = res and self.drop_db(self.server1, "db`:db_clone")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-                self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return res
 
@@ -163,7 +135,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

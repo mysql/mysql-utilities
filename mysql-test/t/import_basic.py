@@ -17,10 +17,9 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError, UtilDBError
+
 
 class test(mutlib.System_test):
     """Import Data
@@ -308,51 +307,22 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE %s" % q_db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
-        try:
-            self.drop_db(self.server1, 'db`:db')
-        except:
-            return False
-        try:
-            self.drop_db(self.server1, "import_test")
-        except:
-            return False
-        try:
-            self.drop_db(self.server2, "util_test")
-        except:
-            pass  # ok if this fails - it is a spawned server
-        try:
-            self.drop_db(self.server2, 'db`:db')
-        except:
-            pass  # ok if this fails - it is a spawned server
-        try:
-            self.drop_db(self.server2, "import_test")
-        except:
-            pass  # ok if this fails - it is a spawned server
+        # OK if drop_db fails - they are spawned servers.
+        self.drop_db(self.server1, "util_test")
+        self.drop_db(self.server1, 'db`:db')
+        self.drop_db(self.server1, "import_test")
+        self.drop_db(self.server2, "util_test")
+        self.drop_db(self.server2, 'db`:db')
+        self.drop_db(self.server2, "import_test")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
                 self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return True
 

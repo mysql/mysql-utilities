@@ -16,10 +16,10 @@
 #
 import difflib
 import os
-import sys
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
-from mysql.utilities.common.format import format_tabular_list
+
+from mysql.utilities.exception import MUTLibError
+
 
 class test(mutlib.System_test):
     """.frm file reader
@@ -35,7 +35,6 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.server0 = self.servers.get_server(0)
-        self.drop_all()
         self.frm_output = "frm_output.txt"
         self.s1_serverid = None
 
@@ -57,6 +56,8 @@ class test(mutlib.System_test):
                 raise MUTLibError("Cannot spawn frm_test server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
+
+        self.drop_all()
 
         self.server1.exec_query("CREATE DATABASE frm_test")
         basedir = self.server1.show_server_variable("basedir")[0][1]
@@ -173,25 +174,8 @@ class test(mutlib.System_test):
         # Not a comparative test, returning True
         return True
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'frm_test%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-
     def drop_all(self):
-        res1 = True
-        try:
-            self.drop_db(self.server1, "frm_test")
-        except:
-            res1 = False
-        return res1
+        return self.drop_db(self.server1, "frm_test")
 
     def cleanup(self):
         if self.res_fname:

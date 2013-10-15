@@ -97,17 +97,6 @@ class test(mutlib.System_test):
         # Not a comparative test, returning True
         return True
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        if not res:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            res2 = server.exec_query("DROP DATABASE {0}".format(db))
-        except:
-            return False
-        return True
-
     def drop_all(self):
         drop_dbs_s1 = ["util_test_fk2", "util_test_fk3", "util_test_fk"]
         drop_dbs_s2 = ["util_test_fk_copy"]

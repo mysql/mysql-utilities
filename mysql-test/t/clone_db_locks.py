@@ -15,10 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
+
 
 class test(mutlib.System_test):
     """simple db clone
@@ -78,8 +81,8 @@ class test(mutlib.System_test):
                     if res and res[0][0] != 'util_db_clone':
                         return (False, ("Result failure.\n",
                                         "Database clone not found.\n"))
-                except UtilDBError, e:
-                    raise MUTLibError(e.errmsg)
+                except UtilError as err:
+                    raise MUTLibError(err.errmsg)
             else:
                 return(False, "Test case returned wrong result.\n")
 
@@ -88,35 +91,16 @@ class test(mutlib.System_test):
     def record(self):
         # Not a comparative test, returning True
         return True
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        res1, res2 = True, True
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            res1 = False
-        try:
-            self.drop_db(self.server1, "util_db_clone")
-        except:
-            res2 = False
+        res1 = self.drop_db(self.server1, "util_test")
+        res2 = self.drop_db(self.server1, "util_db_clone")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-                self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return res1 and res2
 
@@ -124,7 +108,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

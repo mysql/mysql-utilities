@@ -16,7 +16,9 @@
 #
 import os
 import time
+
 import replicate
+
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.replication import Master, Slave
 
@@ -355,16 +357,8 @@ class test(replicate.test):
         return (True, '')
     
     def record(self):
-        return True # Not a comparative test
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-    
+        return True  # Not a comparative test
+
     def _drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "master_db1")

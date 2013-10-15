@@ -17,8 +17,6 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 
@@ -289,20 +287,7 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE %s" % q_db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "util_test1")
@@ -317,7 +302,7 @@ class test(mutlib.System_test):
             try:
                 self.server1.exec_query(drop)
                 self.server2.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         return True
 

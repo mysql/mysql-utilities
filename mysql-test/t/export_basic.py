@@ -15,10 +15,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
 import copy_db_parameters
 
-from mysql.utilities.common.table import quote_with_backticks
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -167,33 +165,6 @@ class test(copy_db_parameters.test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE %s" % q_db)
-        except:
-            return False
-        return True
-
-    def drop_all(self):
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
-        try:
-            self.drop_db(self.server1, 'db`:db')
-        except:
-            return False
-        return True
-
     def cleanup(self):
-        try:
-            self.drop_db(self.server1, 'import_test')
-        except:
-            pass
+        self.drop_db(self.server1, 'import_test')
         return copy_db_parameters.test.cleanup(self)

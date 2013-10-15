@@ -16,7 +16,9 @@
 #
 import os
 import mutlib
+
 from mysql.utilities.exception import UtilError, MUTLibError
+
 
 class test(mutlib.System_test):
     """simple db copy
@@ -88,29 +90,10 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        res1, res2, res3 = True, True, True
-        try:
-            self.drop_db(self.server1, "util_spec")
-        except:
-            res1 = False
-        try:
-            self.drop_db(self.server2, "util_spec_clone")
-        except:
-            res2 = False
+        res1 = self.drop_db(self.server1, "util_spec")
+        res2 = self.drop_db(self.server2, "util_spec_clone")
         return res1 and res2
             
     def cleanup(self):

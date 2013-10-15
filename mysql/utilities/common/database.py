@@ -384,7 +384,6 @@ class Database(object):
                           "(object may not exist): {2}".format(name,
                                                                "source",
                                                                drop_str))
-                pass
         else:
             try:
                 self.destination.exec_query(drop_str, self.query_options)
@@ -394,7 +393,6 @@ class Database(object):
                           "(object may not exist): {2}".format(name,
                                                                "destination",
                                                                drop_str))
-                pass
 
     def __create_object(self, obj_type, obj, show_grant_msg,
                         quiet=False, new_engine=None, def_engine=None):

@@ -15,9 +15,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
+import mutlib
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
@@ -326,20 +325,7 @@ class test(mutlib.System_test):
     
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE %s" % q_db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         self.drop_db(self.server1, "inventory")
         self.drop_db(self.server1, "inventory1")
