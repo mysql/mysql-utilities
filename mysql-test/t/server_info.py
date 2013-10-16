@@ -47,17 +47,42 @@ class test(mutlib.System_test):
 
     def do_replacements(self):
         # Mask out this information to make result file deterministic
-        self.replace_result("        version:", "        version: XXXX\n")
-        self.replace_result("        datadir:", "        datadir: XXXX\n")
-        self.replace_result("        basedir:", "        basedir: XXXX\n")
-        self.replace_result("     plugin_dir:", "     plugin_dir: XXXX\n")
-        self.replace_result("    config_file:", "    config_file: XXXX\n")
-        self.replace_result("     binary_log:", "     binary_log: XXXX\n")
-        self.replace_result(" binary_log_pos:", " binary_log_pos: XXXX\n")
-        self.replace_result("      relay_log:", "      relay_log: XXXX\n")
-        self.replace_result("  relay_log_pos:", "  relay_log_pos: XXXX\n")
-        self.replace_result("         server: localhost:",
-                            "         server: localhost: XXXX\n")
+        self.replace_result("                  version:",
+                            "                  version: XXXX\n")
+        self.replace_result("                  datadir:",
+                            "                  datadir: XXXX\n")
+        self.replace_result("                  basedir:",
+                            "                  basedir: XXXX\n")
+        self.replace_result("               plugin_dir:",
+                            "               plugin_dir: XXXX\n")
+        self.replace_result("              config_file:",
+                            "              config_file: XXXX\n")
+        self.replace_result("               binary_log:",
+                            "               binary_log: XXXX\n")
+        self.replace_result("           binary_log_pos:",
+                            "           binary_log_pos: XXXX\n")
+        self.replace_result("                relay_log:",
+                            "                relay_log: XXXX\n")
+        self.replace_result("            relay_log_pos:",
+                            "            relay_log_pos: XXXX\n")
+        self.replace_result("                   server: localhost:",
+                            "                   server: localhost: XXXX\n")
+        self.replace_result("              general_log:",
+                            "              general_log: XXXX\n")
+        self.replace_result("         general_log_file:",
+                            "         general_log_file: XXXX\n")
+        self.replace_result("    general_log_file_size:",
+                            "    general_log_file_size: XXXX\n")
+        self.replace_result("                log_error:",
+                            "                log_error: XXXX\n")
+        self.replace_result("      log_error_file_size:",
+                            "      log_error_file_size: XXXX\n")
+        self.replace_result("           slow_query_log:",
+                            "           slow_query_log: XXXX\n")
+        self.replace_result("      slow_query_log_file:",
+                            "      slow_query_log_file: XXXX\n")
+        self.replace_result(" slow_query_log_file_size:",
+                            " slow_query_log_file_size: XXXX\n")
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         port = int(self.servers.get_next_port())

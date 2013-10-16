@@ -18,13 +18,15 @@
 """
 This file contains the reporting mechanisms for reporting disk usage.
 """
-
 import os
 import re
 import subprocess
 import sys
 import tempfile
 import time
+
+from collections import defaultdict, namedtuple
+from itertools import chain
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
@@ -33,10 +35,39 @@ from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
 from mysql.utilities.common.server import (connect_servers, get_local_servers,
                                            Server, test_connect)
 
+log_file_tuple = namedtuple('log_file_tuple',
+                            "log_name log_file log_file_size")
 
-_COLUMNS = ['server', 'version', 'datadir', 'basedir', 'plugin_dir',
-            'config_file', 'binary_log', 'binary_log_pos', 'relay_log',
-            'relay_log_pos']
+_LOG_FILES_VARIABLES = {
+    'error log': log_file_tuple('log_error', None, 'log_error_file_size'),
+    'general log': log_file_tuple('general_log', 'general_log_file',
+                                  'general_log_file_size'),
+    'slow query log': log_file_tuple('slow_query_log', 'slow_query_log_file',
+                                     'slow_query_log_file_size')
+}
+
+_SERVER_VARIABLES = ['version', 'datadir', 'basedir', 'plugin_dir']
+
+
+_COLUMNS = ['server', 'config_file', 'binary_log', 'binary_log_pos',
+            'relay_log', 'relay_log_pos']
+
+_WARNING_TEMPLATE = ("Unable to get information about '{0}' size. Please "
+                     "check if the file '{1}' exists or if you have the "
+                     "necessary Operating System permissions to access it.")
+
+# Add the values from server variables to the _COLUMNS list
+_COLUMNS.extend(_SERVER_VARIABLES)
+
+# Retrieve column names from the _LOG_FILES_VARIABLES, filter the
+# None value, sort them alphabetically and add them to the  _COLUMNS list
+_COLUMNS.extend(sorted(
+    val for val in chain(*_LOG_FILES_VARIABLES.values()) if val is not None)
+)
+
+# Used to get O(1) performance in checking if an item is already present
+# in _COLUMNS
+_COLUMNS_SET = set(_COLUMNS)
 
 
 def _get_binlog(server):
@@ -46,13 +77,12 @@ def _get_binlog(server):
 
     Returns tuple (binary log, binary log position)
     """
-    binlog = None
-    binlog_pos = None
+    binlog, binlog_pos = '', ''
     res = server.exec_query("SHOW MASTER STATUS")
     if res != [] and res is not None:
         binlog = res[0][0]
         binlog_pos = res[0][1]
-    return (binlog, binlog_pos)
+    return binlog, binlog_pos
 
 
 def _get_relay_log(server):
@@ -62,13 +92,12 @@ def _get_relay_log(server):
 
     Returns tuple (relay log, relay log position)
     """
-    relay_log = None
-    relay_log_pos = None
+    relay_log, relay_log_pos = '', ''
     res = server.exec_query("SHOW SLAVE STATUS")
     if res != [] and res is not None:
         relay_log = res[0][7]
         relay_log_pos = res[0][8]
-    return (relay_log, relay_log_pos)
+    return relay_log, relay_log_pos
 
 
 def _server_info(server_val, get_defaults=False, options=None):
@@ -107,24 +136,100 @@ def _server_info(server_val, get_defaults=False, options=None):
     servers = connect_servers(source_values, None, conn_options)
     server = servers[0]
 
-    rows = server.exec_query("SHOW VARIABLES LIKE 'basedir'")
-    if rows:
-        basedir = rows[0][1]
-    else:
-        raise UtilError("Unable to determine basedir of running server.")
+    params_dict = defaultdict(str)
 
-    if os.name == "posix":
-        my_def_search = ["/etc/my.cnf", "/etc/mysql/my.cnf",
-                         os.path.join(basedir, "my.cnf"), "~/.my.cnf"]
-    else:
-        my_def_search = [r"c:\windows\my.ini", r"c:\my.ini", r"c:\my.cnf",
-                         os.path.join(os.curdir, "my.ini")]
-    my_def_search.append(os.path.join(os.curdir, "my.cnf"))
+    # Initialize list of warnings
+    params_dict['warnings'] = []
 
     # Identify server by string: 'host:port[:socket]'.
     server_id = "{0}:{1}".format(source_values['host'], source_values['port'])
     if source_values.get('socket', None):
         server_id = "{0}:{1}".format(server_id, source_values.get('socket'))
+    params_dict['server'] = server_id
+
+    # Get _SERVER_VARIABLES values from the server
+    for server_var in _SERVER_VARIABLES:
+        res = server.show_server_variable(server_var)
+        if res:
+            params_dict[server_var] = res[0][1]
+        else:
+            raise UtilError("Unable to determine {0} of server '{1}'"
+                            ".".format(server_var, server_id))
+
+    # Get _LOG_FILES_VARIABLES values from the server
+    for msg, log_tpl in _LOG_FILES_VARIABLES.iteritems():
+        res = server.show_server_variable(log_tpl.log_name)
+        if res:
+            # Check if log is turned off
+            params_dict[log_tpl.log_name] = res[0][1]
+            # If logs are turned off, skip checking information about the file
+            if res[0][1] in ('', 'OFF'):
+                continue
+
+            # Logging is enabled, so we can get get information about log_file
+            # unless it is log_error because in that case we already have it.
+            if log_tpl.log_file is not None:  # if it is not log_error
+                log_file = server.show_server_variable(
+                    log_tpl.log_file)[0][1]
+                params_dict[log_tpl.log_file] = log_file
+            else:  # log error, so log_file_name is already on params_dict
+                log_file = params_dict[log_tpl.log_name]
+
+            # Now get the information about the size of the logs
+            try:
+                params_dict[log_tpl.log_file_size] = "{0} bytes".format(
+                    os.path.getsize(log_file))
+
+            except os.error:
+                # if we are unable to get the log_file_size
+                params_dict[log_tpl.log_file_size] = ''
+                warning_msg = _WARNING_TEMPLATE.format(msg, log_file)
+                params_dict['warnings'].append(warning_msg)
+        else:
+            params_dict['warnings'].append("Unable to get information "
+                                           "regarding variable '{0}'"
+                                           ).format(msg)
+
+    # if audit_log plugin is installed and enabled
+    if server.supports_plugin('audit'):
+        res = server.show_server_variable('audit_log_file')
+        if res:
+            # Audit_log variable might be a relative path to the datadir,
+            # so it needs to be treated accordingly
+            if not os.path.isabs(res[0][1]):
+                params_dict['audit_log_file'] = os.path.join(
+                    params_dict['datadir'], res[0][1])
+            else:
+                params_dict['audit_log_file'] = res[0][1]
+
+            # Add audit_log field to the _COLUMNS List unless it is already
+            # there
+            if 'audit_log_file' not in _COLUMNS_SET:
+                _COLUMNS.append('audit_log_file')
+                _COLUMNS.append('audit_log_file_size')
+                _COLUMNS_SET.add('audit_log_file')
+            try:
+                params_dict['audit_log_file_size'] = "{0} bytes".format(
+                    os.path.getsize(params_dict['audit_log_file']))
+
+            except os.error:
+                # If we are unable to get the size of the audit_log_file
+                params_dict['audit_log_file_size'] = ''
+                warning_msg = _WARNING_TEMPLATE.format(
+                    "audit log",
+                    params_dict['audit_log_file']
+                )
+                params_dict['warnings'].append(warning_msg)
+
+    # Build search path for config files
+    if os.name == "posix":
+        my_def_search = ["/etc/my.cnf", "/etc/mysql/my.cnf",
+                         os.path.join(params_dict['basedir'], "my.cnf"),
+                         "~/.my.cnf"]
+    else:
+        my_def_search = [r"c:\windows\my.ini", r"c:\my.ini", r"c:\my.cnf",
+                         os.path.join(os.curdir, "my.ini")]
+    my_def_search.append(os.path.join(os.curdir, "my.cnf"))
 
     # Get server's default configuration values.
     defaults = []
@@ -132,11 +237,14 @@ def _server_info(server_val, get_defaults=False, options=None):
         # Can only get defaults for local servers (need to access local data).
         if server.is_alias('localhost'):
             try:
-                my_def_path = get_tool_path(basedir, "my_print_defaults")
+                my_def_path = get_tool_path(params_dict['basedir'],
+                                            "my_print_defaults")
             except UtilError as err:
                 raise UtilError("Unable to retrieve the defaults data "
                                 "(requires access to my_print_defaults): {0} "
-                                "(basedir: {1})".format(err.errmsg, basedir))
+                                "(basedir: {1})".format(err.errmsg,
+                                                        params_dict['basedir'])
+                                )
             out_file = tempfile.TemporaryFile()
             # Execute tool: <basedir>/my_print_defaults mysqld
             subprocess.call([my_def_path, "mysqld"], stdout=out_file)
@@ -150,13 +258,6 @@ def _server_info(server_val, get_defaults=False, options=None):
             defaults.append("\nWARNING: The utility can not get defaults from "
                             "a remote host.")
 
-    # Get server version
-    try:
-        res = server.show_server_variable('version')
-        version = res[0][1]
-    except:
-        raise UtilError("Cannot get version for server " + server_id)
-
     # Find config file
     config_file = ""
     for search_path in my_def_search:
@@ -165,20 +266,17 @@ def _server_info(server_val, get_defaults=False, options=None):
                 config_file = "{0}, {1}".format(config_file, search_path)
             else:
                 config_file = search_path
+    params_dict['config_file'] = config_file
 
-    # Find datadir, basedir, plugin-dir, binary log, relay log
-    res = server.show_server_variable("datadir")
-    datadir = res[0][1]
-    res = server.show_server_variable("basedir")
-    basedir = res[0][1]
-    res = server.show_server_variable("plugin_dir")
-    plugin_dir = res[0][1]
-    binlog, binlog_pos = _get_binlog(server)
-    relay_log, relay_log_pos = _get_relay_log(server)
+    # Find binary log, relay log
+    params_dict['binary_log'], params_dict['binary_log_pos'] = _get_binlog(
+        server)
+    params_dict['relay_log'], params_dict['relay_log_pos'] = _get_relay_log(
+        server)
+
     server.disconnect()
 
-    return ((server_id, version, datadir, basedir, plugin_dir, config_file,
-             binlog, binlog_pos, relay_log, relay_log_pos), defaults)
+    return params_dict, defaults
 
 
 def _start_server(server_val, basedir, datadir, options=None):
@@ -372,7 +470,8 @@ def show_server_info(servers, options):
         else:
             _show_running_servers()
 
-    rows = []
+    row_dict_lst = []
+    warnings = []
     server_val = {}
     for server in servers:
         new_server = None
@@ -424,16 +523,23 @@ def show_server_info(servers, options):
                                     " or cannot be parsed.")
                 new_server = _start_server(server_val, basedir,
                                            datadir, options)
-
-        info, defaults = _server_info(server, show_defaults, options)
-        if info:
-            rows.append(info)
+        info_dict, defaults = _server_info(server, show_defaults, options)
+        warnings.extend(info_dict['warnings'])
+        if info_dict:
+            row_dict_lst.append(info_dict)
         if new_server:
             # Need to stop the server!
             new_server.disconnect()
             _stop_server(server_val, basedir, options)
 
+    # Get the row values stored in the dictionaries
+    rows = [[row_dict[key] for key in _COLUMNS] for row_dict in row_dict_lst]
+
     print_list(sys.stdout, fmt, _COLUMNS, rows, no_headers)
+    if warnings:
+        print("\n# List of Warnings: \n")
+        for warning in warnings:
+            print("WARNING: {0}\n".format(warning))
 
     # Print the default configurations.
     if show_defaults and len(defaults) > 0:
