@@ -15,8 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import import_basic
-from mysql.utilities.exception import MUTLibError
+
+import mutlib
+
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _ENGINE_QUERY = """
     SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES
@@ -25,7 +27,8 @@ _ENGINE_QUERY = """
 
 _TABLES = ('t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 't10')
 
-class test(import_basic.test):
+
+class test(mutlib.System_test):
     """check storage engine options for import utility
     This test executes a test for engine parameters for mysqldbimport.
     It uses the import_basic test as a parent for teardown methods.
@@ -46,7 +49,6 @@ class test(import_basic.test):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.export_import_file = "test_run.txt"
         num_servers = self.servers.num_servers()
         if self.need_servers:
             try:
@@ -99,8 +101,7 @@ class test(import_basic.test):
                                         (table_name, res[0][0]))
 
         self.res_fname = "result.txt"
-        import_basic.test.drop_all(self)
-        
+
         to_conn = "--server=" + self.build_connection_string(self.server1)
         
         import_file = os.path.normpath("./std_data/bad_engine.csv")
@@ -187,6 +188,20 @@ class test(import_basic.test):
 
         return True
 
+    def drop_all(self):
+        # OK if drop_db fails - they are spawned servers.
+        self.drop_db(self.server1, "util_test")
+        self.drop_db(self.server1, 'db`:db')
+        self.drop_db(self.server1, "import_test")
+
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
+        for drop in drop_user:
+            try:
+                self.server1.exec_query(drop)
+            except UtilError:
+                pass
+        return True
+
     def get_result(self):
         return self.compare(__name__, self.results)
 
@@ -194,4 +209,11 @@ class test(import_basic.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return import_basic.test.cleanup(self)
+        # Remove result file.
+        if self.res_fname:
+            try:
+                os.unlink(self.res_fname)
+            except OSError:
+                pass  # Ignore error because file may not exist.
+        # Drop all imported database data.
+        return self.drop_all()
