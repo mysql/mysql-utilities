@@ -17,11 +17,11 @@ do
 	MYSQLINIT="/dist-packages/mysql/__init__.py"
 	if [ -d $PYDIST/dist-packages/mysql ];
 	then	
-		if [ -d $PYDIST/dist-packages/mysql ];
+		if [ ! -e $PYDIST/dist-packages/mysql/__init__.py ] && [ ! -L $PYDIST/dist-packages/mysql/__init__.py ];
 		then
-			#ls $PYSHARED$MYSQLINIT
+			ls $PYDIST/dist-packages/mysql
 			touch $PYDIST$MYSQLINIT
-			ls $PYDIST$MYSQLINIT -l
+			ls $PYDIST$MYSQLINIT -la
 		fi
 		
 	else

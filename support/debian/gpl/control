@@ -8,7 +8,10 @@ Standards-Version: 3.9.3
 
 Package: mysql-utilities
 Architecture: all
-Depends: python2.6 | python2.7, python (>= 2.6.3), mysql-connector-python (>= 1.0.9)
+Depends: python2.6 | python2.7, python (>= 2.6.3), mysql-connector-python (>= 1.0.9) | mysql-connector-python-commercial (>= 1.0.9)
+Conflicts: mysql-utilities-commercial (<= ${binary:Version})
+Replaces: mysql-utilities-commercial (<= ${binary:Version}), mysql-utilities (<= ${binary:Version})
+Provides: mysql-utilities
 Homepage: http://dev.mysql.com/doc/workbench/en/mysql-utilities.html
 Description: Collection of scripts for managing MySQL servers
  MySQL Utilities is both a set of command-line utilities as well as a 
