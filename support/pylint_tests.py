@@ -20,8 +20,8 @@
 This file contains pylint and pep8 tests.
 
 Requirements:
-  pylint==1.0.0
-  pep8==1.4.6
+  pylint>=1.0.0
+  pep8>=1.4.6
 """
 
 import os
@@ -33,20 +33,34 @@ try:
     from pylint import lint
     from pylint.reporters import BaseReporter
     from pylint.reporters.text import TextReporter, ColorizedTextReporter
+    from pylint.__pkginfo__ import version as pylint_version
 except ImportError:
     sys.stdout.write("Pylint is not installed on your system.\n")
     sys.exit(1)
 
 try:
-    from pep8 import StyleGuide, BaseReport
+    from pep8 import StyleGuide, BaseReport, __version__ as pep8_version
 except ImportError:
     sys.stdout.write("Pep8 is not installed on your system.\n")
     sys.exit(1)
 
 
+_PYLINT_MIN_VERSION = "1.0.0"
+_PEP8_MIN_VERSION = "1.4.6"
 _PACKAGES = (os.path.join('mysql', 'utilities'),)
 _CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 (_BASE_PATH, _,) = os.path.split(_CURRENT_PATH)
+
+
+if pylint_version.split(".") < _PYLINT_MIN_VERSION.split("."):
+    sys.stdout.write("ERROR: pylint version >= {0} is required to run "
+                     "pylint_tests.\n".format(_PYLINT_MIN_VERSION))
+    sys.exit(1)
+
+if pep8_version.split(".") < _PEP8_MIN_VERSION.split("."):
+    sys.stdout.write("ERROR: pep8 version >= {0} is required to run "
+                     "pylint_tests.\n".format(_PEP8_MIN_VERSION))
+    sys.exit(1)
 
 
 class CustomTextReporter(TextReporter):
@@ -253,5 +267,7 @@ if __name__ == "__main__":
             reporter = CustomTextReporter(output)
 
         process_items(reporter, items)
+    except KeyboardInterrupt:
+        sys.stdout.write("\n")
     finally:
         output.close()
