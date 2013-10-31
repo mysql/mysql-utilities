@@ -340,18 +340,18 @@ class Database(object):
         # Get tables
         if not self.skip_tables:
             self.__add_db_objects(_TABLE)
+        # Get functions
+        if not self.skip_funcs:
+            self.__add_db_objects(_FUNC)
+        # Get stored procedures
+        if not self.skip_procs:
+            self.__add_db_objects(_PROC)
         # Get views
         if not self.skip_views:
             self.__add_db_objects(_VIEW)
         # Get triggers
         if not self.skip_triggers:
             self.__add_db_objects(_TRIG)
-        # Get stored procedures
-        if not self.skip_procs:
-            self.__add_db_objects(_PROC)
-        # Get functions
-        if not self.skip_funcs:
-            self.__add_db_objects(_FUNC)
         # Get events
         if not self.skip_events:
             self.__add_db_objects(_EVENT)
@@ -682,7 +682,6 @@ class Database(object):
 
         # Create the objects in the new database
         for obj in self.objects:
-
             # Drop object if --force specified and database not dropped
             # Grants do not need to be dropped for overwriting
             if options.get("force", False) and obj[0] != _GRANT:
@@ -770,7 +769,16 @@ class Database(object):
         else:
             q_db = (db if is_quoted_with_backticks(db)
                     else quote_with_backticks(db))
-            name_str = q_db + "." + q_name
+
+            # Switch the default database to execute the
+            # SHOW CREATE statement without needing to specify the database
+            # This is for 5.1 compatibility reasons:
+            try:
+                self.source.exec_query("USE {0}".format(q_db))
+            except UtilError as err:
+                raise UtilDBError("ERROR: Couldn't change "
+                                  "default database: {0}".format(err.errmsg))
+        name_str = q_name
 
         # Retrieve the CREATE statement.
         row = self.source.exec_query(

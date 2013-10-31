@@ -41,6 +41,7 @@ Test case 2 - Use diff --difftype=unified
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -60,6 +61,7 @@ Test case 3 - Use diff --difftype=context
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -83,6 +85,7 @@ Test case 4 - Use diff --difftype=differ
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -100,6 +103,7 @@ Test case 5 - Use --force
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -126,8 +130,10 @@ Test case 5 - Use --force
 +) ENGINE=MEMORY DEFAULT CHARSET=latin1
 # Comparing `util_test`.`t3` to `util_test`.`t3`                   [PASS]
 # Comparing `util_test`.`t4` to `util_test`.`t4`                   [PASS]
+# Comparing `util_test`.`t5` to `util_test`.`t5`                   [PASS]
 # Comparing `util_test`.`trg` to `util_test`.`trg`                 [PASS]
 # Comparing `util_test`.`v1` to `util_test`.`v1`                   [PASS]
+# Comparing `util_test`.`v2` to `util_test`.`v2`                   [PASS]
 Compare failed. One or more differences found.
 Test case 6 - Use --quiet 
 Test case 7 - Use --width=65 
@@ -135,6 +141,7 @@ Test case 7 - Use --width=65
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                   [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`         [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`         [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`         [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`         [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -154,6 +161,7 @@ Test case 8 - Use --width=55
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`         [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -189,6 +197,17 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1)
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+
+# Definition for object `util_test`.`f2`:
+CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100)
+
+# Definition for object `util_test`.`f2`:
+CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100)
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 
 # Definition for object `util_test`.`p1`:
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
@@ -227,6 +246,7 @@ Test case 10 - Use --changes-for=server1
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -246,6 +266,7 @@ Test case 11 - Use --changes-for=server1 --show-reverse
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -279,6 +300,7 @@ Test case 12 - Use --changes-for=server2
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server2)
@@ -298,6 +320,7 @@ Test case 13 - Use --changes-for=server2 --show-reverse
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server2)

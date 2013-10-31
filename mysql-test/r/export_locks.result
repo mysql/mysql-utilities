@@ -26,11 +26,26 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
-# TRIGGER: util_test.trg
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
 # PROCEDURE: util_test.p1
@@ -39,11 +54,13 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# FUNCTION: util_test.f1
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
-    DETERMINISTIC
-RETURN (SELECT 1);
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 # Grant:
@@ -141,6 +158,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - export data with no-locks locking
@@ -168,6 +190,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - export data with lock-all locking
@@ -195,6 +222,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - export data with snapshot locking
@@ -222,5 +254,10 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;

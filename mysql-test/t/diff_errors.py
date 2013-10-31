@@ -91,8 +91,8 @@ class test(diff.test):
                 raise MUTLibError("%s: failed" % comment)
                 
         try:
-            self.server1.exec_query("CREATE TABLE util_test.t5 (a int)")
-            self.server2.exec_query("CREATE TABLE util_test.t6 (a int)")
+            self.server1.exec_query("CREATE TABLE util_test.t6 (a int)")
+            self.server2.exec_query("CREATE TABLE util_test.t7 (a int)")
         except:
             raise MUTLibError("Cannot create test tables.")
         

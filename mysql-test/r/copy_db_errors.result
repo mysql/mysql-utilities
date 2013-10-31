@@ -29,14 +29,18 @@ Test case 7 - users with minimal privileges
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying EVENT util_test.e1
 #...done.
 Test case 8 - source user not enough privileges needed
@@ -59,14 +63,18 @@ Test case 11 - source user has privileges needed
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying EVENT util_test.e1
 #...done.
 Test case 12 - dest user not enough privileges needed
@@ -89,14 +97,18 @@ Test case 15 - dest user has privileges needed
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying EVENT util_test.e1
 #...done.
 Test case 16 - cannot parse --source
@@ -124,14 +136,18 @@ WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying EVENT util_test.e1
 #...done.
 Test case 21 - default storage engine missing
@@ -143,14 +159,18 @@ WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying EVENT util_test.e1
 #...done.
 Test case 22 - database listed and --all

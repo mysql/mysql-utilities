@@ -155,7 +155,8 @@ class test(copy_db.test):
 
         comment = ("Test case {0}b - SQL LIKE VS REGEXP pattern (match entire "
                    "value VS match anywhere in value).").format(test_num)
-        cmd_opts = "{0} -x 1 -x t --regexp".format(cmd_str)
+        # Exclude all tables except table t5, because view v2 depends on it
+        cmd_opts = "{0} -x 1 -x t[^5] --regexp".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

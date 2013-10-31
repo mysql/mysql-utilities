@@ -7,7 +7,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 2 : Testing import with CSV format and BRIEF display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -17,7 +17,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 3 : Testing import with TAB format and BRIEF display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -27,7 +27,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 4 : Testing import with GRID format and BRIEF display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -37,7 +37,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 5 : Testing import with VERTICAL format and BRIEF display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -47,7 +47,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 6 : Testing import with SQL format and FULL display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -57,7 +57,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 7 : Testing import with CSV format and FULL display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -67,7 +67,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 8 : Testing import with TAB format and FULL display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -77,7 +77,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 9 : Testing import with GRID format and FULL display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -87,7 +87,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 10 : Testing import with VERTICAL format and FULL display
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -97,7 +97,7 @@ Running import...
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test Case 11 : Testing import with SQL format and BRIEF display (using backticks)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 

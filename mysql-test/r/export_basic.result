@@ -26,11 +26,26 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
-# TRIGGER: util_test.trg
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
 # PROCEDURE: util_test.p1
@@ -39,11 +54,13 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# FUNCTION: util_test.f1
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
-    DETERMINISTIC
-RETURN (SELECT 1);
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 # Grant:
@@ -145,6 +162,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - export data only - bulk insert
@@ -160,6 +182,8 @@ INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 T
 INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys'),  (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES  (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - export data and metadata
@@ -190,11 +214,26 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
-# TRIGGER: util_test.trg
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
 # PROCEDURE: util_test.p1
@@ -203,11 +242,13 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# FUNCTION: util_test.f1
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
-    DETERMINISTIC
-RETURN (SELECT 1);
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 # Grant:
@@ -305,6 +346,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - export data and metadata with quiet
@@ -329,9 +375,23 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
 DELIMITER ||
@@ -339,10 +399,10 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
-    DETERMINISTIC
-RETURN (SELECT 1);
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
@@ -401,6 +461,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - export data and metadata with debug
 # Source on localhost: ... connected.
@@ -432,11 +497,26 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
-# TRIGGER: util_test.trg
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
 # PROCEDURE: util_test.p1
@@ -445,11 +525,13 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# FUNCTION: util_test.f1
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
 DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
-    DETERMINISTIC
-RETURN (SELECT 1);
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 # Grant:
@@ -547,6 +629,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 #
 SET FOREIGN_KEY_CHECKS=1;
@@ -571,14 +658,6 @@ CREATE TABLE ```t``export_1` (
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-# VIEW: db`:db.`v`export_1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `db``:db`.```v``export_1` AS select `db``:db`.```t``export_1`.`id``` AS `id```,`db``:db`.```t``export_1`.`other` AS `other` from `db``:db`.```t``export_1`;
-# PROCEDURE: db`:db.pr``oc
-DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `pr````oc`()
-INSERT INTO `db``:db`.```t``export_1` (other) VALUES ("proc->trigger->func");
-||
-DELIMITER ;
 # FUNCTION: db`:db.fu`nc
 DELIMITER ||
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET latin1
@@ -586,6 +665,14 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHA
 RETURN `a```;
 ||
 DELIMITER ;
+# PROCEDURE: db`:db.pr``oc
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `pr````oc`()
+INSERT INTO `db``:db`.```t``export_1` (other) VALUES ("proc->trigger->func");
+||
+DELIMITER ;
+# VIEW: db`:db.`v`export_1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW ```v``export_1` AS select ```t``export_1`.`id``` AS `id```,```t``export_1`.`other` AS `other` from ```t``export_1`;
 # EVENT: db`:db.`e`export_1
 DELIMITER ||
 CREATE EVENT ```e``export_1` ON SCHEDULE EVERY 1 YEAR STARTS [...]
@@ -653,14 +740,6 @@ CREATE TABLE ```t``export_1` (
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-# VIEW: db`:db.`v`export_1
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `db``:db`.```v``export_1` AS select `db``:db`.```t``export_1`.`id``` AS `id```,`db``:db`.```t``export_1`.`other` AS `other` from `db``:db`.```t``export_1`;
-# PROCEDURE: db`:db.pr``oc
-DELIMITER ||
-CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `pr````oc`()
-INSERT INTO `db``:db`.```t``export_1` (other) VALUES ("proc->trigger->func");
-||
-DELIMITER ;
 # FUNCTION: db`:db.fu`nc
 DELIMITER ||
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET latin1
@@ -668,6 +747,14 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHA
 RETURN `a```;
 ||
 DELIMITER ;
+# PROCEDURE: db`:db.pr``oc
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `pr````oc`()
+INSERT INTO `db``:db`.```t``export_1` (other) VALUES ("proc->trigger->func");
+||
+DELIMITER ;
+# VIEW: db`:db.`v`export_1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW ```v``export_1` AS select ```t``export_1`.`id``` AS `id```,```t``export_1`.`other` AS `other` from ```t``export_1`;
 # EVENT: db`:db.`e`export_1
 DELIMITER ||
 CREATE EVENT ```e``export_1` ON SCHEDULE EVERY 1 YEAR STARTS [...]
@@ -743,6 +830,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 USE `import_test`;
 # Exporting data from import_test
 # Data for table `import_test`.`customers`: 

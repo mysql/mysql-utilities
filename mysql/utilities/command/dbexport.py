@@ -167,14 +167,14 @@ def export_metadata(source, src_val, db_list, options):
             objects = []
             if not skip_tables:
                 objects.append("TABLE")
+            if not skip_funcs:
+                objects.append("FUNCTION")
+            if not skip_procs:
+                objects.append("PROCEDURE")
             if not skip_views:
                 objects.append("VIEW")
             if not skip_triggers:
                 objects.append("TRIGGER")
-            if not skip_procs:
-                objects.append("PROCEDURE")
-            if not skip_funcs:
-                objects.append("FUNCTION")
             if not skip_events:
                 objects.append("EVENT")
             if not skip_grants:

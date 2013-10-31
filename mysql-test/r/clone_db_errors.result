@@ -23,14 +23,18 @@ Test case 5 - No error: user with % - has permissions
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.

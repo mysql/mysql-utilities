@@ -6,6 +6,7 @@ Test case 1 - find objects simple search
 | root[...]  | TABLE        | t2           | util_test  | TABLE       | t2       |
 | root[...]  | TABLE        | t3           | util_test  | TABLE       | t3       |
 | root[...]  | TABLE        | t4           | util_test  | TABLE       | t4       |
+| root[...]  | TABLE        | t5           | util_test  | TABLE       | t5       |
 +---+
 
 Test case 2 - find objects name search

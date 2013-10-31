@@ -51,7 +51,7 @@ Test case 2 - no grants
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 3 - no events
@@ -60,43 +60,43 @@ Test case 3 - no events
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 4 - no functions
+Test case 4 - no triggers
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 0, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 5 - no procedures
+Test case 5 - no views
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 6 - no triggers
+Test case 6 - no procedures
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 7 - no views
+Test case 7 - no functions
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 8 - no tables
@@ -124,7 +124,7 @@ Test case 10 - no grants
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 11 - no events
@@ -133,43 +133,43 @@ Test case 11 - no events
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 12 - no functions
+Test case 12 - no triggers
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 0, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 13 - no procedures
+Test case 13 - no views
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 1, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 14 - no triggers
+Test case 14 - no procedures
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 2, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
-Test case 15 - no views
+Test case 15 - no functions
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
 Database was created.
-OBJECT COUNTS: tables = 4, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 16 - no tables
@@ -212,10 +212,19 @@ CREATE TABLE `util_test`.`t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB;
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
-CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
-CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE TABLE `util_test`.`t5` (
+  `product_id` int(10) unsigned NOT NULL,
+  `name` varchar(20),
+  `base_price` decimal(20,2) unsigned,
+  `tax_percentage` decimal(3,0) unsigned,
+  PRIMARY KEY(`product_id`)
+) ENGINE=InnoDB;
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
 GRANT CREATE ON `util_test`.* TO 'joe'@'user'
@@ -259,8 +268,9 @@ UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1' AND `
 UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2' AND `b` = '15 test fkeys';
 UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3' AND `b` = '16 test fkeys';
 UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '4' AND `b` = NULL;
-SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO `util_test`.`t4` VALUES  (3, 2)
+SET FOREIGN_KEY_CHECKS=1;
+INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19)
 #...done.
 Test case 19 - no data
 # Source on localhost: ... connected.
@@ -285,10 +295,19 @@ CREATE TABLE `util_test`.`t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB;
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
-CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
-CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE TABLE `util_test`.`t5` (
+  `product_id` int(10) unsigned NOT NULL,
+  `name` varchar(20),
+  `base_price` decimal(20,2) unsigned,
+  `tax_percentage` decimal(3,0) unsigned,
+  PRIMARY KEY(`product_id`)
+) ENGINE=InnoDB;
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
 GRANT CREATE ON `util_test`.* TO 'joe'@'user'
@@ -351,10 +370,19 @@ CREATE TABLE `util_test`.`t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB;
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
-CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
-CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE TABLE `util_test`.`t5` (
+  `product_id` int(10) unsigned NOT NULL,
+  `name` varchar(20),
+  `base_price` decimal(20,2) unsigned,
+  `tax_percentage` decimal(3,0) unsigned,
+  PRIMARY KEY(`product_id`)
+) ENGINE=InnoDB;
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
+CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
+CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
 GRANT CREATE ON `util_test`.* TO 'joe'@'user'
@@ -394,7 +422,8 @@ GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%'
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
 INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example'),  (NULL)
 INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL),  (4, NULL, NULL)
-SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO `util_test`.`t4` VALUES  (3, 2)
+SET FOREIGN_KEY_CHECKS=1;
+INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19)
 #...done.
 Test case 21 - no messages (quiet)

@@ -61,8 +61,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
@@ -131,8 +131,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
@@ -232,8 +232,8 @@ Test case 4 -  --skip-data-check --format=csv -a
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.

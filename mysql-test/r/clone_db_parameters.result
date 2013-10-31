@@ -6,14 +6,18 @@ Test case 1 - normal run
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
@@ -87,14 +91,17 @@ Test case 4 - no data
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying GRANTS from util_test
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
-OBJECT COUNTS: tables = 4, views = 1, triggers = 1, procedures = 1, functions = 1, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test case 5 - quiet clone
 Test case 6 - verbose clone with drop warnings.
 # Source on XXXX-XXXX: ... connected.
@@ -124,21 +131,35 @@ REFERENCES `util_db_clone`.`t3`
 ON UPDATE RESTRICT
 ON DELETE RESTRICT
 
-# Dropping new object VIEW util_db_clone.`v1`
-# WARNING: Unable to drop `v1` from source database (object may not exist): DROP VIEW `util_db_clone`.`v1`
-# Copying VIEW util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `util_db_clone`.`v1` AS select `util_db_clone`.`t1`.`a` AS `a` from `util_db_clone`.`t1`
-# Dropping new object PROCEDURE util_db_clone.`p1`
-# WARNING: Unable to drop `p1` from source database (object may not exist): DROP PROCEDURE `util_db_clone`.`p1`
-# Copying PROCEDURE util_test.p1
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
-INSERT INTO util_db_clone.t1 VALUES ("50")
+# Dropping new object TABLE util_db_clone.`t5`
+# WARNING: Unable to drop `t5` from source database (object may not exist): DROP TABLE `util_db_clone`.`t5`
+# Copying TABLE util_test.t5
+CREATE TABLE `util_db_clone`.`t5` LIKE `util_test`.`t5`
 # Dropping new object FUNCTION util_db_clone.`f1`
 # WARNING: Unable to drop `f1` from source database (object may not exist): DROP FUNCTION `util_db_clone`.`f1`
 # Copying FUNCTION util_test.f1
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1)
+# Dropping new object FUNCTION util_db_clone.`f2`
+# WARNING: Unable to drop `f2` from source database (object may not exist): DROP FUNCTION `util_db_clone`.`f2`
+# Copying FUNCTION util_test.f2
+CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100)
+# Dropping new object PROCEDURE util_db_clone.`p1`
+# WARNING: Unable to drop `p1` from source database (object may not exist): DROP PROCEDURE `util_db_clone`.`p1`
+# Copying PROCEDURE util_test.p1
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_db_clone.t1 VALUES ("50")
+# Dropping new object VIEW util_db_clone.`v1`
+# WARNING: Unable to drop `v1` from source database (object may not exist): DROP VIEW `util_db_clone`.`v1`
+# Copying VIEW util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`
+# Dropping new object VIEW util_db_clone.`v2`
+# WARNING: Unable to drop `v2` from source database (object may not exist): DROP VIEW `util_db_clone`.`v2`
+# Copying VIEW util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_db_clone`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`
 # Copying GRANTS from util_test
 GRANT ALTER ON `util_db_clone`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_db_clone`.* TO 'joe'@'user'
@@ -192,6 +213,8 @@ INSERT INTO `util_db_clone`.`t2` SELECT * FROM `util_test`.`t2`
 INSERT INTO `util_db_clone`.`t3` SELECT * FROM `util_test`.`t3`
 # Copying data for TABLE util_test.t4
 INSERT INTO `util_db_clone`.`t4` SELECT * FROM `util_test`.`t4`
+# Copying data for TABLE util_test.t5
+INSERT INTO `util_db_clone`.`t5` SELECT * FROM `util_test`.`t5`
 # Dropping new object TRIGGER util_db_clone.`trg`
 # WARNING: Unable to drop `trg` from source database (object may not exist): DROP TRIGGER `util_db_clone`.`trg`
 # Copying TRIGGER util_test.trg

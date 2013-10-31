@@ -27,6 +27,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -55,6 +63,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
@@ -89,6 +102,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -117,6 +138,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
@@ -151,6 +177,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -179,6 +213,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 CHANGE MASTER <goes here>
@@ -213,6 +252,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -241,6 +288,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
@@ -275,6 +327,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -303,6 +363,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
@@ -337,6 +402,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -365,6 +438,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server's master
 CHANGE MASTER <goes here>
@@ -399,6 +477,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -427,6 +513,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 # CHANGE MASTER <goes here>
@@ -463,6 +554,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -491,6 +590,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 # CHANGE MASTER <goes here>
@@ -527,6 +631,14 @@ CREATE TABLE `t4` (
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -555,6 +667,11 @@ INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
 # Data for table `util_test`.`t4`: 
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`: 
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 # Connecting to the current server as master
 # CHANGE MASTER <goes here>

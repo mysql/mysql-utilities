@@ -799,9 +799,9 @@ def _build_col_metadata(obj_type, definitions):
                 obj_name = defn[1]
                 col_list = []
                 col_list.append((defn[4], defn[5]))
-                # check for end.
-                if i + 1 == stop - 1:
-                    table_col_list.append((obj_name, col_list))
+            # check for end.
+            if i + 1 == stop:
+                table_col_list.append((obj_name, col_list))
     return table_col_list
 
 

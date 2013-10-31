@@ -3,6 +3,7 @@ Test case 1 - Use diff  --difftype=differ
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -55,9 +56,9 @@ Test case 11 - some objects don't exist in dbs
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
-#        TABLE: t5
-# WARNING: Objects in server2.util_test but not in server1.util_test:
 #        TABLE: t6
+# WARNING: Objects in server2.util_test but not in server1.util_test:
+#        TABLE: t7
 Compare failed. One or more differences found.
 Test case 12 - no objects specified.
 Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4

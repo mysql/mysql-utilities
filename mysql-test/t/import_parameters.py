@@ -73,8 +73,8 @@ class test(import_basic.test):
         # Now test the skips
 
         # Note: data and blobs must be done separately
-        _SKIPS = ("grants", "events", "functions", "procedures",
-                  "triggers", "views", "tables", "create_db")
+        _SKIPS = ("grants", "events", "triggers", "views", "procedures",
+                  "functions", "tables", "create_db")
         _FORMATS = ("CSV", "SQL")
 
         case_num = 2

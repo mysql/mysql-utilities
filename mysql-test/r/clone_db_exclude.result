@@ -5,11 +5,15 @@ Test case 1 - exclude by name
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v2
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t5
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
@@ -20,12 +24,16 @@ Test case 2 - exclude by regex
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying VIEW util_test.v1
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t5
 # Copying TRIGGER util_test.trg
 #...done.
 Test case 3 - exclude by name and regex
@@ -35,9 +43,13 @@ Test case 3 - exclude by name and regex
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
-# Copying PROCEDURE util_test.p1
+# Copying TABLE util_test.t5
 # Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v2
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t5
 #...done.
