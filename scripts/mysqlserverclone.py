@@ -36,6 +36,7 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             check_basedir_option,
                                             setup_common_options)
+from mysql.utilities.common.server import Server
 
 
 # Constants
@@ -168,6 +169,12 @@ if opt.basedir and opt.basedir[0] == '.':
 if opt.basedir is None:
     try:
         conn = parse_connection(opt.server)
+
+        # Now check for local server
+        server = Server({'conn_info': conn})
+        if not server.is_alias('localhost'):
+            parser.error("Server to be cloned must be running on the same "
+                         "machine as mysqlserverclone.")
     except exception.FormatError:
         _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err)
