@@ -18,10 +18,11 @@
 from xml.dom.minidom import parse, parseString
 import os
 
+# MySQL Utilities\scripts\etc\mysql\fabric.cfg
 dir_fab_conf = ('<Directory>'
-    '<Directory Id="LocalAppDataFolder" Name="LocalAppData">'
-    '<Directory Id="MySQLDir" Name="MySQL">'
-    '<Directory Id="FABCONF" Name="MySQL Utilities"/>'
+    '<Directory Id="Scripts" Name="scripts">'
+    '<Directory Id="ETC" Name="etc">'
+    '<Directory Id="FABCONF" Name="mysql"/>'
     '</Directory>'
     '</Directory>'
     '</Directory>'
@@ -37,7 +38,8 @@ dirref_fab =('<Product>'
     '<DirectoryRef Id="FABCONF">'
     '<Component Id="Fabric_config"'
     ' Guid="CA95B0AF-5500-48CD-9707-56608AE78491">'
-    '<RemoveFolder Id="RemMySQLDir" Directory="MySQLDir" On="uninstall"/>'
+    '<RemoveFolder Id="RemScripts" Directory="Scripts" On="uninstall"/>'
+    '<RemoveFolder Id="RemMySQLDir" Directory="ETC" On="uninstall"/>'
     '<RemoveFolder Id="RemFABCONF" Directory="FABCONF" On="uninstall"/>'
     '<RegistryKey Root="HKCU"'
     ' Key="Software\\MySQL\\MySQL Utilities\\fabric"'
@@ -50,7 +52,7 @@ dirref_fab =('<Product>'
     '<RegistryValue Type="string" Name="Location" Value="[FABCONF]"/>'
     '</RegistryKey>'
     '<File Id="main.cfg"'
-    ' Source="$(var.BuildDir)\\%LocalAppData%\\MySQL\\MySQL Utilities\\fabric.cfg"'
+    ' Source="$(var.BuildDir)\\scripts\\etc\\mysql\\fabric.cfg"'
     ' Checksum="yes"/>'
     '</Component>'
     '</DirectoryRef>'
@@ -74,8 +76,6 @@ comp_doczip_menu = ('<Component>'
     '</Component>'
 )
 
-docphp = "mysql-fabric-doctrine-0.4.0.zip"
-
 dirref_doczip = ('<Product><DirectoryRef Id="DOCTRINEZIP">'
     '<Component Guid="cadd4711-6c3d-426f-a646-ad4f3a62f885" Id="SetupRegistryDocZip">'
     '<RegistryKey Action="createAndRemoveOnUninstall" Key="Software\MySQL\MySQL Utilities\[DOCTRINEZIP]" Root="HKCU">'
@@ -92,10 +92,10 @@ dirref_doczip = ('<Product><DirectoryRef Id="DOCTRINEZIP">'
     '<Environment Action="set" Id="SystemPathDocZip" Name="PATH" Part="last" Permanent="no" System="yes" Value="[DOCTRINEZIP]"/>'
     '</Component>'
     '<Component Guid="d8069f9b-5d6b-4643-9273-78e2ab016edd" Id="DocZip">'
-    '<File Checksum="yes" Id="{docphp_id}" Source="$(var.BuildDir)\\%LocalAppData%\\MySQL\\MySQL Utilities\\{docphp}"/>'
+    '<File Checksum="yes" Id="{docphp_id}" Source="$(var.BuildDir)\\scripts\\etc\\mysql\\{docphp}"/>'
     '</Component>'
     '</DirectoryRef></Product>'
-).format(docphp_id=docphp.replace('-', '_'), docphp=docphp)
+)
 
 dir_docphp = '<Directory Id="DocMenu" Name="Documentation"/>'
 
@@ -131,8 +131,9 @@ def get_element(dom_msi, tagName, name=None, id=None):
 def add_fabric_elements(dom_msi):
     # Define the Directories structure that will be used on the installation 
     # to Directory.
-    dir = get_element(dom_msi, "Directory", name='SourceDir', id='TARGETDIR')
-    append_childs_from_unparsed_xml(dir, dir_fab_conf)
+    dir_in = get_element(dom_msi, "Directory", name='MySQL Utilities',
+                         id="INSTALLDIR")
+    append_childs_from_unparsed_xml(dir_in, dir_fab_conf)
 
     # Add the Fabric scripts.
     diref = get_element(dom_msi, "DirectoryRef", id='INSTALLDIR')
@@ -151,7 +152,7 @@ def add_fabric_elements(dom_msi):
     append_childs_from_unparsed_xml(feature, compref_fab)
 
 
-def add_doczip_elements(dom_msi):
+def add_doczip_elements(dom_msi, doc_zip_ver):
     # Get the Directory elements, that is where the installation 
     # directory structure is defined.
     dir = get_element(dom_msi, "Directory", name='MySQL Utilities', id="INSTALLDIR")
@@ -159,7 +160,9 @@ def add_doczip_elements(dom_msi):
 
     # Add Doctrine folder and files
     product = dom_msi.getElementsByTagName("Product")[0]
-    append_childs_from_unparsed_xml(product, dirref_doczip)
+    dirref = dirref_doczip.format(docphp_id=doc_zip_ver.replace('-', '_'),
+                                  docphp=doc_zip_ver)
+    append_childs_from_unparsed_xml(product, dirref)
 
     # Add Doctrine shortcut.
     diref = get_element(dom_msi, "DirectoryRef", id="UtilsMenu")
@@ -194,7 +197,7 @@ def add_features(xml_path, result_path, add_fabric=False, add_doczip=False,
     if add_fabric:
         add_fabric_elements(dom_msi)
     if add_doczip:
-        add_doczip_elements(dom_msi)
+        add_doczip_elements(dom_msi, add_doczip)
     _print(log, "Saving xml to:{0} working directory:{1}"
            "".format(result_path, os.getcwd()))
     f = open(result_path, "w+")

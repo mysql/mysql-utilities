@@ -327,10 +327,9 @@ class install_data(_install_data):
             install_sysconfdir = '/etc'
         else:
             install_sysconfdir = os.path.join(install_dir, 'etc')
-        install_sysconfdir = '/etc'
 
         # Go over all entries in data_files and process it if needed
-	new_data_files = []
+        new_data_files = []
         for df in self.data_files:
             # Figure out what the entry contain and collect a list of files.
             if isinstance(df, str):

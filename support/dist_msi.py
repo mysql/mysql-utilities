@@ -248,8 +248,10 @@ class MSIBuiltDist(_MSIDist):
             for dest, data_files in self.distribution.data_files:
                 for data_file in data_files:
                     log.info('data_file: {0}'.format(data_file))
-                    if fnmatch.fnmatch(data_file, 'data/mysql-fabric-doctrine-?.?.?.zip'):
-                        add_doczip = True
+                    doczip_pattern = 'data/mysql-fabric-doctrine-?.?.?.zip'
+                    if fnmatch.fnmatch(data_file, doczip_pattern):
+                        head, tail = os.path.split(data_file)
+                        add_doczip = tail or head
                         log.info('-Adding doctrine extensions')
         if pck_fabric or add_doczip:
             base_xml_path = "support/MSWindows/mysql_utilities.xml"

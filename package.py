@@ -144,9 +144,12 @@ from info import META_INFO, INSTALL
 
 # cx_Freeze executables and configuration
 APPS = [ cx_Freeze.Executable(script) for script in glob('scripts/mysql*.py') ]
+# Acquire packages names to include in library from module info
+INSTALL_COPY = INSTALL.copy()
+print("Packages to include on library: {0}".format(INSTALL_COPY['packages']))
 BUILD_EXE_OPTIONS = {
-    "packages": [ 'mysql.connector' ],
-    "excludes": []
+    "packages": INSTALL_COPY['packages'],
+    "excludes": [],
     }
 
 # Arguments passed to the setup() function. This is dict can
@@ -160,15 +163,7 @@ SETUP_ARGS.update({
         },
     'cmdclass': {},
     })
-INSTALL_COPY = INSTALL.copy()
-cpy_packages = [
-    'mysql',
-    'mysql.connector', 
-    'mysql.connector.locales',
-    'mysql.connector.locales.eng',
-    ]
-INSTALL_COPY['packages'].extend(cpy_packages)
-print("INSTALL_COPY['packages'] {0}".format(INSTALL_COPY['packages']))
+
 SETUP_ARGS.update(INSTALL_COPY)
 
 
@@ -285,10 +280,8 @@ class install_data(_install_data):
         install_logdir = '/var/log'
         if os.name == 'posix':
             install_sysconfdir = '/etc'
-        elif os.name == 'nt':
-            install_sysconfdir = '%LocalAppData%/MySQL/MySQL Utilities'
         else:
-            install_sysconfdir = '/etc'
+            install_sysconfdir = 'scripts\\etc\\mysql'
 
         if not self.data_files:
             return
