@@ -470,7 +470,7 @@ class Table(object):
         query[in]          the INSERT string for executemany()
         blob_col[in]       number of the column containing the blob
 
-        Returns tuple (UPDATE string, blob data)
+        Returns UPDATE string
         """
         if self.column_format is None:
             self.get_column_metadata()
@@ -714,9 +714,7 @@ class Table(object):
         # Now insert the blob data if there is any
         for blob_insert in blob_data:
             try:
-                # Must convert blob data to a raw string for cursor to handle.
-                dest.exec_query(blob_insert[0] % "%r" % blob_insert[1],
-                                self.query_options)
+                dest.exec_query(blob_insert, self.query_options)
             except UtilError, e:
                 raise UtilError("Problem updating blob field. "
                                 "Error = %s" % e.errmsg)

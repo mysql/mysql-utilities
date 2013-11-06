@@ -21,6 +21,12 @@ from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
 
+BLOB_TEXT_TABLE = ("CREATE TABLE `util_test`.`tt` ("
+                   "`a` INT(11) NOT NULL AUTO_INCREMENT, "
+                   "`b` TEXT, `c` BLOB, PRIMARY KEY (`a`)) ENGINE=InnoDB")
+BLOB_TEXT_DATA = "INSERT INTO `util_test`.`tt` VALUES (NULL, 'test', 0xff0e)"
+BLOB_TEXT_DROP = "DROP TABLE `util_test`.`tt`"
+
 
 class test(mutlib.System_test):
     """simple db copy
@@ -57,7 +63,7 @@ class test(mutlib.System_test):
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file_backticks, 
+            res = self.server1.read_and_exec_SQL(data_file_backticks,
                                                  self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: {1}"
@@ -73,9 +79,15 @@ class test(mutlib.System_test):
                 "{0}: {1}".format(data_file_views, err.errmsg)
             )
 
+        # Create table with blobs and insert data
+        try:
+            self.server1.exec_query(BLOB_TEXT_TABLE)
+            self.server1.exec_query(BLOB_TEXT_DATA)
+        except UtilError:
+            raise MUTLibError("Failed to create table with blobs.")
+
         return True
 
-    
     def run(self):
         self.res_fname = "result.txt"
 
@@ -97,6 +109,9 @@ class test(mutlib.System_test):
         self.results.append(res)
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
+
+        # drop the blob table first - memory doesn't support blobs
+        self.server1.exec_query(BLOB_TEXT_DROP)
 
         test_num += 1
         comment = ("Test case {0} - copy using different engine"
@@ -146,7 +161,7 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # These two DB and tables does not contains any row, and are used  
+        # These two DB and tables does not contains any row, and are used
         # to test DB copy of default character set and collation.
         # was not move to ./std_data/basic_data.sql to avoid warning
         # "A partial copy from a server that has GTIDs.." messages
@@ -188,7 +203,7 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         return True
-  
+
     def get_result(self):
         msg = []
         copied_db_on_server2 = ["util_db_clone", "util_test", "util_db_clone",
@@ -263,7 +278,7 @@ class test(mutlib.System_test):
             return (False, ("Result failure.\n", "\n".join(msg)))
         else:
             return (True, "")
-    
+
     def record(self):
         # Not a comparative test, returning True
         return True
@@ -282,7 +297,7 @@ class test(mutlib.System_test):
                                'db`:db_clone', "views_test_clone"]
         for db in db_drops_on_server2:
             self.drop_db(self.server2, db)
-        
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
@@ -291,10 +306,8 @@ class test(mutlib.System_test):
             except UtilError:
                 pass
         return True
-            
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
