@@ -126,7 +126,7 @@ class test(failover.test):
 
         # Stop the server
         server.disconnect()
-        self.kill(pid, True)
+        self.kill(pid)
 
         # Need to wait until the process is really dead.
         if self.debug:
@@ -152,8 +152,8 @@ class test(failover.test):
         if self.debug:
             print("# Waiting for failover to complete.")
         i = 0
-        while not os.path.exists(self.failover_dir):
-            time.sleep(1)
+        while not os.path.isdir(self.failover_dir):
+            time.sleep(5)
             i += 1
             if i > _TIMEOUT:
                 if self.debug:
@@ -263,6 +263,7 @@ class test(failover.test):
         if self.debug:
             print("Waiting for failover daemon to register master and start "
                   "its monitoring process")
+        time.sleep(5)
         i = 0
         with open(logfile, "r") as f:
             while i < _TIMEOUT:

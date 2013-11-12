@@ -163,6 +163,7 @@ class FailoverConsole(object):
                             default = 'auto'
         """
         self.interval = int(options.get("interval", 15))
+        self.pingtime = options.get("pingtime", 3)
         self.mode = options.get("failover_mode", "auto")
         self.logging = options.get("logging", False)
         self.log_file = options.get("log_file", None)
@@ -678,6 +679,27 @@ class FailoverConsole(object):
         self._print_list(False)
         self._print_footer(self.scroll_on)
 
+    def _reconnect_master(self, pingtime=3):
+        """Tries to reconnect to the master
+
+        This method tries to reconnect to the master and if connection fails
+        after 3 attemps, returns False.
+        """
+        if self.master and self.master.is_alive():
+            return True
+        is_connected = False
+        i = 0
+        while i < 3:
+            try:
+                self.master.connect()
+                is_connected = True
+                break
+            except:
+                pass
+            time.sleep(pingtime)
+            i += 1
+        return is_connected
+
     def display_console(self):
         """Display the failover console
 
@@ -705,7 +727,13 @@ class FailoverConsole(object):
         # Wait for a key press or the interval to expire
         done = False
         while not done:
+            # Disconnect the master while waiting for the interval to expire
+            self.master.disconnect()
+            # Wait for the interval to expire
             key = self._wait_for_interval()
+            # Reconnect to the master
+            self._reconnect_master(self.pingtime)
+
             if key is None:
                 return None
             if key in ['Q', 'q']:

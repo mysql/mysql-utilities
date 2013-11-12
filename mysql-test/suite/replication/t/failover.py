@@ -170,6 +170,7 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("Waiting for failover console to register master and start "
                   "its monitoring process")
+        time.sleep(5)
         i = 0
         with open(log_filename, 'r') as file_:
             while i < _TIMEOUT:
@@ -200,9 +201,9 @@ class test(rpl_admin_gtid.test):
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
 
-        # Stop the server 
+        # Stop the server
         server.disconnect()
-        self.kill(pid, True)
+        self.kill(pid)
 
         # Need to wait until the process is really dead.
         if self.debug:
@@ -228,8 +229,8 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("# Waiting for failover to complete.")
         i = 0
-        while not os.path.exists(self.failover_dir):
-            time.sleep(1)
+        while not os.path.isdir(self.failover_dir):
+            time.sleep(5)
             i += 1
             if i > _TIMEOUT:
                 if self.debug:

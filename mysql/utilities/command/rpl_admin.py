@@ -777,16 +777,30 @@ class RplCommands(object):
                     try:
                         self.topology.master.connect()
                     except:
-                        self._report("Cannot reconnect to master.",
-                                     logging.INFO, False)
+                        pass
 
                 # Check the master again. If no connection or lost connection,
-                # try ping and if still not alive, failover. This performs the
-                # timeout threshold for detecting a down master.
+                # try ping. This performs the timeout threshold for detecting
+                # a down master. If still not alive, try to reconnect and if
+                # connection fails after 3 attempts, failover.
                 if self.topology.master is None or \
                    not ping_host(self.topology.master.host, pingtime) or \
                    not self.topology.master.is_alive():
                     failover = True
+                    i = 0
+                    while i < 3:
+                        try:
+                            self.topology.master.connect()
+                            failover = False  # Master is now connected again
+                            break
+                        except:
+                            pass
+                        time.sleep(pingtime)
+                        i += 1
+
+                    if failover:
+                        self._report("Failed to reconnect to the master after "
+                                     "3 attemps.", logging.INFO)
 
             if failover:
                 self._report("Master is confirmed to be down or unreachable.",

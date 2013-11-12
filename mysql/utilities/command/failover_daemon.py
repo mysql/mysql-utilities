@@ -75,6 +75,7 @@ class FailoverDaemon(object):
         self.rpl = rpl
         self.options = rpl.options
         self.interval = int(self.options.get("interval", 15))
+        self.pingtime = int(self.options.get("pingtime", 3))
         self.force = self.options.get("force", False)
         self.mode = self.options.get("failover_mode", "auto")
         self.old_mode = None
@@ -236,6 +237,27 @@ class FailoverDaemon(object):
                 ["{0}: {1}".format(*col) for col in zip(labels, row)]
             )
             logging.info(msg)
+
+    def _reconnect_master(self, pingtime=3):
+        """Tries to reconnect to the master
+
+        This method tries to reconnect to the master and if connection fails
+        after 3 attemps, returns False.
+        """
+        if self.master and self.master.is_alive():
+            return True
+        is_connected = False
+        i = 0
+        while i < 3:
+            try:
+                self.master.connect()
+                is_connected = True
+                break
+            except:
+                pass
+            time.sleep(pingtime)
+            i += 1
+        return is_connected
 
     def add_warning(self, warning_key, warning_msg):
         """Add a warning message to the current dictionary of warnings.
@@ -490,16 +512,21 @@ class FailoverDaemon(object):
                     try:
                         self.rpl.topology.master.connect()
                     except:
-                        self._report("Cannot reconnect to master.",
-                                     logging.INFO, False)
+                        pass
 
                 # Check the master again. If no connection or lost connection,
-                # try ping and if still not alive, failover. This performs the
-                # timeout threshold for detecting a down master.
+                # try ping. This performs the timeout threshold for detecting
+                # a down master. If still not alive, try to reconnect and if
+                # connection fails after 3 attempts, failover.
                 if self.rpl.topology.master is None or \
                    not ping_host(self.rpl.topology.master.host, pingtime) or \
                    not self.rpl.topology.master.is_alive():
                     failover = True
+                    if self._reconnect_master(self.pingtime):
+                        failover = False  # Master is now connected again
+                    if failover:
+                        self._report("Failed to reconnect to the master after "
+                                     "3 attemps.", logging.INFO)
 
             if failover:
                 self._report("Master is confirmed to be down or "
@@ -600,30 +627,37 @@ class FailoverDaemon(object):
             else:
                 self.del_warning("errant_tnx")
 
-            # Log status
-            self._print_warnings()
-            self._log_master_status()
+            if self.master and self.master.is_alive():
+                # Log status
+                self._print_warnings()
+                self._log_master_status()
 
-            self.list_data = []
-            if "health" in self.report_values:
-                (health_labels, health_data) = self._format_health_data()
-                if health_data:
-                    self._log_data("Health Status:", health_labels,
-                                   health_data)
-            if "gtid" in self.report_values:
-                (gtid_labels, gtid_data) = self._format_gtid_data()
-                for i, v in enumerate(gtid_data):
-                    if v:
-                        self._log_data("GTID Status - {0}"
-                                       "".format(_GTID_LISTS[i]),
-                                       gtid_labels, v)
-            if "uuid" in self.report_values:
-                (uuid_labels, uuid_data) = self._format_uuid_data()
-                if uuid_data:
-                    self._log_data("UUID Status:", uuid_labels, uuid_data)
+                self.list_data = []
+                if "health" in self.report_values:
+                    (health_labels, health_data) = self._format_health_data()
+                    if health_data:
+                        self._log_data("Health Status:", health_labels,
+                                       health_data)
+                if "gtid" in self.report_values:
+                    (gtid_labels, gtid_data) = self._format_gtid_data()
+                    for i, v in enumerate(gtid_data):
+                        if v:
+                            self._log_data("GTID Status - {0}"
+                                           "".format(_GTID_LISTS[i]),
+                                           gtid_labels, v)
+                if "uuid" in self.report_values:
+                    (uuid_labels, uuid_data) = self._format_uuid_data()
+                    if uuid_data:
+                        self._log_data("UUID Status:", uuid_labels, uuid_data)
+
+            # Disconnect the master while waiting for the interval to expire
+            self.master.disconnect()
 
             # Wait for the interval to expire
             time.sleep(self.interval)
+
+            # Reconnect to the master
+            self._reconnect_master(self.pingtime)
 
             first_pass = False
 
