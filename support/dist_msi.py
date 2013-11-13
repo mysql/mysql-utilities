@@ -58,7 +58,7 @@ class _MSIDist(bdist):
          "creating the distribution"),
         ('sub-version=', 's',
          "adds a subversion after the current version, "
-         "(default: %s)" % "-1"),
+         "(default: %s)" % ""),
         ]
 
     boolean_options = ['keep-temp']
@@ -72,7 +72,7 @@ class _MSIDist(bdist):
         self.dist_type = None
         self.dist_target = None
         self.product_name = 'MySQL Utilities'
-        self.sub_version = "-1"
+        self.sub_version = ""
 
     def finalize_options(self):
         """Finalize opitons"""
