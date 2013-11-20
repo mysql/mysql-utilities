@@ -187,6 +187,14 @@ class test(import_basic.test):
             self.drop_db(self.server2, '`db``:db`')
             test_num += 1
 
+        cmd_str = ("mysqldbimport.py {0} {1} "
+                   "--character-set=unsupported_charset"
+                   "".format(self.export_import_file, to_conn))
+        comment = "Test case {0} - invalid --character-set".format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         if os.name != "posix":
             self.replace_result("# Importing definitions and data from "
                                 "std_data\\bad_object.csv",

@@ -146,6 +146,16 @@ class test(mutlib.System_test):
         self.replace_substring("127.0.0.1", "localhost")
         self.replace_result("| audit.log", "| audit.log [...] \n")
 
+        # Mask file-stats with different file size.
+        self.replace_result("+------------+--------+--------------------------"
+                            "-+---------------------------+\n",
+                            "+------------+-------+---------------------------"
+                            "+---------------------------+\n")
+        self.replace_result("| File       | Size   | Created                  "
+                            " | Last Modified             |\n",
+                            "| File       | Size  | Created                   "
+                            "| Last Modified             |\n")
+
         # Remove new audit log variable recently introduced.
         self.remove_result("| audit_log_format")
 

@@ -39,7 +39,8 @@ from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.options import (setup_common_options, add_engines,
                                             add_skip_options, check_verbosity,
                                             add_verbosity, check_skip_options,
-                                            add_format_option)
+                                            add_format_option,
+                                            add_character_set_option)
 
 
 # Constants
@@ -70,6 +71,9 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
+
+# Add character set option
+add_character_set_option(parser)
 
 # Input format
 add_format_option(parser, "the input file format in either sql (default), "
@@ -186,6 +190,7 @@ options = {
     "skip_rpl": opt.skip_rpl,
     "skip_gtid": opt.skip_gtid,
     "table": opt.table,
+    "charset": opt.charset,
 }
 
 # Parse server connection values

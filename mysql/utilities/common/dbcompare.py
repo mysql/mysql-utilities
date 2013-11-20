@@ -195,12 +195,14 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     Returns tuple of Server objects (server1, server2)
     """
     quiet = options.get("quiet", False)
+    charset = options.get("charset", None)
 
     conn_options = {
         'quiet': quiet,
         'src_name': "server1",
         'dest_name': "server2",
         'version': "5.1.30",
+        'charset': charset,
     }
     servers = connect_servers(server1_val, server2_val, conn_options)
     server1 = servers[0]

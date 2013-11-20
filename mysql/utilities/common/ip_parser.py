@@ -335,6 +335,16 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
         # Unrecognized format
         raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
 
+    # Get character-set from options
+    if isinstance(options, dict):
+        charset = options.get("charset", None)
+    else:
+        # options is an instance of optparse.Values
+        try:
+            charset = options.charset  # pylint: disable=E1103
+        except AttributeError:
+            charset = None
+
     # Set parsed connection values
     connection = {
         "user": user,
@@ -342,6 +352,9 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
         "port": int(port) if port else 3306,
         "passwd": passwd if passwd else ''
     }
+
+    if charset:
+        connection["charset"] = charset
 
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.

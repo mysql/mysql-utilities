@@ -32,7 +32,8 @@ import sys
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
-                                            add_format_option)
+                                            add_format_option,
+                                            add_character_set_option)
 
 
 # Check for connector/python
@@ -44,6 +45,9 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               "mysqlmetagrep - search metadata",
                               "%prog --server=user:pass@host:port:socket "
                               "[options] pattern", True)
+
+# Add character set option
+add_character_set_option(parser)
 
 # Setup utility-specific options:
 parser.add_option("-b", "--body",
@@ -120,9 +124,11 @@ try:
     if options.print_sql:
         print(command.sql())
     else:
-        command.execute(options.server, format=options.format)
+        command.execute(options.server, format=options.format,
+                        charset=options.charset)
 except:
     _, details, _ = sys.exc_info()
-    sys.stderr.write('ERROR: %s' % details)
+    sys.stderr.write("ERROR: {0}\n".format(details))
+    sys.exit(1)
 
 sys.exit()

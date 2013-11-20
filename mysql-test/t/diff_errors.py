@@ -110,6 +110,15 @@ class test(diff.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        test_num += 1
+        comment = "Test case {0} - invalid --character-set".format(test_num)
+        res = self.run_test_case(1, "{0} util_test:util_test "
+                                 "--character-set=unsupported_charset"
+                                 "".format(cmd_str),
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_substring("on [::1]", "on localhost")
 
         return True

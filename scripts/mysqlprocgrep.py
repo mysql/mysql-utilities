@@ -35,7 +35,8 @@ from mysql.utilities.command.proc import (ProcessGrep, KILL_CONNECTION,
                                           HOST, DB, COMMAND, INFO, STATE)
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
-                                            add_verbosity, add_format_option)
+                                            add_verbosity, add_format_option,
+                                            add_character_set_option)
 
 
 def add_pattern(option, opt, value, parser, field):
@@ -56,6 +57,10 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               "mysqlprocgrep - search process information",
                               "%prog --server=user:pass@host:port:socket "
                               "[options]", True)
+
+# Add character set option
+add_character_set_option(parser)
+
 # Add regexp
 add_regexp(parser)
 
@@ -138,14 +143,15 @@ try:
     if options.print_sql:
         print(command.sql(options.sql_body).strip())
     else:
-        command.execute(options.server, format=options.format)
+        command.execute(options.server, format=options.format,
+                        charset=options.charset)
 except EmptyResultError:
     _, details, _ = sys.exc_info()
     sys.stderr.write("No matches\n")
     sys.exit(1)
 except Exception:
     _, details, _ = sys.exc_info()
-    sys.stderr.write('ERROR: %s' % details)
+    sys.stderr.write('ERROR: {0}\n'.format(details))
     sys.exit(2)
 
 sys.exit()

@@ -152,6 +152,18 @@ def setup_common_options(program_name, desc_str, usage_str,
     return parser
 
 
+def add_character_set_option(parser):
+    """Add the --character-set option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("--character-set", action="store", dest="charset",
+                      type="string", default=None,
+                      help="sets the client character set. The default is "
+                      "retrieved from the server variable "
+                      "'character_set_client'.")
+
+
 _SKIP_VALUES = (
     "tables", "views", "triggers", "procedures",
     "functions", "events", "grants", "data",

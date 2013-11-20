@@ -204,6 +204,7 @@ class ProcessGrep(object):
         output = kwrds.get('output', sys.stdout)
         connector = kwrds.get('connector', mysql.connector)
         fmt = kwrds.get('format', "grid")
+        charset = kwrds.get('charset', None)
 
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")
@@ -214,8 +215,20 @@ class ProcessGrep(object):
             if not conn:
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
+            if charset:
+                conn['charset'] = charset
             info = conn
             connection = connector.connect(**info)
+
+            if not charset:
+                # If no charset provided, get it from the
+                # "character_set_client" server variable.
+                cursor = connection.cursor()
+                cursor.execute("SHOW VARIABLES LIKE 'character_set_client'")
+                res = cursor.fetchall()
+                connection.set_charset_collation(charset=str(res[0][1]))
+                cursor.close()
+
             cursor = connection.cursor()
             cursor.execute(self.__select)
             for row in cursor:

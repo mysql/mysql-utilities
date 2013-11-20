@@ -12,6 +12,10 @@ Options:
   --server2=SERVER2     connection information for second server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   -f FORMAT, --format=FORMAT
                         display the output in either grid (default), tab, csv,
                         or vertical format

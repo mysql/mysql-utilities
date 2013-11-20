@@ -308,6 +308,7 @@ def connect_servers(src_val, dest_val, options=None):
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
+    charset = options.get("charset", None)
 
     source = None
     destination = None
@@ -319,6 +320,12 @@ def connect_servers(src_val, dest_val, options=None):
     dest_dict = get_connection_dictionary(dest_val)
     if dest_dict and "]" in dest_dict['host']:
         dest_dict['host'] = clean_IPv6(dest_dict['host'])
+
+    # Add character set
+    if src_dict and charset:
+        src_dict["charset"] = charset
+    if dest_dict and charset:
+        dest_dict["charset"] = charset
 
     # Check for uniqueness - dictionary
     if options.get("unique", False) and dest_dict is not None:
@@ -536,7 +543,7 @@ class Server(object):
             verbose        print extra data during operations (optional)
                            default value = False
             charset        Default character set for the connection.
-                           (default utf8)
+                           (default None)
         """
         if options is None:
             options = {}
@@ -546,7 +553,6 @@ class Server(object):
         self.verbose = options.get("verbose", False)
         self.db_conn = None
         self.host = None
-        self.charset = options.get("charset", "utf8")
         self.role = options.get("role", "Server")
         conn_values = get_connection_dictionary(options.get("conn_info"))
         try:
@@ -559,6 +565,8 @@ class Server(object):
             self.port = 3306
             if conn_values["port"] is not None:
                 self.port = int(conn_values["port"])
+            self.charset = options.get("charset",
+                                       conn_values.get("charset", None))
         except KeyError:
             raise UtilError("Dictionary format not recognized.")
         self.connect_error = None
@@ -822,10 +830,16 @@ class Server(object):
                 parameters['unix_socket'] = self.socket
             if self.passwd and self.passwd != "":
                 parameters['passwd'] = self.passwd
-            parameters['charset'] = self.charset
+            if self.charset:
+                parameters['charset'] = self.charset
             parameters['host'] = parameters['host'].replace("[", "")
             parameters['host'] = parameters['host'].replace("]", "")
             self.db_conn = mysql.connector.connect(**parameters)
+            # If no charset provided, get it from the "character_set_client"
+            # server variable.
+            if not self.charset:
+                res = self.show_server_variable('character_set_client')
+                self.db_conn.set_charset_collation(charset=res[0][1])
         except mysql.connector.Error, e:
             # Reset any previous value if the connection cannot be established,
             # before raising an exception. This prevents the use of a broken

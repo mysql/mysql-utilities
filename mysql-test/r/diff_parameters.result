@@ -13,6 +13,10 @@ Options:
   --server2=SERVER2     connection information for second server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   --width=WIDTH         display width
   --force               do not abort when a diff test fails
   --skip-table-options  skip check of all table options (e.g., AUTO_INCREMENT,

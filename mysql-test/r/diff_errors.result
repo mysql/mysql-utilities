@@ -64,3 +64,6 @@ Test case 12 - no objects specified.
 Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff.py: error: No objects specified to compare.
+Test case 13 - invalid --character-set
+# server1 on localhost: ... ERROR: Cannot connect to the server1 server.
+Error Character set 'unsupported_charset' unsupported.

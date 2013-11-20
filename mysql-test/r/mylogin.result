@@ -1,16 +1,16 @@
-{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
-{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
-{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
-{'passwd': '', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
-{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
-{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
-{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
-{'passwd': '', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
-{'passwd': '', 'host': 'localhost', 'user': 'test_user2', 'port': 3306}
-{'passwd': '', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user2', 'port': 13000}
-{'passwd': '', 'host': 'localhost', 'user': 'test_user3', 'port': 3306}
-{'passwd': '', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user3', 'port': 3306}
-{'passwd': '', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user3', 'port': 13001}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 1000}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': '/my.socket', 'host': 'localhost', 'user': 'test_user', 'port': 3306}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user2', 'port': 3306}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user2', 'port': 13000}
+{'passwd': '', 'host': 'localhost', 'charset': 'utf8', 'user': 'test_user3', 'port': 3306}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user3', 'port': 3306}
+{'passwd': '', 'charset': 'utf8', 'unix_socket': 'my.socket', 'host': 'localhost', 'user': 'test_user3', 'port': 13001}
 ('test_user', None)
 ('test_user', None)
 ('test_user', '')

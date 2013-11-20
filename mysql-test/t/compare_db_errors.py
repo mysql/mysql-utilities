@@ -137,6 +137,15 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+                   "--character-set=unsupported_charset"
+                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+        comment = ("Test case {0} - Invalid --character-set"
+                   "".format(test_num, cmd_opts))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("mysqldbcompare.py: error: Server1 connection "
                             "values invalid",

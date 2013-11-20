@@ -41,7 +41,8 @@ from mysql.utilities.common.messages import (PARSE_ERR_DB_OBJ_MISSING,
                                              PARSE_ERR_DB_OBJ_PAIR_EXT)
 from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             check_verbosity, add_changes_for,
-                                            add_reverse, setup_common_options)
+                                            add_reverse, setup_common_options,
+                                            add_character_set_option)
 
 
 # Constants
@@ -73,6 +74,9 @@ parser.add_option("--server2", action="store", dest="server2",
                   help="connection information for second server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
+
+# Add character set option
+add_character_set_option(parser)
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
@@ -117,6 +121,7 @@ options = {
     "changes-for": opt.changes_for,
     "reverse": opt.reverse,
     "skip_table_opts": opt.skip_tbl_opts,
+    "charset": opt.charset,
 }
 
 # Parse server connection values

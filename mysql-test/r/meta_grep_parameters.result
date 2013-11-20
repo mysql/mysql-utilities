@@ -9,6 +9,10 @@ Options:
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   -b, --body            search the body of routines, triggers, and events as
                         well
   --search-objects=OBJECT_TYPES, --object-types=OBJECT_TYPES

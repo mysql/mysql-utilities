@@ -106,6 +106,13 @@ class test(export_basic.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
 
+        cmd_str = ("mysqldbexport.py {0} --all "
+                   "--character-set=unsupported_charset".format(from_conn))
+        comment = "Test case 10 - invalid --character-set"
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_substring("1045 (28000)", "1045")
 
         self.replace_substring("on [::1]", "on localhost")

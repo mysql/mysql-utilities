@@ -9,6 +9,10 @@ Options:
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   -f FORMAT, --format=FORMAT
                         the input file format in either sql (default), grid,
                         tab, csv, raw_csv or vertical format

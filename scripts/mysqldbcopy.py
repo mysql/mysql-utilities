@@ -43,7 +43,8 @@ from mysql.utilities.common.options import (add_skip_options, add_verbosity,
                                             check_skip_options, add_engines,
                                             add_all, check_all, add_locking,
                                             add_regexp, add_rpl_mode,
-                                            add_rpl_user, setup_common_options)
+                                            add_rpl_user, setup_common_options,
+                                            add_character_set_option)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 
@@ -89,6 +90,9 @@ parser.add_option("--destination", action="store", dest="destination",
                   help="connection information for destination server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
+
+# Add character set option
+add_character_set_option(parser)
 
 # Overwrite mode
 parser.add_option("-f", "--force", action="store_true", dest="force",
@@ -197,6 +201,7 @@ options = {
     "rpl_mode": opt.rpl_mode,
     "verbosity": opt.verbosity,
     "skip_gtid": opt.skip_gtid,
+    "charset": opt.charset,
 }
 
 # Parse source connection values

@@ -245,7 +245,15 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("%s: failed" % comment)
         test_num += 1
-            
+
+        cmd_str = ("mysqldbcopy.py {0} {1} --all "
+                   "--character-set=unsupported_charset"
+                   "".format(from_conn, to_conn))
+        comment = "Test case {0} - Invalid --character-set".format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")

@@ -9,6 +9,10 @@ Options:
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   -G, --basic-regexp, --regexp
                         use 'REGEXP' operator to match pattern. Default is to
                         use 'LIKE'.

@@ -260,16 +260,29 @@ class ObjectGrep(object):
                            default = GRID
         """
         fmt = kwrds.get('format', "grid")
+        charset = kwrds.get('charset', None)
         entries = []
         for info in connections:
             conn = parse_connection(info)
             if not conn:
                 msg = "'%s' is not a valid connection specifier" % (info,)
                 raise FormatError(msg)
+            if charset:
+                conn['charset'] = charset
             info = conn
             conn['host'] = conn['host'].replace("[", "")
             conn['host'] = conn['host'].replace("]", "")
             connection = connector.connect(**info)
+
+            if not charset:
+                # If no charset provided, get it from the
+                # "character_set_client" server variable.
+                cursor = connection.cursor()
+                cursor.execute("SHOW VARIABLES LIKE 'character_set_client'")
+                res = cursor.fetchall()
+                connection.set_charset_collation(charset=str(res[0][1]))
+                cursor.close()
+
             cursor = connection.cursor()
             cursor.execute(self.__sql)
             entries.extend([tuple([_spec(info)] + list(row))

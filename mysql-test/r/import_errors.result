@@ -101,3 +101,6 @@ Running import...
 ERROR: Cannot read an import file generated with --display=NAMES
 AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test case 19 - invalid --character-set
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Character set 'unsupported_charset' unsupported.

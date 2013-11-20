@@ -39,7 +39,8 @@ from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             check_skip_options, add_verbosity,
                                             add_format_option, add_rpl_mode,
                                             add_all, check_all, add_locking,
-                                            add_rpl_user, check_rpl_options)
+                                            add_rpl_user, check_rpl_options,
+                                            add_character_set_option)
 from mysql.utilities.common.sql_transform import (remove_backtick_quoting,
                                                   is_quoted_with_backticks)
 
@@ -73,6 +74,9 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               DESCRIPTION, USAGE)
 
 # Setup utility-specific options:
+
+# Add character set option
+add_character_set_option(parser)
 
 # Output format
 add_format_option(parser, "display the output in either sql (default), "
@@ -232,6 +236,7 @@ options = {
     "comment_rpl": opt.comment_rpl,
     "export": opt.export,
     "skip_gtid": opt.skip_gtid,
+    "charset": opt.charset,
 }
 
 # Parse server connection values

@@ -55,7 +55,7 @@ class test(mutlib.System_test):
                      "test' \\\"-hyphen:my.socket",
                      "test' \\\"-hyphen:13001:my.socket"]
         for test in con_tests:
-            con_dic = parse_connection(test)
+            con_dic = parse_connection(test, options={"charset": "utf8"})
             self.results.append(con_dic)
 
         # Test parse_user_password with login-paths

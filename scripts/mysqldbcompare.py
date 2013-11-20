@@ -44,6 +44,7 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             check_verbosity,
                                             add_changes_for, add_reverse,
                                             add_format_option,
+                                            add_character_set_option,
                                             setup_common_options)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
@@ -77,6 +78,9 @@ parser.add_option("--server2", action="store", dest="server2",
                   help="connection information for second server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
+
+# Add character set option
+add_character_set_option(parser)
 
 # Output format
 add_format_option(parser, "display the output in either grid (default), "
@@ -167,6 +171,7 @@ options = {
     "reverse": opt.reverse,
     "span_key_size": opt.span_key_size,
     "skip_table_opts": opt.skip_tbl_opts,
+    "charset": opt.charset,
 }
 
 # Parse server connection values

@@ -191,3 +191,6 @@ Test case 23 - error: --rpl-user=root but no --rpl
 Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy.py: error: The --rpl-user option must be used with the --rpl option.
+Test case 24 - Invalid --character-set
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Character set 'unsupported_charset' unsupported.

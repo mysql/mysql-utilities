@@ -41,6 +41,10 @@ Options:
                         connection information for destination server in the
                         form: <user>[:<password>]@<host>[:<port>][:<socket>]
                         or <login-path>[:<port>][:<socket>].
+  --character-set=CHARSET
+                        sets the client character set. The default is
+                        retrieved from the server variable
+                        'character_set_client'.
   -f, --force           drop the new database or object if it exists
   --threads=THREADS     use multiple threads (connections) for insert
   -x EXCLUDE, --exclude=EXCLUDE

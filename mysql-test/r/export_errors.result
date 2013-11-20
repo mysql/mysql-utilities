@@ -26,3 +26,6 @@ Test case 9 - error: db list and --all
 Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport.py: error: You cannot use the --all option with a list of databases.
+Test case 10 - invalid --character-set
+# Source on localhost: ... ERROR: Cannot connect to the Source server.
+Error Character set 'unsupported_charset' unsupported.
