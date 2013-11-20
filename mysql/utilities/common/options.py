@@ -456,14 +456,15 @@ def add_rpl_mode(parser, do_both=True, add_file=True):
     rpl_mode_options = _PERMITTED_RPL_DUMP
     if do_both:
         rpl_mode_options.append("both")
-        rpl_mode_both = ", and 'both' = include 'master' and 'slave' " + \
-                        "options where applicable"
+        rpl_mode_both = (", and 'both' = include 'master' and 'slave' options "
+                         "where applicable")
     parser.add_option("--rpl", "--replication", dest="rpl_mode",
                       action="store", help="include replication information. "
-                      "Choices = 'master' = include the CHANGE MASTER command "
-                      "using source server as the master, 'slave' = include "
-                      "the CHANGE MASTER command using the destination "
-                      "server's master information%s." % rpl_mode_both,
+                      "Choices: 'master' = include the CHANGE MASTER command "
+                      "for the source server's master (itself if it is a "
+                      "master or its master if it is a slave), 'slave' = "
+                      "include the CHANGE MASTER command for the source "
+                      "server if it is a slave{0}.".format(rpl_mode_both),
                       choices=rpl_mode_options)
     if add_file:
         parser.add_option("--rpl-file", "--replication-file", dest="rpl_file",
