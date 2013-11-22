@@ -1,11 +1,14 @@
 Test case 1 - help
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+MySQL Utilities mysqldbexport version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport - export metadata and data from databases
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

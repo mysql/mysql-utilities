@@ -1,23 +1,23 @@
 Test case 1 - Missing server option
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --server option is required for --show-options.
+mysqlauditadmin: error: The --server option is required for --show-options.
 Test case 2 - Server connection parse error
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: Server connection values invalid
+mysqlauditadmin: error: Server connection values invalid
 Test case 3 - Server connection empty
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --server option is required for --show-options.
+mysqlauditadmin: error: The --server option is required for --show-options.
 Test case 4 - Invalid option
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: no such option: --xpto
+mysqlauditadmin: error: no such option: --xpto
 Test case 5 - Invalid command
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The command 'xpto' is not a valid command.
+mysqlauditadmin: error: The command 'xpto' is not a valid command.
 Test case 6 - Invalid policy value
 The POLICY command requires one of the following values: ALL, NONE, LOGINS, QUERIES, DEFAULT.
 ERROR: Please provide the correct value for the POLICY command.
@@ -25,62 +25,62 @@ Test case 7 - Invalid rotate_on_size value
 Invalid integer value: XPTO
 ERROR: Please provide the correct value for the ROTATE_ON_SIZE command.
 Test case 8 - Missing audit-log-name
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: You must specify the --audit-log-name option for copying log files or viewing file statistics.
+mysqlauditadmin: error: You must specify the --audit-log-name option for copying log files or viewing file statistics.
 Test case 9 - Invalid file specified by audit-log-name
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The specified --audit-log-name is not a file: /xpto/xpto.log
+mysqlauditadmin: error: The specified --audit-log-name is not a file: /xpto/xpto.log
 Test case 10 - Missing audit-log-name for command copy
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --audit-log-name option is required for the COPY command.
+mysqlauditadmin: error: The --audit-log-name option is required for the COPY command.
 Test case 11 - Missing copy-to for command copy
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: You must specify the --copy-to option for copying a log file.
+mysqlauditadmin: error: You must specify the --copy-to option for copying a log file.
 Test case 12 - Copy audit log to a non existing destination
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: You must have read and write access to the destination for audit log copy.
+mysqlauditadmin: error: You must have read and write access to the destination for audit log copy.
 Test case 13 - Invalid remote-login format
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --remote-login option should be in the format: <user>:<host_or_ip>
+mysqlauditadmin: error: The --remote-login option should be in the format: <user>:<host_or_ip>
 Test case 14 - Value required for command rotate_on_size
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The command ROTATE_ON_SIZE requires the --value option.
+mysqlauditadmin: error: The command ROTATE_ON_SIZE requires the --value option.
 Test case 15 - Value required for command policy
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The command POLICY requires the --value option.
+mysqlauditadmin: error: The command POLICY requires the --value option.
 Test case 16 - Server option required for command rotate
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --server option is required for the ROTATE command.
+mysqlauditadmin: error: The --server option is required for the ROTATE command.
 Test case 17 - Only one command at a time
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: You can only perform one command at a time.
+mysqlauditadmin: error: You can only perform one command at a time.
 Test case 18 - No option specified
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: At least one valid option must be specified.
+mysqlauditadmin: error: At least one valid option must be specified.
 Test case 19 - Additional server option/command missing
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --server option requires --show-options and/or a valid command.
+mysqlauditadmin: error: The --server option requires --show-options and/or a valid command.
 Test case 20 - Value option requires a valid command
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --value option must be used with a valid command.
+mysqlauditadmin: error: The --value option must be used with a valid command.
 Test case 21 - Additional audit log name option\command missing
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --audit-log-name option requires --file-stats and/or a valid command.
+mysqlauditadmin: error: The --audit-log-name option requires --file-stats and/or a valid command.
 Test case 22 - Copy-to option requires command COPY
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
+Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
-mysqlauditadmin.py: error: The --copy-to option can only be used with the COPY command.
+mysqlauditadmin: error: The --copy-to option can only be used with the COPY command.

@@ -1,11 +1,14 @@
 Test case 1 - do the help
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+MySQL Utilities mysqlindexcheck version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck - check for duplicate or redundant indexes
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

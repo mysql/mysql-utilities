@@ -1,8 +1,4 @@
 Test case 1 - Show the help
-Usage: mysqlauditgrep.py [options] AUDIT_LOG_FILE 
-
-mysqlauditgrep - audit log search utility
-
 Options:
   --version             show program's version number and exit
   --help                display this help message and exit

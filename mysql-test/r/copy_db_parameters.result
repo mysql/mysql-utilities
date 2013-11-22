@@ -27,13 +27,16 @@ Test case 2 - operation fails - need overwrite
 # Copying database util_test renamed as util_db_clone
 ERROR: destination database exists. Use --force to overwrite existing database.
 Test case 3 - help
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+MySQL Utilities mysqldbcopy version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy - copy databases from one server to another
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --source=SOURCE       connection information for source server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

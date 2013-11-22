@@ -160,6 +160,13 @@ class test(import_basic.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldbimport version",
+                "MySQL Utilities mysqldbimport version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

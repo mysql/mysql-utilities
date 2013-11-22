@@ -1,11 +1,8 @@
 Test case 1 - show the help 
-Usage: mysqlauditadmin.py --server=user:pass@host:port --show-options 
-
-mysqlauditadmin - audit log maintenance utility
-
 Options:
   --version             show program's version number and exit
   --help                display this help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

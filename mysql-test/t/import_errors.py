@@ -229,9 +229,9 @@ class test(import_basic.test):
 
         self.replace_substring("1045 (28000)", "1045")
 
-        self.replace_result("mysqldbimport.py: error: Server connection "
+        self.replace_result("mysqldbimport: error: Server connection "
                             "values invalid",
-                            "mysqldbimport.py: error: Server connection "
+                            "mysqldbimport: error: Server connection "
                             "values invalid\n")
 
         return True

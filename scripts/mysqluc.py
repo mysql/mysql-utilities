@@ -20,7 +20,7 @@
 This file contains the mysql utilities client.
 """
 
-from mysql.utilities.common.options import UtilitiesParser
+from mysql.utilities.common.options import license_callback, UtilitiesParser
 from mysql.utilities.common.tools import (check_connector_python,
                                           check_python_version)
 
@@ -83,16 +83,23 @@ def build_variable_dictionary_list(args):
     return variables
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = UtilitiesParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
-    add_help_option=False
+    add_help_option=False,
+    prog=program
 )
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",

@@ -99,13 +99,13 @@ class test(copy_user.test):
         # Replace error code.
         self.replace_result("Error 1045", "Error XXXX: Access denied\n")
         self.replace_result("Error 2003", "Error XXXX: Access denied\n")
-        self.replace_result("mysqluserclone.py: error: Source connection "
+        self.replace_result("mysqluserclone: error: Source connection "
                             "values invalid",
-                            "mysqluserclone.py: error: Source connection "
+                            "mysqluserclone: error: Source connection "
                             "values invalid\n")
-        self.replace_result("mysqluserclone.py: error: Destination connection "
+        self.replace_result("mysqluserclone: error: Destination connection "
                             "values invalid",
-                            "mysqluserclone.py: error: Destination connection "
+                            "mysqluserclone: error: Destination connection "
                             "values invalid\n")
 
         self.replace_substring("on [::1]", "on localhost")

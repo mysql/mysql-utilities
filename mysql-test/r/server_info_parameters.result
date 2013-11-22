@@ -1,18 +1,14 @@
 Test case 1 - show help
-MySQL Utilities mysqlserverinfo.py version XXX
-Copyright (c) YYYY Oracle and/or its affiliates. All rights reserved.
-This is a release of dual licensed MySQL Utilities. For the avoidance of
-doubt, this particular copy of the software is released
-under the version 2 of the GNU General Public License.
-MySQL Utilities is brought to you by Oracle.
-
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
+MySQL Utilities mysqlserverinfo version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo - show server information
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

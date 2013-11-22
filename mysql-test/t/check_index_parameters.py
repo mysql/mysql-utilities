@@ -133,6 +133,13 @@ class test(check_index.test):
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqlindexcheck version",
+                "MySQL Utilities mysqlindexcheck version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

@@ -153,9 +153,9 @@ class test(show_rpl.test):
                             "user 'wanda'@'localhost' (using password: "
                             "YES)\n")
 
-        self.replace_result("mysqlrplshow.py: error: Master connection "
+        self.replace_result("mysqlrplshow: error: Master connection "
                             "values invalid",
-                            "mysqlrplshow.py: error: Master connection "
+                            "mysqlrplshow: error: Master connection "
                             "values invalid\n")
 
         show_rpl.test.stop_replication(self, self.server_list[1])

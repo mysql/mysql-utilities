@@ -1,11 +1,14 @@
 Test Case 1 : Showing help 
-Usage: mysqldiskusage.py --server=user:pass@host:port:socket db1 --all
+MySQL Utilities mysqldiskusage version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage - show disk usage for databases
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

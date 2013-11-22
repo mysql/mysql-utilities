@@ -63,6 +63,13 @@ class test(proc_grep.test):
         if os.name != "posix":
             self.replace_result("    USER LIKE ", "    USER LIKE 'XXXX'\n")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqlprocgrep version",
+                "MySQL Utilities mysqlprocgrep version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

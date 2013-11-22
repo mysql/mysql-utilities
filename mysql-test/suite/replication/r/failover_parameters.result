@@ -1,11 +1,7 @@
 Test case 1 - show help
-Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
-
-mysqlfailover - automatic replication health monitoring and failover
-
-Options:
   --version             show program's version number and exit
   --help                display this help message and exit
+  --license             display program's license and exit
   --candidates=CANDIDATES
                         connection information for candidate slave servers for
                         failover in the form:

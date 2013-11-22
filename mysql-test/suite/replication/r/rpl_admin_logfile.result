@@ -21,6 +21,6 @@ Test Case 2 - Log file is reopened
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test Case 3 - Log file can not be written to
-Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: Error opening log file: Permission denied
+mysqlrpladmin: error: Error opening log file: Permission denied

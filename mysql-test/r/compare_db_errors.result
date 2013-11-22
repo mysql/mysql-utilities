@@ -1,35 +1,35 @@
 Test case 1 - Invalid --server1 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Server1 connection values invalid
+mysqldbcompare: error: Server1 connection values invalid
 Test case 2 - Invalid --server2 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Server2 connection values invalid
+mysqldbcompare: error: Server2 connection values invalid
 Test case 3 - missing backticks inventory.inventory 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Cannot parse the specified database(s): 'inventory.inventory'. Please verify that the database(s) are specified in a valid format (i.e., db1[:db2]) and that backtick quotes are properly used when required. The use of backticks is required if non alphanumeric characters are used for database names. Parsing the specified database results in db1 = 'inventory' and db2 = 'inventory'.
+mysqldbcompare: error: Cannot parse the specified database(s): 'inventory.inventory'. Please verify that the database(s) are specified in a valid format (i.e., db1[:db2]) and that backtick quotes are properly used when required. The use of backticks is required if non alphanumeric characters are used for database names. Parsing the specified database results in db1 = 'inventory' and db2 = 'inventory'.
 Test case 4 - non existing database '`inventory.inventory`'
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 ERROR: The database inventory.inventory does not exist.
 Test case 5 - invalid format :inventory 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: Cannot parse the specified database(s): ':inventory'. Please verify that the database(s) are specified in a valid format (i.e., db1[:db2]) and that backtick quotes are properly used when required.
+mysqldbcompare: error: Cannot parse the specified database(s): ':inventory'. Please verify that the database(s) are specified in a valid format (i.e., db1[:db2]) and that backtick quotes are properly used when required.
 Test case 6 - invalid value for --span-key-size=A 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: option --span-key-size: invalid integer value: 'A'
+mysqldbcompare: error: option --span-key-size: invalid integer value: 'A'
 Test case 7 - size too low for --span-key-size=-4 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: The value -4 specified for option --span-key-size is too small and would cause inaccurate results, please retry with a bigger value or the default value of 8.
+mysqldbcompare: error: The value -4 specified for option --span-key-size is too small and would cause inaccurate results, please retry with a bigger value or the default value of 8.
 Test case 8 - no options
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
-mysqldbcompare.py: error: No databases specified to compare.
+mysqldbcompare: error: No databases specified to compare.
 Test case 9 - No pri key
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

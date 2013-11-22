@@ -128,6 +128,12 @@ class test(clone_db.test):
                                        "ON SCHEDULE EVERY 1 YEAR STARTS "
                                        "'YYYY-MM-DD HH:MI:SS' ON COMPLETION")
 
+        self.replace_result(
+                "MySQL Utilities mysqldbcopy version",
+                "MySQL Utilities mysqldbcopy version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

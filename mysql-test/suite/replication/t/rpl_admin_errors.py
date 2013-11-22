@@ -259,9 +259,9 @@ class test(rpl_admin.test):
         self.replace_substring(socket.gethostname().split('.', 1)[0],
                                "<hostname>")
 
-        self.replace_result("mysqlrpladmin.py: error: New master connection "
+        self.replace_result("mysqlrpladmin: error: New master connection "
                             "values invalid",
-                            "mysqlrpladmin.py: error: New master connection "
+                            "mysqlrpladmin: error: New master connection "
                             "values invalid\n")
         self.replace_result("ERROR: Master connection values invalid or "
                             "cannot be parsed",

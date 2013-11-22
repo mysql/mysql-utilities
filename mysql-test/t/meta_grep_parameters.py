@@ -75,6 +75,13 @@ class test(meta_grep.test):
 
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqlmetagrep version",
+                "MySQL Utilities mysqlmetagrep version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

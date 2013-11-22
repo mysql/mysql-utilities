@@ -3,13 +3,13 @@ ERROR: The value wiki-waki is not a valid value for --skip.
 Test case 2 - exporting data and skipping data
 ERROR: You cannot use --export=data and --skip-data when exporting table data.
 Test case 3 - no database specified
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: You must specify at least one database to export or use the --all option to export all databases.
+mysqldbexport: error: You must specify at least one database to export or use the --all option to export all databases.
 Test case 4 - cannot parse --server
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: Server connection values invalid
+mysqldbexport: error: Server connection values invalid
 Test case 5 - error: cannot connect to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
@@ -23,9 +23,9 @@ Test case 8 - error: not enough privileges
 # Source on localhost: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - error: db list and --all
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: You cannot use the --all option with a list of databases.
+mysqldbexport: error: You cannot use the --all option with a list of databases.
 Test case 10 - invalid --character-set
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error Character set 'unsupported_charset' unsupported.

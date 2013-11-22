@@ -184,7 +184,7 @@ class test(mutlib.System_test):
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlauditadmin"
-                                           ".py version", 6)
+                                           " version", 6)
 
     def get_result(self):
         return self.compare(__name__, self.results)

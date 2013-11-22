@@ -123,7 +123,7 @@ class test(show_rpl.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlrplshow.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrplshow "
                                            "version", 6)
 
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")

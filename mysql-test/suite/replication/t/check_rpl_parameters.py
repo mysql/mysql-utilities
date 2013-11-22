@@ -79,7 +79,7 @@ class test(check_rpl.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlrplcheck.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrplcheck "
                                            "version", 6)
 
         test_num += 1

@@ -39,7 +39,8 @@ from mysql.utilities.command.audit_log import (AuditLog,
                                                command_requires_log_name,
                                                command_requires_server)
 from mysql.utilities.common.options import (add_verbosity, UtilitiesParser,
-                                            CaseInsensitiveChoicesOption)
+                                            CaseInsensitiveChoicesOption,
+                                            license_callback)
 from mysql.utilities.common.tools import (check_connector_python,
                                           show_file_statistics)
 
@@ -60,18 +61,25 @@ if not check_connector_python():
     sys.exit(1)
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = MyParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=audit_log.VALID_COMMANDS_TEXT
+    epilog=audit_log.VALID_COMMANDS_TEXT,
+    prog=program
 )
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Setup utility-specific options:
 

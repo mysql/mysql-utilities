@@ -327,7 +327,7 @@ class test(mutlib.System_test):
         self.replace_result("         VERSION:", "         VERSION: ...\n")
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep "
                                            "version", 6)
 
     def get_result(self):

@@ -36,11 +36,11 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import Server, check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_failover_connections
-from mysql.utilities.common.options import (UtilitiesParser,
-                                            CaseInsensitiveChoicesOption,
-                                            add_format_option, add_verbosity,
+from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             add_failover_options, add_rpl_user,
-                                            check_server_lists)
+                                            CaseInsensitiveChoicesOption,
+                                            check_server_lists,
+                                            license_callback, UtilitiesParser)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
                                              PARSE_ERR_SLAVE_DISCO_REQ,
@@ -73,18 +73,25 @@ if not check_connector_python():
     sys.exit(1)
 
 # Setup the command parser
+program=os.path.basename(sys.argv[0]).replace(".py","")
 parser = MyParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=get_valid_rpl_command_text()
+    epilog=get_valid_rpl_command_text(),
+    prog=program
 )
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)

@@ -1,11 +1,14 @@
 Test case 1 - Use --help 
-Usage: mysqldbcompare.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
+MySQL Utilities mysqldbcompare version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 
 mysqldbcompare - compare databases for consistency
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server1=SERVER1     connection information for first server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

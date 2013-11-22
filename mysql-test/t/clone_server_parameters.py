@@ -137,7 +137,7 @@ class test(mutlib.System_test):
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities "
-                                           "mysqlserverclone.py version", 6)
+                                           "mysqlserverclone version", 6)
 
         return True
 

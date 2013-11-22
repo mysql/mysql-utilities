@@ -124,6 +124,13 @@ class test(frm_reader_base.test):
         self.replace_result("# std_data", "# std_data/frm_files/t9.frm\n")
         self.replace_substring(user, "JOE_USER")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqlfrm version",
+                "MySQL Utilities mysqlfrm version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

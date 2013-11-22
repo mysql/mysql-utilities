@@ -201,6 +201,13 @@ class test(diskusage_basic.test):
 
         self.replace_result("error_log.err", "error_log.err,XXXX\n")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldiskusage version",
+                "MySQL Utilities mysqldiskusage version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

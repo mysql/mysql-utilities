@@ -47,13 +47,9 @@ localhost:PORT2 (MASTER)
    +--- localhost:PORT1 - (SLAVE)
 
 Test case 5 - show topology - help
-Usage: mysqlrplshow.py --master=root@localhost:3306 
-
-mysqlrplshow - show slaves attached to a master
-
-Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

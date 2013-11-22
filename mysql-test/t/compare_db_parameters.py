@@ -150,6 +150,13 @@ class test(compare_db.test):
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldbcompare version",
+                "MySQL Utilities mysqldbcompare version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         compare_db.test.do_replacements(self)
 
         return True

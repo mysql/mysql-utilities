@@ -150,13 +150,13 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.replace_result("mysqldbcompare.py: error: Server1 connection "
+        self.replace_result("mysqldbcompare: error: Server1 connection "
                             "values invalid",
-                            "mysqldbcompare.py: error: Server1 connection "
+                            "mysqldbcompare: error: Server1 connection "
                             "values invalid\n")
-        self.replace_result("mysqldbcompare.py: error: Server2 connection "
+        self.replace_result("mysqldbcompare: error: Server2 connection "
                             "values invalid",
-                            "mysqldbcompare.py: error: Server2 connection "
+                            "mysqldbcompare: error: Server2 connection "
                             "values invalid\n")
 
         self.replace_substring("on [::1]", "on localhost")

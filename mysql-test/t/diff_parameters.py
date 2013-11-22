@@ -156,9 +156,12 @@ class test(diff.test):
         self.replace_result("*** util_test.t2", "*** util_test.t2\n")
         self.replace_substring("on [::1]", "on localhost")
 
-        # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqldiff.py "
-                                           "version", 6)
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldiff version",
+                "MySQL Utilities mysqldiff version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
 
         return True
 

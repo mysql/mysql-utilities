@@ -1,5 +1,7 @@
 Test case 1 - Use --help 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+MySQL Utilities mysqldiff version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff - compare object definitions among objects where the difference is
 how db1.obj1 differs from db2.obj2
@@ -7,6 +9,7 @@ how db1.obj1 differs from db2.obj2
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server1=SERVER1     connection information for first server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

@@ -39,21 +39,21 @@ Test case 5 - No error: user with % - has permissions
 # Copying EVENT util_test.e1
 #...done.
 Test case 6 - cannot parse --source
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: Source connection values invalid
+mysqldbcopy: error: Source connection values invalid
 Test case 7 - cannot parse --destination
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: Destination connection values invalid
+mysqldbcopy: error: Destination connection values invalid
 Test case 8 - no destination specified
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: No destination server specified.
+mysqldbcopy: error: No destination server specified.
 Test case 9 - no database specified
-Usage: mysqldbcopy.py --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
-mysqldbcopy.py: error: You must specify at least one database to copy or use the --all option to copy all databases.
+mysqldbcopy: error: You must specify at least one database to copy or use the --all option to copy all databases.
 Test case 10 - clone with --all
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.

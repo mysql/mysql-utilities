@@ -25,17 +25,18 @@ import optparse
 import os
 import sys
 
-from mysql.utilities import VERSION_FRM
+from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.read_frm import (read_frm_files,
                                               read_frm_files_diagnostic)
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.options import (add_verbosity, license_callback,
+                                            UtilitiesParser)
 from mysql.utilities.common.server import connect_servers
 
 
-class MyParser(optparse.OptionParser):
+class MyParser(UtilitiesParser):
     """Custom class to set the epilog.
     """
     def format_epilog(self, formatter):
@@ -161,14 +162,21 @@ Enjoy!
 """
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = MyParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=EXTENDED_HELP
+    epilog=EXTENDED_HELP,
+    prog=program
 )
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Add --help option
 parser.add_option("--help", action="help")

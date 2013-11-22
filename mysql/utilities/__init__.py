@@ -28,6 +28,7 @@ RELEASE_STRING = (
     " (part of MySQL Workbench Distribution %s.%s.%s)" % WORKBENCH_VERSION)
 
 COPYRIGHT = "2010, 2013 Oracle and/or its affiliates. All rights reserved."
+
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of
 doubt, this particular copy of the software is released
@@ -35,8 +36,14 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 """
 
-VERSION_FRM = ("MySQL Utilities {program} version " + RELEASE_STRING
-               + "\n" + COPYRIGHT_FULL)
+LICENSE = "GPLv2"
+
+VERSION_FRM = ("MySQL Utilities {program} version {RELEASE_STRING} \n"
+               "License type: {LICENSE}".format(program="{program}",
+                                                RELEASE_STRING=RELEASE_STRING,
+                                                LICENSE=LICENSE))
+
+LICENSE_FRM = (VERSION_FRM + "\n" + COPYRIGHT_FULL)
 PYTHON_MIN_VERSION = (2, 6, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)
 

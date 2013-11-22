@@ -252,13 +252,13 @@ class test(replicate.test):
         self.replace_result("ERROR: Query failed. 1227",
                             "ERROR: Query failed. 1227: Access denied;\n")
 
-        self.replace_result("mysqlreplicate.py: error: Master connection "
+        self.replace_result("mysqlreplicate: error: Master connection "
                             "values invalid",
-                            "mysqlreplicate.py: error: Master connection "
+                            "mysqlreplicate: error: Master connection "
                             "values invalid\n")
-        self.replace_result("mysqlreplicate.py: error: Slave connection "
+        self.replace_result("mysqlreplicate: error: Slave connection "
                             "values invalid",
-                            "mysqlreplicate.py: error: Slave connection "
+                            "mysqlreplicate: error: Slave connection "
                             "values invalid\n")
 
         return True

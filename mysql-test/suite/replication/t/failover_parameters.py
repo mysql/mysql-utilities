@@ -44,7 +44,7 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlfailover.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlfailover "
                                            "version", 6)
 
         return True

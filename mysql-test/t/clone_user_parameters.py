@@ -69,6 +69,13 @@ class test(clone_user.test):
 
         self.replace_substring("on [::1]", "on localhost")
 
+                # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqluserclone version",
+                "MySQL Utilities mysqluserclone version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

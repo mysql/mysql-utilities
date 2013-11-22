@@ -41,6 +41,7 @@ from mysql.utilities.common.topology import parse_failover_connections
 from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
                                             add_failover_options,
                                             check_server_lists,
+                                            license_callback,
                                             UtilitiesParser)
 
 
@@ -103,16 +104,23 @@ except:
 set_signal_handler(on_exit)
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = UtilitiesParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
-    add_help_option=False
+    add_help_option=False,
+    prog=program
 )
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)

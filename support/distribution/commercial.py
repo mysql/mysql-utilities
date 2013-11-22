@@ -33,7 +33,10 @@ COPYRIGHT_FULL_COM = [
     "doubt, this particular copy of the software is released\n",
     "under a commercial license and the GNU General Public"
     " License does not apply.\n",
-    "MySQL Utilities is brought to you by Oracle.\n"
+    "MySQL Utilities is brought to you by Oracle.\n",
+    "\"\"\"\n",
+    "\n",
+    "LICENSE = \"Commercial\"\n"
 ]
 
 COMMERCIAL_LICENSE_NOTICE = """
@@ -395,6 +398,7 @@ def remove_full_gpl_cr(base_path, dry_run=0):
             for r_line in COPYRIGHT_FULL_COM:
                 result.append(r_line)
                 line = init_f.readline() # drop an original line
+                print("rep {0} - > {1}".format(line, r_line))
             line = init_f.readline() # get the ending quotes
         else:
             result.append(line)

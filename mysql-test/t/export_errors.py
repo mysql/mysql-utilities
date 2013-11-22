@@ -138,9 +138,9 @@ class test(export_basic.test):
 
         self.remove_result("# WARNING: The server supports GTIDs")
 
-        self.replace_result("mysqldbexport.py: error: Server connection "
+        self.replace_result("mysqldbexport: error: Server connection "
                             "values invalid",
-                            "mysqldbexport.py: error: Server connection "
+                            "mysqldbexport: error: Server connection "
                             "values invalid\n")
 
         return True

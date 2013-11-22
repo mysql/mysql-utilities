@@ -87,7 +87,7 @@ class test(rpl_admin_gtid.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         pidfile = os.path.realpath(os.path.normpath("nonexistent.pid"))
-        self.mask_result_portion("mysqlfailover.py: error: pidfile ", pidfile,
+        self.mask_result_portion("mysqlfailover: error: pidfile ", pidfile,
                                  " does not exist.", "######")
         self.remove_result("NOTE: Log file")
 

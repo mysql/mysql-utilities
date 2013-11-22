@@ -168,6 +168,13 @@ class test(copy_db.test):
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
 
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldbcopy version",
+                "MySQL Utilities mysqldbcopy version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
+
         return True
 
     def get_result(self):

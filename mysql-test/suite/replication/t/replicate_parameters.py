@@ -54,7 +54,7 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlreplicate.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlreplicate "
                                            "version", 6)
 
         test_num += 1

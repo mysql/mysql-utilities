@@ -139,6 +139,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_opt, test_case)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
 
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")

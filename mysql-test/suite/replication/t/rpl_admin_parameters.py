@@ -68,7 +68,7 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlrpladmin.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrpladmin "
                                            "version", 6)
 
         test_num += 1

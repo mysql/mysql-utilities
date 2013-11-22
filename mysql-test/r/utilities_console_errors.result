@@ -1,7 +1,7 @@
 Test case 1 - Test --hide-utils missing --add-util=mysqlfakeutility option
-Usage: mysqluc.py 
+Usage: mysqluc 
 
-mysqluc.py: error: You can only use --hide_utils option along the --add-util option.
+mysqluc: error: You can only use --hide_utils option along the --add-util option.
 Test case 2 - Test --hide-utils with --add-util=mysqlfakeutility option
 Launching console ...
 

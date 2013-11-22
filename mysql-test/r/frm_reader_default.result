@@ -1,10 +1,13 @@
 Test case 1: - Show help
-Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+MySQL Utilities mysqlfrm version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm - show CREATE TABLE from .frm files
 
 Options:
   --version             show program's version number and exit
+  --license             display program's license and exit
   --help                
   --basedir=BASEDIR     the base directory for the server
   --diagnostic          read the frm files byte-by-byte to form the CREATE

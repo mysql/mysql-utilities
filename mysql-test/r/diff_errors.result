@@ -33,25 +33,25 @@ Test case 5 - object doesn't exist
 # server2 on localhost: ... connected.
 ERROR: The object util_test.t31 does not exist.
 Test case 6 - malformed argument util_test.util_test 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: Cannot parse the specified database objects: 'util_test.util_test'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required.
+mysqldiff: error: Cannot parse the specified database objects: 'util_test.util_test'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required.
 Test case 7 - malformed argument util_test.t3:util_test 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: Incorrect object compare argument, one specific object is missing. Please verify that both object are correctly specified. No object has been specified for db2 'util_test', while object 't3' was specified for db1 'util_test'. Format should be: db1[.object1]:db2[.object2].
+mysqldiff: error: Incorrect object compare argument, one specific object is missing. Please verify that both object are correctly specified. No object has been specified for db2 'util_test', while object 't3' was specified for db1 'util_test'. Format should be: db1[.object1]:db2[.object2].
 Test case 8 - malformed argument util_test:util_test.t3 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: Incorrect object compare argument, one specific object is missing. Please verify that both object are correctly specified. No object has been specified for db1 'util_test', while object 't3' was specified for db2 'util_test'. Format should be: db1[.object1]:db2[.object2].
+mysqldiff: error: Incorrect object compare argument, one specific object is missing. Please verify that both object are correctly specified. No object has been specified for db1 'util_test', while object 't3' was specified for db2 'util_test'. Format should be: db1[.object1]:db2[.object2].
 Test case 9 - malformed argument util_test.t3.t3:util_test.t3 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: Cannot parse the specified database objects: 'util_test.t3.t3:util_test.t3'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required.
+mysqldiff: error: Cannot parse the specified database objects: 'util_test.t3.t3:util_test.t3'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required.
 Test case 10 - malformed argument util_test.t3:util_test..t4 
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: Cannot parse the specified database objects: 'util_test.t3:util_test..t4'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required. The use of backticks is required if non alphanumeric characters are used for identifier names. Parsing the specified objects results in: db1 = 'util_test', object1 = 't3', db2 = 'util_test' and object2 = 'None'.
+mysqldiff: error: Cannot parse the specified database objects: 'util_test.t3:util_test..t4'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required. The use of backticks is required if non alphanumeric characters are used for identifier names. Parsing the specified objects results in: db1 = 'util_test', object1 = 't3', db2 = 'util_test' and object2 = 'None'.
 Test case 11 - some objects don't exist in dbs
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -61,9 +61,9 @@ Test case 11 - some objects don't exist in dbs
 #        TABLE: t7
 Compare failed. One or more differences found.
 Test case 12 - no objects specified.
-Usage: mysqldiff.py --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff.py: error: No objects specified to compare.
+mysqldiff: error: No objects specified to compare.
 Test case 13 - invalid --character-set
 # server1 on localhost: ... ERROR: Cannot connect to the server1 server.
 Error Character set 'unsupported_charset' unsupported.

@@ -29,7 +29,7 @@ import os.path
 
 from optparse import Option as CustomOption, OptionValueError
 
-from mysql.utilities import VERSION_FRM
+from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
@@ -51,7 +51,6 @@ class UtilitiesParser(optparse.OptionParser):
         """
         print self.version
         optparse.OptionParser.print_help(self, output)
-
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -83,6 +82,12 @@ def prefix_check_choice(option, opt, value):
     # Doesn't match. Show user possible choices.
     raise OptionValueError("option %s: invalid choice: %r (choose from %s)"
                            % (opt, value, choices))
+
+def license_callback(self, opt, value, parser, *args, **kwargs):
+        """Show license information and exit.
+        """
+        print(LICENSE_FRM.format(program=parser.prog))
+        parser.exit()
 
 
 class CaseInsensitiveChoicesOption(CustomOption):
@@ -124,14 +129,19 @@ def setup_common_options(program_name, desc_str, usage_str,
     Returns parser object
     """
 
+    program_name = program_name.replace(".py","")
     parser = UtilitiesParser(
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,
         add_help_option=False,
-        option_class=CaseInsensitiveChoicesOption)
+        option_class=CaseInsensitiveChoicesOption,
+        prog=program_name)
     parser.add_option("--help", action="help", help="display a help message "
                       "and exit")
+    parser.add_option("--license", action='callback',
+                      callback=license_callback,
+                      help="display program's license and exit")
 
     if server:
         # Connection information for the first server
