@@ -19,6 +19,13 @@ import frm_reader_base
 from mysql.utilities.exception import MUTLibError
 
 
+FRM_FILES = "./std_data/frm_files"
+NEW_FRM_DIR = "./test_frm"
+FILES_READ = ['me.too.periods.frm', 't1.frm', 't2.frm', 't3.frm',
+              't4.frm', 't5.frm', 't6.frm', 't7.frm', 't8.frm',
+              'this.has.periods.frm']
+
+
 class test(frm_reader_base.test):
     """.frm file reader
     This test executes test cases to test the .frm reader in default mode.
@@ -67,6 +74,29 @@ class test(frm_reader_base.test):
         res = self.run_test_case(0, cmd + frm_file_path, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        # Export new .frm files with new storage engine specified.
+        os.mkdir(NEW_FRM_DIR)
+        new_cmd = ("{0} --new-storage-engine=MEMORY --frmdir={1} "
+                   "{2}".format(cmd, NEW_FRM_DIR, frm_file_path))
+        comment = ("Test case {0}: - Export .frm files in a db "
+                   "folder".format(test_num))
+        res = self.run_test_case(0, new_cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        # Check to see that files were created
+        files_found = os.listdir(NEW_FRM_DIR)
+        files_found.sort()
+        if not files_found == FILES_READ:
+            raise MUTLibError("{0}: failed to create new "
+                              ".frm_files".format(comment))
+        try:
+            for frm_file in files_found:
+                os.unlink("{0}/{1}".format(NEW_FRM_DIR, frm_file))
+            os.rmdir(NEW_FRM_DIR)
+        except OSError:
+            pass
         test_num += 1
 
         # Perform a test using the --user option for the current user

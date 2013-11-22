@@ -19,7 +19,6 @@ import os
 import frm_reader_base
 from mysql.utilities.exception import MUTLibError
 
-
 class test(frm_reader_base.test):
     """.frm file reader
     This test executes the .frm reader error conditions. The errors this test
@@ -136,6 +135,15 @@ class test(frm_reader_base.test):
         comment = "Test case {0}: - attempt to use existing port".format(
             test_num)
         res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        new_cmd_str = ("{0} {1} --port=13033 --frmdir='wesayso' "
+                       "--new-storage-engine=MEMORY"
+                       "".format(self.cmd, frm_file_path))
+        comment = "Test case {0}: - --frm-dir invalid".format(test_num)
+        res = self.run_test_case(2, new_cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -496,7 +496,7 @@ def show_server_info(servers, options):
             # If we got errno 1045 it means Access denied,
             # notify the user if a password was used or not.
             if util_error.errno == ER_ACCESS_DENIED_ERROR:
-                use_pass = 'YES' if conn_dict['passwd'] else 'NO' 
+                use_pass = 'YES' if conn_dict['passwd'] else 'NO'
                 er = ("Access denied for user '{0}'@'{1}' using password: {2}"
                       ).format(conn_dict['user'], conn_dict['host'], use_pass)
             # To propose to start a cloned server for extract the info,

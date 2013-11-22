@@ -29,3 +29,7 @@ Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>
 mysqlfrm.py: error: You must specify a different port to use for the spawned server.
 Test case 8: - attempt to use existing port
 # Starting the spawned server on port XXXXX ... ERROR: Port XXXXX in use. Please choose an available port.
+Test case 9: - --frm-dir invalid
+Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm.py: error: The directory, 'wesayso' does not exist.

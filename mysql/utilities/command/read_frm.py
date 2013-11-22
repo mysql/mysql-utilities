@@ -22,12 +22,11 @@ and general options (verbosity, etc.).
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 import uuid
-
-from shutil import copy
 
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import serverclone
@@ -238,6 +237,7 @@ def _get_create_statement(server, temp_datadir,
     verbosity = int(options.get("verbosity", 0))
     quiet = options.get("quiet", False)
     new_engine = options.get("new_engine", None)
+    frm_dir = options.get("frm_dir", "./")
     user = options.get('user', 'root')
 
     if not quiet:
@@ -259,14 +259,14 @@ def _get_create_statement(server, temp_datadir,
             if requires_decoding(frm_file[1]):
                 new_frm_file = decode(frm_file[1])
                 frm_file = (frm_file[0], new_frm_file, frm_file[2])
-                copy(frm_file[2], new_path)
+                shutil.copy(frm_file[2], new_path)
             # Check name for encoding and encode
             elif requires_encoding(frm_file[1]):
                 new_frm_file = encode(frm_file[1]) + ".frm"
                 new_frm = os.path.join(new_path, new_frm_file)
-                copy(frm_file[2], new_frm)
+                shutil.copy(frm_file[2], new_frm)
             else:
-                copy(frm_file[2], new_path)
+                shutil.copy(frm_file[2], new_path)
         except:
             _, e, _ = sys.exc_info()
             print("ERROR: {0}".format(e))
@@ -330,6 +330,26 @@ def _get_create_statement(server, temp_datadir,
                 create_str = create_str.replace("CREATE TABLE ",
                                                 "CREATE TABLE `%s`." %
                                                 frm_file[0])
+
+            # if requested, generate the new .frm with the altered engine
+            if new_engine:
+                server.exec_query("ALTER TABLE `{0}`.`{1}` "
+                                  "ENGINE={2}".format(db_name,
+                                                      frm_file[1],
+                                                      new_engine))
+                new_frm_file = os.path.join(frm_dir,
+                                            "{0}.frm".format(frm_file[1]))
+                if os.path.exists(new_frm_file):
+                    print("#\n# WARNING: Unable to create new .frm file. "
+                          "File exists.")
+                else:
+                    try:
+                        shutil.copyfile(new_frm, new_frm_file)
+                        print("# Copy of .frm file with new storage "
+                              "engine saved as {0}.".format(new_frm_file))
+                    except (IOError, OSError, shutil.Error) as e:
+                        print("# WARNING: Unable to create new .frm file. "
+                              "Error: {0}".format(e))
 
         elif frm_type == "VIEW":
             # 5) show CREATE VIEW

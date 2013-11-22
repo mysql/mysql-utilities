@@ -151,6 +151,11 @@ Helpful Hints
     simply specify the colon like this: /home/me/data1/:t1.frm. In this
     case, the database will be omitted from the CREATE statement.
 
+  - If you use the --new-storage-engine option, you must also provide the
+    --frmdir option. When these options are specified, the utility will
+    generate a new .frm file (prefixed with 'new_') and save it in the
+    --frmdir= directory.
+
 Enjoy!
 
 """
@@ -183,6 +188,11 @@ parser.add_option("--diagnostic", action="store_true", dest="diagnostic",
 parser.add_option("--new-storage-engine", action="store", dest="new_engine",
                   default=None, help="change ENGINE clause to use this "
                   "engine.")
+
+# Add frmdir
+parser.add_option("--frmdir", action="store", dest="frmdir", default=None,
+                  help="save the new .frm files in this directory. Used and "
+                       "valid with --new-storage-engine only.")
 
 # Need port - only valid with --diagnostic mode
 parser.add_option("--port", action="store", dest="port", help="Port to use "
@@ -253,6 +263,23 @@ if opt.server and opt.basedir:
 if opt.diagnostic and opt.user:
     print ("# WARNING: The --user option is only used for the default mode.")
 
+# Check for --new-storage-engine and --frmdir
+if opt.new_engine:
+    if not opt.frmdir:
+        parser.error("You must specify the --frmdir with "
+                     "--new-storage-engine.")
+    # Check frmdir validity
+    else:
+        if not os.path.exists(opt.frmdir):
+            parser.error("The directory, "
+                         "'{0}' does not exist.".format(opt.frmdir))
+        if not os.access(opt.frmdir, os.R_OK | os.W_OK):
+            parser.error("You must have read and write access to the .frm "
+                         "directory '{0}'.".format(opt.frmdir))
+elif not opt.new_engine and opt.frmdir:
+    print("# WARNING: --frmdir encountered without --new-storage-engine. "
+              "No .frm files will be saved.")
+
 server = None
 if opt.server is None and opt.diagnostic:
     print("# WARNING: Cannot generate character set or "
@@ -302,6 +329,7 @@ options = {
     "verbosity": opt.verbosity if opt.verbosity else 0,
     "user": opt.user,
     "start_timeout": opt.start_timeout,
+    "frm_dir": opt.frmdir,
 }
 
 # Print disclaimer banner for diagnostic mode
