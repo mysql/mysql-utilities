@@ -120,3 +120,20 @@ class LogParserError(UtilError):
     """
     def __init__(self, message=''):
         super(LogParserError, self).__init__(message)
+
+
+class ConnectionValuesError(Exception):
+    """Specific error raised by Server when values are not valid.
+
+    This exception class is used to report errors when Cannot determine
+    connection information type supplied by MySQL utilities
+    """
+
+    def __init__(self, message, errno=0):
+        super(ConnectionValuesError, self).__init__()
+        self.args = (message, errno)
+        self.errmsg = message
+        self.errno = errno
+
+    def __str__(self):
+        return self.errmsg

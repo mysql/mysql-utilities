@@ -28,7 +28,8 @@ from collections import defaultdict, namedtuple
 from itertools import chain
 
 from mysql.connector.errorcode import (ER_ACCESS_DENIED_ERROR,
-                                       CR_CONNECTION_ERROR)
+                                       CR_CONNECTION_ERROR,
+                                       CR_CONN_HOST_ERROR)
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import parse_connection
@@ -482,6 +483,7 @@ def show_server_info(servers, options):
             test_connect(server, True)
         except UtilError as util_error:
             conn_dict = get_connection_dictionary(server)
+            server1 = Server(options={'conn_info': conn_dict})
             server_is_off = False
             # If we got errno 2002 it means can not connect through the
             # given socket, but if path to socket not empty, server could be
@@ -492,18 +494,25 @@ def show_server_info(servers, options):
                     mydir = os.path.split(socket)[0]
                     if os.path.isdir(mydir) and len(os.listdir(mydir)) != 0:
                         server_is_off = True
-
+            # If we got errno 2003 and this is a windows, we do not have
+            # socket, instead we check if server is localhost.
+            elif (util_error.errno == CR_CONN_HOST_ERROR and
+                  os.name == 'nt' and server1.is_alias("localhost")):
+                server_is_off = True
             # If we got errno 1045 it means Access denied,
             # notify the user if a password was used or not.
-            if util_error.errno == ER_ACCESS_DENIED_ERROR:
+            elif util_error.errno == ER_ACCESS_DENIED_ERROR:
                 use_pass = 'YES' if conn_dict['passwd'] else 'NO'
                 er = ("Access denied for user '{0}'@'{1}' using password: {2}"
                       ).format(conn_dict['user'], conn_dict['host'], use_pass)
+            # Use the error message from the connection attempt.
+            else:
+                er = [util_error.errmsg]
             # To propose to start a cloned server for extract the info,
             # can not predict if the server is really off, but we can do it
             # in case of socket error, or if one of the related
             # parameter was given.
-            elif (server_is_off or basedir or datadir or start):
+            if (server_is_off or basedir or datadir or start):
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
 
