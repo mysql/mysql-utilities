@@ -14,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import copy_db
 from mysql.utilities.exception import MUTLibError, UtilError
 
@@ -31,24 +30,22 @@ class test(copy_db.test):
 
     def setup(self):
         return copy_db.test.setup(self)
-        
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-       
+
         from_conn = "--source={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         to_conn = "--destination={0}".format(
-            self.build_connection_string(self.server2)
-        )
+            self.build_connection_string(self.server2))
 
         cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} "
                    "util_test:util_db_clone".format(from_conn, to_conn))
-        
+
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.
-        
+
         cmd_opts = "{0} --force --skip=grants".format(cmd_str)
         test_num = 1
         comment = "Test case {0} - no grants".format(test_num)
@@ -104,17 +101,17 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append(self.check_objects(self.server2, "util_db_clone"))
-        
+
         # Create the database to test --skip=create-db
         query = "DROP DATABASE util_db_clone"
         try:
-            res = self.server2.exec_query(query)
+            self.server2.exec_query(query)
         except UtilError as err:
             raise MUTLibError(err.errmsg)
 
         query = "CREATE DATABASE util_db_clone"
         try:
-            res = self.server2.exec_query(query)
+            self.server2.exec_query(query)
         except UtilError as err:
             raise MUTLibError(err.errmsg)
 
@@ -132,7 +129,7 @@ class test(copy_db.test):
             res = self.server2.exec_query(query)
         except UtilError as err:
             raise MUTLibError(err.errmsg)
-        
+
         test_num += 1
         # Show possible errors from skip misuse
         cmd_opts = "{0} --skip=tables".format(cmd_str)
@@ -160,12 +157,12 @@ class test(copy_db.test):
         self.remove_result("# WARNING: The server supports GTIDs")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return copy_db.test.cleanup(self)

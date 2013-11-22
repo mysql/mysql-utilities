@@ -3,10 +3,10 @@ Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/d
 
 mysqlserverclone.py: error: No new database path. Use --help for available options.
 Test case 2 - error: clone remote server
+# WARNING: Root password for new instance has not been set.
 Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/data2 --new-port=3310 --new-id=12 --root-password=root
 
 mysqlserverclone.py: error: Server to be cloned must be running on the same machine as mysqlserverclone.
-# WARNING: Root password for new instance has not been set.
 Test case 3 - error: no login
 # WARNING: Root password for new instance has not been set.
 ERROR: Cannot connect to the source server.
@@ -24,6 +24,6 @@ Usage: mysqlserverclone.py --server=user:pass@host:port:socket --new-data=/tmp/d
 mysqlserverclone.py: error: Target data directory exists and is not empty. Use --delete-data option to delete folder before cloning.
 Test case 7 - --new-data does not exist (but cannot connect)
 ERROR: Cannot connect to the source server.
-Error ####:(28000): Access denied for user 'root'@'localhost' (using password: YES)
+Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 8 - attempt to use existing port
-ERROR: Port in use. Please choose an available port.
+ERROR: Port ##### in use. Please choose an available port.

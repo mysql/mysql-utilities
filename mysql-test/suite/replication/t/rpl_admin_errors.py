@@ -62,12 +62,12 @@ class test(rpl_admin.test):
         self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         self.server1.exec_query("GRANT SELECT, SUPER ON *.* TO "
                                 "'jane'@'localhost'")
-        mock_master1 = "--master=joe@localhost:%s" % self.server1.port
-        mock_master2 = "--master=jane@localhost:%s" % self.server1.port
-        slaves_str = "--slaves=" + \
-                     ",".join([slave1_conn, slave2_conn, slave3_conn])
-        candidates_str = "--candidates=" + \
-                         ",".join([slave1_conn, slave2_conn, slave3_conn])
+        mock_master1 = "--master=joe@localhost:{0}".format(
+            self.server1.port)
+        mock_master2 = "--master=jane@localhost:{0}".format(
+            self.server1.port)
+        slaves_str = "--slaves={0}".format(
+            ",".join([slave1_conn, slave2_conn, slave3_conn]))
 
         # List of test cases for test
         test_cases = [
@@ -78,13 +78,15 @@ class test(rpl_admin.test):
              "--discover-slaves-login=root"),
             ("Switchover but no --master, --new-master,", 2, "switchover",
              "--discover-slaves-login=root"),
-            ("No slaves or discover-slaves-login", 2, "switchover", master_str),
+            ("No slaves or discover-slaves-login", 2, "switchover",
+             master_str),
             ("Bad --new-master connection string", 2, "switchover", master_str,
              slaves_str, "--new-master=whatmeworry?"),
             ("Bad --master connection string", 1, "switchover", slaves_str,
-             "--new-master=%s" % master_conn, "--master=whatmeworry?"),
+             "--new-master={0}".format(master_conn), "--master=whatmeworry?"),
             ("Bad --slaves connection string", 1, "switchover", master_str,
-             "--new-master=%s" % master_conn, "--slaves=what,me,worry?"),
+             "--new-master={0}".format(master_conn),
+             "--slaves=what,me,worry?"),
             ("Bad --candidates connection string", 1, "failover",
              slaves_str, "--candidates=what,me,worry?"),
             ("Not enough privileges - health joe", 1, "health", mock_master1,
@@ -92,7 +94,7 @@ class test(rpl_admin.test):
             ("Not enough privileges - health jane", 0, "health", mock_master2,
              slaves_str),
             ("Not enough privileges - switchover jane", 1, "switchover",
-             mock_master2, slaves_str, "--new-master=%s" % slave3_conn),
+             mock_master2, slaves_str, "--new-master={0}".format(slave3_conn)),
             ("Failover command requires --slaves", 2, "failover"),
             ("Failover command cannot be used with --discover-slaves-login", 2,
              "--discover-slaves-login=root", "failover",)
@@ -100,7 +102,7 @@ class test(rpl_admin.test):
 
         test_num = 1
         for case in test_cases:
-            comment = "Test case %s - %s" % (test_num, case[0])
+            comment = "Test case {0} - {1}".format(test_num, case[0])
             parts = [base_cmd]
             for opt in case[2:]:
                 parts.append(opt)
@@ -108,12 +110,12 @@ class test(rpl_admin.test):
             res = mutlib.System_test.run_test_case(self, case[1], cmd_str,
                                                    comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
         # Now test to see what happens when master is listed as a slave
         comment = ("Test case {0} - Master listed as a slave - "
-                   "literal").format(test_num)
+                   "literal".format(test_num))
         cmd_str = "{0} health {1} {2},{3}".format(base_cmd, master_str,
                                                   slaves_str, master_conn)
         res = self.run_test_case(2, cmd_str, comment)
@@ -121,32 +123,33 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - Master listed as a slave - alias"  % test_num
-        cmd_str = "%s health %s %s" % (base_cmd, master_str,
-                  "--slaves=root:root@%s:%s" % \
-                    (socket.gethostname().split('.', 1)[0], self.server1.port))
+        comment = "Test case {0} - Master listed as a slave - alias".format(
+            test_num)
+        cmd_str = ("{0} health {1} --slaves=root:root@{2}:{3}".format(
+            base_cmd, master_str, socket.gethostname().split('.', 1)[0],
+            self.server1.port))
         res = mutlib.System_test.run_test_case(self, 2, cmd_str,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - Master listed as a candidate - alias" % test_num
-        cmd_str = "%s elect %s %s %s" % (base_cmd, master_str,
-                  "--candidates=root:root@%s:%s" % \
-                    (socket.gethostname().split('.', 1)[0], self.server1.port),
-                  slaves_str)
+        comment = ("Test case {0} - Master listed as a candidate - "
+                   "alias".format(test_num))
+        cmd_str = "{0} elect {1} --candidates=root:root@{2}:{3} {4}".format(
+            base_cmd, master_str, socket.gethostname().split('.', 1)[0],
+            self.server1.port, slaves_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         for command in ('start', 'stop', 'reset'):
             comment = ("Test case {0} - {1} without "
-                       "--slaves").format(test_num, command.capitalize())
+                       "--slaves".format(test_num, command.capitalize()))
             cmd_str = ("{0} {1} --discover-slaves-login="
-                       "root:root").format(base_cmd, command)
+                       "root:root".format(base_cmd, command))
             res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -156,9 +159,9 @@ class test(rpl_admin.test):
         for command in ('start', 'stop', 'reset', 'health', 'failover',
                         'switchover'):
             comment = ("Test case {0} - {1} using --discover-slaves-login and "
-                       "--slaves").format(test_num, command.capitalize())
+                       "--slaves".format(test_num, command.capitalize()))
             cmd_str = ("{0} {1} {2} --discover-slaves-login="
-                       "root:root").format(base_cmd, command, slaves_str)
+                       "root:root".format(base_cmd, command, slaves_str))
             res = mutlib.System_test.run_test_case(self, 2, cmd_str, comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -168,7 +171,7 @@ class test(rpl_admin.test):
         command = 'switchover'
         comment = ("Test case {0} - {1} using switchover new master is "
                    "the actual master with --discover-slaves"
-                   "").format(test_num, command.capitalize())
+                   "".format(test_num, command.capitalize()))
         cmd_str = ("{0} {1} {2} {3} --new-master={4} "
                    "--discover-slaves-login=root:root"
                    "".format(base_cmd, command, master_str,
@@ -183,10 +186,10 @@ class test(rpl_admin.test):
         command = 'switchover'
         comment = ("Test case {0} - {1} using switchover new master is the "
                    "actual master, replacing new-master host with alias."
-                   "").format(test_num, command.capitalize())
+                   "".format(test_num, command.capitalize()))
         cmd_str = ("{0} {1} {2} {3},{4} --new-master={4}"
                    "".format(base_cmd, command, master_str, slaves_str,
-                             master_conn.replace("localhost","127.0.0.1")))
+                             master_conn.replace("localhost", "127.0.0.1")))
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -197,39 +200,39 @@ class test(rpl_admin.test):
         alone_srv_conn = self.build_connection_string(self.server5).strip(' ')
 
         comment = ("Test case {0} - Switchover using a wrong slave (without "
-                   "--force)").format(test_num)
+                   "--force)".format(test_num))
         slaves_str = ",".join([slave2_conn, slave3_conn, alone_srv_conn])
         cmd_str = ("{0} --master={1} --new-master={2} --slaves={3} "
-                   "switchover --rpl-user=rpl:rpl").format(base_cmd,
-                                                           master_conn,
-                                                           slave1_conn,
-                                                           slaves_str)
+                   "switchover --rpl-user=rpl:rpl".format(base_cmd,
+                                                          master_conn,
+                                                          slave1_conn,
+                                                          slaves_str))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - Switchover using a wrong slave and with "
-                   "--force").format(test_num)
+                   "--force".format(test_num))
         slaves_str = ",".join([slave2_conn, slave3_conn, alone_srv_conn])
         cmd_str = ("{0} --master={1} --new-master={2} --slaves={3} --force "
-                   "switchover --rpl-user=rpl:rpl").format(base_cmd,
-                                                           master_conn,
-                                                           slave1_conn,
-                                                           slaves_str)
+                   "switchover --rpl-user=rpl:rpl".format(base_cmd,
+                                                          master_conn,
+                                                          slave1_conn,
+                                                          slaves_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - Switchover using with --force and user "
-                   "does not have grant priv").format(test_num)
+                   "does not have grant priv".format(test_num))
         slaves_str = ",".join([slave2_conn, slave3_conn])
         cmd_str = ("{0} --master={1} --new-master={2} --force switchover -q "
                    "--rpl-user=rpl:rpl --slaves={3} --log={4} --log-age=1 "
-                   "--rpl-user=notthere --no-health"
-                   ).format(base_cmd, slave1_conn, alone_srv_conn, slaves_str,
-                            _LOGNAME)
+                   "--rpl-user=notthere "
+                   "--no-health".format(base_cmd, slave1_conn, alone_srv_conn,
+                                        slaves_str, _LOGNAME))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

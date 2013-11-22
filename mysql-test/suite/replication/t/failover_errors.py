@@ -20,6 +20,7 @@ import rpl_admin_gtid
 import socket
 from mysql.utilities.exception import MUTLibError
 
+
 class test(rpl_admin_gtid.test):
     """test replication failover utility
     This test exercises the mysqlfailover utility known error conditions.
@@ -41,90 +42,106 @@ class test(rpl_admin_gtid.test):
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
         slave4_conn = self.build_connection_string(self.server5).strip(' ')
 
-        comment = "Test case 1 - No master"
+        test_num = 1
+        comment = "Test case {0} - No master".format(test_num)
         cmd_str = "mysqlfailover.py " 
         cmd_opts = " --discover-slaves-login=root:root"
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - No slaves or discover-slaves-login"
+        test_num += 1
+        comment = ("Test case {0} - No slaves or "
+                   "discover-slaves-login".format(test_num))
         cmd_str = "mysqlfailover.py " 
         cmd_opts = " --master=root:root@localhost"
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - Low value for interval."
+        test_num += 1
+        comment = "Test case {0} - Low value for interval.".format(test_num)
         cmd_str = "mysqlfailover.py --interval=1" 
         cmd_opts = " --master=root:root@localhost"
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - elect mode but no candidates"
-        cmd_str = "mysqlfailover.py " 
-        cmd_opts = " --master=root:root@localhost --failover-mode=elect "
-        cmd_opts += "--slaves=%s " % slave1_conn
+        test_num += 1
+        comment = ("Test case {0} - elect mode but no "
+                   "candidates".format(test_num))
+        cmd_str = "mysqlfailover.py "
+        cmd_opts = (" --master=root:root@localhost --failover-mode=elect "
+                    "--slaves={0} ".format(slave1_conn))
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
             
         # Test for missing --rpl-user
         
         # Add server5 to the topology
-        conn_str = " --slave=%s" % self.build_connection_string(self.server5)
-        conn_str += " --master=%s " % master_conn 
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        conn_str = " --slave={0}  --master={1} ".format(
+            self.build_connection_string(self.server5), master_conn)
+
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
             return False
 
-        comment = "Test case 5 - FILE/TABLE mix and missing --rpl-user"
+        test_num += 1
+        comment = ("Test case {0} - FILE/TABLE mix and missing "
+                   "--rpl-user".format(test_num))
         cmd_str = "mysqlfailover.py "        
-        cmd_opts = " --master=%s --log=a.txt" % master_conn
-        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn,
-                                               slave3_conn, slave4_conn])
+        cmd_opts = " --master={0} --log=a.txt --slaves={1} ".format(
+            master_conn, ",".join([slave1_conn, slave2_conn, slave3_conn,
+                                   slave4_conn]))
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
         # Now test to see what happens when master is listed as a slave
-        comment = "Test case 6 - Master listed as a slave - literal" 
+        test_num += 1
+        comment = ("Test case {0} - Master listed as a slave - "
+                   "literal".format(test_num))
         cmd_str = "mysqlfailover.py health "        
-        cmd_opts = " --master=%s " % master_conn
-        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn,
-                                               slave3_conn, master_conn])
+        cmd_opts = " --master={0}  --slaves={1} ".format(
+            master_conn,  ",".join([slave1_conn, slave2_conn, slave3_conn,
+                                    master_conn]))
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 7 - Master listed as a slave - alias" 
+        test_num += 1
+        comment = ("Test case {0} - Master listed as a slave - "
+                   "alias".format(test_num))
         cmd_str = "mysqlfailover.py health "        
-        cmd_opts = " --master=%s " % master_conn
-        cmd_opts += " --slaves=root:root@%s:%s " % \
-                    (socket.gethostname().split('.', 1)[0], self.server1.port)
+        cmd_opts = " --master={0}  --slaves=root:root@{1}:{2} ".format(
+            master_conn, socket.gethostname().split('.', 1)[0],
+            self.server1.port)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 8 - Master listed as a candiate - alias" 
+        test_num += 1
+        comment = ("Test case {0} - Master listed as a candidate - "
+                   "alias".format(test_num))
         cmd_str = "mysqlfailover.py health "        
-        cmd_opts = " --master=%s " % master_conn
-        cmd_opts += " --slaves=%s " % ",".join([slave1_conn, slave2_conn])
-        cmd_opts += " --candidates=root:root@%s:%s " % \
-                    (socket.gethostname().split('.', 1)[0], self.server1.port)
+        cmd_opts = (" --master={0} --slaves={1} --candidates=root:root@{2}:"
+                    "{3} ".format(master_conn,
+                                  ",".join([slave1_conn, slave2_conn]),
+                                  socket.gethostname().split('.', 1)[0],
+                                  self.server1.port))
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.reset_topology()
         
@@ -149,10 +166,10 @@ class test(rpl_admin_gtid.test):
             try:
                 os.unlink(self.res_fname)
                 os.unlink("a.txt")
-            except:
+            except OSError:
                 pass
 
         # Kill the servers that are only used for this test
         kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
-                    'rep_slave3_gtid', 'rep_slave4_gtid']
+                     'rep_slave3_gtid', 'rep_slave4_gtid']
         return self.kill_server_list(kill_list)

@@ -20,6 +20,7 @@ import mutlib
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, MUTLibError
 
+
 class test(mutlib.System_test):
     """clone server parameters
     This test exercises the parameters for mysqlserverclone
@@ -33,36 +34,30 @@ class test(mutlib.System_test):
         self.new_server = None
         return True
 
-    def _test_server_clone(self, cmd_str, comment, kill=True, capture_all=False):
-        self.results.append(comment+"\n")
+    def _test_server_clone(self, cmd_str, comment, kill=True,
+                           capture_all=False):
+        self.results.append(comment + "\n")
         port1 = int(self.servers.get_next_port())
-        cmd_str += " --new-port=%d " % port1
-        full_datadir = os.path.join(os.getcwd(), "temp_%s" % port1)
-        cmd_str += " --new-data=%s --delete " % full_datadir
+        cmd_str = "{0} --new-port={1} ".format(cmd_str, port1)
+        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port1))
+        cmd_str = "{0} --new-data={1} --delete ".format(cmd_str, full_datadir)
         res = self.exec_util(cmd_str, "start.txt")
-        for line in open("start.txt").readlines():
-            # Don't save lines that have [Warning] or don't start with #
-            index = line.find("[Warning]")
-            if capture_all or (index <= 0 and line[0] == '#'):
-                self.results.append(line)
+        with open("start.txt") as f:
+            for line in f:
+                # Don't save lines that have [Warning] or don't start with #
+                index = line.find("[Warning]")
+                if capture_all or (index <= 0 and line[0] == '#'):
+                    self.results.append(line)
         if res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Create a new instance
-        conn = {
-            "user"   : "root",
-            "passwd" : "root",
-            "host"   : "localhost",
-            "port"   : port1,
-            "unix_socket" : full_datadir + "/mysql.sock"
-        }
+        conn = {"user": "root", "passwd": "root", "host": "localhost",
+                "port": port1, "unix_socket": full_datadir + "/mysql.sock"}
         if os.name != "posix":
             conn["unix_socket"] = None
 
-        server_options = {
-            'conn_info' : conn,
-            'role'      : "cloned_server_2",
-        }
+        server_options = {'conn_info': conn, 'role': "cloned_server_2", }
         self.new_server = Server(server_options)
         if self.new_server is None:
             return False
@@ -71,7 +66,7 @@ class test(mutlib.System_test):
             # Connect to the new instance
             try:
                 self.new_server.connect()
-            except UtilError, e:
+            except UtilError:
                 self.new_server = None
                 raise MUTLibError("Cannot connect to spawned server.")
             self.servers.stop_server(self.new_server)
@@ -80,28 +75,28 @@ class test(mutlib.System_test):
 
     def run(self):
         self.res_fname = "result.txt"
-        base_cmd = "mysqlserverclone.py --server=%s --root-password=root " % \
-                    self.build_connection_string(self.servers.get_server(0))
+        base_cmd = ("mysqlserverclone.py --server={0} "
+                    "--root-password=root ".format(
+                        self.build_connection_string(
+                            self.servers.get_server(0))))
 
-        test_cases = [
-            # (comment, command options, kill running server)
-            ("show help", " --help ", False, True),
-            ("write command to file", " --write-command=startme.sh ",
-             True, False),
-            ("write command to file shortcut", " -w startme.sh ", True, False),
-            ("verbosity = -v", " -v ", True, False),
+        #  (comment, command options, kill running server)
+        test_cases = [("show help", " --help ", False, True), (
+            "write command to file", " --write-command=startme.sh ", True,
+            False), ("write command to file shortcut", " -w startme.sh ", True,
+                     False), ("verbosity = -v", " -v ", True, False),
             ("verbosity = -vv", " -vv ", True, False),
             ("verbosity = -vvv", " -vvv ", True, False),
-            ("-vvv and write command to file shortcut",
-             " -vvv -w startme.sh ", True, False),
+            ("-vvv and write command to file shortcut", " -vvv -w startme.sh ",
+                True, False),
         ]
 
         test_num = 1
         for row in test_cases:
-            new_comment = "Test case %d : %s" % (test_num, row[0])
-            if not self._test_server_clone(base_cmd + row[1],
-                                           new_comment, row[2], row[3]):
-                raise MUTLibError("%s: failed" % new_comment)
+            new_comment = "Test case {0} : {1}".format(test_num, row[0])
+            if not self._test_server_clone(base_cmd + row[1], new_comment,
+                                           row[2], row[3]):
+                raise MUTLibError("{0}: failed".format(new_comment))
             test_num += 1
 
         # Perform a test using the --user option for the current user
@@ -114,10 +109,10 @@ class test(mutlib.System_test):
             if not user:
                 raise MUTLibError("Cannot obtain user name for test case.")
 
-        comment = "Test case %s: - User the --user option" % test_num
-        if not self._test_server_clone(base_cmd + "--user=%s" % user,
+        comment = "Test case {0}: - User the --user option".format(test_num)
+        if not self._test_server_clone("{0}--user={1}".format(base_cmd, user),
                                        comment, True, False):
-            raise MUTLibError("%s: failed" % new_comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
@@ -141,8 +136,8 @@ class test(mutlib.System_test):
         self.remove_result("# trying again...")
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlserverclone"
-                                           ".py version", 6)
+        self.remove_result_and_lines_after("MySQL Utilities "
+                                           "mysqlserverclone.py version", 6)
 
         return True
 
@@ -155,11 +150,11 @@ class test(mutlib.System_test):
     def _remove_file(self, filename):
         try:
             os.unlink(filename)
-        except:
+        except OSError:
             pass
 
     def cleanup(self):
         files = [self.res_fname, "start.txt", "startme.sh"]
-        for file in files:
-            self._remove_file(file)
+        for file_ in files:
+            self._remove_file(file_)
         return True

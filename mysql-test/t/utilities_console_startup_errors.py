@@ -34,17 +34,17 @@ class test(mutlib.System_test):
         PRINT_WIDTH = 75
         UTIL_PATH = "/scripts"
         self.options = {
-            'verbosity' : "verbosity",
-            'quiet'     : "quiet",
-            'width'     : PRINT_WIDTH,
-            'utildir'   : UTIL_PATH,
-            'variables' : "build_variable_dictionary_list(args)",
-            'prompt'    : 'mysqluc> ',
-            'welcome'   : "WELCOME_MESSAGE",
-            'goodbye'   : "GOODBYE_MESSAGE",
-            'commands'  : None,
-            'custom'    : True, # We are using custom commands
-            }
+            'verbosity': "verbosity",
+            'quiet': "quiet",
+            'width': PRINT_WIDTH,
+            'utildir': UTIL_PATH,
+            'variables': "build_variable_dictionary_list(args)",
+            'prompt': 'mysqluc> ',
+            'welcome': "WELCOME_MESSAGE",
+            'goodbye': "GOODBYE_MESSAGE",
+            'commands': None,
+            'custom': True,  # We are using custom commands
+        }
 
         self.path_fakeutil = os.path.join(os.getcwd(), "mysqlfakeutil.py")
         self.write_fake_util(self.path_fakeutil,
@@ -53,10 +53,9 @@ class test(mutlib.System_test):
 
     def write_fake_util(self, util_name, content):
         # Write a fake utility
-        file_fakeutil = open(util_name, "w")
-        file_fakeutil.writelines(content)
-        file_fakeutil.flush()
-        file_fakeutil.close()
+        with open(util_name, "w") as file_fakeutil:
+            file_fakeutil.writelines(content)
+            file_fakeutil.flush()
 
     def run(self):
         self.res_fname = "result.txt"
@@ -65,16 +64,16 @@ class test(mutlib.System_test):
         utils = Utilities(self.options)
 
         test_num = 1
-        comment = ("Test case {0} - Test error with non-existent utility"
-                   "").format(test_num)
+        comment = ("Test case {0} - Test error with non-existent "
+                   "utility".format(test_num))
         print(comment)
         cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqlnotexst")]
         util_name = "mysqlnotexst"
         utils._get_util_info(cmd, util_name)
 
         test_num += 1
-        comment = ("Test case {0} - Test error with wrong parameter"
-                   "").format(test_num)
+        comment = ("Test case {0} - Test error with wrong "
+                   "parameter".format(test_num))
         print(comment)
         utils = Utilities(self.options)
         cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqldiff.py"),
@@ -83,8 +82,8 @@ class test(mutlib.System_test):
         utils._get_util_info(cmd, util_name)
 
         test_num += 1
-        comment = ("Test case {0} - Test errorcode returned, and no message."
-                   "").format(test_num)
+        comment = ("Test case {0} - Test errorcode returned, and no "
+                   "message.".format(test_num))
         print(comment)
         utils = Utilities(self.options)
         cmd = ["python", os.path.join(os.getcwd(), "mysqlfakeutil.py"),
@@ -96,7 +95,7 @@ class test(mutlib.System_test):
         self.write_fake_util(self.path_fakeutil,
                              ["import sys\n", "sys.exit(0)\n"])
         comment = ("Test case {0} - Test error trying to parse help from the "
-                   "utility").format(test_num)
+                   "utility".format(test_num))
         print(comment)
         utils = Utilities(self.options)
         cmd = ["python", os.path.join(os.getcwd(), "mysqlfakeutil.py"),
@@ -107,15 +106,15 @@ class test(mutlib.System_test):
         sys.stdout.flush()
         sys.stdout.close()
         sys.stdout = bkp_stdout
-        file_res = open(os.path.join(os.getcwd(), self.res_fname))
+        with open(os.path.join(os.getcwd(), self.res_fname)) as file_res:
 
-        self.results = [line.replace("\r", "")
-                        for line in file_res.readlines()]
+            self.results = [line.replace("\r", "")
+                            for line in file_res.readlines()]
 
-        self.replace_result(("The execution of the command returned: "
-                             "python: can't open file"),
-                            ("The execution of the command returned: "
-                             "python: can't open file ...\n"))
+            self.replace_result(("The execution of the command returned: "
+                                 "python: can't open file"),
+                                ("The execution of the command returned: "
+                                 "python: can't open file ...\n"))
 
         if self.debug:
             print("\n")

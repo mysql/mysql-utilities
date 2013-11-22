@@ -37,19 +37,18 @@ class test(mutlib.System_test):
                 self.servers.spawn_new_servers(3)
             except MUTLibError as err:
                 raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
-        # Set spawned servers
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
+            # Set spawned servers
         self.server1 = self.servers.get_server(1)
         self.server2 = self.servers.get_server(2)
         data_file = os.path.normpath("./std_data/fkeys.sql")
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as e:
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
-                              "{0}: {1}".format(data_file, e.errmsg))
+                              "{0}: {1}".format(data_file, err.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
 
@@ -72,23 +71,25 @@ class test(mutlib.System_test):
             res = self.exec_util(cmd_str + cmd_opts, self.res_fname)
             self.results.append(res)
             return res == 0
-        except UtilDBError as e:
-            raise MUTLibError(comment.format(test_num, e.errmsg))
+        except UtilDBError as err:
+            raise MUTLibError(comment.format(test_num, err.errmsg))
 
     def get_result(self):
         if self.server2 and self.results[0] == 0:
             query = "DELETE FROM `util_test_fk_copy`.t1 WHERE d = 1"
             try:
-                res = self.server2.exec_query(query)
-                # If FK constraints were cloned, it it should throw an exception
-            except UtilDBError as e:
+                self.server2.exec_query(query)
+                # If FK constraints were cloned, it it should throw an
+                # exception
+            except UtilDBError as err:
                 # Check if the reason the deletion failed was because of FK
                 # constraints
-                i = e[0].find("Cannot delete or update a parent row: a foreign")
+                i = err[0].find(
+                    "Cannot delete or update a parent row: a foreign")
                 if i != -1:
-                    return (True, None)
+                    return True, None
                 else:
-                    raise MUTLibError(e.errmsg)
+                    raise MUTLibError(err.errmsg)
             return (False, ("Result failure.\n", "FK constraints "
                                                  "were not copied"))
         return False, ("Result failure.\n", "Database copy not found.\n")
@@ -113,6 +114,6 @@ class test(mutlib.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        # Drop databases and kill spawned servers
-        return (self.drop_all() and self.kill_server(self.server1.role) and
-                self.kill_server(self.server2.role))
+            # Drop databases and kill spawned servers
+        return (self.drop_all() and self.kill_server(
+            self.server1.role) and self.kill_server(self.server2.role))

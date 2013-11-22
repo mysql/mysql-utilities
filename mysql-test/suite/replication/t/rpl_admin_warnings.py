@@ -102,53 +102,53 @@ class test(rpl_admin.test):
 
         master_str = "--master={0}".format(master_conn)
         slaves_str = "--slaves={0}".format(
-                            ",".join([slave1_conn, slave2_conn, slave3_conn]))
+            ",".join([slave1_conn, slave2_conn, slave3_conn]))
         candidates_str = "--candidates={0}".format(
-                            ",".join([slave1_conn, slave2_conn, slave3_conn]))
+            ",".join([slave1_conn, slave2_conn, slave3_conn]))
 
         test_num = 1
         comment = ("Test case {0} - warning for --exec* and not switchover or "
-                   "failover").format(test_num)
+                   "failover".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=csv "
                    " --exec-before=dummy "
-                   "--exec-after=dummy").format(master_str, slaves_str)
+                   "--exec-after=dummy".format(master_str, slaves_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - warning for --candidate and not "
-                   "switchover").format(test_num)
+                   "switchover".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=csv "
-                   "{2}").format(master_str, slaves_str, candidates_str)
+                   "{2}".format(master_str, slaves_str, candidates_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - warning for --new-master and not "
-                   "switchover").format(test_num)
+                   "switchover".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} health --quiet --format=tab "
-                   " --new-master={2} ").format(master_str, slaves_str,
-                                                slave2_conn)
+                   " --new-master={2} ".format(master_str, slaves_str,
+                                               slave2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - warning for missing "
-                   "--report-host").format(test_num)
+                   "--report-host".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} --disco=root:root health "
-                   "--format=csv ").format(master_str)
+                   "--format=csv ".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - warning for --format and not health or "
-                   "gtid").format(test_num)
+                   "gtid".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} stop --quiet "
-                   "--format=tab ").format(master_str, slaves_str)
+                   "--format=tab ".format(master_str, slaves_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -159,9 +159,9 @@ class test(rpl_admin.test):
 
         test_num += 1
         comment = ("Test case {0} - warning for --master and "
-                   "failover").format(test_num)
+                   "failover".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} "
-                   "failover").format(master_str, slaves_str)
+                   "failover".format(master_str, slaves_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -172,12 +172,12 @@ class test(rpl_admin.test):
 
         test_num += 1
         comment = ("Test case {0} - warnings for switchover with offline "
-                   "slave").format(test_num)
+                   "slave".format(test_num))
         off_slaves_str = ",".join([slave2_conn, slave3_conn,
                                    "root@offline:1234"])
         cmd_str = ("mysqlrpladmin.py --master={0} --new-master={1} --slaves="
-                   "{2} switchover ").format(master_conn, slave1_conn,
-                                             off_slaves_str)
+                   "{2} switchover ".format(master_conn, slave1_conn,
+                                            off_slaves_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -212,6 +212,6 @@ class test(rpl_admin.test):
 
     def cleanup(self):
         kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
-                    'rep_slave3_gtid', 'rep_slave4_gtid']
+                     'rep_slave3_gtid', 'rep_slave4_gtid']
         return (rpl_admin.test.cleanup(self)
                 and self.kill_server_list(kill_list))

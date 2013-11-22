@@ -14,9 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import export_parameters_def
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(export_parameters_def.test):
     """check parameters for export utility
@@ -36,56 +36,61 @@ class test(export_parameters_def.test):
         try:
             self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
                                     " x_blob blob")
-        except UtilDBError, e:
-            raise MUTLibError("Cannot alter table: %s" % e.errmsg)
+        except UtilError as err:
+            raise MUTLibError("Cannot alter table:{0}".format(err.errmsg))
 
         try:
             self.server1.exec_query("UPDATE util_test.t2 SET x_blob = "
                                     "'This is a blob.' ")
 
-        except UtilDBError, e:
-            raise MUTLibError("Cannot update rows: %s" % e.errmsg)
+        except UtilError as err:
+            raise MUTLibError("Cannot update rows: {0}".format(err.errmsg))
 
         return True
 
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=" + self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqldbexport.py --skip-gtid %s " % from_conn
+        test_num = 1
+        cmd_str = "mysqldbexport.py --skip-gtid {0} ".format(from_conn)
 
-        cmd_opts = "%s util_test --format=SQL --export=data" % cmd_str
-        comment = "Test case 1 - SQL single rows"
+        cmd_opts = "{0} util_test --format=SQL --export=data".format(cmd_str)
+        comment = "Test case {0} - SQL single rows".format(test_num)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - SQL bulk insert"
+        test_num += 1
+        comment = "Test case {0} - SQL bulk insert".format(test_num)
         res = self.run_test_case(0, cmd_opts + " --bulk-insert", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - skip blobs"
+        test_num += 1
+        comment = "Test case {0} - skip blobs".format(test_num)
         res = self.run_test_case(0, cmd_opts + " --skip-blobs", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Conduct format and display combination tests
         # Note: should say it is ignored for --export=data output.
 
         func = export_parameters_def.test.test_format_and_display_values
-        func(self, "%s util_test --export=data --format=" % cmd_str, 4)
+        func(self, "{0} util_test --export=data --format=".format(cmd_str), 4)
 
         self.server1.exec_query("ALTER TABLE util_test.t2 ADD COLUMN "
-                                 " y_blob blob")
+                                " y_blob blob")
         self.server1.exec_query("UPDATE util_test.t2 SET y_blob = "
                                 "'This is yet another blob.' ")
 
-        comment = "Test case 31 - multiple blobs"
+        test_num = 31
+        comment = "Test case {0} - multiple blobs".format(test_num)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         ## Mask known source.
         self.replace_result("# Source on localhost: ... connected.",

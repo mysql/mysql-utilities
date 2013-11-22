@@ -37,19 +37,18 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file, err.errmsg))
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_str = "mysqlindexcheck.py {0}".format(from_conn)
 
         test_num = 1
         comment = ("Test case {0} - check a table without "
-                   "indexes").format(test_num)
+                   "indexes".format(test_num))
         cmd = "{0} util_test_c.t6 -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -57,7 +56,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check a list of tables and "
-                   "databases").format(test_num)
+                   "databases".format(test_num))
         cmd = "{0} util_test_c util_test_a.t1 util_test_b -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -65,7 +64,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check all tables for a single "
-                   "database").format(test_num)
+                   "database".format(test_num))
         cmd = "{0} util_test_a -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -73,7 +72,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check tables for a non-existant "
-                   "database").format(test_num)
+                   "database".format(test_num))
         cmd = "{0} util_test_X -vv".format(cmd_str)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -81,7 +80,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check indexes for a non-existant "
-                   "table").format(test_num)
+                   "table".format(test_num))
         cmd = "{0} nosuch.nosuch -vv".format(cmd_str)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -89,7 +88,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check indexes for a non-existant table "
-                   "with skip option").format(test_num)
+                   "with skip option".format(test_num))
         cmd = "{0} nosuch.nosuch -vv --skip".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -97,7 +96,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check clustered indexes "
-                   "redundancies").format(test_num)
+                   "redundancies".format(test_num))
         cmd = "{0} util_test_d -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -108,34 +107,27 @@ class test(mutlib.System_test):
                             "# Source on XXXX-XXXX: ... connected.\n")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_all(self):
-        try:
-            self.server1.exec_query("DROP DATABASE util_test_a")
-        except:
-            pass
-        try:
-            self.server1.exec_query("DROP DATABASE util_test_b")
-        except:
-            pass
-        try:
-            self.server1.exec_query("DROP DATABASE util_test_c")
-        except:
-            pass
-        try:
-            self.server1.exec_query("DROP DATABASE util_test_d")
-        except:
-            pass
+        databases = ["util_test_a", "util_test_b", "util_test_c",
+                     "util_test_d"]
+        for db in databases:
+            try:
+                self.server1.exec_query("DROP DATABASE IF EXISTS "
+                                        "{0}".format(db))
+            except UtilError as err:
+                pass
+                raise MUTLibError("ERROR DROPPING DATABASE {0}: "
+                                  "{1}".format(db, err.errmsg))
 
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         self.drop_all()
         return True
-

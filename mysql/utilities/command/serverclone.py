@@ -77,7 +77,8 @@ def clone_server(conn_val, options):
     mysqld_options = options.get('mysqld_options', '')
 
     if not check_port_in_use('localhost', int(new_port)):
-        raise UtilError("Port in use. Please choose an available port.")
+        raise UtilError("Port {0} in use. Please choose an "
+                        "available port.".format(new_port))
 
     # Clone running server
     if conn_val is not None:
@@ -115,7 +116,7 @@ def clone_server(conn_val, options):
         if not quiet:
             print "# Creating new data directory..."
         try:
-            res = os.mkdir(new_data)
+            os.mkdir(new_data)
         except:
             raise UtilError("Unable to create directory '%s'" % new_data)
 
@@ -206,13 +207,18 @@ def clone_server(conn_val, options):
             try:
                 os.kill(proc.pid, subprocess.signal.SIGTERM)
             except OSError:
-                pass
+                raise UtilError("Failed to kill process with pid '{0}'"
+                                "".format(proc.pid))
         else:
-            try:
-                subprocess.Popen("taskkill /F /T /PID %i" % proc.pid,
-                                 shell=True)
-            except:
-                pass
+            ret_code = subprocess.call("taskkill /F /T /PID "
+                                       "{0}".format(proc.pid), shell=True)
+
+            # return code 0 means it was successful and 128 means it tried
+            # to kill a process that doesn't exist
+            if ret_code not in (0, 128):
+                raise UtilError("Failed to kill process with pid '{0}'. "
+                                "Return code {1}".format(proc.pid,
+                                                         ret_code))
 
     # Drop the bootstrap file
     if os.path.isfile("bootstrap.sql"):

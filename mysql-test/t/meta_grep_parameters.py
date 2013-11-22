@@ -49,7 +49,7 @@ class test(meta_grep.test):
 
         test_num += 1
         comment = ("Test case {0} - do the SQL for a simple "
-                   "search").format(test_num)
+                   "search".format(test_num))
         cmd = "{0} --sql -Gb --pattern=t2".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -57,18 +57,18 @@ class test(meta_grep.test):
 
         test_num += 1
         comment = ("Test case {0} - do the SQL for a simple search with "
-                   "type").format(test_num)
+                   "type".format(test_num))
         cmd = ("{0} --sql --search-objects=table -Gb "
-               "--pattern=t2").format(cmd_base)
+               "--pattern=t2".format(cmd_base))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - do the SQL for a body search with type "
-                   "(VIEW).").format(test_num)
+                   "(VIEW).".format(test_num))
         cmd = ("{0} --sql --search-objects=view -Gb "
-               "--pattern=%t1%").format(cmd_base)
+               "--pattern=%t1%".format(cmd_base))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

@@ -28,7 +28,7 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
-        # Need at least one server.
+            # Need at least one server.
         self.server1 = None
         self.server2 = None
         self.need_server = False
@@ -38,19 +38,19 @@ class test(mutlib.System_test):
 
     def _load_data(self, server, data_file):
         try:
-            res = server.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            server.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
 
     def setup(self):
         self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         self._load_data(self.server1,
@@ -64,66 +64,77 @@ class test(mutlib.System_test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        s1_conn = "--server1=" + self.build_connection_string(self.server1)
-        s2_conn = "--server2=" + self.build_connection_string(self.server2)
+        s1_conn = "--server1={0}".format(
+            self.build_connection_string(self.server1))
+        s2_conn = "--server2={0}".format(
+            self.build_connection_string(self.server2))
 
-        cmd_str = "mysqldiff.py %s %s util_test:util_test" % (s1_conn, s2_conn)
-        cmd_str += " --force --difftype=sql "
+        cmd_str = "mysqldiff.py {0} {1} util_test:util_test".format(s1_conn,
+                                                                    s2_conn)
+        cmd_str = "{0} --force --difftype=sql ".format(cmd_str)
 
-        comment = "Test case 1 - create transform for objects for " + \
-                  "--changes-for=server1"
+        test_num = 1
+        comment = ("Test case {0} - create transform for objects for "
+                   "--changes-for=server1".format(test_num))
         cmd_opts = " --changes-for=server1 "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - create transform for objects for " + \
-                  "--changes-for=server2"
+        test_num += 1
+        comment = ("Test case {0} - create transform for objects for "
+                   "--changes-for=server2".format(test_num))
         cmd_opts = " --changes-for=server2 "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - create transform for objects for " + \
-                  "--changes-for=server1 with reverse"
+        test_num += 1
+        comment = ("Test case {0} - create transform for objects for "
+                   "--changes-for=server1 with reverse".format(test_num))
         cmd_opts = " --changes-for=server1 --show-reverse "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - create transform for objects for " + \
-                  "--changes-for=server2 with reverse"
+        test_num += 1
+        comment = ("Test case {0} - create transform for objects for "
+                   "--changes-for=server2 with reverse".format(test_num))
         cmd_opts = " --changes-for=server2 --show-reverse "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Do transform for tables with different names
-        cmd_str = "mysqldiff.py %s %s util_test.t1:util_test.t6" % \
-                  (s1_conn, s2_conn)
-        cmd_str += " --force --difftype=sql "
+        cmd_str = "mysqldiff.py {0} {1} util_test.t1:util_test.t6".format(
+            s1_conn, s2_conn)
+        cmd_str = "{0} --force --difftype=sql ".format(cmd_str)
 
         self.server2.exec_query("CREATE TABLE util_test.t6 ENGINE=MyISAM AS "
                                 "SELECT * FROM util_test.t1")
 
-        comment = "Test case 5 - create transform for renamed table "
+        test_num += 1
+        comment = ("Test case {0} - create transform for renamed "
+                   "table ".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Check to see if rename worked
 
-        cmd_str = "mysqldiff.py %s %s util_test.t6:util_test.t6" % \
-                  (s1_conn, s2_conn)
-        cmd_str += " --force --difftype=sql "
+        cmd_str = "mysqldiff.py {0} {1} util_test.t6:util_test.t6".format(
+            s1_conn, s2_conn)
+        cmd_str = "{0} --force --difftype=sql ".format(cmd_str)
 
         self.server1.exec_query("ALTER TABLE util_test.t1 "
                                 "RENAME TO util_test.t6, ENGINE=MyISAM")
 
-        comment = "Test case 6 - test transform for renamed table "
+        test_num += 1
+        comment = ("Test case {0} - test transform for renamed "
+                   "table ".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
@@ -159,6 +170,8 @@ class test(mutlib.System_test):
         return True
 
     def cleanup(self):
-        if self.res_fname:
+        try:
             os.unlink(self.res_fname)
+        except OSError:
+            pass
         return self.drop_all()

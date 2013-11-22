@@ -118,8 +118,7 @@ class test(mutlib.System_test):
 
         parameters = ("{0}:{1} -a --changes-for=server2 --difftype=sql -vv"
                       "".format(self.db_test_name, self.db_test_name))
-        res = self.run_test_case(0, cmd_str.format(params=parameters),
-                                 comment)
+        res = self.run_test_case(0, cmd_str.format(params=parameters), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -147,8 +146,7 @@ class test(mutlib.System_test):
 
         comment = ("Test case {0} - check database with known differences "
                    "".format(test_case))
-        res = self.run_test_case(1, cmd_str.format(params=parameters),
-                                 comment)
+        res = self.run_test_case(1, cmd_str.format(params=parameters), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -163,15 +161,13 @@ class test(mutlib.System_test):
         # Mask inconsistent Python 2.7 behavior
         self.replace_result("@@ -1 +1 @@", "@@ -1,1 +1,1 @@\n")
         self.replace_result("# @@ -1 +1 @@", "# @@ -1,1 +1,1 @@\n")
-        
-        synoms = [("on [::1]", "on localhost"),
-                  ("city`", "City`"),
+
+        synoms = [("on [::1]", "on localhost"), ("city`", "City`"),
                   ("country`", "Country`"),
                   ("countrylanguage`", "CountryLanguage`"),
                   ("world.city", "world.City"),
                   ("world.country", "world.Country"),
-                  ("world.Countrylanguage",
-                   "world.CountryLanguage"),
+                  ("world.Countrylanguage", "world.CountryLanguage"),
                   ("TABLE     city", "TABLE     City"),
                   ("TABLE     country", "TABLE     Country"),
                   ("TABLE     Countrylanguage", "TABLE     CountryLanguage")]
@@ -187,6 +183,6 @@ class test(mutlib.System_test):
                 os.unlink(self.setup_temp_file)
             if self.res_fname:
                 os.unlink(self.res_fname)
-        except:
+        except OSError:
             pass
         return self.kill_server(self.server2.role)

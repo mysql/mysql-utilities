@@ -37,10 +37,9 @@ class test(mutlib.System_test):
             try:
                 self.servers.spawn_new_servers(3)
             except MUTLibError as err:
-                raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
-        # Set spawned servers without using the one passed to MUT
+                raise MUTLibError("Cannot spawn needed "
+                                  "servers: {0}".format(err.errmsg))
+            # Set spawned servers without using the one passed to MUT
         self.server1 = self.servers.get_server(1)
         self.server2 = self.servers.get_server(2)
         self.drop_all()
@@ -48,20 +47,23 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/fkeys.sql")
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as e:
+        except UtilError as err:
             raise MUTLibError("Failed to read commands from file"
-                              " {0}: {1}".format((data_file, e.errmsg)))
+                              " {0}: {1}".format((data_file, err.errmsg)))
         self.server1.disable_foreign_key_checks(False)
         return True
 
-    
     def run(self):
         self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
-       
-        comment = "Test case 1 - copy database with foreign keys"
+
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+
+        test_num = 1
+        comment = ("Test case {0} - copy database with foreign "
+                   "keys".format(test_num))
         cmd_str = ("mysqldbcopy.py --skip-gtid "
                    "{0} {1} ".format(from_conn, to_conn))
         cmd_opts = "util_test_fk2:util_test_fk2_copy"
@@ -70,7 +72,7 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
         return True
-  
+
     def get_result(self):
         msg = None
         if self.server2 and self.server1 and self.results[0] == 0:
@@ -81,12 +83,12 @@ class test(mutlib.System_test):
                 res_clo = self.server2.exec_query(query_clo)
                 # check if create table statements are equal
                 if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
-                    return (True, msg)
+                    return True, msg
             except UtilDBError as e:
                 raise MUTLibError(e.errmsg)
         return (False, ("Result failure.\n", "Create TABLE statements are not"
                                              " equal\n"))
-    
+
     def record(self):
         # Not a comparative test, returning True
         return True
@@ -103,10 +105,10 @@ class test(mutlib.System_test):
             drop_results_s2.append(self.drop_db(self.server2, db))
 
         return all(drop_results_s1) and all(drop_results_s2)
-            
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         # Drop databases and kill spawned servers
-        return (self.drop_all() and self.kill_server(self.server1.role) and
-                self.kill_server(self.server2.role))
+        return (self.drop_all() and self.kill_server(self.server1.role)
+                and self.kill_server(self.server2.role))

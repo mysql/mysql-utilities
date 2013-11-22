@@ -60,8 +60,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -111,8 +111,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -150,8 +150,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -186,8 +186,8 @@ mt_db,0
 mysql,XXXXXXX
 util_test,XXXXXXX
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 log_file,size
 mysql-bin.000001,XXXX
@@ -218,8 +218,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -251,8 +251,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX

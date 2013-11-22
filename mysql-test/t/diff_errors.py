@@ -14,13 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import diff
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _ARGUMENTS = ['util_test.util_test', 'util_test.t3:util_test',
               'util_test:util_test.t3', 'util_test.t3.t3:util_test.t3',
               'util_test.t3:util_test..t4']
+
 
 class test(diff.test):
     """check errors for diff
@@ -38,77 +38,80 @@ class test(diff.test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        s1_conn = "--server1=" + self.build_connection_string(self.server1)
-        s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
-        cmd_str = "mysqldiff.py %s %s util_test:util_test " % \
-                  (s1_conn, s2_conn)
+        s1_conn = "--server1={0}".format(
+            self.build_connection_string(self.server1))
+        s2_conn = "--server2={0}".format(
+            self.build_connection_string(self.server2))
+
+        cmd_str = "mysqldiff.py {0} {1} util_test:util_test ".format(s1_conn,
+                                                                     s2_conn)
 
         test_num = 1
-        cmd_opts = " --difftype=differ" 
-        comment = "Test case %d - Use diff %s" % (test_num, cmd_opts)
+        cmd_opts = " --difftype=differ"
+        comment = "Test case {0} - Use diff {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldiff.py %s %s " % (s1_conn, s2_conn)
-
-        test_num += 1
-        cmd_opts = " util_test1:util_test" 
-        comment = "Test case %d - database doesn't exist" % test_num
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+        cmd_str = "mysqldiff.py {0} {1} ".format(s1_conn, s2_conn)
 
         test_num += 1
-        cmd_opts = " util_test:util_test2" 
-        comment = "Test case %d - database doesn't exist" % test_num
+        cmd_opts = " util_test1:util_test"
+        comment = "Test case {0} - database doesn't exist".format(test_num)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " util_test.t3:util_test.t33" 
-        comment = "Test case %d - object doesn't exist" % test_num
+        cmd_opts = " util_test:util_test2"
+        comment = "Test case {0} - database doesn't exist".format(test_num)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " util_test.t31:util_test.t3" 
-        comment = "Test case %d - object doesn't exist" % test_num
+        cmd_opts = " util_test.t3:util_test.t33"
+        comment = "Test case {0} - object doesn't exist".format(test_num)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " util_test.t31:util_test.t3"
+        comment = "Test case {0} - object doesn't exist".format(test_num)
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         for arg in _ARGUMENTS:
             test_num += 1
-            cmd_opts = " %s" % arg 
-            comment = "Test case %d - malformed argument%s " % \
-                      (test_num, cmd_opts)
+            cmd_opts = " {0}".format(arg)
+            comment = "Test case {0} - malformed argument{1} ".format(test_num,
+                                                                      cmd_opts)
             res = self.run_test_case(2, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
-                
+                raise MUTLibError("{0}: failed".format(comment))
+
         try:
             self.server1.exec_query("CREATE TABLE util_test.t6 (a int)")
             self.server2.exec_query("CREATE TABLE util_test.t7 (a int)")
-        except:
+        except UtilError:
             raise MUTLibError("Cannot create test tables.")
-        
-        test_num += 1
-        cmd_opts = " util_test:util_test " 
-        comment = "Test case %d - some objects don't exist in dbs" % test_num
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
 
         test_num += 1
-        cmd_opts = " " 
-        comment = "Test case %d - no objects specified." % test_num
+        cmd_opts = " util_test:util_test "
+        comment = ("Test case {0} - some objects don't exist in "
+                   "dbs".format(test_num))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " "
+        comment = "Test case {0} - no objects specified.".format(test_num)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - invalid --character-set".format(test_num)

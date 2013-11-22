@@ -14,9 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import check_index_parameters
 from mysql.utilities.exception import MUTLibError
+
 
 class test(check_index_parameters.test):
     """check for best and worst indexes for the check_index_parameters utility
@@ -31,32 +31,35 @@ class test(check_index_parameters.test):
 
     def setup(self):
         return check_index_parameters.test.setup(self)
-        
+
     def run(self):
         self.res_fname = "result.txt"
-        from_conn = "--server=" + self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqlindexcheck.py %s util_test_a " % from_conn
-       
-        comment = "Test case 1 - show best indexes on small database"
+        cmd_str = "mysqlindexcheck.py {0} util_test_a ".format(from_conn)
+
+        test_num = 1
+        comment = ("Test case {0} - show best indexes on small "
+                   "database".format(test_num))
         res = self.run_test_case(0, cmd_str + "--stats -v --best=5", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - show worst indexes on small database"
+        test_num += 1
+        comment = ("Test case {0} - show worst indexes on small "
+                   "database".format(test_num))
         res = self.run_test_case(0, cmd_str + "--stats -v --worst=5", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
+            raise MUTLibError("{0}: failed".format(comment))
+
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return check_index_parameters.test.cleanup(self)
-
-

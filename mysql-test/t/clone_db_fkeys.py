@@ -37,8 +37,7 @@ class test(mutlib.System_test):
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
                 raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
 
         # Set spawned servers
         self.server1 = self.servers.get_server(1)
@@ -47,23 +46,25 @@ class test(mutlib.System_test):
         self.server1.disable_foreign_key_checks(True)
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as e:
+        except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
-                              "{1}".format(data_file, e.errmsg))
+                              "{1}".format(data_file, err.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
-       
+
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
+
         # Test case 1 - clone a sample database and check if create table
-        # statement from one of the tables is equal to the one from the original
+        # statement from one of the tables is equal to the one from the
+        # original
         # table
-        cmd_opts = ["mysqldbcopy.py", "--skip-gtid",
-                    from_conn, to_conn,
+        cmd_opts = ["mysqldbcopy.py", "--skip-gtid", from_conn, to_conn,
                     "util_test_fk2:util_test_fk2_clone"]
         cmd = " ".join(cmd_opts)
         try:
@@ -74,9 +75,9 @@ class test(mutlib.System_test):
             self.results.append(res)
             self.server1.connect()
             return res == 0
-        except MUTLibError as e:
-            raise MUTLibError(e.errmsg)
-          
+        except MUTLibError as err:
+            raise MUTLibError(err.errmsg)
+
     def get_result(self):
         # Reconnect to check status of test case
         msg = None
@@ -89,12 +90,12 @@ class test(mutlib.System_test):
 
                 # Check if create table statements are equal
                 if res_ori and res_clo and res_clo[0][1] == res_ori[0][1]:
-                    return (True, msg)
+                    return True, msg
             except UtilDBError as e:
                 raise MUTLibError(e.errmsg)
-        return (False, ("Result failure.\n", "Create TABLE statements are not "
-                                             "equal\n"))
-    
+        return False, ("Result failure.\n", ("Create TABLE statements are not"
+                                             " equal\n"))
+
     def record(self):
         # Not a comparative test, returning True
         return True
@@ -110,5 +111,5 @@ class test(mutlib.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        # Drop databases and kill spawned servers
+            # Drop databases and kill spawned servers
         return self.drop_all() and self.kill_server(self.server1.role)

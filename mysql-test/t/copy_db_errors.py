@@ -16,7 +16,8 @@
 #
 import os
 import copy_db
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(copy_db.test):
     """check errors for copy db
@@ -31,219 +32,265 @@ class test(copy_db.test):
         res = copy_db.test.setup(self)
         if not res:
             return res
-        # Create users for privilege testing
+            # Create users for privilege testing
         self.drop_users()
-        res = self.server1.exec_query("CREATE USER 'joe'@'localhost'")
-        res = self.server1.exec_query("CREATE USER 'sam'@'localhost'")
-        res = self.server1.exec_query("GRANT SELECT, EVENT ON util_test.* TO " + \
-                                      "'joe'@'localhost'")
-        res = self.server1.exec_query("GRANT SELECT ON mysql.* TO " + \
-                                      "'joe'@'localhost'")
-        res = self.server1.exec_query("GRANT SHOW VIEW ON util_test.* TO " + \
-                                      "'joe'@'localhost'")
+        self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+        self.server1.exec_query("CREATE USER 'sam'@'localhost'")
+        self.server1.exec_query(
+            "GRANT SELECT, EVENT ON util_test.* TO " + "'joe'@'localhost'")
+        self.server1.exec_query(
+            "GRANT SELECT ON mysql.* TO " + "'joe'@'localhost'")
+        self.server1.exec_query(
+            "GRANT SHOW VIEW ON util_test.* TO " + "'joe'@'localhost'")
 
-        res = self.server2.exec_query("CREATE USER 'joe'@'localhost'")
-        res = self.server2.exec_query("CREATE USER 'sam'@'localhost'")
-        res = self.server2.exec_query("GRANT ALL ON util_db_clone.* TO " + \
-                                      "'joe'@'localhost' WITH GRANT OPTION")
-        res = self.server2.exec_query("GRANT SUPER, CREATE USER ON *.* TO " + \
-                                      "'joe'@'localhost'")
+        self.server2.exec_query("CREATE USER 'joe'@'localhost'")
+        self.server2.exec_query("CREATE USER 'sam'@'localhost'")
+        self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
+                                "'joe'@'localhost' WITH GRANT OPTION")
+        self.server2.exec_query("GRANT SUPER, CREATE USER ON *.* TO "
+                                "'joe'@'localhost'")
         return True
-                    
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-       
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s " % from_conn
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+
+        test_num = 1
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} ".format(from_conn)
         cmd_opts = "util_test:util_db_clone "
-        comment = "Test case 1 - error: no destination specified"
+        comment = ("Test case {0} - error: no destination "
+                   "specified".format(test_num))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
+        test_num += 1
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
+                                                               to_conn)
         cmd_opts = " "
-        comment = "Test case 2 - error: no database specified"
+        comment = ("Test case {0} - error: no database "
+                   "specified".format(test_num))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_opts = " wax\t::sad "
-        comment = "Test case 3 - error: cannot parse database list"
+        comment = ("Test case {0} - error: cannot parse database "
+                   "list".format(test_num))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_opts = "NOT_THERE_AT_ALL:util_db_clone"
-        comment = "Test case 4 - error: old database doesn't exist"
+        comment = ("Test case {0} - error: old database doesn't "
+                   "exist".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s " \
-                  "--source=nope:nada@localhost:3306 "  % to_conn
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} "
+                   "--source=nope:nada@localhost:3306 ".format(to_conn))
         cmd_opts = "util_test:util_db_clone "
-        comment = "Test case 5 - error: cannot connect to source"
+        comment = ("Test case {0} - error: cannot connect to "
+                   "source".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
-        cmd_str = "mysqldbcopy.py --skip-gtid %s " \
-                  "--destination=nope:nada@localhost:3306 "  % from_conn
-        cmd_opts = "util_test:util_db_clone "
-        comment = "Test case 6 - error: cannot connect to destination"
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=joe@localhost:%s " % self.server1.port
-        # Watchout for Windows: it doesn't use sockets!
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} "
+                   "--destination=nope:nada@localhost:3306 ".format(from_conn))
+        cmd_opts = "util_test:util_db_clone "
+        comment = ("Test case {0} - error: cannot connect to "
+                   "destination".format(test_num))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        from_conn = "--source=joe@localhost:{0} ".format(self.server1.port)
+        # Watch out for Windows: it doesn't use sockets!
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = "--destination=joe@localhost:%s:%s" % \
-                    (self.server2.port, self.server2.socket)
+            to_conn = "--destination=joe@localhost:{0}:{1}".format(
+                self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=joe@localhost:%s" % (self.server2.port)
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
+            to_conn = "--destination=joe@localhost:{0}".format(
+                self.server2.port)
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
+                                                               to_conn)
+        test_num += 1
         cmd_opts = "util_test:util_db_clone "
-        comment = "Test case 7 - users with minimal privileges"
+        comment = ("Test case {0} - users with minimal "
+                   "privileges".format(test_num))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=sam@localhost:%s " % self.server1.port
+        from_conn = "--source=sam@localhost:{0} ".format(self.server1.port)
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = "--destination=joe@localhost:%s:%s" % \
-                      (self.server2.port, self.server2.socket)
+            to_conn = "--destination=joe@localhost:{0}:{1}".format(
+                self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=joe@localhost:%s" % self.server2.port
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
+            to_conn = "--destination=joe@localhost:{0}".format(
+                self.server2.port)
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
+                                                               to_conn)
+
+        test_num += 1
         cmd_opts = "util_test:util_db_clone --force"
-        comment = "Test case 8 - source user not enough privileges needed"
+        comment = ("Test case {0} - source user not enough privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
-        # Give Sam some privileges on source and retest until copy works
-        res = self.server1.exec_query("GRANT SELECT ON util_test.* TO " + \
-                                      "'sam'@'localhost'")
-        comment = "Test case 9 - source user has some privileges needed"
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
-        res = self.server1.exec_query("GRANT SELECT ON mysql.* TO " + \
-                                      "'sam'@'localhost'")
-        comment = "Test case 10 - source user has some privileges needed"
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        res = self.server1.exec_query("GRANT SHOW VIEW, EVENT "
-                                      "ON util_test.* TO " + \
-                                      "'sam'@'localhost'")
-        
-        comment = "Test case 11 - source user has privileges needed"
+        test_num += 1
+        # Give Sam some privileges on source and retest until copy works
+        self.server1.exec_query("GRANT SELECT ON util_test.* TO "
+                                "'sam'@'localhost'")
+        comment = ("Test case {0} - source user has some privileges "
+                   "needed".format(test_num))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        self.server1.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
+        comment = ("Test case {0} - source user has some privileges "
+                   "needed".format(test_num))
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        self.server1.exec_query("GRANT SHOW VIEW, EVENT "
+                                "ON util_test.* TO 'sam'@'localhost'")
+        comment = ("Test case {0} - source user has privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix":
-            to_conn = "--destination=sam@localhost:%s:%s" % \
-                      (self.server2.port, self.server2.socket)
+            to_conn = "--destination=sam@localhost:{0}:{1}".format(
+                self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=sam@localhost:%s" % self.server2.port
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
+            to_conn = "--destination=sam@localhost:{0}".format(
+                self.server2.port)
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
+                                                               to_conn)
         cmd_opts = "util_test:util_db_clone --force "
-        comment = "Test case 12 - dest user not enough privileges needed"
+        comment = ("Test case {0} - dest user not enough privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         # Give Sam some privileges on source and retest until copy works
-        res = self.server2.exec_query("GRANT ALL ON util_db_clone.* TO " + \
-                                      "'sam'@'localhost' WITH GRANT OPTION")
-        comment = "Test case 13 - dest user has some privileges needed"
+        self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
+                                "'sam'@'localhost' WITH GRANT OPTION")
+        comment = ("Test case {0} - dest user has some privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        res = self.server2.exec_query("GRANT CREATE USER ON *.* TO " + \
-                                      "'sam'@'localhost'")
-        comment = "Test case 14 - dest user has some privileges needed"
+        test_num += 1
+        self.server2.exec_query("GRANT CREATE USER ON *.* TO "
+                                "'sam'@'localhost'")
+        comment = ("Test case {0} - dest user has some privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        res = self.server2.exec_query("GRANT SUPER ON *.* TO " + \
-                                      "'sam'@'localhost'")
-        comment = "Test case 15 - dest user has privileges needed"
+        test_num += 1
+        self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'localhost'")
+        comment = ("Test case {0} - dest user has privileges "
+                   "needed".format(test_num))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks %s " \
-                  "util_test:util_db_clone --force " % to_conn
-        comment = "Test case 16 - cannot parse --source"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks {0} "
+                   "util_test:util_db_clone --force ".format(to_conn))
+        comment = "Test case {0} - cannot parse --source".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s util_test:util_db_clone " \
-                  "--destination=rocks_rocks_rocks --force " % from_conn
-        comment = "Test case 17 - cannot parse --destination"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} util_test:util_db_clone "
+                   "--destination=rocks_rocks_rocks "
+                   "--force ".format(from_conn))
+        comment = "Test case {0} - cannot parse --destination".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks " \
-                  "util_test:util_db_clone --force "
-        comment = "Test case 18 - no destination specified"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks "
+                   "util_test:util_db_clone --force ")
+        comment = "Test case {0} - no destination specified".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (to_conn, from_conn)
-        comment = "Test case 19 - no database specified"
+        test_num += 1
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(to_conn,
+                                                               from_conn)
+        comment = "Test case {0} - no database specified".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s util_test:util_db_clone " \
-                  "--force --new-storage-engine=NOTTHERE" % \
-                   (to_conn, from_conn)
-        comment = "Test case 20 - new storage engine missing"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --force --new-storage-engine=NOTTHERE".format(to_conn,
+                                                                   from_conn))
+        comment = "Test case {0} - new storage engine missing".format(test_num)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s util_test:util_db_clone " \
-                 "--force --default-storage-engine=NOPENOTHERE" % \
-                 (to_conn, from_conn)
-        comment = "Test case 21 - default storage engine missing"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --force --default-storage-engine="
+                   "NOPENOTHERE".format(to_conn, from_conn))
+        comment = ("Test case {0} - default storage engine "
+                   "missing".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s util_test:util_db_clone " \
-                  "--force --all"  % (to_conn, from_conn)
-        comment = "Test case 22 - database listed and --all"
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --force --all".format(to_conn, from_conn))
+        comment = "Test case {0} - database listed and --all".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Check --rpl option errors        
-        test_num = 23        
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s util_test " % \
-                  (to_conn, from_conn)
-        comment = "Test case %s - error: %s but no --rpl" % \
-                  (test_num, "--rpl-user=root")
+        test_num += 1
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} "
+                   "util_test ".format(to_conn, from_conn))
+        comment = "Test case {0} - error: {1} but no --rpl".format(
+            test_num, "--rpl-user=root")
         res = self.run_test_case(2, cmd_str + "--rpl-user=root", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         cmd_str = ("mysqldbcopy.py {0} {1} --all "
@@ -263,15 +310,13 @@ class test(copy_db.test):
                             "# Destination: sam@localhost:[] ... connected\n")
 
         # Mask known source and destination host name.
-        self.replace_substring("on localhost",
-                               "on XXXX-XXXX")
-        self.replace_substring("on [::1]",
-                               "on XXXX-XXXX")
+        self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         # Replace error code.
         self.replace_result("Error 1045", "Error XXXX: Access denied\n")
         self.replace_result("Error 2003", "Error XXXX: Access denied\n")
-        
+
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
 
@@ -286,35 +331,32 @@ class test(copy_db.test):
                             "values invalid\n")
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-        
+
     def drop_users(self):
         try:
             self.server1.exec_query("DROP USER 'joe'@'localhost'")
-        except:
-            pass 
+        except UtilError:
+            pass
         try:
             self.server1.exec_query("DROP USER 'sam'@'localhost'")
-        except:
+        except UtilError:
             pass
         try:
             self.server2.exec_query("DROP USER 'joe'@'localhost'")
-        except:
-            pass 
+        except UtilError:
+            pass
         try:
             self.server2.exec_query("DROP USER 'sam'@'localhost'")
-        except:
+        except UtilError:
             pass
-    
+
     def cleanup(self):
         self.drop_users()
         res = copy_db.test.cleanup(self)
         return res
-
-
-

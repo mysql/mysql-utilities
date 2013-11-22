@@ -25,7 +25,7 @@ Test case 7 - Master listed as a slave - alias
 Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The master and one of the slaves are the same host and port.
-Test case 8 - Master listed as a candiate - alias
+Test case 8 - Master listed as a candidate - alias
 Usage: mysqlfailover.py --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover.py: error: The master and one of the candidates are the same host and port.

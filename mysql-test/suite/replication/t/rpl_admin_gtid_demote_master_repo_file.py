@@ -22,7 +22,7 @@ from mysql.utilities.exception import MUTLibError
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
-                            '--report-host=localhost --report-port=%s '
+                            '--report-host=localhost --report-port={0} '
                             '--master-info-repository=file"')
 
 
@@ -43,13 +43,13 @@ class test(rpl_admin.test):
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
         self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
         self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS_FILE % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
@@ -69,167 +69,134 @@ class test(rpl_admin.test):
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
-        slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        #slave4_conn = self.build_connection_string(self.server5).strip(' ')
 
-        comment = ("Test case %s - mysqlrplshow OLD Master before demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
-        #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        comment = ("Test case {0} - mysqlrplshow OLD Master before "
+                   "demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(master_conn)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow not yet NEW Master Before "
-                   "switchover demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
-        #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        comment = ("Test case {0} - mysqlrplshow not yet NEW Master Before "
+                   "switchover demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         # mysqlrpladmin --master=root:root@localhost:13091
         # --new-master=root:root@localhost:13094
         # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
-        comment = ("Test case %s - demote-master switchover -vvv "
-                   "using actual rpl user"
-                   % test_num)
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = [" --new-master=%s  " % slave1_conn,]
-        cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
-        cmd_opts.append("--rpl-user=rpl:rpl ")
-        cmd_opts.append("--demote-master switchover -vvv")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        comment = ("Test case {0} - demote-master switchover -vvv "
+                   "using actual rpl user".format(test_num))
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = (" --new-master={0} --discover-slaves={1} "
+                    "--rpl-user=rpl:rpl --demote-master switchover "
+                    "-vvv".format(slave1_conn, master_conn.split('@')[0]))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow OLD Master after demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
+        comment = ("Test case {0} - mysqlrplshow OLD Master after "
+                   "demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(master_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow NEW Master"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
+        comment = ("Test case {0} - mysqlrplshow NEW Master".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         # mysqlrpladmin --master=root:root@localhost:13091
         # --new-master=root:root@localhost:13094
         # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
-        comment = ("Test case %s - demote-master switchover -vvv "
-                   "Using a different rpl user and no --force" % test_num)
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % slave1_conn
-        cmd_opts = [" --new-master=%s  " % slave3_conn,]
-        cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
-        cmd_opts.append("--rpl-user=rpluser:hispassword ")
-        cmd_opts.append("--demote-master switchover -vvv")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        comment = ("Test case {0} - demote-master switchover -vvv Using a "
+                   "different rpl user and no --force".format(test_num))
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(slave1_conn)
+        cmd_opts = (" --new-master={0} --discover-slaves={1} "
+                    "--rpl-user=rpluser:hispassword --demote-master "
+                    "switchover -vvv".format(slave3_conn,
+                                             master_conn.split('@')[0]))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow still OLD Master after "
-                   "failed switchover demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
+        comment = ("Test case {0} - mysqlrplshow still OLD Master after "
+                   "failed switchover demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow not yet NEW Master after "
-                   "failed switchover demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave3_conn
+        comment = ("Test case {0} - mysqlrplshow not yet NEW Master after "
+                   "failed switchover demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave3_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         # mysqlrpladmin --master=root:root@localhost:13091
         # --new-master=root:root@localhost:13094
         # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
-        comment = ("Test case %s - demote-master switchover -vvv "
-                   "Using a different rpl user and using the --force"
-                   % test_num)
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % slave1_conn
-        cmd_opts = [" --new-master=%s  " % slave3_conn,]
-        cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
-        cmd_opts.append("--rpl-user=rpluser:hispassword ")
-        cmd_opts.append("--demote-master switchover -vvv ")
-        cmd_opts.append("--force")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        comment = ("Test case {0} - demote-master switchover -vvv "
+                   "Using a different rpl user and using the --force".format(
+                   test_num))
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(slave1_conn)
+        cmd_opts = (" --new-master={0} --discover-slaves={1} "
+                    "--rpl-user=rpluser:hispassword --demote-master "
+                    "switchover -vvv "
+                    "--force".format(slave3_conn, master_conn.split('@')[0]))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow OLD Master after demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
+        comment = ("Test case {0} - mysqlrplshow OLD Master after "
+                   "demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case %s - mysqlrplshow NEW Master after demote"
-                   % test_num)
-        cmd_str = "mysqlrplshow.py --master=%s " % slave3_conn
+        comment = ("Test case {0} - mysqlrplshow NEW Master after "
+                   "demote".format(test_num))
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave3_conn)
         #  --master=root:root@localhost:13091 --disco=root:root -r
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        cmd_opts.append("-r")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = "--discover-slaves={0} -r".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
@@ -335,33 +302,33 @@ class test(rpl_admin.test):
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.
-        self.replace_substring("+----------------------------------------------"
-                               "-----------------------------------------+",
-                               "+---------+")
-        self.replace_substring("+----------------------------------------------"
+        self.replace_substring("+---------------------------------------------"
                                "------------------------------------------+",
                                "+---------+")
-        self.replace_substring("| health                                       "
-                               "                                         |",
-                               "| health  |")
-        self.replace_substring("| health                                       "
+        self.replace_substring("+---------------------------------------------"
+                               "-------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                      "
                                "                                          |",
                                "| health  |")
-        self.replace_substring("| OK                                           "
-                               "                                         |",
+        self.replace_substring("| health                                      "
+                               "                                           |",
+                               "| health  |")
+        self.replace_substring("| OK                                          "
+                               "                                          |",
                                "| OK      |")
-        self.replace_substring("| OK                                           "
-                               "                                          |",
+        self.replace_substring("| OK                                          "
+                               "                                           |",
                                "| OK      |")
         self.replace_substring_portion("| Slave delay is ",
                                        "seconds behind master., No, Slave has "
                                        "1 transactions behind master.  |",
                                        "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
-                               "                                         |",
-                               "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
+        self.replace_substring("| Slave has 1 transactions behind master.     "
                                "                                          |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.     "
+                               "                                           |",
                                "| OK      |")
 
         self.replace_substring("+------------------------------------------+",

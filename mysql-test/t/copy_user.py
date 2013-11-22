@@ -17,7 +17,8 @@
 import os
 import mutlib
 from mysql.utilities.common.user import User
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+
 
 class test(mutlib.System_test):
     """copy user
@@ -38,81 +39,94 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
+            except MUTLibError:
                 raise MUTLibError("Cannot spawn needed servers.")
-                
+
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = "./std_data/basic_users.sql"
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError(
+                "Failed to read commands from file {0}: "
+                "{1}".format(data_file, err.errmsg))
         return True
-        
+
     def show_user_grants(self, server, user):
-        query = "SHOW GRANTS FOR %s" % (user)
+        query = "SHOW GRANTS FOR {0}".format(user)
         try:
             res = server.exec_query(query)
             if res is not None:
                 for row in res:
-                    self.results.append(row[0]+"\n")
-        except:
-            raise MUTLibError("Cannot get grants for %s." % user)
-            
+                    self.results.append(row[0] + "\n")
+        except UtilError:
+            raise MUTLibError("Cannot get grants for {0}.".format(user))
+
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
-        cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
-       
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+        cmd_str = "mysqluserclone.py {0} {1} ".format(from_conn, to_conn)
+
         # Test case 1 - copy a user to a single user
-        comment = "Test case 1 - copy a single user joe_pass@user to " + \
-                  "a single user: jill@user"
+        test_num = 1
+        comment = ("Test case {0} - copy a single user joe_pass@user to a "
+                   "single user: jill@user".format(test_num))
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.show_user_grants(self.server2, "'jill'@'user'")
 
         # Test case 2 - copy a user to a multiple users
-        comment= "Test case 2 - copy a single user amy_nopass@user to " + \
-                            "multiple users: jack@user and john@user"
-        res = self.run_test_case(0, cmd_str + " amy_nopass@user " +
-                                 "jack:duh@user john@user", comment)
+        test_num += 1
+        comment = ("Test case {0} - copy a single user amy_nopass@user to "
+                   "multiple users: jack@user and john@user".format(test_num))
+        res = self.run_test_case(0,
+                                 cmd_str + " amy_nopass@user " +
+                                 "jack:duh@user john@user",
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        self.show_user_grants(self.server2,"jack@user")
-        self.show_user_grants(self.server2,"john@user")
+        self.show_user_grants(self.server2, "jack@user")
+        self.show_user_grants(self.server2, "john@user")
 
-        # Test case 3 - attempt to copy a non-existant user
-        comment= "Test case 3 - attempt to copy a non-existant user"
+        # Test case 3 - attempt to copy a non-existent user
+        test_num += 1
+        comment = ("Test case {0} - attempt to copy a non-existent "
+                   "user".format(test_num))
         res = self.run_test_case(1, cmd_str + " nosuch@user jack@user",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Test case 4 - attempt to copy a user to a user that already exists
-        comment= "Test case 4 - attempt to copy a user to a user that " + \
-                 "already exists"
+        test_num += 1
+        comment = ("Test case {0} - attempt to copy a user to a user that "
+                   "already exists".format(test_num))
         res = self.run_test_case(1, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Test case 5 - attempt to copy a user to a user that already exists
         #               with overwrite
+        test_num += 1
         self.show_user_grants(self.server2, "jill@user")
-        comment= "Test case 5 - attempt to copy a user to a user that " + \
-                 "already exists with --force"
-        res = self.run_test_case(0, cmd_str + " joe_pass@user " +
-                                 "jill:duh@user --force", comment)
+        comment = ("Test case {0} - attempt to copy a user to a user that "
+                   "already exists with --force".format(test_num))
+        res = self.run_test_case(0,
+                                 cmd_str + " joe_pass@user " +
+                                 "jill:duh@user --force",
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # No show overwritten grants
         self.show_user_grants(self.server2, "jill@user")
@@ -122,22 +136,30 @@ class test(mutlib.System_test):
             self.server1.exec_query("CREATE USER joe_pass@'%'")
             self.server1.exec_query("GRANT ALL ON util_test.* TO "
                                     "joe_pass@'%'")
-        except UtilDBError, e:
-            raise MUTLibError("Cannot create user with global grants: %s" %
-                               e.errmsg)
-            
-        comment= "Test case 6 - show clone without --include-global-privileges"
-        res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
-                                 "joe_nopass@user --force ", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+        except UtilDBError as err:
+            raise MUTLibError("Cannot create user with global grants: "
+                              "{0}".format(err.errmsg))
 
-        comment= "Test case 7 - show clone with --include-global-privileges"
-        res = self.run_test_case(0, cmd_str + " -v joe_pass@user " +
-                                 "joe_nopass@user --force " +
-                                 "--include-global-privileges", comment)
+        test_num += 1
+        comment = ("Test case {0} - show clone without "
+                   "--include-global-privileges".format(test_num))
+        res = self.run_test_case(0,
+                                 cmd_str + " -v joe_pass@user " +
+                                 "joe_nopass@user --force ",
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show clone with "
+                   "--include-global-privileges".format(test_num))
+        res = self.run_test_case(0,
+                                 cmd_str + (" -v joe_pass@user "
+                                            "joe_nopass@user --force "
+                                            "--include-global-privileges"),
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_substring("on [::1]", "on localhost")
 
@@ -145,50 +167,41 @@ class test(mutlib.System_test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def drop_user(self, user_name, server):
         user = User(server, user_name)
         if user.exists():
             res = user.drop()
-            if res is not None:
-                print "cleanup: failed to drop user %s" % user_name
+            if not res:
+                print("cleanup: failed to drop user {0}".format(user_name))
         return True
 
     def drop_all(self):
-        res = self.drop_user("joe_pass@'%'", self.server1)
-        res = self.drop_user("joe_pass@user", self.server1)
-        res = self.drop_user("'joe_nopass'@'user'", self.server1)
-        res = self.drop_user("'amy_nopass'@'user'", self.server1)
-        res = self.drop_user("'jill'@'user'", self.server1)
-        res = self.drop_user("'jack'@'user'", self.server1)
-        res = self.drop_user("'john'@'user'", self.server1)
-        res = self.drop_user("joe_pass@'%'", self.server2)
-        res = self.drop_user("joe_pass@user", self.server2)
-        res = self.drop_user("'joe_nopass'@'user'", self.server2)
-        res = self.drop_user("'amy_nopass'@'user'", self.server2)
-        res = self.drop_user("'jill'@'user'", self.server2)
-        res = self.drop_user("'jack'@'user'", self.server2)
-        res = self.drop_user("'john'@'user'", self.server2)
+        user_drop_lst = ["joe_pass@'%'", "joe_pass@user",
+                         "'joe_nopass'@'user'", "'amy_nopass'@'user'",
+                         "'jill'@'user'", "'jack'@'user'", "'john'@'user'"]
+
+        for user in user_drop_lst:
+            self.drop_user(user, self.server1)
+            self.drop_user(user, self.server2)
+
         query = "DROP DATABASE util_test"
         try:
-            res = self.server1.exec_query(query)
-        except:
+            self.server1.exec_query(query)
+        except UtilError:
             pass
         try:
-            res = self.server2.exec_query(query)
-        except:
+            self.server2.exec_query(query)
+        except UtilError:
             pass
-    
+
     def cleanup(self):
-        if self.res_fname:
+        try:
             os.unlink(self.res_fname)
+        except OSError:
+            pass
         self.drop_all()
         return True
-
-
-
-
-

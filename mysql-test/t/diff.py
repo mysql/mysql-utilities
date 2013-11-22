@@ -17,8 +17,7 @@
 import os
 import mutlib
 
-from mysql.utilities.exception import MUTLibError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 
 class test(mutlib.System_test):
@@ -69,8 +68,7 @@ class test(mutlib.System_test):
 
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath(
-            "./std_data/db_compare_backtick.sql"
-        )
+            "./std_data/db_compare_backtick.sql")
         try:
             self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
             self.server2.read_and_exec_SQL(data_file_backticks, self.debug)
@@ -95,14 +93,11 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
 
         s1_conn = "--server1={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         s2_conn = "--server2={0}".format(
-            self.build_connection_string(self.server2)
-        )
+            self.build_connection_string(self.server2))
         s2_conn_dupe = "--server2={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_base = "mysqldiff.py {0} {1} ".format(s1_conn, s2_conn)
 
@@ -115,7 +110,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff a single object - not "
-                   "same").format(test_num)
+                   "same".format(test_num))
         cmd = "{0} util_test.t2:util_test.t2".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -123,7 +118,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff a single object - is "
-                   "same").format(test_num)
+                   "same".format(test_num))
         cmd = "{0} util_test.t3:util_test.t3".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -131,18 +126,18 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff multiple objects - are "
-                   "same").format(test_num)
+                   "same".format(test_num))
         cmd = ("{0} util_test.t3:util_test.t3 "
-               "util_test.t4:util_test.t4").format(cmd_base)
+               "util_test.t4:util_test.t4".format(cmd_base))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - diff multiple objects + database - some "
-                   "same").format(test_num)
+                   "same".format(test_num))
         cmd = ("{0} util_test.t3:util_test.t3 util_test.t4:util_test.t4 "
-               "util_test:util_test --force").format(cmd_base)
+               "util_test:util_test --force".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -153,16 +148,16 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff two databases on same server "
-                   "w/server2").format(test_num)
+                   "w/server2".format(test_num))
         cmd = ("mysqldiff.py {0} {1} "
-               "util_test:util_test1").format(s1_conn, s2_conn_dupe)
+               "util_test:util_test1".format(s1_conn, s2_conn_dupe))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - diff two databases on same "
-                   "server").format(test_num)
+                   "server".format(test_num))
         cmd = "mysqldiff.py {0} util_test:util_test1".format(s1_conn)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -170,7 +165,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff a sample database with weird names "
-                   "(backticks)").format(test_num)
+                   "(backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db.``:db`:`db.``:db`'"
@@ -183,7 +178,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - diff a single object with weird names "
-                   "(backticks)").format(test_num)
+                   "(backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = ("'`db.``:db`.```t``.``export_2`:"
@@ -199,7 +194,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - diff a sample database containing tables "
                    "with weird names (no backticks) and different table "
-                   "options.").format(test_num)
+                   "options.".format(test_num))
         cmd_arg = "db_diff_test:db_diff_test"
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
@@ -209,7 +204,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - diff a sample database containing tables "
                    "with weird names (no backticks) and skipping "
-                   "table options.").format(test_num)
+                   "table options.".format(test_num))
         cmd_arg = "db_diff_test:db_diff_test --skip-table-options"
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
@@ -220,19 +215,21 @@ class test(mutlib.System_test):
 
         # Create the same PROCEDURE on each server with the same name of an
         # already existing TABLE (i.e., ```t``export_1`).
-        self.server1.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 1")
-        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 1")
+        self.server1.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 1")
+        self.server2.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 1")
         if os.name == 'posix':
             cmd_arg = "'`db.``:db`:`db.``:db`'"
         else:
             cmd_arg = '"`db.``:db`:`db.``:db`"'
-        # Execute test (no differences expected)
+            # Execute test (no differences expected)
         test_num += 1
         comment = ("Test case {0} - diff a database with objects of "
                    "different types with the same name "
-                   "(no differences)").format(test_num)
+                   "(no differences)".format(test_num))
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -241,13 +238,14 @@ class test(mutlib.System_test):
         # Replace the PROCEDURE previously created on one of the servers by a
         # different one.
         self.server2.exec_query("DROP PROCEDURE `db.``:db`.```t``export_1`")
-        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 2")
+        self.server2.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 2")
         # Execute test (differences expected)
         test_num += 1
         comment = ("Test case {0} - diff a database with objects of "
                    "different types with the same name "
-                   "(with differences)").format(test_num)
+                   "(with differences)".format(test_num))
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -260,11 +258,11 @@ class test(mutlib.System_test):
         else:
             cmd_arg = ('"`db.``:db`.```t``export_1`:'
                        '`db.``:db`.```t``export_1`"')
-        # Execute test for specific objects (differences expected)
+            # Execute test for specific objects (differences expected)
         test_num += 1
         comment = ("Test case {0} - diff specific objects of "
                    "different types with the same name "
-                   "(with differences)").format(test_num)
+                   "(with differences)".format(test_num))
         cmd = "mysqldiff.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -272,7 +270,7 @@ class test(mutlib.System_test):
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
-        
+
         self.replace_result("+++ util_test.t1", "+++ util_test.t1\n")
         self.replace_result("+++ util_test.t2", "+++ util_test.t2\n")
         self.replace_result("--- util_test.t1", "--- util_test.t1\n")
@@ -281,10 +279,10 @@ class test(mutlib.System_test):
         self.replace_substring("on [::1]", "on localhost")
 
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
 
@@ -310,7 +308,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

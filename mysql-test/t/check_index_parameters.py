@@ -34,8 +34,7 @@ class test(check_index.test):
     def run(self):
         self.res_fname = "result.txt"
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_str = "mysqlindexcheck.py {0}".format(from_conn)
 
@@ -52,7 +51,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - show drops for a table with dupe (-vv) "
-                   "indexes").format(test_num)
+                   "indexes".format(test_num))
         cmd = "{0} util_test_a.t1 --show-drops -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -60,7 +59,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - show drops for a table with dupe "
-                   "indexes").format(test_num)
+                   "indexes".format(test_num))
         cmd = "{0} util_test_a.t1 -d".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -68,7 +67,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - show drops for a table without dupe (-vv) "
-                   "indexes").format(test_num)
+                   "indexes".format(test_num))
         cmd = "{0} util_test_c.t6 --show-drops -vv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -76,7 +75,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - same as test case 2 but "
-                   "quiet").format(test_num)
+                   "quiet".format(test_num))
         cmd = "{0} util_test_a.t1 --show-drops".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -84,7 +83,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - same as test case 4 but "
-                   "quiet").format(test_num)
+                   "quiet".format(test_num))
         cmd = "{0} util_test_c.t6 -d".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -106,7 +105,7 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - find redundancy with the clustered "
-                   "index (InnoDB)").format(test_num)
+                   "index (InnoDB)".format(test_num))
         cmd = "{0} util_test_d.cluster_idx -d -i --stats -vvv".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -114,17 +113,18 @@ class test(check_index.test):
 
         test_num += 1
         comment = ("Test case {0} - not find redundancy with the clustered "
-                   "index (not InnoDB)").format(test_num)
-        cmd = "{0} util_test_d.no_cluster_idx -d -i --stats -vvv".format(cmd_str)
+                   "index (not InnoDB)".format(test_num))
+        cmd = "{0} util_test_d.no_cluster_idx -d -i --stats -vvv".format(
+            cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case {0} - find various redundancies (and duplicates) "
-                   "with the clustered index (InnoDB)").format(test_num)
+        comment = ("Test case {0} - find various redundancies (and duplicates)"
+                   " with the clustered index (InnoDB)".format(test_num))
         cmd = ("{0} util_test_d.various_cluster_idx -d -i --stats "
-               "-vvv").format(cmd_str)
+               "-vvv".format(cmd_str))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

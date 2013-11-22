@@ -45,22 +45,22 @@ class test(copy_db_parameters.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = ("--server="
-                     "{0}").format(self.build_connection_string(self.server1))
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
         cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
 
         test_num = 1
         comment = "Test case {0} - export metadata only".format(test_num)
         cmd_str = ("{0} --export=definitions --format=SQL "
-                   "--skip=events ").format(cmd)
+                   "--skip=events ".format(cmd))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - export data only - single "
-                   "rows").format(test_num)
+                   "rows".format(test_num))
         cmd_str = "{0} --export=data --format=SQL ".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -68,7 +68,7 @@ class test(copy_db_parameters.test):
 
         test_num += 1
         comment = ("Test case {0} - export data only - bulk "
-                   "insert").format(test_num)
+                   "insert".format(test_num))
         cmd_str = "{0} --export=DATA --format=SQL --bulk-insert".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -83,18 +83,18 @@ class test(copy_db_parameters.test):
 
         test_num += 1
         comment = ("Test case {0} - export data and metadata with "
-                   "quiet").format(test_num)
+                   "quiet".format(test_num))
         cmd_str = ("{0} --export=both --format=SQL --skip=events "
-                   "--quiet").format(cmd)
+                   "--quiet".format(cmd))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - export data and metadata with "
-                   "debug").format(test_num)
+                   "debug".format(test_num))
         cmd_str = ("{0} --export=both --format=SQL --skip=events "
-                   "-vvv").format(cmd)
+                   "-vvv".format(cmd))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -108,7 +108,7 @@ class test(copy_db_parameters.test):
         cmd_str = "mysqldbexport.py {0} {1} --skip-gtid".format(from_conn,
                                                                 cmd_arg)
         comment = ("Test case {0} - export database with weird names "
-                   "(backticks)").format(test_num)
+                   "(backticks)".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -120,14 +120,14 @@ class test(copy_db_parameters.test):
                         "VALUES ('{0}')".format(special_chars))
         self.server1.exec_query(insert_query)
         comment = ("Test case {0} - export data with special "
-                   "characters").format(test_num)
+                   "characters".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - export data with unicode "
-                   "characters").format(test_num)
+                   "characters".format(test_num))
         cmd_str = "{0} --export=data --format=SQL import_test".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:

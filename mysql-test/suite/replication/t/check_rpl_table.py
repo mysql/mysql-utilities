@@ -14,12 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import replicate
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
-_MYSQLD = ' --mysqld="--log-bin=mysql-bin --sync-master-info=1 --master-info-repository=table"'
+_MYSQLD = (' --mysqld="--log-bin=mysql-bin --sync-master-info=1 '
+           '--master-info-repository=table"')
+
 
 class test(replicate.test):
     """check replication conditions
@@ -54,59 +56,68 @@ class test(replicate.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        master_str = "--master=%s" % self.build_connection_string(self.server2)
-        slave_str = " --slave=%s" % self.build_connection_string(self.server3)
+        master_str = "--master={0}".format(
+            self.build_connection_string(self.server2))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server3))
         conn_str = master_str + slave_str
         
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
-            res = self.exec_util(cmd, self.res_fname)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd, self.res_fname)
+        except MUTLibError as err:
+            raise MUTLibError(err.errmsg)
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
-        comment = "Test case 1 - normal run"
+        test_num = 1
+        comment = "Test case {0} - normal run".format(test_num)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
             
-        comment = "Test case 2 - verbose run"
+        test_num += 1
+        comment = "Test case {0} - verbose run".format(test_num)
         cmd_opts = " -vv"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - with show slave status"
+        test_num += 1
+        comment = "Test case {0} - with show slave status".format(test_num)
         cmd_opts = " -s"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
             
         self.server1.exec_query("STOP SLAVE")
         self.server1.exec_query("CHANGE MASTER TO MASTER_HOST='127.0.0.1'")
         self.server1.exec_query("START SLAVE")
 
-        comment = "Test case 4 - normal run with loopback"
+        test_num += 1
+        comment = "Test case {0} - normal run with loopback".format(test_num)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.server2.exec_query("DROP USER rpl@localhost")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@'%'"
                                 " IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
-        comment = "Test case 5 - normal run with grant for rpl@'%'"
+        test_num += 1
+        comment = "Test case {0} - normal run with grant for rpl@'%'".format(
+            test_num)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
             
         self.server2.exec_query("DROP USER rpl@'%'")
-        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@localhost"
-                                " IDENTIFIED BY 'rpl'")
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
+                                "TO rpl@localhost "
+                                "IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
         self.do_replacements()

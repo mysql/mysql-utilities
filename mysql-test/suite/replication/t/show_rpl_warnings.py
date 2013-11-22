@@ -14,10 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import mutlib
 import rpl_admin
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(rpl_admin.test):
     """test show replication topology
@@ -41,18 +42,19 @@ class test(rpl_admin.test):
         self.server5.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
                                 "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
 
-        self.master_str = " --master=%s" % \
-                          self.build_connection_string(self.server1)
+        self.master_str = " --master={0}".format(
+            self.build_connection_string(self.server1))
         try:
             self.server5.exec_query("STOP SLAVE")
             self.server5.exec_query("RESET SLAVE")
-        except:
-            pass
+        except UtilError as err:
+            raise MUTLibError("ERROR resetting slave: {0}".format(err.errmsg))
 
-        slave_str = " --slave=%s" % self.build_connection_string(self.server5)
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server5))
         conn_str = self.master_str + slave_str
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
-        res1 = self.exec_util(cmd, self.res_fname)
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
+        self.exec_util(cmd, self.res_fname)
 
         return res
 
@@ -60,26 +62,21 @@ class test(rpl_admin.test):
         self.res_fname = "result.txt"
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
-        slave1_conn = self.build_connection_string(self.server2).strip(' ')
-        slave2_conn = self.build_connection_string(self.server3).strip(' ')
-        slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        slave4_conn = self.build_connection_string(self.server5).strip(' ')
 
-        master_str = "--master=" + master_conn
-        slaves_str = "--slaves=" + \
-                     ",".join([slave1_conn, slave2_conn, slave3_conn])
-
-        comment = "Test case 1 - warning for missing --report-host"
-        cmd_str = "mysqlrplshow.py --master=%s --disco=root:root " % master_conn
+        test_num = 1
+        comment = "Test case {0} - warning for missing --report-host".format(
+            test_num)
+        cmd_str = "mysqlrplshow.py --master={0} --disco=root:root ".format(
+            master_conn)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
             self.server5.exec_query("STOP SLAVE")
             self.server5.exec_query("RESET SLAVE")
-        except:
-            pass
+        except UtilError as err:
+            raise MUTLibError("ERROR resetting slave: {0}".format(err.errmsg))
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)

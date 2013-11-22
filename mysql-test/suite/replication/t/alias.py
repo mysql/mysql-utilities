@@ -17,9 +17,10 @@
 import socket
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _MASTER_ALIASES = ['127.0.0.1', 'localhost']
+
 
 class test(mutlib.System_test):
     """setup replication
@@ -43,15 +44,15 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication slave " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication slave "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "rep_slave", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "rep_slave",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server1 = res[0]
@@ -62,42 +63,49 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication master " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication master "
+                                  "server_id: {0}".format(err.errmsg))
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                                "rep_master", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s2_serverid, "rep_master",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
 
-        self.server1.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % self.server1.host)
+        self.server1.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' IDENTIFIED "
+                                "BY 'root'".format(self.server1.host))
 
         host_ip = socket.gethostbyname_ex(socket.gethostname())
         _MASTER_ALIASES.append(host_ip[2][0])
         _MASTER_ALIASES.append(host_ip[0])
 
         for ip in host_ip[2]:
-            self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % ip)
-            self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'%s' IDENTIFIED BY 'rpl'" % ip)
+            self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' "
+                                    "IDENTIFIED BY 'root'".format(ip))
+            self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
+                                    "'rpl'@'{0}' IDENTIFIED BY "
+                                    "'rpl'".format(ip))
 
         for alias in _MASTER_ALIASES:
-            self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'%s' IDENTIFIED BY 'root'" % alias)
-            self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'%s' IDENTIFIED BY 'rpl'" % alias)
+            self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' "
+                                    "IDENTIFIED BY 'root'".format(alias))
+            self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
+                                    "'rpl'@'{0}' IDENTIFIED BY "
+                                    "'rpl'".format(alias))
 
         return True
 
     def run_test_case(self, master_host, comment):
 
-        from mysql.utilities.common.server import Server
-
-        master_str = "--master=root:root@%s:%s" % (master_host, self.server2.port)
-        slave_str = " --slave=root:root@%s:%s" % (self.server1.host, self.server1.port)
+        master_str = "--master=root:root@{0}:{1}".format(master_host,
+                                                         self.server2.port)
+        slave_str = " --slave=root:root@{0}:{1}".format(self.server1.host,
+                                                        self.server1.port)
         conn_str = master_str + slave_str
 
         if self.debug:
@@ -105,27 +113,29 @@ class test(mutlib.System_test):
 
         # Stop and reset the slave
         try:
-            res = self.server1.exec_query("STOP SLAVE")
-            res = self.server1.exec_query("RESET SLAVE")
-        except:
-            raise MUTLibError("%s: Failed to stop/reset slave." % comment)
+            self.server1.exec_query("STOP SLAVE")
+            self.server1.exec_query("RESET SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop/reset slave.".format(
+                comment))
 
         # Setup replication
-        self.results.append(comment+'\n')
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        self.results.append('{0}\n'.format(comment))
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         if self.debug:
-            self.results.append(cmd+'\n')
+            self.results.append('{0}\n'.format(comment))
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
             return False
 
         # Run check replication
-        cmd = "mysqlrplcheck.py %s " % conn_str
-        self.results.append(cmd+'\n')
+        cmd = "mysqlrplcheck.py {0} ".format(conn_str)
+        self.results.append('{0}\n'.format(cmd))
         res = self.exec_util(cmd, self.res_fname)
-        for line in open(self.res_fname).readlines():
-            self.results.append(line)
-        self.results.append("\n")
+        with open(self.res_fname) as f:
+            for line in f:
+                self.results.append(line)
+            self.results.append("\n")
         if res != 0:
             return False
 
@@ -136,10 +146,10 @@ class test(mutlib.System_test):
 
         test_num = 1
         for alias in _MASTER_ALIASES:
-            comment = "Test case %s - master as %s." % (test_num, alias)
+            comment = "Test case {0} - master as {1}.".format(test_num, alias)
             res = self.run_test_case(alias, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
         self.replace_substring(str(self.server1.port), "PORT1")

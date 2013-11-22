@@ -41,16 +41,18 @@ class test(mutlib.System_test):
         return True
   
     def get_result(self):
-        str = None
+        str_ = None
         if self.result != 0:
-            str = "Unexpected return code: %d\n" % (self.result)
-        return (self.result == 0, str)
+            str_ = "Unexpected return code: {0}\n".format(self.result)
+        return self.result == 0, str_
         
     def record(self):
         # Not a comparative test, returning True
         return True
     
     def cleanup(self):
-        os.unlink("./result.txt")
+        try:
+            os.unlink("./result.txt")
+        except OSError:
+            pass
         return True
-

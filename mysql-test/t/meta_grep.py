@@ -39,8 +39,7 @@ class test(mutlib.System_test):
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
                 raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
         else:
             num_server -= 1  # Get last server in list
         self.server1 = self.servers.get_server(num_server)
@@ -52,15 +51,14 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file, err.errmsg))
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
 
         from_conn = self.build_connection_string(self.server1)
 
-        cmd_base = (
-            "mysqlmetagrep.py --server={0} --database=util_test"
-        ).format(from_conn)
+        cmd_base = ("mysqlmetagrep.py --server={0} "
+                    "--database=util_test".format(from_conn))
 
         test_num = 1
         comment = "Test case {0} - find objects simple search".format(test_num)
@@ -88,7 +86,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - find objects regexp search with "
-                   "type").format(test_num)
+                   "type".format(test_num))
         cmd = "{0} -Gb --pattern=t2 --search=table".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -99,7 +97,7 @@ class test(mutlib.System_test):
         for frmt in _FORMATS:
             test_num += 1
             comment = ("Test case {0} - find objects format="
-                       "{1}").format(test_num, frmt)
+                       "{1}".format(test_num, frmt))
             cmd = "{0} --format={1} -Gb --pattern=t2".format(cmd_base, frmt)
             res = self.run_test_case(0, cmd, comment)
             if not res:
@@ -108,7 +106,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - find LIKE pattern in object body "
-                   "(including VIEWS).").format(test_num)
+                   "(including VIEWS).".format(test_num))
         cmd = "{0} --body --pattern=%t1%".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -117,7 +115,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - find REGEXP pattern in object body "
-                   "(including VIEW).").format(test_num)
+                   "(including VIEW).".format(test_num))
         cmd = "{0} -bG --pattern=t1".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:

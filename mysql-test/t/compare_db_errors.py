@@ -16,7 +16,8 @@
 #
 import os
 import compare_db
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(compare_db.test):
     """check errors for dbcompare
@@ -33,8 +34,9 @@ class test(compare_db.test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: " + e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         return True
@@ -62,10 +64,10 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
+        cmd_str = "mysqldbcompare.py {0} {1}".format(s1_conn, s2_conn)
         cmd_opts = " inventory.inventory"
         comment = ("Test case {0} - missing backticks{1} "
-                   "").format(test_num, cmd_opts)
+                   "".format(test_num, cmd_opts))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -76,18 +78,19 @@ class test(compare_db.test):
             cmd_opts = "'`inventory.inventory`'"
         else:
             cmd_opts = '"`inventory.inventory`"'
-        cmd_str = "mysqldbcompare.py %s %s %s" % (s1_conn, s2_conn, cmd_opts)
+        cmd_str = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
+                                                         cmd_opts)
         comment = ("Test case {0} - non existing database "
-                   "'`inventory.inventory`'").format(test_num)
+                   "'`inventory.inventory`'".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = "mysqldbcompare.py %s %s" % (s1_conn, s2_conn)
+        cmd_str = "mysqldbcompare.py {0} {1}".format(s1_conn, s2_conn)
         cmd_opts = " :inventory"
-        comment = ("Test case {0} - invalid format{1} "
-                   "").format(test_num, cmd_opts)
+        comment = ("Test case {0} - invalid format{1} ".format(test_num,
+                                                               cmd_opts))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -97,7 +100,7 @@ class test(compare_db.test):
                    "".format(s1_conn, s2_conn, "inventory:inventory -a"))
         cmd_opts = "--span-key-size=A"
         comment = ("Test case {0} - invalid value for {1} "
-                   "").format(test_num, cmd_opts)
+                   "".format(test_num, cmd_opts))
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -168,11 +171,13 @@ class test(compare_db.test):
 
     def cleanup(self):
         try:
-            self.server1.exec_query("DROP DATABASE inventory")
-        except:
-            pass
+            self.server1.exec_query("DROP DATABASE IF EXISTS inventory")
+        except UtilError as err:
+            raise MUTLibError("Unable to drop inventory database: "
+                              "{0}".format(err.errmsg))
         try:
-            self.server2.exec_query("DROP DATABASE inventory")
-        except:
-            pass
+            self.server2.exec_query("DROP DATABASE IF EXISTS inventory")
+        except UtilError as err:
+            raise MUTLibError("Unable to drop inventory database: "
+                              "{0}".format(err.errmsg))
         return compare_db.test.cleanup(self)

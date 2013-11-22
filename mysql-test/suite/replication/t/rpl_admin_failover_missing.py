@@ -17,17 +17,17 @@
 import mutlib
 import rpl_admin
 import tempfile
-from mysql.utilities.exception import MUTLibError, UtilRplError
+from mysql.utilities.exception import MUTLibError, UtilRplError, UtilError
 from mysql.utilities.common.format import format_tabular_list
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin --skip-slave-start',
                                 '--log-slave-updates --gtid-mode=on',
                                 '--enforce-gtid-consistency',
                                 '--report-host=localhost',
-                                '--report-port=%s --sync-master-info=1',
+                                '--report-port={0} --sync-master-info=1',
                                 '--master-info-repository=table"'])
 
-_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
+_GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('{0}', {1})"
 
 _GRANT_QUERY = "GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'"
 _SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
@@ -50,15 +50,15 @@ class test(rpl_admin.test):
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
@@ -83,17 +83,16 @@ class test(rpl_admin.test):
         try:
             self.server5.exec_query("STOP SLAVE")
             self.server5.exec_query("RESET SLAVE")
-        except:
-            pass
+        except UtilError:
+            raise MUTLibError("Unable to reset slave")
 
         cmd = " ".join(["mysqlreplicate.py --rpl-user=rpl:rpl ",
-                        " --slave=%s" % self.slave4_conn,
-                        " --master=%s" % self.master_conn])
-        res = self.exec_util(cmd, self.res_fname)
+                        " --slave={0}".format(self.slave4_conn),
+                        " --master={0}".format(self.master_conn)])
+        self.exec_util(cmd, self.res_fname)
 
         self.servers_list = [self.server1, self.server2, self.server3,
                              self.server4, self.server5]
-
 
         return True
 
@@ -102,21 +101,21 @@ class test(rpl_admin.test):
         master_gtids = master_gtid[0][0].split('\n')
         for gtid in master_gtids:
             try:
-                res = slave.exec_query(_GTID_WAIT % (gtid.strip(','), 300))
-            except UtilRplError, e:
-                raise MUTLibError("Error executing %s: %s" %
-                                   ((_GTID_WAIT % (gtid.strip(','), 300)),
-                                   e.errmsg))
+                slave.exec_query(_GTID_WAIT.format(gtid.strip(','), 300))
+            except UtilRplError as err:
+                raise MUTLibError("Error executing {0}: {1}".format(
+                    _GTID_WAIT.format(gtid.strip(','), 300), err.errmsg))
         return
 
     def dump_table(self, server):
-        header = "# Dump of table test_relay.t1 for server %s:\n" % server.role
+        header = "# Dump of table test_relay.t1 for server {0}:\n".format(
+            server.role)
         self.results.append(header)
         if self.debug:
             print header
         rows = server.exec_query("SELECT * FROM test_relay.t1")
         f_out = tempfile.TemporaryFile()
-        format_tabular_list(f_out, ['a', 'b'], rows, {"separator" : ","})
+        format_tabular_list(f_out, ['a', 'b'], rows, {"separator": ","})
         f_out.seek(0)
         for row in f_out.readlines():
             self.results.append(row)
@@ -176,17 +175,19 @@ class test(rpl_admin.test):
         for server in self.servers_list:
             self.dump_table(server)
 
-        comment = "Test case %s - failover to %s:%s with relay log entries" % \
-                  (test_num, self.server2.host, self.server2.port)
+        comment = ("Test case {0} - failover to {1}:{2} with relay log "
+                   "entries".format(test_num, self.server2.host,
+                                    self.server2.port))
         slaves = ",".join([self.slave2_conn, self.slave3_conn,
                            self.slave4_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % self.master_conn
-        cmd_opts = " --candidates=%s  " % self.slave1_conn
-        cmd_opts += " --slaves=%s failover -vvv --force" % slaves
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(self.master_conn)
+        cmd_opts = (" --candidates={0} --slaves={1} failover -vvv "
+                    "--force".format(self.slave1_conn, slaves))
+
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Wait for slaves
@@ -197,16 +198,16 @@ class test(rpl_admin.test):
         for server in self.servers_list:
             self.dump_table(server)
 
-        comment = ("Test case %s - failover to %s:%s with skipping slaves" %
-                   (test_num, self.server3.host, self.server3.port))
+        comment = ("Test case {0} - failover to {1}:{2} with skipping "
+                   "slaves".format(test_num, self.server3.host,
+                                   self.server3.port))
         slaves = ",".join([self.slave3_conn, self.slave4_conn])
-        cmd_str = ("mysqlrpladmin.py --master=%s --candidates=%s --slaves=%s "
-                   "failover -vvv" %
-                   (self.slave1_conn, self.slave2_conn, slaves))
+        cmd_str = ("mysqlrpladmin.py --master={0} --candidates={1} "
+                   "--slaves={2} failover -vvv".format(
+                   self.slave1_conn, self.slave2_conn, slaves))
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        test_num += 1
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)

@@ -142,53 +142,55 @@ class test(export_basic.test):
 
         # First, with headers
         if full_format:
-            for format in _FORMATS:
-                cmd_variant = cmd_opts + format
-                comment = "Test case %s - %s format" % \
-                          (starting_case_num, format)
+            for format_ in _FORMATS:
+                cmd_variant = cmd_opts + format_
+                comment = "Test case {0} - {1} format".format(
+                    starting_case_num, format_)
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTLibError("%s: failed" % comment)
+                    raise MUTLibError("{0}: failed".format(comment))
 
         # Now without headers
         if no_headers:
-            for format in _FORMATS:
-                cmd_variant = cmd_opts + format + " --no-headers"
-                comment = "Test case %s - %s format no headers" % \
-                          (starting_case_num, format)
+            for format_ in _FORMATS:
+                cmd_variant = cmd_opts + format_ + " --no-headers"
+                comment = "Test case {0} - {1} format no headers".format(
+                    starting_case_num, format_)
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTLibError("%s: failed" % comment)
+                    raise MUTLibError("{0}: failed".format(comment))
 
         # Now the abbreviations
         if abbrev:
-            for format in _FORMATS_ABBREV:
-                cmd_variant = cmd_opts + format
-                comment = "Test case %s - %s format" % \
-                          (starting_case_num, format)
+            for format_ in _FORMATS_ABBREV:
+                cmd_variant = cmd_opts + format_
+                comment = "Test case {0} - {1} format".format(
+                    starting_case_num, format_)
                 res = self.run_test_case(0, cmd_variant, comment)
                 starting_case_num += 1
                 if not res:
-                    raise MUTLibError("%s: failed" % comment)
+                    raise MUTLibError("{0}: failed".format(comment))
 
         # Conduct format and display combination tests
 
         _DISPLAYS = ("BRIEF", "FULL", "NAMES")
         # SQL format not valid
-        _FORMAT_DISPLAY = ("GRID","CSV","TAB","VERTICAL")
+        _FORMAT_DISPLAY = ("GRID", "CSV", "TAB", "VERTICAL")
 
         if displays:
-            for format in _FORMAT_DISPLAY:
+            for format_ in _FORMAT_DISPLAY:
                 for display in _DISPLAYS:
-                    cmd_variant = cmd_opts + format + " --display=%s" % display
-                    comment = "Test case %s - %s format with %s display" % \
-                              (starting_case_num, format, display)
+                    cmd_variant = cmd_opts + "{0} --display={1}".format(
+                        format_, display)
+                    comment = ("Test case {0} - {1} format with {2} "
+                               "display".format(starting_case_num, format_,
+                                                display))
                     res = self.run_test_case(0, cmd_variant, comment)
                     starting_case_num += 1
                     if not res:
-                        raise MUTLibError("%s: failed" % comment)
+                        raise MUTLibError("{0}: failed".format(comment))
 
         # Perform masking for deterministic output
 
@@ -215,10 +217,10 @@ class test(export_basic.test):
 
     def _mask_grid(self):
         self.mask_column_result("| def ", "|", 2, " None           ")
-        self.mask_column_result("| None           | util_test       | trg", "|",
-                                2, " None             ")
-        self.mask_column_result("| None             | util_test       | trg", "|",
-                                6, " None                  ")
+        self.mask_column_result("| None           | util_test       | trg",
+                                "|", 2, " None             ")
+        self.mask_column_result("| None             | util_test       | trg",
+                                "|", 6, " None                  ")
         self.mask_column_result("| None           | util_test     | t", "|",
                                 16, " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| None           | util_test     | t", "|",
@@ -230,119 +232,108 @@ class test(export_basic.test):
         self.mask_column_result("| None           | util_test     | t", "|",
                                 17, " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| None           | util_test "
-                                "    | e1          |", "|",
-                                14, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| util_test  | e1    |", "|",
-                                18, " X           ")
-        self.mask_column_result("| util_test  | e1    |", "|",
-                                9, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | e1    |", "|",
-                                10, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | e1    |", "|",
-                                12, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| e1    | root@localhost  |", "|",
-                                10, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| e1    | root@localhost  |", "|",
-                                14, " X           ")
-        self.mask_column_result("| util_test  | p1", "|",
-                                14, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | p1", "|",
-                                15, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | f1", "|",
-                                14, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | f1", "|",
-                                15, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | f2", "|",
-                                14, " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | f2", "|",
-                                15, " XXXX-XX-XX XX:XX:XX  ")
+                                "    | e1          |", "|", 14,
+                                " XXXX-XX-XX XX:XX:XX ")
+        self.mask_column_result("| util_test  | e1    |", "|", 18,
+                                " X           ")
+        self.mask_column_result("| util_test  | e1    |", "|", 9,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | e1    |", "|", 10,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | e1    |", "|", 12,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| e1    | root@localhost  |", "|", 10,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| e1    | root@localhost  |", "|", 14,
+                                " X           ")
+        self.mask_column_result("| util_test  | p1", "|", 14,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | p1", "|", 15,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f1", "|", 14,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f1", "|", 15,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f2", "|", 14,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f2", "|", 15,
+                                " XXXX-XX-XX XX:XX:XX  ")
 
     def _mask_csv(self):
-        self.mask_column_result("`e1`,root@localhost,", ",",
-                                5, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`,root@localhost,", ",",
-                                9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`,root@localhost,", ",",
-                                10, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`,root@localhost,", ",",
-                                13, "XX")
+        self.mask_column_result("`e1`,root@localhost,", ",", 5,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`,root@localhost,", ",", 9,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`,root@localhost,", ",", 10,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`,root@localhost,", ",", 13, "XX")
         self.mask_column_result("def,`util_test`,", ",", 1, "")
         self.mask_column_result(",`util_test`,`trg`", ",", 5, "")
-        self.mask_column_result(",`util_test`,`t", ",",
-                                10, "XXXXXXXXXX")
-        self.mask_column_result(",`util_test`,`t", ",",
-                                11, "XXXXXXXXXX")
-        self.mask_column_result(",`util_test`,`t", ",",
-                                13, "XXXXXXXXXX")
-        self.mask_column_result(",`util_test`,`t", ",",
-                                15, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",`util_test`,`t", ",",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",",
-                                13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",",
-                                14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",",
-                                13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",",
-                                14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`f2`,FUNCTION", ",",
-                                17, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`f2`,FUNCTION", ",",
-                                18, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`e1`", ",",
-                                8, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result(",`util_test`,`e1`", ",",
-                                17, "XX")
-        self.mask_column_result("`util_test`,`e1`", ",",
-                                9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`e1`", ",",
-                                11, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`,`e1`", ",",
-                                17, "XX")
+        self.mask_column_result(",`util_test`,`t", ",", 10, "XXXXXXXXXX")
+        self.mask_column_result(",`util_test`,`t", ",", 11, "XXXXXXXXXX")
+        self.mask_column_result(",`util_test`,`t", ",", 13, "XXXXXXXXXX")
+        self.mask_column_result(",`util_test`,`t", ",", 15,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",`util_test`,`t", ",", 16,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",", 13,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`p1`,PROCEDURE", ",", 14,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",", 13,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`f1`,FUNCTION", ",", 14,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`f2`,FUNCTION", ",", 17,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`f2`,FUNCTION", ",", 18,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`e1`", ",", 8,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result(",`util_test`,`e1`", ",", 17, "XX")
+        self.mask_column_result("`util_test`,`e1`", ",", 9,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`e1`", ",", 11,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`,`e1`", ",", 17, "XX")
 
     def _mask_tab(self):
-        self.mask_column_result("`e1`	root@localhost", "\t",
-                                5, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`	root@localhost", "\t",
-                                9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`	root@localhost", "\t",
-                                10, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`	root@localhost", "\t",
-                                13, "XX")
+        self.mask_column_result("`e1`	root@localhost", "\t", 5,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`	root@localhost", "\t", 9,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`	root@localhost", "\t", 10,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`	root@localhost", "\t", 13, "XX")
         self.mask_column_result("def	`util_test`	`t", "\t", 1, "")
         self.mask_column_result("def	`util_test`	`v", "\t", 1, "")
         self.mask_column_result("	`util_test`	`trg`", "\t", 5, "")
-        self.mask_column_result("	`util_test`	`t", "\t",
-                                10, "XXXXXX")
-        self.mask_column_result("	`util_test`	`t", "\t",
-                                11, "XXXXXXXX")
-        self.mask_column_result("	`util_test`	`t", "\t",
-                                13, "XX")
-        self.mask_column_result("	`util_test`	`t", "\t",
-                                15, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("	`util_test`	`t", "\t",
-                                16, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t",
-                                13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t",
-                                14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t",
-                                13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t",
-                                14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`f2`	FUNCTION", "\t",
-                                13, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`f2`	FUNCTION", "\t",
-                                14, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`e1`", "\t",
-                                8, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`e1`", "\t",
-                                17, "XX")
-        self.mask_column_result("`util_test`	`e1`", "\t",
-                                9, "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`util_test`	`e1`", "\t",
-                                11, "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	`util_test`	`t", "\t", 10, "XXXXXX")
+        self.mask_column_result("	`util_test`	`t", "\t", 11, "XXXXXXXX")
+        self.mask_column_result("	`util_test`	`t", "\t", 13, "XX")
+        self.mask_column_result("	`util_test`	`t", "\t", 15,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("	`util_test`	`t", "\t", 16,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t", 13,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`p1`	PROCEDURE", "\t", 14,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t", 13,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`f1`	FUNCTION", "\t", 14,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`f2`	FUNCTION", "\t", 13,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`f2`	FUNCTION", "\t", 14,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`e1`", "\t", 8,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`e1`", "\t", 17, "XX")
+        self.mask_column_result("`util_test`	`e1`", "\t", 9,
+                                "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`util_test`	`e1`", "\t", 11,
+                                "XXXX-XX-XX XX:XX:XX")
 
     def _mask_vertical(self):
         self.replace_result("                   UPDATE_TIME:",

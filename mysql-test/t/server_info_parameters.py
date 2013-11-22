@@ -14,12 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import server_info
 
 from mysql.utilities.exception import MUTLibError
 
-_FORMATS = ['GRID','CSV','TAB','VERTICAL']
+_FORMATS = ['GRID', 'CSV', 'TAB', 'VERTICAL']
 
 
 class test(server_info.test):
@@ -40,38 +39,40 @@ class test(server_info.test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        from_conn2 = "--server=" + self.build_connection_string(self.server2)
-        cmd_str = "mysqlserverinfo.py %s " % from_conn2
+        from_conn2 = "--server={0}".format(
+            self.build_connection_string(self.server2))
+        cmd_str = "mysqlserverinfo.py {0} ".format(from_conn2)
 
         test_num = 1
 
         cmd_opts = " --format=csv --help"
-        comment = "Test case %d - show help" % test_num
+        comment = "Test case {0} - show help".format(test_num)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask version information
         self.replace_result("MySQL Utilities mysqlserverinfo.py version",
                             "MySQL Utilities mysqlserverinfo.py version XXX\n")
         # Mask copyright date
         self.replace_result("Copyright (c)", "Copyright (c) YYYY Oracle "
-                            "and/or its affiliates. All rights reserved.\n")
+                                             "and/or its affiliates. All "
+                                             "rights reserved.\n")
 
         test_num += 1
         cmd_opts = " --format=csv --no-headers"
-        comment = "Test case %d - no headers" % test_num
+        comment = "Test case {0} - no headers".format(test_num)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        for format in _FORMATS:
-            cmd_opts = " --format=%s --no-headers" % format
+        for format_ in _FORMATS:
+            cmd_opts = " --format={0} --no-headers".format(format_)
             test_num += 1
-            comment = "Test case %d - %s" % (test_num, cmd_opts)
+            comment = "Test case {0} - {1}".format(test_num, cmd_opts)
             res = self.run_test_case(0, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
         cmd_str = self.start_stop_newserver(delete_log=False,
                                             stop_server=False)
@@ -79,17 +80,18 @@ class test(server_info.test):
         test_num += 1
         # We will also show that -vv does not produce any additional output.
         cmd_opts = " --format=vertical -vv"
-        comment = "Test case %d - verbose run against online server" % test_num
+        comment = "Test case {0} - verbose run against online server".format(
+            test_num)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         cmd_opts = " --format=vertical --show-servers"
-        comment = "Test case %d - show servers" % test_num
+        comment = "Test case {0} - show servers".format(test_num)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
@@ -106,7 +108,7 @@ class test(server_info.test):
         test_num += 1
         comment = "Test case {0} - run against offline server".format(test_num)
         cmd_opts = ("--format=vertical --start --basedir={0} --datadir={1} "
-                    "--start-timeout=0").format(self.basedir, self.datadir3)
+                    "--start-timeout=0".format(self.basedir, self.datadir3))
         cmd = "{0} {1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -129,6 +131,7 @@ class test(server_info.test):
 
     def cleanup(self):
         from mysql.utilities.common.tools import delete_directory
+
         if self.server3:
             delete_directory(self.datadir3)
             self.server3 = None

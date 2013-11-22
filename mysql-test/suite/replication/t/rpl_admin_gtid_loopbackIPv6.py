@@ -15,17 +15,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
 _IPv6_LOOPBACK = "::1"
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
-                      '--log-slave-updates --gtid-mode=on '
-                      '--enforce-gtid-consistency --report-host=%s '
-                      '--report-port=%s --bind-address=:: '
-                      '--master-info-repository=table"')
+                       '--log-slave-updates --gtid-mode=on '
+                       '--enforce-gtid-consistency --report-host={0} '
+                       '--report-port={1} --bind-address=:: '
+                       '--master-info-repository=table"')
 
 
 class test(rpl_admin.test):
@@ -50,20 +49,20 @@ class test(rpl_admin.test):
         self.servers.cloning_host = _IPv6_LOOPBACK
         # Setting mutlib.HOST to: {0}'.format(mutlib.HOST) #127.0.0.1
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv6_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server1 = self.spawn_server("rep_master_gtid_loopback_ipv6",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv6_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server2 = self.spawn_server("rep_slave1_gtid_loopback_ipv6",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv6_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server3 = self.spawn_server("rep_slave2_gtid_loopback_ipv6",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv6_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server4 = self.spawn_server("rep_slave3_gtid_loopback_ipv6",
                                          mysqld, True)
 
@@ -89,47 +88,42 @@ class test(rpl_admin.test):
 
         comment = ("Test case {0} - mysqlrplshow OLD Master "
                    "before demote".format(test_num))
-        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplshow.py --master={0} ".format(master_conn)
+        cmd_opts = "--discover-slaves={0} ".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - loopback ([::1]) "
                    "switchover demote-master ".format(test_num))
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = [" --new-master=%s  " % slave1_conn,]
-        cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
-        cmd_opts.append("--rpl-user=rpluser:hispassword ")
-        cmd_opts.append("--demote-master switchover")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = (" --new-master={0} --discover-slaves={1} "
+                    "--rpl-user=rpluser:hispassword --demote-master "
+                    "switchover".format(slave1_conn,
+                                        master_conn.split('@')[0]))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
         comment = ("Test case {0} - mysqlrplshow "
                    "NEW Master after demote".format(test_num))
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
+        cmd_opts = "--discover-slaves={0} ".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - mysqlrplcheck "
                    "NEW Master after demote".format(test_num))
-        cmd_str = "mysqlrplcheck.py --master=%s " % slave1_conn
-        cmd_opts = ["--slave=%s " % master_conn]
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplcheck.py --master={0} ".format(slave1_conn)
+        cmd_opts = "--slave={0} ".format(master_conn)
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
@@ -138,24 +132,21 @@ class test(rpl_admin.test):
         cmd_str = "mysqlrpladmin.py "#--master=%s " % slave1_conn
         slaves = ",".join([slave2_conn, slave3_conn,
                            master_conn])
-        cmd_opts = [" --slaves={0} ".format(slaves)]
-        cmd_opts.append("--rpl-user=rpluser:hispassword ")
-        cmd_opts.append("failover ")
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_opts = (" --slaves={0} --rpl-user=rpluser:hispassword "
+                    "failover".format(slaves))
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
         comment = ("Test case {0} - mysqlrplshow "
                    "NEW Master after failover".format(test_num))
-        cmd_str = "mysqlrplshow.py --master=%s " % slave2_conn
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        res = self.run_test_case(0, "%s %s" % (cmd_str, "".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave2_conn)
+        cmd_opts = "--discover-slaves={0} ".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
@@ -224,33 +215,33 @@ class test(rpl_admin.test):
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.
-        self.replace_substring("+----------------------------------------------"
-                               "-----------------------------------------+",
-                               "+---------+")
-        self.replace_substring("+----------------------------------------------"
+        self.replace_substring("+---------------------------------------------"
                                "------------------------------------------+",
                                "+---------+")
-        self.replace_substring("| health                                       "
-                               "                                         |",
-                               "| health  |")
-        self.replace_substring("| health                                       "
+        self.replace_substring("+---------------------------------------------"
+                               "-------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                      "
                                "                                          |",
                                "| health  |")
-        self.replace_substring("| OK                                           "
-                               "                                         |",
+        self.replace_substring("| health                                      "
+                               "                                           |",
+                               "| health  |")
+        self.replace_substring("| OK                                          "
+                               "                                          |",
                                "| OK      |")
-        self.replace_substring("| OK                                           "
-                               "                                          |",
+        self.replace_substring("| OK                                          "
+                               "                                           |",
                                "| OK      |")
         self.replace_substring_portion("| Slave delay is ",
                                        "seconds behind master., No, Slave has "
                                        "1 transactions behind master.  |",
                                        "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
-                               "                                         |",
-                               "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
+        self.replace_substring("| Slave has 1 transactions behind master.     "
                                "                                          |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.     "
+                               "                                           |",
                                "| OK      |")
 
         self.replace_substring("+------------------------------------------+",
@@ -275,9 +266,8 @@ class test(rpl_admin.test):
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
         kill_list = ['rep_master_gtid_loopback_ipv6',
-                    'rep_slave1_gtid_loopback_ipv6',
-                    'rep_slave2_gtid_loopback_ipv6',
-                    'rep_slave3_gtid_loopback_ipv6']
+                     'rep_slave1_gtid_loopback_ipv6',
+                     'rep_slave2_gtid_loopback_ipv6',
+                     'rep_slave3_gtid_loopback_ipv6']
         return (rpl_admin.test.cleanup(self)
                 and self.kill_server_list(kill_list))
-

@@ -17,9 +17,7 @@
 import os
 import mutlib
 
-from mysql.utilities.exception import MUTLibError
-from mysql.utilities.exception import UtilDBError
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
 BLOB_TEXT_TABLE = ("CREATE TABLE `util_test`.`tt` ("
                    "`a` INT(11) NOT NULL AUTO_INCREMENT, "
@@ -55,7 +53,7 @@ class test(mutlib.System_test):
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: {1}"
                               "".format(data_file, err.errmsg))
@@ -63,8 +61,7 @@ class test(mutlib.System_test):
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
+            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: {1}"
                               "".format(data_file_backticks, err.errmsg))
@@ -74,10 +71,8 @@ class test(mutlib.System_test):
         try:
             self.server1.read_and_exec_SQL(data_file_views, self.debug)
         except UtilError as err:
-            raise MUTLibError(
-                "Failed to read commands from file "
-                "{0}: {1}".format(data_file_views, err.errmsg)
-            )
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_views, err.errmsg))
 
         # Create table with blobs and insert data
         try:
@@ -91,12 +86,14 @@ class test(mutlib.System_test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
 
         test_num = 1
         comment = ("Test case {0} - copy a sample database X:Y"
-                   "").format(test_num)
+                   "".format(test_num))
         cmd = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn, to_conn)
         res = self.exec_util(cmd + " util_test:util_db_clone", self.res_fname)
         self.results.append(res)
@@ -114,8 +111,8 @@ class test(mutlib.System_test):
         self.server1.exec_query(BLOB_TEXT_DROP)
 
         test_num += 1
-        comment = ("Test case {0} - copy using different engine"
-                   "").format(test_num)
+        comment = ("Test case {0} - copy using different "
+                   "engine".format(test_num))
         cmd += " util_test:util_db_clone --force --new-storage-engine=MEMORY"
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
@@ -124,7 +121,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - copy a sample database X:Y with weird "
-                   "names (backticks)").format(test_num)
+                   "names (backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db``:db`:`db``:db_clone`'"
@@ -138,7 +135,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - copy a sample database X with weird "
-                   "names (backticks)").format(test_num)
+                   "names (backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db``:db`'"
@@ -152,10 +149,9 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - copy a sample database with views"
-                   "").format(test_num)
+                   "".format(test_num))
         cmd = "mysqldbcopy.py {0} {1} {2}".format(
-            from_conn, to_conn, "views_test:views_test_clone"
-        )
+            from_conn, to_conn, "views_test:views_test_clone")
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:
@@ -179,13 +175,13 @@ class test(mutlib.System_test):
             self.server1.exec_query(query)
 
         test_num += 1
-        dest_c = ("--destination={0}"
-                  "").format(self.build_connection_string(self.server1))
+        dest_c = "--destination={0}".format(
+            self.build_connection_string(self.server1))
         comment = "Test case {0} - copydb default collation".format(test_num)
         dbs = ("util_test_default_collation:"
                "util_test_default_collation_copy")
         cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2}"
-               "").format(from_conn, dest_c, dbs)
+               "".format(from_conn, dest_c, dbs))
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:
@@ -196,7 +192,7 @@ class test(mutlib.System_test):
         dbs = ("util_test_default_charset:"
                "util_test_default_charset_copy")
         cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2}"
-               "").format(from_conn, dest_c, dbs)
+               "".format(from_conn, dest_c, dbs))
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:
@@ -219,7 +215,7 @@ class test(mutlib.System_test):
                     if res[0][0] != db:
                         msg.append("Database {0} not found in {1}.\n"
                                    "".format(db, self.server2.role))
-                except:
+                except UtilError:
                     msg.append("Database {0} not found in {1}.\n"
                                "".format(db, self.server2.role))
             except UtilDBError as err:
@@ -231,7 +227,7 @@ class test(mutlib.System_test):
                     if res[0][0] != db:
                         msg.append("Database {0} not found in {1}.\n"
                                    "".format(db, self.server1.role))
-                except:
+                except UtilError:
                     msg.append("Database {0} not found in {1}.\n"
                                "".format(db, self.server1.role))
             except UtilDBError as err:
@@ -244,13 +240,12 @@ class test(mutlib.System_test):
                   "information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY`"
                   " CCSA WHERE CCSA.collation_name = T.table_collation "
                   " AND T.table_schema = '{1}' AND T.table_name = 't1'")
-        check_db_info_on_server1 = [
-            ("util_test_default_collation_copy",
-             "DEFAULT_COLLATION_NAME",
-             "utf8_general_ci", "COLLATION_NAME"),
-            ("util_test_default_charset_copy",
-             "DEFAULT_CHARACTER_SET_NAME",
-             "utf8", "CHARACTER_SET_NAME")]
+        check_db_info_on_server1 = [("util_test_default_collation_copy",
+                                     "DEFAULT_COLLATION_NAME",
+                                     "utf8_general_ci", "COLLATION_NAME"), (
+                                    "util_test_default_charset_copy",
+                                    "DEFAULT_CHARACTER_SET_NAME", "utf8",
+                                    "CHARACTER_SET_NAME")]
         for db in check_db_info_on_server1:
             try:
                 res = self.server1.exec_query(qry_db.format(db[1], db[0]))
@@ -259,7 +254,7 @@ class test(mutlib.System_test):
                         msg.append("For database {0} attribute {1} copy "
                                    "failed, got {2} expected {3}.\n"
                                    "".format(db[0], db[1], res[0][0], db[2]))
-                except:
+                except UtilError:
                     msg.append("For database {0} no value found for attribute "
                                "{1}.\n".format(db[0], db[1]))
 
@@ -269,15 +264,15 @@ class test(mutlib.System_test):
                         msg.append("For table {0} attribute {1} copy "
                                    "failed, got {2} expected {3}.\n"
                                    "".format(db[0], db[3], res[0][0], db[2]))
-                except:
+                except IndexError:
                     msg.append("For table {0} no value found for attribute "
                                "{1}.\n".format(db[0], db[3]))
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
         if msg:
-            return (False, ("Result failure.\n", "\n".join(msg)))
+            return False, ("Result failure.\n", "\n".join(msg))
         else:
-            return (True, "")
+            return True, ""
 
     def record(self):
         # Not a comparative test, returning True

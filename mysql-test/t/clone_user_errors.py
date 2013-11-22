@@ -14,10 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import clone_user
 
 from mysql.utilities.exception import MUTLibError
+
 
 class test(clone_user.test):
     """clone user error conditions
@@ -34,55 +34,76 @@ class test(clone_user.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqluserclone.py --source=noone:nope@localhost:3306 " + \
-                  to_conn
-        comment = "Test case 1 - error: invalid login to source server"
+        cmd_str = ("mysqluserclone.py "
+                   "--source=noone:nope@localhost:3306 {0}".format(to_conn))
+
+        test_num = 1
+        comment = ("Test case {0} - error: invalid login to source "
+                   "server".format(test_num))
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqluserclone.py --destination=noone:nope@localhost:3306 " + \
-                  from_conn
-        comment = "Test case 2 - error: invalid login to destination server"
+        test_num += 1
+        cmd_str = ("mysqluserclone.py "
+                   "--destination=noone:nope@localhost:3306 "
+                   "{0}".format(from_conn))
+        comment = ("Test case {0} - error: invalid login to "
+                   "destination server".format(test_num))
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
-        comment = "Test case 3 - error: no arguments"
+        test_num += 1
+        cmd_str = "mysqluserclone.py {0} {1} ".format(from_conn, to_conn)
+        comment = "Test case {0} - error: no arguments".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - error: no new user"
+        test_num += 1
+        comment = "Test case {0} - error: no new user".format(test_num)
         res = self.run_test_case(2, cmd_str + "joenopass@localhost", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 5 - error: cannot use dump and quiet together"
-        res = self.run_test_case(2, cmd_str + " root@localhost " \
-                                 " x@f --quiet --dump", comment)
+        test_num += 1
+        comment = ("Test case {0} - error: cannot use dump and "
+                   "quiet together".format(test_num))
+        res = self.run_test_case(2, cmd_str + (" root@localhost  x@f "
+                                               "--quiet --dump"),
+                                 comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqluserclone.py --source=wikiwakawonky %s " % to_conn
-        comment = "Test case 6 - error: cannot parser source connection"
+        test_num += 1
+        cmd_str = ("mysqluserclone.py --source=wikiwakawonky "
+                   "{0} ".format(to_conn))
+        comment = ("Test case {0} - error: cannot parser source "
+                   "connection".format(test_num))
         res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqluserclone.py --destination=wikiwakawonky %s " % \
-                  from_conn
-        comment = "Test case 7 - error: cannot parser destination connection"
+        test_num += 1
+        cmd_str = ("mysqluserclone.py "
+                   "--destination=wikiwakawonky {0} ".format(from_conn))
+
+        comment = ("Test case {0} - error: cannot parser "
+                   "destination connection".format(test_num))
         res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
         cmd_str = "mysqluserclone.py --list -vvv"
-        comment = "Test case 8 - error: missing source option"
+        comment = ("Test case {0} - error: missing source "
+                   "option".format(test_num))
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -100,10 +121,8 @@ class test(clone_user.test):
                             "values invalid\n")
 
         # Mask known source and destination host name.
-        self.replace_substring("on localhost",
-                               "on XXXX-XXXX")
-        self.replace_substring("on [::1]",
-                               "on XXXX-XXXX")
+        self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         return True
 

@@ -20,10 +20,10 @@ import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
 
-_DEFAULT_MYSQL_OPTS = '"--log-bin=mysql-bin --skip-slave-start ' + \
-                      '--log-slave-updates --gtid-mode=on ' + \
-                      '--enforce-gtid-consistency ' + \
-                      '--sync-master-info=1 --master-info-repository=table"'
+_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
+                       '--log-slave-updates --gtid-mode=on '
+                       '--enforce-gtid-consistency '
+                       '--sync-master-info=1 --master-info-repository=table"')
 
 _FORMATS = ['sql', 'csv', 'tab', 'grid', 'vertical']
 
@@ -51,15 +51,15 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except UtilError, e:
-                raise MUTLibError("Cannot get gtid enabled server 1 " +
-                                   "server_id: %s" % e.errmsg)
+            except UtilError as err:
+                raise MUTLibError("Cannot get gtid enabled server 1 "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "with_gtids_1",
-                                                '%s' % _DEFAULT_MYSQL_OPTS)
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "with_gtids_1",
+                _DEFAULT_MYSQL_OPTS)
             if not res:
                 raise MUTLibError("Cannot spawn gtid enabled server 1.")
             self.server1 = res[0]
@@ -70,15 +70,15 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except UtilError, e:
-                raise MUTLibError("Cannot get gtid enabled server 2 " +
-                                   "server_id: %s" % e.errmsg)
+            except UtilError as err:
+                raise MUTLibError("Cannot get gtid enabled server 2 "
+                                  "server_id: {0}".format(err.errmsg))
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                               "with_gtids_2",
-                                                '%s' % _DEFAULT_MYSQL_OPTS)
+            res = self.servers.spawn_new_server(
+                self.server0, self.s2_serverid, "with_gtids_2",
+                _DEFAULT_MYSQL_OPTS)
             if not res:
                 raise MUTLibError("Cannot spawn gtid enabled server 2.")
             self.server2 = res[0]
@@ -89,9 +89,9 @@ class test(mutlib.System_test):
             self.server3 = self.servers.get_server(index)
             try:
                 res = self.server3.show_server_variable("server_id")
-            except UtilError, e:
-                raise MUTLibError("Cannot get non-gtid server " +
-                                   "server_id: %s" % e.errmsg)
+            except UtilError as err:
+                raise MUTLibError("Cannot get non-gtid server server_id: "
+                                  "{0}".format(err.errmsg))
             self.s3_serverid = int(res[0][1])
         else:
             self.s3_serverid = self.servers.get_next_id()
@@ -108,50 +108,51 @@ class test(mutlib.System_test):
     def exec_export_import(self, server1, server2, exp_cmd, imp_cmd,
                            test_num, test_case, ret_val=True, reset=True,
                            load_data=True):
-        conn1 = "--server=" + self.build_connection_string(server1)
-        conn2 = "--server=" + self.build_connection_string(server2)
+        conn1 = "--server={0}".format(self.build_connection_string(server1))
+        conn2 = "--server={0}".format(self.build_connection_string(server2))
         if load_data:
             try:
-                res = server1.read_and_exec_SQL(self.data_file, self.debug)
-            except UtilError, e:
-                raise MUTLibError("Failed to read commands from file %s: %s" %
-                                  (self.data_file, e.errmsg))
+                server1.read_and_exec_SQL(self.data_file, self.debug)
+            except UtilError as err:
+                raise MUTLibError("Failed to read commands from file {0}: "
+                                  "{1}".format((self.data_file, err.errmsg)))
 
-        comment = "Test case %s (export phase) %s" % (test_num, test_case)
-        cmd_str = exp_cmd + conn1 + " > " + self.export_file
+        comment = "Test case {0} (export phase) {1}".format(test_num,
+                                                            test_case)
+        cmd_str = "{0}{1} > {2}".format(exp_cmd, conn1, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             for row in self.results:
                 print row,
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Display the export file if in debug mode
         if self.debug:
-            f = open(self.export_file.strip())
-            for row in f.readlines():
-                print row,
-            f.close()
+            with open(self.export_file.strip()) as f:
+                for row in f:
+                    print row,
 
-        comment = "Test case %s (import phase) %s" % (test_num, test_case)
+        comment = "Test case {0} (import phase) {1}".format(test_num,
+                                                            test_case)
         if reset:
-            server2.exec_query("RESET MASTER") # reset GTID_EXECUTED
-        cmd_str = imp_cmd + conn2 + self.export_file
+            server2.exec_query("RESET MASTER")  # reset GTID_EXECUTED
+        cmd_str = "{0}{1}{2}".format(imp_cmd, conn2, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res == ret_val:
             for row in self.results:
                 print row,
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.drop_all()
 
     def run(self):
         self.res_fname = "result.txt"
-        self.export_file = " export.txt "
+        self.export_file = "export.txt"
         self.data_file = os.path.normpath("./std_data/basic_data.sql")
 
-        export_cmd_str = "mysqldbexport.py util_test --export=both " + \
-                         "--skip=events,grants,procedures,functions,views " + \
-                         "--format=%s "
-        import_cmd_str = "mysqldbimport.py --import=both --format=%s "
+        export_cmd_str = ("mysqldbexport.py util_test --export=both "
+                          "--skip=events,grants,procedures,functions,views "
+                          "--format={0} ")
+        import_cmd_str = "mysqldbimport.py --import=both --format={0} "
 
         # Test cases:
         # for each type in [sql, csv, tab, grid, vertical]
@@ -167,12 +168,11 @@ class test(mutlib.System_test):
 
         test_num = 1
         for test_case in _TEST_CASES:
-            for format in _FORMATS:
-                self.exec_export_import(test_case[0], test_case[1],
-                                        export_cmd_str % format,
-                                        import_cmd_str % format,
-                                        test_num, "%s, format=%s" %
-                                        (test_case[2], format))
+            for format_ in _FORMATS:
+                self.exec_export_import(
+                    test_case[0], test_case[1], export_cmd_str.format(format_),
+                    import_cmd_str.format(format_), test_num,
+                    "{0}, format={1}".format(test_case[2], format_))
                 test_num += 1
 
         # Now do the warnings for GTIDs:
@@ -180,17 +180,18 @@ class test(mutlib.System_test):
         # - GTIDS on but --skip-gtid option present
 
         # Need to test for all formats to exercise warning detection code
-        for format in _FORMATS:
+        for format_ in _FORMATS:
             self.server1.exec_query("CREATE DATABASE util_test2")
             self.exec_export_import(self.server1, self.server2,
-                                    export_cmd_str % format,
-                                    import_cmd_str % format,
-                                    test_num, "partial backup w/%s" % format)
+                                    export_cmd_str.format(format_),
+                                    import_cmd_str.format(format_),
+                                    test_num,
+                                    "partial backup w/{0}".format(format_))
             test_num += 1
 
         self.exec_export_import(self.server1, self.server2,
-                                export_cmd_str % "sql --skip-gtid",
-                                import_cmd_str % "sql --skip-gtid",
+                                export_cmd_str.format("sql --skip-gtid"),
+                                import_cmd_str.format("sql --skip-gtid"),
                                 test_num, "skip gtids")
         test_num += 1
 
@@ -202,11 +203,10 @@ class test(mutlib.System_test):
         self.server2.exec_query("RESET MASTER")
         self.server2.exec_query("CREATE DATABASE util_test")
         self.exec_export_import(self.server1, self.server2,
-                                export_cmd_str % "sql ",
-                                import_cmd_str % "sql ",
+                                export_cmd_str.format("sql "),
+                                import_cmd_str.format("sql "),
                                 test_num, "gtid_executed error",
                                 False, False, False)
-        test_num += 1
 
         self.replace_result("# GTID operation: SET @@GLOBAL.GTID_PURGED",
                             "# GTID operation: SET @@GLOBAL.GTID_PURGED = ?\n")
@@ -221,19 +221,17 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         try:
-            if self.res_fname:
-                os.unlink(self.res_fname)
-        except:
+            os.unlink(self.res_fname)
+        except (OSError, AttributeError):
             pass
         try:
-            if self.export_file:
-                os.unlink(self.export_file)
-        except:
+            os.unlink(self.export_file)
+        except (OSError, AttributeError):
             pass
 
         # Kill the servers that are no longer used
         kill_list = ['with_gtids_1', 'with_gtids_2', 'no_gtids']
-        return (self.drop_all() and self.kill_server_list(kill_list))
+        return self.drop_all() and self.kill_server_list(kill_list)
 
     def drop_all(self):
         servers = [self.server1, self.server2, self.server3]

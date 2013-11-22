@@ -22,14 +22,16 @@ import mutlib
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.format import format_tabular_list
 
-_DATA_SQL = [
-    "CREATE DATABASE apostrophe",
-    "CREATE TABLE apostrophe.t1 (a char(30), b blob)",
-    "INSERT INTO apostrophe.t1 VALUES ('1', 'test single apostrophe''')",
-    "INSERT INTO apostrophe.t1 VALUES ('2', 'test 2 '' apostrophes ''')",
-    "INSERT INTO apostrophe.t1 VALUES ('3', 'test three'' apos''trophes''')",
-    "INSERT INTO apostrophe.t1 VALUES ('4 '' ', 'test '' in 2 columns')",
-]
+_DATA_SQL = ["CREATE DATABASE apostrophe",
+             "CREATE TABLE apostrophe.t1 (a char(30), b blob)",
+             "INSERT INTO apostrophe.t1 VALUES ('1', 'test single "
+             "apostrophe''')",
+             "INSERT INTO apostrophe.t1 VALUES ('2', 'test 2 '' apostrophes "
+             "''')",
+             "INSERT INTO apostrophe.t1 VALUES ('3', 'test three'' "
+             "apos''trophes''')",
+             "INSERT INTO apostrophe.t1 VALUES ('4 '' ', 'test '' in 2 "
+             "columns')", ]
 
 
 class test(mutlib.System_test):
@@ -51,39 +53,40 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to create test data: "
                               "{0}".format(err.errmsg))
         return True
-    
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
-       
+
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
+
         # dump if debug run
         if self.debug:
             print "\n# Dump of data to be cloned:"
             rows = self.server1.exec_query("SELECT * FROM apostrophe.t1")
             format_tabular_list(sys.stdout, ['char_field', 'blob_field'], rows)
-       
+
         # Test case 1 - clone a sample database
-        cmd = "mysqldbcopy.py %s %s apostrophe:apostrophe_clone " \
-              " --skip-gtid " % (from_conn, to_conn)
+        cmd = ("mysqldbcopy.py {0} {1} apostrophe:apostrophe_clone "
+               " --skip-gtid ".format(from_conn, to_conn))
         try:
             res = self.exec_util(cmd, self.res_fname)
             self.results.append(res)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
-          
+        except MUTLibError as err:
+            raise MUTLibError(err.errmsg)
+
         # dump if debug run
         if self.debug:
             print "\n# Dump of data cloned:"
             rows = self.server1.exec_query("SELECT * FROM apostrophe_clone.t1")
             format_tabular_list(sys.stdout, ['char_field', 'blob_field'], rows)
-            
+
         return True
 
     def get_result(self):
-        msg = None
         if self.server1 and self.results[0] == 0:
             query = "SHOW DATABASES LIKE 'apostrophe_%'"
             try:
@@ -92,8 +95,8 @@ class test(mutlib.System_test):
                     return (True, None)
             except UtilError as err:
                 raise MUTLibError(err.errmsg)
-        return (False, ("Result failure.\n", "Database clone not found.\n"))
-    
+        return False, ("Result failure.\n", "Database clone not found.\n")
+
     def record(self):
         # Not a comparative test, returning True
         return True
@@ -105,9 +108,8 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         if self.res_fname:
-            os.unlink(self.res_fname)
+            try:
+                os.unlink(self.res_fname)
+            except OSError:
+                pass
         return self.drop_all()
-
-
-
-

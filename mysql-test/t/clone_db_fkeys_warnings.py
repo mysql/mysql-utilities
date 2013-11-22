@@ -37,18 +37,17 @@ class test(mutlib.System_test):
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
                 raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
-        # Set spawned servers
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
+            # Set spawned servers
         self.server1 = self.servers.get_server(1)
         data_file = os.path.normpath("./std_data/fkeys.sql")
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as e:
+        except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
-                              "{1}".format(data_file, e.errmsg))
+                              "{1}".format(data_file, err.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
 
@@ -95,7 +94,7 @@ class test(mutlib.System_test):
                    "InnoDB".format(test_num))
 
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
-         # Mask known source and destination host name.
+        # Mask known source and destination host name.
 
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -113,7 +112,7 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
-        drop_dbs = ["util_test_fk2",  "util_test_fk2_clone", "util_test_fk",
+        drop_dbs = ["util_test_fk2", "util_test_fk2_clone", "util_test_fk",
                     "util_test_fk_clone", "util_test_fk3"]
         drop_results = []
         for db in drop_dbs:
@@ -123,5 +122,5 @@ class test(mutlib.System_test):
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
-        # Drop databases and kill spawned servers
+            # Drop databases and kill spawned servers
         return self.drop_all() and self.kill_server(self.server1.role)

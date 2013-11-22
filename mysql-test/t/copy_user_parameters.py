@@ -14,10 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import copy_user
 
 from mysql.utilities.exception import MUTLibError
+
 
 class test(copy_user.test):
     """clone user parameter checking
@@ -34,39 +34,49 @@ class test(copy_user.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
-        cmd_str = "mysqluserclone.py %s %s " % (from_conn, to_conn)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+        cmd_str = "mysqluserclone.py {0} {1} ".format(from_conn, to_conn)
 
-        comment = "Test case 1 - show the grant statements"
-        res = self.run_test_case(0, cmd_str + " --dump joe_nopass@user " + \
-                                 "jack@user john@user jill@user", comment)
+        test_num = 1
+        comment = "Test case {0} - show the grant statements".format(test_num)
+        res = self.run_test_case(0,
+                                 cmd_str + " --dump joe_nopass@user " +
+                                 "jack@user john@user jill@user",
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - show the help"
+        test_num += 1
+        comment = "Test case 2 - show the help".format(test_num)
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqluserclone.py "
                                            "version", 6)
 
-        comment = "Test case 3 - use the quiet parameter"
-        res = self.run_test_case(0, cmd_str + "joe_nopass@user --force" + \
-                                 " jack@user john@user jill@user --quiet ",
+        test_num += 1
+        comment = "Test case 3 - use the quiet parameter".format(test_num)
+        res = self.run_test_case(0, cmd_str + "joe_nopass@user --force "
+                                              "jack@user john@user "
+                                              "jill@user --quiet ",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        cmd_str = "mysqluserclone.py --source=%s" % \
-                  self.build_connection_string(self.server2)
-        comment = "Test case 4 - use --dump and --list to show all users"
+        test_num += 1
+        cmd_str = "mysqluserclone.py --source={0}".format(
+            self.build_connection_string(self.server2))
+        comment = ("Test case {0} - use --dump and --list to show "
+                   "all users".format(test_num))
         res = self.run_test_case(0, cmd_str + " --list --dump --format=csv",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.remove_result("root,")
         self.remove_result("# Dumping grants for user 'root'")

@@ -212,7 +212,7 @@ class test(failover.test):
             except OSError:
                 pass
 
-        return (comment, found_row)
+        return comment, found_row
 
     def test_failover_daemon(self, comment, cmd, logfile, pidfile,
                              stop_daemon, key_phrase=None):
@@ -326,7 +326,7 @@ class test(failover.test):
                                           "master and start its monitoring "
                                           "process".format(comment))
 
-        return (comment, found_row)
+        return comment, found_row
 
     def run(self):
         self.res_fname = "result.txt"

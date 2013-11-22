@@ -44,44 +44,46 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}:{1} ".format(data_file, err.errmsg))
         return True
-    
-    def run(self):
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
 
-        test_num = 0       
+    def run(self):
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+
+        test_num = 0
         for locktype in _LOCKTYPES:
             test_num += 1
 
-            comment = "Test case %s - copy with locking=%s" % \
-                      (test_num, locktype)
+            comment = "Test case {0} - copy with locking={0}".format(test_num,
+                                                                     locktype)
             if self.debug:
                 print comment
             self.drop_db(self.server1, "util_db_copy")
-            cmd = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn) + \
-                  " util_test:util_db_copy --force --locking=%s" % locktype
+            cmd = ("mysqldbcopy.py --skip-gtid {0} {1}  util_test:util_db_copy"
+                   " --force --locking={2}".format(from_conn, to_conn,
+                                                   locktype))
             try:
                 res = self.exec_util(cmd, self.res_fname)
                 self.results.append(res)
-            except MUTLibError, e:
-                raise MUTLibError(e.errmsg)
-                
+            except MUTLibError:
+                raise
+
         return True
-          
+
     def get_result(self):
-        msg = None
         for result in self.results:
             if self.server1 and result == 0:
                 query = "SHOW DATABASES LIKE 'util_%'"
@@ -93,10 +95,10 @@ class test(mutlib.System_test):
                 except UtilError as err:
                     raise MUTLibError(err.errmsg)
             else:
-                return(False, "Test case returned wrong result.\n")
+                return False, "Test case returned wrong result.\n"
 
-        return (True, None)
-    
+        return True, None
+
     def record(self):
         # Not a comparative test, returning True
         return True
@@ -119,7 +121,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

@@ -40,8 +40,8 @@ Test case 3 - demote-master switchover same user but missing password
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
-ERROR: The specified replication user is using a password (but none was specified).
-Use the --force option to force the use of the user specified with  --rpl-user and no password.
+ERROR: The replication user specified with --rpl-user does not match the existing replication user.
+Use the --force option to use the replication user specified with --rpl-user.
 # Errors found. Switchover aborted.
 # ...done.
 

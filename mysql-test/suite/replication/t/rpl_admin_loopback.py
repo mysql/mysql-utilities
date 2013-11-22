@@ -15,7 +15,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
 import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
@@ -23,8 +22,8 @@ _IPv4_LOOPBACK = "127.0.0.1"
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates  '
-                       '--report-host=%s '
-                       '--report-port=%s --bind-address=0.0.0.0 "')
+                       '--report-host={0} '
+                       '--report-port={1} --bind-address=0.0.0.0 "')
 
 
 class test(rpl_admin.test):
@@ -48,20 +47,20 @@ class test(rpl_admin.test):
         self.servers.cloning_host = _IPv4_LOOPBACK
 
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv4_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server1 = self.spawn_server("rep_master_loopback",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv4_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server2 = self.spawn_server("rep_slave1_loopback",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv4_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server3 = self.spawn_server("rep_slave2_loopback",
                                          mysqld, True)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv4_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
+                                            self.servers.view_next_port())
         self.server4 = self.spawn_server("rep_slave3_loopback",
                                          mysqld, True)
 
@@ -82,52 +81,45 @@ class test(rpl_admin.test):
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
-        slave2_conn = self.build_connection_string(self.server3).strip(' ')
-        slave3_conn = self.build_connection_string(self.server4).strip(' ')
 
         comment = ("Test case {0} - mysqlrplshow OLD Master "
                    "before demote".format(test_num))
-        cmd_str = "mysqlrplshow.py --master=%s " % master_conn
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplshow.py --master={0} ".format(master_conn)
+        cmd_opts = "--discover-slaves={0} ".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - loopback (127.0.0.1) "
                    "switchover demote-master ".format(test_num))
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = [" --new-master=%s  " % slave1_conn,]
-        cmd_opts.append("--discover-slaves=%s " % master_conn.split('@')[0])
-        cmd_opts.append("--rpl-user=rpl:rpl ")
-        cmd_opts.append("--demote-master switchover --force")
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = (" --new-master={0} --discover-slaves={1} "
+                    "--rpl-user=rpl:rpl --demote-master switchover "
+                    "--force".format(slave1_conn, master_conn.split('@')[0]))
+
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
         comment = ("Test case {0} - mysqlrplshow "
                    "NEW Master after demote".format(test_num))
-        cmd_str = "mysqlrplshow.py --master=%s " % slave1_conn
-        cmd_opts = ["--discover-slaves=%s " % master_conn.split('@')[0]]
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplshow.py --master={0} ".format(slave1_conn)
+        cmd_opts = "--discover-slaves={0} ".format(master_conn.split('@')[0])
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - mysqlrplcheck "
                    "NEW Master after demote".format(test_num))
-        cmd_str = "mysqlrplcheck.py --master=%s " % slave1_conn
-        cmd_opts = ["--slave=%s " % master_conn]
-        res = self.run_test_case(0, "%s %s" % (cmd_str,"".join(cmd_opts)),
-                                 comment)
+        cmd_str = "mysqlrplcheck.py --master={0} ".format(slave1_conn)
+        cmd_opts = "--slave={0} ".format(master_conn)
+        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         # Now we return the topology to its original state for other tests
@@ -228,7 +220,6 @@ class test(rpl_admin.test):
         self.servers.cloning_host = self.old_cloning_host
         # Kill the servers that are only for this test.
         kill_list = ['rep_master_loopback', 'rep_slave1_loopback',
-                    'rep_slave2_loopback', 'rep_slave3_loopback']
+                     'rep_slave2_loopback', 'rep_slave3_loopback']
         return (rpl_admin.test.cleanup(self)
                 and self.kill_server_list(kill_list))
-

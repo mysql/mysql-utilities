@@ -115,7 +115,11 @@ class User(object):
         if self.verbosity > 0:
             print query_str
 
-        self.server1.exec_query(query_str, self.query_options)
+        try:
+            self.server1.exec_query(query_str, self.query_options)
+        except UtilError:
+            return False
+        return True
 
     def exists(self, user_name=None):
         """Check to see if the user exists

@@ -44,14 +44,14 @@ class test(mutlib.System_test):
             try:
                 res = self.server1.show_server_variable("server_id")
             except MUTLibError as err:
-                raise MUTLibError("Cannot get frm test server " +
-                                   "server_id: %s" % err.errmsg)
+                raise MUTLibError("Cannot get frm test server "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "frm_test", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "frm_test",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn frm_test server.")
             self.server1 = res[0]
@@ -60,21 +60,18 @@ class test(mutlib.System_test):
         self.drop_all()
 
         self.server1.exec_query("CREATE DATABASE frm_test")
-        basedir = self.server1.show_server_variable("basedir")[0][1]
 
         # Load a known CREATE TABLE|VIEW statement from file
         data_file = os.path.normpath("./std_data/frm_test.sql")
-        sql_statements = []
         try:
-            file = open(data_file, 'r')
-            queries = " ".join([a.strip("\n") for a in file.readlines()])
-            sql_statements = queries.split(";")
-            for table_sql in sql_statements:
-                res = self.server1.exec_query(table_sql)
-            file.close()
+            with open(data_file, 'r') as f:
+                queries = " ".join([a.strip("\n") for a in f])
+                sql_statements = queries.split(";")
+                for table_sql in sql_statements:
+                    self.server1.exec_query(table_sql)
         except MUTLibError as err:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + err.errmsg)
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, err.errmsg))
 
         return True
 
@@ -82,7 +79,7 @@ class test(mutlib.System_test):
 
         if self.debug:
             print comment
-            print "Running test for %s" % tablename
+            print "Running test for {0}".format(tablename)
 
         self.results.append(comment)
         try:
@@ -91,18 +88,19 @@ class test(mutlib.System_test):
         except MUTLibError as err:
             raise MUTLibError(err.errmsg)
         if not res == exp_result:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         if self.debug:
-            for row in open(self.res_fname, 'r').readlines():
-                print row
+            with open(self.res_fname, 'r') as f:
+                for row in f:
+                    print row
 
         # Get the create statement
-        create_table = self.server1.exec_query("SHOW CREATE TABLE frm_test.%s" % \
-                                               tablename)[0][1]
+        create_table = self.server1.exec_query(
+            "SHOW CREATE TABLE frm_test.{0}".format(tablename))[0][1]
         # Add the database
-        create_table = create_table.replace("`%s`" % tablename,
-                                            "`frm_test`.`%s`" % tablename, 1)
+        create_table = create_table.replace(
+            "`{0}`".format(tablename), "`frm_test`.`{0}`".format(tablename), 1)
         # Add the ending ;
         create_table = create_table.strip()
         create_stmt = [a.strip() for a in create_table.split('\n')]
@@ -138,37 +136,37 @@ class test(mutlib.System_test):
         test_num = 1
         res = self.server1.exec_query("SHOW TABLES FROM frm_test")
         tables = [a[0] for a in res]
-        tables.sort() # make predictable order
+        tables.sort()  # make predictable order
 
         port = self.servers.get_next_port()
-        self.cmd = "mysqlfrm.py --server=%s --port=%s " % \
-                   (self.build_connection_string(self.server1), port)
+        self.cmd = "mysqlfrm.py --server={0} --port={1} ".format(
+            self.build_connection_string(self.server1), port)
 
         # Perform tests of specific .frm files
         for tablename in tables:
         # Read the .frm File from the server
             datadir = self.server1.show_server_variable("datadir")[0][1]
-            frm_file = os.path.normpath("%s/frm_test/%s.frm > %s" % \
-                                        (datadir, tablename, self.frm_output))
-            comment = "Test case %s: - Check complex types " % test_num + \
-                      "and default values for table: %s" % tablename
+            frm_file = os.path.normpath("{0}/frm_test/{1}.frm > {2}".format(
+                datadir, tablename, self.frm_output))
+            comment = ("Test case {0}: - Check complex types "
+                       "and default values for table: {1}".format(test_num,
+                                                                  tablename))
             self.check_frm_read(tablename, frm_file, comment)
             test_num += 1
 
         return True
 
     def get_result(self):
-        msg = None
         stop = len(self.results)
         i = 0
         while i < stop:
             comment = self.results[i]
-            result = self.results[i+1]
+            result = self.results[i + 1]
             if result:
-                return (False, "%s\nFAILED: differences found!")
+                return False, "{0}\nFAILED: differences found!".format(comment)
             i += 2
 
-        return (True, '')
+        return True, ''
 
     def record(self):
         # Not a comparative test, returning True

@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import replicate
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(replicate.test):
     """check parameters for the replicate utility
@@ -33,43 +34,48 @@ class test(replicate.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        comment = "Test case 1 - use the test feature"
+        test_num = 1
+        comment = "Test case {0} - use the test feature".format(test_num)
         res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
                                 comment, "--test-db=db_not_there_yet", True)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            res = self.server2.exec_query("STOP SLAVE")
-        except:
-            pass
+            self.server2.exec_query("STOP SLAVE")
+        except UtilError as err:
+            raise MUTLibError("Cannot stop slave: {0}".format(err.errmsg))
 
-        comment = "Test case 2 - show the help"
+        test_num += 1
+        comment = "Test case {0} - show the help".format(test_num)
         res = self.run_rpl_test(self.server1, self.server2, self.s1_serverid,
                                 comment, "--help", True)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlreplicate.py "
                                            "version", 6)
 
-        comment = "Test case 3 - use the verbose feature"
+        test_num += 1
+        comment = "Test case {0} - use the verbose feature".format(test_num)
         res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
                                 comment, " --verbose", True)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            res = self.server2.exec_query("STOP SLAVE")
-        except:
-            pass
+            self.server2.exec_query("STOP SLAVE")
+        except UtilError as err:
+            raise MUTLibError("Cannot stop slave: {0}".format(err.errmsg))
 
-        comment = "Test case 4 - use the start-from-beginning feature"
+        test_num += 1
+        comment = ("Test case {0} - use the start-from-beginning "
+                   "feature".format(test_num))
         res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
                                 comment, " --start-from-beginning", True)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.remove_result("# status:")
         self.remove_result("# error: ")

@@ -105,6 +105,6 @@ class test(rpl_admin_gtid.test):
         if self.res_fname:
             try:
                 os.unlink("failover.log")
-            except:
+            except OSError:
                 pass
         return super(test, self).cleanup()

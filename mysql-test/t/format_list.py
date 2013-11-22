@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import mutlib
 import os
-import sys
+
+import mutlib
+
 
 class test(mutlib.System_test):
     """Test format module
@@ -32,16 +33,15 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
-
         from mysql.utilities.common.format import format_tabular_list
         from mysql.utilities.common.format import format_vertical_list
 
-        rows_1 = [('one',),('two',),('three',)]
+        rows_1 = [('one',), ('two',), ('three',)]
         cols_1 = ['a']
-        rows_2 = [('one',None),('two',None),('three',None)]
-        cols_2 = ['a','b']
-        rows_3 = [('one',None,31),('two',None,32),('three',None,33)]
-        cols_3 = ['a','b','c']
+        rows_2 = [('one', None), ('two', None), ('three', None)]
+        cols_2 = ['a', 'b']
+        rows_3 = [('one', None, 31), ('two', None, 32), ('three', None, 33)]
+        cols_3 = ['a', 'b', 'c']
 
         format_tabular_list(self.test_file, cols_1, rows_1)
         format_tabular_list(self.test_file, cols_2, rows_2)
@@ -65,5 +65,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        os.unlink('format_test')
+        try:
+            os.unlink('format_test')
+        except OSError:
+            pass
         return True

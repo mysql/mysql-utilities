@@ -20,6 +20,7 @@ import mutlib
 import socket
 from mysql.utilities.exception import MUTLibError
 
+
 class test(check_rpl.test):
     """check replication conditions
     This test runs the mysqlrplcheck utility on a known master-slave topology
@@ -41,70 +42,72 @@ class test(check_rpl.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        master_str = "--master=%s" % self.build_connection_string(self.server2)
-        slave_str = " --slave=%s" % self.build_connection_string(self.server1)
+        master_str = "--master={0}".format(
+            self.build_connection_string(self.server2))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server1))
         conn_str = master_str + slave_str
         
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl " 
         try:
-            res = self.exec_util(cmd, self.res_fname)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd, self.res_fname)
+        except MUTLibError as err:
+            raise MUTLibError(err.errmsg)
 
         cmd_str = "mysqlrplcheck.py " + conn_str
 
         test_num = 1
         comment = "Test case {0} - master parameter invalid".format(test_num)
-        cmd_opts = " %s --master=root_root_root" % slave_str
+        cmd_opts = " {0} --master=root_root_root".format(slave_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
-                                                   comment)
+                                               comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - slave parameter invalid".format(test_num)
-        cmd_opts = " %s --slave=root_root_root" % master_str
+        cmd_opts = " {0} --slave=root_root_root".format(master_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
-                                                   comment)
+                                               comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - same server literal "
-                   "specification").format(test_num)
+                   "specification".format(test_num))
         same_str = self.build_connection_string(self.server2)
-        cmd_opts = " --master=%s --slave=%s" % (same_str, same_str)
+        cmd_opts = " --master={0} --slave={1}".format(same_str, same_str)
         res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
-                                                   comment)
+                                               comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: invalid login to server "
-                   "(master)").format(test_num)
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        slave_str + " --master=nope:nada@localhost:5510",
-                        comment)
+                   "(master)".format(test_num))
+        res = mutlib.System_test.run_test_case(
+            self, 1, "{0}{1} --master=nope:nada@localhost:"
+                     "5510".format(cmd_str, slave_str), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: invalid login to server "
-                   "(slave)").format(test_num)
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str +
-                        master_str + " --slave=nope:nada@localhost:5511",
-                        comment)
+                   "(slave)".format(test_num))
+        res = mutlib.System_test.run_test_case(
+            self, 1, "{0}{1} --slave=nope:nada@localhost:"
+                     "5511".format(cmd_str, master_str), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - master and slave same host".format(test_num)
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str +
-                        master_str + " --slave=root:root@%s:%s" %
-                        (socket.gethostname().split('.', 1)[0],
-                         self.server2.port), comment)
+        res = mutlib.System_test.run_test_case(
+            self, 2, "{0}{1} --slave=root:root@{2}:{3}".format(
+                cmd_str, master_str,  socket.gethostname().split('.', 1)[0],
+                self.server2.port), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - no options used".format(test_num)
@@ -155,6 +158,3 @@ class test(check_rpl.test):
     
     def cleanup(self):
         return check_rpl.test.cleanup(self)
-
-
-

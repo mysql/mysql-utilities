@@ -18,6 +18,7 @@ import os
 import mutlib
 from mysql.utilities.exception import MUTLibError, UtilError
 
+
 class test(mutlib.System_test):
     """check indexes for duplicates and redundancies
     This test executes the check index utility on a single server displaying
@@ -36,8 +37,8 @@ class test(mutlib.System_test):
         except:
             pass
         if len(rows) == 0:
-            raise MUTLibError("Need employees database loaded on %s" % \
-                               self.server1.role)
+            raise MUTLibError(
+                "Need employees database loaded on %s" % self.server1.role)
         return res
 
     def setup(self):
@@ -81,7 +82,7 @@ class test(mutlib.System_test):
         cmd = "{0}--stats -vv --best=1".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("{0}: failed" .format(comment))
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - show only worst index".format(test_num)
@@ -89,7 +90,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        # Mask the output
+            # Mask the output
         self.mask_column_result("employees", ",", 7, 'NNNNNNN')
         self.mask_column_result("employees", ",", 8, 'NNNNNNN')
         self.mask_column_result("employees", ",", 9, 'NNNNNNN')
@@ -98,10 +99,10 @@ class test(mutlib.System_test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return True    # No cleanup needed
 

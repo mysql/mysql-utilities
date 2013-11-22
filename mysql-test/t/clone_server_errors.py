@@ -18,8 +18,8 @@ import os
 import shutil
 import mutlib
 
-from mysql.utilities.common.server import Server
 from mysql.utilities.exception import MUTLibError
+
 
 class test(mutlib.System_test):
     """clone server errors
@@ -35,53 +35,55 @@ class test(mutlib.System_test):
 
     def run(self):
         self.res_fname = "result.txt"
-        s0_conn = self.build_connection_string(self.servers.get_server(0))
-        cmd_str = "mysqlserverclone.py --server=%s " % s0_conn
-        tnum = 1
+        cmd_str = "mysqlserverclone.py --server={0} ".format(
+            self.build_connection_string(self.servers.get_server(0)))
+        test_num = 1
 
         port1 = int(self.servers.get_next_port())
-        newport = "--new-port=%d " % port1
-        comment = "Test case {0} - error: no --new-data option".format(tnum)
+        newport = "--new-port={0} ".format(port1)
+        comment = ("Test case {0} - error: no --new-data "
+                   "option".format(test_num))
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
-        comment = "Test case {0} - error: clone remote server".format(tnum)
+        comment = "Test case {0} - error: clone remote server".format(test_num)
         res = self.run_test_case(2, "mysqlserverclone.py "
-                                 "--server=root:root@notme:90125 "
-                                 "--new-data=/nada "
-                                 "--new-id=7 {0} ".format(newport), comment)
+                                    "--server=root:root@notme:90125 "
+                                    "--new-data=/nada "
+                                    "--new-id=7 {0} ".format(newport), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
-        comment = "Test case {0} - error: no login".format(tnum)
+        comment = "Test case {0} - error: no login".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py "
-                                 "--server=root:root@localhost:90125 "
-                                 "--new-data=/nada "
-                                 "--new-id=7 {0} ".format(newport), comment)
+                                    "--server=root:root@localhost:90125 "
+                                    "--new-data=/nada "
+                                    "--new-id=7 {0} ".format(newport), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
-        comment = "Test case {0} - error: cannot connect".format(tnum)
+        comment = "Test case {0} - error: cannot connect".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py --server=nope@"
-                                 "localhost:3310 --new-data=/nada --new-id=7 "
-                                 "--root-password=nope {0}".format(newport),
+                                    "localhost:3310 --new-data=/nada "
+                                    "--new-id=7 "
+                                    "--root-password=nope {0}".format(newport),
                                  comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
         cmd_str = "{0} --new-id={1} {2} {3} {4}".format(
             cmd_str, self.servers.get_next_id(), newport,
             "--root-password=root ", "--new-data=/not/there/yes")
-        comment = "Test case {0} - cannot create directory".format(tnum)
+        comment = "Test case {0} - cannot create directory".format(test_num)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
         # Make the directory and put a file in it
         new_dir = os.path.join(os.getcwd(), "test123")
@@ -93,11 +95,11 @@ class test(mutlib.System_test):
         cmd_str = ("mysqlserverclone.py --server=root:nope@nothere "
                    "--new-data={0} --new-id=7 --root-password=nope "
                    "{1}".format(new_dir, newport))
-        comment = "Test case {0} - error: --new-data exists".format(tnum)
+        comment = "Test case {0} - error: --new-data exists".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
         shutil.rmtree(new_dir, True)
 
@@ -105,17 +107,20 @@ class test(mutlib.System_test):
                    "--new-data={0} --new-id=7 --root-password=nope "
                    "{1}".format(new_dir, newport))
         comment = ("Test case {0} - --new-data does not exist (but cannot "
-                   "connect)".format(tnum))
+                   "connect)".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        tnum += 1
+        test_num += 1
 
-        cmd_str = " ".join(["mysqlserverclone.py", "--server=%s" % s0_conn,
-                            "--new-port=%s" % self.servers.get_server(0).port,
-                            "--new-data=%s" % new_dir, "--root=root"])
+        cmd_str = " ".join(
+            ["mysqlserverclone.py", "--server={0}".format(
+                self.build_connection_string(self.servers.get_server(0))),
+                "--new-port={0}".format(self.servers.get_server(0).port),
+                "--new-data={0}".format(new_dir), "--root=root"])
 
-        comment = "Test case {0} - attempt to use existing port".format(tnum)
+        comment = ("Test case {0} - attempt to use existing "
+                   "port".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -133,9 +138,12 @@ class test(mutlib.System_test):
 
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
 
-        self.replace_result(
-            "ERROR: Unable to create directory",
-            "ERROR: Unable to create directory '/not/there/yes'\n")
+        self.replace_result("ERROR: Unable to create directory",
+                            "ERROR: Unable to create directory "
+                            "'/not/there/yes'\n")
+
+        self.replace_substring_portion("ERROR: Port ", "in use",
+                                       "ERROR: Port ##### in use")
 
         return True
 

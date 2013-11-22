@@ -56,6 +56,8 @@ mysqlfakeutility  a mysqlutility mock to test mysqluc
 mysqlreplicate    establish replication with a master                        
 
 Test case 4 - Test --add-util=mysqlfakeutility execute --help option
+Launching console ...
+
 Usage: mysqlfakeutility.py --return-code=<return_code> --message-error=<path>
 
 mysqlfakeutility - a mysqlutility mock to test mysqluc
@@ -67,8 +69,6 @@ Options:
                         the code to return at the program end.
   -m MESSAGE_ERROR, --message-error=MESSAGE_ERROR
                         an error message to show in stderr, if it's required
-Launching console ...
-
 
 Test case 5 - Test fakeutility --return-code=1
 Launching console ...

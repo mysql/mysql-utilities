@@ -40,8 +40,9 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: " + e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         self.server2 = self.servers.get_server(1)
         return True
 
@@ -86,16 +87,16 @@ class test(mutlib.System_test):
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         port = int(self.servers.get_next_port())
-        res = self.servers.start_new_server(self.server1,
-                                            port,
-                                            self.servers.get_next_id(),
-                                            "root", "temp_server_info")
+        res = self.servers.start_new_server(self.server1, port,
+                                            self.servers.get_next_id(), "root",
+                                            "temp_server_info")
         self.server3 = res[0]
         if not self.server3:
             raise MUTLibError("Failed to create a new slave.")
 
-        from_conn3 = "--server=" + self.build_connection_string(self.server3)
-        cmd_str = "mysqlserverinfo.py %s " % from_conn3
+        from_conn3 = "--server={0}".format(
+            self.build_connection_string(self.server3))
+        cmd_str = "mysqlserverinfo.py {0} ".format(from_conn3)
 
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
@@ -113,7 +114,7 @@ class test(mutlib.System_test):
         # restarting server fails if log is different, from the original
         # so we will delete them.
         logs = ["ib_logfile0", "ib_logfile1"]
-        while(logs):
+        while logs:
             for log in tuple(logs):
                 log_file = os.path.join(datadir, log)
                 if os.path.exists(log_file):
@@ -122,23 +123,24 @@ class test(mutlib.System_test):
                         time.sleep(1)
                         if not os.path.exists(log_file):
                             logs.remove(log)
-                    except:
+                    except OSError:
                         pass
 
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        s2_conn = "--server=" + self.build_connection_string(self.server2)
+        s2_conn = "--server={0}".format(
+            self.build_connection_string(self.server2))
 
-        cmd_str = "mysqlserverinfo.py %s " % s2_conn
+        cmd_str = "mysqlserverinfo.py {0} ".format(s2_conn)
 
         test_num = 1
-        comment = "Test case %d - basic serverinfo " % test_num
+        comment = "Test case {0} - basic serverinfo ".format(test_num)
         cmd_opts = " --format=vertical "
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
         self.do_replacements()
 
@@ -149,28 +151,29 @@ class test(mutlib.System_test):
         self.res_fname_temp = "result2.txt"
 
         test_num += 1
-        comment = "Test case %d - basic serverinfo with -d option" % test_num
-        self.results.append(comment+'\n')
+        comment = "Test case {0} - basic serverinfo with -d option".format(
+            test_num)
+        self.results.append(comment + '\n')
         cmd_opts = " --format=vertical -d "
-        res = 0
+
         try:
             res = self.exec_util(cmd_str + cmd_opts, self.res_fname_temp)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+        except MUTLibError as err:
+            raise MUTLibError(err.errmsg)
         if res != 0:
             return False
         self.results.append("\n")
 
         cmd_str = self.start_stop_newserver()
         test_num += 1
-        cmd_opts = (' --format=vertical --basedir=%s --datadir=%s --start' %
-                    (self.basedir, self.datadir3))
-        comment = ("Test case %d - re-started server %s " %
-                   (test_num, "prints results"))
+        cmd_opts = (' --format=vertical --basedir={0} --datadir={1} '
+                    '--start'.format(self.basedir, self.datadir3))
+        comment = ("Test case {0} - re-started server prints "
+                   "results ".format(test_num))
         #cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         time.sleep(2)
         self.do_replacements()
@@ -179,12 +182,11 @@ class test(mutlib.System_test):
     def get_result(self):
         # First, check result of test case 2
         found = False
-        file = open(self.res_fname_temp, 'r')
-        for line in file.readlines():
-            if line[0:19] == "Defaults for server":
-                found = True
-                break
-        file.close()
+        with open(self.res_fname_temp, 'r') as f:
+            for line in f:
+                if line[0:19] == "Defaults for server":
+                    found = True
+                    break
         if self.res_fname_temp:
             os.unlink(self.res_fname_temp)
         if not found:
@@ -198,9 +200,10 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
         from mysql.utilities.common.tools import delete_directory
+
         if self.server3:
             delete_directory(self.datadir3)
             self.server3 = None

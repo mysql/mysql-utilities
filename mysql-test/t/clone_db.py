@@ -38,8 +38,8 @@ class test(mutlib.System_test):
         try:
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
 
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
@@ -47,21 +47,19 @@ class test(mutlib.System_test):
             res = self.server1.read_and_exec_SQL(data_file_backticks,
                                                  self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file_backticks, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file_backticks, err.errmsg))
 
         return True
-    
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-        
+
         from_conn = "--source={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         to_conn = "--destination={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         # Test case 1 - clone a sample database
         cmd_base = "mysqldbcopy.py --skip-gtid {0} {1} {2}"
@@ -69,8 +67,7 @@ class test(mutlib.System_test):
         res = self.exec_util(cmd, self.res_fname)
         if res:  # i.e., res != 0
             raise MUTLibError(
-                "'{0}' failed. Return code: {1}".format(cmd, res)
-            )
+                "'{0}' failed. Return code: {1}".format(cmd, res))
 
         # Test case 2 - clone a sample database with weird names (backticks)
         # Set input parameter with appropriate quotes for the OS
@@ -83,8 +80,7 @@ class test(mutlib.System_test):
         self.results.append(res)
         if res:  # i.e., res != 0
             raise MUTLibError(
-                "'{0}' failed. Return code: {1}".format(cmd, res)
-            )
+                "'{0}' failed. Return code: {1}".format(cmd, res))
 
         return True
 
@@ -108,8 +104,8 @@ class test(mutlib.System_test):
                 return (False, ("Result failure.\n",
                                 "Database clone 'db`:db_clone' not found.\n"))
         else:
-            return (False, ("Result failure.\n",
-                            "Test server no longer available to verify "
+            return False, ("Result failure.\n",
+                           ("Test server no longer available to verify "
                             "cloning results.\n"))
         return True, None
 

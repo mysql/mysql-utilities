@@ -44,8 +44,8 @@ class test(mutlib.System_test):
             try:
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
-                raise MUTLibError("Cannot spawn needed servers: %s"
-                                  % err.errmsg)
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/db_compare_test.sql")
@@ -53,13 +53,12 @@ class test(mutlib.System_test):
             res = self.server1.read_and_exec_SQL(data_file, self.debug)
             res = self.server2.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file, err.errmsg))
+            raise MUTLibError("Failed to read commands from file"
+                              " {0}: {1}".format(data_file, err.errmsg))
 
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath(
-            "./std_data/db_compare_backtick.sql"
-        )
+            "./std_data/db_compare_backtick.sql")
         try:
             self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
             self.server2.read_and_exec_SQL(data_file_backticks, self.debug)
@@ -115,7 +114,7 @@ class test(mutlib.System_test):
             res = self.server2.exec_query("USE inventory;")
             res = self.server2.exec_query("DROP VIEW inventory.cleaning")
             res = self.server2.exec_query("DROP VIEW inventory.finishing_up")
-            res = self.server2.exec_query("UPDATE inventory.supplies SET " 
+            res = self.server2.exec_query("UPDATE inventory.supplies SET "
                                           "cost = 10.00 WHERE cost = 9.99")
             res = self.server2.exec_query("INSERT INTO inventory.supplier "
                                           "VALUES (2, 'Wesayso Corporation')")
@@ -125,21 +124,19 @@ class test(mutlib.System_test):
                                           "WHERE cost = 10.00 AND "
                                           "type = 'cleaning'")
         except UtilError as err:
-            raise MUTLibError("Failed to execute query: %s" % err.errmsg)
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
 
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-        
+
         s1_conn = "--server1={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         s2_conn = "--server2={0}".format(
-            self.build_connection_string(self.server2)
-        )
+            self.build_connection_string(self.server2))
         s2_conn_dupe = "--server2={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_base = "mysqldbcompare.py {0} {1} ".format(s1_conn, s2_conn)
 
@@ -154,7 +151,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
-                   "(extra table)").format(test_num)
+                   "(extra table)".format(test_num))
         cmd = "{0} inventory:inventory -a".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -165,7 +162,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
-                   "direction = server1 (default)").format(test_num)
+                   "direction = server1 (default)".format(test_num))
         cmd = "{0} inventory:inventory -a --format=CSV".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -173,27 +170,27 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
-                   "direction = server2").format(test_num)
+                   "direction = server2".format(test_num))
         cmd = ("{0} inventory:inventory -a --format=CSV "
-               "--changes-for=server2").format(cmd_base)
+               "--changes-for=server2".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
-                   "direction = server1 and reverse").format(test_num)
+                   "direction = server1 and reverse".format(test_num))
         cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server1 "
-               "--show-reverse").format(cmd_base)
+               "--show-reverse".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
-                   "direction = server2 and reverse").format(test_num)
+                   "direction = server2 and reverse".format(test_num))
         cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server2 "
-               "--show-reverse").format(cmd_base)
+               "--show-reverse".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -204,16 +201,16 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - compare two databases on same server "
-                   "w/server2").format(test_num)
+                   "w/server2".format(test_num))
         cmd = ("mysqldbcompare.py {0} {1} inventory:inventory2 "
-               "-a").format(s1_conn, s2_conn_dupe)
+               "-a".format(s1_conn, s2_conn_dupe))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - compare two databases on same "
-                   "server").format(test_num)
+                   "server".format(test_num))
         cmd = "mysqldbcompare.py {0} inventory:inventory2 -a".format(s1_conn)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -227,16 +224,16 @@ class test(mutlib.System_test):
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         test_num += 1
         comment = ("Test case {0} - compare a database with weird names "
-                   "(backticks)").format(test_num)
+                   "(backticks)".format(test_num))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = "Test case {0} - compare two empty databases".format(test_num)
-        cmd = "mysqldbcompare.py {0} {1} {2}".format(
-            s1_conn, s2_conn, "empty_db:empty_db -a"
-        )
+        comment = "Test case {0} - compare two empty databases".format(
+            test_num)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
+                                                     "empty_db:empty_db -a")
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -244,7 +241,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare a sample database containing "
                    "tables with weird names (no backticks) and different "
-                   "table options.").format(test_num)
+                   "table options.".format(test_num))
         cmd_arg = ("db_diff_test:db_diff_test -a "
                    "--skip-row-count --skip-data-check")
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
@@ -255,7 +252,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare a sample database containing "
                    "tables with weird names (no backticks) and skipping "
-                   "table options.").format(test_num)
+                   "table options.".format(test_num))
         cmd_arg = ("db_diff_test:db_diff_test -a --skip-table-options "
                    "--skip-row-count --skip-data-check")
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
@@ -267,19 +264,21 @@ class test(mutlib.System_test):
 
         # Create the same PROCEDURE on each server with the same name of an
         # already existing TABLE (i.e., ```t``export_1`).
-        self.server1.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 1")
-        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 1")
+        self.server1.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 1")
+        self.server2.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 1")
         if os.name == 'posix':
             cmd_arg = "'`db.``:db`:`db.``:db`' -a"
         else:
             cmd_arg = '"`db.``:db`:`db.``:db`" -a'
-        # Execute test (no differences expected)
+            # Execute test (no differences expected)
         test_num += 1
         comment = ("Test case {0} - compare a database with objects of "
                    "different types with the same name "
-                   "(no differences)").format(test_num)
+                   "(no differences)".format(test_num))
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -288,13 +287,14 @@ class test(mutlib.System_test):
         # Replace the PROCEDURE previously created on one of the servers by a
         # different one.
         self.server2.exec_query("DROP PROCEDURE `db.``:db`.```t``export_1`")
-        self.server2.exec_query("CREATE PROCEDURE `db.``:db`.```t``export_1`() "
-                                "SELECT 2")
+        self.server2.exec_query(
+            "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
+            "SELECT 2")
         # Execute test (differences expected)
         test_num += 1
         comment = ("Test case {0} - compare a database with objects of "
                    "different types with the same name "
-                   "(with differences)").format(test_num)
+                   "(with differences)".format(test_num))
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -303,26 +303,26 @@ class test(mutlib.System_test):
         self.do_replacements()
 
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
 
     def do_replacements(self):
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
-        prefixes = ['***','---','+++']
-        names = ['supplies','supplier','tools']
+        prefixes = ['***', '---', '+++']
+        names = ['supplies', 'supplier', 'tools']
         for prefix in prefixes:
             for name in names:
-                self.replace_result("%s inventory.%s" % (prefix, name),
-                                    "%s inventory.%s\n" % (prefix, name))
-                
+                self.replace_result("{0} inventory.{1}".format(prefix, name),
+                                    "{0} inventory.{1}\n".format(prefix, name))
+
         # Mask inconsistent Python 2.7 behavior
         self.replace_result("@@ -1 +1 @@", "@@ -1,1 +1,1 @@\n")
         self.replace_result("# @@ -1 +1 @@", "# @@ -1,1 +1,1 @@\n")
-        
+
         self.replace_substring("on [::1]", "on localhost")
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
 
@@ -343,7 +343,3 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

@@ -14,14 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import export_basic
 from mysql.utilities.exception import MUTLibError
+
 
 class test(export_basic.test):
     """check export db skips
     This test executes a series of export database operations using a variety
-    of skip oject parameters. It uses the export_basic test as a parent for
+    of skip object parameters. It uses the export_basic test as a parent for
     setup and teardown methods.
     """
 
@@ -34,28 +34,29 @@ class test(export_basic.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqldbexport.py %s util_test --format=CSV " % from_conn + \
-                  "--display=NAMES  --skip-gtid --skip=data"
+        cmd_str = ("mysqldbexport.py {0} util_test --format=CSV "
+                   "--display=NAMES --skip-gtid --skip=data".format(from_conn))
 
         test_num = 1
-        comment = "Test case %d - baseline" % test_num
+        comment = "Test case {0} - baseline".format(test_num)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        _SKIPS=[",grants", ",events", ",functions", ",procedures",
-                ",triggers", ",views", ",tables"]
+        _SKIPS = [",grants", ",events", ",functions", ",procedures",
+                  ",triggers", ",views", ",tables"]
         skip_str = ""
         for skip in _SKIPS:
             test_num += 1
-            skip_str += skip
-            cmd_opts = "%s%s" % (cmd_str, skip_str)
-            comment = "Test case %d - no data,%s" % (test_num, skip_str)
+            skip_str = "{0}{1}".format(skip_str, skip)
+            cmd_opts = "{0}{1}".format(cmd_str, skip_str)
+            comment = "Test case {0} - no data,{1}".format(test_num, skip_str)
             res = self.run_test_case(0, cmd_opts, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_substring("on [::1]", "on localhost")
 

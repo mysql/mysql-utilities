@@ -1,14 +1,4 @@
 Test case 1 - test failover scripts
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
@@ -26,6 +16,11 @@ Test case 1 - test failover scripts
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -48,6 +43,11 @@ Test case 1 - test failover scripts
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -60,16 +60,6 @@ Test case 1 - test failover scripts
 # Replication Topology Health:
 # ...done.
 Test case 2 - test switchover scripts
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT4
-# new master host: 
-# new master port: 
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
@@ -84,6 +74,11 @@ Test case 2 - test switchover scripts
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
@@ -118,6 +113,11 @@ Test case 2 - test switchover scripts
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -132,17 +132,6 @@ Test case 2 - test switchover scripts
 # Replication Topology Health:
 # ...done.
 Test case 3 - test script exit < threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT4
-# new master host: 
-# new master port: 
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -158,6 +147,12 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: XXX Script failed.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
@@ -192,6 +187,11 @@ ERROR: XXX Script failed.
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -206,12 +206,6 @@ ERROR: XXX Script failed.
 # Replication Topology Health:
 # ...done.
 Test case 4 - test script exit = threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -227,16 +221,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 5 - test script exit > threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -252,21 +246,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 6 - test script exit < threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT4
-# new master host: 
-# new master port: 
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -282,6 +271,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
@@ -316,6 +310,12 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
+# Returning code 10
 ERROR: XXX Script failed.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -330,17 +330,6 @@ ERROR: XXX Script failed.
 # Replication Topology Health:
 # ...done.
 Test case 7 - test script exit = threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT4
-# new master host: 
-# new master port: 
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -356,6 +345,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
@@ -390,21 +384,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 8 - test script exit > threshold switchover
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT1
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  localhost
-# old master port:  PORT4
-# new master host: 
-# new master port: 
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
@@ -420,6 +409,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT1
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
@@ -454,21 +448,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 9 - test script exit < threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -484,6 +473,12 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: XXX Script failed.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -506,6 +501,11 @@ ERROR: XXX Script failed.
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -518,12 +518,6 @@ ERROR: XXX Script failed.
 # Replication Topology Health:
 # ...done.
 Test case 10 - test script exit = threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -539,16 +533,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 11 - test script exit > threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -564,21 +558,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 12 - test script exit < threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -594,6 +583,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -616,6 +610,12 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: XXX Script failed.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
@@ -628,17 +628,6 @@ ERROR: XXX Script failed.
 # Replication Topology Health:
 # ...done.
 Test case 13 - test script exit = threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -654,6 +643,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -676,21 +670,16 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
 Test case 14 - test script exit > threshold failover
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# ARGUMENTS PASSED:
-# old master host:  UNKNOWN
-# old master port:  UNKNOWN
-# new master host:  localhost
-# new master port:  PORT4
-# Returning code 10
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
 # Checking privileges on candidates.
@@ -706,6 +695,11 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -728,6 +722,12 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Returning code 10
 ERROR: External script XXXXXXX
 Specified threshold exceeded. Operation aborted.
 WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.

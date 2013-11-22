@@ -600,7 +600,6 @@ def export_databases(server_values, db_list, options):
     }
     servers = connect_servers(server_values, None, conn_options)
     source = servers[0]
-
     # Check for GTID support
     supports_gtid = servers[0].supports_gtid()
     if not skip_gtids and not supports_gtid == 'ON':

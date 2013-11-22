@@ -43,84 +43,88 @@ class test(mutlib.System_test):
         num_servers = self.servers.num_servers()
         if self.need_servers:
             try:
-                self.servers.spawn_new_servers(num_servers+2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+                self.servers.spawn_new_servers(num_servers + 2)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         else:
-            num_servers -= 2 # Get last 2 servers in list
+            num_servers -= 2  # Get last 2 servers in list
         self.server1 = self.servers.get_server(num_servers)
-        self.server2 = self.servers.get_server(num_servers+1)
+        self.server2 = self.servers.get_server(num_servers + 1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError(
+                "Failed to read commands from file {0}: {1}".format(
+                    data_file, err.errmsg))
 
         rows = self.server2.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if rows:
             basedir = rows[0][1]
         else:
             raise MUTLibError("Unable to determine basedir of running "
-                                 "server.")
+                              "server.")
 
         self.mysql_path = get_tool_path(basedir, "mysql")
 
         return True
 
     def show_data(self, tbl):
-        comment = "Showing data for table %s \n" % tbl
+        comment = "Showing data for table {0} \n".format(tbl)
         self.results.append(comment)
         if os.name == "posix":
-            cmd = "%s %s util_test -e 'SELECT  * FROM %s'" % \
-                  (self.mysql_path, self.server2_conn, tbl)
+            cmd = "{0} {1} util_test -e 'SELECT  * FROM {2}'".format(
+                self.mysql_path, self.server2_conn, tbl)
         else:
-            cmd = '%s %s util_test -e "SELECT  * FROM %s"' % \
-                  (self.mysql_path, self.server2_conn, tbl)
+            cmd = '{0} {1} util_test -e "SELECT  * FROM {2}"'.format(
+                self.mysql_path, self.server2_conn, tbl)
         res = self.exec_util(cmd, self.res_fname, True)
         if res != 0:
-            raise MUTLibError("%s: failed" % comment)
-        file = open(self.res_fname)
-        for row in file.readlines():
-            self.results.append(row)
-        file.close()
+            raise MUTLibError("{0}: failed".format(comment))
+        with open(self.res_fname) as f:
+            for row in f:
+                self.results.append(row)
 
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
         conn_val = self.get_connection_values(self.server2)
-        self.server2_conn = "-u%s -p%s " % (conn_val[0], conn_val[1])
+        self.server2_conn = "-u{0} -p{1} ".format(conn_val[0], conn_val[1])
         if conn_val[3] is not None:
-            self.server2_conn += "--port=%s " % conn_val[3]
+            self.server2_conn = "{0}--port={1} ".format(self.server2_conn,
+                                                        conn_val[3])
         if conn_val[4] is not None:
-            self.server2_conn += "--socket=%s " % conn_val[4]
+            self.server2_conn = "{0}--socket={1} ".format(self.server2_conn,
+                                                          conn_val[4])
 
-        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn
+        cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
 
-        comment = "Test case 1 - export metadata to new server via the " \
-                  "mysql monitor"
-        cmd_str = cmd + " --export=definitions --format=SQL --quiet " \
-                  " --skip=events,grants | %s %s "  % \
-                  (self.mysql_path, self.server2_conn)
+        test_num = 1
+        comment = ("Test case {0} - export metadata to new server via the "
+                   "mysql monitor".format(test_num))
+        cmd_str = cmd + (" --export=definitions --format=SQL --quiet  "
+                         "--skip=events,grants | "
+                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        self.results.append("%s\n" % \
-                            self.check_objects(self.server2, "util_test",
-                                               False))
+        self.results.append("{0}\n".format(
+            self.check_objects(self.server2, "util_test", False)))
 
-        comment = "Test case 2 - export the data to new server via the " \
-                  "mysql monitor"
-        cmd_str = cmd + " --export=data --format=SQL --quiet " \
-                  " --skip=events,grants | %s %s "  % \
-                  (self.mysql_path, self.server2_conn)
+        test_num += 1
+        comment = ("Test case {0} - export the data to "
+                   "new server via the mysql monitor".format(test_num))
+        cmd_str = cmd + (" --export=data --format=SQL --quiet  "
+                         "--skip=events,grants | "
+                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.show_data("t1")
         self.show_data("t2")
@@ -129,31 +133,30 @@ class test(mutlib.System_test):
 
         try:
             self.server2.exec_query("DROP DATABASE util_test")
-        except:
+        except UtilError:
             raise MUTLibError("Cannot drop database before import.")
 
-        self.results.append("%s\n" % \
-                            self.check_objects(self.server2, "util_test",
-                                               False))
+        self.results.append("{0}\n".format(
+            self.check_objects(self.server2, "util_test", False)))
 
-        comment = "Test case 3 - export all objects and data to new server " \
-                  "via the mysql monitor"
-        cmd_str = cmd + " --export=both --format=SQL --quiet " \
-                  " --skip=events,grants | %s %s "  % \
-                  (self.mysql_path, self.server2_conn)
+        test_num += 1
+        comment = ("Test case {0} - export all objects and data to new server "
+                   "via the mysql monitor".format(test_num))
+        cmd_str = cmd + (" --export=both --format=SQL --quiet  "
+                         "--skip=events,grants | "
+                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        self.results.append("%s\n" % \
-                            self.check_objects(self.server2, "util_test",
-                                               False))
+        self.results.append("{0}\n".format(
+            self.check_objects(self.server2, "util_test", False)))
 
         self.show_data("t1")
         self.show_data("t2")
         self.show_data("t3")
         self.show_data("t4")
-        
+
         self.remove_result("Warning: Using a password on the")
 
         return True

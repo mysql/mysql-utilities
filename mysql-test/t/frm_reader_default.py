@@ -15,9 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import sys
 import frm_reader_base
 from mysql.utilities.exception import MUTLibError
+
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -40,8 +40,8 @@ class test(frm_reader_base.test):
         test_num = 1
 
         port = self.servers.get_next_port()
-        cmd = "mysqlfrm.py --server=%s --port=%s " % \
-                   (self.build_connection_string(self.server1), port)
+        cmd = "mysqlfrm.py --server={0} --port={1} ".format(
+            self.build_connection_string(self.server1), port)
 
         # Show the help
         comment = "Test case {0}: - Show help".format(test_num)
@@ -52,19 +52,21 @@ class test(frm_reader_base.test):
 
         # Perform test of all .frm files in a known database folder
         datadir = self.server1.show_server_variable("datadir")[0][1]
-        frm_file_path = os.path.normpath("%s/frm_test/" % datadir)
-        comment = "Test case %s: - Check .frm files in a db folder" % test_num
+        frm_file_path = os.path.normpath("{0}/frm_test/".format(datadir))
+        comment = ("Test case {0}: - Check .frm files in a "
+                   "db folder".format(test_num))
         res = self.run_test_case(0, cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Perform test of all .frm files in a random folder
         frm_file_path = os.path.normpath("./std_data/frm_files")
-        comment = "Test case %s: - Check .frm files in a db folder" % test_num
+        comment = ("Test case {0}: - Check .frm files in a db "
+                   "folder".format(test_num))
         res = self.run_test_case(0, cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Perform a test using the --user option for the current user
@@ -77,20 +79,19 @@ class test(frm_reader_base.test):
             if not user:
                 raise MUTLibError("Cannot obtain user name for test case.")
 
-        comment = "Test case %s: - User the --user option" % test_num
+        comment = "Test case {0}: - User the --user option".format(test_num)
         frm_file_path = os.path.join(frm_file_path, "t1.frm")
-        cmd_str = " ".join([cmd, frm_file_path, "--user=%s" % user, "-v"])
+        cmd_str = " ".join([cmd, frm_file_path, "--user={0}".format(user),
+                            "-v"])
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        test_num += 1
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("# Starting the spawned server on port",
                             "# Starting the spawned server on port XXXXXXX\n")
         self.replace_result("# CREATE statement",
                             "# CREATE statement for [...]\n")
-        self.replace_result("# std_data",
-                            "# std_data/frm_files/t9.frm\n")
+        self.replace_result("# std_data", "# std_data/frm_files/t9.frm\n")
         self.replace_substring(user, "JOE_USER")
 
         return True

@@ -14,8 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import audit_log_grep
 import os
+
+import audit_log_grep
 from mysql.utilities.exception import MUTLibError
 
 
@@ -51,7 +52,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Specified argument is not a "
-                   "file").format(num_test)
+                   "file".format(num_test))
         cmd_opts = "--file-stats xpto.log"
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -71,12 +72,11 @@ class test(audit_log_grep.test):
 
         #Read audit log for testes
         audit_log_name = os.path.normpath(
-            "./std_data/audit.log.13488316109086370"
-        )
+            "./std_data/audit.log.13488316109086370")
 
         num_test += 1
         comment = ("Test case {0} - Only one file search at a "
-                   "time").format(num_test)
+                   "time".format(num_test))
         cmd_opts = "--file-stats {0} xpto.log".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -92,7 +92,8 @@ class test(audit_log_grep.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         num_test += 1
-        comment = "Test case {0} - Invalid --start-date format".format(num_test)
+        comment = "Test case {0} - Invalid --start-date format".format(
+            num_test)
         cmd_opts = "--start-date=T12:30:05 {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -109,7 +110,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid --query-type option "
-                   "value").format(num_test)
+                   "value".format(num_test))
         cmd_opts = '--query-type="", {0}'.format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -126,7 +127,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid --event-type option "
-                   "value").format(num_test)
+                   "value".format(num_test))
         cmd_opts = '--event-type=,,"", {0}'.format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -159,7 +160,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid --status option "
-                   "value").format(num_test)
+                   "value".format(num_test))
         cmd_opts = '--status="",, {0}'.format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -176,7 +177,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid STATUS interval "
-                   "format").format(num_test)
+                   "format".format(num_test))
         cmd_opts = "--status=1046,200-250-300 {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -185,7 +186,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid STATUS interval "
-                   "lower bound").format(num_test)
+                   "lower bound".format(num_test))
         cmd_opts = "--status=1.0-100 {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)
@@ -194,7 +195,7 @@ class test(audit_log_grep.test):
 
         num_test += 1
         comment = ("Test case {0} - Invalid STATUS interval "
-                   "upper bound").format(num_test)
+                   "upper bound".format(num_test))
         cmd_opts = "--status=1- {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(2, cmd, comment)

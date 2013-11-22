@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+
 
 class test(mutlib.System_test):
     """setup replication
@@ -38,15 +39,15 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication slave " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication slave "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "rep_slave", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "rep_slave",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server1 = res[0]
@@ -57,15 +58,15 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication master " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication master "
+                                  "server_id: {0}".format(err.errmsg))
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                                "rep_master", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s2_serverid,"rep_master",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
@@ -77,16 +78,17 @@ class test(mutlib.System_test):
                      comment, options=None, save_for_compare=False,
                      expected_result=0, save_results=True):
 
-        master_str = "--master=%s" % self.build_connection_string(master)
-        slave_str = " --slave=%s" % self.build_connection_string(slave)
+        master_str = "--master={0}".format(
+            self.build_connection_string(master))
+        slave_str = " --slave={0}".format(self.build_connection_string(slave))
         conn_str = master_str + slave_str
         
         # Test case 1 - setup replication among two servers
         if not save_for_compare:
             self.results.append(comment)
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         if options:
-            cmd += " %s" % options
+            cmd = "{0} {1}".format(cmd, options)
         if not save_for_compare and save_results:
             self.results.append(cmd)
         res = self.exec_util(cmd, self.res_fname)
@@ -101,43 +103,49 @@ class test(mutlib.System_test):
             res = slave.exec_query("SHOW SLAVE STATUS")
             if not save_for_compare and save_results:
                 self.results.append(res)
-        except UtilDBError, e:
-            raise MUTLibError("Cannot show slave status: %s" % e.errmsg)
+        except UtilDBError as err:
+            raise MUTLibError("Cannot show slave status: "
+                              "{0}".formar(err.errmsg))
 
         if save_for_compare:
             self.results.append(comment+"\n")
-            for line in open(self.res_fname).readlines():
-                # Don't save lines that have [Warning]
-                index = line.find("[Warning]")
-                if index <= 0:
-                    self.results.append(line)
+            with open(self.res_fname) as f:
+                for line in f:
+                    # Don't save lines that have [Warning]
+                    index = line.find("[Warning]")
+                    if index <= 0:
+                        self.results.append(line)
 
         return True
     
     def run(self):
         self.res_fname = "result.txt"
         
-        comment = "Test case 1 - replicate server1 as slave of server2 "
+        test_num = 1
+        comment = ("Test case {0} - replicate server1 as slave of "
+                   "server2 ".format(test_num))
         res = self.run_rpl_test(self.server1, self.server2, self.s1_serverid,
                                 comment, None)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
         try:
-            res = self.server1.exec_query("STOP SLAVE")
-        except:
-            raise MUTLibError("%s: Failed to stop slave." % comment)
+            self.server1.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
 
-        comment = "Test case 2 - replicate server2 as slave of server1 "
+        test_num += 1
+        comment = ("Test case {0} - replicate server2 as slave of "
+                   "server1 ".format(test_num))
         res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
                                 comment, None)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
         try:
-            res = self.server2.exec_query("STOP SLAVE")
-        except:
-            raise MUTLibError("%s: Failed to stop slave." % comment)
+            self.server2.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
 
         return True
 
@@ -148,15 +156,16 @@ class test(mutlib.System_test):
         # Check test case
         if self.results[index] == 0:
             if self.results[index+1] == ():
-                return (false, "%s: Slave status missing." % comment)
+                return False, "{0}: Slave status missing.".format(comment)
             test_result = self.results[index+1][0]
             if test_result[0] != "Waiting for master to send event":
                 test_passed = False
-                msg = "%s: Slave failed to communicate with master." % comment
+                msg = ("{0}: Slave failed to communicate with "
+                       "master.".format(comment))
         else:
             test_passed = False
-            msg = "%s: Replication event failed." % comment
-        return (test_passed, msg)
+            msg = "{0}: Replication event failed.".format(comment)
+        return test_passed, msg
 
     def get_result(self):
         # tc1 tc2 content
@@ -174,7 +183,7 @@ class test(mutlib.System_test):
         if not res[0]:
             return res
 
-        return (True, None)
+        return True, None
         
     def mask_results(self):
         self.mask_column_result("| builtin", "|", 2, " XXXXXXXX ")
@@ -201,7 +210,6 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
         return True
-

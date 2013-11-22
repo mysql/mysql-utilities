@@ -39,15 +39,12 @@ class test(diff.test):
         self.res_fname = "result.txt"
 
         s1_conn = "--server1={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         s2_conn = "--server2={0}".format(
-            self.build_connection_string(self.server2)
-        )
+            self.build_connection_string(self.server2))
 
-        cmd_base = "mysqldiff.py {0} {1} util_test:util_test".format(
-            s1_conn, s2_conn
-        )
+        cmd_base = "mysqldiff.py {0} {1} util_test:util_test".format(s1_conn,
+                                                                     s2_conn)
 
         test_num = 1
         cmd_opts = "--help"
@@ -57,9 +54,9 @@ class test(diff.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        for frmt in _FORMATS:
+        for format_ in _FORMATS:
             test_num += 1
-            cmd_opts = "--difftype={0}".format(frmt)
+            cmd_opts = "--difftype={0}".format(format_)
             comment = "Test case {0} - Use diff {1}".format(test_num, cmd_opts)
             cmd = "{0} {1}".format(cmd_base, cmd_opts)
             res = self.run_test_case(1, cmd, comment)
@@ -115,7 +112,7 @@ class test(diff.test):
             res = self.run_test_case(1, cmd, comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
-            # now with reverse
+                # now with reverse
             test_num += 1
             cmd_opts = "--changes-for={0} --show-reverse".format(direct)
             comment = "Test case {0} - Use {1} ".format(test_num, cmd_opts)
@@ -127,24 +124,24 @@ class test(diff.test):
         # Test use of --skip-table-options (different AUTO_INCREMENT)
         difftype_options = ['', '--difftype=context', '--difftype=sql']
         cmd_base = ("mysqldiff.py {0} {1} "
-                    "db_diff_test:db_diff_test").format(s1_conn, s2_conn)
+                    "db_diff_test:db_diff_test".format(s1_conn, s2_conn))
         for difftype_opt in difftype_options:
             for direct in _DIRECTIONS:
                 test_num += 1
-                comment = ("Test case {0}a - Changes for {1} {2} (not skipping "
-                           "table options).").format(test_num, direct,
-                                                     difftype_opt)
+                comment = ("Test case {0}a - Changes for {1} {2} (not "
+                           "skipping table options).".format(test_num, direct,
+                                                             difftype_opt))
                 cmd = "{0} --changes-for={1} {2}".format(cmd_base, direct,
                                                          difftype_opt)
                 res = self.run_test_case(1, cmd, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
                 comment = ("Test case {0}b - Changes for {1} {2} (skipping "
-                           "table options).").format(test_num, direct,
-                                                     difftype_opt)
+                           "table options).".format(test_num, direct,
+                                                    difftype_opt))
                 cmd = ("{0} --changes-for={1} {2} "
-                       "--skip-table-options").format(cmd_base, direct,
-                                                      difftype_opt)
+                       "--skip-table-options".format(cmd_base, direct,
+                                                     difftype_opt))
                 res = self.run_test_case(0, cmd, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))

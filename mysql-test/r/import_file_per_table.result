@@ -21,6 +21,15 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 NULL 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t5.sql.
+#...done.
+# Data from util_test.t5:
+1 kitkat 0.99 19 
+2 M&M 5.99 19 
+3 milk 0.67 5 
+4 Dr. Pepper 0.99 19 
 Test case 2 - grid format with --file-per-table
 # Testing file-per-table import:
 Running import...
@@ -44,6 +53,15 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 NULL 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t5.grid.
+#...done.
+# Data from util_test.t5:
+1 kitkat 0.99 19 
+2 M&M 5.99 19 
+3 milk 0.67 5 
+4 Dr. Pepper 0.99 19 
 Test case 3 - csv format with --file-per-table
 # Testing file-per-table import:
 Running import...
@@ -67,6 +85,15 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 NULL 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t5.csv.
+#...done.
+# Data from util_test.t5:
+1 kitkat 0.99 19 
+2 M&M 5.99 19 
+3 milk 0.67 5 
+4 Dr. Pepper 0.99 19 
 Test case 4 - tab format with --file-per-table
 # Testing file-per-table import:
 Running import...
@@ -90,6 +117,15 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 NULL 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t5.tab.
+#...done.
+# Data from util_test.t5:
+1 kitkat 0.99 19 
+2 M&M 5.99 19 
+3 milk 0.67 5 
+4 Dr. Pepper 0.99 19 
 Test case 5 - vertical format with --file-per-table
 # Testing file-per-table import:
 Running import...
@@ -113,3 +149,12 @@ Running import...
 12 Test Basic database example 
 13 Test Basic database example 
 NULL 
+Running import...
+# Source on localhost: ... connected.
+# Importing data from util_test.t5.vertical.
+#...done.
+# Data from util_test.t5:
+1 kitkat 0.99 19 
+2 M&M 5.99 19 
+3 milk 0.67 5 
+4 Dr. Pepper 0.99 19 

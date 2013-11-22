@@ -54,72 +54,78 @@ class test(mutlib.System_test):
         # Build connection string <login-path>[:<port>][:<socket>]
         self.server1_con_str = 'test_mylogin_clone_user'
         if con_val[3]:
-            self.server1_con_str = "%s:%s" % (self.server1_con_str, con_val[3])
+            self.server1_con_str = "{0}:{1}".format(self.server1_con_str,
+                                                    con_val[3])
         if con_val[4]:
-            self.server1_con_str = "%s:%s" % (self.server1_con_str, con_val[4])
+            self.server1_con_str = "{0}:{1}".format(self.server1_con_str,
+                                                    con_val[4])
 
         # Load users data
         data_file = "./std_data/basic_users.sql"
         try:
             self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
-            raise MUTLibError("Failed to read commands from file %s: %s"
-                              % (data_file, err.errmsg))
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
         return True
 
     def show_user_grants(self, user):
-        query = "SHOW GRANTS FOR %s" % user
+        query = "SHOW GRANTS FOR {0}".format(user)
         try:
             res = self.server1.exec_query(query)
             if res is not None:
                 for row in res:
                     self.results.append(row[0] + '\n')
         except UtilError as err:
-            raise MUTLibError("Failed to get grants for %s: %s."
-                              % (user, err.errmsg))
+            raise MUTLibError("Failed to get grants for {0}: "
+                              "{1}.".format(user, err.errmsg))
 
     def run(self):
         self.res_fname = "result.txt"
 
         cmd_str = ("mysqluserclone.py --source={0} "
-                   "--destination={0} ").format(self.server1_con_str)
+                   "--destination={0} ".format(self.server1_con_str))
 
         # Test case 1 - clone a user to a single user (using login-path)
-        comment = "Test case 1 - Clone one user to another (using login-path)"
+        test_num = 1
+        comment = ("Test case {0} - Clone one user to another "
+                   "(using login-path)".format(test_num))
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.show_user_grants("'jill'@'user'")
 
         # Test case 2 - clone a user to a multiple users (using login-path)
-        comment = ("Test case 2 - Clone a user to multiple users "
-                  "(using login-path)")
-        res = self.run_test_case(0, cmd_str + " amy_nopass@user " +
-                                 "jack:duh@user john@user", comment)
+        test_num += 1
+        comment = ("Test case {0} - Clone a user to multiple users "
+                   "(using login-path)".format(test_num))
+        res = self.run_test_case(0,
+                                 cmd_str + " amy_nopass@user " +
+                                 "jack:duh@user john@user",
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.show_user_grants("jack@user")
         self.show_user_grants("john@user")
 
         # Test case 3 - clone a user with only --source (using login-path)
-        cmd_str = ("mysqluserclone.py --source=%s --force "
-                   % self.server1_con_str)
+        test_num += 1
+        cmd_str = ("mysqluserclone.py --source={0} --force ".format(
+            self.server1_con_str))
 
-        comment = ("Test case 3 - Clone one user to another (using login-path)"
-                   " with only source specified")
+        comment = ("Test case {0} - Clone one user to another (using "
+                   "login-path) with only source specified".format(test_num))
         res = self.run_test_case(0, cmd_str + " joe_pass@user jill:duh@user",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source and destination host name.
-        self.replace_substring("on localhost",
-                               "on XXXX-XXXX")
-        self.replace_substring("on [::1]",
-                               "on XXXX-XXXX")
+        self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         return True
 
@@ -133,8 +139,8 @@ class test(mutlib.System_test):
         user = User(server, user_name)
         if user.exists():
             res = user.drop()
-            if res:
-                print "cleanup: failed to drop user %s" % user_name
+            if not res:
+                print("cleanup: failed to drop user {0}".format(user_name))
         return True
 
     def cleanup(self):
@@ -144,27 +150,12 @@ class test(mutlib.System_test):
         query = "DROP DATABASE util_test"
         try:
             self.server1.exec_query(query)
-        except Exception:
+        except UtilError:
             return False
-        res = self.drop_user("'joe_pass'@'%'", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("joe_pass@user", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("'joe_nopass'@'user'", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("'amy_nopass'@'user'", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("'jill'@'user'", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("'jack'@'user'", self.server1)
-        if not res:
-            return False
-        res = self.drop_user("'john'@'user'", self.server1)
-        if not res:
-            return False
-        return True
+        users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",
+                 "'amy_nopass'@'user'", "'jill'@'user'", "'jack'@'user'",
+                 "'john'@'user'"]
+
+        users_dropped = [self.drop_user(user, self.server1) for user in users]
+
+        return all(users_dropped)

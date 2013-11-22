@@ -20,8 +20,9 @@ import clone_db
 from mysql.utilities.exception import MUTLibError
 
 # List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
+(DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT) = (
+    "DATABASE", "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT",
+    "GRANT")
 
 
 class test(clone_db.test):
@@ -42,11 +43,9 @@ class test(clone_db.test):
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
         to_conn = "--destination={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_base = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn,
                                                                to_conn)
@@ -64,7 +63,7 @@ class test(clone_db.test):
 
         test_num += 1
         comment = ("Test case {0} - operation fails - "
-                   "need force").format(test_num)
+                   "need force".format(test_num))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -104,7 +103,7 @@ class test(clone_db.test):
         self.drop_db(self.server1, "util_db_clone")
         # Test clone in verbose mode.
         comment = ("Test case {0} - verbose clone "
-                   "with drop warnings.").format(test_num)
+                   "with drop warnings.".format(test_num))
         cmd_opts = "--force --verbose util_test:util_db_clone"
         cmd = "{0} {1}".format(cmd_base, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
