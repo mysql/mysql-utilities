@@ -142,7 +142,7 @@ Test case 2 - export data only - single rows
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -150,19 +150,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -174,15 +174,15 @@ Test case 3 - export data only - bulk insert
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example'),  (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys'),  (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES  (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
@@ -326,7 +326,7 @@ GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -334,19 +334,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -441,7 +441,7 @@ GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -449,19 +449,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -609,7 +609,7 @@ GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -617,19 +617,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -640,7 +640,342 @@ SET FOREIGN_KEY_CHECKS=1;
 #
 Time:       XXXXXX
 
-Test case 7 - export database with weird names (backticks)
+Test case 7 - export data and metadata with multiprocessing (2 processes).
+# Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
+||
+DELIMITER ;
+# PROCEDURE: util_test.p1
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
+#...done.
+USE `util_test`;
+# Exporting data from util_test
+# Data for table `util_test`.`t1`:
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`:
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
+# Data for table `util_test`.`t3`:
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
+# Data for table `util_test`.`t4`:
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
+#...done.
+SET FOREIGN_KEY_CHECKS=1;
+Test case 8 - export data and metadata to output file.
+# Source on localhost: ... connected.
+Output file results:
+SET FOREIGN_KEY_CHECKS=0;
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
+# TABLE: util_test.t1
+CREATE TABLE `t1` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# TABLE: util_test.t2
+CREATE TABLE `t2` (
+  `a` char(30) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test.t3
+CREATE TABLE `t3` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# TABLE: util_test.t4
+CREATE TABLE `t4` (
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# TABLE: util_test.t5
+CREATE TABLE `t5` (
+  `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# FUNCTION: util_test.f1
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+    DETERMINISTIC
+RETURN (SELECT 1);
+||
+DELIMITER ;
+# FUNCTION: util_test.f2
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
+    DETERMINISTIC
+RETURN base_price + base_price*(tax_percentage/100);
+||
+DELIMITER ;
+# PROCEDURE: util_test.p1
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
+INSERT INTO util_test.t1 VALUES ("50");
+||
+DELIMITER ;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: util_test.v2
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# TRIGGER: util_test.trg
+DELIMITER ||
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+||
+DELIMITER ;
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+# Grant:
+GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
+# Grant:
+GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
+#...done.
+USE `util_test`;
+# Exporting data from util_test
+# Data for table `util_test`.`t1`:
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
+# Data for table `util_test`.`t2`:
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
+# Data for table `util_test`.`t3`:
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
+# Data for table `util_test`.`t4`:
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
+#...done.
+SET FOREIGN_KEY_CHECKS=1;
+Test case 9 - export database with weird names (backticks)
 # Source on localhost: ... connected.
 # Exporting metadata from db`:db
 DROP DATABASE IF EXISTS `db``:db`;
@@ -717,12 +1052,12 @@ GRANT UPDATE ON `db``:db`.* TO 'joe'@'user';
 #...done.
 USE `db``:db`;
 # Exporting data from db`:db
-# Data for table `db``:db`.```t``.``export_2`: 
+# Data for table `db``:db`.```t``.``export_2`:
 INSERT INTO `db``:db`.```t``.``export_2` VALUES (1, '@`var`.`var`');
-# Data for table `db``:db`.```t``export_1`: 
+# Data for table `db``:db`.```t``export_1`:
 INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
 #...done.
-Test case 8 - export data with special characters
+Test case 10 - export data with special characters
 # Source on localhost: ... connected.
 # Exporting metadata from db`:db
 DROP DATABASE IF EXISTS `db``:db`;
@@ -799,18 +1134,18 @@ GRANT UPDATE ON `db``:db`.* TO 'joe'@'user';
 #...done.
 USE `db``:db`;
 # Exporting data from db`:db
-# Data for table `db``:db`.```t``.``export_2`: 
+# Data for table `db``:db`.```t``.``export_2`:
 INSERT INTO `db``:db`.```t``.``export_2` VALUES (1, '@`var`.`var`');
-# Data for table `db``:db`.```t``export_1`: 
+# Data for table `db``:db`.```t``export_1`:
 INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
 INSERT INTO `db``:db`.```t``export_1` VALUES (2, '\0\'\"\b\n\r\t\Z\\\%\_');
 #...done.
-Test case 9 - export data with unicode characters
+Test case 11 - export data with unicode characters
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -818,26 +1153,26 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
 INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 USE `import_test`;
 # Exporting data from import_test
-# Data for table `import_test`.`customers`: 
+# Data for table `import_test`.`customers`:
 INSERT INTO `import_test`.`customers` VALUES (1, 'Customer 1');
 INSERT INTO `import_test`.`customers` VALUES (2, 'Customer 2');
 INSERT INTO `import_test`.`customers` VALUES (3, 'Customer 3');

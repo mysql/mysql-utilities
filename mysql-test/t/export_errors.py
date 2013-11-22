@@ -15,7 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import export_basic
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -33,55 +35,63 @@ class test(export_basic.test):
         self.server0 = self.servers.get_server(0)
         try:
             self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+            # Need to grant some privileges to joe on util_test to be able to
+            # see the database, otherwise it is as it does not exist.
+            self.server1.exec_query("GRANT ALL ON util_test.* TO "
+                                    "'joe'@'localhost'")
+            self.server1.exec_query("REVOKE SELECT ON util_test.* FROM "
+                                    "'joe'@'localhost'")
         except UtilError as err:
-            raise MUTLibError("ERROR: Unable to create USER 'joe'@'localhost':"
-                              " {0}".format(err.errmsg))
+            raise MUTLibError("Cannot create user joe'@'localhost' with "
+                              "necessary privileges: {0}".format(err.errmsg))
         return export_basic.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1))
+            self.build_connection_string(self.server1)
+        )
 
-        cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
+        cmd = "mysqldbexport.py {0} util_test --skip-gtid".format(from_conn)
 
         test_num = 1
         comment = "Test case {0} - bad --skip values".format(test_num)
-        cmd = "{0} --skip=events,wiki-waki,woo-woo ".format(cmd)
-        res = self.run_test_case(1, cmd, comment)
+        cmd_str = "{0} --skip=events,wiki-waki,woo-woo ".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - exporting data and skipping "
-                   "data".format(test_num))
-        cmd = "{0} --skip=data --export=data".format(cmd)
-        res = self.run_test_case(1, cmd, comment)
+                   "data").format(test_num)
+        cmd_str = "{0} --skip=data --export=data".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbexport.py {0} --skip-gtid".format(from_conn)
+
         test_num += 1
-        cmd_str = "mysqldbexport.py {0} --skip-gtid ".format(from_conn)
         comment = "Test case {0} - no database specified".format(test_num)
-        res = self.run_test_case(2, cmd_str, comment)
+        res = self.run_test_case(2, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbexport.py util_test --skip-gtid"
+
         test_num += 1
-        cmd_str = ("mysqldbexport.py --server=rocks_rocks_rocks "
-                   "--skip-gtid util_test ")
         comment = "Test case {0} - cannot parse --server".format(test_num)
+        cmd_str = "{0} --server=rocks_rocks_rocks".format(cmd)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbexport.py --skip-gtid --server=nope:nada@localhost:"
-                   "{0} util_test".format(self.server0.port))
         comment = ("Test case {0} - error: cannot connect to "
-                   "server".format(test_num))
+                   "server").format(test_num)
+        cmd_str = ("{0} --server=nope:nada@localhost:"
+                   "{1}").format(cmd, self.server0.port)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -92,46 +102,66 @@ class test(export_basic.test):
             joe_conn = "{0}:{1}".format(joe_conn, self.server1.socket)
 
         test_num += 1
-        cmd_str = "mysqldbexport.py {0} util_test --skip-gtid ".format(
-            joe_conn)
         comment = ("Test case {0} - error: not enough "
-                   "privileges".format(test_num))
+                   "privileges").format(test_num)
+        cmd_str = "{0} {1}".format(cmd, joe_conn)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbexport.py --skip-gtid"
+
         test_num += 1
-        cmd_str = "mysqldbexport.py {0} notthereatall --skip-gtid ".format(
-            from_conn)
         comment = "Test case {0} - database does not exist".format(test_num)
+        cmd_str = "{0} {1} notthereatall".format(cmd, from_conn)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbexport.py util_test --skip-gtid"
+
         test_num += 1
-        cmd_str = ("mysqldbexport.py {0} util_test --export=definitions"
-                   " --skip-gtid ".format(joe_conn))
         comment = ("Test case {0} - error: not enough "
-                   "privileges".format(test_num))
+                   "privileges").format(test_num)
+        cmd_str = "{0} {1} --export=definitions".format(cmd, joe_conn)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbexport.py {0} util_test --skip-gtid".format(from_conn)
+
         test_num += 1
-        cmd_str = "mysqldbexport.py {0} util_test --all --skip-gtid".format(
-            from_conn)
         comment = "Test case {0} - error: db list and --all".format(test_num)
+        cmd_str = "{0} --all".format(cmd)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - invalid --character-set".format(test_num)
         cmd_str = ("mysqldbexport.py {0} --all "
                    "--character-set=unsupported_charset".format(from_conn))
-        comment = "Test case 10 - invalid --character-set"
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - error: invalid multiprocess "
+                   "value.").format(test_num)
+        cmd_str = "{0} --multiprocess=0.5".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: multiprocess value smaller than "
+                   "zero.").format(test_num)
+        cmd_str = "{0} --multiprocess=-1".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Mask non deterministic output.
         self.replace_substring("1045 (28000)", "1045")
 
         self.replace_substring("on [::1]", "on localhost")
@@ -155,5 +185,5 @@ class test(export_basic.test):
         try:
             self.server1.exec_query("DROP USER 'joe'@'localhost'")
         except UtilError:
-            pass
+            pass  # Ignore DROP USER failure (user may not exist).
         return export_basic.test.cleanup(self)

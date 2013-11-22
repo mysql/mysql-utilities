@@ -56,7 +56,6 @@ class test(export_rpl_errors.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("CREATE DATABASE util_test")
         self.server1.exec_query("CREATE USER imnotamouse@localhost")
 
         comment = "Test case {0} - warning: --rpl-user missing".format(
@@ -98,9 +97,10 @@ class test(export_rpl_errors.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
-        
+
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server3))
+        self.server3.exec_query("CREATE DATABASE util_test")
         
         cmd_str = ("mysqldbexport.py util_test --export=both "
                    "--rpl-user=rpl:rpl {0} ".format(from_conn))

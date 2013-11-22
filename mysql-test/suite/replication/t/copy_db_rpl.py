@@ -188,6 +188,10 @@ class test(replicate.test):
 
         # Drop all databases and reestablish replication
         if restart_replication:
+            # Rollback here to avoid active transaction error for STOP SLAVE
+            # with 5.5 servers (versions > 5.5.0).
+            if self.servers.get_server(0).check_version_compat(5, 5, 0):
+                destination.rollback()
             destination.exec_query("STOP SLAVE")
             destination.exec_query("RESET SLAVE")
             for db in db_list:
@@ -285,9 +289,13 @@ class test(replicate.test):
             if self.debug:
                 print "done."
 
+        # ROLLBACK to close any active transaction leading to wrong values for
+        # the next SELECT COUNT(*) with 5.5 servers (versions > 5.5.0).
+        if self.servers.get_server(0).check_version_compat(5, 5, 0):
+            destination.rollback()
         results.append(self._check_result(destination, "SELECT COUNT(*) "
                                                        "FROM master_db1.t1"))
-        
+
         if self.debug:
             print comment
             print "Expected Results:", expected_results[test_num-1]

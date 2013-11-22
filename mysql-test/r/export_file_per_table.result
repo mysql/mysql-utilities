@@ -8,6 +8,12 @@ USE `util_test_mt`;
 #...done.
 Test case 2 - sql format with --file-per-table
 SET FOREIGN_KEY_CHECKS=0;
+# The following are sample SOURCE commands. If needed correct the path to match files location.
+# SOURCE util_test.t1.sql
+# SOURCE util_test.t2.sql
+# SOURCE util_test.t3.sql
+# SOURCE util_test.t4.sql
+# SOURCE util_test.t5.sql
 SET FOREIGN_KEY_CHECKS=1;
 # Checking for file-per-table creation:
 #       util_test.t1.sql ................. [PASS]

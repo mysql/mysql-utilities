@@ -75,6 +75,8 @@ class Lock(object):
         self.server = server
         self.table_list = table_list
 
+        self.query_opts = {'fetch': False, 'commit': False}
+
         # If no locking, we're done
         if self.locking == 'no-locks':
             return
@@ -95,19 +97,19 @@ class Lock(object):
                 print '# LOCK STRING:', lock_str
 
             # Execute the lock
-            self.server.exec_query(lock_str)
+            self.server.exec_query(lock_str, self.query_opts)
 
             self.locked = True
 
         elif self.locking == 'snapshot':
-            self.server.exec_query(_SESSION_ISOLATION_LEVEL)
-            self.server.exec_query(_START_TRANSACTION)
+            self.server.exec_query(_SESSION_ISOLATION_LEVEL, self.query_opts)
+            self.server.exec_query(_START_TRANSACTION, self.query_opts)
 
         # Execute a FLUSH TABLES WITH READ LOCK for replication uses only
         elif self.locking == 'flush' and options.get("rpl_mode", None):
             if self.verbosity >= 3 and not self.silent:
                 print "# LOCK STRING: %s" % _FLUSH_TABLES_READ_LOCK
-            self.server.exec_query(_FLUSH_TABLES_READ_LOCK)
+            self.server.exec_query(_FLUSH_TABLES_READ_LOCK, self.query_opts)
             self.locked = True
         else:
             raise UtilError("Invalid locking type: '%s'." % self.locking)
@@ -135,7 +137,7 @@ class Lock(object):
         if self.locking in ['lock-all', 'flush']:
             if self.verbosity >= 3 and not self.silent:
                 print "UNLOCK TABLES"
-            self.server.exec_query("UNLOCK TABLES")
+            self.server.exec_query("UNLOCK TABLES", self.query_opts)
             self.locked = False
 
         # Stop transaction if locking == 0
@@ -143,8 +145,8 @@ class Lock(object):
             if not abort:
                 if self.verbosity >= 3 and not self.silent:
                     print "COMMIT"
-                self.server.exec_query("COMMIT")
+                self.server.exec_query("COMMIT", self.query_opts)
             else:
-                self.server.exec_queery("ROLLBACK")
+                self.server.exec_queery("ROLLBACK", self.query_opts)
                 if self.verbosity >= 3 and not self.silent:
                     print "ROLLBACK"

@@ -286,7 +286,7 @@ if opt.new_engine:
                          "directory '{0}'.".format(opt.frmdir))
 elif not opt.new_engine and opt.frmdir:
     print("# WARNING: --frmdir encountered without --new-storage-engine. "
-              "No .frm files will be saved.")
+          "No .frm files will be saved.")
 
 server = None
 if opt.server is None and opt.diagnostic:

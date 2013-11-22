@@ -79,6 +79,14 @@ Options:
                         statements. Valid only with --rpl option.
   --skip-fkey-checks    skip creation of foreign key disable/enable
                         statements.
+  --multiprocess=MULTIPROCESS
+                        use multiprocessing, number of processes to use for
+                        concurrent execution. Special values: 0 (number of
+                        processes equal to the CPUs detected) and 1 (default -
+                        no concurrency).
+  --output-file=OUTPUT_FILE
+                        path and file name to store the generated output, by
+                        default the standard output (no file).
 Test case 2 - no grants
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;

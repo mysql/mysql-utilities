@@ -810,12 +810,9 @@ class Table(object):
                     pthreads.append(p)
 
             if num_conn > 1:
-                # Wait for all to finish
-                num_complete = 0
-                while num_complete < len(pthreads):
-                    for p in pthreads:
-                        if not p.is_alive():
-                            num_complete += 1
+                # Wait for all threads to finish
+                for p in pthreads:
+                    p.join()
 
     def retrieve_rows(self, num_conn=1):
         """Retrieve the table data in rows.
@@ -832,10 +829,12 @@ class Table(object):
         Returns (yield) row data
         """
 
-        segment_size = self.get_segment_size(num_conn)
+        if num_conn > 1:
+            # Only get the segment size when needed.
+            segment_size = self.get_segment_size(num_conn)
 
         # Execute query to get all of the data
-        cur = self.server.exec_query("SELECT * FROM %s" % self.q_table,
+        cur = self.server.exec_query("SELECT * FROM {0}".format(self.q_table),
                                      self.query_options)
 
         while True:
@@ -854,7 +853,7 @@ class Table(object):
                 raise StopIteration()
             else:
                 rows = cur.fetchmany(segment_size)
-                if rows == []:
+                if not rows:
                     raise StopIteration()
                 #print "ROWS 3:", rows
             if rows is None:

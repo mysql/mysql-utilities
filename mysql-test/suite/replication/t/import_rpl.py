@@ -185,6 +185,10 @@ class test(copy_db_rpl.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
+        # Rollback here to avoid active transaction error for STOP SLAVE with
+        # 5.5 servers.
+        if self.servers.get_server(0).check_version_compat(5, 5, 0):
+            self.server3.rollback()
         # Do the last test case again but don't skip to show rows are updated
         self.server3.exec_query("STOP SLAVE")
         self.server3.exec_query("RESET SLAVE")

@@ -56,10 +56,9 @@ class test(replicate.test):
             self.server3 = res[0]
             self.servers.add_new_server(self.server3, True)
 
-        try:
-            self.server1.exec_query("DROP DATABASE util_test")
-        except UtilError:
-            pass
+        # Create util_test database to avoid not exist error.
+        self.server1.exec_query("DROP DATABASE IF EXISTS util_test")
+        self.server1.exec_query("CREATE DATABASE util_test")
 
         return result
 
@@ -99,7 +98,6 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("CREATE DATABASE util_test")
         self.server1.exec_query("CREATE USER imnotamouse@localhost")
 
         cmd_str = "mysqldbexport.py util_test --export=data {0} ".format(
@@ -132,7 +130,6 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("DROP DATABASE util_test")
         self.server1.exec_query("DROP USER imnotamouse@localhost")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
@@ -147,6 +144,7 @@ class test(replicate.test):
 
         from_conn = "--server=" + self.build_connection_string(self.server3)
 
+        self.server3.exec_query("CREATE DATABASE util_test")
         cmd_str = ("mysqldbexport.py util_test --export=both "
                    "--rpl-user=rpl:rpl {0} ".format(from_conn))
         comment = "Test case {0} - error: no binlog".format(test_num)

@@ -163,7 +163,7 @@ def execute_script(run_cmd, filename=None, options=None, verbosity=False):
     command = " ".join([run_cmd, cmd_opts])
 
     if verbosity:
-        print "# SCRIPT EXECUTED:", command
+        print("# SCRIPT EXECUTED: {0}".format(command))
 
     proc = subprocess.Popen(command, shell=True,
                             stdout=f_out, stderr=f_out)
@@ -504,3 +504,13 @@ def check_connector_python(print_error=True):
                   "Connector/Python from http://dev.mysql.com.")
         return False
     return True
+
+
+def print_elapsed_time(start_time):
+    """Print the elapsed time to stdout (screen)
+
+    start_time[in]      The starting time of the test
+    """
+    stop_time = time.time()
+    display_time = stop_time - start_time
+    print("Time: {0:.2f} sec\n".format(display_time))

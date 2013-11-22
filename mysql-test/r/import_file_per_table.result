@@ -1,4 +1,8 @@
 Test case 1 - sql format with --file-per-table
+# The following are sample SOURCE commands. If needed correct the path to match files location.
+# SOURCE util_test.t1.sql
+# SOURCE util_test.t2.sql
+# SOURCE util_test.t5.sql
 # Testing file-per-table import:
 Running import...
 # Source on localhost: ... connected.

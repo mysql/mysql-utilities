@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import copy_db
 from mysql.utilities.exception import MUTLibError, UtilError
 
@@ -56,248 +57,274 @@ class test(copy_db.test):
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
-            self.build_connection_string(self.server1))
+            self.build_connection_string(self.server1)
+        )
         to_conn = "--destination={0}".format(
-            self.build_connection_string(self.server2))
+            self.build_connection_string(self.server2)
+        )
+
+        cmd = "mysqldbcopy.py --skip-gtid {0}".format(from_conn)
 
         test_num = 1
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} ".format(from_conn)
-        cmd_opts = "util_test:util_db_clone "
         comment = ("Test case {0} - error: no destination "
-                   "specified".format(test_num))
-        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+                   "specified").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
+
         test_num += 1
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
-                                                               to_conn)
-        cmd_opts = " "
         comment = ("Test case {0} - error: no database "
-                   "specified".format(test_num))
-        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+                   "specified").format(test_num)
+        res = self.run_test_case(2, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " wax\t::sad "
         comment = ("Test case {0} - error: cannot parse database "
-                   "list".format(test_num))
-        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+                   "list").format(test_num)
+        cmd_str = "{0} wax\t::sad".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = "NOT_THERE_AT_ALL:util_db_clone"
         comment = ("Test case {0} - error: old database doesn't "
-                   "exist".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "exist").format(test_num)
+        cmd_str = "{0} NOT_THERE_AT_ALL:util_db_clone".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        cmd = ("mysqldbcopy.py --skip-gtid {0} "
+               "--source=nope:nada@localhost:3306").format(to_conn)
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} "
-                   "--source=nope:nada@localhost:3306 ".format(to_conn))
-        cmd_opts = "util_test:util_db_clone "
         comment = ("Test case {0} - error: cannot connect to "
-                   "source".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "source").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        cmd = ("mysqldbcopy.py --skip-gtid {0} "
+               "--destination=nope:nada@localhost:3306").format(from_conn)
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} "
-                   "--destination=nope:nada@localhost:3306 ".format(from_conn))
-        cmd_opts = "util_test:util_db_clone "
         comment = ("Test case {0} - error: cannot connect to "
-                   "destination".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "destination").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=joe@localhost:{0} ".format(self.server1.port)
-        # Watch out for Windows: it doesn't use sockets!
+        from_conn = "--source=joe@localhost:{0}".format(self.server1.port)
+        # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = "--destination=joe@localhost:{0}:{1}".format(
-                self.server2.port, self.server2.socket)
+            to_conn = ("--destination=joe@localhost:{0}:"
+                       "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=joe@localhost:{0}".format(
-                self.server2.port)
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
-                                                               to_conn)
+            to_conn = ("--destination=joe@localhost:"
+                       "{0})").format(self.server2.port)
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
+
         test_num += 1
-        cmd_opts = "util_test:util_db_clone "
         comment = ("Test case {0} - users with minimal "
-                   "privileges".format(test_num))
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+                   "privileges").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone".format(cmd)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=sam@localhost:{0} ".format(self.server1.port)
+        from_conn = "--source=sam@localhost:{0}".format(self.server1.port)
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = "--destination=joe@localhost:{0}:{1}".format(
-                self.server2.port, self.server2.socket)
+            to_conn = ("--destination=joe@localhost:{0}:"
+                       "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=joe@localhost:{0}".format(
-                self.server2.port)
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
-                                                               to_conn)
+            to_conn = ("--destination=joe@localhost:"
+                       "{0}").format(self.server2.port)
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
         test_num += 1
-        cmd_opts = "util_test:util_db_clone --force"
         comment = ("Test case {0} - source user not enough privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone --force".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
         # Give Sam some privileges on source and retest until copy works
         self.server1.exec_query("GRANT SELECT ON util_test.* TO "
                                 "'sam'@'localhost'")
+
+        test_num += 1
         comment = ("Test case {0} - source user has some privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
         self.server1.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
+
+        test_num += 1
         comment = ("Test case {0} - source user has some privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        self.server1.exec_query("GRANT SHOW VIEW, EVENT ON util_test.* TO "
+                                "'sam'@'localhost'")
+
         test_num += 1
-        self.server1.exec_query("GRANT SHOW VIEW, EVENT "
-                                "ON util_test.* TO 'sam'@'localhost'")
         comment = ("Test case {0} - source user has privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix":
-            to_conn = "--destination=sam@localhost:{0}:{1}".format(
-                self.server2.port, self.server2.socket)
+            to_conn = ("--destination=sam@localhost:{0}:"
+                       "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = "--destination=sam@localhost:{0}".format(
-                self.server2.port)
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
-                                                               to_conn)
-        cmd_opts = "util_test:util_db_clone --force "
+            to_conn = ("--destination=sam@localhost:"
+                       "{0}").format(self.server2.port)
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
+
+        test_num += 1
         comment = ("Test case {0} - dest user not enough privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone --force".format(cmd)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
-        # Give Sam some privileges on source and retest until copy works
+        # Give some privileges on source and retest until copy works
         self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
                                 "'sam'@'localhost' WITH GRANT OPTION")
+
+        test_num += 1
         comment = ("Test case {0} - dest user has some privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
         self.server2.exec_query("GRANT CREATE USER ON *.* TO "
                                 "'sam'@'localhost'")
+
+        test_num += 1
         comment = ("Test case {0} - dest user has some privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
         self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'localhost'")
+
+        test_num += 1
         comment = ("Test case {0} - dest user has privileges "
-                   "needed".format(test_num))
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+                   "needed").format(test_num)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks {0} "
-                   "util_test:util_db_clone --force ".format(to_conn))
         comment = "Test case {0} - cannot parse --source".format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks {0}"
+                   " util_test:util_db_clone --force").format(to_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} util_test:util_db_clone "
-                   "--destination=rocks_rocks_rocks "
-                   "--force ".format(from_conn))
         comment = "Test case {0} - cannot parse --destination".format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} util_test:util_db_clone "
+                   "--destination=rocks_rocks_rocks --force").format(from_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks "
-                   "util_test:util_db_clone --force ")
         comment = "Test case {0} - no destination specified".format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks "
+                   "util_test:util_db_clone --force")
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(to_conn,
-                                                               from_conn)
         comment = "Test case {0} - no database specified".format(test_num)
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1}".format(to_conn,
+                                                              from_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   " --force --new-storage-engine=NOTTHERE".format(to_conn,
-                                                                   from_conn))
         comment = "Test case {0} - new storage engine missing".format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --force --new-storage-engine=NOTTHERE").format(to_conn,
+                                                                    from_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   " --force --default-storage-engine="
-                   "NOPENOTHERE".format(to_conn, from_conn))
         comment = ("Test case {0} - default storage engine "
-                   "missing".format(test_num))
+                   "missing").format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --default-storage-engine=NOPENOTHERE"
+                   " --force").format(to_conn, from_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   " --force --all".format(to_conn, from_conn))
         comment = "Test case {0} - database listed and --all".format(test_num)
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
+                   " --force --all").format(to_conn, from_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Check --rpl option errors        
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1} util_test".format(to_conn,
+                                                                    from_conn)
+
+        # Check --rpl option errors
         test_num += 1
-        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} "
-                   "util_test ".format(to_conn, from_conn))
-        comment = "Test case {0} - error: {1} but no --rpl".format(
-            test_num, "--rpl-user=root")
-        res = self.run_test_case(2, cmd_str + "--rpl-user=root", comment)
+        comment = ("Test case {0} - error: {1} but no "
+                   "--rpl").format(test_num, "--rpl-user=root")
+        cmd_str = "{0} --rpl-user=root".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        test_num += 1
 
+        test_num += 1
+        comment = "Test case {0} - Invalid --character-set".format(test_num)
         cmd_str = ("mysqldbcopy.py {0} {1} --all "
                    "--character-set=unsupported_charset"
                    "".format(from_conn, to_conn))
-        comment = "Test case {0} - Invalid --character-set".format(test_num)
         res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: invalid multiprocess "
+                   "value.").format(test_num)
+        cmd_str = "{0} --multiprocess=0.5".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: multiprocess value smaller than "
+                   "zero.").format(test_num)
+        cmd_str = "{0} --multiprocess=-1".format(cmd)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

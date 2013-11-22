@@ -26,21 +26,24 @@ from mysql.utilities.common.tools import check_python_version
 # Check Python version compatibility
 check_python_version()
 
+import multiprocessing
 import os
 import sys
 import time
 import re
 
-from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.messages import WARN_OPT_ONLY_USED_WITH
 from mysql.utilities.common.options import (setup_common_options, add_engines,
                                             add_skip_options, check_verbosity,
                                             add_verbosity, check_skip_options,
                                             add_format_option,
                                             add_character_set_option)
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.tools import (check_connector_python,
+                                          print_elapsed_time)
+from mysql.utilities.exception import FormatError, UtilError
 
 
 # Constants
@@ -54,189 +57,263 @@ _PERMITTED_IMPORTS = ["data", "definitions", "both"]
 if not check_connector_python():
     sys.exit(1)
 
+if __name__ == '__main__':
+    # Needed for freeze support to avoid RuntimeError when running as a Windows
+    # executable, otherwise ignored.
+    multiprocessing.freeze_support()
 
-def print_elapsed_time(start_test):
-    """Print the elapsed time to stdout (screen)
+    # Setup the command parser and setup server, help
+    parser = setup_common_options(os.path.basename(sys.argv[0]),
+                                  DESCRIPTION, USAGE)
 
-    start_test[in]      The starting time of the test
-    """
-    stop_test = time.time()
-    display_time = int((stop_test - start_test) * 100)
-    if display_time == 0:
-        display_time = 1
-    print("Time: %6d\n" % display_time)
+    # Setup utility-specific options:
 
-# Setup the command parser and setup server, help
-parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE)
+    # Add character set option
+    add_character_set_option(parser)
 
-# Setup utility-specific options:
+    # Input format
+    add_format_option(parser, "the input file format in either sql (default), "
+                      "grid, tab, csv, raw_csv or vertical format", "sql",
+                      True, extra_formats=["raw_csv"])
 
-# Add character set option
-add_character_set_option(parser)
+    # Import mode
+    parser.add_option("-i", "--import", action="store", dest="import_type",
+                      default="definitions", help="control the import of "
+                      "either 'data' = only the table data for the tables in "
+                      "the database list, 'definitions' = import only the "
+                      "definitions for the objects in the database list, or "
+                      "'both' = import the metadata followed by the data "
+                      "(default: import definitions)", type="choice",
+                      choices=_PERMITTED_IMPORTS)
 
-# Input format
-add_format_option(parser, "the input file format in either sql (default), "
-                  "grid, tab, csv, raw_csv or vertical format", "sql", True,
-                  extra_formats=["raw_csv"])
+    # Drop mode
+    parser.add_option("-d", "--drop-first", action="store_true", default=False,
+                      help="drop database before importing.", dest="do_drop")
 
-# Import mode
-parser.add_option("-i", "--import", action="store", dest="import_type",
-                  default="definitions", help="control the import of either "
-                  "'data' = only the table data for the tables in the "
-                  "database list, 'definitions' = import only the definitions "
-                  "for the objects in the database list, or 'both' = import "
-                  "the metadata followed by the data "
-                  "(default: import definitions)", type="choice",
-                  choices=_PERMITTED_IMPORTS)
+    # Single insert mode
+    parser.add_option("-b", "--bulk-insert", action="store_true",
+                      dest="bulk_insert", default=False, help="use bulk "
+                      "insert statements for data (default:False)")
 
-# Drop mode
-parser.add_option("-d", "--drop-first", action="store_true", default=False,
-                  help="drop database before importing.", dest="do_drop")
+    # Header row
+    parser.add_option("-h", "--no-headers", action="store_true",
+                      dest="no_headers", default=False,
+                      help="files do not contain column headers")
 
-# Single insert mode
-parser.add_option("-b", "--bulk-insert", action="store_true",
-                  dest="bulk_insert", default=False, help="use bulk insert "
-                  "statements for data (default:False)")
+    # Dryrun mode
+    parser.add_option("--dryrun", action="store_true", dest="dryrun",
+                      default=False, help="import the files and generate the "
+                      "statements but do not execute them - useful for "
+                      "testing file validity")
 
-# Header row
-parser.add_option("-h", "--no-headers", action="store_true", dest="no_headers",
-                  default=False, help="files do not contain column headers")
+    # Add table for import raw csv files
+    parser.add_option("--table", action="store", dest="table", default=None,
+                      help="destination table in the form: <db>.<table>.")
 
-# Dryrun mode
-parser.add_option("--dryrun", action="store_true", dest="dryrun",
-                  default=False, help="import the files and generate the "
-                  "statements but do not execute them - useful for testing "
-                  "file validity")
+    # Skip blobs for import
+    parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
+                      default=False, help="do not import blob data.")
 
-# Add table for import raw csv files
-parser.add_option("--table", action="store", dest="table", default=None,
-                  help="destination table in the form: <db>.<table>.")
+    # Skip replication commands
+    parser.add_option("--skip-rpl", action="store_true", dest="skip_rpl",
+                      default=False, help="do not execute replication "
+                                          "commands.")
 
-# Skip blobs for import
-parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
-                  default=False, help="do not import blob data.")
+    # Add skip generation of GTID statements
+    parser.add_option("--skip-gtid", action="store_true", default=False,
+                      dest="skip_gtid", help="do not execute the GTID_PURGED "
+                      "statements.")
 
-# Skip replication commands
-parser.add_option("--skip-rpl", action="store_true", dest="skip_rpl",
-                  default=False, help="do not execute replication commands.")
+    # Add the skip common options
+    add_skip_options(parser)
 
-# Add skip generation of GTID statements
-parser.add_option("--skip-gtid", action="store_true", default=False,
-                  dest="skip_gtid", help="do not execute the GTID_PURGED "
-                  "statements.")
+    # Add verbosity and quiet (silent) mode
+    add_verbosity(parser, True)
 
-# Add the skip common options
-add_skip_options(parser)
+    # Add engine options
+    add_engines(parser)
 
-# Add verbosity and quiet (silent) mode
-add_verbosity(parser, True)
+    # Add multiprocessing option
+    parser.add_option("--multiprocess", action="store", dest="multiprocess",
+                      type="int", default="1", help="use multiprocessing, "
+                      "number of processes to use for concurrent execution. "
+                      "Special values: 0 (number of processes equal to the "
+                      "CPUs detected) and 1 (default - no concurrency).")
 
-# Add engine options
-add_engines(parser)
+    # Add autocommit option.
+    parser.add_option("--autocommit", action="store_true", dest="autocommit",
+                      default=False, help="use autocommit, by default "
+                      "autocommit is off and transactions are only committed "
+                      "once at the end of each imported file.")
 
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
+    # Add max bulk insert option (to avoid broken pipe errors).
+    parser.add_option("--max-bulk-insert", action="store", type="int",
+                      dest="max_bulk_insert",
+                      help="maximum bulk insert size, by default 30000.")
 
-# Warn if quiet and verbosity are both specified
-check_verbosity(opt)
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
 
-try:
-    skips = check_skip_options(opt.skip_objects)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
+    # Warn if quiet and verbosity are both specified
+    check_verbosity(opt)
 
-# Fail if no arguments
-if len(args) == 0:
-    parser.error("You must specify at least one file to import.")
-
-if opt.skip_blobs and not opt.import_type == "data":
-    print("# WARNING: --skip-blobs option ignored for metadata import.")
-
-if "data" in skips and opt.import_type == "data":
-    print("ERROR: You cannot use --import=data and --skip-data when "
-          "importing table data.")
-    sys.exit(1)
-
-if "create_db" in skips and opt.do_drop:
-    print("ERROR: You cannot combine --drop-first and --skip=create_db.")
-    exit(1)
-
-# Set options for database operations.
-options = {
-    "skip_tables": "tables" in skips,
-    "skip_views": "views" in skips,
-    "skip_triggers": "triggers" in skips,
-    "skip_procs": "procedures" in skips,
-    "skip_funcs": "functions" in skips,
-    "skip_events": "events" in skips,
-    "skip_grants": "grants" in skips,
-    "skip_create": "create_db" in skips,
-    "skip_data": "data" in skips,
-    "skip_blobs": opt.skip_blobs,
-    "format": opt.format,
-    "no_headers": opt.no_headers,
-    "single": not opt.bulk_insert,
-    "import_type": opt.import_type,
-    "dryrun": opt.dryrun,
-    "do_drop": opt.do_drop,
-    "quiet": opt.quiet,
-    "verbosity": opt.verbosity,
-    "debug": opt.verbosity >= 3,
-    "new_engine": opt.new_engine,
-    "def_engine": opt.def_engine,
-    "skip_rpl": opt.skip_rpl,
-    "skip_gtid": opt.skip_gtid,
-    "table": opt.table,
-    "charset": opt.charset,
-}
-
-# Parse server connection values
-try:
-    server_values = parse_connection(opt.server, None, options)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Server connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Server connection values invalid: %s." % err.errmsg)
-
-# Check values for --format=raw_csv
-if opt.format == "raw_csv":
-    if not opt.table:
-        print("ERROR: You must provide --table while using --format=raw_csv.")
+    try:
+        skips = check_skip_options(opt.skip_objects)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR: {0}".format(err.errmsg))
         sys.exit(1)
-    # Validate table name using format <db>.<table>
-    table_re = re.compile(r"{0}(?:\.){0}".format(REGEXP_QUALIFIED_OBJ_NAME))
-    if not table_re.match(opt.table):
-        parser.error("Invalid table name: {0}.".format(opt.table))
 
-# Ignore --table for formats other than RAW_CSV.
-if opt.table and opt.format != "raw_csv":
-    print("WARNING: The --table option is only required for --format=raw_csv "
-          "(option ignored).")
+    # Fail if no arguments
+    if len(args) == 0:
+        parser.error("You must specify at least one file to import.")
 
-# Build list of files to import
-file_list = []
-for file_name in args:
-    file_list.append(file_name)
+    if opt.skip_blobs and not opt.import_type == "data" and not opt.quiet:
+        print("# WARNING: --skip-blobs option ignored for metadata import.")
 
-try:
-    # record start time
-    if opt.verbosity >= 3:
-        start_test = time.time()
+    if "data" in skips and opt.import_type == "data":
+        print("ERROR: You cannot use --import=data and --skip-data when "
+              "importing table data.")
+        sys.exit(1)
 
-    for file_name in file_list:
-        dbimport.import_file(server_values, file_name, options)
+    if "create_db" in skips and opt.do_drop:
+        print("ERROR: You cannot combine --drop-first and --skip=create_db.")
+        exit(1)
 
-    if opt.verbosity >= 3:
-        print_elapsed_time(start_test)
+    # Check multiprocessing option.
+    if opt.multiprocess < 0:
+        parser.error("Number of processes '{0}' must be greater or equal than "
+                     "zero.".format(opt.multiprocess))
+    num_cpu = multiprocessing.cpu_count()
+    if opt.multiprocess > num_cpu and not opt.quiet:
+        print("# WARNING: Number of processes '{0}' is greater than the "
+              "number of CPUs '{1}'.".format(opt.multiprocess, num_cpu))
 
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
+    # Warning if too many process are used.
+    num_files = len(args)
+    if opt.multiprocess > num_files and not opt.quiet:
+        print("# WARNING: Number of processes '{0}' is greater than the "
+              "number of files to import '{1}'.".format(opt.multiprocess,
+                                                        num_files))
 
-sys.exit()
+    # Check max bulk insert option.
+    if opt.max_bulk_insert and opt.max_bulk_insert <= 1:
+        parser.error("Maximum bulk insert size '{0}' must be greater than "
+                     "one.".format(opt.max_bulk_insert))
+    if opt.max_bulk_insert and not opt.bulk_insert and not opt.quiet:
+        print(WARN_OPT_ONLY_USED_WITH.format(opt="--max-bulk-insert",
+                                             used_with="--bulk-insert"))
+    # Set default value for max bulk insert.
+    max_bulk_size = opt.max_bulk_insert if opt.max_bulk_insert else 30000
+
+    # Set options for database operations.
+    options = {
+        "skip_tables": "tables" in skips,
+        "skip_views": "views" in skips,
+        "skip_triggers": "triggers" in skips,
+        "skip_procs": "procedures" in skips,
+        "skip_funcs": "functions" in skips,
+        "skip_events": "events" in skips,
+        "skip_grants": "grants" in skips,
+        "skip_create": "create_db" in skips,
+        "skip_data": "data" in skips,
+        "skip_blobs": opt.skip_blobs,
+        "format": opt.format,
+        "no_headers": opt.no_headers,
+        "single": not opt.bulk_insert,
+        "import_type": opt.import_type,
+        "dryrun": opt.dryrun,
+        "do_drop": opt.do_drop,
+        "quiet": opt.quiet,
+        "verbosity": opt.verbosity,
+        "debug": opt.verbosity >= 3,
+        "new_engine": opt.new_engine,
+        "def_engine": opt.def_engine,
+        "skip_rpl": opt.skip_rpl,
+        "skip_gtid": opt.skip_gtid,
+        "table": opt.table,
+        "charset": opt.charset,
+        "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
+        "autocommit": opt.autocommit,
+        "max_bulk_insert": max_bulk_size,
+    }
+
+    # Parse server connection values
+    try:
+        server_values = parse_connection(opt.server, None, options)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Server connection values invalid: {0}.".format(err))
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Server connection values invalid: "
+                     "{0}.".format(err.errmsg))
+
+    # Check values for --format=raw_csv
+    if opt.format == "raw_csv":
+        if not opt.table:
+            print("ERROR: You must provide --table while using "
+                  "--format=raw_csv.")
+            sys.exit(1)
+        # Validate table name using format <db>.<table>
+        table_re = re.compile(
+            r"{0}(?:\.){0}".format(REGEXP_QUALIFIED_OBJ_NAME)
+        )
+        if not table_re.match(opt.table):
+            parser.error("Invalid table name: {0}.".format(opt.table))
+
+    # Ignore --table for formats other than RAW_CSV.
+    if opt.table and opt.format != "raw_csv" and not opt.quiet:
+        print("WARNING: The --table option is only required for "
+              "--format=raw_csv (option ignored).")
+
+    # Build list of files to import
+    file_list = []
+    for file_name in args:
+        file_list.append(file_name)
+
+    try:
+        # record start time
+        if opt.verbosity >= 3:
+            start_test = time.time()
+
+        # Import all specified files.
+        import_file_tasks = []
+        for file_name in file_list:
+            # Check multiprocess file import.
+            # Note: Multiprocessing is only applied at the file level,
+            # independently from the system (posix or not).
+            if options['multiprocess'] > 1:
+                # Create import file task.
+                import_task = {
+                    'srv_con': server_values,
+                    'file_name': file_name,
+                    'options': options
+                }
+                import_file_tasks.append(import_task)
+            else:
+                # Import file (no concurrency at the file level).
+                dbimport.import_file(server_values, file_name, options)
+
+        # Import files concurrently.
+        if import_file_tasks:
+            # Create process pool.
+            workers_pool = multiprocessing.Pool(
+                processes=options['multiprocess']
+            )
+
+            # Concurrently import files.
+            workers_pool.map_async(dbimport.multiprocess_file_import_task,
+                                   import_file_tasks)
+            workers_pool.close()
+            workers_pool.join()
+
+        if opt.verbosity >= 3:
+            print_elapsed_time(start_test)
+
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR: {0}".format(err.errmsg))
+        sys.exit(1)
+
+    sys.exit()

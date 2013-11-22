@@ -88,6 +88,9 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                   % WARN_OPT_NOT_REQUIRED)
 
+WARN_OPT_ONLY_USED_WITH = ("# WARNING: The {opt} option is only used with "
+                           "{used_with} (option ignored).")
+
 WARN_OPT_USING_DEFAULT = ("WARNING: Using default value '{default}' for "
                           "option {opt}.")
 

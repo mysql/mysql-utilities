@@ -194,3 +194,11 @@ mysqldbcopy: error: The --rpl-user option must be used with the --rpl option.
 Test case 24 - Invalid --character-set
 # Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
 Error Character set 'unsupported_charset' unsupported.
+Test case 25 - error: invalid multiprocess value.
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: option --multiprocess: invalid integer value: '0.5'
+Test case 26 - error: multiprocess value smaller than zero.
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: Number of processes '-1' must be greater or equal than zero.

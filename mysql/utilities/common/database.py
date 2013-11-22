@@ -20,18 +20,21 @@ This module contains abstractions of a MySQL Database object used by
 multiple utilities.
 """
 
+import multiprocessing
+import os
 import re
+import sys
 
 from collections import deque
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.options import obj2sql
+from mysql.utilities.common.server import connect_servers, Server
 from mysql.utilities.common.user import User
 from mysql.utilities.common.sql_transform import (quote_with_backticks,
                                                   remove_backtick_quoting,
                                                   is_quoted_with_backticks)
-
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -105,6 +108,104 @@ ON DELETE {DELETE_RULE}
 """
 
 
+def _multiprocess_tbl_copy_task(copy_tbl_task):
+    """Multiprocess copy table data method.
+
+    This method wraps the copy of the table's data to allow its concurrent
+    execution by a pool of processes.
+
+    copy_tbl_task[in]   dictionary of values required by a process to
+                        perform the table copy task, namely:
+                        'source_srv': <dict with source connections values>,
+                        'dest_srv': <dict with destination connections values>,
+                        'source_db': <source database name>,
+                        'destination_db': <destination database name>,
+                        'table': <table to copy>,
+                        'options': <dict of options>,
+                        'cloning': <cloning flag>,
+                        'connections': <number of concurrent connections>,
+                        'q_source_db': <quoted source database name>.
+    """
+    # Get input to execute task.
+    source_srv = copy_tbl_task.get('source_srv')
+    dest_srv = copy_tbl_task.get('dest_srv')
+    source_db = copy_tbl_task.get('source_db')
+    target_db = copy_tbl_task.get('target_db')
+    table = copy_tbl_task.get('table')
+    options = copy_tbl_task.get('options')
+    cloning = copy_tbl_task.get('cloning')
+    # Execute copy table task.
+    # NOTE: Must handle any exception here, because worker processes will not
+    # propagate them to the main process.
+    try:
+        _copy_table_data(source_srv, dest_srv, source_db, target_db, table,
+                         options, cloning)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR copying data for table '{0}': {1}".format(table,
+                                                               err.errmsg))
+
+
+def _copy_table_data(source_srv, destination_srv, db_name, new_db_name,
+                     tbl_name, tbl_options, cloning, connections=1):
+    """Copy the data of the specified table.
+
+    This method copies/clones all the data from a table to another (new)
+    database.
+
+    source_srv[in]      Source server (Server instance or dict. with the
+                        connection values).
+    destination_srv[in] Destination server (Server instance or dict. with the
+                        connection values).
+    db_name[in]         Name of the database with the table to copy.
+    new_db_name[in]     Name of the destination database to copy the table.
+    tbl_name[in]        Name of the table to copy.
+    tbl_options[in]     Table options.
+    cloning[in]         Cloning flag, in order to use a different method to
+                        copy data on the same server
+    connections[in]     Specify the use of multiple connections/processes to
+                        copy the table data (rows). By default, only 1 used.
+                        Note: Multiprocessing option should be preferred.
+    """
+    # Import table needed here to avoid circular import issues.
+    from mysql.utilities.common.table import Table
+    # Handle source and destination server instances or connection values.
+    # Note: For multiprocessing the use of connection values instead of a
+    # server instance is required to avoid internal errors.
+    if isinstance(source_srv, Server):
+        source = source_srv
+    else:
+        # Get source server instance from connection values.
+        conn_options = {
+            'quiet': True,  # Avoid repeating output for multiprocessing.
+            'version': "5.1.30",
+        }
+        servers = connect_servers(source_srv, None, conn_options)
+        source = servers[0]
+    if isinstance(destination_srv, Server):
+        destination = destination_srv
+    else:
+        # Get source server instance from connection values.
+        conn_options = {
+            'quiet': True,  # Avoid repeating output for multiprocessing.
+            'version': "5.1.30",
+        }
+        servers = connect_servers(destination_srv, None, conn_options)
+        destination = servers[0]
+
+    # Copy table data.
+    if not tbl_options.get("quiet", False):
+        print("# Copying data for TABLE {0}.{1}".format(db_name,
+                                                        tbl_name))
+    q_tbl_name = "{0}.{1}".format(quote_with_backticks(db_name),
+                                  quote_with_backticks(tbl_name))
+    tbl = Table(source, q_tbl_name, tbl_options)
+    if tbl is None:
+        raise UtilDBError("Cannot create table object before copy.", -1,
+                          db_name)
+    tbl.copy_data(destination, cloning, new_db_name, connections)
+
+
 class Database(object):
     """
     The Database class encapsulates a database. The class has the following
@@ -156,8 +257,9 @@ class Database(object):
         self.init_called = False
         self.destination = None  # Used for copy mode
         self.cloning = False    # Used for clone mode
-        self.query_options = {  # Used for skipping fetch of rows
-            'fetch': False
+        self.query_options = {  # Used for skipping buffered fetch of rows
+            'fetch': False,
+            'commit': False,  # No COMMIT needed for DDL operations (default).
         }
         self.constraints = deque()  # Used to store constraints to execute
                                     # after table creation, deque is
@@ -238,7 +340,6 @@ class Database(object):
         return True = database successfully created, False = error
         """
 
-        db = None
         if db_name:
             db = db_name if is_quoted_with_backticks(db_name) \
                 else quote_with_backticks(db_name)
@@ -578,7 +679,8 @@ class Database(object):
 
         # Enable Foreign Key Checks to prevent the swapping of
         # RESTRICT referential actions with NO ACTION
-        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1")
+        query_opts = {'fetch': False, 'commit': False}
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1", query_opts)
 
         # while constraint queue is not empty
         while self.constraints:
@@ -590,14 +692,14 @@ class Database(object):
             if self.verbose:
                 print(query)
             try:
-                self.destination.exec_query(query)
+                self.destination.exec_query(query, query_opts)
             except Exception as err:
                 raise UtilDBError("Unable to execute constraint query "
                                   "{0}. Error: {1}".format(query, err.errmsg),
                                   -1, self.new_db)
 
         # Turn Foreign Key Checks off again
-        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=0")
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=0", query_opts)
 
     def copy_objects(self, new_db, options, new_server=None,
                      connections=1, check_exists=True):
@@ -652,8 +754,6 @@ class Database(object):
 
         # Check to see if database exists
         if check_exists:
-            exists = False
-            drop_server = None
             if self.cloning:
                 exists = self.exists(self.source, new_db)
                 drop_server = self.source
@@ -697,22 +797,27 @@ class Database(object):
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
         # After object creation, add the constraints
-        self.__apply_constraints()
+        if self.constraints:
+            self.__apply_constraints()
 
-    def copy_data(self, new_db, options, new_server=None, connections=1):
+    def copy_data(self, new_db, options, new_server=None, connections=1,
+                  src_con_val=None, dest_con_val=None):
         """Copy the data for the tables.
 
         This method will copy the data for all of the tables to another, new
         database. The method will process an input file with INSERT statements
         if the option was selected by the caller.
 
-        new_db[in]         Name of the new database
-        options[in]        Options for copy e.g. force, etc.
-        new_server[in]     Connection to another server for copying the db
-                           Default is None (copy to same server - clone)
-        connections[in]    Number of threads(connections) to use for insert
+        new_db[in]          Name of the new database
+        options[in]         Options for copy e.g. force, etc.
+        new_server[in]      Connection to another server for copying the db
+                            Default is None (copy to same server - clone)
+        connections[in]     Number of threads(connections) to use for insert
+        src_con_val[in]     Dict. with the connection values of the source
+                            server (required for multiprocessing).
+        dest_con_val[in]    Dict. with the connection values of the
+                            destination server (required for multiprocessing).
         """
-        from mysql.utilities.common.table import Table
 
         # Must call init() first!
         # Guard for init() prerequisite
@@ -738,18 +843,38 @@ class Database(object):
             'quiet': quiet
         }
 
+        copy_tbl_tasks = []
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
         for tblname in table_names:
-            if not quiet:
-                print "# Copying data for TABLE %s.%s" % (self.db_name,
-                                                          tblname)
-            tbl = Table(self.source, "%s.%s" % (self.q_db_name,
-                                                quote_with_backticks(tblname)),
-                        tbl_options)
-            if tbl is None:
-                raise UtilDBError("Cannot create table object before copy.",
-                                  -1, self.db_name)
-            tbl.copy_data(self.destination, self.cloning, new_db, connections)
+            # Check multiprocess table copy (only on POSIX systems).
+            if options['multiprocess'] > 1 and os.name == 'posix':
+                # Create copy task.
+                copy_task = {
+                    'source_srv': src_con_val,
+                    'dest_srv': dest_con_val,
+                    'source_db': self.db_name,
+                    'target_db': new_db,
+                    'table': tblname,
+                    'options': tbl_options,
+                    'cloning': self.cloning,
+                }
+                copy_tbl_tasks.append(copy_task)
+            else:
+                # Copy data from a table (no multiprocessing).
+                _copy_table_data(self.source, self.destination, self.db_name,
+                                 new_db, tblname, tbl_options, self.cloning)
+
+        # Copy tables concurrently.
+        if copy_tbl_tasks:
+            # Create process pool.
+            workers_pool = multiprocessing.Pool(
+                processes=options['multiprocess']
+            )
+            # Concurrently export tables.
+            workers_pool.map_async(_multiprocess_tbl_copy_task, copy_tbl_tasks)
+            workers_pool.close()
+            # Wait for all task to be completed by workers.
+            workers_pool.join()
 
     def get_create_statement(self, db, name, obj_type):
         """Return the create statement for the object
@@ -774,7 +899,8 @@ class Database(object):
             # SHOW CREATE statement without needing to specify the database
             # This is for 5.1 compatibility reasons:
             try:
-                self.source.exec_query("USE {0}".format(q_db))
+                self.source.exec_query("USE {0}".format(q_db),
+                                       self.query_options)
             except UtilError as err:
                 raise UtilDBError("ERROR: Couldn't change "
                                   "default database: {0}".format(err.errmsg))

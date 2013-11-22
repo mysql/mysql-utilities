@@ -17,7 +17,10 @@
 import os
 import mutlib
 
-from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
+from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import UtilDBError
+from mysql.utilities.exception import UtilError
 
 BLOB_TEXT_TABLE = ("CREATE TABLE `util_test`.`tt` ("
                    "`a` INT(11) NOT NULL AUTO_INCREMENT, "
@@ -87,22 +90,27 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
-            self.build_connection_string(self.server1))
+            self.build_connection_string(self.server1)
+        )
         to_conn = "--destination={0}".format(
-            self.build_connection_string(self.server2))
+            self.build_connection_string(self.server2)
+        )
+
+        cmd = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn, to_conn)
 
         test_num = 1
         comment = ("Test case {0} - copy a sample database X:Y"
-                   "".format(test_num))
-        cmd = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn, to_conn)
-        res = self.exec_util(cmd + " util_test:util_db_clone", self.res_fname)
+                   "").format(test_num)
+        cmd_str = "{0} util_test:util_db_clone".format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
         self.results.append(res)
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - copy a sample database X".format(test_num)
-        res = self.exec_util(cmd + " util_test", self.res_fname)
+        cmd_str = "{0} util_test".format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
         self.results.append(res)
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
@@ -111,10 +119,20 @@ class test(mutlib.System_test):
         self.server1.exec_query(BLOB_TEXT_DROP)
 
         test_num += 1
-        comment = ("Test case {0} - copy using different "
-                   "engine".format(test_num))
-        cmd += " util_test:util_db_clone --force --new-storage-engine=MEMORY"
-        res = self.exec_util(cmd, self.res_fname)
+        comment = ("Test case {0} - copy using different engine"
+                   "").format(test_num)
+        cmd_str = ("{0} util_test:util_db_clone --force "
+                   "--new-storage-engine=MEMORY").format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - copy using "
+                   "multiprocessing").format(test_num)
+        cmd_str = "{0} util_test:util_test_multi --multiprocess=2".format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
         self.results.append(res)
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
@@ -202,11 +220,13 @@ class test(mutlib.System_test):
 
     def get_result(self):
         msg = []
-        copied_db_on_server2 = ["util_db_clone", "util_test", "util_db_clone",
-                                'db`:db_clone', 'db`:db', "views_test_clone"]
+        copied_db_on_server2 = ['util_db_clone', 'util_test',
+                                'util_test_multi', 'db`:db_clone',
+                                'db`:db', 'views_test_clone']
         copied_db_on_server1 = ["util_test_default_collation_copy",
                                 "util_test_default_charset_copy"]
 
+        # Check databases existence.
         query = "SHOW DATABASES LIKE '{0}'"
         for db in copied_db_on_server2:
             try:
@@ -215,7 +235,7 @@ class test(mutlib.System_test):
                     if res[0][0] != db:
                         msg.append("Database {0} not found in {1}.\n"
                                    "".format(db, self.server2.role))
-                except UtilError:
+                except IndexError:
                     msg.append("Database {0} not found in {1}.\n"
                                "".format(db, self.server2.role))
             except UtilDBError as err:
@@ -227,12 +247,39 @@ class test(mutlib.System_test):
                     if res[0][0] != db:
                         msg.append("Database {0} not found in {1}.\n"
                                    "".format(db, self.server1.role))
-                except UtilError:
+                except IndexError:
                     msg.append("Database {0} not found in {1}.\n"
                                "".format(db, self.server1.role))
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
 
+        # Compare number of copied rows.
+        dbs2compare = [
+            ('`util_test`', ('`util_test`', '`util_db_clone`',
+                             '`util_test_multi`')),
+            ('`db``:db`', ('`db``:db`', '`db``:db_clone`')),
+            ('`views_test`', ('`views_test_clone`',))
+        ]
+        for cmp_data in dbs2compare:
+            self.server1.exec_query("USE {0}".format(cmp_data[0]))
+            res = self.server1.exec_query("SHOW TABLES")
+            for row in res:
+                table = quote_with_backticks(row[0])
+                base_count = self.server1.exec_query(
+                    "SELECT COUNT(*) FROM {0}".format(table)
+                )[0][0]
+                for i in range(len(cmp_data[1])):
+                    tbl_count = self.server2.exec_query(
+                        "SELECT COUNT(*) FROM {0}.{1}".format(cmp_data[1][i],
+                                                              table)
+                    )[0][0]
+                    if tbl_count != base_count:
+                        msg.append("Different row count for table {0}.{1}, "
+                                   "got {2} expected "
+                                   "{3}.".format(cmp_data[1][i], table,
+                                                 tbl_count, base_count))
+
+        # Check attributes (character set and collation).
         qry_db = ("SELECT {0} FROM INFORMATION_SCHEMA.SCHEMATA "
                   "WHERE SCHEMA_NAME = '{1}'")
         qry_tb = ("SELECT CCSA.{0} "
@@ -254,7 +301,7 @@ class test(mutlib.System_test):
                         msg.append("For database {0} attribute {1} copy "
                                    "failed, got {2} expected {3}.\n"
                                    "".format(db[0], db[1], res[0][0], db[2]))
-                except UtilError:
+                except IndexError:
                     msg.append("For database {0} no value found for attribute "
                                "{1}.\n".format(db[0], db[1]))
 

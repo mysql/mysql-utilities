@@ -21,6 +21,8 @@ table data.
 """
 
 import csv
+import re
+import sys
 
 from itertools import imap
 
@@ -126,8 +128,7 @@ def _read_row(file_h, fmt, skip_comments=False):
                 if skip_comments:
                     continue
                 else:
-                    new_row = []
-                    new_row.append(row)
+                    new_row = [row]
                     yield new_row
                     continue
             # If we find a header, and we've already read data, return the
@@ -215,10 +216,10 @@ def _read_row(file_h, fmt, skip_comments=False):
                     yield row
 
     if warnings_found:
-        print "CAUTION: The following %s warning " % len(warnings_found) + \
-              "messages were included in the import file:"
+        print("CAUTION: The following {0} warning messages were included in "
+              "the import file:".format(len(warnings_found)))
         for row in warnings_found:
-            print row.strip('\n')
+            print(row.strip('\n'))
 
 
 def _check_for_object_list(row, obj_type):
@@ -239,11 +240,11 @@ def _check_for_object_list(row, obj_type):
         return False
 
 
-def read_next(file_h, fmt, no_headers=False):
+def read_next(file_h, fmt):
     """Read properly formatted import file and return the statements.
 
     This method reads the next object from the file returning a tuple
-    containing the type of object - either a definition, SQL statment,
+    containing the type of object - either a definition, SQL statement,
     or the beginning of data rows and the actual data from the file.
 
     It uses the _read_row() method to read the file returning either
@@ -254,7 +255,6 @@ def read_next(file_h, fmt, no_headers=False):
 
     file_h[in]        Opened file handle
     fmt[in]           One of SQL,CSV,TAB,GRID,or VERTICAL
-    no_headers[in]    If True, file has headers (we skip them)
 
     Returns (tuple) - ('SQL'|'DATA'|'BEGIN_DATA'|'<object>', <data read>)
     """
@@ -555,7 +555,7 @@ def _build_column_ref(row):
 
 
 def _build_create_objects(obj_type, db, definitions):
-    """Build the CREATE and GRANT SQL statments for object definitions.
+    """Build the CREATE and GRANT SQL statements for object definitions.
 
     This method takes the object information read from the file using the
     _read_next() method and constructs SQL definition statements for each
@@ -588,7 +588,7 @@ def _build_create_objects(obj_type, db, definitions):
         engine = defn[col_ref.get("ENGINE", 2)]
         create_str = ""
         if obj_type == "TABLE":
-            if (obj_db == "" and obj_name == ""):
+            if obj_db == "" and obj_name == "":
                 obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
             if (obj_db == defn[col_ref.get("TABLE_SCHEMA", 0)] and
@@ -601,8 +601,7 @@ def _build_create_objects(obj_type, db, definitions):
                 create_strings.append(create_str)
                 obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
-                col_list = []
-                col_list.append(defn)
+                col_list = [defn]
             # check for end.
             if i + 1 == stop:
                 create_str = _build_create_table(obj_db, obj_name,
@@ -788,17 +787,16 @@ def _build_col_metadata(obj_type, definitions):
             continue
         defn = definitions[i]
         if obj_type == "TABLE":
-            if (obj_db == "" and obj_name == ""):
+            if obj_db == "" and obj_name == "":
                 obj_db = defn[0]
                 obj_name = defn[1]
-            if (obj_db == defn[0] and obj_name == defn[1]):
+            if obj_db == defn[0] and obj_name == defn[1]:
                 col_list.append((defn[4], defn[5]))
             else:
                 table_col_list.append((obj_name, col_list))
                 obj_db = defn[0]
                 obj_name = defn[1]
-                col_list = []
-                col_list.append((defn[4], defn[5]))
+                col_list = [(defn[4], defn[5])]
             # check for end.
             if i + 1 == stop:
                 table_col_list.append((obj_name, col_list))
@@ -901,7 +899,12 @@ def _skip_object(obj_type, options):
 
 
 def _exec_statements(statements, destination, fmt, options, dryrun=False):
-    """Execute a list of SQL statements
+    """Execute a list of SQL statements.
+
+    Execute SQL statements from the provided list in the destination server,
+    according to the provided options. This method also manage autocommit and
+    bulk insert options in order to optimize the performance of the statements
+    execution.
 
     statements[in]    A list of SQL statements to execute
     destination[in]   A connection to the destination server
@@ -914,30 +917,202 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
     new_engine = options.get("new_engine", None)
     def_engine = options.get("def_engine", None)
     quiet = options.get("quiet", False)
+    autocommit = options.get('autocommit', False)
+    bulk_insert = not options.get('single', True)
+
+    # Set autocommit and query options adequately.
+    if autocommit and not destination.autocommit_set():
+        destination.toggle_autocommit(enable=1)
+    elif not autocommit and destination.autocommit_set():
+        destination.toggle_autocommit(enable=0)
+    query_opts = {'fetch': False, 'columns': False, 'commit': False}
+
+    if bulk_insert:
+        max_inserts = options.get('max_bulk_insert', 30000)
+        count = 0
+        bulk_insert_start = None
+        bulk_values = []
+        # Compile regexp to split INSERT values here, in order to reuse it
+        # and improve performance of _parse_insert_statement().
+        re_value_split = re.compile("VALUES?", re.IGNORECASE)
+
+    dml_cmd = False
+
+    # Process all statements.
     for statement in statements:
-        st_list = None
         if ((new_engine is not None or def_engine is not None)
-                and statement.upper()[0:12] == "CREATE TABLE"):
+                and statement[0:12].upper() == "CREATE TABLE"):
+            # Add statements to substitute engine.
             i = statement.find(' ', 13)
             tbl_name = statement[13:i]
             st_list = destination.substitute_engine(tbl_name, statement,
                                                     new_engine, def_engine,
                                                     quiet)
-        st_list = [statement] if st_list is None else st_list
+        elif bulk_insert:
+            # Bulk insert (if possible) to execute as a single statement.
+            if statement[0:6].upper().startswith('INSERT'):
+                # Parse INSERT statement.
+                insert_start, values = _parse_insert_statement(statement,
+                                                               re_value_split)
+                if values is None:
+                    # Cannot bulk insert.
+                    if bulk_values:
+                        # Existing bulk insert to process.
+                        st_list = [",".join(bulk_values)]
+                        bulk_values = []
+                        count = 0
+                    else:
+                        st_list = []
+                    st_list.append(statement)
+                elif not bulk_values:
+                    # Start creating a new bulk insert.
+                    bulk_insert_start = insert_start
+                    bulk_values.append(
+                        "{0} VALUES {1}".format(bulk_insert_start, values)
+                    )
+                    count += 1
+                    st_list = []
+                elif insert_start != bulk_insert_start:
+                    # Different INSERT found (table, options or syntax),
+                    # generate bulk insert statement to execute and initiate a
+                    # new bulk insert.
+                    st_list = [",".join(bulk_values)]
+                    bulk_values = []
+                    count = 0
+                    bulk_insert_start = insert_start
+                    bulk_values.append(
+                        "{0} VALUES {1}".format(bulk_insert_start, values)
+                    )
+                    count += 1
+                elif count >= max_inserts:
+                    # Maximum bulk insert size reached (to avoid broken pipe
+                    # error), generate bulk to execute and initiate new one.
+                    st_list = [",".join(bulk_values)]
+                    bulk_values = []
+                    count = 0
+                    bulk_values.append(
+                        "{0} VALUES {1}".format(bulk_insert_start, values)
+                    )
+                else:
+                    bulk_values.append(values)
+                    count += 1
+                    st_list = []
+            else:
+                # Not an INSERT statement.
+                if bulk_values:
+                    # Existing bulk insert to process.
+                    st_list = [",".join(bulk_values)]
+                    bulk_values = []
+                    count = 0
+                else:
+                    st_list = []
+                st_list.append(statement)
+        else:
+            # Common statement, just add it to be executed.
+            st_list = [statement]
+
+        # Execute statements list.
         for st in st_list:
+            # Check query type to determine if a COMMIT is needed, in order to
+            # avoid Error 1694 (Cannot modify SQL_LOG_BIN inside transaction).
+            if not autocommit:
+                if dml_cmd:
+                    if st[0:_GTID_PREFIX].upper() in _GTID_COMMANDS:
+                        # DML previously executed and GTID command found.
+                        destination.commit()
+                        dml_cmd = False
+                elif st[0:6] in _DATA_COMMANDS:
+                    dml_cmd = True  # DML command found (COMMIT needed later).
+            # Execute query.
             try:
                 if dryrun:
                     print(st)
                 elif fmt != "sql" or not _skip_sql(st, options):
-                    destination.exec_query(st)
-
-            # Here we capture any exception and raise UtilError to communicate
-            # to the script/user. Since all util errors (exceptions) derive
-            # from Exception, this is safe.
-            except Exception as err:
+                    destination.exec_query(st, options=query_opts)
+            # It is not a good practice to catch the base Exception class,
+            # instead all errors should be caught in a Util/Connector error.
+            # Exception is only caught for safety (unanticipated errors).
+            except UtilError as err:
                 raise UtilError("Invalid statement:\n{0}"
                                 "\nERROR: {1}".format(st, err.errmsg))
+            except Exception as err:
+                raise UtilError("Unexpected error:\n{0}".format(err))
+
+    if bulk_insert and bulk_values:
+        # Make sure last bulk insert is executed.
+        st = ",".join(bulk_values)
+        try:
+            if dryrun:
+                print(st)
+            elif fmt != "sql" or not _skip_sql(st, options):
+                destination.exec_query(st, options=query_opts)
+        except UtilError as err:
+            raise UtilError("Invalid statement:\n{0}"
+                            "\nERROR: {1}".format(st, err.errmsg))
+        except Exception as err:
+            # Exception is only caught for safety (unanticipated errors).
+            raise UtilError("Unexpected error:\n{0}".format(err))
+
+    # Commit at the end (if autocommit is disabled).
+    if not autocommit:
+        destination.commit()
     return True
+
+
+def _parse_insert_statement(insert_stmt, regexp_split_values=None):
+    """Parse an INSERT statement to build bulk insert.
+
+    This method parses INSERT statements, separating the VALUES tuple from the
+    beginning of the query (in order to build bulk insert). The method also
+    verify if the statement is already a bulk insert or use unsupported
+    options/syntax, an in this case the initial statement is returned without
+    any separated values.
+
+    insert_stmt[in]             INSERT statement to be parsed.
+    regexp_split_values[in]     Compiled regular expression to split the
+                                VALUES|VALUE of the INSERT statement. This
+                                parameter can be used for performance reason,
+                                avoiding compiling the regexp at each call if
+                                not specified.
+
+    Returns a tuple with the start of the INSERT statement (without values)
+    and the values, or the full statement and none if the INSERT syntax or
+    query options are not supported or it is already a bulk insert.
+    """
+    if not regexp_split_values:
+        # Split statement by VALUES|VALUE.
+        regexp_split_values = re.compile("VALUES?", re.IGNORECASE)
+    insert_values = regexp_split_values.split(insert_stmt)
+    try:
+        values = insert_values[1]
+    except IndexError:
+        # INSERT statement does not contain 'VALUES'.
+        # The following syntax are not supported to build bulk inserts:
+        # - INSERT INTO tbl_name SET col_name= expr, ...
+        # - INSERT INTO tbl_name SELECT ...
+        return insert_stmt, None
+    values = values.strip(' ;')
+
+    # Check if already a bulk insert (if it has more than one tuple of values),
+    # or if other options are used at the end (e.g., ON DUPLICATE KEY UPDATE).
+    # In those cases, the original statement is returned (no bulk insert).
+    prev_char = ''
+    found = 0
+    skip_in_str = False
+    # Find first closing bracket ')', end of first VALUES tuple.
+    # Note: need to ignore ')' in strings.
+    for idx, char in enumerate(values[1:]):
+        if char == "'" and prev_char != '\\':
+            skip_in_str = not skip_in_str
+        elif char == ')' and not skip_in_str:
+            found = idx + 2  # 1 + 1 (skip first char + need to check next).
+            break
+        prev_char = char
+    # Check if there are more values/options after the first closing bracket.
+    if len(values[found:]) > 1:
+        return insert_stmt, None  # Return original statement (not supported).
+
+    return insert_values[0].strip(), values
 
 
 def _get_column_metadata(tbl_class, table_col_list):
@@ -952,6 +1127,33 @@ def _get_column_metadata(tbl_class, table_col_list):
             tbl_class.get_column_metadata(tbl_col_def[1])
             return True
     return False
+
+
+def multiprocess_file_import_task(import_file_task):
+    """Multiprocess import file method.
+
+    This method wraps the import_file method to allow its concurrent
+    execution by a pool of processes.
+
+    import_file_task[in]    dictionary of values required by a process to
+                            perform the file import task, namely:
+                            {'srv_con': <dict with server connections values>,
+                             'file_name': <file to import>,
+                             'options': <dict of options>,
+                            }
+    """
+    # Get input values to execute task.
+    srv_con_values = import_file_task.get('srv_con')
+    file_name = import_file_task.get('file_name')
+    options = import_file_task.get('options')
+    # Execute import file task.
+    # NOTE: Must handle any exception here, because worker processes will not
+    # propagate them to the main process.
+    try:
+        import_file(srv_con_values, file_name, options)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR: {0}".format(err.errmsg))
 
 
 def import_file(dest_val, file_name, options):
@@ -1014,8 +1216,7 @@ def import_file(dest_val, file_name, options):
         elif len(table_col_list) > 0:
             col_meta = _get_column_metadata(tbl, table_col_list)
         else:
-            fix_cols = []
-            fix_cols.append((tbl.tbl_name, columns))
+            fix_cols = [(tbl.tbl_name, columns)]
             col_meta = _get_column_metadata(tbl, fix_cols)
         if not col_meta:
             raise UtilError("Cannot build bulk insert statements without "
@@ -1060,7 +1261,7 @@ def import_file(dest_val, file_name, options):
             text = "definitions and data"
         else:
             text = import_type
-        print "# Importing %s from %s." % (text, file_name)
+        print("# Importing {0} from {1}.".format(text, file_name))
 
     # Setup variables we will need
     skip_header = not no_headers
@@ -1157,7 +1358,14 @@ def import_file(dest_val, file_name, options):
             continue
         # Check for basic command
         if row[0] == "BASIC_COMMAND":
-            if import_type != "data":
+            if import_type != "data" or "FOREIGN_KEY_CHECKS" in row[1].upper():
+                # Process existing data rows to keep execution order.
+                if len(table_rows) > 0:
+                    _process_data(tbl_name, statements, columns,
+                                  table_col_list, table_rows, skip_blobs,
+                                  use_columns_names)
+                    table_rows = []
+                # Now, add command to to the statements list.
                 statements.append(row[1])
             continue
         # In the first pass, try to get the database name from the file
@@ -1275,8 +1483,12 @@ def import_file(dest_val, file_name, options):
 
     # Check gtid process
     if supports_gtid and not gtid_command_found:
-        print _GTID_MISSING_WARNING
+        print(_GTID_MISSING_WARNING)
 
     if not quiet:
-        print "#...done."
+        if options['multiprocess'] > 1:
+            # Indicate processed file for multiprocessing.
+            print("#...done. ({0})".format(file_name))
+        else:
+            print("#...done.")
     return True

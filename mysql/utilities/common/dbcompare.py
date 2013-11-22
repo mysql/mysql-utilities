@@ -955,9 +955,13 @@ def check_consistency(server1, server2, table1_name, table2_name,
     if options.get('toggle_binlog', 'False'):
         binlog_server1 = server1.binlog_enabled()
         if binlog_server1:
+            # Commit to avoid error setting sql_log_bin inside a transaction.
+            server1.rollback()
             server1.toggle_binlog("DISABLE")
         binlog_server2 = server2.binlog_enabled()
         if binlog_server2:
+            # Commit to avoid error setting sql_log_bin inside a transaction.
+            server2.commit()
             server2.toggle_binlog("DISABLE")
     else:  # set to false to skip after actions to turn binlog back on
         binlog_server1 = False
@@ -1034,8 +1038,12 @@ def check_consistency(server1, server2, table1_name, table2_name,
                 data_diffs.extend(res)
 
     if binlog_server1:
+        # Commit to avoid error setting sql_log_bin inside a transaction.
+        server1.commit()
         server1.toggle_binlog("ENABLE")
     if binlog_server2:
+        # Commit to avoid error setting sql_log_bin inside a transaction.
+        server2.commit()
         server2.toggle_binlog("ENABLE")
 
     return data_diffs

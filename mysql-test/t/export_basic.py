@@ -15,9 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import copy_db_parameters
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
+_OUTPUT_FILE = "export_result.sql"
 
 
 class test(copy_db_parameters.test):
@@ -100,6 +103,27 @@ class test(copy_db_parameters.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        comment = ("Test case {0} - export data and metadata with "
+                   "multiprocessing (2 processes).").format(test_num)
+        cmd_str = ("{0} --export=both --format=SQL --skip=events "
+                   "--multiprocess=2").format(cmd)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - export data and metadata to "
+                   "output file.").format(test_num)
+        cmd_str = ("{0} --export=both --format=SQL --skip=events "
+                   "--output-file={1}").format(cmd, _OUTPUT_FILE)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        # Send output file contents to results.
+        self.results.append("Output file results:\n")
+        self.record_results(_OUTPUT_FILE)
+
+        test_num += 1
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
             cmd_arg = "'`db``:db`' --export=both"
@@ -156,6 +180,10 @@ class test(copy_db_parameters.test):
                             "ON SCHEDULE EVERY 1 YEAR STARTS",
                             "CREATE EVENT ```e``export_1` "
                             "ON SCHEDULE EVERY 1 YEAR STARTS [...]\n")
+        # Mask multiprocessing warning.
+        self.remove_result("# WARNING: Number of processes ")
+        # Mask already existing outfile (in case cleanup-up fails).
+        self.remove_result("# WARNING: Specified output file already exists.")
 
         return True
 
@@ -167,4 +195,8 @@ class test(copy_db_parameters.test):
 
     def cleanup(self):
         self.drop_db(self.server1, 'import_test')
+        try:
+            os.remove(_OUTPUT_FILE)
+        except OSError:
+            pass  # Ignore if file cannot be removed (may not exist).
         return copy_db_parameters.test.cleanup(self)

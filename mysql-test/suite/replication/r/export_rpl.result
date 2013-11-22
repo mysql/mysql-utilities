@@ -43,7 +43,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -51,19 +51,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -118,7 +118,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -126,19 +126,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -193,7 +193,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -201,19 +201,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -268,7 +268,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -276,19 +276,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -343,7 +343,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -351,19 +351,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -418,7 +418,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -426,19 +426,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -450,7 +450,7 @@ START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - rpl = both and lock_type = no-locks
 # Source on localhost: ... connected.
-# SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -493,7 +493,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -501,19 +501,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -524,10 +524,10 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
-# SET FOREIGN_KEY_CHECKS=1;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - rpl = both and lock_type = lock-all
 # Source on localhost: ... connected.
-# SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -570,7 +570,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -578,19 +578,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -601,10 +601,10 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
-# SET FOREIGN_KEY_CHECKS=1;
+SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - rpl = both and lock_type = snapshot
 # Source on localhost: ... connected.
-# SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -647,7 +647,7 @@ DELIMITER ;
 #...done.
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -655,19 +655,19 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
 INSERT INTO `util_test`.`t2` VALUES (NULL);
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
-# Data for table `util_test`.`t5`: 
+# Data for table `util_test`.`t5`:
 INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
 INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
@@ -678,4 +678,4 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # Connecting to the current server's master
 # CHANGE MASTER <goes here>
 # START SLAVE;
-# SET FOREIGN_KEY_CHECKS=1;
+SET FOREIGN_KEY_CHECKS=1;

@@ -39,7 +39,7 @@ from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
                                               clean_IPv6, format_IPv6)
 
 
-_FOREIGN_KEY_SET = "SET foreign_key_checks = %s"
+_FOREIGN_KEY_SET = "SET foreign_key_checks = {0}"
 _AUTOCOMMIT_SET = "SET AUTOCOMMIT = {0}"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
@@ -920,6 +920,8 @@ class Server(object):
                            (default is True)
             raw            If True, use a buffered raw cursor
                            (default is True)
+            commit         Perform a commit (if needed) automatically at the
+                           end (default: True)..
 
         Returns result set or cursor
         """
@@ -929,11 +931,11 @@ class Server(object):
         columns = options.get('columns', False)
         fetch = options.get('fetch', True)
         raw = options.get('raw', True)
+        do_commit = options.get('commit', True)
 
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before executing a query."
 
-        results = ()
         # If we are fetching all, we need to use a buffered
         if fetch:
             if raw:
@@ -944,37 +946,65 @@ class Server(object):
         else:
             cur = self.db_conn.cursor(raw=True)
 
+        # Execute query, handling parameters.
         try:
             if params == ():
                 cur.execute(query_str)
             else:
                 cur.execute(query_str, params)
-        except mysql.connector.Error, e:
+        except mysql.connector.Error as err:
             cur.close()
-            raise UtilDBError("Query failed. " + e.__str__())
-        except Exception, e:
+            raise UtilDBError("Query failed. {0}".format(err))
+        except Exception:
             cur.close()
-            raise UtilError("Unknown error. Command: %s" % query_str)
-        if fetch or columns:
-            try:
-                results = cur.fetchall()
-            except mysql.connector.errors.InterfaceError, e:
-                if e.msg.lower() == "no result set to fetch from.":
-                    pass  # This error means there were no results.
-                else:     # otherwise, re-raise error
-                    raise e
+            raise UtilError("Unknown error. Command: {0}".format(query_str))
 
-            if columns:
-                col_headings = cur.column_names
-                col_names = []
-                for col in col_headings:
-                    col_names.append(col)
-                results = col_names, results
-            cur.close()
-            self.db_conn.commit()
-            return results
+        # Fetch rows (only if available or fetch = True).
+        if cur.with_rows:
+            if fetch or columns:
+                try:
+                    results = cur.fetchall()
+                    if columns:
+                        col_headings = cur.column_names
+                        col_names = []
+                        for col in col_headings:
+                            col_names.append(col)
+                        results = col_names, results
+                except mysql.connector.Error as err:
+                    raise UtilDBError("Error fetching all query data: "
+                                      "{0}".format(err))
+                finally:
+                    cur.close()
+                return results
+            else:
+                # Return cursor to fetch rows elsewhere (fetch = false).
+                return cur
         else:
+            # No results (not a SELECT)
+            try:
+                if do_commit:
+                    self.db_conn.commit()
+            except mysql.connector.Error as err:
+                raise UtilDBError("Error performing commit: {0}".format(err))
+            finally:
+                cur.close()
             return cur
+
+    def commit(self):
+        """Perform a COMMIT.
+        """
+        # Guard for connect() prerequisite
+        assert self.db_conn, "You must call connect before executing a query."
+
+        self.db_conn.commit()
+
+    def rollback(self):
+        """Perform a ROLLBACK.
+        """
+        # Guard for connect() prerequisite
+        assert self.db_conn, "You must call connect before executing a query."
+
+        self.db_conn.rollback()
 
     def show_server_variable(self, variable):
         """Returns one or more rows from the SHOW VARIABLES command.
@@ -1442,8 +1472,8 @@ class Server(object):
     def disable_foreign_key_checks(self, disable=True):
         """Enable or disable foreign key checks for the connection.
 
-        disable[in]        if True, turn off foreign key checks
-                           elif False turn foreign key checks on
+        disable[in]     if True, turn off foreign key checks
+                        elif False turn foreign key checks on.
         """
         value = None
         if self.fkeys is None:
@@ -1453,7 +1483,8 @@ class Server(object):
         elif not self.fkeys:
             value = "ON"
         if value is not None:
-            self.exec_query(_FOREIGN_KEY_SET % value, {'fetch': 'false'})
+            self.exec_query(_FOREIGN_KEY_SET.format(value),
+                            {'fetch': False, 'commit': False})
 
     def autocommit_set(self):
         """Check autocommit status for the connection.

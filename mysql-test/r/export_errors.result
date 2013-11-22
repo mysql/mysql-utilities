@@ -29,3 +29,11 @@ mysqldbexport: error: You cannot use the --all option with a list of databases.
 Test case 10 - invalid --character-set
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error Character set 'unsupported_charset' unsupported.
+Test case 11 - error: invalid multiprocess value.
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: option --multiprocess: invalid integer value: '0.5'
+Test case 12 - error: multiprocess value smaller than zero.
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: Number of processes '-1' must be greater or equal than zero.
