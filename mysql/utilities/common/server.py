@@ -30,7 +30,8 @@ import tempfile
 
 import mysql.connector
 
-from mysql.utilities.exception import UtilError, UtilDBError, UtilRplError
+from mysql.utilities.exception import (FormatError, UtilError, UtilDBError,
+                                       UtilRplError)
 from mysql.utilities.common.user import User
 from mysql.utilities.common.tools import (delete_directory, execute_script,
                                           ping_host)
@@ -71,7 +72,7 @@ def get_connection_dictionary(conn_info):
         # parse the string
         conn_val = parse_connection(conn_info, None)
     else:
-        raise UtilError("Cannot determine connection information type.")
+        raise FormatError("Cannot determine connection information type.")
 
     return conn_val
 
@@ -395,7 +396,8 @@ def test_connect(conn_info, throw_errors=False):
     try:
         src_val = get_connection_dictionary(conn_info)
     except Exception as err:
-        raise UtilError("Server connection values invalid: %s." % err.errmsg)
+        raise FormatError("Server connection values invalid: {0}."
+                          "".format(err.errmsg))
     try:
         conn_options = {
             'quiet': True,

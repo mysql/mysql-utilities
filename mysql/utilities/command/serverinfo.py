@@ -19,7 +19,6 @@
 This file contains the reporting mechanisms for reporting disk usage.
 """
 import os
-import re
 import subprocess
 import sys
 import tempfile
@@ -28,11 +27,15 @@ import time
 from collections import defaultdict, namedtuple
 from itertools import chain
 
+from mysql.connector.errorcode import (ER_ACCESS_DENIED_ERROR,
+                                       CR_CONNECTION_ERROR)
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import get_tool_path, get_mysqld_version
-from mysql.utilities.common.server import (connect_servers, get_local_servers,
+from mysql.utilities.common.server import (connect_servers,
+                                           get_connection_dictionary,
+                                           get_local_servers,
                                            Server, test_connect)
 
 log_file_tuple = namedtuple('log_file_tuple',
@@ -478,23 +481,29 @@ def show_server_info(servers, options):
         try:
             test_connect(server, True)
         except UtilError as util_error:
-            if util_error.errmsg.startswith("Server connection "
-                                            "values invalid:"):
-                raise util_error
-            # If we got an exception it may means that the server is offline
-            # in that case we will try to turn a clone to extract the info
-            # if the user passed the necessary parameters.
-            pattern = r".*?: (.*?)\((.*)\)"
-            res = re.match(pattern, util_error.errmsg, re.S)
-            if not res:
-                er = ["error: <%s>" % util_error.errmsg]
-            else:
-                er = res.groups()
+            conn_dict = get_connection_dictionary(server)
+            server_is_off = False
+            # If we got errno 2002 it means can not connect through the
+            # given socket, but if path to socket not empty, server could be
+            # turned off.
+            if util_error.errno == CR_CONNECTION_ERROR:
+                socket = conn_dict.get("unix_socket", "")
+                if socket:
+                    mydir = os.path.split(socket)[0]
+                    if os.path.isdir(mydir) and len(os.listdir(mydir)) != 0:
+                        server_is_off = True
 
-            if (re.search("refused", "".join(er)) or
-               re.search("Can't connect to local MySQL server through socket",
-                         "".join(er)) or
-               re.search("Can't connect to MySQL server on", "".join(er))):
+            # If we got errno 1045 it means Access denied,
+            # notify the user if a password was used or not.
+            if util_error.errno == ER_ACCESS_DENIED_ERROR:
+                use_pass = 'YES' if conn_dict['passwd'] else 'NO' 
+                er = ("Access denied for user '{0}'@'{1}' using password: {2}"
+                      ).format(conn_dict['user'], conn_dict['host'], use_pass)
+            # To propose to start a cloned server for extract the info,
+            # can not predict if the server is really off, but we can do it
+            # in case of socket error, or if one of the related
+            # parameter was given.
+            elif (server_is_off or basedir or datadir or start):
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
 
