@@ -31,6 +31,8 @@ from distutils.dir_util import copy_tree, remove_tree
 class BuildDistOSX(bdist):
     """This class contains the command to built an osx distribution package
     """
+    platf_n = '-osx'
+    platf_v = '.'.join(platform.mac_ver()[0].split('.', 2)[0:2])
     description = 'create a mac osx distribution package'
     user_options = [
         ('keep-temp', 'k',
@@ -48,11 +50,10 @@ class BuildDistOSX(bdist):
          "directory to put final built distributions in"),
         ('platform=', 'p',
          "name of the platform in resulting file "
-         "(default '{0}')".format(platform.linux_distribution()[0].lower())),
+         "(default '{0}')".format(platf_n)),
         ('platform-version=', 'v',
          "version of the platform in resulting file "
-         "(default '{0}')".format('.'.join(
-             platform.linux_distribution()[1].split('.', 2)[0:2])))
+         "(default '{0}')".format(platf_v))
     ]
 
     boolean_options = ['keep-temp', 'create-dmg', 'sign']
@@ -65,9 +66,8 @@ class BuildDistOSX(bdist):
         self.create_dmg = False
         self.dist_dir = None
         self.started_dir = os.getcwd()
-        self.platform = platform.linux_distribution()[0].lower()
-        self.platform_version = '.'.join(
-            platform.linux_distribution()[1].split('.', 2)[0:2])
+        self.platform = self.platf_n
+        self.platform_version = self.platf_v
         self.debug = False
         self.osx_pkg_name = "{0}-{1}.pkg".format(self.name, self.version)
         self.dstroot = "dstroot"
@@ -306,11 +306,10 @@ class BuildDistOSXcom(BuildDistOSX):
          "directory to put final built distributions in"),
         ('platform=', 'p',
          "name of the platform in resulting file "
-         "(default '{0}')".format(platform.linux_distribution()[0].lower())),
+         "(default '{0}')".format(BuildDistOSX.platf_n)),
         ('platform-version=', 'v',
          "version of the platform in resulting file "
-         "(default '{0}')".format('.'.join(
-             platform.linux_distribution()[1].split('.', 2)[0:2])))
+         "(default '{0}')".format(BuildDistOSX.platf_v))
     ]
 
     boolean_options = ['keep-temp', 'create-dmg', 'sign']
@@ -323,9 +322,8 @@ class BuildDistOSXcom(BuildDistOSX):
         self.create_dmg = False
         self.dist_dir = None
         self.started_dir = os.getcwd()
-        self.platform = platform.linux_distribution()[0].lower()
-        self.platform_version = '.'.join(
-            platform.linux_distribution()[1].split('.', 2)[0:2])
+        self.platform = self.platf_n
+        self.platform_version = self.platf_v
         self.debug = False
         self.osx_pkg_name = "{0}-{1}.pkg".format(self.name, self.version)
         self.dstroot = "dstroot"
