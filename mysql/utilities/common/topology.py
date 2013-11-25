@@ -871,10 +871,12 @@ class Topology(Replication):
             if not self._has_missing_transactions(candidate, temp_master):
                 continue
 
-            res = candidate.stop()
-            if res is None or res != () and not self.quiet:
-                self._report("Candidate %s:%s failed to stop." %
-                             (hostport, res[0]))
+            try:
+                candidate.stop()
+            except UtilError as err:
+                if not self.quiet:
+                    self._report("Candidate {0} failed to stop. "
+                                 "{1}".format(hostport, err.errmsg))
 
             # Block writes to slave (temp_master)
             lock_ftwrl = Lock(temp_master, [], lock_options)
@@ -898,12 +900,13 @@ class Topology(Replication):
             temp_master.set_read_only(False)
             lock_ftwrl.unlock()
 
-            res = candidate.start()
-            candidate.exec_query("COMMIT")
-
-            if res is None or res != () and not self.quiet:
-                self._report("Candidate %s:%s failed to start." %
-                             (hostport, res[0]))
+            try:
+                candidate.start()
+                candidate.exec_query("COMMIT")
+            except UtilError as err:
+                if not self.quiet:
+                    self._report("Candidate {0} failed to start. "
+                                 "{1}".format(hostport, err.errmsg))
 
             if self.verbose and not self.quiet:
                 self._report("# Waiting for candidate to catch up to slave "
@@ -1493,12 +1496,15 @@ class Topology(Replication):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                res = slave.reset()
-                if res is None or res != () and not quiet:
-                    message = "{0}WARN - slave failed to reset".format(msg)
-                    self._report(message, logging.WARN)
-                elif not quiet:
-                    self._report("{0}Ok".format(msg))
+                try:
+                    slave.reset()
+                except UtilError:
+                    if not quiet:
+                        message = "{0}WARN - slave failed to reset".format(msg)
+                        self._report(message, logging.WARN)
+                else:
+                    if not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'start':
                 if (self.master and
                         not slave.is_configured_for_master(self.master) and
@@ -1506,12 +1512,15 @@ class Topology(Replication):
                     message = ("{0}WARN - slave is not configured with this "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                res = slave.start()
-                if res is None or res != () and not quiet:
-                    message = "{0}WARN - slave failed to start".format(msg)
-                    self._report(message, logging.WARN)
-                elif not quiet:
-                    self._report("{0}Ok".format(msg))
+                try:
+                    slave.start()
+                except UtilError:
+                    if not quiet:
+                        message = "{0}WARN - slave failed to start".format(msg)
+                        self._report(message, logging.WARN)
+                else:
+                    if not quiet:
+                        self._report("{0}Ok".format(msg))
             elif command == 'stop':
                 if (self.master and
                         not slave.is_configured_for_master(self.master) and
@@ -1523,12 +1532,15 @@ class Topology(Replication):
                     message = ("{0}WARN - slave is not connected to "
                                "master").format(msg)
                     self._report(message, logging.WARN)
-                res = slave.stop()
-                if res is None or res != () and not quiet:
-                    message = "{0}WARN - slave failed to stop".format(msg)
-                    self._report(message, logging.WARN)
-                elif not quiet:
-                    self._report("{0}Ok".format(msg))
+                try:
+                    slave.stop()
+                except UtilError:
+                    if not quiet:
+                        message = "{0}WARN - slave failed to stop".format(msg)
+                        self._report(message, logging.WARN)
+                else:
+                    if not quiet:
+                        self._report("{0}Ok".format(msg))
 
     def connect_candidate(self, candidate, master=True):
         """Parse and connect to the candidate

@@ -196,6 +196,9 @@ class test(rpl_admin.test):
 
         # Show contents of server
         for server in self.servers_list:
+            # ROLLBACK just to close any pending transaction, otherwise
+            # dump_table() can return inconsistent values.
+            server.rollback()
             self.dump_table(server)
 
         comment = ("Test case {0} - failover to {1}:{2} with skipping "

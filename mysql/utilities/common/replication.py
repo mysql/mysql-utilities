@@ -1914,8 +1914,9 @@ class Slave(Server):
         if show_command:
             print "# Change master command for %s:%s" % (self.host, self.port)
             print "#", change_master
-        res = self.exec_query(change_master)
-        if res is None or res != ():
-            raise UtilRplError("Slave %s:%s change master failed.",
-                               (hostport, res[0]))
+        try:
+            self.exec_query(change_master)
+        except UtilError as err:
+            raise UtilRplError("Slave {0} change master failed. "
+                               "{1}".format(hostport, err.errmsg))
         return True

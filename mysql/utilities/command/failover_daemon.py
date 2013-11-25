@@ -347,6 +347,8 @@ class FailoverDaemon(object):
         if register:
             res = self.master.exec_query(_CREATE_FC_TABLE)
             res = self.master.exec_query(_SELECT_FC_TABLE.format(*host_port))
+            # COMMIT to close session before enabling binlog.
+            self.master.commit()
             if res != []:
                 # Someone beat us there. Drat.
                 self.old_mode = self.mode
