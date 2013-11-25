@@ -1,7 +1,7 @@
 Test case 1 - Show the help
-Options:
   --version             show program's version number and exit
   --help                display this help message and exit
+  --license             display program's license and exit
   -f FORMAT, --format=FORMAT
                         display the output in either GRID (default), TAB, CSV,
                         VERTICAL and RAW format

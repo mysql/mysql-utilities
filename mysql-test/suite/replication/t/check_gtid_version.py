@@ -61,7 +61,7 @@ class test(mutlib.System_test):
                 raise MUTLibError("Cannot spawn gtid enabled server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
-
+        self.drop_all()
         self.server1.exec_query("CREATE DATABASE gtid_version")
         self.server1.exec_query("CREATE TABLE gtid_version.t1 (a int)")
         self.server1.exec_query("INSERT INTO gtid_version.t1 VALUES (1)")
@@ -70,10 +70,8 @@ class test(mutlib.System_test):
     
     def run(self):
         self.res_fname = "result.txt"
-        self.export_file = " export.txt "
-        self.data_file = os.path.normpath("./std_data/basic_data.sql")
 
-        export_cmd_str = ("mysqldbexport.py util_test --export=both " 
+        export_cmd_str = ("mysqldbexport.py gtid_version --export=both "
                           "--skip=events,grants,procedures,functions,views " 
                           "--format=SQL ")
 

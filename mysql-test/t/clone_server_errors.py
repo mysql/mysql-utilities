@@ -51,7 +51,7 @@ class test(mutlib.System_test):
         comment = "Test case {0} - error: clone remote server".format(test_num)
         res = self.run_test_case(2, "mysqlserverclone.py "
                                     "--server=root:root@notme:90125 "
-                                    "--new-data=/nada "
+                                    "--new-data=/nada --delete-data "
                                     "--new-id=7 {0} ".format(newport), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -60,16 +60,16 @@ class test(mutlib.System_test):
         comment = "Test case {0} - error: no login".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py "
                                     "--server=root:root@localhost:90125 "
-                                    "--new-data=/nada "
-                                    "--new-id=7 {0} ".format(newport), comment)
+                                    "--new-data=/nada --delete-data "
+                                    "--new-id=7 {0}".format(newport), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         comment = "Test case {0} - error: cannot connect".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py --server=nope@"
-                                    "localhost:3310 --new-data=/nada "
-                                    "--new-id=7 "
+                                    "localhost:38310 --new-data=/nada "
+                                    "--new-id=7 --delete-data "
                                     "--root-password=nope {0}".format(newport),
                                  comment)
         if not res:
@@ -129,6 +129,9 @@ class test(mutlib.System_test):
         self.mask_result("Error 2003:", "2003", "####")
         self.mask_result("Error 1045", "1045", "####:")
         self.replace_result("Error ####: Can't connect to MySQL server",
+                            "Error ####: Can't connect to MySQL server"
+                            " on 'nothere:####'\n")
+        self.replace_result("Error ####:(28000):",
                             "Error ####: Can't connect to MySQL server"
                             " on 'nothere:####'\n")
 

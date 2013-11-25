@@ -1,5 +1,4 @@
 Test case 1 - show help
-Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --license             display program's license and exit

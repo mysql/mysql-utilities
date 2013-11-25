@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+import shutil
 import frm_reader_base
 from mysql.utilities.exception import MUTLibError
 
@@ -77,7 +78,11 @@ class test(frm_reader_base.test):
         test_num += 1
 
         # Export new .frm files with new storage engine specified.
+
+        if os.path.exists(NEW_FRM_DIR):  # delete directory if it exists
+            shutil.rmtree(NEW_FRM_DIR)
         os.mkdir(NEW_FRM_DIR)
+
         new_cmd = ("{0} --new-storage-engine=MEMORY --frmdir={1} "
                    "{2}".format(cmd, NEW_FRM_DIR, frm_file_path))
         comment = ("Test case {0}: - Export .frm files in a db "
@@ -94,7 +99,7 @@ class test(frm_reader_base.test):
         try:
             for frm_file in files_found:
                 os.unlink("{0}/{1}".format(NEW_FRM_DIR, frm_file))
-            os.rmdir(NEW_FRM_DIR)
+            shutil.rmtree(NEW_FRM_DIR)
         except OSError:
             pass
         test_num += 1
@@ -126,9 +131,9 @@ class test(frm_reader_base.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqlfrm version",
-                "MySQL Utilities mysqlfrm version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqlfrm version",
+            "MySQL Utilities mysqlfrm version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

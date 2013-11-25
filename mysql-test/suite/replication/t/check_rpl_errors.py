@@ -139,13 +139,13 @@ class test(check_rpl.test):
                             "Error ####: Can't connect to local MySQL server "
                             "####...\n")
 
-        self.replace_result("mysqlrplcheck.py: error: Master connection "
+        self.replace_result("mysqlrplcheck: error: Master connection "
                             "values invalid",
-                            "mysqlrplcheck.py: error: Master connection "
+                            "mysqlrplcheck: error: Master connection "
                             "values invalid\n")
-        self.replace_result("mysqlrplcheck.py: error: Slave connection "
+        self.replace_result("mysqlrplcheck: error: Slave connection "
                             "values invalid",
-                            "mysqlrplcheck.py: error: Slave connection "
+                            "mysqlrplcheck: error: Slave connection "
                             "values invalid\n")
 
         return True

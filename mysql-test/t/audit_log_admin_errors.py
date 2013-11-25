@@ -220,9 +220,9 @@ class test(audit_log_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.replace_result("mysqlauditadmin.py: error: Server connection "
-                            "values invalid",
-                            "mysqlauditadmin.py: error: Server connection "
+        self.replace_result("mysqlauditadmin: error: Server connection values"
+                            " invalid",
+                            "mysqlauditadmin: error: Server connection "
                             "values invalid\n")
 
         return True

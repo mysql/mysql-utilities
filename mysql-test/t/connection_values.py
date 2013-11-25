@@ -15,9 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import mutlib
-from mysql.utilities.exception import UtilError, FormatError
-from mysql.utilities.common.server import get_connection_dictionary, \
-    connect_servers
+from mysql.utilities.exception import (ConnectionValuesError, FormatError,
+                                       UtilError)
+from mysql.utilities.common.server import (get_connection_dictionary,
+                                           connect_servers)
 
  # List of tuples (comment, input, fail)
 _TEST_CASES = [('Good connection string but cannot connect',
@@ -61,8 +62,10 @@ class test(mutlib.System_test):
                 src_val = get_connection_dictionary(_TEST_CASES[i][1])
                 server_options = {'quiet': True, 'version': None,
                                   'src_name': "test", 'dest_name': None, }
-                s = connect_servers(src_val, None, server_options)
+                connect_servers(src_val, None, server_options)
             except UtilError as err:
+                self.results.append((True, err.errmsg))
+            except ConnectionValuesError as err:
                 self.results.append((True, err.errmsg))
             except FormatError as err:
                 self.results.append((True, err))

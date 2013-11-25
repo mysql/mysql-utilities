@@ -136,7 +136,7 @@ class test(mutlib.System_test):
                                                             test_case)
         if reset:
             server2.exec_query("RESET MASTER")  # reset GTID_EXECUTED
-        cmd_str = "{0}{1}{2}".format(imp_cmd, conn2, self.export_file)
+        cmd_str = "{0}{1} {2}".format(imp_cmd, conn2, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res == ret_val:
             for row in self.results:

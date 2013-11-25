@@ -139,9 +139,10 @@ class test(frm_reader_base.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        new_cmd_str = ("{0} {1} --port=13033 --frmdir='wesayso' "
+        quotes = "'" if os.name == "posix" else '"'
+        new_cmd_str = ("{0} {1} --port=13033 --frmdir={2}wesayso{2} "
                        "--new-storage-engine=MEMORY"
-                       "".format(self.cmd, frm_file_path))
+                       "".format(self.cmd, frm_file_path, quotes))
         comment = "Test case {0}: - --frm-dir invalid".format(test_num)
         res = self.run_test_case(2, new_cmd_str, comment)
         if not res:

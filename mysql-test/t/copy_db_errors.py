@@ -127,7 +127,7 @@ class test(copy_db.test):
                        "{1}").format(self.server2.port, self.server2.socket)
         else:
             to_conn = ("--destination=joe@localhost:"
-                       "{0})").format(self.server2.port)
+                       "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
         test_num += 1
