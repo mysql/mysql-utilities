@@ -200,9 +200,8 @@ class BuildDistOSX(bdist):
                 if filename.endswith('.dmg'):
                     new_name = filename.replace(
                         '{0}'.format(self.version),
-                        '{0}{1}{2}_py{3}'.format(self.version, self.platform,
-                                                 self.platform_version,
-                                                 sys.version[0:3])
+                        '{0}{1}{2}'.format(self.version, self.platform,
+                                                 self.platform_version)
                     )
                     file_path = os.path.join(base, filename)
                     file_dest = os.path.join(self.started_dir,
@@ -214,9 +213,8 @@ class BuildDistOSX(bdist):
                 if dir_name.endswith('.pkg'):
                     new_name = dir_name.replace(
                         '{0}'.format(self.version),
-                        '{0}{1}{2}_py{3}'.format(self.version, self.platform,
-                                                 self.platform_version,
-                                                 sys.version[0:3])
+                        '{0}{1}{2}'.format(self.version, self.platform,
+                                                 self.platform_version)
                     )
                     dir_dest = os.path.join(self.started_dir,
                                             self.dist_dir, new_name)
