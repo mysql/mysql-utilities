@@ -237,7 +237,7 @@ def _get_create_statement(server, temp_datadir,
     verbosity = int(options.get("verbosity", 0))
     quiet = options.get("quiet", False)
     new_engine = options.get("new_engine", None)
-    frm_dir = options.get("frm_dir", "./")
+    frm_dir = options.get("frm_dir", ".{0}".format(os.sep))
     user = options.get('user', 'root')
 
     if not quiet:

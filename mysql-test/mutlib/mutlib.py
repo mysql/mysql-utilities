@@ -891,7 +891,7 @@ class System_test(object):
         """
         linenum = 0
         for line in self.results:
-            if line.find(target):
+            if line.find(target) >= 0:
                 self.results.pop(linenum)
                 replace_line = line.replace(target, replacement)
                 self.results.insert(linenum, replace_line)

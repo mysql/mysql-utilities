@@ -1630,7 +1630,7 @@ class FrmReader(object):
             self.frm_file.write(struct.pack("<H", 6))
             self.frm_file.write("MEMORY")
 
-            # Close file and exit
-            self.frm_file.close()
+        # Close file and exit
+        self.frm_file.close()
 
-        return (engine_type, engine_str, server_version)
+        return engine_type, engine_str, server_version

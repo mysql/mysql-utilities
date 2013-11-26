@@ -20,8 +20,7 @@ import frm_reader_base
 from mysql.utilities.exception import MUTLibError
 
 
-FRM_FILES = "./std_data/frm_files"
-NEW_FRM_DIR = "./test_frm"
+NEW_FRM_DIR = ".{0}test_frm".format(os.sep)
 FILES_READ = ['me.too.periods.frm', 't1.frm', 't2.frm', 't3.frm',
               't4.frm', 't5.frm', 't6.frm', 't7.frm', 't8.frm',
               'this.has.periods.frm']
@@ -128,6 +127,10 @@ class test(frm_reader_base.test):
                             "# CREATE statement for [...]\n")
         self.replace_result("# std_data", "# std_data/frm_files/t9.frm\n")
         self.replace_substring(user, "JOE_USER")
+        self.replace_substring("# Copy of .frm file with new storage engine "
+                               "saved as .\\test_frm\\",
+                               "# Copy of .frm file with new storage engine "
+                               "saved as ./test_frm/")
 
         # Mask version
         self.replace_result(
