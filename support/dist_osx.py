@@ -375,17 +375,18 @@ class BuildDistOSXcom(BuildDistOSX):
             log.info("current directory: {0}".format(os.getcwd()))
         log.info("bdist_com cmd finish")
 
-        install_cmd = self.get_finalized_command('install_data')
-        log.info("install_cmd.dist_dir {0}".format(root))
-        install_cmd.install_dir = root
-        log.info("install_cmd.root {0}".format(osx_path))
-        install_cmd.root = osx_path
-        log.info("install_cmd.prefix {0}".format(bdist.prefix))
+        if self.distribution.data_files:
+            install_cmd = self.get_finalized_command('install_data')
+            log.info("install_cmd.dist_dir {0}".format(root))
+            install_cmd.install_dir = root
+            log.info("install_cmd.root {0}".format(osx_path))
+            install_cmd.root = osx_path
+            log.info("install_cmd.prefix {0}".format(bdist.prefix))
 
-        self.run_command('install_data')
-        if self.debug:
-            log.info("current directory: {0}".format(os.getcwd()))
-        log.info("install_cmd cmd finish")
+            self.run_command('install_data')
+            if self.debug:
+                log.info("current directory: {0}".format(os.getcwd()))
+            log.info("install_cmd cmd finish")
 
         # Copy necessary files to build osx package.
         if self.debug:
