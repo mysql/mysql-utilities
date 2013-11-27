@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+	<key>IFPkgDescriptionTitle</key>
+	<string>MySQL Utilities</string>
+	<key>IFPkgDescriptionVersion</key>
+	<string>{VERSION}</string>
+	<key>IFPkgDescriptionDescription</key>
+	<string>MySQL Utilities provides a collection of command-line utilities that are used for maintaining and administering MySQL servers, including:
+
+  Admin Utilities (Clone, Copy, Compare, Diff, Export, Import)
+  Replication Utilities (Setup, Configuration)
+  General Utilities (Disk Usage, Redundant Indexes, Search Meta Data)
+  And many more</string>
+	<key>IFPkgDescriptionTitle</key>
+	<string>API and Command Line Applications</string>
+  </dict>
+</plist>
