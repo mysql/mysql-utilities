@@ -21,7 +21,7 @@ from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common import utilities as utils
 
 
-_BASE_COMMENT = "Test Case %d: "
+_BASE_COMMENT = "Test Case {0}: "
 
 
 class test(utilities_console_base.test):
@@ -49,16 +49,15 @@ class test(utilities_console_base.test):
     def write_filtered_script(self, file_name):
         """ Writes a script to be filtered.
         """
-        f = open(os.path.join(self.tmp_dir, file_name), "w")
-        f.write("pass")
-        f.flush()
-        f.close()
+        with open(os.path.join(self.tmp_dir, file_name), "w") as f:
+            f.write("pass")
+            f.flush()
 
     def do_test(self, test_num, comment, command):
-        res = self.run_test_case(0, command, _BASE_COMMENT %
-                                 test_num + comment)
+        res = self.run_test_case(0, command,
+                                 _BASE_COMMENT.format(test_num) + comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("Usage: mysqlreplicate",
                             "Usage: mysqlreplicate XXXXXXXXXXXXXXXXXXXXX \n")
@@ -72,12 +71,12 @@ class test(utilities_console_base.test):
         self.res_fname = "result.txt"
         test_num = 1
         comment = "Test utilities.get_util_path with custom path \n"
-        self.results.append(_BASE_COMMENT % test_num + comment)
+        self.results.append(_BASE_COMMENT.format(test_num) + comment)
         self.results.append("-----\n")
-        self.results.append("Custom util path: %s\n" % self.tmp_dir)
+        self.results.append("Custom util path: {0}\n".format(self.tmp_dir))
         new_util_path = utils.get_util_path(self.tmp_dir)
-        self.results.append("returned path from get_util_path: %s\n" %
-                            new_util_path)
+        self.results.append(
+            "returned path from get_util_path: {0}\n".format(new_util_path))
         if not new_util_path == self.tmp_dir:
             raise MUTLibError("get_util_path fails to get expected path")
         self.results.append("Test Pass \n")
@@ -85,16 +84,16 @@ class test(utilities_console_base.test):
 
         test_num += 1
         comment = "Show help utilities with custom utildir"
-        cmd_str = 'mysqluc.py --width=77'
-        cmd_str += ' --utildir={0} {1}'.format(self.tmp_dir, '--execute="%s"')
+        cmd_str = 'mysqluc.py --width=77 --utildir={0} {1} '.format(
+            self.tmp_dir, '--execute="{0}"')
         cmd = "help utilities"
-        self.do_test(test_num, comment, cmd_str % cmd)
+        self.do_test(test_num, comment, cmd_str.format(cmd))
 
         test_num += 1
         comment = "Execute an utility --help on a custom utildir"
         cmd = self.util_test + " --help; help utilities"
 
-        self.do_test(test_num, comment, cmd_str % cmd)
+        self.do_test(test_num, comment, cmd_str.format(cmd))
 
         self.replace_substring("tmp_scripts\mysql", "tmp_scripts/mysql")
         return True
@@ -111,6 +110,6 @@ class test(utilities_console_base.test):
                 os.unlink(self.res_fname)
                 os.unlink(os.path.join(self.tmp_dir, self.util_file))
                 shutil.rmtree(self.tmp_dir)
-            except:
-                pass
+            except OSError as err:
+                raise err
         return True

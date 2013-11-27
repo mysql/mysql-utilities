@@ -3,7 +3,7 @@ Test case 1 - SQL single rows
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -11,7 +11,7 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
@@ -21,13 +21,18 @@ UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Ba
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - SQL bulk insert
@@ -35,19 +40,21 @@ Test case 2 - SQL bulk insert
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', NULL),  ('12 Test Basic database example', NULL),  ('13 Test Basic database example', NULL),  (NULL, NULL);
 # Blob data for table t2:
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys'),  (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES  (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - skip blobs
@@ -55,7 +62,7 @@ Test case 3 - skip blobs
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -63,19 +70,24 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES (NULL, NULL);
 # WARNING : Table t2 has blob data that has been excluded by --skip-blobs.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - sql format
@@ -83,7 +95,7 @@ Test case 4 - sql format
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -91,7 +103,7 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
@@ -101,20 +113,25 @@ UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Ba
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - csv format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -123,28 +140,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - tab format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -153,28 +176,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - GRID format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -186,7 +215,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -195,7 +224,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -204,19 +233,28 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - VERTICAL format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -232,7 +270,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -246,7 +284,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -260,11 +298,33 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - sql format no headers
@@ -272,7 +332,7 @@ Test case 9 - sql format no headers
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -280,7 +340,7 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
@@ -290,20 +350,25 @@ UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Ba
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - csv format no headers
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -312,28 +377,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 11 - tab format no headers
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -342,28 +413,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 12 - GRID format no headers
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -375,7 +452,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -384,7 +461,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -393,19 +470,28 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 13 - VERTICAL format no headers
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -421,7 +507,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -435,7 +521,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -449,11 +535,33 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 14 - SQ format
@@ -461,7 +569,7 @@ Test case 14 - SQ format
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -469,7 +577,7 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL);
@@ -479,20 +587,25 @@ UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '11 Test Ba
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '12 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 15 - CS format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -501,28 +614,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 16 - ta format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -531,28 +650,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 17 - g format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -564,7 +689,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -573,7 +698,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -582,19 +707,28 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 18 - v format
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -610,7 +744,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -624,7 +758,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -638,18 +772,40 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 19 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -661,7 +817,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -670,7 +826,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -679,12 +835,21 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 20 - GRID format with FULL display
@@ -692,7 +857,7 @@ Test case 20 - GRID format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -704,7 +869,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -713,7 +878,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -722,12 +887,21 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 21 - GRID format with NAMES display
@@ -735,7 +909,7 @@ Test case 21 - GRID format with NAMES display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
 +---------------------------------+
@@ -747,7 +921,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 06 Test Basic database example  |
 | 07 Test Basic database example  |
 +---------------------------------+
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 +---------------------------------+------------------+
 | a                               | x_blob           |
 +---------------------------------+------------------+
@@ -756,7 +930,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 13 Test Basic database example  | This is a blob.  |
 | NULL                            | This is a blob.  |
 +---------------------------------+------------------+
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 +----+----------------+
 | a  | b              |
 +----+----------------+
@@ -765,19 +939,28 @@ SET FOREIGN_KEY_CHECKS=0;
 | 3  | 16 test fkeys  |
 | 4  | NULL           |
 +----+----------------+
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 +----+----+
 | c  | d  |
 +----+----+
 | 3  | 2  |
 +----+----+
+# Data for table `util_test`.`t5`:
++-------------+-------------+-------------+-----------------+
+| product_id  | name        | base_price  | tax_percentage  |
++-------------+-------------+-------------+-----------------+
+| 1           | kitkat      | 0.99        | 19              |
+| 2           | M&M         | 5.99        | 19              |
+| 3           | milk        | 0.67        | 5               |
+| 4           | Dr. Pepper  | 0.99        | 19              |
++-------------+-------------+-------------+-----------------+
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 22 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -786,21 +969,27 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 23 - CSV format with FULL display
@@ -808,7 +997,7 @@ Test case 23 - CSV format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -817,21 +1006,27 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 24 - CSV format with NAMES display
@@ -839,7 +1034,7 @@ Test case 24 - CSV format with NAMES display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -848,28 +1043,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`,`x_blob`
 11 Test Basic database example,This is a blob.
 12 Test Basic database example,This is a blob.
 13 Test Basic database example,This is a blob.
 NULL,This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`,`b`
 1,14 test fkeys
 2,15 test fkeys
 3,16 test fkeys
 4,NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`,`d`
 3,2
+# Data for table `util_test`.`t5`:
+`product_id`,`name`,`base_price`,`tax_percentage`
+1,kitkat,0.99,19
+2,M&M,5.99,19
+3,milk,0.67,5
+4,Dr. Pepper,0.99,19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 25 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -878,21 +1079,27 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 26 - TAB format with FULL display
@@ -900,7 +1107,7 @@ Test case 26 - TAB format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -909,21 +1116,27 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 27 - TAB format with NAMES display
@@ -931,7 +1144,7 @@ Test case 27 - TAB format with NAMES display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
 02 Test Basic database example
@@ -940,28 +1153,34 @@ SET FOREIGN_KEY_CHECKS=0;
 05 Test Basic database example
 06 Test Basic database example
 07 Test Basic database example
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 `a`	`x_blob`
 11 Test Basic database example	This is a blob.
 12 Test Basic database example	This is a blob.
 13 Test Basic database example	This is a blob.
 NULL	This is a blob.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 `a`	`b`
 1	14 test fkeys
 2	15 test fkeys
 3	16 test fkeys
 4	NULL
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 `c`	`d`
 3	2
+# Data for table `util_test`.`t5`:
+`product_id`	`name`	`base_price`	`tax_percentage`
+1	kitkat	0.99	19
+2	M&M	5.99	19
+3	milk	0.67	5
+4	Dr. Pepper	0.99	19
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 28 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -977,7 +1196,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -991,7 +1210,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1005,11 +1224,33 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 29 - VERTICAL format with FULL display
@@ -1017,7 +1258,7 @@ Test case 29 - VERTICAL format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -1033,7 +1274,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -1047,7 +1288,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1061,11 +1302,33 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 30 - VERTICAL format with NAMES display
@@ -1073,7 +1336,7 @@ Test case 30 - VERTICAL format with NAMES display
 SET FOREIGN_KEY_CHECKS=0;
 # NOTE : --display is ignored for data export.
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
 *************************       2. row *************************
@@ -1089,7 +1352,7 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       7. row *************************
  a: 07 Test Basic database example
 7 rows.
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 *************************       1. row *************************
       a: 11 Test Basic database example
  x_blob: This is a blob.
@@ -1103,7 +1366,7 @@ SET FOREIGN_KEY_CHECKS=0;
       a: NULL
  x_blob: This is a blob.
 4 rows.
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 *************************       1. row *************************
  a: 1
  b: 14 test fkeys
@@ -1117,11 +1380,33 @@ SET FOREIGN_KEY_CHECKS=0;
  a: 4
  b: NULL
 4 rows.
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 *************************       1. row *************************
  c: 3
  d: 2
 1 row.
+# Data for table `util_test`.`t5`:
+*************************       1. row *************************
+     product_id: 1
+           name: kitkat
+     base_price: 0.99
+ tax_percentage: 19
+*************************       2. row *************************
+     product_id: 2
+           name: M&M
+     base_price: 5.99
+ tax_percentage: 19
+*************************       3. row *************************
+     product_id: 3
+           name: milk
+     base_price: 0.67
+ tax_percentage: 5
+*************************       4. row *************************
+     product_id: 4
+           name: Dr. Pepper
+     base_price: 0.99
+ tax_percentage: 19
+4 rows.
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 31 - multiple blobs
@@ -1129,7 +1414,7 @@ Test case 31 - multiple blobs
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from util_test
-# Data for table `util_test`.`t1`: 
+# Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example');
@@ -1137,7 +1422,7 @@ INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
-# Data for table `util_test`.`t2`: 
+# Data for table `util_test`.`t2`:
 INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', NULL, NULL);
 INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', NULL, NULL);
 INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', NULL, NULL);
@@ -1151,12 +1436,17 @@ UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is ye
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = '13 Test Basic database example';
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = NULL;
 UPDATE `util_test`.`t2` SET `x_blob` = 'This is a blob.', `y_blob` = 'This is yet another blob.' WHERE `a` = NULL;
-# Data for table `util_test`.`t3`: 
+# Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (4, NULL);
-# Data for table `util_test`.`t4`: 
+# Data for table `util_test`.`t4`:
 INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;

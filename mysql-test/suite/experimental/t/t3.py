@@ -16,6 +16,7 @@
 #
 import mutlib
 
+
 class test(mutlib.System_test):
     """Experimental test #3
     This example tests the return codes for the methods. Uncomment out the
@@ -35,7 +36,7 @@ class test(mutlib.System_test):
         #return False
   
     def get_result(self):
-        return (True, None)
+        return True, None
         #return (False, "Test message\nAnother test message\n")
     
     def record(self):
@@ -46,5 +47,3 @@ class test(mutlib.System_test):
     def cleanup(self):
         return True
         #return False
-
-

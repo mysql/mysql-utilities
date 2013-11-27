@@ -30,22 +30,24 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.exception import UtilError, FormatError
-from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import CaseInsensitiveChoicesOption
-from mysql.utilities.common.options import UtilitiesParser
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.tools import show_file_statistics
-from mysql.utilities.command import audit_log
-from mysql.utilities.command.audit_log import AuditLog
-from mysql.utilities.command.audit_log import command_requires_value
-from mysql.utilities.command.audit_log import command_requires_log_name
-from mysql.utilities.command.audit_log import command_requires_server
 from mysql.utilities import VERSION_FRM
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.command import audit_log
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.command.audit_log import (AuditLog,
+                                               command_requires_value,
+                                               command_requires_log_name,
+                                               command_requires_server)
+from mysql.utilities.common.options import (add_verbosity, UtilitiesParser,
+                                            CaseInsensitiveChoicesOption,
+                                            license_callback)
+from mysql.utilities.common.tools import (check_connector_python,
+                                          show_file_statistics)
 
 
 class MyParser(UtilitiesParser):
+    """Custom class to set the epilog.
+    """
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -59,24 +61,32 @@ if not check_connector_python():
     sys.exit(1)
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = MyParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=audit_log.VALID_COMMANDS_TEXT)
+    epilog=audit_log.VALID_COMMANDS_TEXT,
+    prog=program
+)
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Setup utility-specific options:
 
 # Connection information for the source server
 parser.add_option("--server", action="store", dest="server",
                   type="string", default=None,
-                  help="connection information for the server in " + \
+                  help="connection information for the server in "
                   "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
                   " or <login-path>[:<port>][:<socket>].")
 
@@ -139,8 +149,8 @@ else:
 
 # At least one valid option must be specified
 if (not opt.log_name and not opt.rlogin and not opt.value and not opt.server
-    and not opt.copy_location and not opt.show_options
-    and opt.file_stats == False):
+   and not opt.copy_location and not opt.show_options
+   and not opt.file_stats):
     parser.error("At least one valid option must be specified.")
 
 # if command, check to see if it requires a value.
@@ -207,14 +217,14 @@ if (command and command == "COPY" and opt.copy_location) and \
 
 # Check args for copy-to, file-stats
 if ((command and command == "COPY" and opt.copy_location) or
-    opt.file_stats) and not opt.log_name:
+   opt.file_stats) and not opt.log_name:
     parser.error("You must specify the --audit-log-name option for copying "
                  "log files or viewing file statistics.")
 
 # Check if the specified audit-log-name is a file
 if opt.log_name and not opt.rlogin and not os.path.isfile(opt.log_name):
-    parser.error("The specified --audit-log-name is not a file: %s" \
-                  % opt.log_name)
+    parser.error("The specified --audit-log-name is not a file: %s"
+                 % opt.log_name)
 
 # Check remote login format
 if opt.rlogin:
@@ -224,22 +234,22 @@ if opt.rlogin:
         parser.error("The --remote-login option should be in the format: "
                      "<user>:<host_or_ip>")
 
-    if not (command and  command == "COPY"):
-        parser.error("The --remote-login option can only be used with the COPY "
-                     "command.")
+    if not command and command == "COPY":
+        parser.error("The --remote-login option can only be used with the "
+                     "COPY command.")
 
 
 # Create dictionary of options
 options = {
-    'verbosity'     : opt.verbosity,
-    'command'       : command,
-    'log_name'      : opt.log_name,
-    'server_vals'   : server_values,
-    'rlogin'        : opt.rlogin,
-    'file_stats'    : opt.file_stats,
-    'show_options'  : opt.show_options,
-    'copy_location' : opt.copy_location,
-    'value'         : opt.value,
+    'verbosity': opt.verbosity,
+    'command': command,
+    'log_name': opt.log_name,
+    'server_vals': server_values,
+    'rlogin': opt.rlogin,
+    'file_stats': opt.file_stats,
+    'show_options': opt.show_options,
+    'copy_location': opt.copy_location,
+    'value': opt.value,
 }
 
 try:

@@ -31,21 +31,24 @@ import os.path
 import signal
 import sys
 
+from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import add_failover_options, add_rpl_user
-from mysql.utilities.common.options import check_server_lists
-from mysql.utilities.common.options import UtilitiesParser
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_failover_connections
-from mysql.utilities.command.rpl_admin import RplCommands, purge_log
-from mysql.utilities import VERSION_FRM
+from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
+                                            add_failover_options,
+                                            check_server_lists,
+                                            license_callback,
+                                            UtilitiesParser)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlfailover "
-DESCRIPTION = "mysqlfailover - automatic replication health monitoring and failover"
+DESCRIPTION = ("mysqlfailover - automatic replication health monitoring and "
+               "failover")
 USAGE = "%prog --master=root@localhost --discover-slaves-login=root " + \
         "--candidates=root@host123:3306,root@host456:3306 "
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
@@ -60,13 +63,16 @@ if not check_connector_python():
 # If posix, save old terminal settings so we can restore them on exit.
 try:
     # Only valid for *nix systems.
-    import tty, termios
+    import termios
     old_terminal_settings = termios.tcgetattr(sys.stdin)
 except:
     # Ok to fail for Windows
     pass
 
+
 def set_signal_handler(func):
+    """Set the signal handler.
+    """
     # If posix, restore old terminal settings.
     if os.name == "nt":
         from ctypes import windll
@@ -78,12 +84,17 @@ def set_signal_handler(func):
 # If ctypes present, we have Windows so define the exit with decorators
 try:
     import ctypes
+
     @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)
     def on_exit(signal, func=None):
+        """Override the on_exit callback.
+        """
         logging.info("Failover console stopped with SIGTERM.")
         sys.exit(0)
 except:
     def on_exit(signal, func=None):
+        """Override the on_exit callback.
+        """
         if os.name == "posix":
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
                               old_terminal_settings)
@@ -93,15 +104,23 @@ except:
 set_signal_handler(on_exit)
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = UtilitiesParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
-    add_help_option=False)
+    add_help_option=False,
+    prog=program
+)
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Setup utility-specific options:
 add_failover_options(parser)
@@ -113,18 +132,19 @@ parser.add_option("--interval", "-i", action="store", dest="interval",
                   "Default = 15 seconds. Lowest value is 5 seconds.")
 
 # Add failover modes
-parser.add_option("--failover-mode", "-f", action="store", dest="failover_mode",
-                  type="choice", default="auto", choices=["auto", "elect",
-                  "fail"], help="action to take when the master "
+parser.add_option("--failover-mode", "-f", action="store",
+                  dest="failover_mode", type="choice", default="auto",
+                  choices=["auto", "elect", "fail"],
+                  help="action to take when the master "
                   "fails. 'auto' = automatically fail to best slave, "
                   "'elect' = fail to candidate list or if no candidate meets "
-                  "criteria fail, 'fail' = take no action and stop when master "
-                  "fails. Default = 'auto'.")
+                  "criteria fail, 'fail' = take no action and stop when "
+                  "master fails. Default = 'auto'.")
 
 # Add failover detection extension point
 parser.add_option("--exec-fail-check", action="store", dest="exec_fail",
                   type="string", default=None, help="name of script to "
-                      "execute on each interval to invoke failover")
+                  "execute on each interval to invoke failover")
 
 # Add force to override registry entry
 parser.add_option("--force", action="store_true", dest="force", default=False,
@@ -133,10 +153,10 @@ parser.add_option("--force", action="store_true", dest="force", default=False,
                   "master.")
 
 # Add refresh script external point
-parser.add_option("--exec-post-failover", action="store", dest="exec_post_fail",
-                  type="string", default=None, help="name of script to "
-                  "execute after failover is complete and the utility has "
-                  "refreshed the health report.")
+parser.add_option("--exec-post-failover", action="store",
+                  dest="exec_post_fail", type="string", default=None,
+                  help="name of script to execute after failover is complete "
+                  "and the utility has refreshed the health report.")
 
 
 # Add rediscover on interval
@@ -220,37 +240,39 @@ except UtilRplError:
 # Check hostname alias
 for slave_val in slaves_val:
     if check_hostname_alias(master_val, slave_val):
-        parser.error("The master and one of the slaves are the same host and port.")
+        parser.error("The master and one of the slaves are the same host and "
+                     "port.")
 for cand_val in candidates_val:
     if check_hostname_alias(master_val, cand_val):
-        parser.error("The master and one of the candidates are the same host and port.")
+        parser.error("The master and one of the candidates are the same host "
+                     "and port.")
 
 # Create dictionary of options
 options = {
-    'candidates'       : candidates_val,
-    'ping'             : 3 if opt.ping is None else opt.ping,
-    'verbosity'        : 0 if opt.verbosity is None else opt.verbosity,
-    'before'           : opt.exec_before,
-    'after'            : opt.exec_after,
-    'fail_check'       : opt.exec_fail,
-    'max_position'     : opt.max_position,
-    'max_delay'        : opt.max_delay,
-    'discover'         : opt.discover,
-    'timeout'          : int(opt.timeout),
-    'interval'         : opt.interval,
-    'failover_mode'    : opt.failover_mode,
-    'logging'          : opt.log_file is not None,
-    'log_file'         : opt.log_file,
-    'force'            : opt.force,
-    'post_fail'        : opt.exec_post_fail,
-    'rpl_user'         : opt.rpl_user,
-    'rediscover'       : opt.rediscover,
-    'pedantic'         : opt.pedantic,
-    'no_keyboard'      : opt.no_keyboard,
-    'daemon'           : opt.daemon,
-    'pidfile'          : opt.pidfile,
-    'report_values'    : opt.report_values,
-    'script_threshold' : opt.script_threshold,
+    'candidates': candidates_val,
+    'ping': 3 if opt.ping is None else opt.ping,
+    'verbosity': 0 if opt.verbosity is None else opt.verbosity,
+    'before': opt.exec_before,
+    'after': opt.exec_after,
+    'fail_check': opt.exec_fail,
+    'max_position': opt.max_position,
+    'max_delay': opt.max_delay,
+    'discover': opt.discover,
+    'timeout': int(opt.timeout),
+    'interval': opt.interval,
+    'failover_mode': opt.failover_mode,
+    'logging': opt.log_file is not None,
+    'log_file': opt.log_file,
+    'force': opt.force,
+    'post_fail': opt.exec_post_fail,
+    'rpl_user': opt.rpl_user,
+    'rediscover': opt.rediscover,
+    'pedantic': opt.pedantic,
+    'no_keyboard': opt.no_keyboard,
+    'daemon': opt.daemon,
+    'pidfile': opt.pidfile,
+    'report_values': opt.report_values,
+    'script_threshold': opt.script_threshold,
 }
 
 # Purge log file of old data

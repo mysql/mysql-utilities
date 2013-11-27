@@ -16,10 +16,11 @@
 #
 
 import copy_db_parameters
-from mysql.utilities.common.table import quote_with_backticks
+
 from mysql.utilities.exception import MUTLibError
 
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
+
 
 class test(copy_db_parameters.test):
     """Export Data
@@ -36,26 +37,28 @@ class test(copy_db_parameters.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd = "mysqldbexport.py %s util_test --skip-gtid " % from_conn
+        cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
 
         test_num = 1
-        comment = "Test case %s - export with default locking" % test_num
+        comment = "Test case {0} - export with default locking".format(
+            test_num)
         cmd_str = cmd + " --export=both --format=SQL --skip=events "
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-            
+            raise MUTLibError("{0}: failed".format(comment))
+
         for locktype in _LOCKTYPES:
             test_num += 1
-            comment = "Test case %s - export data with %s locking" % \
-                      (test_num, locktype)
-            cmd_str = cmd + " --export=data --format=SQL --locking=%s" % \
-                      locktype
+            comment = "Test case {0} - export data with {1} locking".format(
+                test_num, locktype)
+            cmd_str = cmd + " --export=data --format=SQL --locking={0}".format(
+                locktype)
             res = self.run_test_case(0, cmd_str, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("Time:", "Time:       XXXXXX\n")
 
@@ -76,26 +79,6 @@ class test(copy_db_parameters.test):
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        except:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            res = server.exec_query("DROP DATABASE {0}".format(q_db))
-        except:
-            return False
-        return True
-
-    def drop_all(self):
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
-        return True
 
     def cleanup(self):
         return copy_db_parameters.test.cleanup(self)

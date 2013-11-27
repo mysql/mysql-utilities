@@ -29,16 +29,16 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.exception import UtilError
-from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.command.check_rpl import check_replication
+from mysql.utilities.common.options import (add_verbosity, license_callback,
+                                            setup_common_options)
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
-                                             WARN_OPT_USING_DEFAULT)
-from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.command.check_rpl import check_replication
-from mysql.utilities.exception import FormatError
+from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
+                                             WARN_OPT_USING_DEFAULT)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlrplcheck "
@@ -136,13 +136,13 @@ if check_hostname_alias(m_values, s_values):
 
 # Create dictionary of options
 options = {
-    'verbosity'    : opt.verbosity,
-    'pedantic'     : False,
-    'quiet'        : opt.quiet,
-    'suppress'     : opt.suppress,
-    'master_info'  : opt.master_info,
-    'slave_status' : opt.slave_status,
-    'width'        : opt.width
+    'verbosity': opt.verbosity,
+    'pedantic': False,
+    'quiet': opt.quiet,
+    'suppress': opt.suppress,
+    'master_info': opt.master_info,
+    'slave_status': opt.slave_status,
+    'width': opt.width
 }
 
 try:

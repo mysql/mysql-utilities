@@ -20,19 +20,21 @@ This file contains the show replication topology functionality.
 """
 
 import sys
-from mysql.utilities.exception import UtilError
 
-def show_topology(master_vals, options={}):
+from mysql.utilities.common.topology_map import TopologyMap
+
+
+def show_topology(master_vals, options=None):
     """Show the slaves/topology map for a master.
 
     This method find the slaves attached to a server if it is a master. It
     can also discover the replication topology if the recurse option is
     True (default = False).
-    
+
     It prints a tabular list of the master(s) and slaves found. If the
     show_list option is True, it will also print a list of the output
     (default = False).
-    
+
     master_vals[in]    Master connection in form user:passwd@host:port:socket
                        or login-path:port:socket.
     options[in]        dictionary of options
@@ -52,25 +54,25 @@ def show_topology(master_vals, options={}):
       max_depth        maximum depth of recursive search
                        Default = None
     """
-    from mysql.utilities.common.topology_map import TopologyMap
-    
+    if options is None:
+        options = {}
+
     topo = TopologyMap(master_vals, options)
     topo.generate_topology_map(options.get('max_depth', None))
 
     if not options.get("quiet", False) and topo.depth():
         print "\n# Replication Topology Graph"
-   
+
     if not topo.slaves_found():
         print "No slaves found."
-        
+
     topo.print_graph()
     print
 
     if options.get("show_list", False):
         from mysql.utilities.common.format import print_list
-        
+
         # make a list from the topology
         topology_list = topo.get_topology_map()
         print_list(sys.stdout, options.get("format", "GRID"),
                    ["Master", "Slave"], topology_list, False, True)
-

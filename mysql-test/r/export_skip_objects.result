@@ -8,18 +8,21 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
-# VIEWS in util_test:
-TABLE_NAME
-`v1`
-# TRIGGERS in util_test:
-TRIGGER_NAME
-`trg`
-# PROCEDURES in util_test:
-NAME
-`p1`
+`t5`
 # FUNCTIONS in util_test:
 NAME
 `f1`
+`f2`
+# PROCEDURES in util_test:
+NAME
+`p1`
+# VIEWS in util_test:
+TABLE_NAME
+`v1`
+`v2`
+# TRIGGERS in util_test:
+TRIGGER_NAME
+`trg`
 # EVENTS in util_test:
 NAME
 `e1`
@@ -73,18 +76,21 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
-# VIEWS in util_test:
-TABLE_NAME
-`v1`
-# TRIGGERS in util_test:
-TRIGGER_NAME
-`trg`
-# PROCEDURES in util_test:
-NAME
-`p1`
+`t5`
 # FUNCTIONS in util_test:
 NAME
 `f1`
+`f2`
+# PROCEDURES in util_test:
+NAME
+`p1`
+# VIEWS in util_test:
+TABLE_NAME
+`v1`
+`v2`
+# TRIGGERS in util_test:
+TRIGGER_NAME
+`trg`
 # EVENTS in util_test:
 NAME
 `e1`
@@ -100,18 +106,21 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
-# VIEWS in util_test:
-TABLE_NAME
-`v1`
-# TRIGGERS in util_test:
-TRIGGER_NAME
-`trg`
-# PROCEDURES in util_test:
-NAME
-`p1`
+`t5`
 # FUNCTIONS in util_test:
 NAME
 `f1`
+`f2`
+# PROCEDURES in util_test:
+NAME
+`p1`
+# VIEWS in util_test:
+TABLE_NAME
+`v1`
+`v2`
+# TRIGGERS in util_test:
+TRIGGER_NAME
+`trg`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - no data,,grants,events,functions
@@ -124,15 +133,17 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
-# VIEWS in util_test:
-TABLE_NAME
-`v1`
-# TRIGGERS in util_test:
-TRIGGER_NAME
-`trg`
+`t5`
 # PROCEDURES in util_test:
 NAME
 `p1`
+# VIEWS in util_test:
+TABLE_NAME
+`v1`
+`v2`
+# TRIGGERS in util_test:
+TRIGGER_NAME
+`trg`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - no data,,grants,events,functions,procedures
@@ -145,9 +156,11 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
+`t5`
 # VIEWS in util_test:
 TABLE_NAME
 `v1`
+`v2`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -163,9 +176,11 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
+`t5`
 # VIEWS in util_test:
 TABLE_NAME
 `v1`
+`v2`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views
@@ -178,6 +193,7 @@ TABLE_NAME
 `t2`
 `t3`
 `t4`
+`t5`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - no data,,grants,events,functions,procedures,triggers,views,tables

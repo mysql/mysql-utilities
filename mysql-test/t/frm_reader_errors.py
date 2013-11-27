@@ -15,10 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import sys
+
 import frm_reader_base
-from mysql.utilities.exception import MUTLibError, UtilDBError
-from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.exception import MUTLibError
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -37,7 +36,6 @@ class test(frm_reader_base.test):
 
     def setup(self):
         self.server0 = self.servers.get_server(0)
-        self.drop_all()
         self.frm_output = "frm_output.txt"
         self.s1_serverid = None
 
@@ -47,18 +45,21 @@ class test(frm_reader_base.test):
             try:
                 res = self.server1.show_server_variable("server_id")
             except MUTLibError as err:
-                raise MUTLibError("Cannot get frm test server " +
-                                   "server_id: %s" % err.errmsg)
+                raise MUTLibError(
+                    "Cannot get frm test server server_id: {0}".format(
+                        err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "frm_test", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "frm_test",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn frm_test server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
+
+        self.drop_all()
 
         return True
 
@@ -69,70 +70,83 @@ class test(frm_reader_base.test):
             print
         test_num = 1
 
-        self.cmd = "mysqlfrm.py --server=%s " % \
-                   self.build_connection_string(self.server1)
+        self.cmd = "mysqlfrm.py --server={0} ".format(
+            self.build_connection_string(self.server1))
 
-        comment = "Test case %s: - Not path or files" % test_num
+        comment = "Test case {0}: - Not path or files".format(test_num)
         res = self.run_test_case(2, self.cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         datadir = self.server1.show_server_variable("datadir")[0][1]
-        frm_file_path = os.path.normpath("%s/frm_test/orig.frm" % datadir)
-        comment = "Test case %s: - Option --port required" % test_num
+        frm_file_path = os.path.normpath("{0}/frm_test/orig.frm".format(
+            datadir))
+        comment = "Test case {0}: - Option --port required".format(test_num)
         res = self.run_test_case(2, self.cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s: - Option --port requires int" % test_num
+        comment = "Test case {0}: - Option --port requires int".format(
+            test_num)
         res = self.run_test_case(2, self.cmd + frm_file_path + " --port=NI",
                                  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s: - No server and no access" % test_num
-        res = self.run_test_case(1, "mysqlfrm.py " + frm_file_path +
-                                 " --port=3333", comment)
+        comment = "Test case {0}: - No server and no access".format(test_num)
+        res = self.run_test_case(1, "mysqlfrm.py {0} --port=3333".format(
+            frm_file_path),  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s: - Connection errors" % test_num
-        res = self.run_test_case(2, "mysqlfrm.py --server=noone:2:2@local " +
-                                 frm_file_path + " --port=3333", comment)
+        comment = "Test case {0}: - Connection errors".format(test_num)
+        res = self.run_test_case(2,
+                                 "mysqlfrm.py --server=noone:2:2@local {0} "
+                                 "--port=3333".format(frm_file_path),
+                                 comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s: - Connection errors" % test_num
+        comment = "Test case {0}: - Connection errors".format(test_num)
         cmd = " ".join(["mysqlfrm.py",
-                        "--server=root:toor@localhost:%s" % self.server0.port,
+                        "--server=root:toor@localhost:"
+                        "{0}".format(self.server0.port),
                         frm_file_path, "--port=3333"])
         res = self.run_test_case(2, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s: - Invalid port" % test_num
-        res = self.run_test_case(2, self.cmd + frm_file_path +
-                                 " --port=%s" % self.server1.port,
-                                 comment)
+        comment = "Test case {0}: - Invalid port".format(test_num)
+        res = self.run_test_case(2, "{0}{1} --port={2}".format(
+            self.cmd, frm_file_path, self.server1.port),  comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         frm_file_path = os.path.normpath("./std_data/frm_files")
-        cmd_str = " ".join([self.cmd, "--port=%s" % self.server0.port,
-                            frm_file_path])
-        comment = "Test case %s: - attempt to use existing port" % test_num
+        cmd_str = " ".join(
+            [self.cmd, "--port={0}".format(self.server0.port), frm_file_path])
+        comment = "Test case {0}: - attempt to use existing port".format(
+            test_num)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
+        quotes = "'" if os.name == "posix" else '"'
+        new_cmd_str = ("{0} {1} --port=13033 --frmdir={2}wesayso{2} "
+                       "--new-storage-engine=MEMORY"
+                       "".format(self.cmd, frm_file_path, quotes))
+        comment = "Test case {0}: - --frm-dir invalid".format(test_num)
+        res = self.run_test_case(2, new_cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.mask_result("Error 2003:", "2003", "####")
         self.replace_result("Error ####: Can't connect to MySQL server",
@@ -147,7 +161,7 @@ class test(frm_reader_base.test):
                             "#                  Mode : XXXXX\n")
         self.replace_result("#         MySQL Version :",
                             "#         MySQL Version : XXXXXXXX\n")
-        self.replace_substring("%s" % self.server0.port, "XXXXX")
+        self.replace_substring("{0}".format(self.server0.port), "XXXXX")
 
         # Must remove these lines because on Windows they are not printed
         # in the same order as other systems.

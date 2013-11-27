@@ -18,7 +18,8 @@ import os
 import utilities_console_base
 from mysql.utilities.exception import MUTLibError
 
-_BASE_COMMENT = "Test Case %d: "
+_BASE_COMMENT = "Test Case {0}: "
+
 
 class test(utilities_console_base.test):
     """mysql utilities console - piped commands
@@ -35,20 +36,21 @@ class test(utilities_console_base.test):
     def do_test(self, test_num, comment, command):
         res = self.exec_util(command, self.res_fname, True)
         if comment:
-            self.results.append(_BASE_COMMENT%test_num + comment + "\n")
+            self.results.append(
+                _BASE_COMMENT.format(test_num) + comment + "\n")
         self.record_results(self.res_fname)
         if res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
     def run(self):
         self.res_fname = "result.txt"
 
         # Setup options to show
-        cmd_str = 'echo "%s" | python '
-        cmd_opt = "%s/mysqluc.py --width=77 " % self.utildir
+        cmd_str = 'echo "{0}" | python '
+        cmd_opt = "{0}/mysqluc.py --width=77 ".format(self.utildir)
 
         return utilities_console_base.test.do_coverage_tests(self,
-                                                             cmd_str+cmd_opt)
+                                                             cmd_str + cmd_opt)
 
     def get_result(self):
         return self.compare(__name__, self.results)

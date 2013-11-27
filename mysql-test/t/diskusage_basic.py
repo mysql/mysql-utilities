@@ -46,25 +46,21 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get diskusage_all server " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get diskusage_all server "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.gen_log = os.path.join(os.getcwd(), "general.log")
             self.slow_log = os.path.join(os.getcwd(), "slow.log")
             self.error_log = os.path.join(os.getcwd(), "error_log.err")
             self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                                "diskusage_all",
-                                                ' --mysqld=--log-bin=mysql-'
-                                                'bin --general-log '
-                                                '--slow-query-log '
-                                                '--slow-query-log-file="%s" '
-                                                '--general-log-file="%s" '
-                                                ' --log-error="%s"' %
-                                                (self.gen_log, self.slow_log,
-                                                 self.error_log))
+            res = self.servers.spawn_new_server(
+                self.server0, self.s1_serverid, "diskusage_all",
+                ' --mysqld=--log-bin=mysql-bin --general-log --slow-query-log '
+                '--slow-query-log-file="{0}" --general-log-file="{1}" '
+                ' --log-error="{2}"'.format(self.slow_log, self.gen_log,
+                                            self.error_log))
             if not res:
                 raise MUTLibError("Cannot spawn diskusage_all server.")
             self.server1 = res[0]
@@ -138,21 +134,26 @@ class test(mutlib.System_test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_base = "mysqldiskusage.py %s util_test --format=CSV" % from_conn
+        cmd_base = ("mysqldiskusage.py {0} util_test "
+                    "--format=CSV".format(from_conn))
         test_num = 1
-        comment = "Test Case %d : Testing disk space (simple)" % test_num
+        comment = ("Test Case {0} : Testing disk space "
+                   "(simple)".format(test_num))
         res = self.run_test_case(0, cmd_base, comment)
         if not res:
-            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
 
-        cmd_base = "mysqldiskusage.py %s util_test --empty test" % from_conn
-        test_num = 2
-        comment = "Test Case %d : Testing disk space (with empty)" % test_num
+        cmd_base = ("mysqldiskusage.py {0} util_test --empty "
+                    "test".format(from_conn))
+        test_num += 1
+        comment = ("Test Case {0} : Testing disk space "
+                   "(with empty)".format(test_num))
         res = self.run_test_case(0, cmd_base, comment)
         if not res:
-            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
 
         self.mask()
 
@@ -163,18 +164,6 @@ class test(mutlib.System_test):
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        except:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE {0}".format(db))
-        except:
-            return False
-        return True
 
     def drop_all(self):
         # Drop user.
@@ -188,7 +177,7 @@ class test(mutlib.System_test):
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-            except:
+            except UtilError:
                 pass
         # Drop database.
         return self.drop_db(self.server1, "util_test")
@@ -197,7 +186,7 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
         self.servers.add_cleanup_file(self.gen_log)
         self.servers.add_cleanup_file(self.slow_log)

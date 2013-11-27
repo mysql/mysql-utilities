@@ -82,7 +82,7 @@ class test(show_rpl.test):
 
         comment = "Test case {0} - show topology".format(test_num)
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --format=csv").format(master_str)
+                   "--show-list --format=csv".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

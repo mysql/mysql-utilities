@@ -14,10 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import export_rpl_errors
 import mutlib
 from mysql.utilities.exception import MUTLibError
+
 
 class test(export_rpl_errors.test):
     """check replication errors for copy utility
@@ -39,71 +40,77 @@ class test(export_rpl_errors.test):
         self.res_fname = "result.txt"
         test_num = 1
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
 
-        cmd_str = "mysqldbcopy.py util_test %s %s " % (from_conn, to_conn)
+        cmd_str = "mysqldbcopy.py util_test {0} {1} ".format(from_conn,
+                                                             to_conn)
 
-        comment = "Test case %s - error: --rpl=both" % test_num
+        comment = "Test case {0} - error: --rpl=both".format(test_num)
         option = " --rpl=both "
         res = mutlib.System_test.run_test_case(self, 2, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("CREATE DATABASE util_test")
         self.server1.exec_query("CREATE USER imnotamouse@localhost")
 
-        comment = "Test case %s - warning: --rpl-user missing" % test_num
+        comment = "Test case {0} - warning: --rpl-user missing".format(
+            test_num)
         option = " --rpl=master "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - error: --rpl-user missing user" % test_num
+        comment = "Test case {0} - error: --rpl-user missing user".format(
+            test_num)
         option = " --rpl=master --rpl-user=missing "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - error: --rpl-user missing privileges" % \
-                  test_num
+        comment = ("Test case {0} - error: --rpl-user missing "
+                   "privileges".format(test_num))
         option = " --rpl=master --rpl-user=imnotamouse "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
         
         self.server1.exec_query("DROP USER imnotamouse@localhost")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
         
-        comment = "Test case %s - error: slave not connected" % test_num
+        comment = "Test case {0} - error: slave not connected".format(
+            test_num)
         option = " --rpl=slave "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
+
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server3))
+        self.server3.exec_query("CREATE DATABASE util_test")
         
-        from_conn = "--server=" + self.build_connection_string(self.server3)
+        cmd_str = ("mysqldbexport.py util_test --export=both "
+                   "--rpl-user=rpl:rpl {0} ".format(from_conn))
         
-        cmd_str = "mysqldbexport.py util_test --export=both " + \
-                  "--rpl-user=rpl:rpl %s " % from_conn
-        
-        comment = "Test case %s - error: no binlog" % test_num
+        comment = "Test case {0} - error: no binlog".format(test_num)
         option = " --rpl=master "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        test_num += 1
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_substring(str(self.server2.port), "PORT2")
@@ -118,4 +125,3 @@ class test(export_rpl_errors.test):
 
     def cleanup(self):
         return export_rpl_errors.test.cleanup(self)
-

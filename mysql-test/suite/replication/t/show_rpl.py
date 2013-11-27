@@ -36,8 +36,8 @@ class test(mutlib.System_test):
             new_port = self.servers.get_next_port()
             mysqld_params = (' --mysqld="--log-bin=mysql-bin '
                              ' --report-host={0} '
-                             '--report-port={1}"').format('localhost',
-                                                          new_port)
+                             '--report-port={1}"'.format('localhost',
+                                                         new_port))
             self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
                                             name, mysqld_params)
@@ -96,94 +96,92 @@ class test(mutlib.System_test):
         test_num = 1
 
         comment = ("Test case {0} - show topology of master with no "
-                   "slaves").format(test_num)
+                   "slaves".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --recurse").format(master_str)
+                   "--show-list --recurse".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0} {1}"
         try:
-            res = self.exec_util(cmd.format(master_str, slave_str),
-                                 self.res_fname)
-            res = self.exec_util(cmd.format(master_str, relay_slave_slave),
-                                 self.res_fname)
-            res = self.exec_util(cmd.format(relay_slave_master, slave_leaf),
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd.format(master_str, slave_str),
+                           self.res_fname)
+            self.exec_util(cmd.format(master_str, relay_slave_slave),
+                           self.res_fname)
+            self.exec_util(cmd.format(relay_slave_master, slave_leaf),
+                           self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         test_num += 1
 
         comment = "Test case {0} - show topology".format(test_num)
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --recurse").format(master_str)
+                   "--show-list --recurse".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
 
         comment = ("Test case {0} - show topology with "
-                   "--max-depth").format(test_num)
+                   "--max-depth".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --recurse --max-depth=1").format(master_str)
+                   "--show-list --recurse --max-depth=1".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
             circle_master = " --master={0}".format(slave_leaf_con)
             circle_slave = " --slave={0}".format(master_con)
-            res = self.exec_util(cmd.format(circle_master, circle_slave),
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd.format(circle_master, circle_slave),
+                           self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         test_num += 1
 
         comment = ("Test case {0} - show topology with circular "
-                   "replication").format(test_num)
+                   "replication".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --recurse").format(master_str)
+                   "--show-list --recurse".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
 
         comment = ("Test case {0} - show circular topology with verbose "
-                   "option").format(test_num)
+                   "option".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
-                   "--show-list --recurse --verbose").format(master_str)
+                   "--show-list --recurse --verbose".format(master_str))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Create a master:master topology
         multi_master1_con = self.build_connection_string(self.server_list[5])
         multi_master2_con = self.build_connection_string(self.server_list[6])
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl --master={0} --slave={1}"
         try:
-            res = self.exec_util(cmd.format(multi_master1_con,
-                                            multi_master2_con),
-                                 self.res_fname)
-            res = self.exec_util(cmd.format(multi_master2_con,
-                                            multi_master1_con),
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd.format(multi_master1_con, multi_master2_con),
+                           self.res_fname)
+            self.exec_util(cmd.format(multi_master2_con, multi_master1_con),
+                           self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         test_num += 1
 
         comment = ("Test case {0} - show topology with master:master "
-                   "replication").format(test_num)
+                   "replication".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root --master={0} "
-                   "--show-list --recurse").format(multi_master1_con)
+                   "--show-list --recurse".format(multi_master1_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Here we need to kill one of the servers to show that the
         # phantom server error from a stale SHOW SLAVE HOSTS is
@@ -201,15 +199,15 @@ class test(mutlib.System_test):
                             "row.\n".format(test_num, len(res)))
 
         comment = ("Test case {0} - show topology with phantom "
-                   "slave").format(test_num)
+                   "slave".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0}"
-                   "--show-list").format(relay_slave_master)
+                   "--show-list".format(relay_slave_master))
         res = self.run_test_case(0, cmd_str, comment)
 
         self.do_replacements()
 
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         for i in range(6, 0, -1):
             self.stop_replication(self.server_list[i])
@@ -221,9 +219,9 @@ class test(mutlib.System_test):
         self.replace_substring("127.0.0.1", "localhost")
         i = 1
         for port in self.port_repl:
-            self.replace_substring("%s" % port, "PORT%d" % i)
+            self.replace_substring("{0}".format(port), "PORT{0}".format(i))
             i += 1
-        # Remove non-deterministic messages (do not appear on all platfoms)
+        # Remove non-deterministic messages (do not appear on all platforms)
         self.replace_result("Error connecting to a slave",
                             "Error connecting to a slave ...\n")
         self.replace_result("Error 2002: Can't connect to",
@@ -241,14 +239,14 @@ class test(mutlib.System_test):
 
     def stop_replication(self, server):
         if server is not None:
-            res = server.exec_query("STOP SLAVE")
-            res = server.exec_query("RESET SLAVE")
-            res = server.exec_query("RESET MASTER")
+            server.exec_query("STOP SLAVE")
+            server.exec_query("RESET SLAVE")
+            server.exec_query("RESET MASTER")
 
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         # Kill the servers that are only for this test.
         kill_list = ['rep_relay_slave', 'multi_master1', 'rep_master_show',
-                    'multi_master2', 'rep_slave_show']
+                     'multi_master2', 'rep_slave_show']
         return self.kill_server_list(kill_list)

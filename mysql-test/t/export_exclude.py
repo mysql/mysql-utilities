@@ -38,36 +38,35 @@ class test(export_parameters_def.test):
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_str = ("mysqldbexport.py --skip=events,grants --no-headers {0} "
-                   "--format=CSV util_test --skip-gtid").format(from_conn)
+                   "--format=CSV util_test --skip-gtid".format(from_conn))
 
         test_num = 1
         comment = "Test case {0} - exclude by name.".format(test_num)
         cmd_opts = ("{0} --exclude=util_test.v1 "
-                    "--exclude=util_test.t4").format(cmd_str)
+                    "--exclude=util_test.t4".format(cmd_str))
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - exclude by name using "
-                   "backticks.").format(test_num)
+                   "backticks.".format(test_num))
         if os.name == 'posix':
             cmd_opts = ("{0} --exclude='`util_test`.`v1`' "
-                        "--exclude='`util_test`.`t4`'").format(cmd_str)
+                        "--exclude='`util_test`.`t4`'".format(cmd_str))
         else:
             cmd_opts = ('{0} --exclude="`util_test`.`v1`" '
-                        '--exclude="`util_test`.`t4`"').format(cmd_str)
+                        '--exclude="`util_test`.`t4`"'.format(cmd_str))
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - exclude using SQL LIKE "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         cmd_opts = "{0} -x f% -x _4".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
@@ -75,7 +74,7 @@ class test(export_parameters_def.test):
 
         test_num += 1
         comment = ("Test case {0} - exclude using REGEXP "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         cmd_opts = "{0} -x ^f -x 4$ --regexp".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
@@ -83,25 +82,25 @@ class test(export_parameters_def.test):
 
         test_num += 1
         comment = ("Test case {0} - exclude by name and SQL LIKE "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         cmd_opts = ("{0} --exclude=f% --exclude=_4 -x p% --exclude=v1 "
-                    "--exclude=util_test.trg").format(cmd_str)
+                    "--exclude=util_test.trg".format(cmd_str))
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - exclude by name and REGEXP "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         cmd_opts = ("{0} --exclude=^f --exclude=4$ -x ^p --exclude=v1 "
-                    "--exclude=util_test.trg --regexp").format(cmd_str)
+                    "--exclude=util_test.trg --regexp".format(cmd_str))
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - exclude everything using SQL LIKE "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         cmd_opts = "{0} -x % ".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
@@ -109,7 +108,7 @@ class test(export_parameters_def.test):
 
         test_num += 1
         comment = ("Test case {0} - exclude everything using REGEXP "
-                   "pattern.").format(test_num)
+                   "pattern.".format(test_num))
         if os.name == 'posix':
             cmd_opts = "{0} -x '.*' --regexp".format(cmd_str)
         else:
@@ -124,14 +123,14 @@ class test(export_parameters_def.test):
         # See: http://dev.mysql.com/doc/en/pattern-matching.html
         test_num += 1
         comment = ("Test case {0}a - SQL LIKE VS REGEXP pattern (match entire "
-                   "value VS match anywhere in value).").format(test_num)
+                   "value VS match anywhere in value).".format(test_num))
         cmd_opts = "{0} -x 1 -x t".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         comment = ("Test case {0}b - SQL LIKE VS REGEXP pattern (match entire "
-                   "value VS match anywhere in value).").format(test_num)
+                   "value VS match anywhere in value).".format(test_num))
         cmd_opts = "{0} -x 1 -x t --regexp".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:

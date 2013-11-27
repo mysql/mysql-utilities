@@ -14,14 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import clone_db
 
 from mysql.utilities.exception import MUTLibError
 
 # List of database objects for enumeration
-DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT = "DATABASE", \
-    "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT", "GRANT"
+(DATABASE, TABLE, VIEW, TRIGGER, PROC, FUNC, EVENT, GRANT) = (
+    "DATABASE", "TABLE", "VIEW", "TRIGGER", "PROCEDURE", "FUNCTION", "EVENT",
+    "GRANT")
+
 
 class test(clone_db.test):
     """check parameters for clone db
@@ -40,57 +42,97 @@ class test(clone_db.test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s " % (from_conn, to_conn)
+        cmd_base = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn,
+                                                               to_conn)
 
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.
 
+        test_num = 1
+        comment = "Test case {0} - normal run".format(test_num)
         cmd_opts = "util_test:util_db_clone"
-        comment = "Test case 1 - normal run"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        cmd = "{0} {1}".format(cmd_base, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - operation fails - need force"
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        test_num += 1
+        comment = ("Test case {0} - operation fails - "
+                   "need force".format(test_num))
+        res = self.run_test_case(1, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - help".format(test_num)
         cmd_opts = "--help"
-        comment = "Test case 3 - help"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        cmd = "{0} {1}".format(cmd_base, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqldbcopy.py "
                                            "version", 6)
 
         # We exercise --force here to ensure skips don't interfere
+        test_num += 1
+        comment = "Test case {0} - no data".format(test_num)
         cmd_opts = "--force --skip=data util_test:util_db_clone"
-        comment = "Test case 4 - no data"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        cmd = "{0} {1}".format(cmd_base, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
         self.results.append(self.check_objects(self.server1, "util_db_clone"))
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - quiet clone".format(test_num)
         cmd_opts = "--force --skip=data --quiet util_test:util_db_clone"
-        comment = "Test case 5 - quiet clone"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        cmd = "{0} {1}".format(cmd_base, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # Drop cloned database to issue drop warnings in verbose mode.
+        self.drop_db(self.server1, "util_db_clone")
+        # Test clone in verbose mode.
+        comment = ("Test case {0} - verbose clone "
+                   "with drop warnings.".format(test_num))
+        cmd_opts = "--force --verbose util_test:util_db_clone"
+        cmd = "{0} {1}".format(cmd_base, cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known platform-dependent lines
         self.replace_result("# Reading the file", "# Reading data file.\n")
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
 
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Destination on ",
                             "# Destination on XXXX-XXXX: ... connected.\n")
+
+        # Mask non deterministic data for event creation (definer and date).
+        self.replace_substring_portion("CREATE", "EVENT `e1`",
+                                       "CREATE DEFINER=`user`@`host` "
+                                       "EVENT `e1`")
+        self.replace_substring_portion("ON SCHEDULE EVERY 1 YEAR STARTS ",
+                                       " ON COMPLETION",
+                                       "ON SCHEDULE EVERY 1 YEAR STARTS "
+                                       "'YYYY-MM-DD HH:MI:SS' ON COMPLETION")
+
+        self.replace_result(
+                "MySQL Utilities mysqldbcopy version",
+                "MySQL Utilities mysqldbcopy version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
 
         return True
 

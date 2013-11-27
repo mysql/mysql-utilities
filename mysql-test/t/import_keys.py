@@ -44,9 +44,9 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(num_servers)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed "
-                                  "servers: {0}".format(e.errmsg))
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         self.server0 = self.servers.get_server(0)
 
         index = self.servers.find_server_by_name("export_basic")
@@ -54,9 +54,9 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except UtilError, e:
+            except UtilError as err:
                 raise MUTLibError("Cannot get export_basic server "
-                                  "server_id: {0}".format(e.errmsg))
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
@@ -72,14 +72,15 @@ class test(mutlib.System_test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except UtilError, e:
-                raise MUTLibError("Cannot get import_basic server " +
-                                  "server_id: {0}".format(e.errmsg))
+            except UtilError as err:
+                raise MUTLibError("Cannot get import_basic server "
+                                  "server_id: {0}".format(err.errmsg))
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                                "import_basic", '"--sql_mode="')
+                                                "import_basic", '"--sql_mode="'
+                                                )
             if not res:
                 raise MUTLibError("Cannot spawn import_basic server.")
             self.server2 = res[0]
@@ -89,10 +90,22 @@ class test(mutlib.System_test):
 
         data_file = os.path.normpath("./std_data/multiple_keys.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file, err.errmsg))
+
+        # In case other tests disable it, enable foreign key checks so
+        # that the server can record the checks are on at start.
+        self.server1.exec_query("SET foreign_key_checks=1")
+        self.server1.disable_foreign_key_checks(True)
+        data_file = os.path.normpath("./std_data/fkeys.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, err.errmsg))
+        self.server1.disable_foreign_key_checks(False)
 
         # In case other tests disable it, enable foreign key checks so
         # that the server can record the checks are on at start.
@@ -173,8 +186,8 @@ class test(mutlib.System_test):
             comment = ("Test Case {0} : Testing import with {1} format and "
                        "multiple part keys".format(test_num, frmt))
             # We test DEFINITIONS and DATA only in other tests
-            self.run_import_test(0, from_conn, to_conn, 'util_test_keys',
-                                 frmt, "BOTH", comment)
+            self.run_import_test(0, from_conn, to_conn, 'util_test_keys', frmt,
+                                 "BOTH", comment)
             self.drop_db(self.server2, "util_test_keys")
             test_num += 1
 
@@ -184,8 +197,8 @@ class test(mutlib.System_test):
         self.tables = ['t1', 'a1']
         comment = ("Test Case {0} : Testing import with foreign "
                    "keys".format(test_num))
-        self.run_import_test(0, from_conn, to_conn, 'util_test_fk',
-                             "SQL", "BOTH", comment)
+        self.run_import_test(0, from_conn, to_conn, 'util_test_fk', "SQL",
+                             "BOTH", comment)
         self.drop_db(self.server2, "util_test_fk")
         test_num += 1
 
@@ -193,12 +206,12 @@ class test(mutlib.System_test):
         # But this will fail because the table has fkeys!
         comment = ("Test Case {0} : Testing import with foreign "
                    "keys and --skip-fkey-checks".format(test_num))
-        self.run_import_test(1, from_conn, to_conn, 'util_test_fk',
-                             "SQL", "BOTH", comment, " --skip-fkey-checks ")
-        self.replace_result("ERROR: Query failed. ",
-                            "ERROR: Query failed. "
-                            "Cannot add foreign key constraint\n")
-        test_num += 1
+        self.run_import_test(1, from_conn, to_conn, 'util_test_fk', "SQL",
+                             "BOTH", comment, " --skip-fkey-checks ")
+        self.replace_result("ERROR: Query failed. ", "ERROR: Query failed. "
+                                                     "Cannot add foreign key "
+                                                     "constraint\n")
+
 
         return True
 
@@ -207,14 +220,6 @@ class test(mutlib.System_test):
 
     def record(self):
         return self.save_result_file(__name__, self.results)
-
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            server.exec_query("DROP DATABASE {0}".format(db))
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        return True
 
     def drop_all(self):
         self.drop_db(self.server1, "util_test_keys")
@@ -229,11 +234,11 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
         if self.export_import_file:
             try:
                 os.unlink(self.export_import_file)
-            except:
+            except OSError:
                 pass
         return self.drop_all()

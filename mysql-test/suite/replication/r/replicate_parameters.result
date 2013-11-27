@@ -7,13 +7,9 @@ Test case 1 - use the test feature
 # Success! Replication is running.
 # ...done.
 Test case 2 - show the help
-Usage: mysqlreplicate.py --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
-
-mysqlreplicate - establish replication with a master
-
-Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].

@@ -41,8 +41,8 @@ class test(rpl_admin.test):
         slave_conn = self.build_connection_string(self.server2).strip(' ')
         
         # For this test, it's OK when master and slave are the same
-        master_str = "--master=" + master_conn
-        slave_str = "--slave=" + slave_conn
+        master_str = "--master={0}".format(master_conn)
+        slave_str = "--slave={0}".format(slave_conn)
         
         # command used in test cases: replace 3 element with location of
         # log file.
@@ -50,31 +50,35 @@ class test(rpl_admin.test):
             "mysqlrpladmin.py",
             master_str,
             slave_str,
-            "--log=" + _LOGNAME,
+            "--log={0}".format(_LOGNAME),
             "health",
-            ]
+        ]
         
         # Test Case 1
-        comment = "Test Case 1 - Log file is newly created"
+        test_num = 1
+        comment = "Test Case {0} - Log file is newly created".format(test_num)
         res = mutlib.System_test.run_test_case(
             self, 0, ' '.join(cmd), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
         # Test Case 2
-        comment = "Test Case 2 - Log file is reopened"
+        test_num += 1
+        comment = "Test Case {0} - Log file is reopened".format(test_num)
         res = mutlib.System_test.run_test_case(
             self, 0, ' '.join(cmd), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
         # Test Case 3
-        comment = "Test Case 3 - Log file can not be written to"
-        os.chmod(_LOGNAME, stat.S_IREAD) # Make log read-only
+        test_num += 1
+        comment = ("Test Case {0} - Log file can not be "
+                   "written to".format(test_num))
+        os.chmod(_LOGNAME, stat.S_IREAD)  # Make log read-only
         res = mutlib.System_test.run_test_case(
             self, 2, ' '.join(cmd), comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
@@ -95,6 +99,6 @@ class test(rpl_admin.test):
             os.unlink(_LOGNAME)
         except OSError:
             if self.debug:
-                print "# failed removing temporary log file " + _LOGNAME
+                print "# failed removing temporary log file {0}".format(
+                    _LOGNAME)
         return rpl_admin.test.cleanup(self)
-

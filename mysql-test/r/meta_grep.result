@@ -6,6 +6,7 @@ Test case 1 - find objects simple search
 | root[...]  | TABLE        | t2           | util_test  | TABLE       | t2       |
 | root[...]  | TABLE        | t3           | util_test  | TABLE       | t3       |
 | root[...]  | TABLE        | t4           | util_test  | TABLE       | t4       |
+| root[...]  | TABLE        | t5           | util_test  | TABLE       | t5       |
 +---+
 
 Test case 2 - find objects name search
@@ -24,24 +25,24 @@ Test case 3 - find objects regexp search
 | root[...]  | TRIGGER      | trg          | util_test  | TRIGGER     | trg      |
 +---+
 
-Test case 4 - find objects regexp search with type 
+Test case 4 - find objects regexp search with type
 +---+
 | Connection | Object Type  | Object Name  | Database   |
 +---+
 | root[...]  | TABLE        | t2           | util_test  | TABLE       | t2       |
 +---+
 
-Test case 5 - find objects  format=CSV
+Test case 5 - find objects format=CSV
 Connection,Object Type,Object Name,Database,Field Type,Matches
 root[...],TABLE,t2,util_test,TABLE,t2
 root[...],TRIGGER,trg,util_test,TRIGGER,trg
 
-Test case 6 - find objects  format=TAB
+Test case 6 - find objects format=TAB
 Connection	Object Type	Object Name	Database	Field Type	Matches
 root[...]
 root[...]
 
-Test case 7 - find objects  format=VERTICAL
+Test case 7 - find objects format=VERTICAL
 *************************       1. row *************************
  Connection: XXXXX
  Object Type: TABLE
@@ -58,11 +59,27 @@ Test case 7 - find objects  format=VERTICAL
      Matches: trg
 2 rows.
 
-Test case 8 - find objects  format=GRID
+Test case 8 - find objects format=GRID
 +---+
 | Connection | Object Type  | Object Name  | Database   |
 +---+
 | root[...]  | TABLE        | t2           | util_test  | TABLE       | t2       |
 | root[...]  | TRIGGER      | trg          | util_test  | TRIGGER     | trg      |
++---+
+
+Test case 9 - find LIKE pattern in object body (including VIEWS).
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TABLE        | t1           | util_test  | TABLE       | t1       |
+| root[...]  | VIEW         | v1           | util_test  | VIEW        | v1       |
++---+
+
+Test case 10 - find REGEXP pattern in object body (including VIEW).
++---+
+| Connection | Object Type  | Object Name  | Database   |
++---+
+| root[...]  | TABLE        | t1           | util_test  | TABLE       | t1       |
+| root[...]  | VIEW         | v1           | util_test  | VIEW        | v1       |
 +---+
 

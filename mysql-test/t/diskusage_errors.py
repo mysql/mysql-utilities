@@ -36,19 +36,14 @@ class test(diskusage_basic.test):
         self.export_import_file = "test_run.txt"
 
         self.port1 = int(self.servers.get_next_port())
-        
+
         self.error_log = os.path.join(os.getcwd(), "error_log.err")
 
-        res = self.servers.start_new_server(self.server0,
-                                            self.port1,
-                                            self.servers.get_next_id(),
-                                            "root", "diskusage_none",
-                                            '--skip-innodb '
-                                            '--default-storage-engine=MyISAM '
-                                            '--log-bin '
-                                            '--log-error="{0}"'.format(
-                                                self.error_log
-                                            ))
+        res = self.servers.start_new_server(
+            self.server0,  self.port1, self.servers.get_next_id(),
+            "root", "diskusage_none",
+            '--skip-innodb --default-storage-engine=MyISAM --log-bin '
+            '--log-error="{0}"'.format(self.error_log))
         self.server1 = res[0]
         if not self.server1:
             raise MUTLibError("Failed to start a new server.")
@@ -75,13 +70,12 @@ class test(diskusage_basic.test):
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_base = "mysqldiskusage.py {0} --format=csv".format(from_conn)
         test_num = 1
         comment = ("Test Case {0} : Errors for logs, binlog, "
-                   "innodb ").format(test_num)
+                   "innodb ".format(test_num))
         cmd = "{0} -lambi -vv".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -90,7 +84,7 @@ class test(diskusage_basic.test):
 
         test_num += 1
         comment = ("Test Case {0} : Using a user without "
-                   "privileges.").format(test_num)
+                   "privileges.".format(test_num))
         cmd_base = cmd_base.replace('root', 'repl')
         cmd = '{0} -a'.format(cmd_base)
         res = self.run_test_case(0, cmd, comment)

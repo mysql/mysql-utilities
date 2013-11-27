@@ -88,12 +88,12 @@ class test(rpl_admin.test):
         self.server4.exec_query("CREATE DATABASE `errant_tnx4`")
 
         comment = ("Test case {0} - failover to {1}:{2} with errant "
-                   "transactions.").format(test_num, self.server2.host,
-                                           self.server2.port)
+                   "transactions.".format(test_num, self.server2.host,
+                                          self.server2.port))
         slaves = ",".join([self.slave1_conn, self.slave2_conn,
                            self.slave3_conn])
         cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
-                   "failover -vvv").format(self.slave1_conn, slaves)
+                   "failover -vvv".format(self.slave1_conn, slaves))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -102,10 +102,10 @@ class test(rpl_admin.test):
 
         comment = ("Test case {0} - failover to {1}:{2} with errant "
                    "transactions using --force "
-                   "option.").format(test_num, self.server2.host,
-                                     self.server2.port)
+                   "option.".format(test_num, self.server2.host,
+                                    self.server2.port))
         cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
-                   "--force failover -vvv").format(self.slave1_conn, slaves)
+                   "--force failover -vvv".format(self.slave1_conn, slaves))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

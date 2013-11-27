@@ -18,8 +18,8 @@
 import os
 
 import mutlib
+
 from mysql.utilities.common.tools import get_tool_path
-from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -56,8 +56,7 @@ class test(mutlib.System_test):
             raise MUTLibError("Unable to find mysql client tool for server "
                               "{0}@{1} on basedir={2}. "
                               "ERROR: {3}".format(base_server.host,
-                                                  base_server.port,
-                                                  basedir,
+                                                  base_server.port, basedir,
                                                   err.errmsg))
 
         # Spawn required servers
@@ -67,8 +66,7 @@ class test(mutlib.System_test):
                 self.servers.spawn_new_servers(3)
             except MUTLibError as err:
                 raise MUTLibError(
-                    "Cannot spawn needed servers: {0}".format(err.errmsg)
-                )
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
 
         # Set spawned servers
         self.server1 = self.servers.get_server(1)
@@ -138,7 +136,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-t ".format(srv1_con, srv2_con))
+                   "-a ".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -148,7 +146,8 @@ class test(mutlib.System_test):
         diff_data1 = (
             "USE util_test_mysql_client;\n"
             "DELIMITER //\n"
-            "CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(OUT param1 INT)\n"
+            "CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(OUT param1 "
+            "INT)\n"
             "BEGIN\n"
             "  SELECT COUNT(*) INTO param1 FROM mysql.user;\n"
             "END //\n"
@@ -157,7 +156,8 @@ class test(mutlib.System_test):
         diff_data2 = (
             "USE util_test_mysql_client;\n"
             "DELIMITER //\n"
-            "CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(OUT param1 INT)\n"
+            "CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(OUT param1 "
+            "INT)\n"
             "BEGIN\n"
             "  -- test comment\n"
             "  SELECT COUNT(*) INTO param1 FROM mysql.user;\n"
@@ -167,24 +167,24 @@ class test(mutlib.System_test):
         # Write diff data for server1 to file
         with open(_INPUT_SQL_FILE, 'w') as sql_file:
             sql_file.write(diff_data1)
-        # Execute diff SQL data on server1
+            # Execute diff SQL data on server1
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)
         # Write diff data for server2 to file
         with open(_INPUT_SQL_FILE, 'w') as sql_file:
             sql_file.write(diff_data2)
-        # Execute diff SQL data on server2
+            # Execute diff SQL data on server2
         res = self.exec_mysql_client_cmd(self.server2, _INPUT_SQL_FILE)
         # Get diff SQL for server1 from server2
         comment = ("Test case {0}a - difference: PROCEDURE with ';' "
-                   "(get diff SQL).").format(test_num)
+                   "(get diff SQL).".format(test_num))
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-t > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
+                   "-a > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        # Append output difference for server1 to result file.
+            # Append output difference for server1 to result file.
         if self.debug:
             print "\nContents of SQL file:"
         sql_file = open(_INPUT_SQL_FILE, 'r')
@@ -197,11 +197,11 @@ class test(mutlib.System_test):
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)
         # Compare server1 and server2 - No difference expected now
         comment = ("Test case {0}b - difference: PROCEDURE with ';' "
-                   "(compare).").format(test_num)
+                   "(compare).".format(test_num))
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-t".format(srv1_con, srv2_con))
+                   "-a".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -234,24 +234,24 @@ class test(mutlib.System_test):
         # Write diff data for server1 to file
         with open(_INPUT_SQL_FILE, 'w') as sql_file:
             sql_file.write(diff_data1)
-        # Execute diff SQL data on server1
+            # Execute diff SQL data on server1
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)
         # Write diff data for server2 to file
         with open(_INPUT_SQL_FILE, 'w') as sql_file:
             sql_file.write(diff_data2)
-        # Execute diff SQL data on server2
+            # Execute diff SQL data on server2
         res = self.exec_mysql_client_cmd(self.server2, _INPUT_SQL_FILE)
         # Get diff SQL for server1 from server2
         comment = ("Test case {0}a - difference: PROCEDURE DEFINER with "
-                   "wildcard (%) (get diff SQL).").format(test_num)
+                   "wildcard (%) (get diff SQL).".format(test_num))
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-t > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
+                   "-a > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        # Append output difference for server1 to result file.
+            # Append output difference for server1 to result file.
         if self.debug:
             print "\nContents of SQL file:"
         sql_file = open(_INPUT_SQL_FILE, 'r')
@@ -264,11 +264,11 @@ class test(mutlib.System_test):
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)
         # Compare server1 and server2 - No difference expected now
         comment = ("Test case {0}b - difference: PROCEDURE DEFINER with "
-                   "wildcard (%) (compare).").format(test_num)
+                   "wildcard (%) (compare).".format(test_num))
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-t".format(srv1_con, srv2_con))
+                   "-a".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -281,28 +281,18 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            server.exec_query("SHOW DATABASES LIKE '%s'" % db)
-        except UtilError:
-            return True  # Ok to exit here as there weren't any dbs to drop
-        try:
-            q_db = quote_with_backticks(db)
-            server.exec_query("DROP DATABASE %s" % q_db)
-        except UtilError:
-            return False
-        return True
-
     def cleanup(self):
         # Drop created databases
         self.drop_db(self.server1, 'util_test_mysql_client')
         self.drop_db(self.server2, 'util_test_mysql_client')
 
         # Remove auxiliary files
-        if self.res_fname and os.path.isfile(self.res_fname):
+        try:
             os.unlink(self.res_fname)
-        if os.path.isfile(_INPUT_SQL_FILE):
+        except OSError:
+            pass
+        try:
             os.unlink(_INPUT_SQL_FILE)
-
+        except OSError:
+            pass
         return True

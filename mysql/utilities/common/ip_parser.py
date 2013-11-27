@@ -27,11 +27,11 @@ import re
 import os
 import logging
 
-from mysql.utilities.exception import FormatError
-from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.my_print_defaults import my_login_config_exists
-from mysql.utilities.common.my_print_defaults import my_login_config_path
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
+                                                      my_login_config_exists,
+                                                      my_login_config_path)
+
 
 log = logging.getLogger('ip_parser')
 
@@ -56,77 +56,77 @@ _CONN_USERPASS = re.compile(
     r"|(?P<sfquote>[\'\"]?)"  # Quote on single user name
     r"(?P<suser>.+)"          # Single user name
     r"(?:(?P=sfquote))"       # Quote match on single user name
-    )
+)
 
 _CONN_QUOTEDHOST = re.compile(
-    r"((?:^[\'].*[\'])|(?:^[\"].*[\"]))" # quoted host name
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
+    r"((?:^[\'].*[\'])|(?:^[\"].*[\"]))"  # quoted host name
+    r"(?:\:(\d+))?"                       # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?"          # Optional path to socket
+)
 
 _CONN_LOGINPATH = re.compile(
-    r"(\w+)"                     # login-path
-    r"(?:\:(\d+))?"              # Optional port number
-    r"(?:\:([\/\\w+.\w+.\-]+))?" # Optional path to socket
-    )
+    r"((?:\\\"|[^:])+|(?:\\\'|[^:])+)"  # login-path
+    r"(?:\:(\d+))?"                     # Optional port number
+    r"(?:\:([\/\\w+.\w+.\-]+))?"        # Optional path to socket
+)
 
 _CONN_ANY_HOST = re.compile(
-    """([\w\.]*%)
+    r"""([\w\.]*%)
        (?:\:{0,1}(.*))                   # capture all the rest
-    """,re.VERBOSE)
+    """, re.VERBOSE)
 
 _CONN_HOST_NAME = re.compile(
-    """(
+    r"""(
         (?:
            (?:
               (?:
                  (?!-)         # must not start with hyphen '-'
                  (?:[\w\d-])*  # must not end with the hyphen
-                 [A-Za-z]      # starts with a character from the alphabet 
-                 (?:[\w\d-])*  
+                 [A-Za-z]      # starts with a character from the alphabet
+                 (?:[\w\d-])*
                  (?:
                     (?<!-)     # end capturing if a '-' is followed by '.'
                  )
                ){1,63}         # limited length for segment
             )
-         (?:                   # following segments 
+         (?:                   # following segments
             (?:\.)?            # the segment separator  the dot '.'
             (?:
                (?!-)
-               [\w\d-]{1,63}   # last segment 
+               [\w\d-]{1,63}   # last segment
                (?<!-)          #shuld not end with hyphen
             )
-          )* 
+          )*
          )
         )
        (.*)                    # capture all the rest
      """, re.VERBOSE)
 
 _CONN_IPv4_NUM_ONLY = re.compile(
-    """(             
+    r"""(
           (?:         # start of the IPv4 1st group
              25[0-4]  # this match numbers 250 to 254
-                    | # or 
+                    | # or
              2[0-4]\d # this match numbers from 200 to 249
                     | # or
              1\d\d    # this match numbers from 100 to 199
                     | # or
              [1-9]{0,1}\d # this match numbers from 0 to 99
-           )  
+           )
           (?:         # start of the 3 next groups
              \.       # the prefix '.' like in '.255'
              (?:
                 25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d
                       # same group as before
               )
-           ) 
-             {3}      # but it will match 3 times of it and prefixed by '.'  
+           )
+             {3}      # but it will match 3 times of it and prefixed by '.'
           )
           (?:\:{0,1}(.*))
           """, re.VERBOSE)
 
 _CONN_port_ONLY = re.compile(
-    """(?:         
+    r"""(?:
           \]{0,1}             # the ']' of IPv6 -optional
                  \:{0,1}      # the ':' for port number  -optional
                         (
@@ -137,40 +137,40 @@ _CONN_port_ONLY = re.compile(
         """, re.VERBOSE)
 
 _CONN_socket_ONLY = re.compile(
-    """(?:           # Not capturing group of ':'
+    r"""(?:           # Not capturing group of ':'
            \:{0,1}
-             ([      # Capturing '\' or '/' file name.ext 
+             ([      # Capturing '\' or '/' file name.ext
                \/\\w+.\w+.\-
-               ]+    # to match a path  
+               ]+    # to match a path
               )
         )?
        (.*)          # all the rest to advice the user.
     """, re.VERBOSE)
 
 _CONN_IPv6 = re.compile(
-    """
-    \[{0,1}                   # the optional heading '[' 
+    r"""
+    \[{0,1}                   # the optional heading '['
     (
      (?!.*::.*::)              # Only a single whildcard allowed
      (?:(?!:)|:(?=:))          # Colon iff it would be part of a wildcard
      (?:                       # Repeat 6 times:
         [0-9a-f]{0,4}          # A group of at most four hexadecimal digits
         (?:(?<=::)|(?<!::):)   # Colon unless preceded by wildcard
-     ){6}                      # expecting 6 groups 
+     ){6}                      # expecting 6 groups
      (?:                       # Either
         [0-9a-f]{0,4}          # Another group
         (?:(?<=::)|(?<!::):)   # Colon unless preceded by wildcard
         [0-9a-f]{0,4}          # Last group
         (?:(?<=::)             # Colon iff preceded by exacly one colon
            |(?<!:)
-           |(?<=:)(?<!::): 
-         )  
+           |(?<=:)(?<!::):
+         )
       )
      )
      (?:
         \]{0,1}\:{0,1}(.*)     # optional closing ']' and group for the rest
       )
-    """,re.VERBOSE)
+    """, re.VERBOSE)
 
 # Type of address amd Key names for the dictionary IP_matchers
 HN = "hostname"
@@ -185,11 +185,12 @@ IP_matchers = {
     HN: _CONN_HOST_NAME,
     ipv4: _CONN_IPv4_NUM_ONLY,
     ipv6: _CONN_IPv6
-    }
+}
+
 
 def hostname_is_ip(hostname):
     """Determine hostname is an IP address.
-    
+
     Return bool - True = is IP address
     """
     if len(hostname.split(":")) <= 1:  # if fewer colons, must be IPv4
@@ -201,7 +202,7 @@ def hostname_is_ip(hostname):
     return True
 
 
-def parse_connection(connection_values, my_defaults_reader=None, options={}):
+def parse_connection(connection_values, my_defaults_reader=None, options=None):
     """Parse connection values.
 
     The function parses a connection specification of one of the forms::
@@ -239,8 +240,13 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
     Returns dictionary (user, passwd, host, port, socket)
             or raise an exception if parsing error
     """
+    if options is None:
+        options = {}
 
     def _match(pattern, search_str):
+        """Returns the groups from string search or raise FormatError if it
+        does not match with the pattern.
+        """
         grp = pattern.match(search_str)
         if not grp:
             raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
@@ -323,19 +329,32 @@ def parse_connection(connection_values, my_defaults_reader=None, options={}):
                 host = host.strip("'")
 
         else:
-            host, port, socket, add_type = parse_server_address(hostportsock)
+            host, port, socket, _ = parse_server_address(hostportsock)
 
     else:
         # Unrecognized format
         raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
 
+    # Get character-set from options
+    if isinstance(options, dict):
+        charset = options.get("charset", None)
+    else:
+        # options is an instance of optparse.Values
+        try:
+            charset = options.charset  # pylint: disable=E1103
+        except AttributeError:
+            charset = None
+
     # Set parsed connection values
     connection = {
-        "user" : user,
-        "host" : host,
-        "port" : int(port) if port else 3306,
-        "passwd" : passwd if passwd else ''
-        }
+        "user": user,
+        "host": host,
+        "port": int(port) if port else 3306,
+        "passwd": passwd if passwd else ''
+    }
+
+    if charset:
+        connection["charset"] = charset
 
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.
@@ -366,13 +385,13 @@ def parse_server_address(connection_str):
                 host = group[0]
                 if IP_matcher == ipv6:
                     host = "[%s]" % host
-                
+
                 if group[1]:
                     part2_port_socket = _match(_CONN_port_ONLY, group[1],
                                                trow_error=False)
                     if not part2_port_socket:
                         unparsed = group[1]
-                    else: 
+                    else:
                         port = part2_port_socket[0]
                         if part2_port_socket[1]:
                             part4 = _match(_CONN_socket_ONLY,
@@ -389,60 +408,64 @@ def parse_server_address(connection_str):
                 address_type = IP_matcher
                 break
         # ignore the error trying to match.
-        except FormatError as err:
+        except FormatError:
             pass
-    # we must alert, that the connection could not be parsed. 
+    # we must alert, that the connection could not be parsed.
     if host is None:
         raise FormatError(_BAD_CONN_FORMAT.format(connection_str))
     _verify_parsing(connection_str, host, port, socket, address_type, unparsed)
 
     return host, port, socket, address_type
 
-def _verify_parsing(connection_str, host, port, socket, address_type, unparsed):
+
+def _verify_parsing(connection_str, host, port, socket, address_type,
+                    unparsed):
     """Verify that the connection string was totally parsed and not parts of
     it where not matched, otherwise raise an error.
     """
     exp_connection_str = connection_str
-    log.debug("exp_connection_str %s" % exp_connection_str)
-    #exp_connection_str = connection_str.replace("[","")
-    #exp_connection_str = exp_connection_str.replace("]","")
+    log.debug("exp_connection_str {0}".format(exp_connection_str))
     parsed_connection_list = []
     if host:
-        log.debug("host %s" % host)
+        log.debug("host {0}".format(host))
         if address_type == ipv6 and not "[" in connection_str:
-            host = host.replace("[","")
-            host = host.replace("]","")
+            host = host.replace("[", "")
+            host = host.replace("]", "")
         parsed_connection_list.append(host)
     if port:
-        log.debug("port %s" % port)
+        log.debug("port {0}".format(port))
         parsed_connection_list.append(port)
     if socket:
-        log.debug("socket %s" % socket)
+        log.debug("socket {0}".format(socket))
         parsed_connection_list.append(socket)
     parsed_connection = ":".join(parsed_connection_list)
-    log.debug('parsed_connection %s' % parsed_connection)
+    log.debug('parsed_connection {0}'.format(parsed_connection))
     diff = None
     if not unparsed:
         log.debug('not unparsed found, creating diff')
-        diff = connection_str.replace(host,"")
+        diff = connection_str.replace(host, "")
         if port:
-            diff = diff.replace(port,"")
+            diff = diff.replace(port, "")
         if socket:
-            diff = diff.replace(socket,"")
-        log.debug("diff %s" % diff)
-    log.debug("unparsed %s" % unparsed)
-    if unparsed or (exp_connection_str != parsed_connection 
+            diff = diff.replace(socket, "")
+        log.debug("diff {0}".format(diff))
+    log.debug("unparsed {0}".format(unparsed))
+    if unparsed or (exp_connection_str != parsed_connection
                     and (diff and diff != ":")):
         log.debug("raising exception")
         parsed_args = "host:%s, port:%s, socket:%s" % (host, port, socket)
         log.debug(_UNPARSED_CONN_FORMAT.format(connection_str,
-                                                       parsed_args,
-                                                       unparsed))
+                                               parsed_args,
+                                               unparsed))
         raise FormatError(_UNPARSED_CONN_FORMAT.format(connection_str,
                                                        parsed_args,
                                                        unparsed))
 
+
 def _match(pattern, connection_str, trow_error=True):
+    """Tries to match a pattern with the connection string and returns the
+    groups.
+    """
     grp = pattern.match(connection_str)
     if not grp:
         if trow_error:
@@ -452,13 +475,17 @@ def _match(pattern, connection_str, trow_error=True):
 
 
 def clean_IPv6(host_address):
+    """Clean IPv6 host address
+    """
     if host_address:
-        host_address = host_address.replace("[","")
-        host_address = host_address.replace("]","")
+        host_address = host_address.replace("[", "")
+        host_address = host_address.replace("]", "")
     return host_address
 
 
 def format_IPv6(host_address):
+    """Format IPv6 host address
+    """
     if host_address:
         if not "]" in host_address:
             host_address = "[{0}]".format(host_address)

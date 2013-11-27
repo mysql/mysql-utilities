@@ -26,6 +26,16 @@ INSERT INTO util_test.t3 (b) VALUES (NULL);
 CREATE TABLE util_test.t4 (c int not null, d int not null, CONSTRAINT ref_t3 FOREIGN KEY(c) REFERENCES util_test.t3(a)) ENGINE=InnoDB;
 INSERT INTO util_test.t4 VALUES (3, 2);
 
+CREATE TABLE util_test.t5 (product_id int UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(20), base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED, PRIMARY KEY(product_id)) ENGINE=INNODB;
+INSERT INTO util_test.t5(name, base_price, tax_percentage) values ('kitkat',0.99, 19);
+INSERT INTO util_test.t5(name, base_price, tax_percentage) values ('M&M', '5.99', 19);
+INSERT INTO util_test.t5(name, base_price, tax_percentage) values ('milk', 0.67, 5);
+INSERT INTO util_test.t5(name, base_price, tax_percentage) values ('Dr. Pepper', 0.99, 19);
+
+CREATE FUNCTION util_test.f2 (base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS DECIMAL (21,2) UNSIGNED DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
+
+CREATE VIEW util_test.v2 AS SELECT name, util_test.f2(t5.base_price, t5.tax_percentage) AS price FROM util_test.t5;
+
 CREATE PROCEDURE util_test.p1(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
 
 CREATE TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');

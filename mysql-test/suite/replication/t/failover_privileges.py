@@ -116,7 +116,7 @@ class test(failover.test):
         # This privilege is mandatory for slaves to connect to the master.
         test_num = 1
         comment = ("Test case {0} - failover (fail) using 'repl' only with: "
-                   "REPLICATION SLAVE.").format(test_num)
+                   "REPLICATION SLAVE.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -135,7 +135,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: SUPER.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "SUPER.").format(test_num)
+                   "SUPER.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -155,7 +155,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: DROP.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "DROP.").format(test_num)
+                   "DROP.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -175,7 +175,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: CREATE.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "CREATE.").format(test_num)
+                   "CREATE.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -195,7 +195,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: GRANT OPTION.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "GRANT OPTION.").format(test_num)
+                   "GRANT OPTION.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -215,7 +215,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: SELECT.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "SELECT.").format(test_num)
+                   "SELECT.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -235,7 +235,7 @@ class test(failover.test):
         # Test failover using a user with missing privilege: RELOAD.
         test_num += 1
         comment = ("Test case {0} - failover (fail) using 'repl' without: "
-                   "RELOAD.").format(test_num)
+                   "RELOAD.".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         cmd = base_cmd.format('', master_conn, slaves_str, 'auto',
                               self.fail_event_script, log_file)
@@ -260,7 +260,7 @@ class test(failover.test):
         test_num += 1
         comment = ("Test case {0} - failover (succeed) using 'repl' with: "
                    "REPLICATION SLAVE, SUPER, GRANT OPTION, SELECT, RELOAD."
-                   "").format(test_num)
+                   "".format(test_num))
         log_file = failover._FAILOVER_LOG.format(test_num)
         key_phrase = "Failover complete"
         cmd = base_cmd.format('python ../scripts/', master_conn, slaves_str,

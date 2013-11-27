@@ -1,7 +1,7 @@
 Test case 1 - error: no db specified
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: You must specify at least one table or database to check.
+mysqlindexcheck: error: You must specify at least one table or database to check.
 Test case 2 - error: invalid source specified
 # Source on nohost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
@@ -9,34 +9,34 @@ Test case 3 - error: invalid login to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
 Test case 4 - error: stats and best=alpha
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --best parameter must be an integer >= 1
+mysqlindexcheck: error: The --best parameter must be an integer >= 1
 Test case 5 - error: stats and worst=alpha
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --worst parameter must be an integer >= 1
+mysqlindexcheck: error: The --worst parameter must be an integer >= 1
 Test case 6 - error: not stats 
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: You must specify --stats for --best or --worst to take effect.
+mysqlindexcheck: error: You must specify --stats for --best or --worst to take effect.
 Test case 7 - error: stats and both best and worst 
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: You must specify either --best or --worst but not both.
+mysqlindexcheck: error: You must specify either --best or --worst but not both.
 Test case 8 - error: stats and worst=-1
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --worst parameter must be an integer >= 1
+mysqlindexcheck: error: The --worst parameter must be an integer >= 1
 Test case 9 - error: stats and best=-1
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --best parameter must be an integer >= 1
+mysqlindexcheck: error: The --best parameter must be an integer >= 1
 Test case 10 - error: stats and worst=0
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --worst parameter must be an integer >= 1
+mysqlindexcheck: error: The --worst parameter must be an integer >= 1
 Test case 11 - error: stats and best=0
-Usage: mysqlindexcheck.py --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
-mysqlindexcheck.py: error: The --best parameter must be an integer >= 1
+mysqlindexcheck: error: The --best parameter must be an integer >= 1

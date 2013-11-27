@@ -1,7 +1,7 @@
 Test case 1 - Test --hide-utils missing --add-util=mysqlfakeutility option
-Usage: mysqluc.py 
+Usage: mysqluc 
 
-mysqluc.py: error: You can only use --hide_utils option along the --add-util option.
+mysqluc: error: You can only use --hide_utils option along the --add-util option.
 Test case 2 - Test --hide-utils with --add-util=mysqlfakeutility option
 Launching console ...
 
@@ -56,6 +56,8 @@ mysqlfakeutility  a mysqlutility mock to test mysqluc
 mysqlreplicate    establish replication with a master                        
 
 Test case 4 - Test --add-util=mysqlfakeutility execute --help option
+Launching console ...
+
 Usage: mysqlfakeutility.py --return-code=<return_code> --message-error=<path>
 
 mysqlfakeutility - a mysqlutility mock to test mysqluc
@@ -67,16 +69,17 @@ Options:
                         the code to return at the program end.
   -m MESSAGE_ERROR, --message-error=MESSAGE_ERROR
                         an error message to show in stderr, if it's required
-Launching console ...
-
 
 Test case 5 - Test fakeutility --return-code=1
 Launching console ...
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlfakeutility' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 Test case 6 - Test fakeutility --return-code=2 and no message
 Launching console ...
 
-An error was found, while executing the command, use "show last error" command to display details
+
+Execution of utility: 'mysqlfakeutility -e2 --message-error=' ended with return code '2' but no error message was streamed to the standard error, please review the output from its execution.
 

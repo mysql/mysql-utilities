@@ -15,9 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
 import proc_grep
 from mysql.utilities.exception import MUTLibError
+
 
 class test(proc_grep.test):
     """Process grep
@@ -36,23 +36,25 @@ class test(proc_grep.test):
         from_conn = self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server1)
 
-        cmd_str = "mysqlprocgrep.py --server=%s " % from_conn
-
-        comment = "Test case 1 - do the help"
+        cmd_str = "mysqlprocgrep.py --server={0} ".format(from_conn)
+        test_num = 1
+        comment = "Test case {0} - do the help".format(test_num)
         res = self.run_test_case(0, cmd_str + "--help", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlprocgrep.py "
                                            "version", 6)
 
-        comment = "Test case 2 - do the SQL for a simple search"
-        cmd_str = "mysqlprocgrep.py --sql "
-        cmd_str += "--match-user=%s " % conn_val[0]
+        test_num += 1
+        comment = "Test case {0} - do the SQL for a simple search".format(
+            test_num)
+        cmd_str = "mysqlprocgrep.py --sql --match-user={0} ".format(
+            conn_val[0])
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.mask_result("    USER LIKE 'root'", "    USER LIKE 'root'",
                          "    USER LIKE 'XXXX'")
@@ -60,6 +62,13 @@ class test(proc_grep.test):
         # Mask funny output on Windows
         if os.name != "posix":
             self.replace_result("    USER LIKE ", "    USER LIKE 'XXXX'\n")
+
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqlprocgrep version",
+                "MySQL Utilities mysqlprocgrep version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
 
         return True
 

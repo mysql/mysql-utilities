@@ -15,12 +15,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
+
 import mutlib
 import replicate
-from mysql.utilities.exception import MUTLibError
+
+from mysql.utilities.exception import MUTLibError, UtilError
 
 _RPL_MODES = ["master", "slave", "both"]
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
+
 
 class test(replicate.test):
     """check --rpl parameter for export utility
@@ -47,90 +50,98 @@ class test(replicate.test):
             self.server3 = self.servers.get_server(index)
             try:
                 res = self.server3.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get relay slave " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get relay slave "
+                                  "server_id: {0}".format(err.errmsg))
             self.s3_serverid = int(res[0][1])
         else:
             self.s3_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s3_serverid,
-                                               "rep_relay_slave", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s3_serverid, "rep_relay_slave",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server3 = res[0]
             self.servers.add_new_server(self.server3, True)
 
-        master_str = "--master=%s" % self.build_connection_string(self.server1)
-        slave_str = " --slave=%s" % self.build_connection_string(self.server2)
+        master_str = "--master={0}".format(
+            self.build_connection_string(self.server1))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server2))
         conn_str = master_str + slave_str
-        res = self.server1.exec_query("STOP SLAVE")
-        res = self.server1.exec_query("RESET SLAVE")
-        res = self.server2.exec_query("STOP SLAVE")
-        res = self.server2.exec_query("RESET SLAVE")
-        res = self.server3.exec_query("STOP SLAVE")
-        res = self.server3.exec_query("RESET SLAVE")
+        self.server1.exec_query("STOP SLAVE")
+        self.server1.exec_query("RESET SLAVE")
+        self.server2.exec_query("STOP SLAVE")
+        self.server2.exec_query("RESET SLAVE")
+        self.server3.exec_query("STOP SLAVE")
+        self.server3.exec_query("RESET SLAVE")
         
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.exec_query("DROP DATABASE IF EXISTS util_test")
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-            res = self.server2.exec_query("DROP DATABASE IF EXISTS util_test")
-            res = self.server2.read_and_exec_SQL(data_file, self.debug)
-            res = self.server3.exec_query("DROP DATABASE IF EXISTS util_test")
-            res = self.server3.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.exec_query("DROP DATABASE IF EXISTS util_test")
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server2.exec_query("DROP DATABASE IF EXISTS util_test")
+            self.server2.read_and_exec_SQL(data_file, self.debug)
+            self.server3.exec_query("DROP DATABASE IF EXISTS util_test")
+            self.server3.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file,  err.errmsg))
 
 
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
-            res = self.exec_util(cmd, self.res_fname)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd, self.res_fname)
+        except MUTLibError:
+            raise
 
-        master_str = " --master=%s" % self.build_connection_string(self.server2)
-        slave_str = " --slave=%s" % self.build_connection_string(self.server3)
+        master_str = " --master={0}".format(
+            self.build_connection_string(self.server2))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server3))
         conn_str = master_str + slave_str
-        res = self.server3.exec_query("STOP SLAVE")
-        res = self.server3.exec_query("RESET SLAVE")
+        self.server3.exec_query("STOP SLAVE")
+        self.server3.exec_query("RESET SLAVE")
         
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
-            res = self.exec_util(cmd, self.res_fname)
-        except MUTLibError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd, self.res_fname)
+        except MUTLibError:
+            raise
 
         return result
 
     def run(self):
-        master_conn = "--server=" + self.build_connection_string(self.server1)
-        relay_conn = "--server=" + self.build_connection_string(self.server2)
-        slave_conn = "--server=" + self.build_connection_string(self.server3)
+        master_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
+        relay_conn = "--server={0}".format(
+            self.build_connection_string(self.server2))
+        slave_conn = "--server={0}".format(
+            self.build_connection_string(self.server3))
 
-        cmd_str = "mysqldbexport.py util_test --export=both " + \
-                  "--skip=events,grants,procedures,functions,views " + \
-                  "--rpl-user=rpl:rpl "
+        cmd_str = ("mysqldbexport.py util_test --export=both "
+                   "--skip=events,grants,procedures,functions,views "
+                   "--rpl-user=rpl:rpl ")
 
         test_num = 1
         for rpl_mode in _RPL_MODES:
             for locktype in _LOCKTYPES:
-                comment = "Test case %s - rpl = %s and lock_type = %s" % \
-                          (test_num, rpl_mode, locktype)
+                comment = ("Test case {0} - rpl = {1} and lock_type = "
+                           "{2}".format(test_num, rpl_mode, locktype))
                 if rpl_mode == "master":
                     cmd_opts = master_conn
                 elif rpl_mode == "slave":
                     cmd_opts = slave_conn
                 else:
                     cmd_opts = relay_conn
-                cmd_opts += " --rpl=%s --locking=%s" % (rpl_mode, locktype)
+                cmd_opts = "{0} --rpl={1} --locking={2}".format(
+                    cmd_opts, rpl_mode, locktype)
                 res = mutlib.System_test.run_test_case(self, 0,
                                                        cmd_str + cmd_opts,
                                                        comment)
                 if not res:
-                    raise MUTLibError("%s: failed" % comment)
+                    raise MUTLibError("{0}: failed".format(comment))
                 test_num += 1
                 
         self.replace_result("CHANGE MASTER", "CHANGE MASTER <goes here>\n")
@@ -146,15 +157,7 @@ class test(replicate.test):
 
     def cleanup(self):
         return replicate.test.cleanup(self)
-        
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "master_db1")
@@ -164,14 +167,14 @@ class test(replicate.test):
         self.drop_db(self.server3, "master_db1")
         try:
             self.server1.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         try:
             self.server2.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         try:
             self.server3.exec_query("DROP USER 'joe'@'user'")
-        except:
+        except UtilError:
             pass
         return True

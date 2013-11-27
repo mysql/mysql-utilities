@@ -1,10 +1,6 @@
 Test Case 1: Help
-Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
-This is a release of dual licensed MySQL Utilities. For the avoidance of
-doubt, this particular copy of the software is released
-under the version 2 of the GNU General Public License.
-MySQL Utilities is brought to you by Oracle.
-
+MySQL Utilities mysqluc version 1.4.1 (part of MySQL Workbench Distribution 6.0.0) 
+License type: GPLv2
 Usage: mysqluc 
 
 mysqluc - Command line client for running MySQL Utilities
@@ -12,6 +8,7 @@ mysqluc - Command line client for running MySQL Utilities
 Options:
   --version             show program's version number and exit
   --help                display this help message and exit
+  --license             display program's license and exit
   --width=WIDTH         display width
   --utildir=UTILDIR     location of utilities
   -e COMMANDS, --execute=COMMANDS
@@ -39,6 +36,7 @@ Option                     Description
 -------------------------  ------------------------------------------------
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
+--license                  display program's license and exit              
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
@@ -47,6 +45,9 @@ Option                     Description
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
                            or <login-path>[:<port>][:<socket>].            
+--character-set=CHARSET    sets the client character set. The default is   
+                           retrieved from the server variable              
+                           'character_set_client'.                         
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
 --skip-table-options       skip check of all table options (e.g.,          
@@ -84,6 +85,7 @@ Option                     Description
 -------------------------  ------------------------------------------------
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
+--license                  display program's license and exit              
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
@@ -92,6 +94,9 @@ Option                     Description
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
                            or <login-path>[:<port>][:<socket>].            
+--character-set=CHARSET    sets the client character set. The default is   
+                           retrieved from the server variable              
+                           'character_set_client'.                         
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
 --skip-table-options       skip check of all table options (e.g.,          
@@ -131,6 +136,8 @@ Option                     Description
                            number and exit             
 --help                     display a help message and  
                            exit                        
+--license                  display program's license   
+                           and exit                    
 --server1=SERVER1          connection information for  
                            first server in the form: <u
                            ser>[:<password>]@<host>[:<p
@@ -141,6 +148,11 @@ Option                     Description
                            user>[:<password>]@<host>[:<
                            port>][:<socket>] or <login-
                            path>[:<port>][:<socket>].  
+--character-set=CHARSET    sets the client character   
+                           set. The default is         
+                           retrieved from the server   
+                           variable                    
+                           'character_set_client'.     
 --width=WIDTH              display width               
 --force                    do not abort when a diff    
                            test fails                  
@@ -192,6 +204,7 @@ Option                     Description
 -------------------------  ---------------------------------------
 --version                  show program's version number and exit 
 --help                     display a help message and exit        
+--license                  display program's license and exit     
 --server1=SERVER1          connection information for first server
                            in the form: <user>[:<password>]@<host>
                            [:<port>][:<socket>] or <login-        
@@ -200,6 +213,9 @@ Option                     Description
                            server in the form: <user>[:<password>]
                            @<host>[:<port>][:<socket>] or <login- 
                            path>[:<port>][:<socket>].             
+--character-set=CHARSET    sets the client character set. The     
+                           default is retrieved from the server   
+                           variable 'character_set_client'.       
 --width=WIDTH              display width                          
 --force                    do not abort when a diff test fails    
 --skip-table-options       skip check of all table options (e.g., 
@@ -238,7 +254,9 @@ Variable  Value
 SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
 
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqldiff' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 Test Case 8: Long variables
 
@@ -257,38 +275,46 @@ Usage: mysqluc
 mysqluc: error: Invalid argument assignment: c==3. Please check your command.
 Test Case 11: show last error command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 
 Test Case 12: clear errors command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
 
-None error to display.
+No error to display.
 
 Test Case 13: show errors command
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-An error was found, while executing the command, use "show last error" command to display details
+
+The console has detected that the utility 'mysqlprocgrep' ended with an error code.
+You can get more information about the error by running the console command 'show last error'.
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 
 
-Execution of utility: mysqlprocgrep  
-returned errorcode: 2 with error message: 
+
+Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 

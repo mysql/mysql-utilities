@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(mutlib.System_test):
     """Process grep
@@ -36,76 +37,91 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError(
+                    "Cannot spawn needed servers: {0}".format(err.errmsg))
         else:
-            num_server -= 1 # Get last server in list
+            num_server -= 1  # Get last server in list
         self.server1 = self.servers.get_server(num_server)
         data_file = os.path.normpath("./std_data/basic_data.sql")
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         from_conn = self.build_connection_string(self.server1)
-        conn_val = self.get_connection_values(self.server1)
-        
-        cmd_base = "mysqlmetagrep.py --server=%s --database=util_test " % \
-                   from_conn
-        
-        test_case_num = 1
-        
-        comment = "Test case %d - find objects simple search" % test_case_num
-        test_case_num += 1
-        cmd = cmd_base + "--pattern=t_"
+
+        cmd_base = ("mysqlmetagrep.py --server={0} "
+                    "--database=util_test".format(from_conn))
+
+        test_num = 1
+        comment = "Test case {0} - find objects simple search".format(test_num)
+        cmd = "{0} --pattern=t_".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        self.results.append("\n")
-        
-        comment = "Test case %d - find objects name search" % test_case_num
-        test_case_num += 1
-        cmd = cmd_base + "-b --pattern=%t2%"
-        res = self.run_test_case(0, cmd, comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
-        comment = "Test case %d - find objects regexp search" % test_case_num
-        test_case_num += 1
-        cmd = cmd_base + "-Gb --pattern=t2"
+        test_num += 1
+        comment = "Test case {0} - find objects name search".format(test_num)
+        cmd = "{0} -b --pattern=%t2%".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
-        
-        comment = "Test case %d - find objects regexp search with type " % \
-                  test_case_num
-        test_case_num += 1
-        cmd = cmd_base + "-Gb --pattern=t2 --search=table"
+
+        test_num += 1
+        comment = "Test case {0} - find objects regexp search".format(test_num)
+        cmd = "{0} -Gb --pattern=t2".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
-        
-        _FORMATS = ("CSV","TAB","VERTICAL","GRID")
-        for format in _FORMATS:
-            comment = "Test case %d - find objects " % \
-                      test_case_num + " format=%s" % format
-            test_case_num += 1
-            cmd = cmd_base + "--format=%s -Gb --pattern=t2" % format
+
+        test_num += 1
+        comment = ("Test case {0} - find objects regexp search with "
+                   "type".format(test_num))
+        cmd = "{0} -Gb --pattern=t2 --search=table".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        self.results.append("\n")
+
+        _FORMATS = ("CSV", "TAB", "VERTICAL", "GRID")
+        for frmt in _FORMATS:
+            test_num += 1
+            comment = ("Test case {0} - find objects format="
+                       "{1}".format(test_num, frmt))
+            cmd = "{0} --format={1} -Gb --pattern=t2".format(cmd_base, frmt)
             res = self.run_test_case(0, cmd, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             self.results.append("\n")
- 
+
+        test_num += 1
+        comment = ("Test case {0} - find LIKE pattern in object body "
+                   "(including VIEWS).".format(test_num))
+        cmd = "{0} --body --pattern=%t1%".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        self.results.append("\n")
+
+        test_num += 1
+        comment = ("Test case {0} - find REGEXP pattern in object body "
+                   "(including VIEW).".format(test_num))
+        cmd = "{0} -bG --pattern=t1".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        self.results.append("\n")
+
         # CSV masks
         self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
 
@@ -122,45 +138,27 @@ class test(mutlib.System_test):
         self.replace_result("| Connection",
                             "| Connection | Object Type  | Object Name  "
                             "| Database   |\n")
-        
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
+        res = self.drop_db(self.server1, "util_test")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-            except:
+            except UtilError:
                 pass
-        return True
+        return res
 
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

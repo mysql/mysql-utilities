@@ -31,6 +31,10 @@ URL:            http://dev.mysql.com/downloads/
 Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:      noarch
+Requires:       python >= 2.6, mysql-connector-python >= 1.0.9
+Obsoletes:      %{name} <= %{version}, mysql-utilities <= %{version}, 
+Provides:       %{name} = %{version}
+AutoReq:        no
 Conflicts:      mysql-utilities
 
 Prefix:			/usr

@@ -22,22 +22,21 @@ the definitions of two databases.
 
 import re
 
-from mysql.utilities.common.database import Database
-from mysql.utilities.common.dbcompare import diff_objects
-from mysql.utilities.common.dbcompare import get_common_objects
-from mysql.utilities.common.dbcompare import server_connect
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
-from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
+                                              server_connect)
+from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
+                                                  quote_with_backticks)
 
 
 def object_diff(server1_val, server2_val, object1, object2, options,
                 object_type=None):
     """diff the definition of two objects
-    
+
     Find the difference among two object definitions.
-    
+
     server1_val[in]    a dictionary containing connection information for the
                        first server including:
                        (user, password, host, port, socket)
@@ -95,15 +94,15 @@ def object_diff(server1_val, server2_val, object1, object2, options,
 
 def database_diff(server1_val, server2_val, db1, db2, options):
     """Find differences among objects from two databases.
-    
+
     This method compares the object definitions among two databases. If any
     differences are found, the differences are printed in the format chosen
     and the method returns False. A True result is returned only when all
     object definitions match.
-    
+
     The method will stop and return False on the first difference found unless
     the option force is set to True (default = False).
-    
+
     server1_val[in]    a dictionary containing connection information for the
                        first server including:
                        (user, password, host, port, socket)

@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(mutlib.System_test):
     """Process grep
@@ -37,41 +38,41 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         else:
-            num_server -= 1 # Get last server in list
+            num_server -= 1  # Get last server in list
         self.server1 = self.servers.get_server(num_server)
         data_file = os.path.normpath("./std_data/basic_data.sql")
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError("Failed to read commands from file {0}: "
+                              "{1}".format(data_file, err.errmsg))
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         from_conn = self.build_connection_string(self.server1)
         conn_val = self.get_connection_values(self.server1)
-        
-        cmd = "mysqlprocgrep.py --server=%s " % from_conn
-        cmd += " --match-user=%s " % conn_val[0]
-        
+
+        cmd = ("mysqlprocgrep.py --server={0} "
+               "--match-user={1} ".format(from_conn, conn_val[0]))
+
         test_case_num = 1
-        
-        _FORMATS = ("CSV","TAB","VERTICAL","GRID")
-        for format in _FORMATS:
-            comment = "Test case %d - find processes for current user" % \
-                      test_case_num + " format=%s" % format
+
+        _FORMATS = ("CSV", "TAB", "VERTICAL", "GRID")
+        for format_ in _FORMATS:
+            comment = ("Test case {0} - find processes for current "
+                       "user format={1}".format(test_case_num, format_))
             test_case_num += 1
-            cmd += " --format=%s " % format
+            cmd = "{0} --format={1} ".format(cmd, format_)
             res = self.run_test_case(0, cmd, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             self.results.append("\n")
 
         # CSV masks
@@ -85,13 +86,13 @@ class test(mutlib.System_test):
         self.mask_column_result("root[...]", "\t", 2, "XXXXX")
         self.mask_column_result("root[...]", "\t", 4, "localhost")
         self.mask_column_result("root[...]", "\t", 7, "XXXXX")
-         
+
         # Vertical masks
         self.replace_result(" Connection: ", " Connection: XXXXX\n")
         self.replace_result("         Id: ", "         Id: XXXXX\n")
         self.replace_result("       Host: ", "       Host: localhost\n")
         self.replace_result("       Time: ", "       Time: XXXXX\n")
-        
+
         # Grid masks
         # Here, we truncate all horizontal bars for deterministic results
         self.replace_result("+---", "+---+\n")
@@ -103,45 +104,27 @@ class test(mutlib.System_test):
                             "| Connection | Id   | User | Host       "
                             "| Db    | Command  | Time  | State      "
                             "| Info [...] |\n")
-        
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("SHOW DATABASES LIKE 'util_%%'")
-        except:
-            return True # Ok to exit here as there weren't any dbs to drop
-        try:
-            res = server.exec_query("DROP DATABASE %s" % db)
-        except:
-            return False
-        return True
-    
+
     def drop_all(self):
-        try:
-            self.drop_db(self.server1, "util_test")
-        except:
-            return False
+        res = self.drop_db(self.server1, "util_test")
+
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
-            except:
+            except UtilError:
                 pass
-        return True
+        return res
 
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)
         return self.drop_all()
-
-
-
-

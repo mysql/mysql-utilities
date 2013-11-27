@@ -1,11 +1,14 @@
 Test Case 1 : Showing help 
-Usage: mysqldiskusage.py --server=user:pass@host:port:socket db1 --all
+MySQL Utilities mysqldiskusage version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage - show disk usage for databases
 
 Options:
   --version             show program's version number and exit
   --help                display a help message and exit
+  --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
@@ -60,8 +63,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -111,8 +114,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -150,8 +153,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -186,8 +189,8 @@ mt_db,0
 mysql,XXXXXXX
 util_test,XXXXXXX
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 log_file,size
 mysql-bin.000001,XXXX
@@ -218,8 +221,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX
@@ -251,8 +254,8 @@ Total database disk usage = XXXXXXX
 
 # Log information.
 log_name,size
-slow.log,XXXX
 general.log,XXXX
+slow.log,XXXX
 error_log.err,XXXX
 
 Total size of logs = XXXX

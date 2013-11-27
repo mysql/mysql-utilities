@@ -16,7 +16,8 @@
 #
 import os
 import replicate
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(replicate.test):
     """setup replication
@@ -47,16 +48,16 @@ class test(replicate.test):
             self.server3 = self.servers.get_server(index)
             try:
                 res = self.server3.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication slave " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication slave "
+                                  "server_id: {0}".format(err.errmsg))
             self.s3_serverid = int(res[0][1])
         else:
             self.s3_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s3_serverid,
-                                                "rep_slave_missing_engines",
-                                              ' --mysqld="--log-bin=mysql-bin '
-                                         '--default_storage_engine=blackhole"')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s3_serverid, "rep_slave_missing_engines",
+                ' --mysqld="--log-bin=mysql-bin '
+                '--default_storage_engine=blackhole"')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server3 = res[0]
@@ -67,16 +68,16 @@ class test(replicate.test):
             self.server4 = self.servers.get_server(index)
             try:
                 res = self.server4.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication master " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication master "
+                                  "server_id: {0}".format(err.errmsg))
             self.s4_serverid = int(res[0][1])
         else:
             self.s4_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s4_serverid,
-                                               "rep_master_missing_engines",
-                                              ' --mysqld="--log-bin=mysql-bin '
-                                            '--default_storage_engine=memory"')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s4_serverid, "rep_master_missing_engines",
+                ' --mysqld="--log-bin=mysql-bin '
+                '--default_storage_engine=memory"')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server4 = res[0]
@@ -87,15 +88,17 @@ class test(replicate.test):
     def run_test_case(self, slave, master, s_id,
                       comment, options=None, expected_result=0):
         
-        master_str = "--master=%s" % self.build_connection_string(master)
-        slave_str = " --slave=%s" % self.build_connection_string(slave)
+        master_str = "--master={0}".format(
+            self.build_connection_string(master))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(slave))
         conn_str = master_str + slave_str
         
         # Test case 1 - setup replication among two servers
         self.results.append(comment+"\n")
-        cmd = "mysqlreplicate.py -vvv --rpl-user=rpl:rpl %s" % conn_str
+        cmd = "mysqlreplicate.py -vvv --rpl-user=rpl:rpl {0}".format(conn_str)
         if options:
-            cmd += " %s" % options
+            cmd += " {0}".format(options)
         res = self.exec_util(cmd, self.res_fname)
         self.record_results(self.res_fname)
         if res != expected_result:
@@ -106,44 +109,47 @@ class test(replicate.test):
     def run(self):
         self.res_fname = "result.txt"
         
-        comment = "Test case 1 - show warnings if slave has different " \
-                  "default engines"
+        test_num = 1
+        comment = ("Test case {0} - show warnings if slave has different "
+                   "default engines".format(test_num))
         res = self.run_test_case(self.server3, self.server2, self.s3_serverid,
                                  comment, None)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
             
-        comment = "Test case 2 - use pedantic to fail if slave has " \
-                  "different default engines"
+        test_num += 1
+        comment = ("Test case {0} - use pedantic to fail if slave has "
+                   "different default engines".format(test_num))
         res = self.run_test_case(self.server3, self.server2, self.s3_serverid,
                                  comment, " --pedantic", 1)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            res = self.server3.exec_query("STOP SLAVE")
-        except:
-            raise MUTLibError("%s: Failed to stop slave." % comment)
+            self.server3.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
 
-
-        comment = "Test case 3 - show warnings if master has different " \
-                  "default engines"
+        test_num += 1
+        comment = ("Test case {0} - show warnings if master has different "
+                   "default engines".format(test_num))
         res = self.run_test_case(self.server1, self.server4, self.s1_serverid,
                                  comment, None)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         
-        comment = "Test case 4 - use pedantic to fail if master has " \
-                  "different default engines"
+        test_num += 1
+        comment = ("Test case {0} - use pedantic to fail if master has "
+                   "different default engines".format(test_num))
         res = self.run_test_case(self.server1, self.server4, self.s1_serverid,
                                  comment, " --pedantic", 1)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            res = self.server1.exec_query("STOP SLAVE")
-        except:
-            raise MUTLibError("%s: Failed to stop slave." % comment)
+            self.server1.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
 
         replicate.test.mask_results(self)
 
@@ -164,4 +170,3 @@ class test(replicate.test):
         if self.res_fname:
             os.unlink(self.res_fname)
         return True
-

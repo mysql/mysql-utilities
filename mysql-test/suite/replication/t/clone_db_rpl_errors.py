@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import clone_db
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(clone_db.test):
     """check errors for clone db
@@ -32,36 +33,39 @@ class test(clone_db.test):
         try:
             self.server1.exec_query("DROP DATABASE IF EXISTS util_clone")
             self.server1.exec_query("CREATE DATABASE util_clone")
-        except MUTLibError, e:
-            raise MUTLibError("Failed to create test database.")
+        except MUTLibError as err:
+            raise MUTLibError("Failed to create test database :"
+                              " {0}".format(err.errmsg))
         return True
         
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
 
         test_num = 1        
         # Check --rpl option errors        
-        cmd_str = "mysqldbcopy.py %s %s util_clone:util_clone2 " % \
-                  (to_conn, from_conn)
-        comment = "Test case %s - error: %s but no --rpl" % \
-                  (test_num, "--rpl-user=root")
+        cmd_str = "mysqldbcopy.py {0} {1} util_clone:util_clone2 ".format(
+            to_conn, from_conn)
+        comment = "Test case {0} - error: --rpl-user=root but no --rpl".format(
+            test_num)
         res = self.run_test_case(2, cmd_str + "--rpl-user=root", comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Attempt to use --rpl while cloning
-        cmd_str = "mysqldbcopy.py %s %s util_clone:util_clone2 --rpl=slave" % \
-                  (to_conn, from_conn)
-        comment = "Test case %s - error: using --rpl with cloning" % test_num
+        cmd_str = ("mysqldbcopy.py {0} {1} util_clone:util_clone2 "
+                   "--rpl=slave".format(to_conn, from_conn))
+        comment = "Test case {0} - error: using --rpl with cloning".format(
+            test_num)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        test_num += 1
+            raise MUTLibError("{0}: failed".format(comment))
 
         return True
   
@@ -75,10 +79,6 @@ class test(clone_db.test):
         try:
             self.server1.exec_query("DROP DATABASE util_clone")
             self.server1.exec_query("DROP DATABASE util_clone2")
-        except:
+        except UtilError:
             pass
         return True
-
-
-
-

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,14 +23,18 @@ or all tables in all databases except internal databases.
 """
 
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.database import Database
+from mysql.utilities.common.table import Table
+
 
 def check_index(src_val, table_args, options):
     """Check for duplicate or redundant indexes for one or more tables
-    
+
     This method will examine the indexes for one or more tables and identify
     any indexes that are potential duplicates or redundant. It prints the
     equivalent DROP statements if selected.
-    
+
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
@@ -43,10 +47,10 @@ def check_index(src_val, table_args, options):
                          index-format : index format = sql, table, tab, csv
                          worst        : show worst performing indexes
                          best         : show best performing indexes
-    
+
     Returns bool True = success, raises UtilError if error
     """
-    
+
     # Get options
     show_drops = options.get("show-drops", False)
     skip = options.get("skip", False)
@@ -54,17 +58,13 @@ def check_index(src_val, table_args, options):
     show_indexes = options.get("show-indexes", False)
     index_format = options.get("index-format", False)
     stats = options.get("stats", False)
-    first_indexes = options.get("best", None)        
+    first_indexes = options.get("best", None)
     last_indexes = options.get("worst", None)
-
-    from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.database import Database
-    from mysql.utilities.common.table import Table
 
     # Try to connect to the MySQL database server.
     conn_options = {
-        'quiet'     : verbosity == 1,
-        'version'   : "5.0.0",
+        'quiet': verbosity == 1,
+        'version': "5.0.0",
     }
     servers = connect_servers(src_val, None, conn_options)
 
@@ -72,13 +72,13 @@ def check_index(src_val, table_args, options):
 
     db_list = []     # list of databases
     table_list = []  # list of all tables to process
-    
+
     # Build a list of objects to process
     # 1. start with db_list if no objects present on command line
     # 2. process command line options.
     # 3. loop through database list and add all tables
     # 4. check indexes
-        
+
     # Perform the options check here. Loop through objects presented.
     for obj in table_args:
         # If a . appears, we are operating on a specific table
@@ -88,7 +88,7 @@ def check_index(src_val, table_args, options):
         # Else we are operating on a specific database.
         else:
             db_list.append(obj)
-    
+
     # Loop through database list adding tables
     for db in db_list:
         db_source = Database(source, db)
@@ -108,15 +108,15 @@ def check_index(src_val, table_args, options):
     # Check indexes for each table in the list
     for table_name in table_list:
         tbl_options = {
-            'verbose'  : verbosity >= 1,
-            'get_cols' : False,
-            'quiet'    : verbosity is None or verbosity < 1
+            'verbose': verbosity >= 1,
+            'get_cols': False,
+            'quiet': verbosity is None or verbosity < 1
         }
         tbl = Table(source, table_name, tbl_options)
         exists = tbl.exists()
         if not exists and not skip:
             raise UtilError("Table %s does not exist. Use --skip "
-                                 "to skip missing tables." % table_name)
+                            "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():
                 if verbosity > 1:
@@ -129,17 +129,16 @@ def check_index(src_val, table_args, options):
                     if verbosity > 1:
                         print "#   Table %s does not contain a PRIMARY key."
                 tbl.check_indexes(show_drops)
-                
+
             # Show best and/or worst indexes
             if stats:
                 if first_indexes is not None:
                     tbl.show_special_indexes(index_format, first_indexes, True)
                 if last_indexes is not None:
                     tbl.show_special_indexes(index_format, last_indexes)
-                
+
         if verbosity > 1:
             print "#"
 
-    if verbosity > 1:    
+    if verbosity > 1:
         print "# ...done."
-

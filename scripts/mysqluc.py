@@ -20,9 +20,9 @@
 This file contains the mysql utilities client.
 """
 
-from mysql.utilities.common.options import UtilitiesParser
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.tools import check_python_version
+from mysql.utilities.common.options import license_callback, UtilitiesParser
+from mysql.utilities.common.tools import (check_connector_python,
+                                          check_python_version)
 
 # Check Python version compatibility
 check_python_version()
@@ -35,10 +35,10 @@ if not check_connector_python():
     sys.exit(1)
 
 try:
-    from mysql.utilities.command.utilitiesconsole import UtilitiesConsole
     from mysql.utilities import VERSION_FRM, VERSION_STRING, COPYRIGHT_FULL
-    from mysql.utilities.common.options import add_verbosity, check_verbosity
     from mysql.utilities.exception import UtilError
+    from mysql.utilities.command.utilitiesconsole import UtilitiesConsole
+    from mysql.utilities.common.options import add_verbosity, check_verbosity
 except:
     print("ERROR: MySQL Utilities are either not installed or are not "
           "accessible from this terminal.")
@@ -55,6 +55,7 @@ Type 'help' for a list of commands or press TAB twice for list of utilities.
 GOODBYE_MESSAGE = "\nThanks for using the MySQL Utilities Client!\n"
 PRINT_WIDTH = 75
 UTIL_PATH = "/scripts"
+
 
 def build_variable_dictionary_list(args):
     """Build a variable dictionary from the arguments
@@ -78,19 +79,27 @@ def build_variable_dictionary_list(args):
     if len(arguments) > 0:
         parser.error("Unbalanced arguments. Please check your command.")
     for i in range(0, len(arguments), 2):
-        variables.append({'name': arguments[i], 'value': arguments[i+1]})
+        variables.append({'name': arguments[i], 'value': arguments[i + 1]})
     return variables
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = UtilitiesParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
-    add_help_option=False)
+    add_help_option=False,
+    prog=program
+)
 
 # Default option to provide help information
 parser.add_option("--help", action="help", help="display this help message "
                   "and exit")
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
 
 # Add display width option
 parser.add_option("--width", action="store", dest="width",
@@ -149,20 +158,19 @@ extra_utils_dict = {}
 for utility in opt.add_util:
     extra_utils_dict[utility] = ()
 
-
 options = {
-    'verbosity' : verbosity,
-    'quiet'     : quiet,
-    'width'     : opt.width,
-    'utildir'   : opt.utildir,
-    'variables' : build_variable_dictionary_list(args),
-    'prompt'    : 'mysqluc> ',
-    'welcome'   : WELCOME_MESSAGE.format(VERSION_STRING, COPYRIGHT_FULL),
-    'goodbye'   : GOODBYE_MESSAGE,
-    'commands'  : opt.commands,
-    'custom'    : True, # We are using custom commands
-    'hide_util' : opt.hide_util,
-    'add_util'  : extra_utils_dict
+    'verbosity': verbosity,
+    'quiet': quiet,
+    'width': opt.width,
+    'utildir': opt.utildir,
+    'variables': build_variable_dictionary_list(args),
+    'prompt': 'mysqluc> ',
+    'welcome': WELCOME_MESSAGE.format(VERSION_STRING, COPYRIGHT_FULL),
+    'goodbye': GOODBYE_MESSAGE,
+    'commands': opt.commands,
+    'custom': True,  # We are using custom commands
+    'hide_util': opt.hide_util,
+    'add_util': extra_utils_dict
 }
 
 try:

@@ -1,10 +1,13 @@
 Test case 1: - Show help
-Usage: mysqlfrm.py --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+MySQL Utilities mysqlfrm version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+License type: GPLv2
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm - show CREATE TABLE from .frm files
 
 Options:
   --version             show program's version number and exit
+  --license             display program's license and exit
   --help                
   --basedir=BASEDIR     the base directory for the server
   --diagnostic          read the frm files byte-by-byte to form the CREATE
@@ -12,6 +15,8 @@ Options:
                         options to decipher character set information
   --new-storage-engine=NEW_ENGINE
                         change ENGINE clause to use this engine.
+  --frmdir=FRMDIR       save the new .frm files in this directory. Used and
+                        valid with --new-storage-engine only.
   --port=PORT           Port to use for the spawned server.
   -s, --show-stats      show file statistics and general table information.
   --server=SERVER       connection information for the server in the form:
@@ -131,6 +136,11 @@ Helpful Hints
     name. If you do not want to use the last folder as the database name,
     simply specify the colon like this: /home/me/data1/:t1.frm. In this
     case, the database will be omitted from the CREATE statement.
+
+  - If you use the --new-storage-engine option, you must also provide the
+    --frmdir option. When these options are specified, the utility will
+    generate a new .frm file (prefixed with 'new_') and save it in the
+    --frmdir= directory.
 
 Enjoy!
 
@@ -1070,7 +1080,136 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 # std_data/frm_files/t9.frm
 #
 #...done.
-Test case 4: - User the --user option
+Test case 4: - Export .frm files in a db folder
+# Source on localhost: ... connected.
+# Starting the spawned server on port XXXXXXX
+# Reading .frm files
+#
+# Reading the col_widths.frm file.
+ERROR: Failed to correctly read the .frm file. Please try reading the file with the --diagnostic mode.
+#
+# Reading the me@002etoo@002eperiods.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/me.too.periods.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`me.too.periods` (
+  `a` int(11) DEFAULT NULL,
+  `b` char(33) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# Reading the t1.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t1.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t1` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# Reading the t2.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t2.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t2` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# Reading the t3.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t3.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t3` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# Reading the t4.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t4.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t4` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=BLACKHOLE DEFAULT CHARSET=latin1
+
+#
+# Reading the t5.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t5.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t5` (
+  `a` int(11) NOT NULL
+) ENGINE=CSV DEFAULT CHARSET=latin1
+
+#
+# Reading the t6.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t6.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t6` (
+  `a` int(11) NOT NULL
+) ENGINE=ARCHIVE DEFAULT CHARSET=latin1
+
+#
+# Reading the t7.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t7.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t7` (
+  `a` int(11) NOT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# Reading the t8.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/t8.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`t8` (
+  `a` int(11) DEFAULT NULL
+) ENGINE=MRG_MyISAM DEFAULT CHARSET=latin1
+
+#
+# Reading the t9.frm file.
+ERROR: Cannot process tables with the PARTITION storage engine. Please use the diagnostic mode to read the t9 file.
+#
+# Reading the this.has.periods.frm file.
+# Copy of .frm file with new storage engine saved as ./test_frm/this.has.periods.frm.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`this.has.periods` (
+  `a` int(11) DEFAULT NULL,
+  `b` char(33) DEFAULT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=latin1
+
+#
+# WARNING: The following files could not be read. You can try the --diagnostic mode to read these files.
+#
+# std_data/frm_files/t9.frm
+# std_data/frm_files/t9.frm
+#
+#...done.
+Test case 5: - User the --user option
 # Source on localhost: ... connected.
 # Spawning server with --user=JOE_USER.
 # Starting the spawned server on port XXXXXXX

@@ -15,7 +15,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import mutlib
 import rpl_admin
 import rpl_admin_gtid
 from mysql.utilities.exception import MUTLibError
@@ -23,13 +22,13 @@ from mysql.utilities.exception import MUTLibError
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
                        '--enforce-gtid-consistency --report-host=localhost '
-                       '--report-port=%s '
+                       '--report-port={0} '
                        '--sync-master-info=1 --master-info-repository=table"')
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
-                            '--report-host=localhost --report-port=%s --sync'
+                            '--report-host=localhost --report-port={0} --sync'
                             '-master-info=1 --master-info-repository=file"')
 
 
@@ -61,10 +60,10 @@ class test(rpl_admin_gtid.test):
 
         # Remove GTIDs here because they are not deterministic when run with
         # other tests that reuse these servers.
-        self.remove_result("localhost,%s,MASTER," % self.m_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s1_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s2_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s3_port)
+        self.remove_result("localhost,{0},MASTER,".format(self.m_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s1_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s2_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s3_port))
 
         slaves = ",".join(["root:root@127.0.0.1:{0}".format(self.server2.port),
                            slave2_conn, slave3_conn])
@@ -77,25 +76,25 @@ class test(rpl_admin_gtid.test):
         slaves_str = "--slaves={0}".format(slaves)
         candidates_str = "--candidates={0}".format(slave3_conn)
 
-        comment = "Test case %s - test failover scripts" % test_num
+        comment = "Test case {0} - test failover scripts".format(test_num)
         command = " ".join(["mysqlrpladmin.py ", candidates_str, slaves_str,
                             "failover", exec_before_str, exec_after_str,
                             "-vvv"])
         res = self.run_test_case(0, command, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Now we return the topology to its original state for other tests
         rpl_admin_gtid.test.reset_topology(self)
 
-        comment = "Test case %s - test switchover scripts" % test_num
+        comment = "Test case {0} - test switchover scripts".format(test_num)
         command = " ".join(["mysqlrpladmin.py", master_str, new_master_str,
                             "switchover", exec_before_str, exec_after_str,
                             "--demote-master", "-vvv", slaves_str])
         res = self.run_test_case(0, command, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Run test cases for testing:
@@ -105,7 +104,6 @@ class test(rpl_admin_gtid.test):
         script_exit = os.path.join(os.getcwd(), "std_data/check_threshold.sh")
         script_test_cases = [("<", 11, 0), ("=", 10, 1), (">", 9, 1)]
         script_options = [(script_exit, script), (script, script_exit)]
-
 
         com_fmt = "Test case {0} - test script exit {1} threshold {2}"
         switch_fmt = " ".join(["mysqlrpladmin.py", master_str, "switchover",
@@ -120,7 +118,8 @@ class test(rpl_admin_gtid.test):
         for command in commands:
             for opt in script_options:
                 for test_case in script_test_cases:
-                    # Now we return the topology to its original state for other tests
+                    # Now we return the topology to its original state
+                    # for other tests
                     rpl_admin_gtid.test.reset_topology(self)
                     comment = com_fmt.format(test_num, test_case[0],
                                              command[0])
@@ -150,7 +149,6 @@ class test(rpl_admin_gtid.test):
                             "ERROR: XXX Script failed.\n")
         self.replace_result("ERROR: {0}".format(script_exit),
                             "ERROR: XXX Script failed.\n")
-
 
         return True
 

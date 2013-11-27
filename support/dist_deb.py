@@ -31,6 +31,27 @@ from distutils.errors import DistutilsError
 
 from support.distribution.utils import unarchive_targz, get_dist_name
 
+FORMAT = 'http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/'
+SOURCE = 'http://www.mysql.com/about/legal/licensing/foss-exception.html',
+GPL_CR = {
+    'FORMAT': FORMAT,
+    'PRODUCT_NAME': 'mysql-utilities',
+    'SOURCE': SOURCE,
+    'CURRENT_YEAR': time.strftime('%Y'),
+    'LICENSE_TYPE': 'GPL2',
+    'README': '',
+}
+
+SOURCE = 'http://www.mysql.com/about/legal/licensing/oem/'
+COM_CR = {
+    'FORMAT': FORMAT,
+    'PRODUCT_NAME': 'mysql-utilities-commercial',
+    'SOURCE': SOURCE,
+    'CURRENT_YEAR': time.strftime('%Y'),
+    'LICENSE_TYPE': 'Commercial',
+    'README': '',
+}
+
 
 class BuildDistDebian(Command):
     """This class contains the command to built a Debian distribution package
@@ -66,12 +87,12 @@ class BuildDistDebian(Command):
         self.deb_base = os.path.join(os.getcwd(), deb_base)
         self.keep_temp = None
         self.dist_dir = None
-        self.deb_build_cmd = 'debuild' #'dpkg-buildpackage'#
+        self.deb_build_cmd = 'debuild'
         self.started_dir = os.getcwd()
         self.platform = platform.linux_distribution()[0].lower()
         self.platform_version = '.'.join(
             platform.linux_distribution()[1].split('.', 2)[0:2])
-        self.debian_support_dir = 'debian' #omit the /gpl for now.
+        self.debian_support_dir = 'debian' # omit the /gpl for now.
         self.debug = True
         self.tag = ''
 
@@ -84,11 +105,11 @@ class BuildDistDebian(Command):
 
     def _populate_deb_base(self):
         """Create and populate the deb base directory"""
-        
+
         def _get_date_time():
             """return time with format, Day, day# MM YYYY HH:MM:SS utc"""
             return time.strftime("%a, %d %b %Y %H:%M:%S %z", time.gmtime())
-        
+
         #copy necessary files and debian metainfo files
         self.mkpath(self.deb_base)
         deb_dir = os.path.join(self.deb_base, "debian")
@@ -97,11 +118,12 @@ class BuildDistDebian(Command):
            ("docs", os.path.join(self.deb_base, "docs")),
            ("mysql", os.path.join(self.deb_base, "mysql")),
            ("scripts", os.path.join(self.deb_base, "scripts"))
-           ]
+        ]
         # Hack for Fabric, copy data dir if exist
         if os.path.exists('data'):
             copy_tree_src_dst.append(("data",
                                       os.path.join(self.deb_base, "data")))
+
         for src, dst in copy_tree_src_dst:
             copy_tree(src, dst)
 
@@ -155,6 +177,17 @@ class BuildDistDebian(Command):
         f_manpages.flush()
         f_manpages.close()
 
+        # debian/copyright
+        log.info("creating debian/copyright file")
+        with open('README.txt') as f_readme:
+            GPL_CR['README'] = ''.join(f_readme)
+        cr_tmp_path = os.path.join("support", "debian", "copyright_template")
+        with open(cr_tmp_path) as f_cr_template:
+            lines = (line.replace('\n', '') for line in f_cr_template)
+            content = '\n'.join(lines).format(**GPL_CR)
+            with open(os.path.join(deb_dir, 'copyright'), 'w') as f_copyright:
+                f_copyright.write('{0}\n'.format(content))
+
     def _create_deb(self, source_only=False, sign_pkg=False, binary=True):
         """Create the deb files using the deb_build_cmd command"""
         log.info("creating deb package using {0}".format(self.deb_build_cmd))
@@ -183,10 +216,10 @@ class BuildDistDebian(Command):
                 if filename.endswith('.deb'):
                     newname = filename.replace(
                         '{0}_all'.format(self.version),
-                        '{0}{1}-{2}{3}_all'.format(self.version, self.tag, 
+                        '{0}-1{1}-{2}{3}_all'.format(self.version, self.tag, 
                                                   self.platform,
                                                   self.platform_version)
-                        )
+                    )
                     filepath = os.path.join(base, filename)
                     filedest = os.path.join(self.started_dir,
                                             self.dist_dir, newname)
@@ -214,16 +247,11 @@ class BuildDistDebian(Command):
         if not self.keep_temp:
             remove_tree(self.deb_base, dry_run=self.dry_run)
 
+
 class BuildCommercialDistDebian(BuildDistDebian):
     description = 'create a commercial built distribution Debian package'
 
     def finalize_options(self):
-        #def _get_fullname():
-        #    return self.commercial_name
-#            return "%s-commercial-%s-" % (
-#                self.distribution.get_name(), self.distribution.get_version())
-
-        #self.distribution.get_fullname = _get_fullname
         self.debian_support_dir = 'debian/commercial'
         BuildDistDebian.finalize_options(self)
 
@@ -295,6 +323,19 @@ class BuildCommercialDistDebian(BuildDistDebian):
                     f_manpages.write('{0}\n'.format(filepath))
         f_manpages.flush()
         f_manpages.close()
+
+        # debian/copyright
+        log.info("creating debian/copyright file")
+        log.info("current directory: {0}".format(os.getcwd()))
+        readme_p = os.path.join('support', 'commercial_docs', 'README_com.txt')
+        with open(readme_p) as f_readme:
+            COM_CR['README'] = ''.join(f_readme)
+        cr_tmp_path = os.path.join("support", "debian", "copyright_template")
+        with open(cr_tmp_path) as f_cr_template:
+            lines = (line.replace('\n', '') for line in f_cr_template)
+            content = '\n'.join(lines).format(**COM_CR)
+            with open(os.path.join(deb_dir, 'copyright'), 'w') as f_copyright:
+                f_copyright.write('{0}\n'.format(content))
 
     def _prepare(self, tarball=None, base=None):
         dist_dirname = self.distribution.get_fullname()

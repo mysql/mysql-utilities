@@ -37,6 +37,10 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.create_login_path_data('test_mylogin', 'test_user', 'localhost')
+        self.create_login_path_data('test-hyphen1234#', 'test_user2',
+                                    'localhost')
+        self.create_login_path_data("test' \\\"-hyphen", 'test_user3',
+                                    'localhost')
         return True
 
     def run(self):
@@ -46,17 +50,31 @@ class test(mutlib.System_test):
                      "test_user@localhost:1000:/my.socket",
                      "test_mylogin:1000:/my.socket",
                      "test_user@localhost:/my.socket",
-                     "test_mylogin:/my.socket"]
-        for test in con_tests:
-            con_dic = parse_connection(test)
-            self.results.append(con_dic)
+                     "test_mylogin:/my.socket", "test-hyphen1234#",
+                     "test-hyphen1234#:13000:my.socket", "test' \\\"-hyphen",
+                     "test' \\\"-hyphen:my.socket",
+                     "test' \\\"-hyphen:13001:my.socket"]
+
+        for test_ in con_tests:
+            con_dic = parse_connection(test_, options={"charset": "utf8"})
+            # Sort the keys to fix the issue where the keys are printed in
+            # different order on linux and windows.
+            self.results.append(sorted(con_dic.iteritems()))
 
         # Test parse_user_password with login-paths
-        user_pass_tests = ["test_user", "test_mylogin",
-                           "test_user:", "user_x:", "user_x:pass_y"]
-        for test in user_pass_tests:
-            user_pass = parse_user_password(test)
+        user_pass_tests = ["test_user", "test_mylogin", "test_user:",
+                           "user_x:", "user_x:pass_y"]
+        for test_ in user_pass_tests:
+            user_pass = parse_user_password(test_)
             self.results.append(user_pass)
+
+        # Transform list of dictionaries into list of strings
+        self.results = ["{0!s}\n".format(con_dic) for con_dic in self.results]
+
+        # remove socket information from posix systems to have same output
+        # on both posix and and windows systems
+        self.replace_substring_portion(", ('unix_socket'", ".socket')", '')
+
         return True
 
     def get_result(self):
@@ -67,4 +85,6 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         self.remove_login_path_data('test_mylogin')
+        self.remove_login_path_data('test-hyphen1234#')
+        self.remove_login_path_data("test' \\\"-hyphen")
         return True

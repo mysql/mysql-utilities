@@ -21,8 +21,8 @@ from mysql.utilities.exception import MUTLibError
 
 _IPv6_LOOPBACK = "::1"
 
-_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin  --report-host=%s '
-                       '--report-port=%s --bind-address=:: "')
+_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin  --report-host={0} '
+                       '--report-port={1} --bind-address=:: "')
 _PASS = "Pass\n"
 _FAIL = "Failed\n\n"
 _BAD_RESULT_MSG = ("Got wrong result for test case {0}. \n"
@@ -42,65 +42,45 @@ _oracle_ip = socket.getaddrinfo(_oracle_com, None)[0][4][0]
 _python_org = "python.org"
 _python_ip = socket.getaddrinfo(_python_org, None)[0][4][0]
 
-_special_test_cases = [{_desc: "This test reuse of aliases",
-                        _test_case_name: _alias_reuseness,
-                       _aliases: [_alias_reuseness],
-                       _host_name: _alias_reuseness,
-                       _result: True},
+_special_test_cases = [
+    {_desc: "This test reuse of aliases", _test_case_name: _alias_reuseness,
+     _aliases: [_alias_reuseness], _host_name: _alias_reuseness,
+     _result: True},
 
-                      {_desc: "this test addition of  lookup to aliases",
-                       _test_case_name: _mock_no_local_host,
-                       _aliases: [],
-                       _host_name: _mock_no_local_host,
-                       _result: True},
+    {_desc: "this test addition of  lookup to aliases",
+     _test_case_name: _mock_no_local_host, _aliases: [],
+     _host_name: _mock_no_local_host, _result: True},
 
-                      {_desc: "This test Negative host added to aliases",
-                       _test_case_name: _alias_reuseness,
-                       _aliases: [],
-                       _host_name: _mock_no_local_host,
-                       _result: False},
+    {_desc: "This test Negative host added to aliases",
+     _test_case_name: _alias_reuseness, _aliases: [],
+     _host_name: _mock_no_local_host, _result: False},
 
-                      {_desc: ("This test non local server host name,"
-                               " lookup of his aliases"),
-                       _test_case_name: _oracle_com,
-                       _aliases: [],
-                       _host_name: _python_org,
-                       _result: False},
+    {_desc: ("This test non local server host name,"
+             " lookup of his aliases"), _test_case_name: _oracle_com,
+     _aliases: [], _host_name: _python_org, _result: False},
 
-                      {_desc: ("This test non local server, lookup"
-                               " of aliases for the given hostname"),
-                      _test_case_name: _oracle_com,
-                       _aliases: [_mock_no_local_host],
-                       _host_name: _mock_no_local_host,
-                       _result: False},
+    {_desc: ("This test non local server, lookup"
+             " of aliases for the given hostname"),
+     _test_case_name: _oracle_com, _aliases: [_mock_no_local_host],
+     _host_name: _mock_no_local_host, _result: False},
 
-                      {_desc: ("This test non local server,"
-                               "lookup of aliases for the given ip"),
-                       _test_case_name: _python_ip,
-                       _aliases: [_mock_no_local_host],
-                       _host_name: _mock_no_local_host,
-                       _result: False},
+    {_desc: ("This test non local server,"
+             "lookup of aliases for the given ip"),
+     _test_case_name: _python_ip, _aliases: [_mock_no_local_host],
+     _host_name: _mock_no_local_host, _result: False},
 
-                      {_desc: ("This test lookup of aliases for non "
-                               "local server by IP."),
-                       _test_case_name: _oracle_ip,
-                       _aliases: [],
-                       _host_name: _oracle_com,
-                       _result: True},
+    {_desc: ("This test lookup of aliases for non "
+             "local server by IP."), _test_case_name: _oracle_ip, _aliases: [],
+     _host_name: _oracle_com, _result: True},
 
-                      {_desc: ("This test lookups of aliases for non "
-                               "local server by hostname."),
-                       _test_case_name: _python_org,
-                       _aliases: [],
-                       _host_name: _python_ip,
-                       _result: True},
+    {_desc: ("This test lookups of aliases for non "
+             "local server by hostname."), _test_case_name: _python_org,
+     _aliases: [], _host_name: _python_ip, _result: True},
 
-                      {_desc: ("It test the reuse of aliases for the "
-                               "given non local server by hostname."),
-                       _test_case_name: _python_org,
-                       _aliases: [_python_ip],
-                       _host_name: _python_ip,
-                       _result: True}]
+    {_desc: ("It test the reuse of aliases for the "
+             "given non local server by hostname."),
+     _test_case_name: _python_org, _aliases: [_python_ip],
+     _host_name: _python_ip, _result: True}]
 
 
 class test(mutlib.System_test):
@@ -123,14 +103,14 @@ class test(mutlib.System_test):
         self.servers.cloning_host = _IPv6_LOOPBACK
 
         self.server0 = self.servers.get_server(0)
-        mysqld = _DEFAULT_MYSQL_OPTS % (_IPv6_LOOPBACK,
-                                        self.servers.view_next_port())
+        mysqld = _DEFAULT_MYSQL_OPTS.format(
+            _IPv6_LOOPBACK, self.servers.view_next_port())
         self.server1_name = "server_1"
         res = self.servers.spawn_new_server(self.server0, "1001",
                                             self.server1_name, mysqld)
         if not res:
-            raise MUTLibError("Cannot spawn server '{0}'."
-                              "".format(name))
+            raise MUTLibError("Cannot spawn server '{0}'.".format(
+                self.server1.name))
         self.server1 = res[0]
 
         self.host_name = socket.gethostname()
@@ -146,15 +126,14 @@ class test(mutlib.System_test):
 
         return True
 
-    def run_is_alias_test(self, server, test_num, test_case,
-                                    exp_res=True):
+    def run_is_alias_test(self, server, test_num, test_case, exp_res=True):
         NOT = ""
         if not exp_res:
             NOT = "not "
         comment = ("test case {0} - test alias: {1} is {2}alias for "
                    "server {3}".format(test_num, test_case, NOT, server.host))
         if self.debug:
-                print(comment)
+            print(comment)
         self.results.append("{0}\n".format(comment))
         res = server.is_alias(test_case)
         if not res == exp_res:
@@ -181,16 +160,16 @@ class test(mutlib.System_test):
     def run(self):
         test_num = 0
         if self.debug:
-                print("\n")
+            print("\n")
         test_num = self.run_is_alias_test_cases(self.server0, test_num)
         test_num = self.run_is_alias_test_cases(self.server1, test_num)
 
-        for dict in _special_test_cases:
+        for dict_ in _special_test_cases:
             test_num += 1
-            self.server1.aliases = dict[_aliases]
-            self.server1.host = dict[_host_name]
-            self.run_is_alias_test(self.server1, test_num, dict[_test_case_name],
-                               dict[_result])
+            self.server1.aliases = dict_[_aliases]
+            self.server1.host = dict_[_host_name]
+            self.run_is_alias_test(self.server1, test_num,
+                                   dict_[_test_case_name], dict_[_result])
 
         # cleanup name_host
         self.server1.host = "localhost"

@@ -14,10 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import clone_db
 
 from mysql.utilities.exception import MUTLibError
+
 
 class test(clone_db.test):
     """check exclude parameter for clone db
@@ -36,35 +37,40 @@ class test(clone_db.test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server1)
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_str = "mysqldbcopy.py --skip-gtid %s %s --skip=grants " % \
-                  (from_conn, to_conn)
-        cmd_str += "util_test:util_db_clone "
+        cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} --skip=grants ".format(
+            from_conn, to_conn)
+        cmd_str = "{0}util_test:util_db_clone ".format(cmd_str)
 
-        comment = "Test case 1 - exclude by name"
+        test_num = 1
+        comment = "Test case {0} - exclude by name".format(test_num)
         cmd_opts = "--exclude=util_test.v1 --exclude=util_test.t4"
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        clone_db.test.drop_db(self, self.server1, 'util_db_clone')
+        self.drop_db(self.server1, 'util_db_clone')
 
-        comment = "Test case 2 - exclude by regex"
+        test_num += 1
+        comment = "Test case {0} - exclude by regex".format(test_num)
         cmd_opts = "--exclude=^e --exclude=4$ --regex "
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        clone_db.test.drop_db(self, self.server1, 'util_db_clone')
+        self.drop_db(self.server1, 'util_db_clone')
 
-        comment = "Test case 3 - exclude by name and regex"
-        cmd_opts = "--exclude=^e --exclude=4$ --regex " + \
-                   "--exclude=v1 --exclude=util_test.trg"
+        test_num += 1
+        comment = "Test case {0} - exclude by name and regex".format(test_num)
+        cmd_opts = ("--exclude=^e --exclude=4$ --regex "
+                    "--exclude=v1 --exclude=util_test.trg")
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source and destination host name.
         self.replace_result("# Source on ",

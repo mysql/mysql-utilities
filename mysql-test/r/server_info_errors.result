@@ -1,15 +1,15 @@
 Test case 1 - no server
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
-mysqlserverinfo.py: error: You must specify at least one server.
+mysqlserverinfo: error: You must specify at least one server.
 
 Test case 2 - bad server
 ERROR: Server connection values invalid
 
 Test case 3 - bad format
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
-mysqlserverinfo.py: error: option --format: invalid choice: 'ASDASDASD' (choose from 'grid', 'tab', 'csv', 'vertical')
+mysqlserverinfo: error: option --format: invalid choice: 'ASDASDASD' (choose from 'grid', 'tab', 'csv', 'vertical')
 
 Test case 4 - wrong password
 ERROR: Access denied for user 'root'@'localhost' using password: YES
@@ -26,6 +26,6 @@ ERROR: Server is offline. To connect, you must also provide datadir and the star
 Test case 8 - offline server without start option
 ERROR: Server is offline. To connect, you must also provide start option
 Test case 9 - Invalid --start-timeout value
-Usage: mysqlserverinfo.py --server=user:pass@host:port:socket --format=grid
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
-mysqlserverinfo.py: error: option --start-timeout: invalid integer value: '1.5'
+mysqlserverinfo: error: option --start-timeout: invalid integer value: '1.5'

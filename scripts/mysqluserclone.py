@@ -30,15 +30,16 @@ check_python_version()
 import os.path
 import sys
 
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.command import userclone
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import WARN_OPT_NOT_REQUIRED
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
+                                             WARN_OPT_NOT_REQUIRED)
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             check_verbosity,
                                             setup_common_options)
-from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
-from mysql.utilities.command import userclone
+
 
 # Constants
 NAME = "MySQL Utilities - mysqluserclone "
@@ -60,17 +61,17 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Connection information for the source server
 parser.add_option("--source", action="store", dest="source",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for source server in " + \
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+                  type="string", default=None,
+                  help="connection information for source server in "
+                       "the form: <user>[:<password>]@<host>[:<port>]"
+                       "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
 # Connection information for the destination server
 parser.add_option("--destination", action="store", dest="destination",
-                  type = "string",
-                  help="connection information for destination server in " + \
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+                  type="string",
+                  help="connection information for destination server in "
+                       "the form: <user>[:<password>]@<host>[:<port>]"
+                       "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
 # Dump mode
 parser.add_option("-d", "--dump", action="store_true",
@@ -87,7 +88,7 @@ parser.add_option("--include-global-privileges", action="store_true",
                   "base_user@% as well as base_user@host", default=False)
 
 # List mode
-parser.add_option("-l","--list", action="store_true", dest="list_users",
+parser.add_option("-l", "--list", action="store_true", dest="list_users",
                   help="list all users on the source - does not require "
                   "a destination", default=False)
 
@@ -109,6 +110,10 @@ if opt.quiet and opt.dump:
 
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
+
+# Fail if no --source provided
+if not opt.source:
+    parser.error(PARSE_ERR_OPTS_REQ.format(opt='--source'))
 
 # Fail if no arguments and no options.
 if (len(args) == 0 or opt is None) and not opt.list_users:
@@ -158,11 +163,11 @@ else:
 
     # Build dictionary of options
     options = {
-        "dump"         : opt.dump,
-        "overwrite"    : opt.overwrite,
-        "quiet"        : opt.quiet,
-        "verbosity"    : opt.verbosity,
-        "global_privs" : opt.global_privs
+        "dump": opt.dump,
+        "overwrite": opt.overwrite,
+        "quiet": opt.quiet,
+        "verbosity": opt.verbosity,
+        "global_privs": opt.global_privs
     }
 
     try:

@@ -29,14 +29,15 @@ check_python_version()
 import os.path
 import sys
 
-from mysql.utilities.common.options import add_basedir_option
-from mysql.utilities.common.options import check_basedir_option
-from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities import exception
 from mysql.utilities.command import serverclone
+from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
+                                            check_basedir_option,
+                                            setup_common_options)
+from mysql.utilities.common.server import Server
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlserverclone "
@@ -56,18 +57,18 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 
 # Data directory for new instance
 parser.add_option("--new-data", action="store", dest="new_data",
-                  type = "string", help="the full path to the location "
+                  type="string", help="the full path to the location "
                   "of the data directory for the new instance")
 
 # Port for the new instance
 parser.add_option("--new-port", action="store", dest="new_port",
-                  type = "string", default="3307", help="the new port "
-                         "for the new instance - default=%default")
+                  type="string", default="3307", help="the new port "
+                  "for the new instance - default=%default")
 
 # Server id for the new instance
 parser.add_option("--new-id", action="store", dest="new_id",
-                  type = "string", default="2", help="the server_id for "
-                         "the new instance - default=%default")
+                  type="string", default="2", help="the server_id for "
+                  "the new instance - default=%default")
 
 # Root password for the new instance
 parser.add_option("--root-password", action="store", dest="root_pass",
@@ -123,7 +124,7 @@ if opt.root_pass is None or opt.root_pass == '':
 
 # Fail if user does not have access to new data dir.
 if os.path.exists(opt.new_data):
-    if not os.access(opt.new_data, os.R_OK|os.W_OK):
+    if not os.access(opt.new_data, os.R_OK | os.W_OK):
         parser.error("You do not have enough privileges to access the folder "
                      "specified by --new-data.")
 
@@ -140,18 +141,18 @@ if int(opt.start_timeout) < 10:
 
 # Build options
 options = {
-    'new_data'       : opt.new_data,
-    'new_port'       : opt.new_port,
-    'new_id'         : opt.new_id,
-    'root_pass'      : opt.root_pass,
-    'mysqld_options' : opt.mysqld,
-    'verbosity'      : opt.verbosity,
-    'quiet'          : opt.quiet,
-    'cmd_file'       : opt.cmd_file,
-    'basedir'        : opt.basedir,
-    'delete'         : opt.delete,
-    'user'           : opt.user,
-    'start_timeout'  : opt.start_timeout,
+    'new_data': opt.new_data,
+    'new_port': opt.new_port,
+    'new_id': opt.new_id,
+    'root_pass': opt.root_pass,
+    'mysqld_options': opt.mysqld,
+    'verbosity': opt.verbosity,
+    'quiet': opt.quiet,
+    'cmd_file': opt.cmd_file,
+    'basedir': opt.basedir,
+    'delete': opt.delete,
+    'user': opt.user,
+    'start_timeout': opt.start_timeout,
 }
 
 # Expand user paths and resolve relative paths
@@ -168,6 +169,12 @@ if opt.basedir and opt.basedir[0] == '.':
 if opt.basedir is None:
     try:
         conn = parse_connection(opt.server)
+
+        # Now check for local server
+        server = Server({'conn_info': conn})
+        if not server.is_alias('localhost'):
+            parser.error("Server to be cloned must be running on the same "
+                         "machine as mysqlserverclone.")
     except exception.FormatError:
         _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err)
@@ -178,7 +185,7 @@ else:
     conn = None
 
 try:
-    res = serverclone.clone_server(conn, options)
+    serverclone.clone_server(conn, options)
 except exception.UtilError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

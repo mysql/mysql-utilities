@@ -23,10 +23,11 @@ import locale
 import os
 import sys
 
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.tools import encode
 from mysql.utilities.common.user import User
-from mysql.utilities.exception import UtilError
+
 
 # Constants
 _KB = 1024.0
@@ -159,17 +160,17 @@ def _find_tablespace_files(folder, verbosity=0):
     try:
         for item in os.listdir(folder):
             itempath = os.path.join(folder, item)
-            name, ext = os.path.splitext(item)
+            _, ext = os.path.splitext(item)
             if os.path.isfile(itempath):
-                name, ext = os.path.splitext(item)
+                _, ext = os.path.splitext(item)
                 if ext.upper() == "IBD":
                     size = os.path.getsize(itempath)
                     total += size
                     if verbosity > 0:
-                        row = (item, size,'file tablespace', '')
+                        row = (item, size, 'file tablespace', '')
                     else:
                         row = (item, size)
-    
+
                     tablespaces.append(row)
             else:
                 subdir, tot = _find_tablespace_files(itempath, verbosity)
@@ -198,7 +199,7 @@ def _build_logfile_list(server, log_name, suffix='_file'):
     if res != [] and res[0][1].upper() == 'OFF':
         print "# The %s is turned off on the server." % log_name
     else:
-        res = server.show_server_variable(log_name+suffix)
+        res = server.show_server_variable(log_name + suffix)
         if res == []:
             raise UtilError("Cannot get %s_file setting." % log_name)
         log_path = res[0][1]
@@ -233,7 +234,7 @@ def _get_log_information(server, log_name, suffix='_file'):
         print "# The %s is turned off on the server." % log_name
     else:
         log_file, log_path, log_size = _build_logfile_list(server, log_name,
-                                                       suffix)
+                                                           suffix)
         if log_file is None or log_path is None or \
            not os.access(log_path, os.R_OK):
             print "# %s information is not accessible. " % log_name + \
@@ -257,7 +258,7 @@ def _build_log_list(folder, prefix):
     binlogs = []
     if prefix is not None:
         for item in os.listdir(folder):
-            name, ext = os.path.splitext(item)
+            name, _ = os.path.splitext(item)
             if name.upper() == prefix.upper():
                 itempath = os.path.join(folder, item)
                 if os.path.isfile(itempath):
@@ -292,7 +293,7 @@ def _build_innodb_list(per_table, folder, datadir, specs, verbosity=0):
     # Here, we want to capture log files as well as tablespace files.
     if specs is not None:
         for item in os.listdir(folder):
-            name, ext = os.path.splitext(item)
+            name, _ = os.path.splitext(item)
             # Check specification list
             for spec in specs:
                 parts = spec.split(":")
@@ -330,7 +331,7 @@ def _build_innodb_list(per_table, folder, datadir, specs, verbosity=0):
     return tablespaces, total_size
 
 
-def _build_db_list(server, rows, include_list, datadir, format=False,
+def _build_db_list(server, rows, include_list, datadir, fmt=False,
                    have_read=False, verbosity=0, include_empty=True):
     """Build a list of all databases and their totals.
 
@@ -358,7 +359,7 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
     rows[in]          A list of databases and their calculated sizes
     include_list[in]  A list of databases included on the command line
     datadir[in]       The data directory
-    format[in]        If True, format columns and rows to standard sizes
+    fmt[in]           If True, format columns and rows to standard sizes
     have_read[in]     If True, user has read access to datadir path
     verbosity[in]     Controls how much data is shown
     include_empty[in] Include empty databases in list
@@ -394,7 +395,7 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
         total += data_size + misc_files
 
         if have_read:
-            if verbosity >= 2: # get all columns
+            if verbosity >= 2:  # get all columns
                 results.append((row[0], dbdir_size, data_size, misc_files,
                                 db_total))
             elif verbosity > 0:
@@ -405,13 +406,13 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
             results.append((row[0], db_total))
 
     if have_read and verbosity > 0:
-        num_cols = min(verbosity+2, 4)
+        num_cols = min(verbosity + 2, 4)
     else:
         num_cols = 1
 
     # Build column list and format if necessary
     col_list = ['db_name']
-    if num_cols == 4: # get all columns
+    if num_cols == 4:  # get all columns
         col_list.append('db_dir_size')
         col_list.append('data_size')
         col_list.append('misc_files')
@@ -424,24 +425,24 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
         col_list.append('total')
 
     fmt_cols = []
-    max_col = [0,0,0,0]
-    if format:
+    max_col = [0, 0, 0, 0]
+    if fmt:
         fmt_cols.append(col_list[0])
-        for i in range(0,num_cols):
-            max_col[i] = _get_formatted_max_width(results, col_list, i+1)
-            fmt_cols.append("{0:>{1}}".format(col_list[i+1], max_col[i]))
+        for i in range(0, num_cols):
+            max_col[i] = _get_formatted_max_width(results, col_list, i + 1)
+            fmt_cols.append("{0:>{1}}".format(col_list[i + 1], max_col[i]))
     else:
         fmt_cols = col_list
 
     # format the list if needed
     fmt_rows = []
-    if format:
+    if fmt:
         for row in results:
-            fmt_data = ['','','','','']
+            fmt_data = ['', '', '', '', '']
             # Put in commas and justify strings
-            for i in range(0,num_cols):
-                fmt_data[i] = locale.format("%d", row[i+1], grouping=True)
-            if num_cols == 4: # get all columns
+            for i in range(0, num_cols):
+                fmt_data[i] = locale.format("%d", row[i + 1], grouping=True)
+            if num_cols == 4:  # get all columns
                 fmt_rows.append((row[0], fmt_data[0], fmt_data[1],
                                  fmt_data[2], fmt_data[3]))
             elif num_cols == 3:
@@ -454,33 +455,33 @@ def _build_db_list(server, rows, include_list, datadir, format=False,
 
     if include_empty:
         dbs = server.exec_query("SHOW DATABASES")
-        if len(fmt_rows) != len(dbs)-1:
+        if len(fmt_rows) != len(dbs) - 1:
             # We have orphaned database - databases not listed in IS.TABLES
             exclude_list = []
             for row in fmt_rows:
                 exclude_list.append(row[0])
             for db in dbs:
                 if db[0].upper() != "INFORMATION_SCHEMA" and \
-                   db[0] not in exclude_list and \
-                   (include_list is None or include_list == [] or \
-                    db[0] in include_list):
-                    if format:
-                        fmt_data = ['','','','','']
-                        for i in range(0,num_cols):
-                            if type(row[i+1]) == type(int):
+                        db[0] not in exclude_list and \
+                        (include_list is None or include_list == [] or
+                         db[0] in include_list):
+                    if fmt:
+                        fmt_data = ['', '', '', '', '']
+                        for i in range(0, num_cols):
+                            if type(row[i + 1]) == type(int):
                                 fmt_data[i] = locale.format("%s",
-                                                            int(row[i+1]),
+                                                            int(row[i + 1]),
                                                             grouping=True)
                             else:
-                                fmt_data[i] = locale.format("%s", row[i+1],
+                                fmt_data[i] = locale.format("%s", row[i + 1],
                                                             grouping=True)
-                        if num_cols == 4: # get all columns
+                        if num_cols == 4:  # get all columns
                             fmt_rows.insert(0, (db[0], fmt_data[0],
                                                 fmt_data[1], fmt_data[2],
                                                 fmt_data[3]))
                         elif num_cols == 3:
                             fmt_rows.insert(0, (db[0], fmt_data[0],
-                                             fmt_data[1], fmt_data[2]))
+                                                fmt_data[1], fmt_data[2]))
                         else:
                             fmt_rows.insert(0, (db[0], fmt_data[0]))
                     else:
@@ -508,10 +509,7 @@ def show_database_usage(server, datadir, dblist, options):
 
     returns True or exception on error
     """
-    
-    from mysql.utilities.common.format import print_list
-
-    format = options.get("format", "grid")
+    fmt = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)
@@ -528,9 +526,9 @@ def show_database_usage(server, datadir, dblist, options):
     if len(dblist) > 0:
         include_list = "("
         stop = len(dblist)
-        for i in range(0,stop):
+        for i in range(0, stop):
             include_list += "'%s'" % dblist[i]
-            if i < stop-1:
+            if i < stop - 1:
                 include_list += ", "
         include_list += ")"
         where_clause = "WHERE table_schema IN %s" % include_list
@@ -542,13 +540,13 @@ def show_database_usage(server, datadir, dblist, options):
 
     # Get list of databases with sizes and formatted when necessary
     columns, rows, db_total = _build_db_list(server, res, dblist, datadir,
-                                             format == "grid",
+                                             fmt == "grid",
                                              have_read, verbosity,
                                              include_empty or do_all)
 
     if not quiet:
         print "# Database totals:"
-    print_list(sys.stdout, format, columns, rows, no_headers)
+    print_list(sys.stdout, fmt, columns, rows, no_headers)
     if not quiet:
         _print_size("\nTotal database disk usage = ", db_total)
         print
@@ -567,18 +565,14 @@ def show_logfile_usage(server, options):
 
     return True or raise exception on error
     """
-    from mysql.utilities.common.format import print_list
-
-    format = options.get("format", "grid")
+    fmt = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
-    verbosity = options.get("verbosity", 0)
-    have_read = options.get("have_read", False)
     quiet = options.get("quiet", False)
 
     if not quiet:
         print "# Log information."
     total = 0
-    
+
     _LOG_NAMES = [
         ('general_log', '_file'), ('slow_query_log', '_file'),
         ('log_error', '')
@@ -589,16 +583,16 @@ def show_logfile_usage(server, options):
         if log is not None:
             logs.append((log, size))
         total += size
-    
+
     fmt_logs = []
     columns = ['log_name', 'size']
     if len(logs) > 0:
-        if format == 'grid':
+        if fmt == 'grid':
             max_col = _get_formatted_max_width(logs, columns, 1)
             if max_col < len('size'):
                 max_col = len('size')
             size = "{0:>{1}}".format('size', max_col)
-            columns = ['log_name',size]
+            columns = ['log_name', size]
             for row in logs:
                 # Add commas
                 size = locale.format("%d", row[1], grouping=True)
@@ -609,7 +603,7 @@ def show_logfile_usage(server, options):
         else:
             fmt_logs = logs
 
-        print_list(sys.stdout, format, columns, fmt_logs, no_headers)
+        print_list(sys.stdout, fmt, columns, fmt_logs, no_headers)
         if not quiet:
             _print_size("\nTotal size of logs = ", total)
             print
@@ -699,7 +693,7 @@ def show_log_usage(server, datadir, options):
             # Requires SUPER for server < 5.6.6 or also REPLICATION CLIENT for
             # server >= 5.6.6 to execute: SHOW BINARY LOGS.
             if (server.check_version_compat(5, 6, 6)
-                and not has_super and not has_rpl_client):
+               and not has_super and not has_rpl_client):
                 print("# {0} information not accessible. User must have the "
                       "SUPER or REPLICATION CLIENT "
                       "privilege.".format(log_type.capitalize()))
@@ -808,12 +802,9 @@ def show_innodb_usage(server, datadir, options):
 
     return True or raise exception on error
     """
-    from mysql.utilities.common.format import print_list
-
-    format = options.get("format", "grid")
+    fmt = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
-    have_read = options.get("have_read", False)
     quiet = options.get("quiet", False)
 
     # Check to see if we have innodb
@@ -868,7 +859,7 @@ def show_innodb_usage(server, datadir, options):
             columns.append('specificaton')
         size = 'size'
         fmt_innodb = []
-        if format.upper() == 'GRID':
+        if fmt.upper() == 'GRID':
             max_col = _get_formatted_max_width(innodb, columns, 1)
             if max_col < len('size'):
                 max_col = len('size')
@@ -892,7 +883,7 @@ def show_innodb_usage(server, datadir, options):
         else:
             fmt_innodb = innodb
 
-        print_list(sys.stdout, format, columns, fmt_innodb, no_headers)
+        print_list(sys.stdout, fmt, columns, fmt_innodb, no_headers)
         if not quiet:
             _print_size("\nTotal size of InnoDB files = ", total)
             print
@@ -906,8 +897,6 @@ def show_innodb_usage(server, datadir, options):
                         print "Tablespace %s can be " % tablespace[3] + \
                               "extended by using %s:%sM[...]\n" % \
                               (parts[0], size)
-
-
     else:
         print "# InnoDB data file information is not accessible. " + \
               "Check your permissions."

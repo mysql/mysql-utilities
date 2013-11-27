@@ -38,11 +38,10 @@ class test(diskusage_basic.test):
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         cmd_base = ("mysqldiskusage.py {0} util_test "
-                    "--format=csv").format(from_conn)
+                    "--format=csv".format(from_conn))
         test_num = 1
         comment = "Test Case {0} : Showing help ".format(test_num)
         cmd = "{0} --help".format(cmd_base)
@@ -146,7 +145,7 @@ class test(diskusage_basic.test):
 
         test_num += 1
         comment = ("Test Case {0} : Database name with strange "
-                   "characters.").format(test_num)
+                   "characters.".format(test_num))
         cmd = '{0}'.format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -156,12 +155,13 @@ class test(diskusage_basic.test):
         # Show log usage using a user with strictly required mySQL privileges.
 
         # Grant only SUPER privilege to user (no previous privilege).
-        self.server1.exec_query("GRANT SUPER ON *.* TO 'repl'@'{0}' IDENTIFIED "
-                                "BY 'repl'".format(self.server1.host))
+        self.server1.exec_query(
+            "GRANT SUPER ON *.* TO 'repl'@'{0}' IDENTIFIED "
+            "BY 'repl'".format(self.server1.host))
 
         test_num += 1
         comment = ("Test Case {0} : Use a user only with SUPER "
-                   "privilege.").format(test_num)
+                   "privilege.".format(test_num))
         cmd_base = cmd_base.replace('root', 'repl')
         cmd = '{0} -a'.format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
@@ -179,7 +179,7 @@ class test(diskusage_basic.test):
 
         test_num += 1
         comment = ("Test Case {0} : Use a user only with REPLICATION CLIENT "
-                   "privilege.").format(test_num)
+                   "privilege.".format(test_num))
         cmd_base = cmd_base.replace('root', 'repl')
         cmd = '{0} -a'.format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
@@ -200,6 +200,13 @@ class test(diskusage_basic.test):
         self.mask_column_result("util_test,X", ",", 5, "XXXXXXX")
 
         self.replace_result("error_log.err", "error_log.err,XXXX\n")
+
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldiskusage version",
+                "MySQL Utilities mysqldiskusage version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
 
         return True
 

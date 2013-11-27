@@ -25,17 +25,20 @@ import optparse
 import os
 import sys
 
-from mysql.utilities import VERSION_FRM
-from mysql.utilities.command.read_frm import read_frm_files
-from mysql.utilities.command.read_frm import read_frm_files_diagnostic
+from mysql.utilities import LICENSE_FRM, VERSION_FRM
+from mysql.utilities.exception import FormatError, UtilError
+from mysql.utilities.command.read_frm import (read_frm_files,
+                                              read_frm_files_diagnostic)
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_verbosity
+from mysql.utilities.common.options import (add_verbosity, license_callback,
+                                            UtilitiesParser)
 from mysql.utilities.common.server import connect_servers
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
 
-class MyParser(optparse.OptionParser):
+
+class MyParser(UtilitiesParser):
+    """Custom class to set the epilog.
+    """
     def format_epilog(self, formatter):
         return self.epilog
 
@@ -149,18 +152,33 @@ Helpful Hints
     simply specify the colon like this: /home/me/data1/:t1.frm. In this
     case, the database will be omitted from the CREATE statement.
 
+  - If you use the --new-storage-engine option, you must also provide the
+    --frmdir option. When these options are specified, the utility will
+    generate a new .frm file (prefixed with 'new_') and save it in the
+    --frmdir= directory.
+
 Enjoy!
 
 """
 
 # Setup the command parser
+program = os.path.basename(sys.argv[0]).replace(".py","")
 parser = MyParser(
-    version=VERSION_FRM.format(program=os.path.basename(sys.argv[0])),
+    version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
     usage=USAGE,
     add_help_option=False,
     option_class=CaseInsensitiveChoicesOption,
-    epilog=EXTENDED_HELP)
+    epilog=EXTENDED_HELP,
+    prog=program
+)
+
+# Add --License option
+parser.add_option("--license", action='callback',
+                  callback=license_callback,
+                  help="display program's license and exit")
+
+# Add --help option
 parser.add_option("--help", action="help")
 
 # Setup utility-specific options:
@@ -178,6 +196,11 @@ parser.add_option("--diagnostic", action="store_true", dest="diagnostic",
 parser.add_option("--new-storage-engine", action="store", dest="new_engine",
                   default=None, help="change ENGINE clause to use this "
                   "engine.")
+
+# Add frmdir
+parser.add_option("--frmdir", action="store", dest="frmdir", default=None,
+                  help="save the new .frm files in this directory. Used and "
+                       "valid with --new-storage-engine only.")
 
 # Need port - only valid with --diagnostic mode
 parser.add_option("--port", action="store", dest="port", help="Port to use "
@@ -248,6 +271,23 @@ if opt.server and opt.basedir:
 if opt.diagnostic and opt.user:
     print ("# WARNING: The --user option is only used for the default mode.")
 
+# Check for --new-storage-engine and --frmdir
+if opt.new_engine:
+    if not opt.frmdir:
+        parser.error("You must specify the --frmdir with "
+                     "--new-storage-engine.")
+    # Check frmdir validity
+    else:
+        if not os.path.exists(opt.frmdir):
+            parser.error("The directory, "
+                         "'{0}' does not exist.".format(opt.frmdir))
+        if not os.access(opt.frmdir, os.R_OK | os.W_OK):
+            parser.error("You must have read and write access to the .frm "
+                         "directory '{0}'.".format(opt.frmdir))
+elif not opt.new_engine and opt.frmdir:
+    print("# WARNING: --frmdir encountered without --new-storage-engine. "
+          "No .frm files will be saved.")
+
 server = None
 if opt.server is None and opt.diagnostic:
     print("# WARNING: Cannot generate character set or "
@@ -270,8 +310,8 @@ if opt.server is not None and not opt.basedir:
 
     try:
         conn_options = {
-            'version'   : "5.1.30",
-            'quiet'     : opt.quiet,
+            'version': "5.1.30",
+            'quiet': opt.quiet,
         }
         servers = connect_servers(source_values, None, conn_options)
     except UtilError as error:
@@ -288,15 +328,16 @@ else:
 
 # Set options for frm operations.
 options = {
-    "basedir"       : basedir,
-    "new_engine"    : opt.new_engine,
-    "show_stats"    : opt.show_stats,
-    "port"          : use_port,
-    "quiet"         : opt.quiet,
-    "server"        : server,
-    "verbosity"     : opt.verbosity if opt.verbosity else 0,
-    "user"          : opt.user,
-    "start_timeout" : opt.start_timeout,
+    "basedir": basedir,
+    "new_engine": opt.new_engine,
+    "show_stats": opt.show_stats,
+    "port": use_port,
+    "quiet": opt.quiet,
+    "server": server,
+    "verbosity": opt.verbosity if opt.verbosity else 0,
+    "user": opt.user,
+    "start_timeout": opt.start_timeout,
+    "frm_dir": opt.frmdir,
 }
 
 # Print disclaimer banner for diagnostic mode

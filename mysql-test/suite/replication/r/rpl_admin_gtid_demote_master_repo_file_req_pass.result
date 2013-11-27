@@ -3,7 +3,7 @@ Test case 1 - mysqlrplshow OLD Master before demote
 # Finding slaves for master: XXXXXXXXX:PORT1
 
 # Replication Topology Graph
-localhost:PORT1 (MASTER)
+XXXXXXXXX:PORT1 (MASTER)
    |
    +--- XXXXXXXXX:PORT2 - (SLAVE)
    |
@@ -40,8 +40,8 @@ Test case 3 - demote-master switchover same user but missing password
 # Performing switchover from master at XXXXXXXXX:PORT1 to slave at XXXXXXXXX:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
-ERROR: The specified replication user is using a password (but none was specified).
-Use the --force option to force the use of the user specified with  --rpl-user and no password.
+ERROR: The replication user specified with --rpl-user does not match the existing replication user.
+Use the --force option to use the replication user specified with --rpl-user.
 # Errors found. Switchover aborted.
 # ...done.
 
@@ -90,7 +90,7 @@ Test case 6 - mysqlrplshow NEW Master.
 # Finding slaves for master: XXXXXXXXX:PORT2
 
 # Replication Topology Graph
-localhost:PORT2 (MASTER)
+XXXXXXXXX:PORT2 (MASTER)
    |
    +--- XXXXXXXXX:PORT1 - (SLAVE)
    |
@@ -126,7 +126,7 @@ Test case 8 - mysqlrplshow NEW Master.
 # Finding slaves for master: XXXXXXXXX:PORT3
 
 # Replication Topology Graph
-localhost:PORT3 (MASTER)
+XXXXXXXXX:PORT3 (MASTER)
    |
    +--- XXXXXXXXX:PORT1 - (SLAVE)
    |
@@ -163,7 +163,7 @@ Test case 10 - mysqlrplshow NEW Master.
 # Finding slaves for master: XXXXXXXXX:PORT4
 
 # Replication Topology Graph
-localhost:PORT4 (MASTER)
+XXXXXXXXX:PORT4 (MASTER)
    |
    +--- XXXXXXXXX:PORT1 - (SLAVE)
    |

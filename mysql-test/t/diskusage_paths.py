@@ -18,7 +18,7 @@ import os
 import diskusage_basic
 from mysql.utilities.exception import MUTLibError, UtilError
 
-_MYSQLD = ('--log-bin="{0}" --general-log --slow-query-log ' + \
+_MYSQLD = ('--log-bin="{0}" --general-log --slow-query-log '
            '--slow-query-log-file="{1}" --general-log-file="{2}" '
            ' --log-error="{3}"')
 
@@ -33,7 +33,7 @@ class test(diskusage_basic.test):
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 2):
             raise MUTLibError("Test requires server version 5.6.2 or later")
-        # Need at least one server.
+            # Need at least one server.
         self.server1 = None
         self.server2 = None
         self.gen_log = None
@@ -69,23 +69,26 @@ class test(diskusage_basic.test):
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError, e:
-            raise MUTLibError("Failed to read commands from file %s: %s" %
-                              (data_file, e.errmsg))
+            self.server1.read_and_exec_SQL(data_file, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, err.errmsg))
         return True
 
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=%s" % self.build_connection_string(self.server1)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
 
-        cmd_base = "mysqldiskusage.py %s util_test --format=CSV -a" % from_conn
+        cmd_base = ("mysqldiskusage.py {0} util_test "
+                    "--format=CSV -a".format(from_conn))
         test_num = 1
-        comment = "Test Case %d : Testing disk space (with paths)" % test_num
+        comment = ("Test Case {0} : Testing disk space "
+                   "(with paths)".format(test_num))
         res = self.run_test_case(0, cmd_base, comment)
         if not res:
-            raise MUTLibError("DISKUSAGE: %s: failed" % comment)
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
 
         diskusage_basic.test.mask(self)
 
@@ -112,4 +115,4 @@ class test(diskusage_basic.test):
 
         kill_list = ['diskusage_paths']
         res = diskusage_basic.test.cleanup(self)
-        return (res and self.kill_server_list(kill_list))
+        return res and self.kill_server_list(kill_list)

@@ -3,6 +3,7 @@ Test case 1 - diff a sample database
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -56,6 +57,7 @@ Test case 5 - diff multiple objects + database - some same
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 # Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -82,8 +84,10 @@ Test case 5 - diff multiple objects + database - some same
 +) ENGINE=MEMORY DEFAULT CHARSET=latin1
 # Comparing `util_test`.`t3` to `util_test`.`t3`                   [PASS]
 # Comparing `util_test`.`t4` to `util_test`.`t4`                   [PASS]
+# Comparing `util_test`.`t5` to `util_test`.`t5`                   [PASS]
 # Comparing `util_test`.`trg` to `util_test`.`trg`                 [PASS]
 # Comparing `util_test`.`v1` to `util_test`.`v1`                   [PASS]
+# Comparing `util_test`.`v2` to `util_test`.`v2`                   [PASS]
 Compare failed. One or more differences found.
 Test case 6 - diff two databases on same server w/server2
 # server1 on localhost: ... connected.
@@ -96,6 +100,9 @@ Test case 6 - diff two databases on same server w/server2
 #        TABLE: t3
 #     FUNCTION: f1
 #         VIEW: v1
+#        TABLE: t5
+#         VIEW: v2
+#     FUNCTION: f2
 #        TABLE: t2
 Compare failed. One or more differences found.
 Test case 7 - diff two databases on same server
@@ -108,6 +115,9 @@ Test case 7 - diff two databases on same server
 #        TABLE: t3
 #     FUNCTION: f1
 #         VIEW: v1
+#        TABLE: t5
+#         VIEW: v2
+#     FUNCTION: f2
 #        TABLE: t2
 Compare failed. One or more differences found.
 Test case 8 - diff a sample database with weird names (backticks)

@@ -9,7 +9,7 @@ Test case 1 - mysqlrplshow OLD Master before demote
 # Finding slaves for master: XXXXXXXXX:PORT4
 
 # Replication Topology Graph
-localhost:PORT1 (MASTER)
+XXXXXXXXX:PORT1 (MASTER)
    |
    +--- XXXXXXXXX:PORT2 - (SLAVE)
    |
@@ -107,7 +107,7 @@ Test case 4 - mysqlrplshow NEW Master after demote
 # Finding slaves for master: XXXXXXXXX:PORT4
 
 # Replication Topology Graph
-localhost:PORT2 (MASTER)
+XXXXXXXXX:PORT2 (MASTER)
    |
    +--- XXXXXXXXX:PORT1 - (SLAVE)
    |

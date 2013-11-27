@@ -14,11 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
 import compare_db
 from mysql.utilities.exception import MUTLibError
 
 _SKIPS = ['object-compare', 'row-count', 'diff', 'data-check']
+
 
 class test(compare_db.test):
     """check skip parameters for dbcompare
@@ -37,34 +37,36 @@ class test(compare_db.test):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
-        s1_conn = "--server1=" + self.build_connection_string(self.server1)
-        s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
-        cmd_str = "mysqldbcompare.py %s %s inventory:inventory " % \
-                  (s1_conn, s2_conn)
+        s1_conn = "--server1={0}".format(
+            self.build_connection_string(self.server1))
+        s2_conn = "--server2={0}".format(
+            self.build_connection_string(self.server2))
+
+        cmd_str = "mysqldbcompare.py {0} {1} inventory:inventory ".format(
+            s1_conn, s2_conn)
 
         compare_db.test.alter_data(self)
-        
+
         skip_all = ""
         test_num = 0
         for skip in _SKIPS:
             test_num += 1
             skip_all = skip_all + " --skip-" + skip
-            cmd_opts = " --skip-%s --format=csv -t" % skip
+            cmd_opts = " --skip-%s --format=csv -a" % skip
             comment = "Test case %d - %s " % (test_num, cmd_opts)
             res = self.run_test_case(1, cmd_str + cmd_opts, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " %s --format=csv -t" % skip_all
+        cmd_opts = " %s --format=csv -a" % skip_all
         comment = "Test case %d - %s " % (test_num, cmd_opts)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         compare_db.test.do_replacements(self)
-        
+
         return True
 
     def get_result(self):

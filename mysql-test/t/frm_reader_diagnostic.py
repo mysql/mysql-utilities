@@ -15,10 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 import os
-import sys
 import frm_reader_base
-from mysql.utilities.exception import MUTLibError, UtilDBError
-from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.exception import MUTLibError
+
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -40,34 +39,37 @@ class test(frm_reader_base.test):
             print
         test_num = 1
 
-        self.cmd = "mysqlfrm.py --server=%s --diagnostic " % \
-                   self.build_connection_string(self.server1)
+        self.cmd = "mysqlfrm.py --server={0} --diagnostic ".format(
+            self.build_connection_string(self.server1))
 
         # Perform test of all .frm files in a known file
         datadir = self.server1.show_server_variable("datadir")[0][1]
-        frm_file_path = os.path.normpath("%s/frm_test/orig.frm" % datadir)
-        comment = "Test case %s: - Check .frm files in a db folder" % test_num
+        frm_file_path = os.path.normpath("{0}/frm_test/orig.frm".format(
+            datadir))
+        comment = "Test case {0}: - Check .frm files in a db folder".format(
+            test_num)
         res = self.run_test_case(0, self.cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Perform test of all .frm files in a random folder
         frm_file_path = os.path.normpath("./std_data/frm_files")
-        comment = "Test case %s: - Check .frm files in a db folder" % test_num
+        comment = "Test case {0}: - Check .frm files in a db folder".format(
+            test_num)
         res = self.run_test_case(0, self.cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Perform test of database option
         frm_file_path = os.path.normpath("./std_data/frm_files/oltp")
-        frm_file_path += ":t1.frm"
-        comment = "Test case %s: - Check .frm files with db option" % test_num
+        frm_file_path = "{0}:t1.frm".format(frm_file_path)
+        comment = "Test case {0}: - Check .frm files with db option".format(
+            test_num)
         res = self.run_test_case(0, self.cmd + frm_file_path, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        test_num += 1
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_result("# CREATE statement",
                             "# CREATE statement for [...]\n")

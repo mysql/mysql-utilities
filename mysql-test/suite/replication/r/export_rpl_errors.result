@@ -1,19 +1,19 @@
 Test case 1 - error: --rpl-file=test.txt but no --rpl
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: The --rpl-file option must be used with the --rpl option.
+mysqldbexport: error: The --rpl-file option must be used with the --rpl option.
 Test case 2 - error: --comment-rpl but no --rpl
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: The --comment-rpl option must be used with the --rpl option.
+mysqldbexport: error: The --comment-rpl option must be used with the --rpl option.
 Test case 3 - error: --rpl-user=root but no --rpl
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: The --rpl-user option must be used with the --rpl option.
+mysqldbexport: error: The --rpl-user option must be used with the --rpl option.
 Test case 4 - error: --rpl-file=test.txt --comment-rpl --rpl-user=root but no --rpl
-Usage: mysqldbexport.py --server=user:pass@host:port:socket db1, db2, db3
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
-mysqldbexport.py: error: The --rpl-file, --rpl-user, --comment-rpl options must be used with the --rpl option.
+mysqldbexport: error: The --rpl-file, --rpl-user, --comment-rpl options must be used with the --rpl option.
 Test case 5 - error: --rpl-file bad path
 # Source on localhost: ... connected.
 ERROR: File inaccessible or bad path: /bad/path/not/there.atall

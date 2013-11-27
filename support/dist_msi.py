@@ -60,7 +60,8 @@ class _MSIDist(bdist):
         ('tag=', 't',
          "Adds a tag name after the release version"),
         ('sub-version=', 's',
-         "adds a subversion after the current version"),
+         "adds a subversion after the current version, "
+         "(default: %s)" % ""),
         ]
 
     boolean_options = ['keep-temp']
@@ -279,6 +280,7 @@ class MSIBuiltDist(_MSIDist):
         pyver = python_version or self.python_version
         if self.plat_name:
             platform = '-' + self.plat_name
+
         return ("mysql-utilities-{app_version}{sub_version}{tag}"
                 "{platform}.wixobj").format(app_version=appver, 
                                             sub_version=self.sub_version,
@@ -326,7 +328,8 @@ class BuiltCommercialMSI(_MSIDist):
         ('tag=', 't',
          "Adds a tag name after the release version"),
         ('sub-version=', 's',
-         "adds a subversion after the current version"),
+         "adds a subversion after the current version, "
+         "(default: %s)" % ""),
     ]
 
     boolean_options = [
@@ -335,6 +338,7 @@ class BuiltCommercialMSI(_MSIDist):
     
     def initialize_options (self):
         """Initialize the options"""
+        self.sub_version = ""
         self.bdist_base = None
         self.tag = ''
         self.keep_temp = 0
@@ -368,6 +372,7 @@ class BuiltCommercialMSI(_MSIDist):
         if self.plat_name:
             platform = '-' + self.plat_name
 
+
         return ("mysql-utilities-commercial-{app_version}{sub_version}{tag}"
                 "{platform}.wixobj").format(app_version=appver,
                                             sub_version=self.sub_version,
@@ -397,5 +402,4 @@ class BuiltCommercialMSI(_MSIDist):
         self.bdist_base = cmdbdist.bdist_dir
         # This sets name for various items as install directory.
         self.product_name = 'MySQL Utilities commercial'
-
 

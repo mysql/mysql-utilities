@@ -16,7 +16,8 @@
 #
 import os
 import import_basic
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilError
+
 
 class test(import_basic.test):
     """check file-per-table option for import utility
@@ -36,10 +37,10 @@ class test(import_basic.test):
 
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            res = self.server2.read_and_exec_SQL(data_file, self.debug)
-        except MUTLibError, e:
-            raise MUTLibError("Failed to read commands from file %s: " % \
-                               data_file + e.errmsg)
+            self.server2.read_and_exec_SQL(data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file, err.errmsg))
 
         # Remove the tables with foreign key checks to simplify test.
         try:
@@ -49,7 +50,7 @@ class test(import_basic.test):
             self.server2.exec_query("SET foreign_key_checks = OFF")
             self.server2.exec_query("DROP TABLE util_test.t3")
             self.server2.exec_query("DROP TABLE util_test.t4")
-        except:
+        except UtilError:
             raise MUTLibError("Cannot drop tables t3,t4 (setup).")
 
         return True
@@ -57,55 +58,61 @@ class test(import_basic.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=" + self.build_connection_string(self.server1)
-        to_conn = "--server=" + self.build_connection_string(self.server2)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
+        to_conn = "--server={0}".format(
+            self.build_connection_string(self.server2))
 
-        _FORMAT_DISPLAY = ("sql","grid","csv","tab","vertical")
+        _FORMAT_DISPLAY = ("sql", "grid", "csv", "tab", "vertical")
 
-        exp_cmd_str = "mysqldbexport.py util_test --export=data --skip-gtid " \
-                      "--file-per-table %s --quiet --format=" % from_conn
-        imp_cmd_str = "mysqldbimport.py --import=data %s --format=" % to_conn
+        exp_cmd_str = ("mysqldbexport.py util_test --export=data --skip-gtid "
+                       "--file-per-table {0} --quiet "
+                       "--format=".format(from_conn))
+        imp_cmd_str = ("mysqldbimport.py --import=data {0} "
+                       "--format=".format(to_conn))
         starting_case_num = 1
 
-        for format in _FORMAT_DISPLAY:
-            cmd_variant = exp_cmd_str + format
-            comment = "Test case %s - %s format with --file-per-table" % \
-                      (starting_case_num, format)
+        for format_ in _FORMAT_DISPLAY:
+            cmd_variant = exp_cmd_str + format_
+            comment = ("Test case {0} - {1} format with "
+                       "--file-per-table".format(starting_case_num, format_))
             res = self.run_test_case(0, cmd_variant, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             starting_case_num += 1
 
             # Now check the output for the correct files and delete them.
             self.results.append("# Testing file-per-table import:\n")
-            for i in range(1,3):
-                self.delete_data("util_test.t%d" % i)
+            for i in [1, 2, 5]:  # List of tables to be tested
+                self.delete_data("util_test.t{0}".format(i))
 
-                file_name = "util_test.t%d.%s" % (i, format.lower())
-                cmd_variant = imp_cmd_str + format + " " + file_name
+                file_name = "util_test.t{0}.{1}".format(i, format_.lower())
+                cmd_variant = "{0}{1} {2}".format(imp_cmd_str, format_,
+                                                  file_name)
 
                 comment = "Running import..."
                 res = self.run_test_case(0, cmd_variant, comment)
                 if not res:
-                    raise MUTLibError("%s: failed" % comment)
+                    raise MUTLibError("{0}: failed".format(comment))
 
                 try:
                     res = self.server2.exec_query("SELECT * FROM "
-                                                  "util_test.t%d" % i)
-                    self.results.append("# Data from util_test.t%d:\n" % i)
+                                                  "util_test.t{0}".format(i))
+                    self.results.append("# Data from util_test.t{0}:\n".format(
+                        i))
                     for row in res:
-                        str = ""
+                        str_ = ""
                         for col in row:
                             # Handle None values
                             if col:
-                                str = "{0}{1} ".format(str, col)
+                                str_ = "{0}{1} ".format(str_, col)
                             else:
-                                str = "{0}NULL ".format(str)
-                        self.results.append(str+"\n")
+                                str_ = "{0}NULL ".format(str_)
+                        self.results.append(str_ + "\n")
 
-                except:
+                except UtilError:
                     raise MUTLibError("Cannot get rows from "
-                                       "util_test.t%d" % i)
+                                      "util_test.t{0}".format(i))
 
                 os.unlink(file_name)
 
@@ -114,9 +121,9 @@ class test(import_basic.test):
     def delete_data(self, tbl):
         try:
             self.server2.exec_query("SET foreign_key_checks = OFF")
-            self.server2.exec_query("DELETE FROM %s" % tbl)
-        except:
-            raise MUTLibError("Cannot delete rows from %s" % tbl)
+            self.server2.exec_query("DELETE FROM {0}".format(tbl))
+        except UtilError:
+            raise MUTLibError("Cannot delete rows from {0}".format(tbl))
 
     def get_result(self):
         return self.compare(__name__, self.results)

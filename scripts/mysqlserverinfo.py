@@ -27,15 +27,14 @@ check_python_version()
 import os
 import sys
 
-from mysql.utilities.command.serverinfo import show_server_info
-from mysql.utilities.common.options import add_basedir_option
-from mysql.utilities.common.options import check_basedir_option
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_format_option
-from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.tools import check_connector_python
-
 from mysql.utilities.exception import UtilError
+from mysql.utilities.command.serverinfo import show_server_info
+from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
+                                            add_format_option,
+                                            check_basedir_option,
+                                            setup_common_options)
+
 
 # Constants
 NAME = "MySQL Utilities - mysqlserverinfo "
@@ -116,17 +115,17 @@ if os.name == 'nt':
 
 # Set options for database operations.
 options = {
-    "format"        : opt.format,
-    "no_headers"    : opt.no_headers,
-    "verbosity"     : opt.verbosity,
-    "debug"         : opt.verbosity >= 3,
-    "show_defaults" : opt.show_defaults,
-    "start"         : opt.start,
-    "basedir"       : opt.basedir,
-    "datadir"       : opt.datadir,
-    "ports"         : opt.ports,
-    "show_servers"  : opt.show_servers,
-    "start_timeout" : opt.start_timeout,
+    "format": opt.format,
+    "no_headers": opt.no_headers,
+    "verbosity": opt.verbosity,
+    "debug": opt.verbosity >= 3,
+    "show_defaults": opt.show_defaults,
+    "start": opt.start,
+    "basedir": opt.basedir,
+    "datadir": opt.datadir,
+    "ports": opt.ports,
+    "show_servers": opt.show_servers,
+    "start_timeout": opt.start_timeout,
 }
 
 if opt.server is None:

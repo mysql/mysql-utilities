@@ -16,6 +16,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+This file contains the metagrep utility which allows users to search metadata.
+"""
+
 from mysql.utilities.common.tools import check_python_version
 
 # Check Python version compatibility
@@ -26,10 +30,11 @@ import re
 import sys
 
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
-from mysql.utilities.common.options import add_regexp
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import add_format_option
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.options import (add_regexp, setup_common_options,
+                                            add_format_option,
+                                            add_character_set_option)
+
 
 # Check for connector/python
 if not check_connector_python():
@@ -41,20 +46,29 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
                               "%prog --server=user:pass@host:port:socket "
                               "[options] pattern", True)
 
+# Add character set option
+add_character_set_option(parser)
+
 # Setup utility-specific options:
 parser.add_option("-b", "--body",
                   dest="check_body", action="store_true", default=False,
-                  help="search the body of routines, triggers, and events as well")
+                  help="search the body of routines, triggers, and events as "
+                  "well")
+
 
 def quote(string):
+    """Quote a string
+    """
     return "'" + string + "'"
 
 # Add some more advanced parsing here to handle types better.
 parser.add_option(
     '--search-objects', '--object-types',
     dest="object_types", default=','.join(OBJECT_TYPES),
-    help="the object type to search in: a comma-separated list"
-    " of one or more of: " + ', '.join(map(quote, OBJECT_TYPES)))
+    help=("the object type to search in: a comma-separated list of one or "
+          "more of: {0}".format(', '.join([quote(obj_type)
+                                           for obj_type in OBJECT_TYPES])))
+)
 
 # Add regexp
 add_regexp(parser)
@@ -66,7 +80,8 @@ parser.add_option(
 parser.add_option(
     "-e", "--pattern",
     dest="pattern",
-    help="pattern to use when matching. Required if the pattern looks like a connection specification.")
+    help="pattern to use when matching. Required if the pattern looks like a "
+    "connection specification.")
 parser.add_option(
     "--database",
     dest="database_pattern", default=None,
@@ -109,9 +124,11 @@ try:
     if options.print_sql:
         print(command.sql())
     else:
-        command.execute(options.server, format=options.format)
-except Exception:
+        command.execute(options.server, format=options.format,
+                        charset=options.charset)
+except:
     _, details, _ = sys.exc_info()
-    sys.stderr.write('ERROR: %s' % details)
+    sys.stderr.write("ERROR: {0}\n".format(details))
+    sys.exit(1)
 
 sys.exit()

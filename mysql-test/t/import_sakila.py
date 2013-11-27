@@ -17,8 +17,7 @@
 import os
 import mutlib
 
-from mysql.utilities.common.table import quote_with_backticks
-from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.exception import MUTLibError
 
 
 _IMPORT_FILES = ['sakila-schema.sql', 'sakila-data.sql']
@@ -38,8 +37,7 @@ class test(mutlib.System_test):
         # Check if sakila database files are available.
         for sakila_file in _IMPORT_FILES:
             file_path = os.path.normpath(
-                _IMPORT_FILES_PATH.format(sakila_file)
-            )
+                _IMPORT_FILES_PATH.format(sakila_file))
             if not os.path.isfile(file_path):
                 raise MUTLibError('Sakila database files not available: '
                                   '{0}'.format(file_path))
@@ -65,15 +63,13 @@ class test(mutlib.System_test):
 
         # Define base import command.
         cmd_base = "mysqldbimport.py --server={0}".format(
-            self.build_connection_string(self.server1)
-        )
+            self.build_connection_string(self.server1))
 
         # Import sakila schema.
         test_num = 1
         comment = "Test case {0} - Import sakila schema.".format(test_num)
         import_file = os.path.normpath(
-            _IMPORT_FILES_PATH.format(_IMPORT_FILES[0])
-        )
+            _IMPORT_FILES_PATH.format(_IMPORT_FILES[0]))
         # By default: --import=definitions
         cmd = "{0} {1}".format(cmd_base, import_file)
         res = self.run_test_case(0, cmd, comment)
@@ -88,8 +84,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = "Test case {0} - Import sakila data.".format(test_num)
         import_file = os.path.normpath(
-            _IMPORT_FILES_PATH.format(_IMPORT_FILES[1])
-        )
+            _IMPORT_FILES_PATH.format(_IMPORT_FILES[1]))
         # --import=both because the data file also include some definitions.
         cmd = "{0} {1} --import=both".format(cmd_base, import_file)
         res = self.run_test_case(0, cmd, comment)
@@ -113,7 +108,7 @@ class test(mutlib.System_test):
                             '\n'.format(len(res)))
         for row in res:
             self.results.append('{0}\n'.format(row[0]))
-        # SELECT COUNT(*) FROM film; (expected result: 1000)
+            # SELECT COUNT(*) FROM film; (expected result: 1000)
         res = self.server1.exec_query("SELECT COUNT(*) FROM film")
         self.results.append('\n')
         self.results.append('b) SELECT COUNT(*) FROM film: {0}.'
@@ -128,23 +123,9 @@ class test(mutlib.System_test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-
-    # This following method should be moved to mutlib module (to be reused).
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning.
-        try:
-            server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        except UtilError:
-            return True  # Ok to exit here as there weren't any dbs to drop.
-        try:
-            q_db = quote_with_backticks(db)
-            server.exec_query("DROP DATABASE {0}".format(q_db))
-        except UtilError:
-            return False
-        return True
 
     def cleanup(self):
         # Remove temporary result file.
@@ -152,5 +133,5 @@ class test(mutlib.System_test):
             os.unlink(self.res_fname)
         except OSError:
             pass
-        # Remove imported database.
+            # Remove imported database.
         return self.drop_db(self.server1, 'sakila')

@@ -14,8 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import replicate
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 # Setup expected results.
@@ -25,6 +26,7 @@ _EXPECTED_RESULTS = [
     (2, [('001c',), ('002a',), ('002b',)]),
     (3, [('002a',), ('002b',)]),
 ]
+
 
 class test(replicate.test):
     """check parameters for the replicate utility
@@ -53,10 +55,11 @@ class test(replicate.test):
     def stop_slave(self, comment, slave):
         # Stop and flush the slave to disconnect are reset
         try:
-            res = slave.exec_query("STOP SLAVE")
-            res = slave.exec_query("RESET SLAVE")
-        except:
-            raise MUTLibError("%s: Cannot stop and reset slave." % comment)
+            slave.exec_query("STOP SLAVE")
+            slave.exec_query("RESET SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Cannot stop and reset slave.".format(
+                comment))
 
     def setup(self):
         self.master_log_info = []
@@ -73,14 +76,14 @@ class test(replicate.test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication slave " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication slave "
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "rep_slave_log")
+                                                "rep_slave_log")
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server1 = res[0]
@@ -91,15 +94,15 @@ class test(replicate.test):
             self.server2 = self.servers.get_server(index)
             try:
                 res = self.server2.show_server_variable("server_id")
-            except MUTLibError, e:
-                raise MUTLibError("Cannot get replication master " +
-                                   "server_id: %s" % e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get replication master "
+                                  "server_id: {0}".format(err.errmsg))
             self.s2_serverid = int(res[0][1])
         else:
             self.s2_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                                "rep_master", ' --mysqld='
-                                                '"--log-bin=mysql-bin "')
+            res = self.servers.spawn_new_server(
+                self.server0, self.s2_serverid, "rep_master",
+                ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
@@ -109,11 +112,11 @@ class test(replicate.test):
 
         # Create a database
         try:
-            res = self.server2.exec_query("RESET MASTER")
-            res = self.server2.exec_query("CREATE DATABASE log_test")
-            res = self.server2.exec_query("CREATE TABLE log_test.t1 "
-                                          "(a char(30)) ENGINE=MEMORY")
-        except MUTLibError, e:
+            self.server2.exec_query("RESET MASTER")
+            self.server2.exec_query("CREATE DATABASE log_test")
+            self.server2.exec_query("CREATE TABLE log_test.t1 (a char(30)) "
+                                    "ENGINE=MEMORY")
+        except MUTLibError:
             raise MUTLibError("Failed to create the test database.")
 
         # Populate with rows and save master log and position
@@ -128,13 +131,13 @@ class test(replicate.test):
         # Insert a row, rotate the logs, and save master position, repeat
         try:
             for row in rows:
-                res = self.server2.exec_query('INSERT INTO log_test.t1 '
-                                              'VALUES ("%s")' % row)
+                self.server2.exec_query('INSERT INTO log_test.t1 '
+                                        'VALUES ("{0}")'.format(row))
                 res = self.server2.exec_query("SHOW MASTER STATUS")
                 if res and not res == []:
                     self.master_log_info.append((res[0][0], res[0][1]))
-            res = self.server2.exec_query("FLUSH LOGS")
-        except UtilError, e:
+            self.server2.exec_query("FLUSH LOGS")
+        except UtilError:
             return False
         return True
     
@@ -143,8 +146,9 @@ class test(replicate.test):
         try:
             res = self.server1.exec_query("SELECT * FROM log_test.t1")
             self.results.append(res)
-        except UtilError, e:
-            raise MUTLibError("%s: Query failed. %s" % (comment, e.errmsg))
+        except UtilError as err:
+            raise MUTLibError("{0}: Query failed. {1}".format(comment,
+                                                              err.errmsg))
     
     def wait_for_slave(self, attempts):
         # Wait for slave to read the master log file
@@ -155,7 +159,7 @@ class test(replicate.test):
                 if res:
                     if res[0] == 'Waiting for master to send event':
                         return
-            except:
+            except UtilError:
                 return
             i += 1
         return
@@ -166,7 +170,7 @@ class test(replicate.test):
                                           self.s1_serverid, comment, options,
                                           False, 0, False)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.wait_for_slave(10)
 
@@ -181,20 +185,26 @@ class test(replicate.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        self.run_and_record_test("Test case 1 - start from beginning",
+        test_num = 1
+        self.run_and_record_test("Test case {0} - start from "
+                                 "beginning".format(test_num),
                                  "--start-from-beginning --quiet")
         
         self.server1.exec_query("DELETE FROM log_test.t1")
 
-        self.run_and_record_test("Test case 2 - start from specific log, pos",
-                            "--master-log-file=%s --master-log-pos=%s --quiet" % 
-                            self.master_log_info[1])
+        test_num += 1
+        self.run_and_record_test("Test case {0} - start from specific log, "
+                                 "pos".format(test_num),
+                                 "--master-log-file={0} --master-log-pos={1} "
+                                 "--quiet".format(*self.master_log_info[1]))
 
         self.server1.exec_query("DELETE FROM log_test.t1")
 
-        self.run_and_record_test("Test case 3 - start at start of specific log",
-                            "--master-log-file=%s --quiet" % 
-                            self.master_log_info[3][0])
+        test_num += 1
+        self.run_and_record_test("Test case {0} - start at start of specific "
+                                 "log".format(test_num),
+                                 "--master-log-file={0} "
+                                 "--quiet".format(self.master_log_info[3][0]))
 
         if self.debug:
             i = 0
@@ -208,7 +218,7 @@ class test(replicate.test):
                     i += 1
                     post_rpl = self.results[i]
                     i += 1
-                    print "Actual:   (%s, %s)" % (result[0], post_rpl)
+                    print("Actual:   ({0}, {1})".format(result[0], post_rpl))
 
         return True
 
@@ -223,32 +233,26 @@ class test(replicate.test):
             post_rpl = self.results[i]
             i += 1
             
-            result_msg = "Result: %s ? %s" % \
-                         (result[1], post_rpl)
+            result_msg = "Result: {0} ? {1}".format(result[1], post_rpl)
 
             if not result[1] == post_rpl:
-                return (False,
-                       "%s: Result mismatch.\n%s" % (test_case, result_msg))
+                return (False, "{0}: Result mismatch."
+                               "\n{1}".format(test_case, result_msg))
             if self.debug:
-                print "%s:\n%s" % (test_case, result_msg)
-        return (True, None)
+                print "{0}:\n{1}".format(test_case, result_msg)
+        return True, None
     
     def record(self):
         # Not a comparative test, returning True
         return True
     
     def drop_all(self):
-        try:
-            self.drop_db(self.server1, "log_test")
-            self.drop_db(self.server2, "log_test")
-        except:
-            return False
-        return True
+        res1 = self.drop_db(self.server1, "log_test")
+        res2 = self.drop_db(self.server2, "log_test")
+        return res1 and res2
             
     def cleanup(self):
         # Kill servers that are only used in this test
         kill_list = ['rep_slave_log']
         return (replicate.test.cleanup(self)
                 and self.kill_server_list(kill_list))
-
-

@@ -14,9 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
 import import_basic
 from mysql.utilities.exception import MUTLibError, UtilDBError
+
 
 class test(import_basic.test):
     """check parameters for import utility
@@ -37,7 +38,7 @@ class test(import_basic.test):
 
         res = self.run_test_case(expected_res, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
@@ -47,25 +48,29 @@ class test(import_basic.test):
         else:
             self.results.append("Database was created.\n")
         self.results.append(self.check_objects(self.server2, "util_test"))
-        try:
-            self.drop_db(self.server2, "util_test")
-        except:
-            pass # ok if this fails - it is a spawned server
+
+        self.drop_db(self.server2, "util_test")
 
     def run(self):
         self.res_fname = "result.txt"
 
-        from_conn = "--server=" + self.build_connection_string(self.server1)
-        to_conn = "--server=" + self.build_connection_string(self.server2)
+        from_conn = "--server={0}".format(
+            self.build_connection_string(self.server1)
+        )
+        to_conn = "--server={0}".format(
+            self.build_connection_string(self.server2)
+        )
 
-        cmd_str = "mysqldbimport.py %s %s --import=definitions " % \
-                  (to_conn, self.export_import_file)
+        cmd = ("mysqldbimport.py {0} --import=definitions "
+               "{1}").format(to_conn, self.export_import_file)
 
+        case_num = 1
+        comment = "Test case {0} - help".format(case_num)
         cmd_opts = " --help"
-        comment = "Test case 1 - help"
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        cmd_str = "{0} {1}".format(cmd, cmd_opts)
+        res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqldbimport.py "
@@ -74,90 +79,113 @@ class test(import_basic.test):
         # Now test the skips
 
         # Note: data and blobs must be done separately
-        _SKIPS = ("grants", "events", "functions", "procedures",
-                  "triggers", "views", "tables", "create_db")
+        _SKIPS = ("grants", "events", "triggers", "views", "procedures",
+                  "functions", "tables", "create_db")
         _FORMATS = ("CSV", "SQL")
 
-        case_num = 2
-        for format in _FORMATS:
+        case_num += 1
+        for frmt in _FORMATS:
             # Create an import file
-            export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
-                         from_conn + " --skip-gtid "
-            export_cmd += "--format=%s --display=BRIEF > %s " % \
-                          (format, self.export_import_file)
+            export_cmd = ("mysqldbexport.py {0} util_test --export=BOTH "
+                          "--skip-gtid --format={1} --display=BRIEF > "
+                          "{2}").format(from_conn, frmt,
+                                        self.export_import_file)
             comment = "Generating import file"
             res = self.run_test_case(0, export_cmd, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
-            cmd_opts = "%s --format=%s --skip=" % (cmd_str, format)
+            cmd_opts = "{0} --format={1} --skip=".format(cmd, frmt)
             for skip in _SKIPS:
                 if case_num != 2 and case_num != 2 + len(_SKIPS):
-                    cmd_opts += ","
-                cmd_opts += "%s" % skip
-                comment = "Test case %d - no %s" % (case_num, skip)
+                    cmd_opts = "{0},".format(cmd_opts)
+                cmd_opts = "{0}{1}".format(cmd_opts, skip)
+                comment = "Test case {0} - no {1}".format(case_num, skip)
                 self.do_skip_test(cmd_opts, comment)
                 case_num += 1
 
-
         # Now test --skip=data, --skip-blobs
         # Create an import file with blobs
-
         try:
-            res = self.server1.exec_query("ALTER TABLE util_test.t3 "
-                                          "ADD COLUMN me_blob BLOB")
-            res = self.server1.exec_query("UPDATE util_test.t3 SET "
-                                          "me_blob = 'This, is a BLOB!'")
-        except UtilDBError, e:
-            raise MUTLibError("Failed to add blob column: %s" % e.errmsg)
+            self.server1.exec_query("ALTER TABLE util_test.t3 "
+                                    "ADD COLUMN me_blob BLOB")
+            self.server1.exec_query("UPDATE util_test.t3 SET "
+                                    "me_blob = 'This, is a BLOB!'")
+        except UtilDBError as err:
+            raise MUTLibError("Failed to add blob column: "
+                              "{0}".format(err.errmsg))
 
-        export_cmd = "mysqldbexport.py %s util_test --export=BOTH " % \
-                     from_conn + " --skip-gtid "
-        export_cmd += "--format=%s --display=BRIEF > %s " % \
-                      ("CSV", self.export_import_file)
+        export_cmd = ("mysqldbexport.py {0} util_test --export=BOTH "
+                      "--skip-gtid --format={1} --display=BRIEF > "
+                      "{2} ").format(from_conn, "CSV", self.export_import_file)
         comment = "Generating import file"
         res = self.run_test_case(0, export_cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # No skips for reference (must skip events for deterministic reasons
-        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
-                  (to_conn, self.export_import_file)
-        cmd_str += " --format=CSV --bulk-insert "
-        comment = "Test case %d - no %s" % (case_num, "events")
-        res = self.run_test_case(0, cmd_str+"--skip=events", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        case_num += 1
-
-        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
-                  (to_conn, self.export_import_file)
-        cmd_str += " --format=CSV --bulk-insert "
-        comment = "Test case %d - no %s" % (case_num, "data")
-        res = self.run_test_case(0, cmd_str+"--skip=events,data", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        case_num += 1
-
-        cmd_str = "mysqldbimport.py %s %s --import=both --dryrun " % \
-                  (to_conn, self.export_import_file)
-        cmd_str += " --format=CSV --skip-blobs --bulk-insert "
-        comment = "Test case %d - no %s" % (case_num, "blobs")
-        res = self.run_test_case(0, cmd_str+"--skip=events", comment)
-        if not res:
-            raise MUTLibError("%s: failed" % comment)
-        case_num += 1
-
-        # Lastly, do a quiet import
-
-        cmd_str = "mysqldbimport.py %s %s --import=both --quiet " % \
-                  (to_conn, self.export_import_file)
-        cmd_str += " --format=CSV --bulk-insert "
-        comment = "Test case %d - no %s" % (case_num, "messages (quiet)")
+        cmd_str = ("mysqldbimport.py {0} {1} --import=both --dryrun "
+                   "--format=CSV --bulk-insert "
+                   "--skip=events").format(to_conn, self.export_import_file)
+        comment = "Test case {0} - no {1}".format(case_num, "events")
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
+
         case_num += 1
+        cmd_str = ("mysqldbimport.py {0} {1} --import=both --dryrun "
+                   "--format=CSV --bulk-insert "
+                   "--skip=events,data").format(to_conn,
+                                                self.export_import_file)
+        comment = "Test case {0} - no {1}".format(case_num, "data")
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        case_num += 1
+        cmd_str = ("mysqldbimport.py {0} {1} --import=both --dryrun "
+                   "--format=CSV --skip-blobs --bulk-insert "
+                   "--skip=events").format(to_conn, self.export_import_file)
+        comment = "Test case {0} - no {1}".format(case_num, "blobs")
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Do a quiet import
+        case_num += 1
+        cmd_str = ("mysqldbimport.py {0} {1} --import=both --quiet "
+                   "--format=CSV "
+                   "--bulk-insert").format(to_conn, self.export_import_file)
+        comment = "Test case {0} - no {1}".format(case_num, "messages (quiet)")
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Import using multiprocessing.
+        case_num += 1
+        comment = "Test case {0} - multiprocessing.".format(case_num)
+        import_opts = "--multiprocess=2"
+        self.drop_db(self.server2, 'util_test')  # drop db before import.
+        self.run_import_test(0, from_conn, to_conn, 'util_test', "SQL",
+                             "BOTH", comment, "", import_opts)
+
+        # Import using autocommit.
+        case_num += 1
+        comment = "Test case {0} - autocommit.".format(case_num)
+        import_opts = "--autocommit"
+        self.drop_db(self.server2, 'util_test')  # drop db before import.
+        self.run_import_test(0, from_conn, to_conn, 'util_test', "SQL",
+                             "BOTH", comment, "", import_opts)
+
+        # Mask multiprocessing warning.
+        self.remove_result("# WARNING: Number of processes ")
+
+        # Mask version
+        self.replace_result(
+                "MySQL Utilities mysqldbimport version",
+                "MySQL Utilities mysqldbimport version X.Y.Z "
+                "(part of MySQL Workbench ... XXXXXX)\n"
+        )
 
         return True
 
@@ -170,5 +198,5 @@ class test(import_basic.test):
     def cleanup(self):
         # Kill servers that won't be used anymore
         kill_list = ['export_basic', 'import_basic']
-        return (import_basic.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (import_basic.test.cleanup(self) and
+                self.kill_server_list(kill_list))

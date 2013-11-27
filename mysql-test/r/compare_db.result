@@ -102,8 +102,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
@@ -176,8 +176,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
 
 
 # Database consistency check failed.
@@ -293,8 +293,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 #
 # Definition diff for reverse changes (--changes-for=server2):
@@ -302,8 +302,8 @@ stock_number,description,qty,cost,type,notes,supplier
 # --- `inventory`.`tools`
 # +++ `inventory`.`tools`
 # @@ -1,1 +1,1 @@
-# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
-# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
+# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
 #
 
 
@@ -421,8 +421,8 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
 
 #
 # Definition diff for reverse changes (--changes-for=server1):
@@ -430,8 +430,8 @@ stock_number,description,qty,cost,type,notes,supplier
 # --- `inventory`.`tools`
 # +++ `inventory`.`tools`
 # @@ -1,1 +1,1 @@
-# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+# -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
+# +CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 #
 
 
@@ -601,79 +601,5 @@ Test case 14 - compare a database with objects of different types with the same 
 # VIEW      `v`export_1                             pass    -       -      
 
 # Database consistency check failed.
-#
-# ...done
-Test case 15 - compare all databases
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db, db.`:db, inventory, db_diff_test
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases db.`:db on server1 and db.`:db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# PROCEDURE `t`export_1                             FAIL    ERROR: The object definitions do not match.
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases inventory on server1 and inventory on server2
-#
-ERROR: The list of objects differs among database inventory and inventory.
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases db_diff_test on server1 and db_diff_test on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# TABLE     table-dash                              FAIL    ERROR: The object definitions do not match.
-
-
-# Database consistency check failed.
-#
-# ...done
-Test case 16 - compare all databases with --exclude option and LIKE pattern
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-
-
-# Databases are consistent.
-#
-# ...done
-Test case 17 - compare all databases with --exclude option and REGEXP pattern
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Comparing databases: empty_db
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-
-
-# Databases are consistent.
 #
 # ...done

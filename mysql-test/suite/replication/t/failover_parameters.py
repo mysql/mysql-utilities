@@ -18,6 +18,7 @@ import os
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
+
 class test(mutlib.System_test):
     """test replication failover utility
     This test runs the mysqlfailover utility parameters on a known topology.
@@ -34,15 +35,16 @@ class test(mutlib.System_test):
 
         cmd_str = "mysqlfailover.py "
 
-        comment = "Test case 1 - show help"
+        test_num = 1
+        comment = "Test case {0} - show help".format(test_num)
         cmd_opts = " --help"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlfailover.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlfailover "
                                            "version", 6)
 
         return True
@@ -57,6 +59,6 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
         return True

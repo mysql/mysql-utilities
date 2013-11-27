@@ -1,4 +1,4 @@
-Test case 1 -  --skip-object-compare --format=csv -t 
+Test case 1 -  --skip-object-compare --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -61,14 +61,14 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
 #
 # ...done
-Test case 2 -  --skip-row-count --format=csv -t 
+Test case 2 -  --skip-row-count --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -131,14 +131,14 @@ stock_number,description,qty,cost,type,notes,supplier
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
 #
 # ...done
-Test case 3 -  --skip-diff --format=csv -t 
+Test case 3 -  --skip-diff --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -202,7 +202,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 -  --skip-data-check --format=csv -t 
+Test case 4 -  --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -232,14 +232,14 @@ Test case 4 -  --skip-data-check --format=csv -t
 --- `inventory`.`tools`
 +++ `inventory`.`tools`
 @@ -1,1 +1,1 @@
--CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` = 'tool')
-+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory`.`tools` AS select `inventory`.`supplies`.`stock_number` AS `stock_number`,`inventory`.`supplies`.`description` AS `description`,`inventory`.`supplies`.`qty` AS `qty`,`inventory`.`supplies`.`cost` AS `cost`,`inventory`.`supplies`.`type` AS `type`,`inventory`.`supplies`.`notes` AS `notes`,`inventory`.`supplies`.`supplier` AS `supplier` from `inventory`.`supplies` where (`inventory`.`supplies`.`type` in ('tool','other'))
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
 
 
 # Database consistency check failed.
 #
 # ...done
-Test case 5 -   --skip-object-compare --skip-row-count --skip-diff --skip-data-check --format=csv -t 
+Test case 5 -   --skip-object-compare --skip-row-count --skip-diff --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2

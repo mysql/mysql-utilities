@@ -26,29 +26,30 @@ from mysql.utilities.common.tools import check_python_version
 # Check Python version compatibility
 check_python_version()
 
+import multiprocessing
 import os
 import re
 import sys
 import time
 
+from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import dbcopy
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR
-from mysql.utilities.common.messages import PARSE_ERR_DB_PAIR_EXT
-from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import add_skip_options
-from mysql.utilities.common.options import add_verbosity, check_verbosity
-from mysql.utilities.common.options import check_skip_options, add_engines
-from mysql.utilities.common.options import add_all, check_all, add_locking
-from mysql.utilities.common.options import add_regexp, add_rpl_mode
-from mysql.utilities.common.options import check_rpl_options, add_rpl_user
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
+                                             PARSE_ERR_DB_PAIR_EXT)
+from mysql.utilities.common.my_print_defaults import MyDefaultsReader
+from mysql.utilities.common.options import (add_skip_options, add_verbosity,
+                                            check_verbosity, check_rpl_options,
+                                            check_skip_options, add_engines,
+                                            add_all, check_all, add_locking,
+                                            add_regexp, add_rpl_mode,
+                                            add_rpl_user, setup_common_options,
+                                            add_character_set_option)
+from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
+                                                  remove_backtick_quoting)
+from mysql.utilities.common.tools import (check_connector_python,
+                                          print_elapsed_time)
 
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -60,224 +61,275 @@ USAGE = "%prog --source=user:pass@host:port:socket " \
 if not check_connector_python():
     sys.exit(1)
 
-def print_elapsed_time(start_test):
-    """Print the elapsed time to stdout (screen)
+if __name__ == '__main__':
+    # Needed for freeze support to avoid RuntimeError when running as a Windows
+    # executable, otherwise ignored.
+    multiprocessing.freeze_support()
 
-    start_test[in]      The starting time of the test
-    """
-    stop_test = time.time()
-    display_time = int((stop_test - start_test) * 100)
-    if display_time == 0:
-        display_time = 1
-    print("Time: %6d\n" % display_time)
+    # Setup the command parser
+    parser = setup_common_options(os.path.basename(sys.argv[0]),
+                                  DESCRIPTION, USAGE, True, False)
 
-# Setup the command parser
-parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE, True, False)
+    # Setup utility-specific options:
 
-# Setup utility-specific options:
+    # Connection information for the source server
+    parser.add_option("--source", action="store", dest="source",
+                      type="string", default="root@localhost:3306",
+                      help="connection information for source server in the "
+                      "form: <user>[:<password>]@<host>[:<port>][:<socket>]"
+                      " or <login-path>[:<port>][:<socket>].")
 
-# Connection information for the source server
-parser.add_option("--source", action="store", dest="source",
-                  type = "string", default="root@localhost:3306",
-                  help="connection information for source server in " + \
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+    # Connection information for the destination server
+    parser.add_option("--destination", action="store", dest="destination",
+                      type="string",
+                      help="connection information for destination server in "
+                      "the form: <user>[:<password>]@<host>[:<port>]"
+                      "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
-# Connection information for the destination server
-parser.add_option("--destination", action="store", dest="destination",
-                  type = "string",
-                  help="connection information for destination server in " + \
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+    # Add character set option
+    add_character_set_option(parser)
 
-# Overwrite mode
-parser.add_option("-f", "--force", action="store_true", dest="force",
-                  help="drop the new database or object if it exists",
-                  default=False)
+    # Overwrite mode
+    parser.add_option("-f", "--force", action="store_true", dest="force",
+                      help="drop the new database or object if it exists",
+                      default=False)
 
-# Threaded/connection mode
-parser.add_option("--threads", action="store", dest="threads",
-                  default=1, help="use multiple threads (connections) "
-                  "for insert")
+    # Add the exclude database option
+    parser.add_option("-x", "--exclude", action="append", dest="exclude",
+                      type="string", default=None, help="exclude one or more "
+                      "objects from the operation using either a specific "
+                      "name (e.g. db1.t1), a LIKE pattern (e.g. db1.t% or "
+                      "db%.%) or a REGEXP search pattern. To use a REGEXP "
+                      "search pattern for all exclusions, you must also "
+                      "specify the --regexp option. Repeat the --exclude "
+                      "option for multiple exclusions.")
 
-# Add the exclude database option
-parser.add_option("-x", "--exclude", action="append", dest="exclude",
-                  type="string", default=None, help="exclude one or more "
-                  "objects from the operation using either a specific name "
-                  "(e.g. db1.t1), a LIKE pattern (e.g. db1.t% or db%.%) or a "
-                  "REGEXP search pattern. To use a REGEXP search pattern for "
-                  "all exclusions, you must also specify the --regexp option. "
-                  "Repeat the --exclude option for multiple exclusions.")
+    # Add the all database options
+    add_all(parser, "databases")
 
-# Add the all database options
-add_all(parser, "databases")
+    # Add the skip common options
+    add_skip_options(parser)
 
-# Add the skip common options
-add_skip_options(parser)
+    # Add verbosity and quiet (silent) mode
+    add_verbosity(parser, True)
 
-# Add verbosity and quiet (silent) mode
-add_verbosity(parser, True)
+    # Add engine options
+    add_engines(parser)
 
-# Add engine options
-add_engines(parser)
+    # Add locking options
+    add_locking(parser)
 
-# Add locking options
-add_locking(parser)
+    # Add regexp
+    add_regexp(parser)
 
-# Add regexp
-add_regexp(parser)
+    # Replication user and password
+    add_rpl_user(parser, None)
 
-# Replication user and password
-add_rpl_user(parser, None)
+    # Add replication options but don't include 'both'
+    add_rpl_mode(parser, False, False)
 
-# Add replication options but don't include 'both'
-add_rpl_mode(parser, False, False)
+    # Add option to skip GTID generation
+    parser.add_option("--skip-gtid", action="store_true", default=False,
+                      dest="skip_gtid", help="skip creation and execution of "
+                      "GTID statements during copy.")
 
-# Add option to skip GTID generation
-parser.add_option("--skip-gtid", action="store_true", default=False,
-                  dest="skip_gtid", help="skip creation and execution of "
-                  "GTID statements during copy.")
+    # Add multiprocessing option.
+    parser.add_option("--multiprocess", action="store", dest="multiprocess",
+                      type="int", default="1", help="use multiprocessing, "
+                      "number of processes to use for concurrent execution. "
+                      "Special values: 0 (number of processes equal to the "
+                      "CPUs detected) and 1 (default - no concurrency).")
 
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
 
-try:
-    skips = check_skip_options(opt.skip_objects)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
+    try:
+        skips = check_skip_options(opt.skip_objects)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR: {0}".format(err.errmsg))
+        sys.exit(1)
 
-# Fail if no options listed.
-if opt.destination is None:
-    parser.error("No destination server specified.")
+    # Fail if no options listed.
+    if opt.destination is None:
+        parser.error("No destination server specified.")
 
-# Fail if no db arguments or all
-if len(args) == 0 and not opt.all:
-    parser.error("You must specify at least one database to copy or "
-                 "use the --all option to copy all databases.")
+    # Fail if no db arguments or all
+    if len(args) == 0 and not opt.all:
+        parser.error("You must specify at least one database to copy or "
+                     "use the --all option to copy all databases.")
 
-# Fail if we have arguments and all databases option listed.
-check_all(parser, opt, args, "databases")
+    # Fail if we have arguments and all databases option listed.
+    check_all(parser, opt, args, "databases")
 
-# Warn if quiet and verbosity are both specified
-check_verbosity(opt)
+    # Warn if quiet and verbosity are both specified
+    check_verbosity(opt)
 
-# Process --exclude values to remove unnecessary quotes (when used) in order
-# to avoid further matching issues.
-if opt.exclude:
-    # Remove unnecessary outer quotes.
-    exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
-else:
-    exclude_list = opt.exclude
+    # Process --exclude values to remove unnecessary quotes (when used) in
+    # order to avoid further matching issues.
+    if opt.exclude:
+        # Remove unnecessary outer quotes.
+        exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
+    else:
+        exclude_list = opt.exclude
 
-# Set options for database operations.
-options = {
-    "skip_tables"      : "tables" in skips,
-    "skip_views"       : "views" in skips,
-    "skip_triggers"    : "triggers" in skips,
-    "skip_procs"       : "procedures" in skips,
-    "skip_funcs"       : "functions" in skips,
-    "skip_events"      : "events" in skips,
-    "skip_grants"      : "grants" in skips,
-    "skip_create"      : "create_db" in skips,
-    "skip_data"        : "data" in skips,
-    "force"            : opt.force,
-    "verbose"          : opt.verbosity >= 1,
-    "quiet"            : opt.quiet,
-    "threads"          : opt.threads,
-    "debug"            : opt.verbosity == 3,
-    "exclude_patterns" : exclude_list,
-    "new_engine"       : opt.new_engine,
-    "def_engine"       : opt.def_engine,
-    "all"              : opt.all,
-    "locking"          : opt.locking,
-    "use_regexp"       : opt.use_regexp,
-    "rpl_user"         : opt.rpl_user,
-    "rpl_mode"         : opt.rpl_mode,
-    "verbosity"        : opt.verbosity,
-    "skip_gtid"        : opt.skip_gtid,
-}
+    # Check multiprocessing options.
+    if opt.multiprocess < 0:
+        parser.error("Number of processes '{0}' must be greater or equal than "
+                     "zero.".format(opt.multiprocess))
+    num_cpu = multiprocessing.cpu_count()
+    if opt.multiprocess > num_cpu and not opt.quiet:
+        print("# WARNING: Number of processes '{0}' is greater than the "
+              "number of CPUs '{1}'.".format(opt.multiprocess, num_cpu))
 
-# Parse source connection values
-try:
-    # Create a basic configuration reader first for optimization purposes.
-    # I.e., to avoid repeating the execution of some methods in further
-    # parse_connection methods (like, searching my_print_defaults tool).
-    config_reader = MyDefaultsReader(options, False)
-    source_values = parse_connection(opt.source, config_reader, options)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Source connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Source connection values invalid: %s." % err.errmsg)
+    # Warning for non-posix (windows) systems if too many process are used.
+    num_db = len(args)
+    if (os.name != 'posix' and num_db and opt.multiprocess > num_db
+            and not opt.quiet):
+        print("# WARNING: Number of processes '{0}' is greater than the "
+              "number of databases to copy '{1}'.".format(opt.multiprocess,
+                                                          num_db))
 
-# Parse destination connection values
-try:
-    dest_values = parse_connection(opt.destination, config_reader, options)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Destination connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Destination connection values invalid: %s."
-                 % err.errmsg)
+    # Set options for database operations.
+    options = {
+        "skip_tables": "tables" in skips,
+        "skip_views": "views" in skips,
+        "skip_triggers": "triggers" in skips,
+        "skip_procs": "procedures" in skips,
+        "skip_funcs": "functions" in skips,
+        "skip_events": "events" in skips,
+        "skip_grants": "grants" in skips,
+        "skip_create": "create_db" in skips,
+        "skip_data": "data" in skips,
+        "force": opt.force,
+        "verbose": opt.verbosity >= 1,
+        "quiet": opt.quiet,
+        "debug": opt.verbosity == 3,
+        "exclude_patterns": exclude_list,
+        "new_engine": opt.new_engine,
+        "def_engine": opt.def_engine,
+        "all": opt.all,
+        "locking": opt.locking,
+        "use_regexp": opt.use_regexp,
+        "rpl_user": opt.rpl_user,
+        "rpl_mode": opt.rpl_mode,
+        "verbosity": opt.verbosity,
+        "skip_gtid": opt.skip_gtid,
+        "charset": opt.charset,
+        "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
+    }
 
-# Check to see if attempting to use --rpl on the same server
-if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:
-    parser.error("You cannot use the --rpl option for copying on the "
-                 "same server.")
+    # Parse source connection values
+    try:
+        # Create a basic configuration reader first for optimization purposes.
+        # I.e., to avoid repeating the execution of some methods in further
+        # parse_connection methods (like, searching my_print_defaults tool).
+        config_reader = MyDefaultsReader(options, False)
+        source_values = parse_connection(opt.source, config_reader, options)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Source connection values invalid: {0}.".format(err))
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Source connection values invalid: "
+                     "{0}.".format(err.errmsg))
 
-# Check replication options
-check_rpl_options(parser, opt)
+    # Parse destination connection values
+    try:
+        dest_values = parse_connection(opt.destination, config_reader, options)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Destination connection values invalid: "
+                     "{0}.".format(err))
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Destination connection values invalid: "
+                     "{0}.".format(err.errmsg))
 
-# Build list of databases to copy
-db_list = []
-for db in args:
-    # Split the database names considering backtick quotes
-    grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?:\:)(`(?:[^`]|``)+`|\w+))?", db)
-    if not grp:
-        parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
-                                              db1_label='orig_db',
-                                              db2_label='new_db'))
-    db_entry = grp.groups()
-    orig_db, new_db = db_entry
+    # Check to see if attempting to use --rpl on the same server
+    if (opt.rpl_mode or opt.rpl_user) and source_values == dest_values:
+        parser.error("You cannot use the --rpl option for copying on the "
+                     "same server.")
 
-    # Verify if the size of the databases matched by the REGEX is equal to the
-    # initial specified string. In general, this identifies the missing use
-    # of backticks.
-    matched_size = len(orig_db)
-    if new_db:
-        # add 1 for the separator ':'
-        matched_size = matched_size + 1
-        matched_size = matched_size + len(new_db)
-    if matched_size != len(db):
-        parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+    # Check replication options
+    check_rpl_options(parser, opt)
+
+    # Build list of databases to copy
+    db_list = []
+    for db in args:
+        # Split the database names considering backtick quotes
+        grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?::)(`(?:[^`]|``)+`|\w+))?",
+                       db)
+        if not grp:
+            parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
                                                   db1_label='orig_db',
-                                                  db2_label='new_db',
-                                                  db1_value=orig_db,
-                                                  db2_value=new_db))
+                                                  db2_label='new_db'))
+        db_entry = grp.groups()
+        orig_db, new_db = db_entry
 
-    # Remove backtick quotes (handled later)
-    orig_db = remove_backtick_quoting(orig_db) \
-                if is_quoted_with_backticks(orig_db) else orig_db
-    new_db = remove_backtick_quoting(new_db) \
-                if new_db and is_quoted_with_backticks(new_db) else new_db
-    db_entry = (orig_db, new_db)
-    db_list.append(db_entry)
+        # Verify if the size of the databases matched by the REGEX is equal to
+        # the initial specified string. In general, this identifies the missing
+        # use of backticks.
+        matched_size = len(orig_db)
+        if new_db:
+            # add 1 for the separator ':'
+            matched_size += 1
+            matched_size += len(new_db)
+        if matched_size != len(db):
+            parser.error(PARSE_ERR_DB_PAIR_EXT.format(db_pair=db,
+                                                      db1_label='orig_db',
+                                                      db2_label='new_db',
+                                                      db1_value=orig_db,
+                                                      db2_value=new_db))
 
-try:
-    # record start time
-    if opt.verbosity >= 3:
-        start_test = time.time()
-    dbcopy.copy_db(source_values, dest_values, db_list, options)
-    if opt.verbosity >= 3:
-        print_elapsed_time(start_test)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
+        # Remove backtick quotes (handled later)
+        orig_db = remove_backtick_quoting(orig_db) \
+            if is_quoted_with_backticks(orig_db) else orig_db
+        new_db = remove_backtick_quoting(new_db) \
+            if new_db and is_quoted_with_backticks(new_db) else new_db
+        db_entry = (orig_db, new_db)
+        db_list.append(db_entry)
 
-sys.exit()
+    try:
+        # Record start time.
+        if opt.verbosity >= 3:
+            start_copy_time = time.time()
+
+        # Copy databases concurrently for non posix systems (windows).
+        if options['multiprocess'] > 1 and os.name != 'posix':
+            # Create copy databases tasks.
+            copy_db_tasks = []
+            for db in db_list:
+                copy_task = {
+                    'source_srv': source_values,
+                    'dest_srv': dest_values,
+                    'db_list': [db],
+                    'options': options
+                }
+                copy_db_tasks.append(copy_task)
+
+            # Create process pool.
+            workers_pool = multiprocessing.Pool(
+                processes=options['multiprocess']
+            )
+
+            # Concurrently copy databases.
+            workers_pool.map_async(dbcopy.multiprocess_db_copy_task,
+                                   copy_db_tasks)
+            workers_pool.close()
+            workers_pool.join()
+        else:
+            # Copy all specified databases (no database level concurrency).
+            # Note: on POSIX systems multiprocessing is applied at the object
+            # level (not database).
+            dbcopy.copy_db(source_values, dest_values, db_list, options)
+
+        # Print elapsed time.
+        if opt.verbosity >= 3:
+            print_elapsed_time(start_copy_time)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR: {0}".format(err.errmsg))
+        sys.exit(1)
+
+    sys.exit()

@@ -50,4 +50,3 @@ class test(t2.test):
             
     def cleanup(self):
         return t2.test.cleanup(self)
-

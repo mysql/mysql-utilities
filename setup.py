@@ -23,6 +23,7 @@ import fnmatch
 import os
 import re
 from glob import glob
+import platform
 import sys
 
 import distutils.core
@@ -82,6 +83,19 @@ else:
         'bdist_deb': BuildDistDebian,
         'bdist_com_deb': BuildCommercialDistDebian
     })
+
+if platform.uname()[0] == 'Darwin':
+    try:
+        from support.dist_osx import BuildDistOSX, BuildDistOSXcom
+                                      
+    except ImportError:
+        pass
+    else:
+        COMMANDS['cmdclass'].update({
+            'bdist_osx': BuildDistOSX,
+            'bdist_com_osx': BuildDistOSXcom
+        })
+
 ARGS = {
 }
 

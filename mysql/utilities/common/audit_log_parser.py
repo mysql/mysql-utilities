@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class AuditLogParser(AuditLogReader):
 
             # Check if record matches status criteria
             if (matching_record and self.options['status']
-                and not self.match_status(record, self.options['status'])):
+               and not self.match_status(record, self.options['status'])):
                 matching_record = False
 
             # Check if record matches datetime range criteria
@@ -120,12 +120,12 @@ class AuditLogParser(AuditLogReader):
 
             # Check if record matches query type criteria
             if (matching_record and self.options['query_type']
-                and not self.match_query_type(record)):
+               and not self.match_query_type(record)):
                 matching_record = False
 
             # Search attributes values for matching pattern
             if (matching_record and self.regexp_pattern
-                and not self.match_pattern(record)):
+               and not self.match_pattern(record)):
                 matching_record = False
 
             # Store record into resulting rows (i.e., survived defined filters)
@@ -136,12 +136,12 @@ class AuditLogParser(AuditLogReader):
                     self.rows.append(record)
 
     def retrieve_rows(self):
-        """ Retrieve the resulting entries from the log parsing process
+        """Retrieve the resulting entries from the log parsing process
         """
         return self.rows if self.rows != [] else None
 
     def _track_new_users_connection_id(self, record, name_upper):
-        """ Track CONNECT records and store information of users and associated
+        """Track CONNECT records and store information of users and associated
         connection IDs.
         """
         user = record.get("USER", None)
@@ -149,13 +149,13 @@ class AuditLogParser(AuditLogReader):
 
         # Register new connection_id (and corresponding user)
         if (name_upper.upper() == "CONNECT" and
-            (user and (user in self.options['users'])) or
-            (priv_user and (priv_user in self.options['users']))):
+           (user and (user in self.options['users'])) or
+           (priv_user and (priv_user in self.options['users']))):
             self.connection_ids.append((user, priv_user,
                                         record.get("CONNECTION_ID")))
 
     def match_users(self, record):
-        """ Match users.
+        """Match users.
 
         Check if the given record match the user search criteria.
         Returns True if the record matches one of the specified users.
@@ -173,8 +173,9 @@ class AuditLogParser(AuditLogReader):
                 return True
         return False
 
-    def match_datetime_range(self, record, start_date, end_date):
-        """ Match date/time range.
+    @staticmethod
+    def match_datetime_range(record, start_date, end_date):
+        """Match date/time range.
 
         Check if the given record match the datetime range criteria.
         Returns True if the record matches the specified date range.
@@ -184,14 +185,14 @@ class AuditLogParser(AuditLogReader):
         end_date[in] end date/time of the record (inclusive);
         """
         if (start_date and (record.get('TIMESTAMP', None) < start_date)) or \
-            (end_date and (end_date < record.get('TIMESTAMP', None))):
+           (end_date and (end_date < record.get('TIMESTAMP', None))):
             # Not within datetime range
             return False
         else:
             return True
 
     def match_pattern(self, record):
-        """ Match REGEXP pattern.
+        """Match REGEXP pattern.
 
         Check if the given record matches the defined pattern.
         Returns True if one of the record values matches the pattern.
@@ -204,7 +205,7 @@ class AuditLogParser(AuditLogReader):
         return False
 
     def match_query_type(self, record):
-        """ Match query types.
+        """Match query types.
 
         Check if the given record matches one of the given query types.
         Returns True if the record possesses a SQL statement/command that
@@ -240,8 +241,9 @@ class AuditLogParser(AuditLogReader):
                     return True
         return False
 
-    def match_event_type(self, record, event_types):
-        """ Match audit log event/record type.
+    @staticmethod
+    def match_event_type(record, event_types):
+        """Match audit log event/record type.
 
         Check if the given record matches one of the given event types.
         Returns True if the record type (i.e., logged event) matches one of the
@@ -256,8 +258,9 @@ class AuditLogParser(AuditLogReader):
         else:
             return False
 
-    def match_status(self, record, status_list):
-        """ Match the record status.
+    @staticmethod
+    def match_status(record, status_list):
+        """Match the record status.
 
         Check if the given record match the specified status criteria.
 
@@ -274,7 +277,8 @@ class AuditLogParser(AuditLogReader):
             for status_val in status_list:
                 # Check if the status value is an interval (tuple) or int
                 if isinstance(status_val, tuple):
-                    # It is an interval; Check if it contains the record status.
+                    # It is an interval; Check if it contains the record
+                    # status.
                     if status_val[0] <= rec_status <= status_val[1]:
                         return True
                 else:

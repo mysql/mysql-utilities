@@ -22,7 +22,7 @@ import mutlib
 from mysql.utilities.exception import MUTLibError, UtilError
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
-                       '--report-port=%s "')
+                       '--report-port={0} "')
 
 
 class test(mutlib.System_test):
@@ -45,18 +45,18 @@ class test(mutlib.System_test):
         if index >= 0 and kill:
             server = self.servers.get_server(index)
             if self.debug:
-                print "# Killing server %s." % server.role
+                print "# Killing server {0}.".format(server.role)
             self.servers.stop_server(server)
             self.servers.remove_server(server.role)
             index = -1
         if self.debug:
-            print "# Spawning %s" % name
+            print "# Spawning {0}".format(name)
         if index >= 0:
             if self.debug:
                 print "# Found it in the servers list."
             server = self.servers.get_server(index)
             try:
-                res = server.show_server_variable("server_id")
+                server.show_server_variable("server_id")
             except MUTLibError as err:
                 raise MUTLibError("Cannot get replication server 'server_id': "
                                   "{0}".format(err.errmsg))
@@ -65,7 +65,8 @@ class test(mutlib.System_test):
                 print "# Cloning server0."
             serverid = self.servers.get_next_id()
             if mysqld is None:
-                mysqld = _DEFAULT_MYSQL_OPTS % self.servers.view_next_port()
+                mysqld = _DEFAULT_MYSQL_OPTS.format(
+                    self.servers.view_next_port())
             res = self.servers.spawn_new_server(self.server0, serverid,
                                                 name, mysqld)
             if not res:
@@ -105,7 +106,7 @@ class test(mutlib.System_test):
 
     def run(self):
 
-        cmd_str = "mysqlrpladmin.py %s " % self.master_str
+        cmd_str = "mysqlrpladmin.py {0} ".format(self.master_str)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
@@ -114,18 +115,21 @@ class test(mutlib.System_test):
 
         slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn])
 
-        comment = "Test case 1 - show health before switchover"
-        cmd_opts = " --slaves=%s --format=vertical health" % slaves_str
+        test_num = 1
+        comment = "Test case {0} - show health before switchover".format(
+            test_num)
+        cmd_opts = " --slaves={0} --format=vertical health".format(slaves_str)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Build connection string with loopback address instead of localhost
         slave_ports = [self.server2.port, self.server3.port, self.server4.port]
-        slaves_loopback = "root:root@127.0.0.1:%s," % self.server2.port
-        slaves_loopback += "root:root@127.0.0.1:%s," % self.server3.port
-        slaves_loopback += "root:root@127.0.0.1:%s" % self.server4.port
+        slaves_loopback = ("root:root@127.0.0.1:{0},root:root@127.0.0.1:{1},"
+                           "root:root@127.0.0.1:{2}".format(self.server2.port,
+                                                            self.server3.port,
+                                                            self.server4.port))
         slave3_conn_ip = slave3_conn.replace("localhost", "127.0.0.1")
 
         # Perform switchover from original master to all other slaves and back.
@@ -142,31 +146,34 @@ class test(mutlib.System_test):
                               slave1_conn, master_conn],
              master_conn, "master", [slave1_conn, slave2_conn, slave3_conn]),
         ]
-        test_num = 2
+        test_num += 1
         for case in test_cases:
             slaves_str = ",".join(case[1])
-            comment = "Test case %s - switchover to %s" % (test_num, case[3])
+            comment = "Test case {0} - switchover to {1}".format(test_num,
+                                                                 case[3])
             cmd_str = ("mysqlrpladmin.py --master={0} "
-                       "--rpl-user=rpl:rpl ").format(case[0])
-            cmd_opts = " --new-master=%s --demote-master " % case[2]
-            cmd_opts += " --slaves=%s switchover" % slaves_str
+                       "--rpl-user=rpl:rpl ".format(case[0]))
+            cmd_opts = (" --new-master={0} --demote-master --slaves={1} "
+                        "switchover".format(case[2], slaves_str))
             res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
             slaves_str = ",".join(case[4])
-            cmd_str = "mysqlrpladmin.py --master=%s " % case[2]
-            comment = "Test case %s - show health after switchover" % test_num
-            cmd_opts = " --slaves=%s --format=vertical health" % slaves_str
+            cmd_str = "mysqlrpladmin.py --master={0} ".format(case[2])
+            comment = "Test case {0} - show health after switchover".format(
+                test_num)
+            cmd_opts = " --slaves={0} --format=vertical health".format(
+                slaves_str)
             res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                    comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
         cmd_str = ("mysqlrpladmin.py --master={0} health "
-                   "--slaves={1}").format(master_conn, slaves_loopback)
+                   "--slaves={1}".format(master_conn, slaves_loopback))
         comment = "Test case {0} - health with loopback".format(test_num)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -174,7 +181,7 @@ class test(mutlib.System_test):
         test_num += 1
 
         cmd_str = ("mysqlrpladmin.py --master={0} health "
-                   "--disc=root:root").format(master_conn)
+                   "--disc=root:root".format(master_conn))
         comment = "Test case {0} - health with discovery".format(test_num)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -185,21 +192,21 @@ class test(mutlib.System_test):
         commands = ['stop', 'start', 'stop', 'reset']
         for cmd in commands:
             comment = ("Test case {0} - run command {1} with "
-                       "--master").format(test_num, cmd)
+                       "--master".format(test_num, cmd))
             cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} "
-                       "{2}").format(master_conn, slaves_str, cmd)
+                       "{2}".format(master_conn, slaves_str, cmd))
             res = self.run_test_case(0, cmd_str, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             # START SLAVE is asynchronous and it can take some time to complete
             # on slow servers
             if cmd == 'start':
                 time.sleep(3)  # wait 3 second for START to finish
                 # Show HEALTH to make sure all slaves started.
                 cmd_str = ("mysqlrpladmin.py --master={0} health "
-                           "--slaves={1}").format(master_conn, slaves_str)
+                           "--slaves={1}".format(master_conn, slaves_str))
                 comment = ("Test case {0}(b) - health after "
-                           "{1}").format(test_num, cmd)
+                           "{1}".format(test_num, cmd))
                 res = self.run_test_case(0, cmd_str, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
@@ -214,19 +221,19 @@ class test(mutlib.System_test):
         commands = ['start', 'stop', 'reset']
         for cmd in commands:
             comment = ("Test case {0} - run command {1} without "
-                       "--master").format(test_num, cmd)
+                       "--master".format(test_num, cmd))
             cmd_str = ("mysqlrpladmin.py --slaves={0} "
-                       "{1}").format(slaves_str, cmd)
+                       "{1}".format(slaves_str, cmd))
             res = self.run_test_case(0, cmd_str, comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
             if cmd == 'start':
                 time.sleep(3)  # wait 3 second for START to finish
                 # Show HEALTH to make sure all slaves started.
                 cmd_str = ("mysqlrpladmin.py --master={0} health "
-                           "--slaves={1}").format(master_conn, slaves_str)
+                           "--slaves={1}".format(master_conn, slaves_str))
                 comment = ("Test case {0}(b) - health after "
-                           "{1}").format(test_num, cmd)
+                           "{1}".format(test_num, cmd))
                 res = self.run_test_case(0, cmd_str, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
@@ -278,10 +285,10 @@ class test(mutlib.System_test):
         for srv in servers:
             try:
                 srv.exec_query("RESET MASTER")
-            except Exception as err:
+            except UtilError as err:
                 raise MUTLibError("Unexpected error performing RESET MASTER "
-                                  "for server %s:%s: %s"
-                                  % (srv.host, srv.port, err))
+                                  "for server {0}:{1}: "
+                                  "{2}".format(srv.host, srv.port, err))
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
                        rpl_passwd='rpl'):
@@ -290,8 +297,8 @@ class test(mutlib.System_test):
         else:
             # Default replication topology - 1 master, 3 slaves
             slaves = [self.server2, self.server3, self.server4]
-        self.master_str = " --master=%s" % \
-                          self.build_connection_string(self.server1)
+        self.master_str = " --master={0}".format(
+            self.build_connection_string(self.server1))
 
         servers = [self.server1]
         servers.extend(slaves)
@@ -309,10 +316,11 @@ class test(mutlib.System_test):
                 pass
 
         for slave in slaves:
-            slave_str = " --slave=%s" % self.build_connection_string(slave)
+            slave_str = " --slave={0}".format(
+                self.build_connection_string(slave))
             conn_str = self.master_str + slave_str
             cmd = ("mysqlreplicate.py --rpl-user={0}:{1} {2} "
-                   "-vvv").format(rpl_user, rpl_passwd, conn_str)
+                   "-vvv".format(rpl_user, rpl_passwd, conn_str))
             res = self.exec_util(cmd, self.res_fname)
             if res != 0:
                 return False

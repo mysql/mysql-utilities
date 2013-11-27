@@ -18,7 +18,8 @@ import os
 import mutlib
 from mysql.utilities.exception import MUTLibError
 
-_BASE_COMMENT = "Test Case %d: "
+_BASE_COMMENT = "Test Case {0}: "
+
 
 class test(mutlib.System_test):
     """mysql utilities console - parameters
@@ -36,55 +37,56 @@ class test(mutlib.System_test):
         return True
 
     def do_test(self, test_num, comment, command):
-        res = self.run_test_case(0, command, _BASE_COMMENT%test_num + comment)
+        res = self.run_test_case(0, command,
+                                 _BASE_COMMENT.format(test_num) + comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
     def run(self):
         self.res_fname = "result.txt"
 
         # Setup options to show
         test_num = 1
-        cmd_str = "mysqluc.py %s"
+        cmd_str = "mysqluc.py {0}"
 
         # show help
         cmd_opt = '--help'
-        self.do_test(test_num, "Help", cmd_str % cmd_opt)
+        self.do_test(test_num, "Help", cmd_str.format(cmd_opt))
         test_num += 1
 
         # do normal execution
         cmd_opt = '-e "help mysqldiff"'
-        self.do_test(test_num, "Normal", cmd_str % cmd_opt)
+        self.do_test(test_num, "Normal", cmd_str.format(cmd_opt))
         test_num += 1
 
         # do verbose output
         cmd_opt = '--verbose -e "help mysqldiff"'
-        self.do_test(test_num, "Verbosity", cmd_str % cmd_opt)
+        self.do_test(test_num, "Verbosity", cmd_str.format(cmd_opt))
         test_num += 1
 
         # do quiet output
         cmd_opt = '--quiet -e "help mysqldiff"'
-        self.do_test(test_num, "Quiet", cmd_str % cmd_opt)
+        self.do_test(test_num, "Quiet", cmd_str.format(cmd_opt))
         test_num += 1
 
         # width adjusted
         cmd_opt = '-e "help mysqldiff" --width=55'
-        self.do_test(test_num, "Normal - width 55", cmd_str % cmd_opt)
+        self.do_test(test_num, "Normal - width 55", cmd_str.format(cmd_opt))
         test_num += 1
 
         # width adjusted
         cmd_opt = '-e "help mysqldiff" --width=66'
-        self.do_test(test_num, "Normal - width 66", cmd_str % cmd_opt)
+        self.do_test(test_num, "Normal - width 66", cmd_str.format(cmd_opt))
         test_num += 1
 
         # test replacement
-        cmd_opt = ' -e "set SERVER=%s;show variables;' % \
-                  self.build_connection_string(self.server0)
+        cmd_opt = ' -e "set SERVER={0};show variables;'.format(
+            self.build_connection_string(self.server0))
         if os.name == 'posix':
-            cmd_opt += 'mysqldiff --server1=\$SERVER"'
+            cmd_opt = '{0}mysqldiff --server1=\$SERVER"'.format(cmd_opt)
         else:
-            cmd_opt += 'mysqldiff --server1=$SERVER"'
-        self.do_test(test_num, "Replacement", cmd_str % cmd_opt)
+            cmd_opt = '{0}mysqldiff --server1=$SERVER"'.format(cmd_opt)
+        self.do_test(test_num, "Replacement", cmd_str.format(cmd_opt))
         test_num += 1
 
         # Long variables
@@ -95,16 +97,18 @@ class test(mutlib.System_test):
 
         # Unbalanced arguments
         comment = "Unbalanced arguments"
-        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c", "Test Case "
-                                 "{0}: {1}".format(test_num, comment))
+        res = self.run_test_case(
+            2, "mysqluc.py a=1 b=2 c", "Test Case {0}: {1}".format(
+                test_num, comment))
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Invalid assigning in arguments
         comment = "Invalid assigning in arguments"
-        res = self.run_test_case(2, "mysqluc.py a=1 b=2 c==3", "Test Case "
-                                 "{0}: {1}".format(test_num, comment))
+        res = self.run_test_case(
+            2, "mysqluc.py a=1 b=2 c==3", "Test Case {0}: {1}".format(
+                test_num, comment))
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
@@ -135,6 +139,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_opt, test_case)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
 
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
@@ -147,13 +152,13 @@ class test(mutlib.System_test):
 
         self.replace_substring(".py", "")
 
-        diff_ret = ("mysqldiff: error: No objects specified to compare.")
+        diff_ret = "mysqldiff: error: No objects specified to compare."
         self.remove_result_and_lines_before(diff_ret, 1)
 
-        diff_ret = ("mysqlprocgrep: error: You need at least one server")
+        diff_ret = "mysqlprocgrep: error: You need at least one server"
         self.remove_result_and_lines_before(diff_ret, 1)
 
-        self.replace_substring("\r\n","\n")
+        self.replace_substring("\r\n", "\n")
 
         return True
 

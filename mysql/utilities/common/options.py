@@ -26,15 +26,15 @@ Methods:
 import copy
 import optparse
 import os.path
-import re
 
-from mysql.utilities import VERSION_FRM
-from mysql.utilities.exception import FormatError
-from mysql.utilities.exception import UtilError
-from optparse import Option as CustomOption, OptionValueError as ValueError
+from optparse import Option as CustomOption, OptionValueError
 
-from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.my_print_defaults import my_login_config_exists
+from mysql.utilities import LICENSE_FRM, VERSION_FRM
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.connector.conversion import MySQLConverter
+from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
+                                                      my_login_config_exists)
+
 
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
@@ -46,12 +46,11 @@ class UtilitiesParser(optparse.OptionParser):
        when --help is used.
     """
 
-    def print_help(self):
+    def print_help(self, output=None):
         """Show version information before help
         """
         print self.version
-        optparse.OptionParser.print_help(self)
-
+        optparse.OptionParser.print_help(self, output)
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -68,19 +67,27 @@ def prefix_check_choice(option, opt, value):
 
     Returns string - valid option chosen
     """
-    choices = ", ".join(map(repr, option.choices)) # String of choices
+    # String of choices
+    choices = ", ".join([repr(choice) for choice in option.choices])
 
     # Get matches for prefix given
     alts = [alt for alt in option.choices if alt.startswith(value.lower())]
     if len(alts) == 1:   # only 1 match
-       return alts[0]
+        return alts[0]
     elif len(alts) > 1:  # multiple matches
-        raise ValueError(("option %s: there are multiple prefixes matching: "
-                          "%r (choose from %s)") % (opt, value, choices))
+        raise OptionValueError(
+            ("option %s: there are multiple prefixes "
+             "matching: %r (choose from %s)") % (opt, value, choices))
 
     # Doesn't match. Show user possible choices.
-    raise ValueError("option %s: invalid choice: %r (choose from %s)"
-                     % (opt, value, choices))
+    raise OptionValueError("option %s: invalid choice: %r (choose from %s)"
+                           % (opt, value, choices))
+
+def license_callback(self, opt, value, parser, *args, **kwargs):
+        """Show license information and exit.
+        """
+        print(LICENSE_FRM.format(program=parser.prog))
+        parser.exit()
 
 
 class CaseInsensitiveChoicesOption(CustomOption):
@@ -96,7 +103,7 @@ class CaseInsensitiveChoicesOption(CustomOption):
 
     def __init__(self, *opts, **attrs):
         if 'choices' in attrs:
-            attrs['choices'] = [ attr.lower() for attr in attrs['choices'] ]
+            attrs['choices'] = [attr.lower() for attr in attrs['choices']]
         CustomOption.__init__(self, *opts, **attrs)
 
 
@@ -122,14 +129,19 @@ def setup_common_options(program_name, desc_str, usage_str,
     Returns parser object
     """
 
+    program_name = program_name.replace(".py","")
     parser = UtilitiesParser(
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,
         add_help_option=False,
-        option_class=CaseInsensitiveChoicesOption)
+        option_class=CaseInsensitiveChoicesOption,
+        prog=program_name)
     parser.add_option("--help", action="help", help="display a help message "
                       "and exit")
+    parser.add_option("--license", action='callback',
+                      callback=license_callback,
+                      help="display program's license and exit")
 
     if server:
         # Connection information for the first server
@@ -150,11 +162,24 @@ def setup_common_options(program_name, desc_str, usage_str,
     return parser
 
 
+def add_character_set_option(parser):
+    """Add the --character-set option.
+
+    parser[in]        the parser instance
+    """
+    parser.add_option("--character-set", action="store", dest="charset",
+                      type="string", default=None,
+                      help="sets the client character set. The default is "
+                      "retrieved from the server variable "
+                      "'character_set_client'.")
+
+
 _SKIP_VALUES = (
-    "tables","views","triggers","procedures",
-    "functions","events","grants","data",
+    "tables", "views", "triggers", "procedures",
+    "functions", "events", "grants", "data",
     "create_db"
 )
+
 
 def add_skip_options(parser):
     """Add the common --skip options for database utilties.
@@ -175,19 +200,16 @@ def check_skip_options(skip_list):
 
     Returns new skip list with items converted to upper case.
     """
-
-    from mysql.utilities.exception import UtilError
-
     new_skip_list = []
     if skip_list is not None:
         items = skip_list.split(",")
-        for object in items:
-            obj = object.lower()
+        for item in items:
+            obj = item.lower()
             if obj in _SKIP_VALUES:
                 new_skip_list.append(obj)
             else:
                 raise UtilError("The value %s is not a valid value for "
-                                "--skip." % object)
+                                "--skip." % item)
     return new_skip_list
 
 
@@ -313,9 +335,10 @@ def add_engines(parser):
     parser[in]        the parser instance
     """
     # Add engine
-    parser.add_option("--new-storage-engine", action="store", dest="new_engine",
-                      default=None, help="change all tables to use this "\
-                      "storage engine if storage engine exists on the destination.")
+    parser.add_option("--new-storage-engine", action="store",
+                      dest="new_engine", default=None, help="change all "
+                      "tables to use this storage engine if storage engine "
+                      "exists on the destination.")
     # Add default storage engine
     parser.add_option("--default-storage-engine", action="store",
                       dest="def_engine", default=None, help="change all "
@@ -344,6 +367,8 @@ def check_engine_options(server, new_engine, def_engine,
                        default = False
     """
     def _find_engine(server, target, message, fail, default):
+        """Find engine
+        """
         if target is not None:
             found = server.has_storage_engine(target)
             if not found and fail:
@@ -351,7 +376,7 @@ def check_engine_options(server, new_engine, def_engine,
             elif not found and not quiet:
                 print message
 
-    engines = server.get_storage_engines()
+    server.get_storage_engines()
     message = "WARNING: %s storage engine %s is not supported on the server."
 
     _find_engine(server, new_engine,
@@ -441,20 +466,21 @@ def add_rpl_mode(parser, do_both=True, add_file=True):
     rpl_mode_options = _PERMITTED_RPL_DUMP
     if do_both:
         rpl_mode_options.append("both")
-        rpl_mode_both = ", and 'both' = include 'master' and 'slave' " + \
-                        "options where applicable"
-    parser.add_option("--rpl", "--replication", dest="rpl_mode", action="store",
-                      help="include replication information. Choices = 'master'"
-                      " = include the CHANGE MASTER command using source "
-                      "server as the master, 'slave' = include the CHANGE "
-                      "MASTER command using the destination server's master "
-                      "information%s." % rpl_mode_both,
+        rpl_mode_both = (", and 'both' = include 'master' and 'slave' options "
+                         "where applicable")
+    parser.add_option("--rpl", "--replication", dest="rpl_mode",
+                      action="store", help="include replication information. "
+                      "Choices: 'master' = include the CHANGE MASTER command "
+                      "for the source server's master (itself if it is a "
+                      "master or its master if it is a slave), 'slave' = "
+                      "include the CHANGE MASTER command for the source "
+                      "server if it is a slave{0}.".format(rpl_mode_both),
                       choices=rpl_mode_options)
     if add_file:
         parser.add_option("--rpl-file", "--replication-file", dest="rpl_file",
-                          action="store", help="path and file name to place the "
-                          "replication information generated. Valid on if the "
-                          "--rpl option is specified.")
+                          action="store", help="path and file name to place "
+                          "the replication information generated. Valid on if "
+                          "the --rpl option is specified.")
 
 
 def check_rpl_options(parser, options):
@@ -488,7 +514,6 @@ def check_rpl_options(parser, options):
                          "option." % (", ".join(errors), num_opt_str))
 
 
-
 def add_failover_options(parser):
     """Add the common failover options.
 
@@ -518,14 +543,15 @@ def add_failover_options(parser):
                       " Valid only with failover command. List multiple slaves"
                       " in comma-separated list.")
 
-    parser.add_option("--discover-slaves-login", action="store", dest="discover",
-                      default=None, type="string", help="at startup, query "
-                      "master for all registered slaves and use the user name "
-                      "and password specified to connect. Supply the user and "
-                      "password in the form <user>[:<password>] or "
-                      "<login-path>. For example, --discover-slaves-login="
-                      "joe:secret will use 'joe' as the user and 'secret' as "
-                      "the password for each discovered slave.")
+    parser.add_option("--discover-slaves-login", action="store",
+                      dest="discover", default=None, type="string",
+                      help="at startup, query master for all registered "
+                      "slaves and use the user name and password specified to "
+                      "connect. Supply the user and password in the form "
+                      "<user>[:<password>] or <login-path>. For example, "
+                      "--discover-slaves-login=joe:secret will use 'joe' as "
+                      "the user and 'secret' as the password for each "
+                      "discovered slave.")
 
     parser.add_option("--exec-after", action="store", dest="exec_after",
                       default=None, type="string", help="name of script to "
@@ -541,8 +567,8 @@ def add_failover_options(parser):
 
     parser.add_option("--log-age", action="store", dest="log_age", default=7,
                       type="int", help="specify maximum age of log entries in "
-                      "days. Entries older than this will be purged on startup. "
-                      "Default = 7 days.")
+                      "days. Entries older than this will be purged on "
+                      "startup. Default = 7 days.")
 
     parser.add_option("--master", action="store", dest="master", default=None,
                       type="string", help="connection information for master "
@@ -563,8 +589,8 @@ def add_failover_options(parser):
     parser.add_option("--seconds-behind", action="store", dest="max_delay",
                       default=0, type="int", help="used to detect slave "
                       "delay. The maximum number of seconds behind the master "
-                      "permitted before slave is considered behind the master. "
-                      "Default is 0.")
+                      "permitted before slave is considered behind the "
+                      "master. Default is 0.")
 
     parser.add_option("--slaves", action="store", dest="slaves",
                       type="string", default=None,
@@ -605,11 +631,11 @@ def obj2sql(obj):
 
     This function convert Python objects to SQL values using the
     conversion functions in the database connector package."""
-    from mysql.connector.conversion import MySQLConverter
     return MySQLConverter().quote(obj)
 
 
-def parse_user_password(userpass_values, my_defaults_reader=None, options={}):
+def parse_user_password(userpass_values, my_defaults_reader=None,
+                        options=None):
     """ This function parses a string with the user/password credentials.
 
     This function parses the login string, determines the used format, i.e.
@@ -633,6 +659,8 @@ def parse_user_password(userpass_values, my_defaults_reader=None, options={}):
 
     Returns a tuple with the username and password.
     """
+    if options is None:
+        options = {}
     # Split on the ':' to determine if a login-path is used.
     login_values = userpass_values.split(':')
     if len(login_values) == 1:

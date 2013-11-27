@@ -53,7 +53,7 @@ def _add_basedir(search_paths, path_str):
 
 
 def get_tool_path(basedir, tool, fix_ext=True, required=True,
-                  defaults_paths=[], search_PATH=False):
+                  defaults_paths=None, search_PATH=False):
     """Search for a MySQL tool and return the full path
 
     basedir[in]         The initial basedir to search (from mysql server)
@@ -71,7 +71,8 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
                         i.e. search_PATH=False.
     Returns (string) full path to tool
     """
-
+    if not defaults_paths:
+        defaults_paths = []
     search_paths = []
 
     if basedir:
@@ -112,28 +113,26 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
     return None
 
 
-def delete_directory(dir):
+def delete_directory(path):
     """Remove a directory (folder) and its contents.
 
-    dir[in]           target directory
+    path[in]           target directory
     """
-    import time
-
-    if os.path.exists(dir):
+    if os.path.exists(path):
         # It can take up to 10 seconds for Windows to 'release' a directory
         # once a process has terminated. We wait...
         if os.name == "nt":
             stop = 10
             i = 1
-            while i < stop and os.path.exists(dir):
-                shutil.rmtree(dir, True)
+            while i < stop and os.path.exists(path):
+                shutil.rmtree(path, True)
                 time.sleep(1)
                 i += 1
         else:
-            shutil.rmtree(dir, True)
+            shutil.rmtree(path, True)
 
 
-def execute_script(run_cmd, file=None, options=[], verbosity=False):
+def execute_script(run_cmd, filename=None, options=None, verbosity=False):
     """Execute a script.
 
     This method spawns a subprocess to execute a script. If a file is
@@ -141,7 +140,7 @@ def execute_script(run_cmd, file=None, options=[], verbosity=False):
     all output from the script.
 
     run_cmd[in]        command/script to execute
-    file[in]           file path name to file, os.stdout, etc.
+    filename[in]       file path name to file, os.stdout, etc.
                        Default is None (do not log/write output)
     options[in]        arguments for script
                        Default is no arguments ([])
@@ -150,19 +149,21 @@ def execute_script(run_cmd, file=None, options=[], verbosity=False):
 
     Returns int - result from process execution
     """
+    if options is None:
+        options = []
     if verbosity:
         f_out = sys.stdout
     else:
-        if not file:
-            file = os.devnull
-        f_out = open(file, 'w')
+        if not filename:
+            filename = os.devnull
+        f_out = open(filename, 'w')
 
     str_opts = [str(opt) for opt in options]
     cmd_opts = " ".join(str_opts)
     command = " ".join([run_cmd, cmd_opts])
 
     if verbosity:
-        print "# SCRIPT EXECUTED:", command
+        print("# SCRIPT EXECUTED: {0}".format(command))
 
     proc = subprocess.Popen(command, shell=True,
                             stdout=f_out, stderr=f_out)
@@ -184,7 +185,7 @@ def ping_host(host, timeout):
         run_cmd = "ping -o -t %s %s" % (timeout, host)
     elif os.name == "posix":
         run_cmd = "ping -w %s %s" % (timeout, host)
-    else: # must be windows
+    else:  # must be windows
         run_cmd = "ping -n %s %s" % (timeout, host)
 
     ret_val = execute_script(run_cmd)
@@ -199,11 +200,6 @@ def get_mysqld_version(mysqld_path):
 
     Returns tuple - (major, minor, release), or None if error
     """
-    import subprocess
-
-    args = [
-        " --version",
-    ]
     out = open("version_check", 'w')
     proc = subprocess.Popen("%s --version" % mysqld_path,
                             stdout=out, stderr=out, shell=True)
@@ -225,9 +221,9 @@ def get_mysqld_version(mysqld_path):
         return None
     version = line.split(' ', 5)[3]
     try:
-        maj, min, dev = version.split(".")
+        maj_ver, min_ver, dev = version.split(".")
         rel = dev.split("-")
-        return (maj, min, rel[0])
+        return (maj_ver, min_ver, rel[0])
     except:
         return None
 
@@ -244,6 +240,8 @@ def show_file_statistics(file_name, wild=False, out_format="GRID"):
     """
 
     def _get_file_stats(path, file_name):
+        """Return file stats
+        """
         stats = os.stat(os.path.join(path, file_name))
         return ((file_name, stats.st_size, time.ctime(stats.st_ctime),
                  time.ctime(stats.st_mtime)))
@@ -252,7 +250,7 @@ def show_file_statistics(file_name, wild=False, out_format="GRID"):
     rows = []
     path, filename = os.path.split(file_name)
     if wild:
-        for root, dirs, files in os.walk(path):
+        for _, _, files in os.walk(path):
             for f in files:
                 if f.startswith(filename):
                     rows.append(_get_file_stats(path, f))
@@ -277,9 +275,10 @@ def remote_copy(filepath, user, host, local_path, verbosity=0):
         run_cmd = "scp %s@%s:%s %s" % (user, host, filepath, local_path)
         if verbosity > 1:
             print("# Command =%s" % run_cmd)
-        print("# Copying file from %s:%s to %s:" % (host, filepath, local_path))
+        print("# Copying file from %s:%s to %s:" %
+              (host, filepath, local_path))
         proc = subprocess.Popen(run_cmd, shell=True)
-        ret_val = proc.wait()
+        proc.wait()
     else:
         print("Remote copy not supported. Please use UNC paths and omit "
               "the --remote-login option to use a local copy operation.")
@@ -313,7 +312,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
                                   error on failure.
     exit_on_fail[in]              If True, issue exit() else do not exit()
                                   on failure.
-    return_error_msg[in]          If True, and is not compatible 
+    return_error_msg[in]          If True, and is not compatible
                                   returns (result, error_msg) tuple.
     """
 
@@ -340,7 +339,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
         # Build the error message
         if max_version:
             max_version_error_msg = 'or higher and lower than %s' % \
-                                    '.'.join(map(str, max_version))
+                '.'.join([str(el) for el in max_version])
         else:
             max_version_error_msg = 'or higher'
 
@@ -352,8 +351,8 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             'compatible Python version.'
         ) % {
             'name': name,
-            'sys_version': '.'.join(map(str, sys_version)),
-            'min_version': '.'.join(map(str, min_version)),
+            'sys_version': '.'.join([str(el) for el in sys_version]),
+            'min_version': '.'.join([str(el) for el in min_version]),
             'max_version_error_msg': max_version_error_msg
         }
 
@@ -382,14 +381,14 @@ def check_port_in_use(host, port):
     """
     try:
         sock = socket.create_connection((host, port))
-    except socket.error as error:
+    except socket.error:
         return True
     sock.close()
     return False
 
 
 def requires_encoding(orig_str):
-    """Check to see if a string requires encoding
+    r"""Check to see if a string requires encoding
 
     This method will check to see if a string requires encoding to be used
     as a MySQL file name (r"[\w$]*").
@@ -404,7 +403,7 @@ def requires_encoding(orig_str):
 
 
 def encode(orig_str):
-    """Encode a string containing non-MySQL observed characters
+    r"""Encode a string containing non-MySQL observed characters
 
     This method will take a string containing characters other than those
     recognized by MySQL (r"[\w$]*") and covert them to embedded ascii values.
@@ -431,7 +430,7 @@ def encode(orig_str):
             i = len(part)
         else:
             j = orig_str[i:].find(part)
-            encode_parts.append(orig_str[i:i+j])
+            encode_parts.append(orig_str[i:i + j])
             i += len(part) + j
 
     # Next, convert the non-valid parts to the form @NNNN (hex)
@@ -467,7 +466,7 @@ def requires_decoding(orig_str):
 
 
 def decode(orig_str):
-    """Decode a string containing @NNNN entries
+    r"""Decode a string containing @NNNN entries
 
     This method will take a string containing characters other than those
     recognized by MySQL (r"[\w$]*") and covert them to character values.
@@ -496,7 +495,7 @@ def check_connector_python(print_error=True):
     Prints error and returns False on failure to find connector.
     """
     try:
-        import mysql.connector
+        import mysql.connector  # pylint: disable=W0612
     except ImportError:
         if print_error:
             print("ERROR: The MySQL Connector/Python module was not found. "
@@ -505,3 +504,13 @@ def check_connector_python(print_error=True):
                   "Connector/Python from http://dev.mysql.com.")
         return False
     return True
+
+
+def print_elapsed_time(start_time):
+    """Print the elapsed time to stdout (screen)
+
+    start_time[in]      The starting time of the test
+    """
+    stop_time = time.time()
+    display_time = stop_time - start_time
+    print("Time: {0:.2f} sec\n".format(display_time))

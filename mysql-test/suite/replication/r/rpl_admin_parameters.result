@@ -1,11 +1,7 @@
 Test case 1 - show help
-Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
-
-mysqlrpladmin - administration utility for MySQL replication
-
-Options:
   --version             show program's version number and exit
   --help                display this help message and exit
+  --license             display program's license and exit
   --candidates=CANDIDATES
                         connection information for candidate slave servers for
                         failover in the form:
@@ -271,6 +267,6 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 8 - attempt master switchover it self
-Usage: mysqlrpladmin.py --slaves=root@localhost:3306 <command>
+Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin.py: error: The specified new master localhost:PORT5 is the same as the actual master localhost:PORT5.
+mysqlrpladmin: error: The specified new master localhost:PORT5 is the same as the actual master localhost:PORT5.

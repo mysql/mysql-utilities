@@ -74,6 +74,9 @@ class BuiltCommercial(bdist):
         self.formats = None
         self.archive_files = None
         self.tag = ''
+        self.man_root = None
+        self.man_prefix = None
+        self.bin_install_dir = None
 
     def finalize_options(self):
         """Finalize the options"""
@@ -212,7 +215,13 @@ class BuiltCommercial(bdist):
         #install MAN pages
         install_man = self.reinitialize_command('install_man',
                                                 reinit_subcommands=1)
-        install_man.root = self.bdist_dir # + "/usr/bin/"
+        if self.man_root:
+            install_man.root = self.man_root
+        else:
+            install_man.root = self.bdist_dir # + "/usr/bin/"
+
+        if self.man_prefix:
+            install_man.prefix = self.man_prefix
 
         log.info("installing to %s" % self.bdist_dir)
         self.run_command('install_man')
@@ -225,6 +234,8 @@ class BuiltCommercial(bdist):
         #install_scripts.root = self.bdist_dir # + "/usr/bin/"
         #install_scripts.build_dir = self.bdist_dir
         scripts_instal_dir = os.path.join(self.bdist_dir, "usr", "bin") #scripts_dir
+        if self.bin_install_dir:
+            scripts_instal_dir = self.bin_install_dir
         install_scripts.install_dir = scripts_instal_dir 
         #install_scripts.get_outputs()
         

@@ -48,20 +48,20 @@ class test(mutlib.System_test):
             self.server1 = self.servers.get_server(index)
             try:
                 res = self.server1.show_server_variable("server_id")
-            except UtilError, e:
+            except UtilError as err:
                 raise MUTLibError("Cannot get gtid enabled server 1 "
-                                   "server_id: %s" % e.errmsg)
+                                  "server_id: {0}".format(err.errmsg))
             self.s1_serverid = int(res[0][1])
         else:
             self.s1_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                               "with_gtids_old", 
-                                                '%s' % _DEFAULT_MYSQL_OPTS)
+                                                "with_gtids_old",
+                                                _DEFAULT_MYSQL_OPTS)
             if not res:
                 raise MUTLibError("Cannot spawn gtid enabled server.")
             self.server1 = res[0]
             self.servers.add_new_server(self.server1, True)
-
+        self.drop_all()
         self.server1.exec_query("CREATE DATABASE gtid_version")
         self.server1.exec_query("CREATE TABLE gtid_version.t1 (a int)")
         self.server1.exec_query("INSERT INTO gtid_version.t1 VALUES (1)")
@@ -70,25 +70,25 @@ class test(mutlib.System_test):
     
     def run(self):
         self.res_fname = "result.txt"
-        self.export_file = " export.txt "
-        self.data_file = os.path.normpath("./std_data/basic_data.sql")
 
-        export_cmd_str = ("mysqldbexport.py util_test --export=both " 
+        export_cmd_str = ("mysqldbexport.py gtid_version --export=both "
                           "--skip=events,grants,procedures,functions,views " 
                           "--format=SQL ")
 
         conn1 = "--server=" + self.build_connection_string(self.server1)
 
-        comment = "Test case 1 attempt failed gtid version check"
+        test_num = 1
+        comment = "Test case {0} attempt failed gtid version check".format(
+            test_num)
         cmd_str = export_cmd_str + conn1
         res = mutlib.System_test.run_test_case(self, 1, cmd_str, comment)
         if not res:
             for row in self.results:
                 print row,
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         self.mask_result("ERROR: The server",
-                         "%s" % self.server1.port, "XXXXX")
+                         "{0}".format(self.server1.port), "XXXXX")
 
         return True
 
@@ -102,13 +102,13 @@ class test(mutlib.System_test):
         try:
             if self.res_fname:
                 os.unlink(self.res_fname)
-        except:
+        except OSError:
             pass
         return self.drop_all()
         
     def drop_all(self):
         try:
             self.server1.exec_query("DROP DATABASE `gtid_version`")
-        except:
+        except UtilError:
             pass
         return True

@@ -16,7 +16,7 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.exception import MUTLibError
 
 
 class test(mutlib.System_test):
@@ -42,9 +42,9 @@ class test(mutlib.System_test):
         if self.need_servers:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
+            except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed servers: "
-                                  "{0}".format(e.errmsg))
+                                  "{0}".format(err.errmsg))
         else:
             num_server -= 1  # Get last server in list
         self.server1 = self.servers.get_server(num_server)
@@ -100,12 +100,11 @@ class test(mutlib.System_test):
 
         #Read audit log for tests
         audit_log_name = os.path.normpath(
-            "./std_data/audit.log.13488316109086370"
-        )
+            "./std_data/audit.log.13488316109086370")
 
         num_test += 1
         comment = ("Test case {0} - Convert all records to the defined "
-                   "format").format(num_test)
+                   "format".format(num_test))
         cmd_opts = "{0} --format=RAW".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -116,7 +115,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries of specific "
-                   "users").format(num_test)
+                   "users".format(num_test))
         cmd_opts = "--users={0} {1} ".format(users, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -125,7 +124,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - No entry found for specified "
-                   "users").format(num_test)
+                   "users".format(num_test))
         cmd_opts = "--users=xpto,,fake, {0} ".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -137,9 +136,9 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries for a specific datetime "
-                   "range").format(num_test)
+                   "range".format(num_test))
         cmd_opts = ("--start-date={0} --end-date={1} "
-                    "{2}").format(startdate, enddate, audit_log_name)
+                    "{2}".format(startdate, enddate, audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -147,9 +146,9 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - No entry found for specified datetime "
-                   "range").format(num_test)
+                   "range".format(num_test))
         cmd_opts = ("--start-date=2012-01-01 --end-date=2012-01-01T23:59:59 "
-                    "{0}").format(audit_log_name)
+                    "{0}".format(audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -159,7 +158,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries matching SQL LIKE "
-                   "pattern ").format(num_test)
+                   "pattern ".format(num_test))
         cmd_opts = "--pattern={0} {1}".format(pattern, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -170,7 +169,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries matching REGEXP "
-                   "pattern ").format(num_test)
+                   "pattern ".format(num_test))
         cmd_opts = "--pattern={0} --regexp {1}".format(pattern, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -179,7 +178,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - No entry found matching specified "
-                   "pattern ").format(num_test)
+                   "pattern ".format(num_test))
         cmd_opts = '--pattern="%% = ___" --regexp {0}'.format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -190,7 +189,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries of specific query "
-                   "types").format(num_test)
+                   "types".format(num_test))
         cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -199,7 +198,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - No entry found for specified query "
-                   "types").format(num_test)
+                   "types".format(num_test))
         cmd_opts = "--query-type=GRANT,REVOKE {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -210,7 +209,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Search entries of specific event "
-                   "types").format(num_test)
+                   "types".format(num_test))
         cmd_opts = "--event-type={0} {1}".format(event_types, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -219,9 +218,9 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - No entry found for specified event "
-                   "types").format(num_test)
+                   "types".format(num_test))
         cmd_opts = ('--event-type="Binlog Dump,NoAudit" '
-                    '{0}').format(audit_log_name)
+                    '{0}'.format(audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -230,7 +229,7 @@ class test(mutlib.System_test):
         status = "1100-1199,1046"
         num_test += 1
         comment = ("Test case {0} - Search entries with specific "
-                   "status").format(num_test)
+                   "status".format(num_test))
         cmd_opts = "--status={0} {1}".format(status, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -240,7 +239,7 @@ class test(mutlib.System_test):
         status = ",100,500-750,50,25,999,,8000-9000,10-30,,"
         num_test += 1
         comment = ("Test case {0} - No entry found for specific "
-                   "status").format(num_test)
+                   "status".format(num_test))
         cmd_opts = "--status={0} {1}".format(status, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -259,10 +258,10 @@ class test(mutlib.System_test):
         comment = "Test case {0} - Apply all search criteria".format(num_test)
         cmd_opts = ("--users={0} --start-date={1} --end-date={2} "
                     "--pattern={3} --regexp --query-type={4} --event-type={5} "
-                    "--status={6} {7}").format(
-                        users, startdate, enddate, pattern, query_types,
-                        event_types, status, audit_log_name
-                    )
+                    "--status={6} {7}".format(users, startdate, enddate,
+                                              pattern, query_types,
+                                              event_types, status,
+                                              audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -270,7 +269,7 @@ class test(mutlib.System_test):
 
         num_test += 1
         comment = ("Test case {0} - Test query-type false "
-                   "positives").format(num_test)
+                   "positives".format(num_test))
         cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -280,7 +279,7 @@ class test(mutlib.System_test):
         query_types = "COMMIT,SET,PREPARE"
         num_test += 1
         comment = ("Test case {0} - Test query-type false "
-                   "positives (particular cases)").format(num_test)
+                   "positives (particular cases)".format(num_test))
         cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
@@ -316,27 +315,19 @@ class test(mutlib.System_test):
         audit_log = self.server1.show_server_variable('audit_log_file')[0][1]
         self.replace_result("          File: " + audit_log,
                             "          File: audit.log\n")
-        self.replace_result("          Size:",
-                            "          Size: ...\n")
-        self.replace_result("       Created:",
-                            "       Created: ...\n")
-        self.replace_result(" Last Modified:",
-                            " Last Modified: ...\n")
+        self.replace_result("          Size:", "          Size: ...\n")
+        self.replace_result("       Created:", "       Created: ...\n")
+        self.replace_result(" Last Modified:", " Last Modified: ...\n")
         self.replace_result("       SERVER_ID: " + server_id,
                             "       SERVER_ID: <SERVER_ID>\n")
-        self.replace_result(" STARTUP_OPTIONS:",
-                            " STARTUP_OPTIONS: ...\n")
-        self.replace_result("       TIMESTAMP:",
-                            "       TIMESTAMP: ...\n")
-        self.replace_result("   MYSQL_VERSION:",
-                            "   MYSQL_VERSION: ...\n")
-        self.replace_result("      OS_VERSION:",
-                            "      OS_VERSION: ...\n")
-        self.replace_result("         VERSION:",
-                            "         VERSION: ...\n")
+        self.replace_result(" STARTUP_OPTIONS:", " STARTUP_OPTIONS: ...\n")
+        self.replace_result("       TIMESTAMP:", "       TIMESTAMP: ...\n")
+        self.replace_result("   MYSQL_VERSION:", "   MYSQL_VERSION: ...\n")
+        self.replace_result("      OS_VERSION:", "      OS_VERSION: ...\n")
+        self.replace_result("         VERSION:", "         VERSION: ...\n")
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep "
                                            "version", 6)
 
     def get_result(self):

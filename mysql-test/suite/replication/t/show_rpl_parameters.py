@@ -19,6 +19,7 @@ import show_rpl
 import mutlib
 from mysql.utilities.exception import UtilError, MUTLibError
 
+
 class test(show_rpl.test):
     """show replication topology - parameter testing
     This test runs the mysqlrplshow utility on a known master-slave topology
@@ -46,11 +47,10 @@ class test(show_rpl.test):
     def run(self):
         self.res_fname = "result.txt"
 
-        master_str = "--master=%s" % \
-                     self.build_connection_string(self.server_list[2])
-        slave_str = " --slave=%s" % \
-                    self.build_connection_string(self.server_list[1])
-        conn_str = master_str + slave_str
+        master_str = "--master={0}".format(
+            self.build_connection_string(self.server_list[2]))
+        slave_str = " --slave={0}".format(
+            self.build_connection_string(self.server_list[1]))
 
         show_rpl.test.stop_replication(self, self.server_list[4])
         show_rpl.test.stop_replication(self, self.server_list[3])
@@ -62,74 +62,80 @@ class test(show_rpl.test):
             res = self.server_list[2].exec_query("SHOW FULL PROCESSLIST")
             for row in res:
                 if row[4].lower() == "binlog dump":
-                    self.server_list[2].exec_query("KILL CONNECTION %s" % \
-                                                   row[0])
+                    self.server_list[2].exec_query("KILL CONNECTION "
+                                                   "{0}".format(row[0]))
 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl "
         try:
-            res = self.exec_util(cmd+master_str+slave_str,
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd+master_str+slave_str, self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         cmd = "mysqlshow_rpl.py --rpl-user=rpl:rpl "
         try:
-            res = self.exec_util(cmd+master_str+slave_str,
-                                 self.res_fname)
-        except UtilError, e:
-            raise MUTLibError(e.errmsg)
+            self.exec_util(cmd+master_str+slave_str, self.res_fname)
+        except UtilError as err:
+            raise MUTLibError(err.errmsg)
 
         cmd_str = "mysqlrplshow.py --disco=root:root " + master_str
 
-        comment = "Test case 1 - show topology - without list"
+        test_num = 1
+        comment = ("Test case {0} - show topology - without "
+                   "list".format(test_num))
         cmd_opts = "  --recurse "
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 2 - show topology - with list"
+        test_num += 1
+        comment = "Test case {0} - show topology - with list".format(test_num)
         cmd_opts = "  --recurse --show-list"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 3 - show topology - with list and quiet"
+        test_num += 1
+        comment = ("Test case {0} - show topology - with list and "
+                   "quiet".format(test_num))
         cmd_opts = "  --recurse --quiet --show-list"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 4 - show topology - with format and without list"
+        test_num += 1
+        comment = ("Test case {0} - show topology - with format and without "
+                   "list".format(test_num))
         cmd_opts = "  --recurse --format=CSV"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
-        comment = "Test case 5 - show topology - help"
+        test_num += 1
+        comment = "Test case {0} - show topology - help".format(test_num)
         cmd_opts = " --help"
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Remove version information
-        self.remove_result_and_lines_after("MySQL Utilities mysqlrplshow.py "
+        self.remove_result_and_lines_after("MySQL Utilities mysqlrplshow "
                                            "version", 6)
 
         _FORMATS = ("CSV", "TAB", "GRID", "VERTICAL")
         test_num = 6
-        for format in _FORMATS:
-            comment = "Test Case %d : Testing show topology with " % test_num
-            comment += "%s format " % format
-            cmd_opts = "  --recurse --show-list --format=%s" % format
+        for format_ in _FORMATS:
+            comment = ("Test Case {0} : Testing show topology with {1} "
+                       "format ".format(test_num, format_))
+            cmd_opts = "  --recurse --show-list --format={0}".format(format_)
             res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
-                                               comment)
+                                                   comment)
             if not res:
-                raise MUTLibError("%s: failed" % comment)
+                raise MUTLibError("{0}: failed".format(comment))
 
             test_num += 1
 

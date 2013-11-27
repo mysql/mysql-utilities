@@ -20,15 +20,21 @@ This module contains abstractions of a MySQL Database object used by
 multiple utilities.
 """
 
+import multiprocessing
+import os
 import re
+import sys
+
 from collections import deque
-from operator import itemgetter
 
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.sql_transform import quote_with_backticks
-from mysql.utilities.common.sql_transform import remove_backtick_quoting
-from mysql.utilities.common.sql_transform import is_quoted_with_backticks
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.options import obj2sql
+from mysql.utilities.common.server import connect_servers, Server
+from mysql.utilities.common.user import User
+from mysql.utilities.common.sql_transform import (quote_with_backticks,
+                                                  remove_backtick_quoting,
+                                                  is_quoted_with_backticks)
 
 # List of database objects for enumeration
 _DATABASE, _TABLE, _VIEW, _TRIG, _PROC, _FUNC, _EVENT, _GRANT = "DATABASE", \
@@ -102,6 +108,104 @@ ON DELETE {DELETE_RULE}
 """
 
 
+def _multiprocess_tbl_copy_task(copy_tbl_task):
+    """Multiprocess copy table data method.
+
+    This method wraps the copy of the table's data to allow its concurrent
+    execution by a pool of processes.
+
+    copy_tbl_task[in]   dictionary of values required by a process to
+                        perform the table copy task, namely:
+                        'source_srv': <dict with source connections values>,
+                        'dest_srv': <dict with destination connections values>,
+                        'source_db': <source database name>,
+                        'destination_db': <destination database name>,
+                        'table': <table to copy>,
+                        'options': <dict of options>,
+                        'cloning': <cloning flag>,
+                        'connections': <number of concurrent connections>,
+                        'q_source_db': <quoted source database name>.
+    """
+    # Get input to execute task.
+    source_srv = copy_tbl_task.get('source_srv')
+    dest_srv = copy_tbl_task.get('dest_srv')
+    source_db = copy_tbl_task.get('source_db')
+    target_db = copy_tbl_task.get('target_db')
+    table = copy_tbl_task.get('table')
+    options = copy_tbl_task.get('options')
+    cloning = copy_tbl_task.get('cloning')
+    # Execute copy table task.
+    # NOTE: Must handle any exception here, because worker processes will not
+    # propagate them to the main process.
+    try:
+        _copy_table_data(source_srv, dest_srv, source_db, target_db, table,
+                         options, cloning)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        print("ERROR copying data for table '{0}': {1}".format(table,
+                                                               err.errmsg))
+
+
+def _copy_table_data(source_srv, destination_srv, db_name, new_db_name,
+                     tbl_name, tbl_options, cloning, connections=1):
+    """Copy the data of the specified table.
+
+    This method copies/clones all the data from a table to another (new)
+    database.
+
+    source_srv[in]      Source server (Server instance or dict. with the
+                        connection values).
+    destination_srv[in] Destination server (Server instance or dict. with the
+                        connection values).
+    db_name[in]         Name of the database with the table to copy.
+    new_db_name[in]     Name of the destination database to copy the table.
+    tbl_name[in]        Name of the table to copy.
+    tbl_options[in]     Table options.
+    cloning[in]         Cloning flag, in order to use a different method to
+                        copy data on the same server
+    connections[in]     Specify the use of multiple connections/processes to
+                        copy the table data (rows). By default, only 1 used.
+                        Note: Multiprocessing option should be preferred.
+    """
+    # Import table needed here to avoid circular import issues.
+    from mysql.utilities.common.table import Table
+    # Handle source and destination server instances or connection values.
+    # Note: For multiprocessing the use of connection values instead of a
+    # server instance is required to avoid internal errors.
+    if isinstance(source_srv, Server):
+        source = source_srv
+    else:
+        # Get source server instance from connection values.
+        conn_options = {
+            'quiet': True,  # Avoid repeating output for multiprocessing.
+            'version': "5.1.30",
+        }
+        servers = connect_servers(source_srv, None, conn_options)
+        source = servers[0]
+    if isinstance(destination_srv, Server):
+        destination = destination_srv
+    else:
+        # Get source server instance from connection values.
+        conn_options = {
+            'quiet': True,  # Avoid repeating output for multiprocessing.
+            'version': "5.1.30",
+        }
+        servers = connect_servers(destination_srv, None, conn_options)
+        destination = servers[0]
+
+    # Copy table data.
+    if not tbl_options.get("quiet", False):
+        print("# Copying data for TABLE {0}.{1}".format(db_name,
+                                                        tbl_name))
+    q_tbl_name = "{0}.{1}".format(quote_with_backticks(db_name),
+                                  quote_with_backticks(tbl_name))
+    tbl = Table(source, q_tbl_name, tbl_options)
+    if tbl is None:
+        raise UtilDBError("Cannot create table object before copy.", -1,
+                          db_name)
+    tbl.copy_data(destination, cloning, new_db_name, connections)
+
+
 class Database(object):
     """
     The Database class encapsulates a database. The class has the following
@@ -115,7 +219,7 @@ class Database(object):
     """
     obj_type = _DATABASE
 
-    def __init__(self, source, name, options={}):
+    def __init__(self, source, name, options=None):
         """Constructor
 
         source[in]         A Server object
@@ -125,6 +229,8 @@ class Database(object):
         options[in]        Array of options for controlling what is included
                            and how operations perform (e.g., verbose)
         """
+        if options is None:
+            options = {}
         self.source = source
         # Keep database identifier considering backtick quotes
         if is_quoted_with_backticks(name):
@@ -149,13 +255,15 @@ class Database(object):
         self.new_db = None
         self.q_new_db = None
         self.init_called = False
-        self.destination = None # Used for copy mode
+        self.destination = None  # Used for copy mode
         self.cloning = False    # Used for clone mode
-        self.query_options = {  # Used for skipping fetch of rows
-            'fetch' : False
+        self.query_options = {  # Used for skipping buffered fetch of rows
+            'fetch': False,
+            'commit': False,  # No COMMIT needed for DDL operations (default).
         }
-        self.constraints = deque()  # Used to store constraints to execute after
-                                    # table creation, deque is thread-safe
+        self.constraints = deque()  # Used to store constraints to execute
+                                    # after table creation, deque is
+                                    # thread-safe
 
         self.objects = []
         self.new_objects = []
@@ -188,7 +296,6 @@ class Database(object):
         res = server.exec_query(_QUERY % db)
         return (res is not None and len(res) >= 1)
 
-
     def drop(self, server, quiet, db_name=None):
         """Drop the database
 
@@ -204,20 +311,20 @@ class Database(object):
         db = None
         if db_name:
             db = db_name if is_quoted_with_backticks(db_name) \
-                    else quote_with_backticks(db_name)
+                else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
         op_ok = False
         if quiet:
             try:
-                res = server.exec_query("DROP DATABASE %s" % (db),
-                                        self.query_options)
+                server.exec_query("DROP DATABASE %s" % (db),
+                                  self.query_options)
                 op_ok = True
             except:
                 pass
         else:
-            res = server.exec_query("DROP DATABASE %s" % (db),
-                                    self.query_options)
+            server.exec_query("DROP DATABASE %s" % (db),
+                              self.query_options)
             op_ok = True
         return op_ok
 
@@ -233,10 +340,9 @@ class Database(object):
         return True = database successfully created, False = error
         """
 
-        db = None
         if db_name:
             db = db_name if is_quoted_with_backticks(db_name) \
-                    else quote_with_backticks(db_name)
+                else quote_with_backticks(db_name)
         else:
             db = self.q_db_name
 
@@ -305,7 +411,6 @@ class Database(object):
                 )
         return create_str
 
-
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.
 
@@ -318,9 +423,8 @@ class Database(object):
         rows = self.get_db_objects(obj_type)
         if rows:
             for row in rows:
-                tuple = (obj_type, row)
-                self.objects.append(tuple)
-
+                tup = (obj_type, row)
+                self.objects.append(tup)
 
     def init(self):
         """Get all objects for the database based on options set.
@@ -337,18 +441,18 @@ class Database(object):
         # Get tables
         if not self.skip_tables:
             self.__add_db_objects(_TABLE)
+        # Get functions
+        if not self.skip_funcs:
+            self.__add_db_objects(_FUNC)
+        # Get stored procedures
+        if not self.skip_procs:
+            self.__add_db_objects(_PROC)
         # Get views
         if not self.skip_views:
             self.__add_db_objects(_VIEW)
         # Get triggers
         if not self.skip_triggers:
             self.__add_db_objects(_TRIG)
-        # Get stored procedures
-        if not self.skip_procs:
-            self.__add_db_objects(_PROC)
-        # Get functions
-        if not self.skip_funcs:
-            self.__add_db_objects(_FUNC)
         # Get events
         if not self.skip_events:
             self.__add_db_objects(_EVENT)
@@ -375,14 +479,21 @@ class Database(object):
         if self.cloning:
             try:
                 self.source.exec_query(drop_str, self.query_options)
-            except:
-                pass
+            except UtilError:
+                if self.verbose:
+                    print("# WARNING: Unable to drop {0} from {1} database "
+                          "(object may not exist): {2}".format(name,
+                                                               "source",
+                                                               drop_str))
         else:
             try:
                 self.destination.exec_query(drop_str, self.query_options)
-            except:
-                pass
-
+            except UtilError:
+                if self.verbose:
+                    print("# WARNING: Unable to drop {0} from {1} database "
+                          "(object may not exist): {2}".format(name,
+                                                               "destination",
+                                                               drop_str))
 
     def __create_object(self, obj_type, obj, show_grant_msg,
                         quiet=False, new_engine=None, def_engine=None):
@@ -400,14 +511,16 @@ class Database(object):
         Note: will handle exception and print error if query fails
         """
         if obj_type == _TABLE and self.cloning:
+            obj_name = quote_with_backticks(obj[0])
             create_list = ["CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}".format(
-                self.q_new_db, obj[0], self.q_db_name)
+                self.q_new_db, obj_name, self.q_db_name)
             ]
         else:
             create_list = [self.__make_create_statement(obj_type, obj)]
         if obj_type == _TABLE:
             may_skip_fk = False  # Check possible issues with FK Constraints
-            tbl_name = "%s.%s" % (self.q_new_db, obj[0])
+            obj_name = quote_with_backticks(obj[0])
+            tbl_name = "%s.%s" % (self.q_new_db, obj_name)
             create_list = self.destination.substitute_engine(tbl_name,
                                                              create_list[0],
                                                              new_engine,
@@ -427,104 +540,134 @@ class Database(object):
             i = create_list[-1].find("ENGINE=")
             if i > 0:
                 j = create_list[-1].find(" ", i)
-                dest_eng = create_list[-1][i+7:j]
+                dest_eng = create_list[-1][i + 7:j]
             dest_eng = dest_eng or src_eng
 
             if src_eng.upper() == 'INNODB' and dest_eng.upper() != 'INNODB':
                 may_skip_fk = True
 
-        str = "# Copying"
+        string = "# Copying"
         if not quiet:
             if obj_type == _GRANT:
                 if show_grant_msg:
-                    print "%s GRANTS from %s" % (str, self.db_name)
+                    print "%s GRANTS from %s" % (string, self.db_name)
             else:
                 print "%s %s %s.%s" % \
-                      (str, obj_type, self.db_name, obj[0])
+                      (string, obj_type, self.db_name, obj[0])
             if self.verbose:
                 print("; ".join(create_list))
-        res = None
+
         try:
-            res = self.destination.exec_query("USE %s" % self.q_new_db,
-                                              self.query_options)
+            self.destination.exec_query("USE %s" % self.q_new_db,
+                                        self.query_options)
         except:
             pass
         for stm in create_list:
             try:
-                res = self.destination.exec_query(stm, self.query_options)
+                self.destination.exec_query(stm, self.query_options)
             except Exception as e:
                 raise UtilDBError("Cannot operate on {0} object."
                                   " Error: {1}".format(obj_type, e.errmsg),
                                   -1, self.db_name)
 
-        # Look for FK constraints
+        # Look for foreign key constraints
         if obj_type == _TABLE:
-            params = {'DATABASE': self.db_name,
-                      'TABLE': obj[0],
-                      }
+            params = {
+                'DATABASE': self.db_name,
+                'TABLE': obj[0],
+            }
             try:
                 query = _FK_CONSTRAINT_QUERY.format(**params)
-                fk_constr = self.source.exec_query(query)
+                fkey_constr = self.source.exec_query(query)
             except Exception as e:
-                raise UtilDBError("Unable to obtain FK constraint information "
-                                  "for table {0}.{1}. Error: {2}".format(
-                                  self.db_name, obj[0], e.errmsg), -1,
-                                  self.db_name
+                raise UtilDBError("Unable to obtain Foreign Key constraint "
+                                  "information for table {0}.{1}. "
+                                  "Error: {2}".format(self.db_name, obj[0],
+                                                      e.errmsg), -1,
+                                  self.db_name)
+
+            # Get information about the foreign keys of the table being
+            # copied/cloned.
+            if fkey_constr and not may_skip_fk:
+
+                # Create a constraint dictionary with the constraint
+                # name as key
+                constr_dict = {}
+
+                # This list is used to ensure the same constraints are applied
+                # in the same order, because iterating the dictionary doesn't
+                # offer any guarantees regarding order, and Python 2.6 has
+                # no ordered_dict
+                constr_lst = []
+
+                for fkey in fkey_constr:
+                    params = constr_dict.get(fkey[1])
+                    # in case the constraint entry already exists, it means it
+                    # is composite, just update the columns names and
+                    # referenced column fields
+                    if params:
+                        params['COLUMN_NAMES'].append(fkey[2])
+                        params['REFERENCED_COLUMNS'].append(fkey[5])
+                    else:  # else create a new entry
+                        constr_lst.append(fkey[1])
+                        constr_dict[fkey[1]] = {
+                            'DATABASE': self.new_db,
+                            'TABLE': fkey[0],
+                            'CONSTRAINT_NAME': fkey[1],
+                            'COLUMN_NAMES': [fkey[2]],
+                            'REFERENCED_DATABASE': fkey[3],
+                            'REFERENCED_TABLE': fkey[4],
+                            'REFERENCED_COLUMNS': [fkey[5]],
+                            'UPDATE_RULE': fkey[6],
+                            'DELETE_RULE': fkey[7],
+                        }
+                # Iterate all the constraints and get the necessary parameters
+                # to create the query
+                for constr in constr_lst:
+                    params = constr_dict[constr]
+                    if self.cloning:  # if it is a cloning table operation
+
+                        # In case the foreign key is composite we need to join
+                        # the columns to use in in alter table query. Only
+                        # useful when cloning
+                        params['COLUMN_NAMES'] = '`,`'.join(
+                            params['COLUMN_NAMES'])
+                        params['REFERENCED_COLUMNS'] = '`,`'.join(
+                            params['REFERENCED_COLUMNS'])
+
+                        # If the foreign key points to a table under the
+                        # database being cloned, change the referenced database
+                        #  name to the new cloned database
+                        if params['REFERENCED_DATABASE'] == self.db_name:
+                            params['REFERENCED_DATABASE'] = self.new_db
+                        else:
+                            print("# WARNING: The database being cloned has "
+                                  "external Foreign Key constraint "
+                                  "dependencies, {0}.{1} depends on {2}."
+                                  "{3}".format(params['DATABASE'],
+                                               params['TABLE'],
+                                               params['REFERENCED_DATABASE'],
+                                               params['REFERENCED_TABLE'])
                                   )
+                        query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
 
-            #Get information about foreign keys of the table being copied/cloned
-            if fk_constr and not may_skip_fk:
-                c = fk_constr[0]
-                # Extract FK Parameters
-                params = {'DATABASE': self.new_db,
-                          'TABLE': c[0],
-                          'CONSTRAINT_NAME': c[1],
-                          'REFERENCED_DATABASE': c[3],
-                          'REFERENCED_TABLE': c[4],
-                          'UPDATE_RULE': c[6],
-                          'DELETE_RULE': c[7],
-                          }
-
-                if self.cloning:  # if it is a cloning table operation
-
-                    # In case FK is composit we need to join the columns to use
-                    # in in alter table query. Only useful when cloning
-                    params['COLUMN_NAMES'] = '`,`'.join(map(itemgetter(2),
-                                                            fk_constr))
-                    params['REFERENCED_COLUMNS'] = '`,`'.join(map(itemgetter(5),
-                                                                  fk_constr))
-
-                    # If the FK points to a table under the database being
-                    # cloned, change the referenced database name to the new
-                    # cloned database
-                    if params['REFERENCED_DATABASE'] == self.db_name:
-                        params['REFERENCED_DATABASE'] = self.new_db
-                    else:
-                        print("# WARNING: The database being cloned has "
-                              "external Foreign Key constraint dependencies,"
-                              " {0}.{1} depends on {2}."
-                              "{3}".format(params['DATABASE'], params['TABLE'],
-                                           params['REFERENCED_DATABASE'],
-                                           params['REFERENCED_TABLE'])
-                              )
-                    query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
-
-                    # Store constraint query for later execution
-                    self.constraints.append(query)
-                    if self.verbose:
-                        print(query)
-                else:  # if we are copying
-                    if params['REFERENCED_DATABASE'] != self.db_name:
-                        # if the table being copied has dependencies to external
-                        # databases
-                        print("# WARNING: The database being copied has "
-                              "external Foreign Key constraint dependencies,"
-                              " {0}.{1} depends on {2}."
-                              "{3}".format(params['DATABASE'], params['TABLE'],
-                                           params['REFERENCED_DATABASE'],
-                                           params['REFERENCED_TABLE'])
-                              )
-            elif fk_constr and may_skip_fk:
+                        # Store constraint query for later execution
+                        self.constraints.append(query)
+                        if self.verbose:
+                            print(query)
+                    else:  # if we are copying
+                        if params['REFERENCED_DATABASE'] != self.db_name:
+                            # if the table being copied has dependencies
+                            # to external databases
+                            print("# WARNING: The database being copied has "
+                                  "external Foreign Key constraint "
+                                  "dependencies, {0}.{1} depends on {2}."
+                                  "{3}".format(params['DATABASE'],
+                                               params['TABLE'],
+                                               params['REFERENCED_DATABASE'],
+                                               params['REFERENCED_TABLE'])
+                                  )
+            elif fkey_constr and may_skip_fk:
                 print("# WARNING: FOREIGN KEY constraints for table {0}.{1} "
                       "are missing because the new storage engine for "
                       "the table is not InnoDB".format(self.new_db, obj[0]))
@@ -536,7 +679,8 @@ class Database(object):
 
         # Enable Foreign Key Checks to prevent the swapping of
         # RESTRICT referential actions with NO ACTION
-        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1")
+        query_opts = {'fetch': False, 'commit': False}
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1", query_opts)
 
         # while constraint queue is not empty
         while self.constraints:
@@ -548,14 +692,14 @@ class Database(object):
             if self.verbose:
                 print(query)
             try:
-                self.destination.exec_query(query)
+                self.destination.exec_query(query, query_opts)
             except Exception as err:
                 raise UtilDBError("Unable to execute constraint query "
                                   "{0}. Error: {1}".format(query, err.errmsg),
                                   -1, self.new_db)
 
         # Turn Foreign Key Checks off again
-        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=0")
+        self.destination.exec_query("SET FOREIGN_KEY_CHECKS=0", query_opts)
 
     def copy_objects(self, new_db, options, new_server=None,
                      connections=1, check_exists=True):
@@ -579,8 +723,6 @@ class Database(object):
         check_exists[in]   If True, check for database existence before copy
                            Default is True
         """
-
-        from mysql.utilities.common.table import Table
 
         # Must call init() first!
         # Guard for init() prerequisite
@@ -610,11 +752,8 @@ class Database(object):
         if self.cloning:
             self.destination = self.source
 
-
         # Check to see if database exists
         if check_exists:
-            exists = False
-            drop_server = None
             if self.cloning:
                 exists = self.exists(self.source, new_db)
                 drop_server = self.source
@@ -631,7 +770,7 @@ class Database(object):
 
         db_name = self.db_name
         definition = self.get_object_definition(db_name, db_name, _DATABASE)
-        schema_name, character_set, collation, sql_path = definition[0]
+        _, character_set, collation, _ = definition[0]
         # Create new database first
         if not self.skip_create:
             if self.cloning:
@@ -643,11 +782,11 @@ class Database(object):
 
         # Create the objects in the new database
         for obj in self.objects:
-
             # Drop object if --force specified and database not dropped
             # Grants do not need to be dropped for overwriting
             if options.get("force", False) and obj[0] != _GRANT:
-                self.__drop_object(obj[0], obj[1][0])
+                obj_name = quote_with_backticks(obj[1][0])
+                self.__drop_object(obj[0], obj_name)
 
             # Create the object
             self.__create_object(obj[0], obj[1], not grant_msg_displayed,
@@ -658,27 +797,31 @@ class Database(object):
             if obj[0] == _GRANT and not grant_msg_displayed:
                 grant_msg_displayed = True
         # After object creation, add the constraints
-        self.__apply_constraints()
+        if self.constraints:
+            self.__apply_constraints()
 
-    def copy_data(self, new_db, options, new_server=None, connections=1):
+    def copy_data(self, new_db, options, new_server=None, connections=1,
+                  src_con_val=None, dest_con_val=None):
         """Copy the data for the tables.
 
         This method will copy the data for all of the tables to another, new
         database. The method will process an input file with INSERT statements
         if the option was selected by the caller.
 
-        new_db[in]         Name of the new database
-        options[in]        Options for copy e.g. force, etc.
-        new_server[in]     Connection to another server for copying the db
-                           Default is None (copy to same server - clone)
-        connections[in]    Number of threads(connections) to use for insert
+        new_db[in]          Name of the new database
+        options[in]         Options for copy e.g. force, etc.
+        new_server[in]      Connection to another server for copying the db
+                            Default is None (copy to same server - clone)
+        connections[in]     Number of threads(connections) to use for insert
+        src_con_val[in]     Dict. with the connection values of the source
+                            server (required for multiprocessing).
+        dest_con_val[in]    Dict. with the connection values of the
+                            destination server (required for multiprocessing).
         """
-
-        from mysql.utilities.common.table import Table
 
         # Must call init() first!
         # Guard for init() prerequisite
-        assert self.init_called, "You must call db.init() before "+ \
+        assert self.init_called, "You must call db.init() before " + \
                                  "db.copy_data()."
 
         if self.skip_data:
@@ -695,24 +838,43 @@ class Database(object):
         quiet = options.get("quiet", False)
 
         tbl_options = {
-            'verbose'  : self.verbose,
-            'get_cols' : True,
-            'quiet'    : quiet
+            'verbose': self.verbose,
+            'get_cols': True,
+            'quiet': quiet
         }
 
+        copy_tbl_tasks = []
         table_names = [obj[0] for obj in self.get_db_objects(_TABLE)]
         for tblname in table_names:
-            if not quiet:
-                print "# Copying data for TABLE %s.%s" % (self.db_name,
-                                                          tblname)
-            tbl = Table(self.source, "%s.%s" % (self.q_db_name,
-                                                quote_with_backticks(tblname)),
-                        tbl_options)
-            if tbl is None:
-                raise UtilDBError("Cannot create table object before copy.",
-                                  -1, self.db_name)
-            tbl.copy_data(self.destination, self.cloning, new_db, connections)
+            # Check multiprocess table copy (only on POSIX systems).
+            if options['multiprocess'] > 1 and os.name == 'posix':
+                # Create copy task.
+                copy_task = {
+                    'source_srv': src_con_val,
+                    'dest_srv': dest_con_val,
+                    'source_db': self.db_name,
+                    'target_db': new_db,
+                    'table': tblname,
+                    'options': tbl_options,
+                    'cloning': self.cloning,
+                }
+                copy_tbl_tasks.append(copy_task)
+            else:
+                # Copy data from a table (no multiprocessing).
+                _copy_table_data(self.source, self.destination, self.db_name,
+                                 new_db, tblname, tbl_options, self.cloning)
 
+        # Copy tables concurrently.
+        if copy_tbl_tasks:
+            # Create process pool.
+            workers_pool = multiprocessing.Pool(
+                processes=options['multiprocess']
+            )
+            # Concurrently export tables.
+            workers_pool.map_async(_multiprocess_tbl_copy_task, copy_tbl_tasks)
+            workers_pool.close()
+            # Wait for all task to be completed by workers.
+            workers_pool.join()
     def get_create_statement(self, db, name, obj_type):
         """Return the create statement for the object
 
@@ -731,7 +893,17 @@ class Database(object):
         else:
             q_db = (db if is_quoted_with_backticks(db)
                     else quote_with_backticks(db))
-            name_str = q_db + "." + q_name
+
+            # Switch the default database to execute the
+            # SHOW CREATE statement without needing to specify the database
+            # This is for 5.1 compatibility reasons:
+            try:
+                self.source.exec_query("USE {0}".format(q_db),
+                                       self.query_options)
+            except UtilError as err:
+                raise UtilDBError("ERROR: Couldn't change "
+                                  "default database: {0}".format(err.errmsg))
+        name_str = q_name
 
         # Retrieve the CREATE statement.
         row = self.source.exec_query(
@@ -870,9 +1042,9 @@ class Database(object):
 
         # Remove objects backticks if needed
         db = remove_backtick_quoting(db) \
-                    if is_quoted_with_backticks(db) else db
+            if is_quoted_with_backticks(db) else db
         name = remove_backtick_quoting(name) \
-                    if is_quoted_with_backticks(name) else name
+            if is_quoted_with_backticks(name) else name
 
         if obj_type == _DATABASE:
             columns = 'SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, ' + \
@@ -885,20 +1057,20 @@ class Database(object):
                       'TABLE_COMMENT, ROW_FORMAT, CREATE_OPTIONS'
             from_name = 'TABLES'
             condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _VIEW:
             columns = 'TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, ' + \
                       'CHECK_OPTION, DEFINER, SECURITY_TYPE'
             from_name = 'VIEWS'
             condition = "TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _TRIG:
             columns = 'TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ' + \
                       'EVENT_OBJECT_TABLE, ACTION_STATEMENT, ' + \
                       'ACTION_TIMING, DEFINER'
             from_name = 'TRIGGERS'
             condition = "TRIGGER_SCHEMA = '%s' AND TRIGGER_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
         elif obj_type == _PROC or obj_type == _FUNC:
             columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
                       'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
@@ -909,28 +1081,28 @@ class Database(object):
                         'ROUTINES.ROUTINE_NAME = proc.name AND ' + \
                         'ROUTINES.ROUTINE_TYPE = proc.type '
             condition = "ROUTINE_SCHEMA = '%s' AND ROUTINE_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
             if obj_type == _PROC:
-                type = 'PROCEDURE'
+                typ = 'PROCEDURE'
             else:
-                type = 'FUNCTION'
-            condition += " AND ROUTINE_TYPE = '%s'" % type
+                typ = 'FUNCTION'
+            condition += " AND ROUTINE_TYPE = '%s'" % typ
         elif obj_type == _EVENT:
-            columns = 'EVENT_SCHEMA, EVENT_NAME, DEFINER, EVENT_DEFINITION, ' + \
-                      'EVENT_TYPE, INTERVAL_FIELD, INTERVAL_VALUE, STATUS, '+ \
-                      'ON_COMPLETION, STARTS, ENDS'
+            columns = ('EVENT_SCHEMA, EVENT_NAME, DEFINER, EVENT_DEFINITION, '
+                       'EVENT_TYPE, INTERVAL_FIELD, INTERVAL_VALUE, STATUS, '
+                       'ON_COMPLETION, STARTS, ENDS')
             from_name = 'EVENTS'
             condition = "EVENT_SCHEMA = '%s' AND EVENT_NAME = '%s'" % \
-                         (db, name)
+                        (db, name)
 
         if from_name is None:
             raise UtilError('Attempting to get definition from unknown object '
                             'type = %s.' % obj_type)
 
         values = {
-            'columns'    : columns,
-            'table_name' : from_name,
-            'conditions' : condition,
+            'columns': columns,
+            'table_name': from_name,
+            'conditions': condition,
         }
         rows = self.source.exec_query(_DEFINITION_QUERY % values)
         if rows != []:
@@ -941,14 +1113,12 @@ class Database(object):
                 values['db'] = db
                 basic_def = rows[0]
                 col_def = self.source.exec_query(_COLUMN_QUERY % values)
-                part_def = self.source.exec_query(_PARTITION_QUERY % \
-                                                  values)
+                part_def = self.source.exec_query(_PARTITION_QUERY % values)
                 definition.append((basic_def, col_def, part_def))
             else:
                 definition.append(rows[0])
 
         return definition
-
 
     def get_next_object(self):
         """Retrieve the next object in the database list.
@@ -977,10 +1147,8 @@ class Database(object):
 
         Returns (string) String to add to where clause or ""
         """
-        from mysql.utilities.common.options import obj2sql
-
         oper = 'NOT REGEXP' if self.use_regexp else 'NOT LIKE'
-        str = ""
+        string = ""
         for pattern in self.exclude_patterns:
             # Check use of qualified object names (with backtick support).
             if pattern.find(".") > 0:
@@ -999,10 +1167,10 @@ class Database(object):
                 value = pattern
             if value:
                 # Append exclude condition to previous one(s).
-                str = "{0} AND {1} {2} {3}".format(str, exclude_param, oper,
-                                                   obj2sql(value))
+                string = "{0} AND {1} {2} {3}".format(string, exclude_param,
+                                                      oper, obj2sql(value))
 
-        return str
+        return string
 
     def get_object_type(self, object_name):
         """Return the object type of an object
@@ -1287,7 +1455,7 @@ class Database(object):
             return None
 
         col_options = {
-            'columns' : get_columns
+            'columns': get_columns
         }
         pos_to_quote = ()
         if obj_type == _GRANT:
@@ -1317,8 +1485,8 @@ class Database(object):
             # Quote required identifiers with backticks
             if need_backtick:
                 # function to quote row elements at a given positions
-                #quote = lambda pos, obj: quote_with_backticks(obj) \
-                #                        if obj and pos in pos_to_quote else obj
+                # quote = lambda pos, obj: quote_with_backticks(obj) \
+                #         if obj and pos in pos_to_quote else obj
                 new_rows = []
                 for row in res[1]:
                     # recreate row tuple quoting needed elements with backticks
@@ -1333,7 +1501,6 @@ class Database(object):
 
             return res
 
-
     def _check_user_permissions(self, uname, host, access):
         """Check user permissions for a given privilege
 
@@ -1343,13 +1510,9 @@ class Database(object):
 
         Returns True if user has permission, False if not
         """
-
-        from mysql.utilities.common.user import User
-
-        user = User(self.source, uname+'@'+host)
+        user = User(self.source, uname + '@' + host)
         result = user.has_privilege(access[0], '*', access[1])
         return result
-
 
     def check_read_access(self, user, host, options):
         """Check access levels for reading database objects
@@ -1397,12 +1560,11 @@ class Database(object):
             if not self._check_user_permissions(user, host, priv):
                 raise UtilDBError("User %s on the %s server does not have "
                                   "permissions to read all objects in %s. " %
-                                   (user, self.source.role, self.db_name) +
-                                   "User needs %s privilege on %s." %
-                                   (priv[1], priv[0]), -1, priv[0])
+                                  (user, self.source.role, self.db_name) +
+                                  "User needs %s privilege on %s." %
+                                  (priv[1], priv[0]), -1, priv[0])
 
         return True
-
 
     def check_write_access(self, user, host, options):
         """Check access levels for creating and writing database objects

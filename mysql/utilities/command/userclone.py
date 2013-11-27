@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,40 +22,39 @@ to the new users.
 """
 
 import sys
+
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.server import connect_servers
+from mysql.utilities.common.format import print_list
+from mysql.utilities.common.user import User
+
 
 def _show_user_grants(source, user_source, base_user, verbosity):
     """Show grants for a specific user.
     """
-    from mysql.utilities.common.user import User
-
     try:
         if not user_source:
             user_source = User(source, base_user, verbosity)
         print "# Dumping grants for user " + base_user
         user_source.print_grants()
-    except UtilError, e:
+    except UtilError:
         print "# Cannot show grants for user %s." % base_user + \
               "Please check user and host for valid names."
 
 
-def show_users(src_val, verbosity, format, dump=False):
+def show_users(src_val, verbosity, fmt, dump=False):
     """Show all users except root and anonymous users on the server.
 
     src_val[in]        a dictionary containing connection information for the
                        source including:
                        (user, password, host, port, socket)
     verbosty[in]       level of information to display
-    format[in]         format of output
+    fmt[in]            format of output
     dump[in]           if True, dump the grants for all users
                        default = False
     """
-
-    from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.format import print_list
-
     conn_options = {
-        'version'   : "5.1.0",
+        'version': "5.1.0",
     }
     servers = connect_servers(src_val, None, conn_options)
     source = servers[0]
@@ -76,7 +75,7 @@ def show_users(src_val, verbosity, format, dump=False):
 
     users = source.exec_query(_QUERY)
     print "# All Users:"
-    print_list(sys.stdout, format, cols, users)
+    print_list(sys.stdout, fmt, cols, users)
     if dump:
         for user in users:
             _show_user_grants(source, None, "'%s'@'%s'" % user[0:2], verbosity)
@@ -116,10 +115,6 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
 
     Returns bool True = success, raises UtilError if error
     """
-
-    from mysql.utilities.common.server import connect_servers
-    from mysql.utilities.common.user import User
-
     dump_sql = options.get("dump", False)
     overwrite = options.get("overwrite", False)
     verbosity = options.get("verbosity", False)
@@ -128,8 +123,8 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
 
     # Don't require destination for dumping base user grants
     conn_options = {
-        'quiet'     : quiet,
-        'version'   : "5.1.0",
+        'quiet': quiet,
+        'version': "5.1.0",
     }
     if dump_sql:
         servers = connect_servers(src_val, None, conn_options)
@@ -161,7 +156,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         for new_user in new_user_list:
             if user_dest.exists(new_user):
                 raise UtilError("User %s already exists. Use --force "
-                      "to drop and recreate user." % new_user)
+                                "to drop and recreate user." % new_user)
 
     if not quiet:
         print "# Cloning %d users..." % (len(new_user_list))
@@ -176,7 +171,7 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         # Clone user.
         try:
             user_source.clone(new_user, destination, global_privs)
-        except UtilError, e:
+        except UtilError:
             raise
 
     if not quiet:

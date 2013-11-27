@@ -45,9 +45,9 @@ class test(rpl_admin_gtid.test):
         return True
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).supports_gtid() != "ON" or \
-           not self.servers.get_server(0).check_version_compat(5, 6, 9):
-            raise MUTLibError("Test requires server version 5.6.9 with "
+        if (self.servers.get_server(0).supports_gtid() != "ON" or
+                not self.servers.get_server(0).check_version_compat(5, 6, 9)):
+            raise MUTLibError("Test requires server version >= 5.6.9 with "
                               "GTID_MODE=ON.")
         return rpl_admin_gtid.test.check_prerequisites(self)
 
@@ -74,26 +74,30 @@ class test(rpl_admin_gtid.test):
             f_out = tempfile.TemporaryFile()
             self.temp_files.append(f_out)
         else:
-            file = os.devnull
-            f_out = open(file, 'w')
+            file_ = os.devnull
+            f_out = open(file_, 'w')
         if os.name == "posix":
-             proc = subprocess.Popen(cmd, shell=True, stdout=f_out,
-                                     stderr=f_out)
+            proc = subprocess.Popen(cmd, shell=True, stdout=f_out,
+                                    stderr=f_out)
         else:
-             proc = subprocess.Popen(cmd, stdout=f_out, stderr=f_out)
-        return (proc, f_out)
+            proc = subprocess.Popen(cmd, stdout=f_out, stderr=f_out)
+        return proc, f_out
 
     def kill(self, pid, force=False):
+        res = True
         if os.name == "posix":
             if force:
-                res = os.kill(pid, subprocess.signal.SIGABRT)
+                os.kill(pid, subprocess.signal.SIGABRT)
             else:
-                res = os.kill(pid, subprocess.signal.SIGTERM)
+                os.kill(pid, subprocess.signal.SIGTERM)
         else:
             f_out = open(os.devnull, 'w')
-            proc = subprocess.Popen("taskkill /F /T /PID %i" % pid, shell=True,
-                                    stdout=f_out, stdin=f_out)
-            res = 0  # Ignore spurious Windows results
+            ret_code = subprocess.call("taskkill /F /T /PID {0}".format(pid),
+                                       shell=True, stdout=f_out, stdin=f_out)
+            if ret_code not in (0, 128):
+                res = False
+                print("Unable to successfully kill process with PID "
+                      "{0}".format(pid))
             f_out.close()
         return res
 
@@ -170,6 +174,7 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("Waiting for failover console to register master and start "
                   "its monitoring process")
+        time.sleep(5)
         i = 0
         with open(log_filename, 'r') as file_:
             while i < _TIMEOUT:
@@ -200,9 +205,9 @@ class test(rpl_admin_gtid.test):
         res = server.show_server_variable("datadir")
         datadir = res[0][1]
 
-        # Stop the server 
+        # Stop the server
         server.disconnect()
-        self.kill(pid, True)
+        self.kill(pid)
 
         # Need to wait until the process is really dead.
         if self.debug:
@@ -228,8 +233,8 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("# Waiting for failover to complete.")
         i = 0
-        while not os.path.exists(self.failover_dir):
-            time.sleep(1)
+        while not os.path.isdir(self.failover_dir):
+            time.sleep(5)
             i += 1
             if i > _TIMEOUT:
                 if self.debug:
@@ -287,7 +292,7 @@ class test(rpl_admin_gtid.test):
             except OSError:
                 pass
 
-        return (comment, found_row)
+        return comment, found_row
 
     def run(self):
         self.res_fname = "result.txt"
@@ -304,32 +309,38 @@ class test(rpl_admin_gtid.test):
         self.test_results = []
         self.test_cases = []
 
-        failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
-                       " --discover-slaves-login=root:root %s --failover-" + \
-                       'mode=%s --log=%s --exec-post-fail="' + \
-                       self.fail_event_script + '" --timeout=5 '
+        failover_cmd = ("python ../scripts/mysqlfailover.py --interval=10 "
+                        " --discover-slaves-login=root:root {0} --failover-"
+                        'mode={1} --log={2} --exec-post-fail="' +
+                        self.fail_event_script + '" --timeout=5 ')
         
         conn_str = " ".join([master_str, slaves_str])
-        str = failover_cmd % (conn_str, 'auto', _FAILOVER_LOG.format('1'))
-        str += " --candidates=%s " % slave1_conn
+        str_ = failover_cmd.format(conn_str, 'auto', _FAILOVER_LOG.format('1'))
+        str_ = "{0} --candidates={1} ".format(str_, slave1_conn)
+        test_num = 1
         self.test_cases.append(
-            (self.server1, str, True, _FAILOVER_LOG.format('1'),
-             "Test case 1 - Simple failover with --failover=auto.",
+            (self.server1, str_, True, _FAILOVER_LOG.format('1'),
+             "Test case {0} - Simple failover with "
+             "--failover=auto.".format(test_num),
              "Failover complete", False)
         )
-        str = failover_cmd % ("--master=%s" % slave1_conn, 'elect',
-                              _FAILOVER_LOG.format('2'))
-        str += " --candidates=%s " % slave2_conn
+        str_ = failover_cmd.format("--master={0}".format(slave1_conn), 'elect',
+                                   _FAILOVER_LOG.format('2'))
+        str_ = "{0} --candidates={1} ".format(str_, slave2_conn)
+        test_num += 1
         self.test_cases.append(
-            (self.server2, str, True, _FAILOVER_LOG.format('2'),
-             "Test case 2 - Simple failover with --failover=elect.",
+            (self.server2, str_, True, _FAILOVER_LOG.format('2'),
+             "Test case {0} - Simple failover with "
+             "--failover=elect.".format(test_num),
              "Failover complete", True)
         )
-        str = failover_cmd % ("--master=%s" % slave2_conn, 'fail',
-                              _FAILOVER_LOG.format('3'))
+        str_ = failover_cmd.format("--master={0}".format(slave2_conn), 'fail',
+                                   _FAILOVER_LOG.format('3'))
+        test_num += 1
         self.test_cases.append(
-            (self.server3, str, False, _FAILOVER_LOG.format('3'),
-             "Test case 3 - Simple failover with --failover=fail.",
+            (self.server3, str_, False, _FAILOVER_LOG.format('3'),
+             "Test case {0} - Simple failover with "
+             "--failover=fail.".format(test_num),
              "Master has failed and automatic", True)
         )
 
@@ -348,17 +359,18 @@ class test(rpl_admin_gtid.test):
         except UtilError:
             pass
 
-        comment = "Test case 4 - test --force on first run"
+        test_num += 1
+        comment = "Test case {0} - test --force on first run".format(test_num)
         # Note: test should pass without any errors. If the start or stop
         #       timeout, the test case has failed and the log will contain
         #       the error.
         if self.debug:
             print comment
 
-        failover_cmd = "python ../scripts/mysqlfailover.py --interval=10 " + \
-                       " --discover-slaves-login=root:root --force " + \
-                       "--master=%s --log=%s" % (slave3_conn,
-                                                 _FAILOVER_LOG.format('4'))
+        failover_cmd = ("python ../scripts/mysqlfailover.py --interval=10 "
+                        " --discover-slaves-login=root:root --force "
+                        "--master={0} --log={1}".format(
+                            slave3_conn, _FAILOVER_LOG.format('4')))
 
         if self.debug:
             print failover_cmd
@@ -377,11 +389,11 @@ class test(rpl_admin_gtid.test):
             if i > _TIMEOUT:
                 if self.debug:
                     print "# Timeout console to start."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "console to start." % comment)
+                raise MUTLibError("{0}: failed - timeout waiting for "
+                                  "console to start.".format(comment))
 
         # Need to poll here and wait for console to really end.
-        ret_val = self.stop_process(proc, f_out, True)
+        self.stop_process(proc, f_out, True)
         # Wait for console to end
         if self.debug:
             print "# Waiting for console to end."
@@ -392,8 +404,8 @@ class test(rpl_admin_gtid.test):
             if i > _TIMEOUT:
                 if self.debug:
                     print "# Timeout console to end."
-                raise MUTLibError("%s: failed - timeout waiting for "
-                                  "console to end." % comment)
+                raise MUTLibError("{0}: failed - timeout waiting for "
+                                  "console to end.".format(comment))
 
         return True
 
@@ -406,18 +418,18 @@ class test(rpl_admin_gtid.test):
             if not act_res[1]:
                 msg = "{0}\n{1}\nEvent missing from log. ".format(msg,
                                                                   act_res[0])
-                return (False, msg)
+                return False, msg
 
-        return (True, '')
+        return True, ''
 
     def record(self):
         return True  # Not a comparative test
 
     def cleanup(self):
         if self.debug:
-            for file in self.temp_files:
-                file.seek(0)
-                for row in file.readlines():
+            for file_ in self.temp_files:
+                file_.seek(0)
+                for row in file_:
                     if len(row.strip()):
                         print row,
 

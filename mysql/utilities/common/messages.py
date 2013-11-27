@@ -32,11 +32,11 @@ PARSE_ERR_DB_PAIR_EXT = ("%s The use of backticks is required if non "
                          "{db2_label} = '{db2_value}'." % PARSE_ERR_DB_PAIR)
 
 PARSE_ERR_DB_OBJ_PAIR = ("Cannot parse the specified database objects: "
-                           "'{db_obj_pair}'. Please verify that the objects "
-                           "are specified in a valid format (i.e., {db1_label}"
-                           "[.{obj1_label}]:{db2_label}[.{obj2_label}]) and "
-                           "that backtick quotes are properly used if "
-                           "required.")
+                         "'{db_obj_pair}'. Please verify that the objects "
+                         "are specified in a valid format (i.e., {db1_label}"
+                         "[.{obj1_label}]:{db2_label}[.{obj2_label}]) and "
+                         "that backtick quotes are properly used if "
+                         "required.")
 
 PARSE_ERR_DB_OBJ_PAIR_EXT = ("%s The use of backticks is required if non "
                              "alphanumeric characters are used for identifier "
@@ -48,10 +48,11 @@ PARSE_ERR_DB_OBJ_PAIR_EXT = ("%s The use of backticks is required if non "
                              % PARSE_ERR_DB_OBJ_PAIR)
 
 PARSE_ERR_DB_OBJ_MISSING_MSG = ("Incorrect object compare argument, one "
-                              "specific object is missing. Please verify that "
-                              "both object are correctly specified. {detail} "
-                              "Format should be: {db1_label}[.{obj1_label}]"
-                              ":{db2_label}[.{obj2_label}].")
+                                "specific object is missing. Please verify "
+                                "that both object are correctly specified. "
+                                "{detail} Format should be: "
+                                "{db1_label}[.{obj1_label}]"
+                                ":{db2_label}[.{obj2_label}].")
 
 PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
                             "{db_no_obj_label} '{db_no_obj_value}', while "
@@ -85,10 +86,13 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
                          "'{cmd}' (option ignored).")
 
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
-                                   % WARN_OPT_NOT_REQUIRED)
+                                  % WARN_OPT_NOT_REQUIRED)
 
-WARN_OPT_USING_DEFAULT = ("WARNING: Using default value '{default}' for option "
-                          "{opt}.")
+WARN_OPT_ONLY_USED_WITH = ("# WARNING: The {opt} option is only used with "
+                           "{used_with} (option ignored).")
+
+WARN_OPT_USING_DEFAULT = ("WARNING: Using default value '{default}' for "
+                          "option {opt}.")
 
 ERROR_SAME_MASTER = ("The specified new master {n_master_host}:{n_master_port}"
                      " is the same as the "

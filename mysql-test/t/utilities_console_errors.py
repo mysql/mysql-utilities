@@ -19,7 +19,6 @@ import mutlib
 import shutil
 
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.command.utilitiesconsole import Utilities
 
 fakeutil_help_tc_5 = """Usage: mysqlfakeutil.py --option
 
@@ -54,17 +53,17 @@ class test(mutlib.System_test):
         PRINT_WIDTH = 75
         UTIL_PATH = self.utildir
         self.options = {
-            'verbosity' : "verbosity",
-            'quiet'     : False,
-            'width'     : PRINT_WIDTH,
-            'utildir'   : UTIL_PATH,
-            'variables' : {},
-            'prompt'    : 'mysqluc> ',
-            'welcome'   : "WELCOME_MESSAGE",
-            'goodbye'   : "GOODBYE_MESSAGE",
-            'commands'  : None,
-            'custom'    : True, # We are using custom commands
-            }
+            'verbosity': "verbosity",
+            'quiet': False,
+            'width': PRINT_WIDTH,
+            'utildir': UTIL_PATH,
+            'variables': {},
+            'prompt': 'mysqluc> ',
+            'welcome': "WELCOME_MESSAGE",
+            'goodbye': "GOODBYE_MESSAGE",
+            'commands': None,
+            'custom': True,  # We are using custom commands
+        }
 
         self.path_fakeutil = os.path.join(self.tmp_dir, "mysqlfakeutil.py")
         self.write_fake_util(self.path_fakeutil,
@@ -73,10 +72,9 @@ class test(mutlib.System_test):
 
     def write_fake_util(self, util_name, content):
         # Write a fake utility
-        file_fakeutil = open(util_name, "w")
-        file_fakeutil.writelines(content)
-        file_fakeutil.flush()
-        file_fakeutil.close()
+        with open(util_name, "w") as file_fakeutil:
+            file_fakeutil.writelines(content)
+            file_fakeutil.flush()
 
     def run(self):
         if self.debug:
@@ -88,7 +86,7 @@ class test(mutlib.System_test):
 
         test_num = 1
         comment = ("Test case {0} - Test {1} missing "
-                   "{2} option").format(test_num, hide_utils, add_util)
+                   "{2} option".format(test_num, hide_utils, add_util))
         execute = "help utilities"
         command = cmd_str.format(self.tmp_dir, hide_utils, '--execute="{0}"')
         res = self.run_test_case(2, command.format(execute), comment)
@@ -97,7 +95,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - Test {1} with {2}"
-                   " option").format(test_num, hide_utils, add_util)
+                   " option".format(test_num, hide_utils, add_util))
         execute = "help utilities"
         params = "{0} {1}".format(hide_utils, add_util)
         command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
@@ -107,7 +105,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - Test {1} option without "
-                   "{2}").format(test_num, add_util, hide_utils)
+                   "{2}".format(test_num, add_util, hide_utils))
         execute = "help utilities"
         command = cmd_str.format(self.tmp_dir, add_util, '--execute="{0}"')
         res = self.run_test_case(0, command.format(execute), comment)
@@ -115,8 +113,8 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case {0} - Test {1} execute --help option"
-                   "").format(test_num, add_util)
+        comment = ("Test case {0} - Test {1} execute --help option".format(
+            test_num, add_util))
         execute = "fakeutility --help"
         params = "{0} {1}".format(hide_utils, add_util)
         command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
@@ -125,8 +123,8 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case {0} - Test fakeutility --return-code=1"
-                   "").format(test_num)
+        comment = ("Test case {0} - Test fakeutility --return-code=1".format(
+            test_num))
         execute = "fakeutility --return-code=1"
         params = "{0} {1}".format(hide_utils, add_util)
         command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
@@ -136,7 +134,7 @@ class test(mutlib.System_test):
 
         test_num += 1
         comment = ("Test case {0} - Test fakeutility --return-code=2 "
-                   "and no message").format(test_num)
+                   "and no message".format(test_num))
         execute = "fakeutility  -e2 --message-error=' '"
         params = "{0} {1}".format(hide_utils, add_util)
         command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')

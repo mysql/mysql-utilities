@@ -32,18 +32,18 @@ import tempfile
 
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
-from mysql.utilities.common.my_print_defaults import my_login_config_path
 from mysql.utilities.common.server import stop_running_server, Server
-from mysql.utilities.common.tools import get_tool_path, delete_directory
+from mysql.utilities.common.table import quote_with_backticks
+from mysql.utilities.common.tools import get_tool_path, check_port_in_use
 from mysql.utilities.command.serverclone import clone_server
 
 from mysql.utilities.exception import MUTLibError
-from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
-
 
 # Constants
 MAX_SERVER_POOL = 10
+MAX_NUM_RETRIES = 50
+
 
 def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
                file_in=None):
@@ -75,33 +75,34 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
         stdin = None
 
     if not abspath:
-        run_cmd = "python " + utildir + "/" + cmd
+        # Use unbuffered flag to ensure output is not buffered thus preventing
+        # issues regarding the order of the output
+        run_cmd = "python -u {0}/{1}".format(utildir, cmd)
     else:
         run_cmd = cmd
-    f_out = open(file_out, 'w+')
-    if debug:
-        print
-        print "exec_util command=", run_cmd
-        proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin)
-    else:
-        proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin,
-                                stdout = f_out, stderr = f_out)
+    with open(file_out, 'w+') as f_out:
+        if debug:
+            print
+            print("exec_util command={0}".format(run_cmd))
+            proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin)
+        else:
+            proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin,
+                                    stdout=f_out, stderr=f_out)
 
-    if file_in:
-        try:
-            lines = file_in.readlines()
-            proc.communicate(''.join(lines))
-        except AttributeError:
-            raise MUTLibError("file_in parameter must be a file-like object")
+        if file_in:
+            try:
+                proc.communicate(''.join(file_in))
+            except AttributeError:
+                raise MUTLibError("file_in parameter must be "
+                                  "a file-like object")
 
-    ret_val = proc.wait()
-    if debug:
-        print "ret_val=", ret_val
-    f_out.close()
+        ret_val = proc.wait()
+        if debug:
+            print "ret_val=", ret_val
     return ret_val
 
 
-class Server_list(object):
+class ServerList(object):
     """The Server_list class is used by the MySQL Utilities Test (MUT)
     facility to gather all the servers used by the tests.
 
@@ -111,6 +112,7 @@ class Server_list(object):
         - shutdown all new servers
         - manage ports and server_ids
     """
+
     def __init__(self, servers, startport, utildir, verbose=False):
         """Constructor
 
@@ -131,34 +133,27 @@ class Server_list(object):
         if servers is None:
             self.server_list = []
 
-
     def view_next_port(self):
         """View the next available server port but don't consume it.
         """
         return self.new_port
 
-
     def get_next_port(self):
         """Get the next available server port.
         """
-        new_port = self.new_port
-        self.new_port += 1
+        new_port, self.new_port = self.new_port, self.new_port + 1
         return new_port
-
 
     def clear_last_port(self):
         """Return last port used to available status.
         """
         self.new_port -= 1
 
-
     def get_next_id(self):
         """Get the next available server id.
         """
-        new_id = self.new_id
-        self.new_id += 1
+        new_id, self.new_id = self.new_id, self.new_id + 1
         return new_id
-
 
     def find_server_by_name(self, name):
         """Retrieve index of the server with the name indicated.
@@ -176,7 +171,6 @@ class Server_list(object):
                 return index
         return -1
 
-
     def get_server(self, index):
         """Retrieve the server located at index.
 
@@ -189,7 +183,6 @@ class Server_list(object):
             return None
         else:
             return self.server_list[index][0]
-
 
     def start_new_server(self, cur_server, port, server_id, passwd,
                          role="server", parameters=None):
@@ -211,13 +204,26 @@ class Server_list(object):
                     msg = None or error message if error
         """
         full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port))
+
+        # if port is in use, try to get another one which isn't to spawn the
+        # new server.
+        for i in xrange(port, port+MAX_NUM_RETRIES):
+            if check_port_in_use("localhost", i):
+                self.new_port = i+1
+                port = i
+                break
+        else:
+            raise UtilError("Ports {0} through {1} are in use. Please choose "
+                            "an available port"
+                            ".".format(port, port + MAX_NUM_RETRIES))
+
         clone_options = {
             'new_data': full_datadir,
             'new_port': port,
             'new_id': server_id,
             'root_pass': passwd,
             'mysqld_options': parameters,
-            'delete' : True,
+            'delete': True,
         }
         if self.verbose:
             clone_options['quiet'] = False
@@ -231,46 +237,44 @@ class Server_list(object):
 
         # Create a new instance
         conn = {
-            "user"   : "root",
-            "passwd" : passwd,
-            "host"   : self.cloning_host,
-            "port"   : port,
+            "user": "root",
+            "passwd": passwd,
+            "host": self.cloning_host,
+            "port": port,
         }
         if os.name == "posix":
             conn["unix_socket"] = os.path.join(full_datadir, "mysql.sock")
 
         server_options = {
-            'conn_info' : conn,
-            'role'      : role or 'server_{0}'.format(port),
+            'conn_info': conn,
+            'role': role or 'server_{0}'.format(port),
         }
-        self.new_server = Server(server_options)
 
-        server = (self.new_server, None)
-
+        new_server = Server(server_options)
         # Connect to the new instance
         try:
-            self.new_server.connect()
-        except UtilError, e:
-            raise MUTLibError("Cannot connect to spawned server: %s" % \
-                               e.errmsg)
+            new_server.connect()
+        except UtilError as err:
+            raise MUTLibError("Cannot connect to spawned server: "
+                              "{0}".format(err.errmsg))
 
         # If connected user is not root, clone it to the new instance.
         conn_val = self.get_connection_values(cur_server)
         if conn_val["user"].lower() != "root":
             user_str = conn_val["user"]
             if conn_val.get("passwd") is not None:
-                user_str += ":%s" % conn_val["passwd"]
-            user_str += "@%s" % conn_val["host"]
-            cmd = "mysqluserclone.py -s --source=%s --destination=%s" % \
-                  (self.get_connection_string(cur_server),
-                   self.get_connection_string(self.new_server)) + \
-                  "%s %s" % (user_str, user_str)
+                user_str = "{0}:{1}".format(user_str, conn_val["passwd"])
+            user_str = "{0}@{1}".format(user_str, conn_val["host"])
+            cmd = ("mysqluserclone.py -s --source={0} --destination={1} {2} "
+                   "{2}".format(self.get_connection_string(cur_server),
+                                self.get_connection_string(new_server),
+                                user_str))
             res = _exec_util(cmd, "cmd.txt", self.utildir)
             if res != 0:
                 raise MUTLibError("Cannot clone connected user.")
 
+        server = (new_server, None)
         return server
-
 
     def stop_server(self, server, wait=10, drop=True):
         """Stop a running server.
@@ -291,7 +295,6 @@ class Server_list(object):
 
         return stop_running_server(server, wait, drop)
 
-
     def spawn_new_servers(self, num_servers):
         """Spawn new servers to match the number needed.
 
@@ -301,8 +304,8 @@ class Server_list(object):
         """
 
         if int(num_servers) > MAX_SERVER_POOL:
-            raise MUTLibError("Request for servers exceeds maximum of " \
-                                 "%d servers." % MAX_SERVER_POOL)
+            raise MUTLibError("Request for servers exceeds maximum of "
+                              "{0} servers.".format(MAX_SERVER_POOL))
         orig_server = self.server_list[0][0]
         num_to_add = num_servers - len(self.server_list)
 
@@ -316,7 +319,6 @@ class Server_list(object):
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
 
-
     def spawn_new_server(self, orig_server, server_id, name, mysqld=None):
         """Spawn a new server with options.
 
@@ -327,44 +329,50 @@ class Server_list(object):
 
         Returns True - success False - failed
         """
-        port1 = int(self.get_next_port())
+        port1 = self.get_next_port()
         try:
             res = self.start_new_server(orig_server, port1, server_id,
                                         "root", name, mysqld)
-        except MUTLibError, e:
-            raise MUTLibError("Cannot spawn %s: %s" % (name, e.errmsg))
+        except MUTLibError as err:
+            raise MUTLibError("Cannot spawn {0}: {1}".format(name, err.errmsg))
 
         return res
-
 
     def shutdown_spawned_servers(self):
         """Shutdown all spawned servers.
         """
-        import subprocess
         for server in self.server_list:
             if server[1] and server[0] is not None and server[0].is_alive():
                 try:
-                    print "  Shutting down server %s..." % server[0].role,
+                    print("  Shutting down server "
+                          "{0}...".format(server[0].role)),
                     if self.stop_server(server[0]):
-                        print "success."
+                        print("success.")
                     elif server[2] is not None and server[2] > 1:
-                        print "WARN - attempting SIGTERM - pid = %s" % server[2]
+                        print("WARN - attempting SIGTERM - pid = "
+                              "{0}".format(server[2])),
                         # try signal termination
+                        retval = 0
                         if os.name == "posix":
-                            retval = os.kill(int(server[2]),
-                                             subprocess.signal.SIGTERM)
+                            try:
+                                os.kill(int(server[2]),
+                                        subprocess.signal.SIGTERM)
+                            except OSError as err:
+                                retval = err.errno
                         else:
-                            retval = subprocess.Popen("taskkill /F /T /PID %i" %
-                                                      int(server[2]),
-                                                      shell=True)
+                            retval = subprocess.call("taskkill /F /T /PID "
+                                                     "{0}".format(server[2],
+                                                     shell=True))
+                        if retval in (0, 128):
+                            print("success.")
                     else:
-                        print "ERROR"
-                except MUTLibError, e:
+                        print("ERROR")
+                except MUTLibError as err:
                     print "ERROR"
-                    print "    Unable to shutdown server %s." % server[0].role
+                    print("    Unable to shutdown server "
+                          "{0}.".format(server[0].role))
 
-
-    def add_new_server(self, new_server, spawned=False, id=-1):
+    def add_new_server(self, new_server, spawned=False, id_=-1):
         """Add an existing server to the server lists.
 
         new_server[in]     Server object to add.
@@ -372,11 +380,10 @@ class Server_list(object):
         id[in]             The process id if known
         """
         if new_server is not None:
-            if id == -1:
+            if id_ == -1:
                 datadir = new_server.show_server_variable("datadir")[0][1]
-                id = self.get_process_id(datadir)
-            self.server_list.append((new_server, spawned, id))
-
+                id_ = self.get_process_id(datadir)
+            self.server_list.append((new_server, spawned, id_))
 
     def remove_server(self, name):
         """Remove a server from the server lists.
@@ -389,12 +396,10 @@ class Server_list(object):
         self.server_list.pop(index)
         return True
 
-
     def num_servers(self):
         """Return number of servers in the list.
         """
         return len(self.server_list)
-
 
     def num_spawned_servers(self):
         """Return number of spawned (new) servers.
@@ -405,7 +410,6 @@ class Server_list(object):
                 num_spawned_servers += 1
         return num_spawned_servers
 
-
     def get_connection_values(self, server):
         """Return a dictionary of connection values for a particular server.
 
@@ -414,7 +418,6 @@ class Server_list(object):
         Returns dictionary
         """
         return server.get_connection_values()
-
 
     def get_connection_parameters(self, server, aslist=False, asdict=False):
         """Return connection parameters for a server.
@@ -442,7 +445,7 @@ class Server_list(object):
             params = [
                 '--user={0}'.format(server.user),
                 '--host={0}'.format(server.host),
-                ]
+            ]
             if server.passwd:
                 params.append('--password={0}'.format(server.passwd))
             if server.socket:
@@ -450,14 +453,13 @@ class Server_list(object):
             params.append('--port={0}'.format(server.port))
             return params
 
-        str1 = "--user=%s --host=%s " % (server.user, server.host)
+        str1 = "--user={0} --host={1} ".format(server.user, server.host)
         if server.passwd:
-            str1 += "--password=%s " % server.passwd
+            str1 = "{0}--password={1} ".format(str1, server.passwd)
         if server.socket:
-            str2 = "--socket=%s " % (server.socket)
-        str2 = "--port=%s " % (server.port)
+            str2 = "--socket={0} ".format(server.socket)
+        str2 = "--port={0} ".format(server.port)
         return str1 + str2
-
 
     def get_connection_string(self, server):
         """Return a string that comprises the normal connection parameters
@@ -469,16 +471,15 @@ class Server_list(object):
         Returns string
         """
 
-        conn_str = "%s" % server.user
+        conn_str = "{0}".format(server.user)
         if server.passwd:
-            conn_str += ":%s" % server.passwd
-        conn_str += "@%s:" % server.host
+            conn_str = "{0}:{1}".format(conn_str, server.passwd)
+        conn_str = "{0}@{1}:".format(conn_str, server.host)
         if server.port:
-            conn_str += "%s" % server.port
+            conn_str = "{0}{1}".format(conn_str, server.port)
         if server.socket is not None and server.socket != "":
-            conn_str += ":%s " % server.socket
+            conn_str = "{0}:{1} ".format(conn_str, server.socket)
         return conn_str
-
 
     def get_process_id(self, datadir):
         """Return process id of new process.
@@ -504,7 +505,6 @@ class Server_list(object):
         """
         self.cleanup_list.append(filename)
 
-
     def remove_files(self):
         """Remove temporary files added during tests.
         """
@@ -512,13 +512,13 @@ class Server_list(object):
             if item is not None:
                 try:
                     os.unlink(item)
-                except:
+                except OSError:
                     pass
 
 
 class System_test(object):
     """The System_test class is used by the MySQL Utilities Test (MUT) facility
-    to perform system tests against MySQL utilitites. This class is the base
+    to perform system tests against MySQL utilities This class is the base
     class from which all tests are derived.
 
     The following utilities are provided:
@@ -547,7 +547,7 @@ class System_test(object):
 
         servers[in]        A list of Server objects
         res_dir[in]        Path to test result files
-        utildir[in]        Path to utilty scripts
+        utildir[in]        Path to utility scripts
         verbose[in]        print extra data during operations (optional)
                            default value = False
         debug[in]          Turn on debugging mode for a single test
@@ -556,12 +556,11 @@ class System_test(object):
 
         self.res_fname = None       # Name of intermediate result file
         self.results = []           # List for storing results
-        self.servers = servers      # Server_list class
+        self.servers = servers      # ServerList class
         self.res_dir = res_dir      # Current test result directory
         self.utildir = utildir      # Location of utilities being tested
         self.verbose = verbose      # Option for verbosity
         self.debug = debug          # Option for diagnostic work
-
 
     def __del__(self):
         """Destructor
@@ -571,33 +570,33 @@ class System_test(object):
         for result in self.results:
             del result
 
-
-    def check_gtid_unsafe(self, on = False):
+    def check_gtid_unsafe(self, on=False):
         """Check for gtid enabled base server
 
         If on is True, method ensures server0 has the server variable
         DISABLE_GTID_UNSAFE_STATEMENTS=ON, else if on is False, method ensures
         server0 does not have DISABLE_GTID_UNSAFE_STATEMENTS=ON.
 
-        Returns bool - False if no DISABE_GTID_UNSAFE_STATEMENTS variable
+        Returns bool - False if no DISABLE_GTID_UNSAFE_STATEMENTS variable
                        found, else throws exception if criteria not met.
         """
         if on:
             # Need servers with DISABLE_GTID_UNSAFE_STATEMENTS
-            self.server0 = self.servers.get_server(0)
-            res = self.server0.show_server_variable("DISABLE_GTID_UNSAFE_"
-                                                    "STATEMENTS")
+            server0 = self.servers.get_server(0)
+            res = server0.show_server_variable("DISABLE_GTID_UNSAFE_"
+                                                "STATEMENTS")
             if res != [] and res[0][1] != "ON":
-                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_STATEMENTS"
-                                  " = ON")
+                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_"
+                                  "STATEMENTS = ON")
         else:
             # Need servers without DISABLE_GTID_UNSAFE_STATEMENTS
-            self.server0 = self.servers.get_server(0)
-            res = self.server0.show_server_variable("DISABLE_GTID_UNSAFE_"
-                                                    "STATEMENTS")
+            server0 = self.servers.get_server(0)
+            res = server0.show_server_variable("DISABLE_GTID_UNSAFE"
+                                               "_STATEMENTS")
             if res != [] and res[0][1] == "ON":
-                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_STATEMENTS"
-                                  " = OFF or a server prior to version 5.6.5.")
+                raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_"
+                                  "STATEMENTS = OFF or a server prior to "
+                                  "version 5.6.5.")
 
         return False
 
@@ -611,24 +610,25 @@ class System_test(object):
         """
         try:
             self.login_reader = MyDefaultsReader(
-                                    find_my_print_defaults_tool=True)
+                find_my_print_defaults_tool=True)
         except UtilError as err:
             raise MUTLibError("MySQL client tools must be accessible to run "
                               "this test (%s). E.g. Add the location of the "
                               "MySQL client tools to your PATH." % err.errmsg)
 
         if not self.login_reader.check_login_path_support():
-            raise MUTLibError("ERROR: the used my_print_defaults tool does not "
-                            "support login-path options. Used tool: %s"
-                            % self.login_reader.tool_path)
+            raise MUTLibError("ERROR: the used my_print_defaults tool does "
+                              "not support login-path options. Used tool: "
+                              "{0}".format(self.login_reader.tool_path))
 
         try:
             self.edit_tool_path = get_tool_path(None, "mysql_config_editor",
                                                 search_PATH=True)
         except UtilError as err:
             raise MUTLibError("MySQL client tools must be accessible to run "
-                              "this test (%s). E.g. Add the location of the "
-                              "MySQL client tools to your PATH." % err.errmsg)
+                              "this test ({0}). E.g. Add the location of the "
+                              "MySQL client tools to your "
+                              "PATH.".format(err.errmsg))
 
     def create_login_path_data(self, login_path, user, host):
         """Add the specified login-path data to .mylogin.cnf.
@@ -646,9 +646,9 @@ class System_test(object):
 
         cmd = [self.edit_tool_path]
         cmd.append('set')
-        cmd.append('--login-path=%s' % login_path)
-        cmd.append('--host=%s' % host)
-        cmd.append('--user=%s' % user)
+        cmd.append('--login-path={0}'.format(login_path))
+        cmd.append('--host={0}'.format(host))
+        cmd.append('--user={0}'.format(user))
 
         # Create a temporary file to redirect stdout
         out_file = tempfile.TemporaryFile()
@@ -671,7 +671,7 @@ class System_test(object):
 
         cmd = [self.edit_tool_path]
         cmd.append('remove')
-        cmd.append('--login-path=%s' % login_path)
+        cmd.append('--login-path={0}'.format(login_path))
 
         # Create a temporary file to redirect stdout
         out_file = tempfile.TemporaryFile()
@@ -702,7 +702,6 @@ class System_test(object):
         return _exec_util(cmd, file_out, self.utildir, self.debug,
                           abspath, file_in)
 
-
     def check_num_servers(self, num_servers):
         """Check the number of servers available.
 
@@ -714,7 +713,6 @@ class System_test(object):
             return True
         return False
 
-
     def get_connection_parameters(self, server):
         """Return a string that comprises the normal connection parameters
         common to MySQL utilities for a particular server.
@@ -724,15 +722,14 @@ class System_test(object):
         Returns string
         """
 
-        str1 = "--user=%s --host=%s " % (server.user, server.host)
+        str1 = "--user={0} --host={1} ".format(server.user, server.host)
         if server.passwd:
-            str1 += "--password=%s " % server.passwd
+            str1 = "{0}--password={1} ".format(str1, server.passwd)
         if server.socket:
-            str2 = "--socket=%s " % (server.socket)
+            str2 = "--socket={0} ".format(server.socket)
         else:
-            str2 = "--port=%s " % (server.port)
+            str2 = "--port={0} ".format(server.port)
         return str1 + str2
-
 
     def get_connection_values(self, server):
         """Return a tuple that comprises the connection parameters for a
@@ -747,7 +744,6 @@ class System_test(object):
         return (server.user, server.passwd, server.host,
                 server.port, server.socket, server.role)
 
-
     def build_connection_string(self, server):
         """Return a connection string
 
@@ -756,22 +752,21 @@ class System_test(object):
         Returns string of the form user:password@host:port:socket
         """
         conn_val = self.get_connection_values(server)
-        conn_str = "%s" % conn_val[0]
+        conn_str = "{0}".format(conn_val[0])
         if conn_val[1]:
-            conn_str += ":%s" % conn_val[1]
+            conn_str = "{0}:{1}".format(conn_str, conn_val[1])
         ipv6 = False
         if ":" in conn_val[2] and not "]" in conn_val[2]:
-            conn_str += "@[%s]:" % conn_val[2]
+            conn_str = "{0}@[{1}]:".format(conn_str,  conn_val[2])
             ipv6 = True
         else:
-            conn_str += "@%s:" % conn_val[2]
+            conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
         if conn_val[3]:
-            conn_str += "%s" % conn_val[3]
+            conn_str = "{0}{1}".format(conn_str, conn_val[3])
         if not ipv6 and conn_val[4] is not None and conn_val[4] != "":
-            conn_str += ":%s " % conn_val[4]
+            conn_str = "{0}:{1} ".format(conn_str, conn_val[4])
 
         return conn_str
-
 
     def run_test_case(self, exp_result, command, comments, debug=False):
         """Execute a test case and save the results.
@@ -787,13 +782,12 @@ class System_test(object):
         Returns True if result matches expected result
         """
         if self.debug or debug:
-            print "\n%s" % comments
+            print "\n{0}".format(comments)
         res = self.exec_util(command, self.res_fname)
         if comments:
-            self.results.append(comments + "\n")
+            self.results.append("{0}\n".format(comments))
         self.record_results(self.res_fname)
         return res == exp_result
-
 
     def run_test_case_result(self, command, comments, debug=False):
         """Execute a test case and save the results returning actual result.
@@ -808,15 +802,14 @@ class System_test(object):
         Returns int - actual result
         """
         if self.debug or debug:
-            print "\n%s" % comments
+            print "\n{0}".format(comments)
         res = self.exec_util(command, self.res_fname)
         if comments:
-            self.results.append(comments + "\n")
+            self.results.append("{0}\n".format(comments))
         self.record_results(self.res_fname)
         return res
 
-
-    def replace_result(self, prefix, str):
+    def replace_result(self, prefix, str_):
         """Replace a string in the results with a new, deterministic string.
 
         prefix[in]         starting prefix of string to mask
@@ -827,9 +820,8 @@ class System_test(object):
             index = line.find(prefix)
             if index == 0:
                 self.results.pop(linenum)
-                self.results.insert(linenum, str)
+                self.results.insert(linenum, str_)
             linenum += 1
-
 
     def remove_result(self, prefix):
         """Remove a string in the results.
@@ -847,7 +839,6 @@ class System_test(object):
         for linenum in range(len(linenums)-1, -1, -1):
             self.results.pop(linenums[linenum])
 
-
     def remove_result_and_lines_before(self, prefix, lines=1):
         """Remove lines in the results with lines before prefix.
 
@@ -861,7 +852,7 @@ class System_test(object):
             index = line.find(prefix)
             if index == 0:
                 linenums.append(int(linenum))
-                for line2rm in range(linenum-lines,linenum):
+                for line2rm in range(linenum-lines, linenum):
                     if line2rm > - 1:
                         linenums.append(int(line2rm))
             linenum += 1
@@ -900,7 +891,7 @@ class System_test(object):
         """
         linenum = 0
         for line in self.results:
-            if line.find(target):
+            if line.find(target) >= 0:
                 self.results.pop(linenum)
                 replace_line = line.replace(target, replacement)
                 self.results.insert(linenum, replace_line)
@@ -957,7 +948,6 @@ class System_test(object):
                                             line[0:loc] + mask + line[start:])
             linenum += 1
 
-
     def mask_result_portion(self, prefix, target, end_target, mask):
         """Mask out a portion of a string for the results using
         a end target to make the masked area a specific length.
@@ -986,7 +976,6 @@ class System_test(object):
                                                 line[end:])
             linenum += 1
 
-
     def mask_column_result(self, prefix, separator, num_col, mask):
         """Mask out a column portion of a string for the results.
 
@@ -1004,14 +993,14 @@ class System_test(object):
                 for i in range(0, num_col):
                     loc = line.find(separator, pos)
                     if i+1 == num_col:
-                        next = line.find(separator, loc)
-                        if next < 0:
+                        next_ = line.find(separator, loc)
+                        if next_ < 0:
                             start = len(line)
                         else:
-                            start = next
+                            start = next_
                         self.results.pop(linenum)
                         if start >= len(line):
-                           self.results.insert(linenum,
+                            self.results.insert(linenum,
                                                 line[0:pos] + mask + "\n")
                         else:
                             self.results.insert(linenum,
@@ -1022,7 +1011,6 @@ class System_test(object):
                     if loc < 0:
                         break
             linenum += 1
-
 
     def check_objects(self, server, db, events=True):
         """Check number of objects.
@@ -1037,20 +1025,19 @@ class System_test(object):
         db_source = Database(server, db)
         db_source.init()
         res = db_source.get_db_objects("TABLE")
-        str = "OBJECT COUNTS: tables = %s, " % (len(res))
+        str_ = "OBJECT COUNTS: tables = %s, " % (len(res))
         res = db_source.get_db_objects("VIEW")
-        str += "views = %s, " % (len(res))
+        str_ += "views = %s, " % (len(res))
         res = db_source.get_db_objects("TRIGGER")
-        str += "triggers = %s, " % (len(res))
+        str_ += "triggers = %s, " % (len(res))
         res = db_source.get_db_objects("PROCEDURE")
-        str += "procedures = %s, " % (len(res))
+        str_ += "procedures = %s, " % (len(res))
         res = db_source.get_db_objects("FUNCTION")
-        str += "functions = %s, " % (len(res))
+        str_ += "functions = %s, " % (len(res))
         if events:
             res = db_source.get_db_objects("EVENT")
-            str += "events = %s \n" % (len(res))
-        return str
-
+            str_ += "events = %s \n" % (len(res))
+        return str_
 
     def compare(self, name, actual):
         """Compare an actual set of return values to the result file
@@ -1067,10 +1054,11 @@ class System_test(object):
         #
         # Check to see if result file exists first.
         #
-        res_fname = os.path.normpath(os.path.join(self.res_dir, name + ".result"))
+        res_fname = os.path.normpath(os.path.join(self.res_dir,
+                                                  "{0}.result".format(name)))
         if not os.access(res_fname, os.F_OK):
             actual.insert(0, "Result file missing - actual results:\n\n")
-            return (False, actual)
+            return False, actual
 
         #
         # Use ndiff to compare to known result file
@@ -1080,16 +1068,17 @@ class System_test(object):
         #
         # Now convert the diff to a string list and write reject file
         #
-        rej_fname = os.path.normpath(os.path.join(self.res_dir, name + ".reject"))
+        rej_fname = os.path.normpath(os.path.join(self.res_dir,
+                                                  "{0}.reject".format(name)))
         rej_file = open(rej_fname, 'w+')
         rej_list = []
         try:
             while 1:
-                str = diff.next()
-                if str[0] in ['-', '+', '?']:
-                    rej_list.append(str)
-                rej_file.write(str)
-        except:
+                str_ = diff.next()
+                if str_[0] in ['-', '+', '?']:
+                    rej_list.append(str_)
+                rej_file.write(str_)
+        except StopIteration:
             pass
         rej_file.close()
 
@@ -1101,8 +1090,7 @@ class System_test(object):
         elif os.access(rej_fname, os.F_OK):
             os.unlink(rej_fname)
 
-        return (rej_list == [], rej_list)
-
+        return rej_list == [], rej_list
 
     def record_results(self, fname):
         """Saves the results from a file to the self.results list.
@@ -1113,7 +1101,6 @@ class System_test(object):
         for line in f_res.readlines():
             self.results.append(line)
         f_res.close()
-
 
     def save_result_file(self, name, results):
         """Saves a result file for the test.
@@ -1129,8 +1116,8 @@ class System_test(object):
             res_file = open(res_fname, 'w+')
             if not res_file:
                 return False
-            for str in results:
-                res_file.write(str)
+            for str_ in results:
+                res_file.write(str_)
             res_file.close()
         return True
 
@@ -1162,7 +1149,6 @@ class System_test(object):
                 print "# Kill failed! Server '{0}' was not found.".format(name)
             return False
 
-
     def kill_server_list(self, servers):
         """Stop (kill) a list of servers and remove from list.
 
@@ -1173,10 +1159,21 @@ class System_test(object):
         kill_results = [self.kill_server(srv_role) for srv_role in servers]
         return all(kill_results)
 
+    def drop_db(self, server, db):
+        # Check before you drop to avoid warning
+        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
+        if not res:
+            return True  # Ok to exit here as there weren't any dbs to drop
+        try:
+            q_db = quote_with_backticks(db)
+            server.exec_query("DROP DATABASE {0}".format(q_db))
+        except UtilError:
+            return False
+        return True
 
     @abstractmethod
     def check_prerequisites(self):
-        """Check preprequisites for test.
+        """Check prerequisites for test.
 
         This method is used to check any prerequisites for a test such as
         the number of servers needed, environment variables, etc.
@@ -1184,7 +1181,6 @@ class System_test(object):
         Returns: True = servers available, False = not enough servers, skip
         """
         pass
-
 
     @abstractmethod
     def setup(self):
@@ -1200,7 +1196,6 @@ class System_test(object):
         """
         pass
 
-
     @abstractmethod
     def run(self):
         """Execute a test.
@@ -1212,7 +1207,6 @@ class System_test(object):
         Returns: True = no errors, False = errors occurred
         """
         pass
-
 
     @abstractmethod
     def get_result(self):
@@ -1232,7 +1226,6 @@ class System_test(object):
         """
         pass
 
-
     @abstractmethod
     def record(self):
         """Record test results for comparison.
@@ -1248,7 +1241,6 @@ class System_test(object):
         Returns: True - success, False - error
         """
         pass
-
 
     @abstractmethod
     def cleanup(self):

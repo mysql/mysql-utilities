@@ -25,7 +25,8 @@ from mysql.utilities.exception import MUTLibError
 
 _FAILOVER_LOG = "fail_log.txt"
 _TIMEOUT = 30
-_LOG_PREFIX = ["a","b","c","d"]
+_LOG_PREFIX = ["a", "b", "c", "d"]
+
 
 class test(failover.test):
     """test replication failover console
@@ -35,8 +36,8 @@ class test(failover.test):
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).supports_gtid() != "ON" or \
-           not self.servers.get_server(0).check_version_compat(5,6,9):
+        if (self.servers.get_server(0).supports_gtid() != "ON" or
+                not self.servers.get_server(0).check_version_compat(5, 6, 9)):
             raise MUTLibError("Test requires server version 5.6.9 with "
                               "GTID_MODE=ON.")
         if self.debug:
@@ -44,7 +45,7 @@ class test(failover.test):
         for log in _LOG_PREFIX:
             try:
                 os.unlink(log+_FAILOVER_LOG)
-            except:
+            except OSError:
                 pass
         return rpl_admin_gtid.test.check_prerequisites(self)
 
@@ -53,10 +54,10 @@ class test(failover.test):
         return rpl_admin_gtid.test.setup(self)
         
     def _poll_console(self, start, name, proc, comment):
-        msg = "Timeout waiting for console %s to " % name
+        msg = "Timeout waiting for console {0} to ".format(name)
         msg += "start." if start else "end."
         if self.debug:
-            print "# Waiting for console %s to" % name,
+            print "# Waiting for console {0} to".format(name),
             print "start." if start else "end."
         elapsed = 0
         delay = 1
@@ -71,21 +72,21 @@ class test(failover.test):
             if elapsed >= _TIMEOUT:
                 if self.debug:
                     print "#", msg
-                raise MUTLibError("%s: " % comment + msg)
+                raise MUTLibError("{0}: {1}".format(comment, msg))
                 
     def _check_result(self, prefix, target):
         found_row = False
         log_file = open(prefix + _FAILOVER_LOG)
         if self.debug:
             print "# Looking for mode change in log."
-        for row in log_file.readlines():
+        for row in log_file:
             if self.debug:
                 print row,
             if target in row:
                 found_row = True
-                break
                 if self.debug:
-                    print "# Found in row = '%s'." % row,
+                    print "# Found in row = '{0}'.".format(row),
+                break
         log_file.close()
         return found_row
 
@@ -95,23 +96,21 @@ class test(failover.test):
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
-        slave3_conn = self.build_connection_string(self.server4).strip(' ')
-        
-        master_str = "--master=" + master_conn
-        slaves_str = "--slaves=" + \
-                     ",".join([slave1_conn, slave2_conn, slave3_conn])
-        candidates_str = "--candidates=" + \
-                         ",".join([slave1_conn, slave2_conn, slave3_conn])
-        
-        failover_cmd = "python ../scripts/mysqlfailover.py --interval=15 " + \
-                       " --discover-slaves-login=root:root --failover-" + \
-                       "mode=%s --log=%s %s "
-        failover_cmd1 = failover_cmd % ("auto", "a" + _FAILOVER_LOG, master_str)
-        failover_cmd2 = failover_cmd % ("auto", "b" + _FAILOVER_LOG, master_str)
-        failover_cmd3 = failover_cmd % ("elect", "c" + _FAILOVER_LOG, master_str)
-        failover_cmd3 += " --candidate=%s" % slave1_conn
-        failover_cmd4 = failover_cmd % ("auto", "d" + _FAILOVER_LOG,
-                                        "--master="+slave2_conn)
+
+        master_str = "--master={0}".format(master_conn)
+
+        failover_cmd = ("python ../scripts/mysqlfailover.py --interval=15 "
+                        " --discover-slaves-login=root:root --failover-"
+                        "mode={0} --log={1} {2} ")
+        failover_cmd1 = failover_cmd.format("auto", "a" + _FAILOVER_LOG,
+                                            master_str)
+        failover_cmd2 = failover_cmd.format("auto", "b" + _FAILOVER_LOG,
+                                            master_str)
+        failover_cmd3 = failover_cmd.format("elect", "c" + _FAILOVER_LOG,
+                                            master_str)
+        failover_cmd3 += " --candidate={0}".format(slave1_conn)
+        failover_cmd4 = failover_cmd.format("auto", "d" + _FAILOVER_LOG,
+                                            "--master="+slave2_conn)
         
         # We launch one console, wait for interval, then start another,
         # wait for interval, then kill both, and finally check log of each
@@ -119,7 +118,9 @@ class test(failover.test):
         # check.
         
         interval = 15
-        comment = "Test case 1 : test multiple instances of failover console."
+        test_num = 1
+        comment = ("Test case {0} : test multiple instances of failover "
+                   "console.".format(test_num))
         if self.debug:
             print comment
             print "# First instance:", failover_cmd1
@@ -136,17 +137,19 @@ class test(failover.test):
         proc2, f_out2 = failover.test.start_process(self, failover_cmd2)
         self._poll_console(True, "second", proc2, comment)
 
-        ret_val = failover.test.stop_process(self, proc1, f_out1, True)
+        failover.test.stop_process(self, proc1, f_out1, True)
         self._poll_console(False, "first", proc1, comment)
 
-        ret_val = failover.test.stop_process(self, proc2, f_out2, True)
+        failover.test.stop_process(self, proc2, f_out2, True)
         self._poll_console(False, "second", proc1, comment)
 
         # Check to see if second console changed modes.
         found_row = self._check_result("b", "Multiple instances of failover")
         self.results.append((comment, found_row))
                     
-        comment = "Test case 2 : test failed instance restart"
+        test_num += 1
+        comment = "Test case {0} : test failed instance restart".format(
+            test_num)
         if self.debug:
             print comment
             print "# Third instance:", failover_cmd3
@@ -180,7 +183,7 @@ class test(failover.test):
             print "# Waiting for interval to end."
         time.sleep(interval)
 
-        ret_val = failover.test.stop_process(self, proc3, f_out3, True)
+        failover.test.stop_process(self, proc3, f_out3, True)
         self._poll_console(False, "third", proc3, comment)
                 
         # Restart the console - should not demote the failover mode.
@@ -191,7 +194,7 @@ class test(failover.test):
         self._poll_console(False, "fourth", proc4, comment)
 
         found_row = self._check_result("d", "Multiple instances of failover")
-        self.results.append((comment, found_row == False))
+        self.results.append((comment, not found_row))
 
         rpl_admin_gtid.test.reset_topology(self)
 
@@ -203,19 +206,17 @@ class test(failover.test):
         msg = ""
         for result in self.results:
             if not result[1]:
-                msg += "\n%s\nTest case failed." % result[0]
-                return (False, msg)
-        return (True, '')
+                msg += "\n{0}\nTest case failed.".format(result[0])
+                return False, msg
+        return True, ''
     
     def record(self):
-        return True # Not a comparative test
+        return True  # Not a comparative test
     
     def cleanup(self):
         for log in _LOG_PREFIX:
             try:
                 os.unlink(log+_FAILOVER_LOG)
-            except:
+            except OSError:
                 pass
         return rpl_admin_gtid.test.cleanup(self)
-
-

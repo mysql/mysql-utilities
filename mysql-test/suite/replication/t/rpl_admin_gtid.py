@@ -107,112 +107,114 @@ class test(rpl_admin.test):
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
         slave4_conn = self.build_connection_string(self.server5).strip(' ')
 
-        comment = "Test case %s - elect" % test_num
+        comment = "Test case {0} - elect".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --candidates=%s  " % slaves
-        cmd_opts += " --slaves=%s elect" % slaves
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = " --candidates={0} --slaves={0} elect".format(slaves)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - gtid" % test_num
+        comment = "Test case {0} - gtid".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --slaves=%s gtid --format=csv " % slaves
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = " --slaves={0} gtid --format=csv ".format(slaves)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Remove GTIDs here because they are not deterministic when run with
         # other tests that reuse these servers.
-        self.remove_result("localhost,%s,MASTER," % self.m_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s1_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s2_port)
-        self.remove_result("localhost,%s,SLAVE," % self.s3_port)
+        self.remove_result("localhost,{0},MASTER,".format(self.m_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s1_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s2_port))
+        self.remove_result("localhost,{0},SLAVE,".format(self.s3_port))
 
-        comment = "Test case %s - heatlh with discover" % test_num
+        comment = "Test case {0} - heatlh with discover".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = " --discover-slaves-login=root:root health --format=csv "
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - failover to %s:%s" % \
-                  (test_num, self.server4.host, self.server4.port)
-        slaves = ",".join(["root:root@127.0.0.1:%s" % self.server2.port,
+        comment = "Test case {0} - failover to {1}:{2}".format(
+            test_num, self.server4.host, self.server4.port)
+        slaves = ",".join(["root:root@127.0.0.1:{0}".format(self.server2.port),
                            slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py "
-        cmd_opts = " --candidates=%s  " % slave3_conn
-        cmd_opts += " --slaves=%s failover" % slaves
+        cmd_opts = " --candidates={0}  --slaves={1} failover".format(
+            slave3_conn, slaves)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         slaves = ",".join([slave1_conn, slave2_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % slave3_conn
-        comment = "Test case %s - show health after failover" % test_num
-        cmd_opts = " --slaves=%s --format=vertical health" % slaves
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(slave3_conn)
+        comment = "Test case {0} - show health after failover".format(test_num)
+        cmd_opts = " --slaves={0} --format=vertical health".format(slaves)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Test for BUG#14080657
-        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'")
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
+                                "'rpl'@'rpl'")
 
-        cmd_str = "mysqlrpladmin.py --master=%s " % slave3_conn
-        comment = "Test case %s - elect with missing rpl user" % test_num
-        cmd_opts = " --slaves=%s elect -vvv --candidates=%s " % \
-                   (slaves, slave1_conn)
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(slave3_conn)
+        comment = "Test case {0} - elect with missing rpl user".format(
+            test_num)
+        cmd_opts = " --slaves={0} elect -vvv --candidates={1} ".format(
+            slaves, slave1_conn)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Now we return the topology to its original state for other tests
         rpl_admin.test.reset_topology(self)
 
         # Add server5 to the topology
-        conn_str = " --slave=%s" % self.build_connection_string(self.server5)
-        conn_str += self.master_str
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl %s" % conn_str
+        conn_str = " --slave={0}{1}".format(
+            self.build_connection_string(self.server5), self.master_str)
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         res = self.exec_util(cmd, self.res_fname)
         if res != 0:
             return False
 
-        comment = "Test case %s - mix FILE/TABLE and missing --rpl-user" % test_num
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --discover-slaves-login=root:root switchover "
-        cmd_opts += "--new-master=root:root@localhost:%s " % self.s4_port
+        comment = ("Test case {0} - mix FILE/TABLE and missing "
+                   "--rpl-user".format(test_num))
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = (" --discover-slaves-login=root:root switchover "
+                    "--new-master=root:root@localhost:{0}".format(
+                    self.s4_port))
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        comment = "Test case %s - mix FILE/TABLE and --rpl-user" % test_num
-        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
-        cmd_str = "mysqlrpladmin.py --master=%s " % master_conn
-        cmd_opts = " --discover-slaves-login=root:root switchover "
-        cmd_opts += "--new-master=root:root@localhost:%s " % self.s4_port
-        cmd_opts += " --rpl-user=rpl:rpl "
+        comment = "Test case {0} - mix FILE/TABLE and --rpl-user".format(
+            test_num)
+        cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
+        cmd_opts = (" --discover-slaves-login=root:root switchover "
+                    "--new-master=root:root@localhost:{0} "
+                    "--rpl-user=rpl:rpl ".format(self.s4_port))
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Now we return the topology to its original state for other tests
@@ -222,15 +224,16 @@ class test(rpl_admin.test):
         self.server5.exec_query("RESET SLAVE")
 
         # Test for BUG#16571812
-        comment = "Test case %s - slave not part of topology" % test_num
+        comment = "Test case {0} - slave not part of topology".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
         candidates = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = " ".join(["mysqlrpladmin.py", "failover", "--force",
-                            "--candidates=%s" % candidates, "--quiet",
-                            "--slaves=%s" % slaves, "--rpl-user=rpl:rpl"])
+                            "--candidates={0}".format(candidates), "--quiet",
+                            "--slaves={0}".format(slaves),
+                            "--rpl-user=rpl:rpl"])
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
         # Reset the topology to its original state
@@ -245,9 +248,9 @@ class test(rpl_admin.test):
         self.server1.exec_query("DROP DATABASE `trx_behind`")
 
         comment = ("Test case {0} - HEALTH with some transactions "
-                   "behind").format(test_num)
+                   "behind".format(test_num))
         cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} health "
-                   "--format=VERTICAL -vvv").format(master_conn, slave1_conn)
+                   "--format=VERTICAL -vvv".format(master_conn, slave1_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -278,33 +281,33 @@ class test(rpl_admin.test):
         # It happens sometimes on windows in a non-deterministic way.
         self.replace_result("    health: Slave delay is ",
                             "    health: OK")
-        self.replace_substring("+----------------------------------------------"
-                               "-----------------------------------------+",
-                               "+---------+")
-        self.replace_substring("+----------------------------------------------"
+        self.replace_substring("+---------------------------------------------"
                                "------------------------------------------+",
                                "+---------+")
-        self.replace_substring("| health                                       "
-                               "                                         |",
-                               "| health  |")
-        self.replace_substring("| health                                       "
+        self.replace_substring("+---------------------------------------------"
+                               "-------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                      "
                                "                                          |",
                                "| health  |")
-        self.replace_substring("| OK                                           "
-                               "                                         |",
+        self.replace_substring("| health                                      "
+                               "                                           |",
+                               "| health  |")
+        self.replace_substring("| OK                                          "
+                               "                                          |",
                                "| OK      |")
-        self.replace_substring("| OK                                           "
-                               "                                          |",
+        self.replace_substring("| OK                                          "
+                               "                                           |",
                                "| OK      |")
         self.replace_substring_portion("| Slave delay is ",
                                        "seconds behind master., No, Slave has "
                                        "1 transactions behind master.  |",
                                        "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
-                               "                                         |",
-                               "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.      "
+        self.replace_substring("| Slave has 1 transactions behind master.     "
                                "                                          |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.     "
+                               "                                           |",
                                "| OK      |")
 
         self.replace_substring("+------------------------------------------+",

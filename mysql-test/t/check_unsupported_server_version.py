@@ -16,7 +16,8 @@
 #
 import os
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError
+
 
 class test(mutlib.System_test):
     """
@@ -26,8 +27,8 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
-        OK = self.check_num_servers(2)
-        if OK:
+        ok = self.check_num_servers(2)
+        if ok:
             self.old_server = None
             self.new_server = None
             stop = self.servers.num_servers()
@@ -39,55 +40,54 @@ class test(mutlib.System_test):
                     self.new_server = index
                 if self.old_server and self.new_server:
                     break
-        if (not OK or 
-            self.old_server is None or 
-            self.new_server is None): 
-            fail_msg = ("Test requires two servers. One server with %s" %
-                        "version 5.1.30 or higher and one prior to 5.1.30")
-            raise MUTLibError(fail_msg) 
-        # Need at least one server.
+        if not ok or self.old_server is None or self.new_server is None:
+            fail_msg = ("Test requires two servers. One server with "
+                        "{0}".format("version 5.1.30 or higher and one "
+                                     "prior to 5.1.30"))
+            raise MUTLibError(fail_msg)
+            # Need at least one server.
         self.server1 = None
         self.server2 = None
         return self.check_num_servers(1)
 
     def setup(self):
         self.server1 = self.servers.get_server(self.old_server)
-        self.server2 = self.servers.get_server(self.new_server)           
+        self.server2 = self.servers.get_server(self.new_server)
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-               
+
         olds_conn = self.build_connection_string(self.server1)
         news_conn = self.build_connection_string(self.server2)
-        
+
         num_test = 1
-        comment = ("Test case %s - compare two databases %s" %
-                   (num_test, "on unsupported server"))
-        cmd_str = "mysqldbcompare.py %s %s" % ("--server1=" + olds_conn,
-                                               "--server2=" + news_conn)
+        comment = ("Test case {0} - compare two databases "
+                   "{1}".format(num_test, "on unsupported server"))
+        cmd_str = "mysqldbcompare.py {0}{1} {2}{3}".format(
+            "--server1=", olds_conn, "--server2=", news_conn)
         cmd_opts = " util_test.util_test -a "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
-        
+
         num_test += 1
-        comment = ("Test case %s - compare two databases %s" % 
-                  (num_test, "on unsupported 2nd server"))
-        
-        cmd_str = "mysqldbcompare.py %s %s" % ("--server1=" + news_conn,
-                                               "--server2=" + olds_conn)
+        comment = ("Test case {0} - compare two databases on "
+                   "unsupported 2nd server".format(num_test))
+
+        cmd_str = "mysqldbcompare.py {0}{1} {2}{3}".format(
+            "--server1=", news_conn, "--server2=", olds_conn)
         cmd_opts = " util_test.util_test -a "
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
-        
+            raise MUTLibError("{0}: failed".format(comment))
+
         return True
-          
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
 
@@ -95,7 +95,6 @@ class test(mutlib.System_test):
         if self.res_fname:
             try:
                 os.unlink(self.res_fname)
-            except:
+            except OSError:
                 pass
-        #self.servers.shutdown_spawned_servers()
         return True

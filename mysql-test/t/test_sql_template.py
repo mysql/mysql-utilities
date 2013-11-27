@@ -18,83 +18,60 @@ import os
 import sys
 
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common.tools import get_tool_path
 
 _TRANSFORM_FILE = "diff_output.txt"
 
-_CREATE_DB = "CREATE DATABASE `%s`"
+_CREATE_DB = "CREATE DATABASE `{0}`"
 
 _TEST_CASES = [
     # Direction a->b
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --quiet --difftype=sql --changes-for=server1 > %s" % _TRANSFORM_FILE,
-        'comment'    : "Test case %d changes-for = server1 : %s",
-        # If true, run startup commands, load data and create objects
-        'load_data'  : True,
-        'exp_result' : 1,
-    },
+    {'run_util': True,  # If true, run utility
+     'options': " --quiet --difftype=sql --changes-for=server1 > "
+                "{0}".format(_TRANSFORM_FILE),
+     'comment': "Test case {0} changes-for = server1 : {1}",
+     # If true, run startup commands, load data and create objects
+     'load_data': True, 'exp_result': 1, },
     # Do consume test (specified in run() method below)
-    {
-        'run_util'   : False,   # If true, run utility
-        'comment'    : "Test case %d consume transformation information : %s",
-        'run_on'     : 'server1',
-        'load_data'  : False,
-        'exp_result' : 0,
-    },
+    {'run_util': False,  # If true, run utility
+     'comment': "Test case {0} consume transformation information : {1}",
+     'run_on': 'server1', 'load_data': False, 'exp_result': 0, },
     # Check to ensure compliance of transformation
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --difftype=sql --changes-for=server1 ",
-        'comment'    : "Test case %d changes-for = server1 post transform : %s",
-        'load_data'  : False,
-        'exp_result' : 0,
-    },
-    # Direction a<-b
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --quiet --difftype=sql --changes-for=server2 > %s" % \
-                       _TRANSFORM_FILE,
-        'comment'    : "Test case %d changes-for = server2 : %s",
-        'load_data'  : True, # If true, load the data and create objects
-        'exp_result' : 1,
-    },
+    {'run_util': True,  # If true, run utility
+     'options': " --difftype=sql --changes-for=server1 ",
+     'comment': "Test case {0} changes-for = server1 post transform : {1}",
+     'load_data': False, 'exp_result': 0, },  # Direction a<-b
+    {'run_util': True,  # If true, run utility
+     'options': " --quiet --difftype=sql --changes-for=server2 > "
+                "{0}".format(_TRANSFORM_FILE),
+     'comment': "Test case {0} changes-for = server2 : {1}",
+     'load_data': True,  # If true, load the data and create objects
+     'exp_result': 1, },
     # Do consume test (specified in run() method below)
-    {
-        'run_util'   : False,   # If true, run utility
-        'comment'    : "Test case %d consume transformation information : %s",
-        'run_on'     : 'server2',
-        'load_data'  : False,
-        'exp_result' : 0,
-    },
+    {'run_util': False,  # If true, run utility
+     'comment': "Test case {0} consume transformation information : {1}",
+     'run_on': 'server2', 'load_data': False, 'exp_result': 0, },
     # Check to ensure compliance of transformation
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --difftype=sql --changes-for=server2 ",
-        'comment'    : "Test case %d changes-for = server2 post transform : %s",
-        'load_data'  : False,
-        'exp_result' : 0,
-    },
+    {'run_util': True,  # If true, run utility
+     'options': " --difftype=sql --changes-for=server2 ",
+     'comment': "Test case {0} changes-for = server2 post transform : {1}",
+     'load_data': False, 'exp_result': 0, },
     # Direction a<->b with dir = a
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --quiet --difftype=sql --changes-for=server1 " + \
-                       "--show-reverse ",
-        'comment'    : "Test case %d changes-for = server1 with reverse : %s",
-        'load_data'  : True, # If true, load the data and create objects
-        'exp_result' : 1,
-    },
-    # Direction a<->b with dir = b
-    {
-        'run_util'   : True,   # If true, run utility
-        'options'    : " --quiet --difftype=sql --changes-for=server2 " + \
-                       "--show-reverse ",
-        'comment'    : "Test case %d changes-for = server2 with reverse : %s",
-        'load_data'  : True, # If true, load the data and create objects
-        'exp_result' : 1,
-    },
+    {'run_util': True,  # If true, run utility
+     'options': " --quiet --difftype=sql --changes-for=server1 "
+                "--show-reverse ",
+     'comment': "Test case {0} changes-for = server1 with reverse : {1}",
+     'load_data': True,  # If true, load the data and create objects
+     'exp_result': 1, },  # Direction a<->b with dir = b
+    {'run_util': True,  # If true, run utility
+     'options': " --quiet --difftype=sql --changes-for=server2 "
+                "--show-reverse ",
+     'comment': "Test case {0} changes-for = server2 with reverse : {1}",
+     'load_data': True,  # If true, load the data and create objects
+     'exp_result': 1, },
 ]
+
 
 class test(mutlib.System_test):
     """Template for diff_<object>_sql tests
@@ -110,7 +87,8 @@ class test(mutlib.System_test):
             'server1_object'  : <create statement for first server>,
             'server2_object'  : <create statement for second server>,
             'comment'         : <comment to be appended to test case name>,
-            'startup_cmds'    : <array of commands to execute before test case>,
+            'startup_cmds'    : <array of commands to execute before test
+            case>,
             'shutdown_cmds'   : <array of commands to execute after test case>,
             # OPTIONAL - use for error code checking
             'error_codes'     : <array of 7 integers used for checking errors>,
@@ -154,10 +132,11 @@ class test(mutlib.System_test):
     """
 
     def check_prerequisites(self):
-#        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-#            raise MUTLibError("Test requires server version prior to 5.6.5")
+    #        if self.servers.get_server(0).check_version_compat(5, 6, 5):
+    #            raise MUTLibError("Test requires server version prior to 5
+    # .6.5")
         self.test_objects = []
-        
+
         # Need at least one server.
         self.server1 = None
         self.server2 = None
@@ -172,48 +151,51 @@ class test(mutlib.System_test):
         if self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
-            except MUTLibError, e:
-                raise MUTLibError("Cannot spawn needed servers: %s" % \
-                                   e.errmsg)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                    err.errmsg))
         self.server2 = self.servers.get_server(1)
-        
-        s1_conn = "--server1=" + self.build_connection_string(self.server1)
-        s2_conn = "--server2=" + self.build_connection_string(self.server2)
-       
-        self.base_cmd = "%s %s %s " % (self.utility, s1_conn, s2_conn)
+
+        s1_conn = "--server1={0}".format(
+            self.build_connection_string(self.server1))
+        s2_conn = "--server2={0}".format(
+            self.build_connection_string(self.server2))
+
+        self.base_cmd = "{0} {1} {2} ".format(self.utility, s1_conn, s2_conn)
 
         rows = self.server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if rows:
             basedir = rows[0][1]
         else:
             raise MUTLibError("Unable to determine basedir of running "
-                                 "server.")
+                              "server.")
 
         self.mysql_path = get_tool_path(basedir, "mysql")
-        
+
         return True
-    
+
     def run(self):
         # Run the test cases for each object
         test_num = 1
         for obj in self.test_objects:
             obj['test_case_results'] = []
-            for i in range(0,len(_TEST_CASES)):
-                comment = _TEST_CASES[i]['comment'] % (test_num, obj['comment'])
-                
+            for i in range(0, len(_TEST_CASES)):
+                comment = _TEST_CASES[i]['comment'].format(test_num,
+                                                           obj['comment'])
+
                 if _TEST_CASES[i]['load_data']:
                     self._drop_all(obj)  # It's Ok if this fails
-                    self.server1.exec_query(_CREATE_DB % obj['db1'])
-                    self.server2.exec_query(_CREATE_DB % obj['db2'])
+                    self.server1.exec_query(_CREATE_DB.format(obj['db1']))
+                    self.server2.exec_query(_CREATE_DB.format(obj['db2']))
 
                 if _TEST_CASES[i]['run_util']:
-                        
+
                     if _TEST_CASES[i]['load_data']:
                         # Run any startup commands listed
                         for cmd in obj['startup_cmds']:
                             self.server1.exec_query(cmd)
                             self.server2.exec_query(cmd)
-                        # Create the objects
+                            # Create the objects
                         if obj['server1_object'] != '':
                             self.server1.exec_query(obj['server1_object'])
                         if obj['server2_object'] != '':
@@ -225,49 +207,50 @@ class test(mutlib.System_test):
                         for cmd in obj.get('server2_data', []):
                             self.server2.exec_query(cmd)
 
-                    if obj['object_name'] == "": # we're testing whole dbs
-                        cmd_opts = "%s:%s %s" % (obj['db1'], obj['db2'],
-                                                 _TEST_CASES[i]['options'])
+                    if obj['object_name'] == "":  # we're testing whole dbs
+                        cmd_opts = "{0}:{1} {2}".format(
+                            obj['db1'], obj['db2'], _TEST_CASES[i]['options'])
                     else:
-                        cmd_opts = "%s.%s:%s.%s %s" % \
-                                   (obj['db1'], obj['object_name'], obj['db2'],
-                                    obj['object_name'],
-                                    _TEST_CASES[i]['options'])
+                        cmd_opts = "{0}.{1}:{2}.{3} {4}".format(
+                            obj['db1'], obj['object_name'], obj['db2'],
+                            obj['object_name'], _TEST_CASES[i]['options'])
                     res = self.run_test_case_result(self.base_cmd + cmd_opts,
                                                     comment)
-                    
+
                     if _TEST_CASES[i]['load_data']:
                         # Run any shutdown commands listed
                         for cmd in obj['shutdown_cmds']:
                             self.server1.exec_query(cmd)
                             self.server2.exec_query(cmd)
-                    
+
                 else:
                     if self.debug:
-                        print "\n%s" % comment
-                        
+                        print "\n{0}".format(comment)
+
                     if _TEST_CASES[i]['run_on'] == 'server1':
                         conn_val = self.get_connection_values(self.server1)
                     else:
                         conn_val = self.get_connection_values(self.server2)
-                        
-                    command = "%s -uroot " % self.mysql_path
+
+                    command = "{0} -uroot ".format(self.mysql_path)
                     if conn_val[1] is not None and len(conn_val[1]) > 0:
-                        command += "-p%s " % conn_val[1]
+                        command = "{0}-p{1} ".format(command, conn_val[1])
                     if conn_val[2] is not None and len(conn_val[2]) > 0:
                         if conn_val[2] != "localhost":
-                            command += "-h %s " % conn_val[2]
+                            command = "{0}-h {1} ".format(command, conn_val[2])
                         else:
-                            command += "-h 127.0.0.1 "
+                            command = "{0}-h 127.0.0.1 ".format(command)
                         if ']' in conn_val[2]:
                             host = conn_val[2].replace('[', '')
                             host = host.replace(']', '')
-                            command += "-h %s " % host
+                            command = "{0}-h {1} ".format(command, host)
                     if conn_val[3] is not None:
-                        command += "--port=%s " % conn_val[3]
+                        command = "{0}--port={1} ".format(command,
+                                                          conn_val[3])
                     if conn_val[4] is not None:
-                        command += "--socket=%s " % conn_val[4]
-                    command += " < %s" % _TRANSFORM_FILE
+                        command = "{0}--socket={1} ".format(command,
+                                                            conn_val[4])
+                    command = "{0} < {1}".format(command, _TRANSFORM_FILE)
                     res = self.exec_util(command, self.res_fname, True)
 
                     if self.debug:
@@ -282,7 +265,7 @@ class test(mutlib.System_test):
                         sys.stdout.flush()
 
                 error_codes = obj.get('error_codes', None)
-                if error_codes is not None and len(error_codes) >= i+1:
+                if error_codes is not None and len(error_codes) >= i + 1:
                     exp_res = error_codes[i]
                 else:
                     exp_res = _TEST_CASES[i]['exp_result']
@@ -290,7 +273,7 @@ class test(mutlib.System_test):
                 test_num += 1
 
         return True
-          
+
     def get_result(self):
         # Here we check the result from execution of each test object.
         # We check all and show a list of those that failed.
@@ -300,30 +283,23 @@ class test(mutlib.System_test):
                 for result in obj['test_case_results']:
                     if result[0] != result[1]:
                         failed_object_tests.append(result)
-            except:
+            except (KeyError, IndexError):
                 return (False, "No test results found for object test "
-                        "diff %s %s comment: %s" % (obj['db1'], obj['db2'],
-                                                    obj['comment']))
+                               "diff {0} {1} comment: "
+                               "{2}".format(obj['db1'], obj['db2'],
+                                            obj['comment']))
         if len(failed_object_tests) > 0:
             msg = ""
             for result in failed_object_tests:
-                msg += "\n%s\nExpected result = " % result[2] + \
-                        "%s, actual result = %s.\n" % (result[1], result[0])
-            return (False, msg)
-            
-        return (True, '')
-    
+                msg = ("{0}\n{1}\nExpected result = {2}, actual result = "
+                       "{3}.\n".format(msg, result[2], result[1], result[0]))
+            return False, msg
+
+        return True, ''
+
     def record(self):
-        return True # Not a comparative test
-    
-    def drop_db(self, server, db):
-        # Check before you drop to avoid warning
-        try:
-            res = server.exec_query("DROP DATABASE `%s`" % db)
-        except:
-            return False
-        return True
-    
+        return True  # Not a comparative test
+
     def _drop_all(self, test_object):
         self.drop_db(self.server1, test_object["db1"])
         self.drop_db(self.server2, test_object["db2"])

@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2010, 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2011, 2013, Oracle and/or its affiliates. All rights
+# reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,17 +20,22 @@
 This file contains the exceptions used by MySQL Utilities and their libraries.
 """
 
+
 class Error(Exception):
+    """Error
+    """
     pass
+
 
 class UtilError(Exception):
     """General errors raised by command modules to user scripts.
-    
+
     This exception class is used to report errors from MySQL utilities
     command modules and are used to communicate known errors to the user.
     """
-    
+
     def __init__(self, message, errno=0):
+        super(UtilError, self).__init__()
         self.args = (message, errno)
         self.errmsg = message
         self.errno = errno
@@ -38,7 +44,7 @@ class UtilError(Exception):
 class UtilDBError(UtilError):
     """Database errors raised when the mysql database server operation fails.
     """
-    
+
     def __init__(self, message, errno=0, db=None):
         UtilError.__init__(self, message, errno)
         self.db = db
@@ -47,7 +53,7 @@ class UtilDBError(UtilError):
 class UtilRplError(UtilError):
     """Replication errors raised during replication operations.
     """
-    
+
     def __init__(self, message, errno=0, master=None, slave=None):
         UtilError.__init__(self, message, errno)
         self.master = master
@@ -57,7 +63,7 @@ class UtilRplError(UtilError):
 class UtilRplWarn(UtilError):
     """Replication warnings raised during replication operations.
     """
-    
+
     def __init__(self, message, errno=0, master=None, slave=None):
         UtilError.__init__(self, message, errno)
         self.master = master
@@ -67,43 +73,67 @@ class UtilRplWarn(UtilError):
 class UtilBinlogError(UtilError):
     """Errors raised during binary log operations.
     """
-    
-    def __init__(self, message, errno=0, file=None, pos=0):
+
+    def __init__(self, message, errno=0, filename=None, pos=0):
         UtilError.__init__(self.message, errno)
-        self.file = file
+        self.file = filename
         self.pos = pos
 
 
 class UtilTestError(UtilError):
     """Errors during test execution of command or common module tests.
-    
+
     This exception is used to raise and error and supply a return value for
     recording the test result.
     """
+
     def __init__(self, message, errno=0, result=None):
         UtilError.__init__(self, message, errno)
         self.result = result
-    
+
 
 class FormatError(Error):
     """An entity was supplied in the wrong format."""
     pass
 
+
 class EmptyResultError(Error):
     """An entity was supplied in the wrong format."""
     pass
 
+
 class MUTLibError(Exception):
     """MUT errors
-    
+
     This exception class is used to report errors from the testing subsystem.
     """
-    
+
     def __init__(self, message, options=None):
+        super(MUTLibError, self).__init__()
         self.args = (message, options)
         self.errmsg = message
         self.options = options
-    
+
+
 class LogParserError(UtilError):
+    """LogParserError
+    """
     def __init__(self, message=''):
-        super(LogParserError,self).__init__(message)
+        super(LogParserError, self).__init__(message)
+
+
+class ConnectionValuesError(Exception):
+    """Specific error raised by Server when values are not valid.
+
+    This exception class is used to report errors when Cannot determine
+    connection information type supplied by MySQL utilities
+    """
+
+    def __init__(self, message, errno=0):
+        super(ConnectionValuesError, self).__init__()
+        self.args = (message, errno)
+        self.errmsg = message
+        self.errno = errno
+
+    def __str__(self):
+        return self.errmsg
