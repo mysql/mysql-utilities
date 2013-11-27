@@ -243,13 +243,20 @@ class BuildDistOSX(bdist):
         if not self.debug:
             install_cmd.verbose = 0
         install_cmd.compile = False
-        purelib_path = os.path.join(osx_path, 'Library', 'Python',
+        purelib_path = os.path.join('Library', 'Python',
                                     sys.version[0:3], 'site-packages')
         log.info("py_version {0}".format(purelib_path))
         install_cmd.install_purelib = purelib_path
+        install_cmd.root = osx_path
+        #install_cmd.install_dir = build_path
         log.info("running install cmd")
         self.run_command('install')
         log.info("install cmd finish")
+
+        copy_tree(os.path.join(osx_path, osx_path, 'bin'),
+                  os.path.join(osx_path, 'bin'))
+
+        remove_tree(os.path.join(osx_path, 'build'))
 
         man_prefix = '/usr/local/share/man'
         install_man_cmd = self.reinitialize_command('install_man',
@@ -368,6 +375,18 @@ class BuildDistOSXcom(BuildDistOSX):
             log.info("current directory: {0}".format(os.getcwd()))
         log.info("bdist_com cmd finish")
 
+        install_cmd = self.get_finalized_command('install_data')
+        log.info("install_cmd.dist_dir {0}".format(root))
+        install_cmd.install_dir = root
+        log.info("install_cmd.root {0}".format(osx_path))
+        install_cmd.root = osx_path
+        log.info("install_cmd.prefix {0}".format(bdist.prefix))
+
+        self.run_command('install_data')
+        if self.debug:
+            log.info("current directory: {0}".format(os.getcwd()))
+        log.info("install_cmd cmd finish")
+
         # Copy necessary files to build osx package.
         if self.debug:
             log.info('dir(bdist) {0}'.format(dir(bdist)))
@@ -387,3 +406,4 @@ class BuildDistOSXcom(BuildDistOSX):
             log.info("current directory: {0}".format(os.getcwd()))
         if not self.keep_temp:
             remove_tree(build_path, dry_run=self.dry_run)
+
