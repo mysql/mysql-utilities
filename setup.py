@@ -339,8 +339,10 @@ class install_data(_install_data):
         install_logdir = '/var/log'
         if os.name == 'posix' and install_dir in ('/', '/usr'):
             install_sysconfdir = '/etc'
-        else:
+        elif os.name == 'nt':
             install_sysconfdir = os.path.join(install_dir, 'etc')
+        else:
+            install_sysconfdir = '/etc'
 
         # Go over all entries in data_files and process it if needed
         new_data_files = []
