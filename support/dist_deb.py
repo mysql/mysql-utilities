@@ -216,7 +216,7 @@ class BuildDistDebian(Command):
                 if filename.endswith('.deb'):
                     newname = filename.replace(
                         '{0}_all'.format(self.version),
-                        '{0}-1{1}-{2}{3}_all'.format(self.version, self.tag, 
+                        '{0}-1{1}{2}{3}_all'.format(self.version, self.tag, 
                                                   self.platform,
                                                   self.platform_version)
                     )
