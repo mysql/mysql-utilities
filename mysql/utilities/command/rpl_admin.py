@@ -85,6 +85,7 @@ _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
 _GTID_ON_REQ = "Slave election requires GTID_MODE=ON for all servers."
 
+WARNING_SLEEP_TIME = 10
 
 def get_valid_rpl_command_text():
     """Provide list of valid command descriptions to caller.
@@ -702,8 +703,9 @@ class RplCommands(object):
         if not self._check_host_references():
             print "# WARNING: %s" % _HOST_IP_WARNING
             self._report(_HOST_IP_WARNING, logging.WARN, False)
-            print "#\n# Failover console will start in 10 seconds."
-            time.sleep(10)
+            print("#\n# Failover console will start in {0} seconds.".format(
+                WARNING_SLEEP_TIME))
+            time.sleep(WARNING_SLEEP_TIME)
 
         # Test failover script. If it doesn't exist, fail.
         no_exec_fail_msg = "Failover check script cannot be found. Please " + \

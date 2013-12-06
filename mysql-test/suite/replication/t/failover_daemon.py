@@ -21,6 +21,7 @@ import time
 import failover
 
 from mysql.utilities.common.tools import delete_directory
+from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
 from mysql.utilities.exception import MUTLibError, UtilError
 
 _FAILOVER_LOG = "{0}fail_log.txt"
@@ -263,7 +264,9 @@ class test(failover.test):
         if self.debug:
             print("Waiting for failover daemon to register master and start "
                   "its monitoring process")
-        time.sleep(5)
+        # Wait because of the warning message that may appear due to
+        # mixing hostnames and IP addresses
+        time.sleep(WARNING_SLEEP_TIME+1)
         i = 0
         with open(logfile, "r") as f:
             while i < _TIMEOUT:
@@ -336,10 +339,12 @@ class test(failover.test):
         slave2_conn = self.build_connection_string(self.server3).strip(" ")
         slave3_conn = self.build_connection_string(self.server4).strip(" ")
         slave4_conn = self.build_connection_string(self.server5).strip(" ")
+        # Failover must work even with a slave that does not exist
+        slave5_conn = "doesNotExist@localhost:999999999999"
 
         master_str = "--master={0}".format(master_conn)
         slaves_str = "--slaves={0}".format(
-            ",".join([slave1_conn, slave2_conn, slave3_conn])
+            ",".join([slave1_conn, slave2_conn, slave3_conn, slave5_conn])
         )
         self.test_results = []
         self.test_cases = []

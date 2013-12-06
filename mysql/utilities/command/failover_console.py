@@ -29,7 +29,6 @@ import struct
 from mysql.utilities.exception import UtilRplError
 from mysql.utilities.common.format import format_tabular_list, print_list
 
-
 _CONSOLE_HEADER = "MySQL Replication Failover Utility"
 _CONSOLE_FOOTER = "Q-quit R-refresh H-health G-GTID Lists U-UUIDs"
 _CONSOLE_FOOTER_NO_KEYBOARD = "Press CTRL+C to quit"
@@ -261,12 +260,15 @@ class FailoverConsole(object):
             return
 
         for slave_dict in topology.slaves:
-            # Turn binary log off first
-            slave_dict["instance"].toggle_binlog("DISABLE")
-            # Drop failover instance registration table.
-            slave_dict["instance"].exec_query(_DROP_FC_TABLE)
-            # Turn binary log on
-            self.master.toggle_binlog("ENABLE")
+            slave_instance = slave_dict["instance"]
+            # Skip unreachable/not connected slaves.
+            if slave_instance and slave_instance.is_alive():
+                # Turn binary log off first
+                slave_instance.toggle_binlog("DISABLE")
+                # Drop failover instance registration table.
+                slave_instance.exec_query(_DROP_FC_TABLE)
+                # Turn binary log on
+                slave_instance.toggle_binlog("ENABLE")
 
     def _reset_interval(self, interval=15):
         """Reset the interval timing
