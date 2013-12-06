@@ -44,13 +44,17 @@ _COMMAND_KEY = {
     '\x1b[D': 'ARROW_LT',
     '\t': 'TAB',
     '\xe0': 'SPECIAL_WIN',
+    '\x7f': 'BACKSPACE_POSIX',
     '\x08': 'BACKSPACE_WIN'
 }
 
 # Some windows keys are different and require reading two keys.
 # The following are the second characters.
 _WIN_COMMAND_KEY = {
-    'S': 'DELETE_WIN', 'H': 'ARROW_UP', 'P': 'ARROW_DN', 'M': 'ARROW_RT',
+    'S': 'DELETE_WIN',
+    'H': 'ARROW_UP',
+    'P': 'ARROW_DN',
+    'M': 'ARROW_RT',
     'K': 'ARROW_LT'
 }
 
@@ -141,7 +145,7 @@ class _CommandHistory(object):
         options[in]        Options for the class member variables
         """
         if options is None:
-            options = {}
+            options = []
         self.position = 0
         self.commands = []
         self.max_size = options.get('max_size', 40)
@@ -797,7 +801,7 @@ class Console(object):
             self.cmd_line.left_arrow_keypress()
         elif cmd_key == 'ARROW_RT':
             self.cmd_line.right_arrow_keypress()
-        elif cmd_key in ['DELETE_POSIX', 'BACKSPACE_WIN']:
+        elif cmd_key in ['BACKSPACE_POSIX', 'BACKSPACE_WIN']:
             self.cmd_line.backspace_keypress()
         else:  # 'TAB'
             segment = self._set_complete_mode()
@@ -894,7 +898,7 @@ class Console(object):
                 cmd_string = self.cmd_line.get_command()
             # else add key to command buffer
             else:
-                self.cmd_line.get_command()
+                cmd_string = self.cmd_line.get_command()
                 self.cmd_line.add(key)
                 cmd_string = self.cmd_line.get_command()
             sys.stdout.flush()
