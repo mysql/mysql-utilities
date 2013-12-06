@@ -45,6 +45,22 @@ class test(meta_grep.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - invalid --object-type.".format(test_num)
+        cmd = ("{0} --body --pattern=%t1% --object-types=function"
+               "".format(cmd_base))
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = "Test case {0} - invalid --search-objects.".format(test_num)
+        cmd = ("{0} --pattern=%t1% --object-types=routine,foo"
+               "".format(cmd_base))
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         return True
 
     def get_result(self):
