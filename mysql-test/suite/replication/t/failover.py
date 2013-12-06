@@ -23,6 +23,7 @@ import rpl_admin_gtid
 
 from mysql.utilities.common.server import get_local_servers
 from mysql.utilities.common.tools import delete_directory
+from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
 from mysql.utilities.exception import MUTLibError, UtilError
 
 _FAILOVER_LOG = "{0}fail_log.txt"
@@ -105,7 +106,7 @@ class test(rpl_admin_gtid.test):
         res = -1
         if kill:
             retval = self.kill(proc.pid)
-            res = 0 if retval is None else -1
+            res = 0 if retval else -1
         else:
             if proc.poll() is None:
                 res = proc.wait()
@@ -174,7 +175,9 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("Waiting for failover console to register master and start "
                   "its monitoring process")
-        time.sleep(5)
+        # Wait because of the warning message that may appear due to
+        # mixing hostnames and IP addresses
+        time.sleep(WARNING_SLEEP_TIME+1)
         i = 0
         with open(log_filename, 'r') as file_:
             while i < _TIMEOUT:
@@ -301,10 +304,13 @@ class test(rpl_admin_gtid.test):
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
+        # Failover must work even with a slave that does not exist
+        slave4_conn = "doesNotExist@localhost:999999999999"
 
         master_str = "--master=" + master_conn
         slaves_str = "--slaves=" + \
-                     ",".join([slave1_conn, slave2_conn, slave3_conn])
+                     ",".join([slave1_conn, slave2_conn, slave3_conn,
+                               slave4_conn])
 
         self.test_results = []
         self.test_cases = []

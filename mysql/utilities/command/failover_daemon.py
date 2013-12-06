@@ -376,12 +376,15 @@ class FailoverDaemon(object):
             return
 
         for slave_dict in topology.slaves:
-            # Turn binary log off first
-            slave_dict["instance"].toggle_binlog("DISABLE")
-            # Drop failover instance registration table.
-            slave_dict["instance"].exec_query(_DROP_FC_TABLE)
-            # Turn binary log on
-            self.master.toggle_binlog("ENABLE")
+            # Skip unreachable/not connected slaves.
+            slave_instance = slave_dict["instance"]
+            if slave_instance and slave_instance.is_alive():
+                # Turn binary log off first
+                slave_instance.toggle_binlog("DISABLE")
+                # Drop failover instance registration table.
+                slave_instance.exec_query(_DROP_FC_TABLE)
+                # Turn binary log on
+                slave_instance.toggle_binlog("ENABLE")
 
     def run(self):
         """Run automatic failover.
