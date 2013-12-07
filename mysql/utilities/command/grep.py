@@ -22,7 +22,7 @@ import sys
 
 import mysql.connector
 
-from mysql.utilities.exception import FormatError, EmptyResultError
+from mysql.utilities.exception import FormatError, EmptyResultError, UtilError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.options import obj2sql
@@ -157,7 +157,11 @@ def _make_select(objtype, pattern, database_pattern, check_body, use_regexp):
         'select_option': '',
         'field_type': "'" + objtype.upper() + "'",
     }
-    options.update(_OBJMAP[objtype])
+    try:
+        options.update(_OBJMAP[objtype])
+    except KeyError:
+        raise UtilError("Invalid object type '{0}'. Use --help to see allowed "
+                        "values.".format(objtype))
 
     # Build a condition for inclusion in the select
     condition = "{field_name} {regex} {pattern}".format(**options)

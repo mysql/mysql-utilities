@@ -34,7 +34,7 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             add_format_option,
                                             add_character_set_option)
-
+from mysql.utilities.exception import UtilError
 
 # Check for connector/python
 if not check_connector_python():
@@ -117,15 +117,19 @@ else:
         parser.error(_AT_LEAST_ONE_SERVER_MSG)
 
 object_types = re.split(r"\s*,\s*", options.object_types)
-command = ObjectGrep(options.pattern, options.database_pattern, object_types,
-                     options.check_body, options.use_regexp)
 
 try:
+    command = ObjectGrep(options.pattern, options.database_pattern,
+                         object_types, options.check_body, options.use_regexp)
     if options.print_sql:
         print(command.sql())
     else:
         command.execute(options.server, format=options.format,
                         charset=options.charset)
+except UtilError:
+    _, err, _ = sys.exc_info()
+    sys.stderr.write("ERROR: {0}\n".format(err.errmsg))
+    sys.exit(1)
 except:
     _, details, _ = sys.exc_info()
     sys.stderr.write("ERROR: {0}\n".format(details))

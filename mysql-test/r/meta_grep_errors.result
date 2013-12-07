@@ -1,0 +1,6 @@
+Test case 1 - invalid --character-set
+ERROR: Character set 'unsupported_charset' unsupported.
+Test case 2 - invalid --object-type.
+ERROR: Invalid object type 'function'. Use --help to see allowed values.
+Test case 3 - invalid --search-objects.
+ERROR: Invalid object type 'foo'. Use --help to see allowed values.

@@ -1,0 +1,2 @@
+Test case 1 - invalid --character-set
+ERROR: Character set 'unsupported_charset' unsupported.
