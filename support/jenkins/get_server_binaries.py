@@ -25,7 +25,7 @@ import socket
 import platform
 import sys
 import shutil
-from .common import working_path
+from support.jenkins.common import working_path
 
 HOSTS = {
     "blade03": {

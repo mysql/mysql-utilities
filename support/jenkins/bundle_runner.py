@@ -25,14 +25,15 @@ import re
 import shutil
 from collections import namedtuple
 
-from .common import (MUTOutputParser, get_server_info, working_path,
-                    copy_connector, extract_file, get_major_version,
-                    pprint_mysql_version, mysql_server, load_databases,
-                    run_mut, execute, SPECIFIC_TESTS, get_mut_test_list)
+from support.jenkins.common import (
+    MUTOutputParser, get_server_info, working_path, copy_connector,
+    extract_file, get_major_version, pprint_mysql_version, mysql_server,
+    load_databases, run_mut, execute, SPECIFIC_TESTS, get_mut_test_list)
+
 if os.name == 'nt':
-    from .commands import COMMANDS_WINDOWS as COMMANDS
+    from support.jenkins.commands import COMMANDS_WINDOWS as COMMANDS
 else:
-    from .commands import COMMANDS_LINUX as COMMANDS
+    from support.jenkins.commands import COMMANDS_LINUX as COMMANDS
 
 if __name__ == '__main__':
     WORKSPACE = os.environ["WORKSPACE"]
