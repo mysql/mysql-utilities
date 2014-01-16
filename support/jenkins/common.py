@@ -278,8 +278,8 @@ def get_server_info(filename):
     NAME is a string with the full name of the server
     """
 
-    match = re.search(r'mysql\-(advanced|enterprise)?(?:\-noinstall)?\-?'
-                      r'(\d\.\d\.\d{1,2})', filename, re.IGNORECASE)
+    match = re.search(r'mysql\-(advanced|enterprise)?(?:\-?noinstall)'
+                      r'?\-?(\d\.\d\.\d{1,2})', filename, re.IGNORECASE)
     if match:
         type_, version = match.groups()
         return (bool(type_), version), match.group(0)
@@ -317,7 +317,7 @@ def _extract_zip(filename, path='.', replace=False):
     zip_ = zipfile.ZipFile(filename)
     (dirname, fname) = os.path.split(filename)
     # Take of .zip and get the archive name
-    shortname = fname[:fname.index(".zip")]
+    shortname = next(iter(zip_.namelist())).split('/')[0]
     extract_foldername = os.path.join(path, shortname)
     if (os.path.exists(extract_foldername) and
             os.path.isdir(extract_foldername)):
@@ -426,7 +426,7 @@ def run_mut(port, parser, specific_tests=None, env=None, force=False,
             verbose=False, override_cmd=None):
     environ = env if env is not None else os.environ
     print("\n\n\n\n ####### Running MUT #######\n\n")
-    command = "python2.7 mut.py --server=root@localhost:{0} ".format(port)
+    command = "python mut.py --server=root@localhost:{0} ".format(port)
 
     if override_cmd:
         command = "{0} {1}".format(command, override_cmd)

@@ -68,6 +68,7 @@ if __name__ == '__main__':
     print("DATABASE FILES HOME: {0}".format(DB_FILES_HOME))
     print("LOAD DATABASES: {0}".format(LOAD_DATABASES))
     print("OVERRIDE MUT CMD: {0}".format(OVERRIDE_MUT_CMD))
+    print("MYSQL_VERSION: {0}".format(MYSQL_VERSION))
 
     # Get oldest bundle
     with working_path(BUNDLES_HOME):
@@ -129,8 +130,8 @@ if __name__ == '__main__':
     copy_connector(CONNECTOR_HOME)
     # add utilities to the pythonpath
     if 'PYTHONPATH' in os.environ:
-        os.environ['PYTHONPATH'] = "{0};{1}".format(os.getcwd(),
-                                                    os.environ['PYTHONPATH'])
+        os.environ['PYTHONPATH'] = "{0}{1}{2}".format(os.getcwd(), os.pathsep,
+                                                      os.environ['PYTHONPATH'])
     else:
         os.environ['PYTHONPATH'] = os.getcwd()
 
@@ -159,7 +160,8 @@ if __name__ == '__main__':
         if server_info is not None:
             ((is_commercial, mysql_version), shortname) = server_info
             # Extract only if mysql_version matches the one we want
-            if mysql_version == MYSQL_VERSION or MYSQL_VERSION == "ALL":
+            if (get_major_version(mysql_version) == MYSQL_VERSION or
+                    MYSQL_VERSION == 'ALL'):
                 fname = extract_file(server, path=SERVERS_DIR, replace=True)
                 if fname is not None:
                     server_list.append(serverTuple(fname, shortname,
@@ -273,7 +275,7 @@ if __name__ == '__main__':
             execute("coverage html -i")
             shutil.move('htmlcov', os.path.join(BUILD_RESULTS, 'coverage'))
 
-    if exit_status or len(output_parser.failed_tests):
+    if exit_status or len(output_parser.failed_tests) > 0:
         sys.exit(1)
     else:
         sys.exit(0)
