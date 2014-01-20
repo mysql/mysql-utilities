@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+import time
 import mutlib
 import rpl_admin
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -39,6 +40,8 @@ _MYSQL_OPTS_INFO_REPO_TABLE = ('"--log-bin=mysql-bin --skip-slave-start '
                                '--sync-master-info=1 '
                                '--master-info-repository=TABLE '
                                '--relay-log-info-repository=TABLE"')
+
+TIMEOUT = 30
 
 
 class test(rpl_admin.test):
@@ -236,25 +239,60 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        # Reset the topology to its original state
-        self.reset_topology()
-
-        # Test if the correct number of transactions behind is displayed.
-        # STOP the slave (not to catch up with the master.
-        self.server2.exec_query("STOP SLAVE SQL_THREAD")
-        # Add 3 transactions to the master.
-        self.server1.exec_query("CREATE DATABASE `trx_behind`")
-        self.server1.exec_query("CREATE TABLE `trx_behind`.`t1` (x char(30))")
-        self.server1.exec_query("DROP DATABASE `trx_behind`")
-
+        # Test for BUGS #16554609 and #18083550
         comment = ("Test case {0} - HEALTH with some transactions "
                    "behind".format(test_num))
         cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} health "
                    "--format=VERTICAL -vvv".format(master_conn, slave1_conn))
+
+        # Reset gtid_executed
+        self.reset_master()
+        # Reset the topology to its original state
+        self.reset_topology()
+        self.server2.exec_query("START SLAVE")
+        server_uuid = self.server1.get_uuid()
+        # Purge some gtids to create holes
+        self.server1.exec_query('SET GLOBAL gtid_purged= "{0}:1:4:6:10'
+                                '"'.format(server_uuid))
+        self.server1.exec_query("CREATE DATABASE `trx_behind`")
+        self.server1.exec_query("CREATE TABLE `trx_behind`.`t1` (x char(30))")
+        # Insert data on the master server:
+        last_val = 15
+        for i in range(last_val):
+            self.server1.exec_query('INSERT INTO `trx_behind`.`t1` '
+                                    'VALUES("{0}")'.format(i))
+        self.server1.commit()
+        # Wait for master to be synced with slave
+        round_ = 0
+        # Give a little time to the slave before verifying if it is in sync
+        time.sleep(3)
+        while round_ < TIMEOUT:
+            try:
+                res = self.server2.exec_query(
+                    "SELECT * FROM `trx_behind`.`t1` WHERE "
+                    "x={0}".format(last_val - 1))
+                # Use rollback to close transaction and read fresh data
+                # data in next select.
+                self.server2.rollback()
+            except UtilDBError:  # database may not exist yet
+                pass
+            finally:
+                if res:
+                    break
+                else:
+                    time.sleep(3)
+                    round_ += 1
+        else:
+            raise MUTLibError("{0}: failed - waiting for slave to sync "
+                              "with master".format(comment))
+
+        # Run the test
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-
+        # DROP DATABASE
+        self.server1.exec_query("DROP DATABASE IF EXISTS `trx_behind`")
+        self.server2.exec_query("DROP DATABASE IF EXISTS `trx_behind`")
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 
