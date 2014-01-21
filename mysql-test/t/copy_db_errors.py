@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ class test(copy_db.test):
         test_num += 1
         comment = ("Test case {0} - source user not enough privileges "
                    "needed").format(test_num)
-        cmd_str = "{0} util_test:util_db_clone --force".format(cmd)
+        cmd_str = "{0} util_test:util_db_clone --drop-first".format(cmd)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -197,7 +197,7 @@ class test(copy_db.test):
         test_num += 1
         comment = ("Test case {0} - dest user not enough privileges "
                    "needed").format(test_num)
-        cmd_str = "{0} util_test:util_db_clone --force".format(cmd)
+        cmd_str = "{0} util_test:util_db_clone --drop-first".format(cmd)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -235,7 +235,7 @@ class test(copy_db.test):
         test_num += 1
         comment = "Test case {0} - cannot parse --source".format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks {0}"
-                   " util_test:util_db_clone --force").format(to_conn)
+                   " util_test:util_db_clone --drop-first").format(to_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -243,7 +243,8 @@ class test(copy_db.test):
         test_num += 1
         comment = "Test case {0} - cannot parse --destination".format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid {0} util_test:util_db_clone "
-                   "--destination=rocks_rocks_rocks --force").format(from_conn)
+                   "--destination=rocks_rocks_rocks --drop-first"
+                   "").format(from_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -251,7 +252,7 @@ class test(copy_db.test):
         test_num += 1
         comment = "Test case {0} - no destination specified".format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid --source=rocks_rocks_rocks "
-                   "util_test:util_db_clone --force")
+                   "util_test:util_db_clone --drop-first")
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -267,8 +268,8 @@ class test(copy_db.test):
         test_num += 1
         comment = "Test case {0} - new storage engine missing".format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   " --force --new-storage-engine=NOTTHERE").format(to_conn,
-                                                                    from_conn)
+                   " --drop-first --new-storage-engine=NOTTHERE"
+                   "").format(to_conn, from_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -278,7 +279,7 @@ class test(copy_db.test):
                    "missing").format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
                    " --default-storage-engine=NOPENOTHERE"
-                   " --force").format(to_conn, from_conn)
+                   " --drop-first").format(to_conn, from_conn)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -286,7 +287,7 @@ class test(copy_db.test):
         test_num += 1
         comment = "Test case {0} - database listed and --all".format(test_num)
         cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   " --force --all").format(to_conn, from_conn)
+                   " --drop-first --all").format(to_conn, from_conn)
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

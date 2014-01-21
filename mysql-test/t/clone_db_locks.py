@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ class test(mutlib.System_test):
                 print comment
             self.drop_db(self.server1, "util_db_clone")
             cmd = ("mysqldbcopy.py --skip-gtid {0} {1} util_test:util_db_clone"
-                   "  --force --locking={2}".format(from_conn, to_conn,
-                                                    locktype))
+                   "  --drop-first --locking={2}".format(from_conn, to_conn,
+                                                         locktype))
             try:
                 res = self.exec_util(cmd, self.res_fname)
                 self.results.append(res)

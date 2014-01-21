@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -90,9 +90,9 @@ if __name__ == '__main__':
     add_character_set_option(parser)
 
     # Overwrite mode
-    parser.add_option("-f", "--force", action="store_true", dest="force",
+    parser.add_option("-d", "--drop-first", action="store_true", default=False,
                       help="drop the new database or object if it exists",
-                      default=False)
+                      dest="do_drop")
 
     # Add the exclude database option
     parser.add_option("-x", "--exclude", action="append", dest="exclude",
@@ -201,7 +201,7 @@ if __name__ == '__main__':
         "skip_grants": "grants" in skips,
         "skip_create": "create_db" in skips,
         "skip_data": "data" in skips,
-        "force": opt.force,
+        "do_drop": opt.do_drop,
         "verbose": opt.verbosity >= 1,
         "quiet": opt.quiet,
         "debug": opt.verbosity == 3,

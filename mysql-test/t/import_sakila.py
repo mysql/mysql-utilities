@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -86,7 +86,8 @@ class test(mutlib.System_test):
         import_file = os.path.normpath(
             _IMPORT_FILES_PATH.format(_IMPORT_FILES[1]))
         # --import=both because the data file also include some definitions.
-        cmd = "{0} {1} --import=both".format(cmd_base, import_file)
+        cmd = ("{0} {1} --import=both"
+               "".format(cmd_base, import_file))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

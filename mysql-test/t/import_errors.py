@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -258,6 +258,16 @@ class test(import_basic.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - error: Use --drop-first to drop the "
+                   "database before importing.").format(test_num)
+        data_file = os.path.normpath("./std_data/basic_data.sql")
+        cmd_str = ("{0} --format=sql --import=both "
+                   "{1}").format(import_cmd, data_file)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Handle message with path (replace '\' by '/').
         if os.name != "posix":
             self.replace_result("# Importing definitions and data from "
@@ -268,6 +278,10 @@ class test(import_basic.test):
                                 "std_data\\bad_sql.sql",
                                 "# Importing definitions from "
                                 "std_data/bad_sql.sql.\n")
+            self.replace_result("# Importing definitions and data from "
+                                "std_data\\basic_data.sql.",
+                                "# Importing definitions and data from "
+                                "std_data/basic_data.sql.\n")
 
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class test(export_gtid.test):
         self.server2.exec_query("RESET MASTER")
         self.server2.exec_query("CREATE DATABASE util_test")
         self.exec_copy(self.server1, self.server2,
-                       copy_cmd_str + " --force ",
+                       copy_cmd_str + " --drop-first ",
                        test_num, "gtid_executed error",
                        False, False, False)
         test_num += 1
@@ -120,7 +120,7 @@ class test(export_gtid.test):
         self.server1.exec_query("RESET MASTER")
         self.server2.exec_query("RESET MASTER")
         self.exec_copy(self.server1, self.server2,
-                       copy_cmd_str + " --force ",
+                       copy_cmd_str + " --drop-first ",
                        test_num, "fixed empty gtid_executed error",
                        False, False)
 

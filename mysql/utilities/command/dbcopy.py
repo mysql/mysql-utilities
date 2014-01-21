@@ -1,6 +1,5 @@
 #
-# Copyright (c) 2010, 2012, 2013 Oracle and/or its affiliates. All rights
-# reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -120,7 +119,7 @@ def copy_db(src_val, dest_val, db_list, options):
 
     This method will copy a database and all of its objects and data from
     one server (source) to another (destination). Options are available to
-    selectively ignore each type of object. The force parameter is
+    selectively ignore each type of object. The do_drop parameter is
     used to permit the copy to overwrite an existing destination database
     (default is to not overwrite).
 
@@ -133,11 +132,11 @@ def copy_db(src_val, dest_val, db_list, options):
     options[in]        a dictionary containing the options for the copy:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, verbose, force, quiet,
+                       skip_data, verbose, do_drop, quiet,
                        connections, debug, exclude_names, exclude_patterns)
 
     Notes:
-        force    - if True, the database on the destination will be dropped
+        do_drop  - if True, the database on the destination will be dropped
                    if it exists (default is False)
         quiet    - do not print any information during operation
                    (default is False)

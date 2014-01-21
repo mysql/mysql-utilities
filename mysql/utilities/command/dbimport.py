@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1382,6 +1382,17 @@ def import_file(dest_val, file_name, options):
                 if do_drop and import_type != "data":
                     statements.append("DROP DATABASE IF EXISTS %s;" % db_name)
                 if import_type != "data":
+                    # If has a CREATE DATABASE statement and the database
+                    # exists and the --drop-first option is not provided,
+                    # issue an error message
+                    if db_name and not do_drop and row[0] == "sql":
+                        dest_db = Database(destination, db_name)
+                        if dest_db.exists() and \
+                                row[1].upper().startswith("CREATE DATABASE"):
+                            raise UtilDBError("The database {0} exists. "
+                                              "Use --drop-first to drop the "
+                                              "database before importing."
+                                              "".format(db_name))
                     if not _skip_object("CREATE_DB", options) and \
                        not fmt == 'sql':
                         statements.append("CREATE DATABASE %s;" % db_name)

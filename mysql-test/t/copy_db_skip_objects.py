@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class test(copy_db.test):
         # In this test, we execute a series of commands saving the results
         # from each run to perform a comparative check.
 
-        cmd_opts = "{0} --force --skip=grants".format(cmd_str)
+        cmd_opts = "{0} --drop-first --skip=grants".format(cmd_str)
         test_num = 1
         comment = "Test case {0} - no grants".format(test_num)
         res = self.run_test_case(0, cmd_opts, comment)

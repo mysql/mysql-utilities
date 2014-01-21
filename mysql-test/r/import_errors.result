@@ -126,3 +126,7 @@ Test case 24 - warning: max bulk insert ignored without bulk insert option.
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions and data from test_run.txt.
 #...done.
+Test case 25 - error: Use --drop-first to drop the database before importing.
+# Source on XXXX-XXXX: ... connected.
+# Importing definitions and data from std_data/basic_data.sql.
+ERROR: The database `util_test` exists. Use --drop-first to drop the database before importing.
