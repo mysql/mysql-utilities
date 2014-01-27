@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -224,12 +224,11 @@ class test(mutlib.System_test):
         # Remove non-deterministic messages (do not appear on all platforms)
         self.replace_result("Error connecting to a slave",
                             "Error connecting to a slave ...\n")
-        self.replace_result("Error 2002: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server"
-                            "\n")
-        self.replace_result("Error 2003: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server"
-                            "\n")
+
+        self.replace_any_result(
+            ["Error 2002: Can't connect to", "Error 2003: Can't connect to",
+             "Error Can't connect to MySQL server on "],
+            "Error ####: Can't connect to local MySQL server\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

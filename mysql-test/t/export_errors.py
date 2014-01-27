@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ class test(export_basic.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Mask non deterministic output.
-        self.replace_substring("1045 (28000)", "1045")
+        self.replace_substring("Error 1045 (28000):", "Error")
 
         self.replace_substring("on [::1]", "on localhost")
 

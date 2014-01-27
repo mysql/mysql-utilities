@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -115,8 +115,11 @@ class test(check_index.test):
                                     "util_test_a", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        self.replace_result("Error 1045", "Error XXXX: Access denied\n")
-        self.replace_result("Error 2003", "Error XXXX: Access denied\n")
+
+        self.replace_any_result(["Error 1045", "Error 2003",
+                                 "Error Can't connect to MySQL server on",
+                                 "Error Access denied for user"],
+                                "Error XXXX: Access denied\n")
 
         return True
 
@@ -128,6 +131,3 @@ class test(check_index.test):
 
     def cleanup(self):
         return check_index.test.cleanup(self)
-
-
-

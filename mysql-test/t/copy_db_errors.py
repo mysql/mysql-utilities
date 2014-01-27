@@ -342,8 +342,10 @@ class test(copy_db.test):
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         # Replace error code.
-        self.replace_result("Error 1045", "Error XXXX: Access denied\n")
-        self.replace_result("Error 2003", "Error XXXX: Access denied\n")
+        self.replace_any_result(["Error 1045", "Error 2003",
+                                 "Error Can't connect to MySQL server on",
+                                 "Error Access denied for user"],
+                                "Error XXXX: Access denied\n")
 
         # Ignore GTID messages (skipping GTIDs in this test)
         self.remove_result("# WARNING: The server supports GTIDs")
@@ -357,7 +359,6 @@ class test(copy_db.test):
                             "values invalid",
                             "mysqldbcopy: error: Destination connection "
                             "values invalid\n")
-
         return True
 
     def get_result(self):

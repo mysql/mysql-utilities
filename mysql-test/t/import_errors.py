@@ -287,14 +287,11 @@ class test(import_basic.test):
         self.replace_substring("on localhost", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
-        self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
-
-        self.replace_substring("1045 (28000)", "1045")
-
         self.replace_substring(" (28000)", "")
         self.replace_result("ERROR: Query failed.", "ERROR: Query failed.\n")
 
-        self.replace_substring("1045 (28000)", "1045")
+        self.replace_substring("Error 1045 (28000):", "Error")
+        self.replace_substring("Error 1045:", "Error")
 
         self.replace_result("mysqldbimport: error: Server connection "
                             "values invalid",

@@ -53,7 +53,7 @@ Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.gri
 mysqldbimport: error: Server connection values invalid
 Test case 9 - error: cannot connect to server
 # Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
-Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
+Error Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 10 - error: not enough privileges
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions from test_run.txt.
