@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1594,16 +1594,17 @@ class Slave(Server):
             gtids_list = gtids[0].split("\n")
             # Extract the interval for each GTID and compute its length
             for gtid_item in gtids_list:
-                interval_str = gtid_item.split(':')[-1]
-                interval_str = interval_str.rstrip(', ')
-                interval = interval_str.split('-')
-                if len(interval) == 1:
-                    # Interval has only one element
-                    gtid_behind += 1
-                else:
-                    # Compute interval size and sum to total of GTIDs behind
-                    num_gtids = int(interval[1]) - int(interval[0]) + 1
-                    gtid_behind += num_gtids
+                interval_list = gtid_item.rstrip(', ')
+                interval_list = interval_list.split(':')[1:]
+                for interval_str in interval_list:
+                    interval = interval_str.split('-')
+                    if len(interval) == 1:
+                        # Interval has only one element
+                        gtid_behind += 1
+                    else:
+                        # Compute interval size and sum to total of GTIDs behind
+                        num_gtids = int(interval[1]) - int(interval[0]) + 1
+                        gtid_behind += num_gtids
         return gtid_behind
 
     def wait_for_slave(self, binlog_file, binlog_pos, timeout=300):

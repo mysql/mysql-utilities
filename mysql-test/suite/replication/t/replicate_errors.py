@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -239,18 +239,13 @@ class test(replicate.test):
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_substring(" (42000)", "")
-        self.replace_result("ERROR: Query failed. 1227: Access denied;",
-                            "ERROR: Query failed. 1227: Access denied;\n")
-
-        self.replace_result("Error 2002: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server "
-                            "####...\n")
-
-        self.replace_result("Error 2003: Can't connect to",
-                            "Error ####: Can't connect to local MySQL server "
-                            "####...\n")
         self.replace_result("ERROR: Query failed. 1227",
                             "ERROR: Query failed. 1227: Access denied;\n")
+
+        self.replace_any_result(
+            ["Error 2002: Can't connect to", "Error 2003: Can't connect to",
+             "Error Can't connect to MySQL server on "],
+            "Error ####: Can't connect to local MySQL server ####...\n")
 
         self.replace_result("mysqlreplicate: error: Master connection "
                             "values invalid",

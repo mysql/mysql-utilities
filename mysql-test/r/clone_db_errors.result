@@ -10,7 +10,7 @@ Test case 3 - error: target database already exists
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
-ERROR: destination database exists. Use --force to overwrite existing database.
+ERROR: destination database exists. Use --drop-first to overwrite existing database.
 Test case 4 - error: user with % - not enough permissions
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.

@@ -12,7 +12,7 @@ Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 mysqldbexport: error: Server connection values invalid
 Test case 5 - error: cannot connect to server
 # Source on localhost: ... ERROR: Cannot connect to the Source server.
-Error 1045: Access denied for user 'nope'@'localhost' (using password: YES)
+Error Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: not enough privileges
 # Source on localhost: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -149,9 +149,7 @@ class test(show_rpl.test):
             
         show_rpl.test.do_replacements(self)
 
-        self.replace_result("Error 1045", "Error 1045: Access denied for "
-                            "user 'wanda'@'localhost' (using password: "
-                            "YES)\n")
+        self.replace_substring("Error 1045:", "Error")
 
         self.replace_result("mysqlrplshow: error: Master connection "
                             "values invalid",

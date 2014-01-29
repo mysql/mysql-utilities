@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -823,6 +823,21 @@ class System_test(object):
                 self.results.insert(linenum, str_)
             linenum += 1
 
+    def replace_any_result(self, prefix_list, replacement_str):
+        """ If any of the prefixes in prefix_list is found on a line from
+        the results, that line is replaced with replacement_str.
+
+        prefix_list[in]      list of starting prefixes of strings to mask
+        replacement_str[in]  Replacement string
+        """
+        for linenum, line in enumerate(self.results):
+            for prefix in prefix_list:
+                index = line.find(prefix)
+                if index == 0:
+                    self.results.pop(linenum)
+                    self.results.insert(linenum, replacement_str)
+                    break
+
     def remove_result(self, prefix):
         """Remove a string in the results.
 
@@ -833,11 +848,28 @@ class System_test(object):
         for line in self.results:
             index = line.find(prefix)
             if index == 0:
-                linenums.append(int(linenum))
+                linenums.append(linenum)
             linenum += 1
         # Must remove lines in reverse order
-        for linenum in range(len(linenums)-1, -1, -1):
-            self.results.pop(linenums[linenum])
+        for linenum in reversed(linenums):
+            self.results.pop(linenum)
+
+    def remove_many_result(self, prefix_list):
+        """ If any of the prefixes in prefix_list is found on a line on
+        the results, removes that line from the results
+
+        prefix_list[in]      list of starting prefixes of strings remove
+        """
+        linenums = []
+        for linenum, line in enumerate(self.results):
+            for prefix in prefix_list:
+                index = line.find(prefix)
+                if index == 0:
+                    linenums.append(linenum)
+                    break
+        # Remove lines in reverse order
+        for linenum in reversed(linenums):
+            self.results.pop(linenum)
 
     def remove_result_and_lines_before(self, prefix, lines=1):
         """Remove lines in the results with lines before prefix.

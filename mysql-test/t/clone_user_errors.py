@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -109,8 +109,11 @@ class test(clone_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Replace error code.
-        self.replace_result("Error 1045", "Error XXXX: Access denied\n")
-        self.replace_result("Error 2003", "Error XXXX: Access denied\n")
+        self.replace_any_result(["Error 1045", "Error 2003",
+                                 "Error Can't connect to MySQL server on",
+                                 "Error Access denied for user"],
+                                "Error XXXX: Access denied\n")
+
         self.replace_result("mysqluserclone: error: Source connection "
                             "values invalid",
                             "mysqluserclone: error: Source connection "

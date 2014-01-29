@@ -575,18 +575,18 @@ Test case 28 - HEALTH with some transactions behind
             role: SLAVE
            state: UP
        gtid_mode: ON
-          health: SQL thread is not running., Slave has 3 transactions behind master.
+          health: Slave has 4 transactions behind master.
          version: XX.XX.XX
  master_log_file: XXXXX.XXXX
   master_log_pos: XXXX
        IO_Thread: Yes
-      SQL_Thread: No
+      SQL_Thread: Yes
      Secs_Behind: X
  Remaining_Delay: XXX
     IO_Error_Num: 0
         IO_Error: 
    SQL_Error_Num: 0
        SQL_Error: 
-    Trans_Behind: 3
+    Trans_Behind: 4
 2 rows.
 # ...done.

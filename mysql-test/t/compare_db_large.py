@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class test(mutlib.System_test):
         source_conn = "--source={0}".format(s1_conn)
         s2_conn = self.build_connection_string(self.server2)
         dest_conn = "--destination={0}".format(s2_conn)
-        copy_cmd = ("mysqldbcopy.py {0} {1} {2}:{3} --force --skip-gtid"
+        copy_cmd = ("mysqldbcopy.py {0} {1} {2}:{3} --drop-first --skip-gtid"
                     "".format(source_conn, dest_conn, self.db_test_name,
                               self.db_test_name))
 

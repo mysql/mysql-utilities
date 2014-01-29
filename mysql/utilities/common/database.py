@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -716,7 +716,7 @@ class Database(object):
         name by setting new_db = old_db or as a new database.
 
         new_db[in]         Name of the new database
-        options[in]        Options for copy e.g. force, etc.
+        options[in]        Options for copy e.g. do_drop, etc.
         new_server[in]     Connection to another server for copying the db
                            Default is None (copy to same server - clone)
         connections[in]    Number of threads(connections) to use for insert
@@ -761,11 +761,11 @@ class Database(object):
                 exists = self.exists(self.destination, new_db)
                 drop_server = self.destination
             if exists:
-                if options.get("force", False):
+                if options.get("do_drop", False):
                     self.drop(drop_server, True, new_db)
                 elif not self.skip_create:
                     raise UtilDBError("destination database exists. Use "
-                                      "--force to overwrite existing "
+                                      "--drop-first to overwrite existing "
                                       "database.", -1, new_db)
 
         db_name = self.db_name
@@ -782,9 +782,9 @@ class Database(object):
 
         # Create the objects in the new database
         for obj in self.objects:
-            # Drop object if --force specified and database not dropped
+            # Drop object if --drop-first specified and database not dropped
             # Grants do not need to be dropped for overwriting
-            if options.get("force", False) and obj[0] != _GRANT:
+            if options.get("do_drop", False) and obj[0] != _GRANT:
                 obj_name = quote_with_backticks(obj[1][0])
                 self.__drop_object(obj[0], obj_name)
 
@@ -809,7 +809,7 @@ class Database(object):
         if the option was selected by the caller.
 
         new_db[in]          Name of the new database
-        options[in]         Options for copy e.g. force, etc.
+        options[in]         Options for copy e.g. do_drop, etc.
         new_server[in]      Connection to another server for copying the db
                             Default is None (copy to same server - clone)
         connections[in]     Number of threads(connections) to use for insert

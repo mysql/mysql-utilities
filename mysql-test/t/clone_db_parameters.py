@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,10 +80,10 @@ class test(clone_db.test):
         self.remove_result_and_lines_after("MySQL Utilities mysqldbcopy.py "
                                            "version", 6)
 
-        # We exercise --force here to ensure skips don't interfere
+        # We exercise --drop-first here to ensure skips don't interfere
         test_num += 1
         comment = "Test case {0} - no data".format(test_num)
-        cmd_opts = "--force --skip=data util_test:util_db_clone"
+        cmd_opts = "--drop-first --skip=data util_test:util_db_clone"
         cmd = "{0} {1}".format(cmd_base, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         self.results.append(self.check_objects(self.server1, "util_db_clone"))
@@ -92,7 +92,7 @@ class test(clone_db.test):
 
         test_num += 1
         comment = "Test case {0} - quiet clone".format(test_num)
-        cmd_opts = "--force --skip=data --quiet util_test:util_db_clone"
+        cmd_opts = "--drop-first --skip=data --quiet util_test:util_db_clone"
         cmd = "{0} {1}".format(cmd_base, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -104,7 +104,7 @@ class test(clone_db.test):
         # Test clone in verbose mode.
         comment = ("Test case {0} - verbose clone "
                    "with drop warnings.".format(test_num))
-        cmd_opts = "--force --verbose util_test:util_db_clone"
+        cmd_opts = "--drop-first --verbose util_test:util_db_clone"
         cmd = "{0} {1}".format(cmd_base, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -128,12 +128,12 @@ class test(mutlib.System_test):
         # Mask known platform-dependent lines
         self.mask_result("Error 2003:", "2003", "####")
         self.mask_result("Error 1045", "1045", "####:")
-        self.replace_result("Error ####: Can't connect to MySQL server",
-                            "Error ####: Can't connect to MySQL server"
-                            " on 'nothere:####'\n")
-        self.replace_result("Error ####:(28000):",
-                            "Error ####: Can't connect to MySQL server"
-                            " on 'nothere:####'\n")
+
+        self.replace_any_result(
+            ["Error ####: Can't connect to MySQL server",
+             "Error ####:(28000):", "Error Can't connect to MySQL server on",
+             "Error Access denied for user"],
+            "Error ####: Can't connect to MySQL server on 'nothere:####'\n")
 
         self.replace_result("# Cloning the MySQL server running on ",
                             "# Cloning the MySQL server running on "

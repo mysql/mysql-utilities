@@ -1,7 +1,7 @@
 Test Case 1: Help
-MySQL Utilities mysqluc version 1.4.1 (part of MySQL Workbench Distribution 6.0.0) 
+MySQL Utilities mysqluc version XXXXXXXXX
 License type: GPLv2
-Usage: mysqluc 
+Usage: mysqluc
 
 mysqluc - Command line client for running MySQL Utilities
 
@@ -29,48 +29,48 @@ Test Case 2: Normal
 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2
 
 Options:
-Option                     Description                                     
+Option                     Description
 -------------------------  ------------------------------------------------
---version                  show program's version number and exit          
---help                     display a help message and exit                 
---license                  display program's license and exit              
---server1=SERVER1          connection information for first server in the  
-                           form:                                           
-                           <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
---server2=SERVER2          connection information for second server in the 
-                           form:                                           
-                           <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
---character-set=CHARSET    sets the client character set. The default is   
-                           retrieved from the server variable              
-                           'character_set_client'.                         
---width=WIDTH              display width                                   
---force                    do not abort when a diff test fails             
---skip-table-options       skip check of all table options (e.g.,          
-                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
+--version                  show program's version number and exit
+--help                     display a help message and exit
+--license                  display program's license and exit
+--server1=SERVER1          connection information for first server in the
+                           form:
+                           <user>[:<password>]@<host>[:<port>][:<socket>]
+                           or <login-path>[:<port>][:<socket>].
+--server2=SERVER2          connection information for second server in the
+                           form:
+                           <user>[:<password>]@<host>[:<port>][:<socket>]
+                           or <login-path>[:<port>][:<socket>].
+--character-set=CHARSET    sets the client character set. The default is
+                           retrieved from the server variable
+                           'character_set_client'.
+--width=WIDTH              display width
+--force                    do not abort when a diff test fails
+--skip-table-options       skip check of all table options (e.g.,
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).
 -v, --verbose              control how much information is displayed. e.g.,
-                           -v = verbose, -vv = more verbose, -vvv = debug  
--q, --quiet                turn off all messages for quiet execution.      
--d, --difftype=DIFFTYPE    display differences in context format in one of 
-                           the following formats:                          
+                           -v = verbose, -vv = more verbose, -vvv = debug
+-q, --quiet                turn off all messages for quiet execution.
+-d, --difftype=DIFFTYPE    display differences in context format in one of
+                           the following formats:
                            [unified|context|differ|sql] (default: unified).
---changes-for=CHANGES_FOR  specify the server to show transformations to   
-                           match the other server. For example, to see the 
+--changes-for=CHANGES_FOR  specify the server to show transformations to
+                           match the other server. For example, to see the
                            transformation for transforming server1 to match
                            server2, use --changes-for=server1. Valid values
-                           are 'server1' or 'server2'. The default is      
-                           'server1'.                                      
---show-reverse             produce a transformation report containing the  
-                           SQL statements to transform the object          
+                           are 'server1' or 'server2'. The default is
+                           'server1'.
+--show-reverse             produce a transformation report containing the
+                           SQL statements to transform the object
                            definitions specified in reverse. For example if
-                           --changes-for is set to server1, also generate  
-                           the transformation for server2. Note: the       
-                           reverse changes are annotated and marked as     
-                           comments.                                       
+                           --changes-for is set to server1, also generate
+                           the transformation for server2. Note: the
+                           reverse changes are annotated and marked as
+                           comments.
 
 Test Case 3: Verbosity
 
@@ -78,48 +78,48 @@ Executing command: help mysqldiff
 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2
 
 Options:
-Option                     Description                                     
+Option                     Description
 -------------------------  ------------------------------------------------
---version                  show program's version number and exit          
---help                     display a help message and exit                 
---license                  display program's license and exit              
---server1=SERVER1          connection information for first server in the  
-                           form:                                           
-                           <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
---server2=SERVER2          connection information for second server in the 
-                           form:                                           
-                           <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
---character-set=CHARSET    sets the client character set. The default is   
-                           retrieved from the server variable              
-                           'character_set_client'.                         
---width=WIDTH              display width                                   
---force                    do not abort when a diff test fails             
---skip-table-options       skip check of all table options (e.g.,          
-                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
+--version                  show program's version number and exit
+--help                     display a help message and exit
+--license                  display program's license and exit
+--server1=SERVER1          connection information for first server in the
+                           form:
+                           <user>[:<password>]@<host>[:<port>][:<socket>]
+                           or <login-path>[:<port>][:<socket>].
+--server2=SERVER2          connection information for second server in the
+                           form:
+                           <user>[:<password>]@<host>[:<port>][:<socket>]
+                           or <login-path>[:<port>][:<socket>].
+--character-set=CHARSET    sets the client character set. The default is
+                           retrieved from the server variable
+                           'character_set_client'.
+--width=WIDTH              display width
+--force                    do not abort when a diff test fails
+--skip-table-options       skip check of all table options (e.g.,
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).
 -v, --verbose              control how much information is displayed. e.g.,
-                           -v = verbose, -vv = more verbose, -vvv = debug  
--q, --quiet                turn off all messages for quiet execution.      
--d, --difftype=DIFFTYPE    display differences in context format in one of 
-                           the following formats:                          
+                           -v = verbose, -vv = more verbose, -vvv = debug
+-q, --quiet                turn off all messages for quiet execution.
+-d, --difftype=DIFFTYPE    display differences in context format in one of
+                           the following formats:
                            [unified|context|differ|sql] (default: unified).
---changes-for=CHANGES_FOR  specify the server to show transformations to   
-                           match the other server. For example, to see the 
+--changes-for=CHANGES_FOR  specify the server to show transformations to
+                           match the other server. For example, to see the
                            transformation for transforming server1 to match
                            server2, use --changes-for=server1. Valid values
-                           are 'server1' or 'server2'. The default is      
-                           'server1'.                                      
---show-reverse             produce a transformation report containing the  
-                           SQL statements to transform the object          
+                           are 'server1' or 'server2'. The default is
+                           'server1'.
+--show-reverse             produce a transformation report containing the
+                           SQL statements to transform the object
                            definitions specified in reverse. For example if
-                           --changes-for is set to server1, also generate  
-                           the transformation for server2. Note: the       
-                           reverse changes are annotated and marked as     
-                           comments.                                       
+                           --changes-for is set to server1, also generate
+                           the transformation for server2. Note: the
+                           reverse changes are annotated and marked as
+                           comments.
 
 Test Case 4: Quiet
 Quiet mode, saving output to XXXXXXXXXXXXXX
@@ -127,129 +127,129 @@ Test Case 5: Normal - width 55
 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2
 
 Options:
-Option                     Description                 
+Option                     Description
 -------------------------  ----------------------------
---version                  show program's version      
-                           number and exit             
---help                     display a help message and  
-                           exit                        
---license                  display program's license   
-                           and exit                    
---server1=SERVER1          connection information for  
+--version                  show program's version
+                           number and exit
+--help                     display a help message and
+                           exit
+--license                  display program's license
+                           and exit
+--server1=SERVER1          connection information for
                            first server in the form: <u
                            ser>[:<password>]@<host>[:<p
-                           ort>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>].  
---server2=SERVER2          connection information for  
+                           ort>][:<socket>] or <login-
+                           path>[:<port>][:<socket>].
+--server2=SERVER2          connection information for
                            second server in the form: <
                            user>[:<password>]@<host>[:<
                            port>][:<socket>] or <login-
-                           path>[:<port>][:<socket>].  
---character-set=CHARSET    sets the client character   
-                           set. The default is         
-                           retrieved from the server   
-                           variable                    
-                           'character_set_client'.     
---width=WIDTH              display width               
---force                    do not abort when a diff    
-                           test fails                  
---skip-table-options       skip check of all table     
-                           options (e.g.,              
-                           AUTO_INCREMENT, ENGINE,     
-                           CHARSET, etc.).             
+                           path>[:<port>][:<socket>].
+--character-set=CHARSET    sets the client character
+                           set. The default is
+                           retrieved from the server
+                           variable
+                           'character_set_client'.
+--width=WIDTH              display width
+--force                    do not abort when a diff
+                           test fails
+--skip-table-options       skip check of all table
+                           options (e.g.,
+                           AUTO_INCREMENT, ENGINE,
+                           CHARSET, etc.).
 -v, --verbose              control how much information
-                           is displayed. e.g., -v =    
+                           is displayed. e.g., -v =
                            verbose, -vv = more verbose,
-                           -vvv = debug                
--q, --quiet                turn off all messages for   
-                           quiet execution.            
--d, --difftype=DIFFTYPE    display differences in      
+                           -vvv = debug
+-q, --quiet                turn off all messages for
+                           quiet execution.
+-d, --difftype=DIFFTYPE    display differences in
                            context format in one of the
-                           following formats:          
+                           following formats:
                            [unified|context|differ|sql]
-                           (default: unified).         
---changes-for=CHANGES_FOR  specify the server to show  
+                           (default: unified).
+--changes-for=CHANGES_FOR  specify the server to show
                            transformations to match the
-                           other server. For example,  
-                           to see the transformation   
-                           for transforming server1 to 
-                           match server2, use          
+                           other server. For example,
+                           to see the transformation
+                           for transforming server1 to
+                           match server2, use
                            --changes-for=server1. Valid
-                           values are 'server1' or     
-                           'server2'. The default is   
-                           'server1'.                  
---show-reverse             produce a transformation    
-                           report containing the SQL   
-                           statements to transform the 
+                           values are 'server1' or
+                           'server2'. The default is
+                           'server1'.
+--show-reverse             produce a transformation
+                           report containing the SQL
+                           statements to transform the
                            object definitions specified
-                           in reverse. For example if  
-                           --changes-for is set to     
-                           server1, also generate the  
-                           transformation for server2. 
-                           Note: the reverse changes   
-                           are annotated and marked as 
-                           comments.                   
+                           in reverse. For example if
+                           --changes-for is set to
+                           server1, also generate the
+                           transformation for server2.
+                           Note: the reverse changes
+                           are annotated and marked as
+                           comments.
 
 Test Case 6: Normal - width 66
 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
-mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2 
+mysqldiff - compare object definitions among objects where the difference is how db1.obj1 differs from db2.obj2
 
 Options:
-Option                     Description                            
+Option                     Description
 -------------------------  ---------------------------------------
---version                  show program's version number and exit 
---help                     display a help message and exit        
---license                  display program's license and exit     
+--version                  show program's version number and exit
+--help                     display a help message and exit
+--license                  display program's license and exit
 --server1=SERVER1          connection information for first server
                            in the form: <user>[:<password>]@<host>
-                           [:<port>][:<socket>] or <login-        
-                           path>[:<port>][:<socket>].             
---server2=SERVER2          connection information for second      
+                           [:<port>][:<socket>] or <login-
+                           path>[:<port>][:<socket>].
+--server2=SERVER2          connection information for second
                            server in the form: <user>[:<password>]
-                           @<host>[:<port>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>].             
---character-set=CHARSET    sets the client character set. The     
-                           default is retrieved from the server   
-                           variable 'character_set_client'.       
---width=WIDTH              display width                          
---force                    do not abort when a diff test fails    
---skip-table-options       skip check of all table options (e.g., 
+                           @<host>[:<port>][:<socket>] or <login-
+                           path>[:<port>][:<socket>].
+--character-set=CHARSET    sets the client character set. The
+                           default is retrieved from the server
+                           variable 'character_set_client'.
+--width=WIDTH              display width
+--force                    do not abort when a diff test fails
+--skip-table-options       skip check of all table options (e.g.,
                            AUTO_INCREMENT, ENGINE, CHARSET, etc.).
--v, --verbose              control how much information is        
-                           displayed. e.g., -v = verbose, -vv =   
-                           more verbose, -vvv = debug             
--q, --quiet                turn off all messages for quiet        
-                           execution.                             
--d, --difftype=DIFFTYPE    display differences in context format  
-                           in one of the following formats:       
-                           [unified|context|differ|sql] (default: 
-                           unified).                              
---changes-for=CHANGES_FOR  specify the server to show             
-                           transformations to match the other     
-                           server. For example, to see the        
+-v, --verbose              control how much information is
+                           displayed. e.g., -v = verbose, -vv =
+                           more verbose, -vvv = debug
+-q, --quiet                turn off all messages for quiet
+                           execution.
+-d, --difftype=DIFFTYPE    display differences in context format
+                           in one of the following formats:
+                           [unified|context|differ|sql] (default:
+                           unified).
+--changes-for=CHANGES_FOR  specify the server to show
+                           transformations to match the other
+                           server. For example, to see the
                            transformation for transforming server1
-                           to match server2, use --changes-       
+                           to match server2, use --changes-
                            for=server1. Valid values are 'server1'
                            or 'server2'. The default is 'server1'.
---show-reverse             produce a transformation report        
-                           containing the SQL statements to       
-                           transform the object definitions       
-                           specified in reverse. For example if   
-                           --changes-for is set to server1, also  
-                           generate the transformation for        
-                           server2. Note: the reverse changes are 
-                           annotated and marked as comments.      
+--show-reverse             produce a transformation report
+                           containing the SQL statements to
+                           transform the object definitions
+                           specified in reverse. For example if
+                           --changes-for is set to server1, also
+                           generate the transformation for
+                           server2. Note: the reverse changes are
+                           annotated and marked as comments.
 
 Test Case 7: Replacement
 
 
 
-Variable  Value                                                            
+Variable  Value
 --------  -----------------------------------------------------------------
 SERVER      XXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -261,16 +261,16 @@ You can get more information about the error by running the console command 'sho
 Test Case 8: Long variables
 
 
-Variable                                          Value                    
+Variable                                          Value
 ------------------------------------------------  -------------------------
-longvariableeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee...  test                     
+longvariableeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee...  test
 
 Test Case 9: Unbalanced arguments
-Usage: mysqluc 
+Usage: mysqluc
 
 mysqluc: error: Unbalanced arguments. Please check your command.
 Test Case 10: Invalid assigning in arguments
-Usage: mysqluc 
+Usage: mysqluc
 
 mysqluc: error: Invalid argument assignment: c==3. Please check your command.
 Test Case 11: show last error command
@@ -316,5 +316,3 @@ Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 Execution of utility: 'mysqlprocgrep' ended with return code '2' and with the following error message:
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
-
-

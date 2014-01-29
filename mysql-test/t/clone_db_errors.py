@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class test(clone_db.test):
 
         cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
                                                                to_conn)
-        cmd_opts = "util_test:util_db_clone --force"
+        cmd_opts = "util_test:util_db_clone --drop-first"
         test_num += 1
         comment = ("Test case {0} - error: user with % - not "
                    "enough permissions".format(test_num))
@@ -119,7 +119,7 @@ class test(clone_db.test):
 
         cmd_str = ("mysqldbcopy.py --source=rocks_rocks_rocks "
                    "{0} ".format(to_conn))
-        cmd_str += "util_test:util_db_clone --force "
+        cmd_str += "util_test:util_db_clone --drop-first "
         test_num += 1
         comment = "Test case {0} - cannot parse --source".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
@@ -128,7 +128,7 @@ class test(clone_db.test):
 
         cmd_str = ("mysqldbcopy.py --destination=rocks_rocks_rocks "
                    "{0} ".format(from_conn))
-        cmd_str += "util_test:util_db_clone --force "
+        cmd_str += "util_test:util_db_clone --drop-first "
         test_num += 1
         comment = "Test case {0} - cannot parse --destination".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)
@@ -136,7 +136,7 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         cmd_str = "mysqldbcopy.py --source=rocks_rocks_rocks "
-        cmd_str += "util_test:util_db_clone --force "
+        cmd_str += "util_test:util_db_clone --drop-first "
         test_num += 1
         comment = "Test case {0} - no destination specified".format(test_num)
         res = self.run_test_case(2, cmd_str, comment)

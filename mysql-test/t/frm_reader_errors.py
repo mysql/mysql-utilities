@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -148,13 +148,12 @@ class test(frm_reader_base.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.mask_result("Error 2003:", "2003", "####")
-        self.replace_result("Error ####: Can't connect to MySQL server",
-                            "Error ####: Can't connect to MySQL server"
-                            " on XXXXXXXXXXXXXXXXXXXX\n")
-        self.replace_result("Error 1045",
-                            "Error ####: Can't connect to MySQL server"
-                            " on XXXXXXXXXXXXXXXXXXXX\n")
+        self.replace_any_result(["Error 1045", "Error 2003",
+                                 "Error Can't connect to MySQL server on ",
+                                 "Error Access denied for user "],
+                                "Error ####: Can't connect to MySQL server"
+                                " on XXXXXXXXXXXXXXXXXXXX\n")
+
         self.replace_result("ERROR: Cannot read",
                             "ERROR: Cannot read XXXXXX\n")
         self.replace_result("#                  Mode :",
