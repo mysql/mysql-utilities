@@ -1,96 +1,84 @@
-%define mysql_license   GPLv2
-%define python_version  %(python -c "import distutils.sysconfig as ds; print ds.get_version()")
-%define name            mysql-utilities
-%define summary         MySQL Utilities contain a collection of scripts useful for managing and administering MySQL servers
-%define vendor          Oracle
-%define packager        Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com>
-%define copyright       Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+%if 0%{?rhel} && 0%{?rhel} <= 5
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%endif
 
-# Following are given defined from the environment/command line:
-#  version
-#  release_info
-#  _topdir
-
-# Hack to use a pattern using %P in the find command
-%define findpat %( echo "/%""P" )
-
-# Prevent manual pages to be compressed (also does not strip binaries, etc.)
-%global __os_install_post %{nil}
-
-Name:           %{name}
-Version:        %{version}
-Release:        1%{?dist}
-Summary:        %{summary}
-
-Group:          Development/Libraries
-License:        %{copyright} Use is subject to license terms.  Under %{mysql_license} license as shown in the Description field.
-Vendor:         %{vendor}
-Packager:       %{packager}
-URL:            http://dev.mysql.com/downloads/
-Source0:		%{name}-%{version}.linux-%{_arch}.tar.gz
-BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-Conflicts:      mysql-utilities-com
-
-Prefix:			/usr
-
+Summary:       Collection of utilities used for maintaining and administering MySQL servers
+Name:          mysql-utilities
+Version:       1.3.6
+Release:       1%{?dist}
+License:       GPLv2
+Group:         Development/Libraries
+URL:           https://dev.mysql.com/downloads/tools/utilities/
+Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-%{version}.zip
+BuildArch:     noarch
+BuildRequires: python-devel > 2.6
+BuildRequires: mysql-connector-python >= 1.0.9
+Requires:      mysql-connector-python >= 1.0.9
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
-%{release_info}
 
-This is a release of MySQL Utilities. For the avoidance of
-doubt, this particular copy of the software is released
-under the version 2 of the GNU General Public License.
-MySQL Utilities is brought to you by Oracle.
-
-%{copyright}
-
-License information can be found in the COPYING file.
-
-MySQL FOSS License Exception
-We want free and open source software applications under
-certain licenses to be able to use the GPL-licensed MySQL
-Utilities (specified GPL-licensed MySQL client libraries)
-despite the fact that not all such FOSS licenses are
-compatible with version 2 of the GNU General Public License.
-Therefore there are special exceptions to the terms and
-conditions of the GPLv2 as applied to these client libraries,
-which are identified and described in more detail in the
-FOSS License Exception at
-<http://www.mysql.com/about/legal/licensing/foss-exception.html>
-
-This software is OSI Certified Open Source Software.
-OSI Certified is a certification mark of the Open Source Initiative.
-
-This distribution may include materials developed by third
-parties. For license and attribution notices for these
-materials, please refer to the documentation that accompanies
-this distribution (see the "Licenses for Third-Party Components"
-appendix) or view the online documentation at
-<http://dev.mysql.com/doc/>
-A copy of the license/notices is also reproduced below.
-
-GPLv2 Disclaimer
-For the avoidance of doubt, except that if any license choice
-other than GPL or LGPL is available it will apply instead,
-Oracle elects to use only the General Public License version 2
-(GPLv2) at this time for any software where a choice of GPL
-license versions is made available with the language indicating
-that GPLv2 or any later version may be used, or where a choice
-of which version of the GPL is applied is otherwise unspecified.
+MySQL Utilities provides a collection of command-line utilities that
+are used for maintaining and administering MySQL servers, including:
+ o Admin Utilities (Clone, Copy, Compare, Diff, Export, Import)
+ o Replication Utilities (Setup, Configuration)
+ o General Utilities (Disk Usage, Redundant Indexes, Search Meta Data)
+ o And many more.
 
 %prep
-%setup -q -n %{name}-%{version}.linux-%{_arch}
+%setup -q
+
+%build
+%{__python} setup.py build
 
 %install
-rm -Rf $RPM_BUILD_ROOT
-cp -a . $RPM_BUILD_ROOT
-(cd $RPM_BUILD_ROOT ; find -follow -type f -printf "%{findpat}\n") > INSTALLED_FILES
+rm -rf %{buildroot}
+
+%{__python} setup.py install --skip-build --root %{buildroot}
+install -d %{buildroot}%{_mandir}/man1
+%{__python} setup.py install_man --root %{buildroot}
+
+# Shipped in c/python
+rm -f  %{buildroot}%{python_sitelib}/mysql/__init__.py*
 
 %clean
+rm -rf %{buildroot}
 
-%files -f INSTALLED_FILES
-%defattr(-,root,root)
+%check
+for test in unit_tests/test* ; do
+    %{__python} $test
+done
+popd
+
+%files
+%defattr(-, root, root, -)
+%doc CHANGES.txt LICENSE.txt README.txt
+%{_bindir}/mysqlauditadmin
+%{_bindir}/mysqlauditgrep
+%{_bindir}/mysqldbcompare
+%{_bindir}/mysqldbcopy
+%{_bindir}/mysqldbexport
+%{_bindir}/mysqldbimport
+%{_bindir}/mysqldiff
+%{_bindir}/mysqldiskusage
+%{_bindir}/mysqlfailover
+%{_bindir}/mysqlfrm
+%{_bindir}/mysqlindexcheck
+%{_bindir}/mysqlmetagrep
+%{_bindir}/mysqlprocgrep
+%{_bindir}/mysqlreplicate
+%{_bindir}/mysqlrpladmin
+%{_bindir}/mysqlrplcheck
+%{_bindir}/mysqlrplshow
+%{_bindir}/mysqlserverclone
+%{_bindir}/mysqlserverinfo
+%{_bindir}/mysqluc
+%{_bindir}/mysqluserclone
+%{python_sitelib}/mysql/utilities
+%if 0%{?rhel} > 5 || 0%{?fedora} > 12
+%{python_sitelib}/mysql_utilities-*.egg-info
+%endif
+%{_mandir}/man1/mysql*.1*
 
 %changelog
-* Fri Feb  1 2013 Geert Vanderkelen <geert.vanderkelen@oracle.com> - 1.3.0
-
-- Initial implementation.
+* Fri Jan 03 2014  Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.3.6-1
+- initial package
