@@ -3,7 +3,7 @@
 %endif
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
-Name:          mysql-utilities-community
+Name:          mysql-utilities
 Version:       1.3.6
 Release:       1%{?dist}
 License:       GPLv2
@@ -25,7 +25,7 @@ are used for maintaining and administering MySQL servers, including:
  o And many more.
 
 %prep
-%setup -q -n mysql-utilities-%{version}
+%setup -q
 
 %build
 %{__python} setup.py build
