@@ -3,7 +3,7 @@
 %endif
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
-Name:          mysql-utilities
+Name:          mysql-utilities-community
 Version:       1.3.6
 Release:       1%{?dist}
 License:       GPLv2
@@ -12,8 +12,8 @@ URL:           https://dev.mysql.com/downloads/tools/utilities/
 Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-%{version}.zip
 BuildArch:     noarch
 BuildRequires: python-devel > 2.6
-BuildRequires: mysql-connector-python >= 1.0.9
 Requires:      mysql-connector-python >= 1.0.9
+Provides:      mysql-utilities = %{version}-%{release}
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
 
@@ -25,7 +25,7 @@ are used for maintaining and administering MySQL servers, including:
  o And many more.
 
 %prep
-%setup -q
+%setup -q -n mysql-utilities-%{version}
 
 %build
 %{__python} setup.py build
@@ -42,12 +42,6 @@ rm -f  %{buildroot}%{python_sitelib}/mysql/__init__.py*
 
 %clean
 rm -rf %{buildroot}
-
-%check
-for test in unit_tests/test* ; do
-    %{__python} $test
-done
-popd
 
 %files
 %defattr(-, root, root, -)
