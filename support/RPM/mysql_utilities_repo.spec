@@ -12,7 +12,6 @@ URL:           https://dev.mysql.com/downloads/tools/utilities/
 Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-%{version}.zip
 BuildArch:     noarch
 BuildRequires: python-devel > 2.6
-BuildRequires: mysql-connector-python >= 1.0.9
 Requires:      mysql-connector-python >= 1.0.9
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
