@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -326,6 +326,34 @@ class test(mutlib.System_test):
                 return False
 
         return True
+
+    def stop_slaves(self, slaves_list=None):
+        if slaves_list:
+            slaves = slaves_list
+        else:
+            # Default replication topology - 1 master, 3 slaves
+            slaves = [self.server2, self.server3, self.server4]
+        for slave in slaves:
+            try:
+                slave.exec_query("STOP SLAVE")
+            except UtilError as err:
+                raise MUTLibError("Unexpected error performing STOP SLAVE "
+                                  "for server {0}:{1}: "
+                                  "{2}".format(slave.host, slave.port, err))
+
+    def reset_slaves(self, slaves_list=None):
+        if slaves_list:
+            slaves = slaves_list
+        else:
+            # Default replication topology - 1 master, 3 slaves
+            slaves = [self.server2, self.server3, self.server4]
+        for slave in slaves:
+            try:
+                slave.exec_query("RESET SLAVE")
+            except UtilError as err:
+                raise MUTLibError("Unexpected error performing RESET SLAVE "
+                                  "for server {0}:{1}: "
+                                  "{2}".format(slave.host, slave.port, err))
 
     def get_result(self):
         return self.compare(__name__, self.results)

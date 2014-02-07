@@ -245,14 +245,23 @@ class test(rpl_admin.test):
         cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} health "
                    "--format=VERTICAL -vvv".format(master_conn, slave1_conn))
 
-        # Reset gtid_executed
-        self.reset_master()
         # Reset the topology to its original state
         self.reset_topology()
-        self.server2.exec_query("START SLAVE")
+
+        # Get master uuid
         master_uuid = self.server1.get_uuid()
+
+        # STOP the slaves, purge binlogs and reset gtid_executed on both
+        # master and slave2 and reset all the slaves
+        self.stop_slaves()
+        self.reset_master([self.server1, self.server2])
+        self.reset_slaves()
+
+        # Start the slave again
+        self.server2.exec_query("START SLAVE")
+
         # Purge some gtids to create holes
-        self.server1.exec_query('SET GLOBAL gtid_purged= "{0}:1:4:6:10'
+        self.server1.exec_query('SET GLOBAL gtid_purged= "{0}:3:5:7:12'
                                 '"'.format(master_uuid))
         self.server1.exec_query("CREATE DATABASE `trx_behind`")
         self.server1.exec_query("CREATE TABLE `trx_behind`.`t1` (x char(30))")
@@ -269,15 +278,14 @@ class test(rpl_admin.test):
         while round_ < TIMEOUT:
             try:
                 res = self.server2.exec_query(
-                    "SELECT * FROM `trx_behind`.`t1` WHERE "
-                    "x={0}".format(last_val - 1))
+                    "SELECT COUNT(*) FROM `trx_behind`.`t1`")
                 # Use rollback to close transaction and read fresh data
                 # data in next select.
                 self.server2.rollback()
             except UtilDBError:  # database may not exist yet
                 pass
             finally:
-                if res:
+                if isinstance(res, list) and int(res[0][0]) == last_val:
                     break
                 else:
                     time.sleep(3)
