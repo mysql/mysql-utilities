@@ -42,12 +42,6 @@ rm -f  %{buildroot}%{python_sitelib}/mysql/__init__.py*
 %clean
 rm -rf %{buildroot}
 
-%check
-for test in unit_tests/test* ; do
-    %{__python} $test
-done
-popd
-
 %files
 %defattr(-, root, root, -)
 %doc CHANGES.txt LICENSE.txt README.txt
