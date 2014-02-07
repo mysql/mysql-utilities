@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,12 +36,12 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
 from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.exception import MUTLibError, UtilError
-from mutlib.mutlib import ServerList
+from mutlib.mutlib import ServerList, get_port
 
 # Constants
 NAME = "MySQL Utilities Test - mut "
 DESCRIPTION = "mut - run tests on the MySQL Utilities"
-USAGE = "%prog --server=user:passwd@host:port:socket test1 test2"
+USAGE = "%prog --server=user:passwd@host:port test1 test2"
 
 # Default settings
 TEST_PATH = "./t"
@@ -68,7 +68,6 @@ def _shutdown_running_servers(server_list, processes, basedir):
     Returns bool - True - servers shutdown attempted
                    False - no servers to shutdown
     """
-
     if len(processes) < 1:
         return False
     for process in processes:
@@ -76,12 +75,14 @@ def _shutdown_running_servers(server_list, processes, basedir):
         connection = {
             "user": "root",
             "passwd": "root",
-            "host": "localhost",
+            "host": "127.0.0.1",
             "port": None,
-            "unix_socket": None
         }
         if os.name == "posix":
-            connection["unix_socket"] = os.path.join(process[1], "mysql.sock")
+            try:
+                connection["port"] = get_port(process[0])
+            except MUTLibError:
+                connection["port"] = -1  # try to kill it forcefully later
         elif os.name == "nt":
             connection["port"] = process[1]
 
@@ -293,7 +294,7 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Add server option
 parser.add_option("--server", action="append", dest="servers",
                   help="connection information for a server to be used "
-                  "in the tests in the form: user:passwd@host:port:socket "
+                  "in the tests in the form: user:passwd@host:port "
                   "- list option multiple times for multiple servers to use")
 
 # Add test wildcard option
@@ -384,7 +385,7 @@ parser.add_option("--skip-cleanup", action="store_true", dest="skip_cleanup",
 opt, args = parser.parse_args()
 
 # Check for debug
-debug_mode = (opt.verbosity >= 3)
+debug_mode = (opt.verbosity >= 2)
 verbose_mode = (opt.verbosity >= 1)
 
 # Cannot use --do-test= with listing tests.
@@ -454,7 +455,7 @@ else:
 if opt.stop_test:
     print("  Stop test           = '{0}%%'".format(opt.stop_test))
 
-server_list = ServerList([], opt.start_port, opt.utildir, verbose_mode)
+server_list = ServerList([], opt.start_port, opt.utildir, opt.verbosity >= 3)
 basedir = None
 
 # Print status of connections
@@ -473,9 +474,9 @@ else:
                          "'{0}'".format(server))
 
         i += 1
-        # Fail if port and socket are both None
-        if conn_val["port"] is None and conn_val["unix_socket"] is None:
-            parser.error("You must specify either a port or a socket "
+        # Fail if port is None
+        if conn_val["port"] is None:
+            parser.error("You must specify either a port "
                          "in the server string: \n       {0}".format(server))
 
         sys.stdout.write("  Connecting to {0} as user {1} on port "

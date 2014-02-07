@@ -1,6 +1,6 @@
 Test case 1 - check a sample database
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 #                                                   Defn    Row     Data   
@@ -17,7 +17,7 @@ Test case 1 - check a sample database
 # ...done
 Test case 2 - check database with known differences (extra table)
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
@@ -37,7 +37,7 @@ Test case 2 - check database with known differences (extra table)
 # ...done
 Test case 3 - check database with known differences direction = server1 (default)
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -111,7 +111,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 4 - check database with known differences direction = server2
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -185,7 +185,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 5 - check database with known differences direction = server1 and reverse
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -313,7 +313,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 6 - check database with known differences direction = server2 and reverse
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -496,7 +496,7 @@ Test case 8 - compare two databases on same server
 # ...done
 Test case 9 - compare a database with weird names (backticks)
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
 #
 #                                                   Defn    Row     Data   
@@ -511,7 +511,7 @@ Test case 9 - compare a database with weird names (backticks)
 # ...done
 Test case 10 - compare two empty databases
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases empty_db on server1 and empty_db on server2
 #
 #                                                   Defn    Row     Data   
@@ -523,7 +523,7 @@ Test case 10 - compare two empty databases
 # ...done
 Test case 11 - compare a sample database containing tables with weird names (no backticks) and different table options.
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -549,7 +549,7 @@ Test case 11 - compare a sample database containing tables with weird names (no 
 # ...done
 Test case 12 - compare a sample database containing tables with weird names (no backticks) and skipping table options.
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -562,7 +562,7 @@ Test case 12 - compare a sample database containing tables with weird names (no 
 # ...done
 Test case 13 - compare a database with objects of different types with the same name (no differences)
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
 #
 #                                                   Defn    Row     Data   
@@ -578,7 +578,7 @@ Test case 13 - compare a database with objects of different types with the same 
 # ...done
 Test case 14 - compare a database with objects of different types with the same name (with differences)
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db.`:db on server1 and db.`:db on server2
 #
 #                                                   Defn    Row     Data   

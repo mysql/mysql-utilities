@@ -26,6 +26,7 @@ from abc import abstractmethod, ABCMeta
 import commands
 import difflib
 import os
+import platform
 import string
 import subprocess
 import tempfile
@@ -100,6 +101,52 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
         if debug:
             print "ret_val=", ret_val
     return ret_val
+
+
+def get_port(process_id):
+    """Returns the port number where the server with pid=process_id is
+    accepting new connections
+
+    process_id[in]   The process id (pid) of the process whose listening port
+                     we want to find out about
+
+    Returns str - The port number where the server is listening
+    """
+    plat = platform.system()
+
+    if plat == "Linux":
+        cmd = "netstat -anop --tcp | grep {0} | grep LISTEN".format(process_id)
+        pid_column = 6
+        port_column = 3
+    elif plat == "Darwin":
+        cmd = "lsof -n -i | grep {0} | grep LISTEN".format(process_id)
+        pid_column = 1
+        port_column = 7
+    elif plat == "Windows":
+        cmd = ('netstat -ano | find /I "{0}" | find /I '
+               '"LISTEN"'.format(process_id))
+        pid_column = 4
+        port_column = 1
+    else:
+        raise MUTLibError("# ERROR: Platform {0} is unsupported".format(plat))
+    with tempfile.TemporaryFile() as f:
+        ret_code = subprocess.call(cmd, shell=True, stdout=f, stderr=f)
+        if not ret_code:  # if it ran successfully
+            f.seek(0)
+            for line in f:
+                try:
+                    columns = line.split()
+                    #  Getting pid only, because of Linux
+                    if columns[pid_column].split('/')[0] == str(process_id):
+                        return columns[port_column].rsplit(':', 1)[-1]
+                except IndexError:  # we might be reading some warning messages
+                    pass
+            else:
+                # Unable to find the port number
+                raise MUTLibError("# ERROR: Unable to retrieve port "
+                                  "information")
+        else:
+            raise MUTLibError("# ERROR: Unable to retrieve port information")
 
 
 class ServerList(object):
@@ -242,8 +289,10 @@ class ServerList(object):
             "host": self.cloning_host,
             "port": port,
         }
-        if os.name == "posix":
-            conn["unix_socket"] = os.path.join(full_datadir, "mysql.sock")
+        # to work properly with ports, we must convert "localhost" to
+        # "127.0.0.1"
+        if conn["host"] == "localhost":
+            conn["host"] = "127.0.0.1"
 
         server_options = {
             'conn_info': conn,
@@ -749,22 +798,18 @@ class System_test(object):
 
         server[in]         A Server object
 
-        Returns string of the form user:password@host:port:socket
+        Returns string of the form user:password@host:port
         """
         conn_val = self.get_connection_values(server)
         conn_str = "{0}".format(conn_val[0])
         if conn_val[1]:
             conn_str = "{0}:{1}".format(conn_str, conn_val[1])
-        ipv6 = False
         if ":" in conn_val[2] and not "]" in conn_val[2]:
             conn_str = "{0}@[{1}]:".format(conn_str,  conn_val[2])
-            ipv6 = True
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
         if conn_val[3]:
             conn_str = "{0}{1}".format(conn_str, conn_val[3])
-        if not ipv6 and conn_val[4] is not None and conn_val[4] != "":
-            conn_str = "{0}:{1} ".format(conn_str, conn_val[4])
 
         return conn_str
 
@@ -809,18 +854,17 @@ class System_test(object):
         self.record_results(self.res_fname)
         return res
 
-    def replace_result(self, prefix, str_):
+    def replace_result(self, prefix, replacement_str):
         """Replace a string in the results with a new, deterministic string.
 
         prefix[in]         starting prefix of string to mask
-        str[in]            replacement string
+        replacement_str[in]            replacement string
         """
         linenum = 0
         for line in self.results:
             index = line.find(prefix)
             if index == 0:
-                self.results.pop(linenum)
-                self.results.insert(linenum, str_)
+                self.results[linenum] = replacement_str
             linenum += 1
 
     def replace_any_result(self, prefix_list, replacement_str):
@@ -834,8 +878,7 @@ class System_test(object):
             for prefix in prefix_list:
                 index = line.find(prefix)
                 if index == 0:
-                    self.results.pop(linenum)
-                    self.results.insert(linenum, replacement_str)
+                    self.results[linenum] = replacement_str
                     break
 
     def remove_result(self, prefix):

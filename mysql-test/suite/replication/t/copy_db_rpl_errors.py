@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ class test(export_rpl_errors.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("CREATE USER imnotamouse@localhost")
+        self.server1.exec_query("CREATE USER imnotamouse@127.0.0.1")
 
         comment = "Test case {0} - warning: --rpl-user missing".format(
             test_num)
@@ -85,7 +85,7 @@ class test(export_rpl_errors.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
         
-        self.server1.exec_query("DROP USER imnotamouse@localhost")
+        self.server1.exec_query("DROP USER imnotamouse@127.0.0.1")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
         

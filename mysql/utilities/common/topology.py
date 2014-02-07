@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1157,15 +1157,14 @@ class Topology(Replication):
 
         slave[in]      the dictionary for the slave to remove
         """
-        i = 0
-        for slave_dict in self.slaves:
-            if slave_dict['host'] == slave['host'] and \
-               int(slave_dict['port']) == int(slave['port']):
+        for i, slave_dict in enumerate(self.slaves):
+            if (slave_dict['instance'] and
+                    slave_dict['instance'].is_alias(slave['host']) and
+                    int(slave_dict['port']) == int(slave['port'])):
                 # Disconnect to satisfy new server restrictions on termination
                 self.slaves[i]['instance'].disconnect()
                 self.slaves.pop(i)
                 break
-            i += 1
 
     def gtid_enabled(self):
         """Check if topology has GTID turned on.

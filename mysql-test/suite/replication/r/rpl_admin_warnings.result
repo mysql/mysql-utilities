@@ -2,26 +2,26 @@ Test case 1 - warning for --exec* and not switchover or failover
 WARNING: The --exec-after option is not required for 'health' (option ignored). Only used with the failover or switchover command.
 WARNING: The --exec-before option is not required for 'health' (option ignored). Only used with the failover or switchover command.
 host,port,role,state,gtid_mode,health
-localhost,PORT1,MASTER,UP,ON,OK
-localhost,PORT2,SLAVE,UP,ON,OK
-localhost,PORT3,SLAVE,UP,ON,OK
-localhost,PORT4,SLAVE,UP,ON,OK
+127.0.0.1,PORT1,MASTER,UP,ON,OK
+127.0.0.1,PORT2,SLAVE,UP,ON,OK
+127.0.0.1,PORT3,SLAVE,UP,ON,OK
+127.0.0.1,PORT4,SLAVE,UP,ON,OK
 Test case 2 - warning for --candidate and not switchover
 WARNING: The --candidates option is not required for 'health' (option ignored). Only used with the failover or elect command.
 host,port,role,state,gtid_mode,health
-localhost,PORT1,MASTER,UP,ON,OK
-localhost,PORT2,SLAVE,UP,ON,OK
-localhost,PORT3,SLAVE,UP,ON,OK
-localhost,PORT4,SLAVE,UP,ON,OK
+127.0.0.1,PORT1,MASTER,UP,ON,OK
+127.0.0.1,PORT2,SLAVE,UP,ON,OK
+127.0.0.1,PORT3,SLAVE,UP,ON,OK
+127.0.0.1,PORT4,SLAVE,UP,ON,OK
 Test case 3 - warning for --new-master and not switchover
 WARNING: The --new-master option is not required for 'health' (option ignored). Only used with the switchover command.
 host	port	role	state	gtid_mode	health
-localhost	PORT1	MASTER	UP	ON	OK
-localhost	PORT2	SLAVE	UP	ON	OK
-localhost	PORT3	SLAVE	UP	ON	OK
-localhost	PORT4	SLAVE	UP	ON	OK
+127.0.0.1	PORT1	MASTER	UP	ON	OK
+127.0.0.1	PORT2	SLAVE	UP	ON	OK
+127.0.0.1	PORT3	SLAVE	UP	ON	OK
+127.0.0.1	PORT4	SLAVE	UP	ON	OK
 Test case 4 - warning for missing --report-host
-# Discovering slaves for master at localhost:PORT1
+# Discovering slaves for master at 127.0.0.1:PORT1
 WARNING: There are slaves that have not been registered with --report-host or --report-port.
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -33,7 +33,7 @@ WARNING: There are slaves that have not been registered with --report-host or --
 #
 # Replication Topology Health:
 host,port,role,state,gtid_mode,health
-localhost,PORT1,MASTER,UP,ON,OK
+127.0.0.1,PORT1,MASTER,UP,ON,OK
 localhost,PORT2,SLAVE,UP,ON,OK
 localhost,PORT3,SLAVE,UP,ON,OK
 localhost,PORT4,SLAVE,UP,ON,OK
@@ -44,7 +44,7 @@ Test case 6 - warning for --master and failover
 WARNING: The --master option is not required for 'failover' (option ignored).
 # Checking privileges.
 # Performing failover.
-# Candidate slave localhost:PORT2 will become the new master.
+# Candidate slave 127.0.0.1:PORT2 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Creating replication user if it does not exist.
@@ -61,14 +61,14 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | ON         | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT2  | MASTER  | UP     | ON         | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 7 - warnings for switchover with offline slave
 # Checking privileges.
-# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -86,9 +86,9 @@ Test case 7 - warnings for switchover with offline slave
 +------------+-------+---------+--------+------------+---------------------------+
 | host       | port  | role    | state  | gtid_mode  | health                    |
 +------------+-------+---------+--------+------------+---------------------------+
-| localhost  | PORT2  | MASTER  | UP     | ON         | OK                        |
-| localhost  | PORT3  | SLAVE   | UP     | ON         | OK                        |
-| localhost  | PORT4  | SLAVE   | UP     | ON         | OK                        |
+| 127.0.0.1  | PORT2  | MASTER  | UP     | ON         | OK                        |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | ON         | OK                        |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | ON         | OK                        |
 | offline    | 1234  | SLAVE   | DOWN   |            | Cannot connect to slave.  |
 +------------+-------+---------+--------+------------+---------------------------+
 # ...done.

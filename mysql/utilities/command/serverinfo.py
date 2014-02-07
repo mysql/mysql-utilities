@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -486,18 +486,16 @@ def show_server_info(servers, options):
             server1 = Server(options={'conn_info': conn_dict})
             server_is_off = False
             # If we got errno 2002 it means can not connect through the
-            # given socket, but if path to socket not empty, server could be
-            # turned off.
+            # given socket.
             if util_error.errno == CR_CONNECTION_ERROR:
                 socket = conn_dict.get("unix_socket", "")
-                if socket:
-                    mydir = os.path.split(socket)[0]
-                    if os.path.isdir(mydir) and len(os.listdir(mydir)) != 0:
-                        server_is_off = True
-            # If we got errno 2003 and this is a windows, we do not have
+                if socket and os.path.isfile(socket):
+                    err = ["Unable to connect to server using "
+                           "socket '{0}'".format(socket)]
+            # If we got errno 2003 and we do not have
             # socket, instead we check if server is localhost.
             elif (util_error.errno == CR_CONN_HOST_ERROR and
-                  os.name == 'nt' and server1.is_alias("localhost")):
+                    server1.is_alias("localhost")):
                 server_is_off = True
             # If we got errno 1045 it means Access denied,
             # notify the user if a password was used or not.
@@ -512,7 +510,7 @@ def show_server_info(servers, options):
             # can not predict if the server is really off, but we can do it
             # in case of socket error, or if one of the related
             # parameter was given.
-            if (server_is_off or basedir or datadir or start):
+            if server_is_off or basedir or datadir or start:
                 er = ["Server is offline. To connect, "
                       "you must also provide "]
 

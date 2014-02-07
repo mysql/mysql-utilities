@@ -15,10 +15,10 @@ Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: The --rpl-file, --rpl-user, --comment-rpl options must be used with the --rpl option.
 Test case 5 - error: --rpl-file bad path
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 ERROR: File inaccessible or bad path: /bad/path/not/there.atall
 Test case 6 - warning: --rpl-user missing
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 STOP SLAVE;
 #...done.
 # Connecting to the current server as master
@@ -26,14 +26,14 @@ STOP SLAVE;
 CHANGE MASTER <goes here>
 START SLAVE;
 Test case 7 - error: --rpl-user missing user
-# Source on localhost: ... connected.
-ERROR: The replication user missing@localhost was not found on localhost:PORT1.
+# Source on 127.0.0.1: ... connected.
+ERROR: The replication user missing@127.0.0.1 was not found on 127.0.0.1:PORT1.
 Test case 8 - error: --rpl-user missing privileges
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 ERROR: Replication user does not have the correct privilege. She needs 'REPLICATION SLAVE' on all replicated databases.
 Test case 9 - error: slave not connected
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 ERROR: Cannot generate CHANGE MASTER command. The slave is not connected to a master and no master information was provided.
 Test case 10 - error: no binlog
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 ERROR: Master must have binary logging turned on.

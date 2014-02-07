@@ -156,8 +156,8 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Mask socket for destination server
-        self.replace_result("# Destination: root@localhost:",
-                            "# Destination: root@localhost:[] ... connected\n")
+        self.replace_result("# Destination: root@127.0.0.1:",
+                            "# Destination: root@127.0.0.1:[] ... connected\n")
 
         # Mask known source and destination host name.
         self.replace_result("# Source on ",

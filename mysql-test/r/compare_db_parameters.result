@@ -62,7 +62,7 @@ Options:
                         marked as comments.
 Test case 2 - Use  -a --difftype=unified --format=grid
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -151,7 +151,7 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 # ...done
 Test case 3 - Use  -a --difftype=unified --format=csv
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -217,7 +217,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 4 - Use  -a --difftype=unified --format=tab
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -283,7 +283,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # ...done
 Test case 5 - Use  -a --difftype=unified --format=vertical
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -435,7 +435,7 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
 # ...done
 Test case 6 - Use  -a --difftype=context --format=grid
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -528,7 +528,7 @@ Test case 6 - Use  -a --difftype=context --format=grid
 # ...done
 Test case 7 - Use  -a --difftype=context --format=csv
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -600,7 +600,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 8 - Use  -a --difftype=context --format=tab
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -672,7 +672,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # ...done
 Test case 9 - Use  -a --difftype=context --format=vertical
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -853,7 +853,7 @@ Test case 9 - Use  -a --difftype=context --format=vertical
 # ...done
 Test case 10 - Use  -a --difftype=differ --format=grid
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -950,7 +950,7 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 # ...done
 Test case 11 - Use  -a --difftype=differ --format=csv
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1016,7 +1016,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 12 - Use  -a --difftype=differ --format=tab
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1082,7 +1082,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # ...done
 Test case 13 - Use  -a --difftype=differ --format=vertical
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1236,7 +1236,7 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
 # ...done
 Test case 14 - without force 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 ERROR: The list of objects differs among database inventory and inventory.
@@ -1298,7 +1298,7 @@ stock_number,description,qty,cost,type,notes,supplier
 
 Test case 16 -  --format=csv -a --width=65
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1364,7 +1364,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 17 -  --format=csv -a --width=55
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1430,7 +1430,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 18 -  --format=csv -vvv -a
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1544,7 +1544,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 19 -  --format=csv -vvv -a --disable-binary-logging
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1658,7 +1658,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 20 -  --format=csv -vvv -a --span-key-size=16
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1772,7 +1772,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 21a - Changes for server1  (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1798,7 +1798,7 @@ Test case 21a - Changes for server1  (not skipping table options).
 # ...done
 Test case 21b - Changes for server1  (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1811,7 +1811,7 @@ Test case 21b - Changes for server1  (skipping table options).
 # ...done
 Test case 22a - Changes for server2  (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1837,7 +1837,7 @@ Test case 22a - Changes for server2  (not skipping table options).
 # ...done
 Test case 22b - Changes for server2  (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1850,7 +1850,7 @@ Test case 22b - Changes for server2  (skipping table options).
 # ...done
 Test case 23a - Changes for server1 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1881,7 +1881,7 @@ Test case 23a - Changes for server1 --difftype=context (not skipping table optio
 # ...done
 Test case 23b - Changes for server1 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1894,7 +1894,7 @@ Test case 23b - Changes for server1 --difftype=context (skipping table options).
 # ...done
 Test case 24a - Changes for server2 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1925,7 +1925,7 @@ Test case 24a - Changes for server2 --difftype=context (not skipping table optio
 # ...done
 Test case 24b - Changes for server2 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1938,7 +1938,7 @@ Test case 24b - Changes for server2 --difftype=context (skipping table options).
 # ...done
 Test case 25a - Changes for server1 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1961,7 +1961,7 @@ AUTO_INCREMENT=50000005;
 # ...done
 Test case 25b - Changes for server1 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1974,7 +1974,7 @@ Test case 25b - Changes for server1 --difftype=sql (skipping table options).
 # ...done
 Test case 26a - Changes for server2 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   
@@ -1997,7 +1997,7 @@ AUTO_INCREMENT=50000010;
 # ...done
 Test case 26b - Changes for server2 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
 #
 #                                                   Defn    Row     Data   

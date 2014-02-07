@@ -22,21 +22,21 @@ from mysql.utilities.exception import MUTLibError, UtilDBError
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
-                       '--enforce-gtid-consistency --report-host=localhost '
+                       '--enforce-gtid-consistency --report-host=127.0.0.1 '
                        '--report-port={port} '
                        '--sync-master-info=1 --master-info-repository=table"')
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
-                            '--report-host=localhost --report-port={port} '
+                            '--report-host=127.0.0.1 --report-port={port} '
                             '--sync-master-info=1 '
                             '--master-info-repository=file"')
 
 _MYSQL_OPTS_INFO_REPO_TABLE = ('"--log-bin=mysql-bin --skip-slave-start '
                                '--log-slave-updates --gtid-mode=ON '
                                '--enforce-gtid-consistency '
-                               '--report-host=localhost --report-port={port} '
+                               '--report-host=127.0.0.1 --report-port={port} '
                                '--sync-master-info=1 '
                                '--master-info-repository=TABLE '
                                '--relay-log-info-repository=TABLE"')
@@ -132,10 +132,10 @@ class test(rpl_admin.test):
 
         # Remove GTIDs here because they are not deterministic when run with
         # other tests that reuse these servers.
-        self.remove_result("localhost,{0},MASTER,".format(self.m_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s1_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s2_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s3_port))
+        self.remove_result("127.0.0.1,{0},MASTER,".format(self.m_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s1_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s2_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s3_port))
 
         comment = "Test case {0} - heatlh with discover".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
@@ -200,7 +200,7 @@ class test(rpl_admin.test):
                    "--rpl-user".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --discover-slaves-login=root:root switchover "
-                    "--new-master=root:root@localhost:{0}".format(
+                    "--new-master=root:root@127.0.0.1:{0}".format(
                     self.s4_port))
         res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
                                                comment)
@@ -212,7 +212,7 @@ class test(rpl_admin.test):
             test_num)
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --discover-slaves-login=root:root switchover "
-                    "--new-master=root:root@localhost:{0} "
+                    "--new-master=root:root@127.0.0.1:{0} "
                     "--rpl-user=rpl:rpl ".format(self.s4_port))
         res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
                                                comment)
@@ -300,8 +300,8 @@ class test(rpl_admin.test):
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.s4_port), "PORT5")
 
-        self.replace_result("#  - For slave 'localhost",
-                            "#  - For slave 'localhost@PORT?': XXXXX\n")
+        self.replace_result("#  - For slave '127.0.0.1",
+                            "#  - For slave '127.0.0.1@PORT?': XXXXX\n")
 
         # Mask data from verbose health report (except Trans_Behind)
         self.replace_result("         version: ",

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,18 +102,6 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/fkeys.sql")
         try:
             self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file "
-                              "{0}: {1}".format(data_file, err.errmsg))
-        self.server1.disable_foreign_key_checks(False)
-
-        # In case other tests disable it, enable foreign key checks so
-        # that the server can record the checks are on at start.
-        self.server1.exec_query("SET foreign_key_checks=1")
-        self.server1.disable_foreign_key_checks(True)
-        data_file = os.path.normpath("./std_data/fkeys.sql")
-        try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file, err.errmsg))

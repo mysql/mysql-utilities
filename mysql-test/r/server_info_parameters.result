@@ -29,27 +29,27 @@ Options:
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
 Test case 2 - no headers
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 localhost:XXXX [...]
 #...done.
 Test case 3 -  --format=GRID --no-headers
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 +---------+
 | XXXX ...|
 +---------+
 #...done.
 Test case 4 -  --format=CSV --no-headers
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 localhost:XXXX [...]
 #...done.
 Test case 5 -  --format=TAB --no-headers
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 localhost:XXXX [...]
 #...done.
 Test case 6 -  --format=VERTICAL --no-headers
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 *************************       1. row *************************
-                   server: localhost: XXXX
+                   server: 127.0.0.1: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX
@@ -70,9 +70,9 @@ Test case 6 -  --format=VERTICAL --no-headers
 1 row.
 #...done.
 Test case 7 - verbose run against online server
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 *************************       1. row *************************
-                   server: localhost: XXXX
+                   server: 127.0.0.1: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX
@@ -96,9 +96,9 @@ Test case 8 - show servers
 # 
 # The following MySQL servers are active on this host:
 # 
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 *************************       1. row *************************
-                   server: localhost: XXXX
+                   server: 127.0.0.1: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX
@@ -123,10 +123,10 @@ Test case 9 - run against offline server
 # Server is offline.
 # Checking server version ... done.
 # Starting read-only instance of the server ... done.
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Shutting down server ... done.
 *************************       1. row *************************
-                   server: localhost: XXXX
+                   server: 127.0.0.1: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX

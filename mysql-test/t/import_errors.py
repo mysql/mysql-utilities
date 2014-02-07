@@ -284,7 +284,7 @@ class test(import_basic.test):
                                 "std_data/basic_data.sql.\n")
 
         # Mask known source and destination host name.
-        self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on 127.0.0.1", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         self.replace_substring(" (28000)", "")

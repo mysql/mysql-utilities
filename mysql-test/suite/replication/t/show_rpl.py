@@ -35,9 +35,8 @@ class test(mutlib.System_test):
         if not mysqld_params:
             new_port = self.servers.get_next_port()
             mysqld_params = (' --mysqld="--log-bin=mysql-bin '
-                             ' --report-host={0} '
-                             '--report-port={1}"'.format('localhost',
-                                                         new_port))
+                             ' --report-host=127.0.0.1 '
+                             '--report-port={0}"'.format(new_port))
             self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
                                             name, mysqld_params)
@@ -216,7 +215,6 @@ class test(mutlib.System_test):
 
     def do_replacements(self):
         self.replace_substring(" (28000)", "")
-        self.replace_substring("127.0.0.1", "localhost")
         i = 1
         for port in self.port_repl:
             self.replace_substring("{0}".format(port), "PORT{0}".format(i))

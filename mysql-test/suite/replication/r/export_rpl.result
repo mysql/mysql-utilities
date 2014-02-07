@@ -1,5 +1,5 @@
 Test case 1 - rpl = master and lock_type = no-locks
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -74,7 +74,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - rpl = master and lock_type = lock-all
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -149,7 +149,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - rpl = master and lock_type = snapshot
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -224,7 +224,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - rpl = slave and lock_type = no-locks
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -299,7 +299,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - rpl = slave and lock_type = lock-all
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -374,7 +374,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - rpl = slave and lock_type = snapshot
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 STOP SLAVE;
 # Exporting metadata from util_test
@@ -449,7 +449,7 @@ CHANGE MASTER <goes here>
 START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - rpl = both and lock_type = no-locks
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
@@ -526,7 +526,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - rpl = both and lock_type = lock-all
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
@@ -603,7 +603,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - rpl = both and lock_type = snapshot
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test

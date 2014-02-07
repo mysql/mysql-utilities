@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from mysql.utilities.exception import MUTLibError
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
-                            '--report-host=localhost --report-port={0} '
+                            '--report-host=127.0.0.1 --report-port={0} '
                             '--master-info-repository=file"')
 
 
@@ -219,7 +219,7 @@ class test(rpl_admin.test):
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(",
                             "# QUERY = SELECT "
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
-        self.replace_substring("localhost", "XXXXXXXXX")
+        self.replace_substring("127.0.0.1", "XXXXXXXXX")
 
         self.remove_result_and_lines_before("WARNING: There are slaves that "
                                             "had connection errors.")

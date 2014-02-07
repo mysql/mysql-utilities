@@ -1,5 +1,5 @@
 Test Case 1 : Testing disk space (simple)
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX
@@ -8,7 +8,7 @@ Total database disk usage = XXXXXXX
 
 #...done.
 Test Case 2 : Testing disk space (with empty)
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Database totals:
 +------------+----------+
 | db_name    |   total  |

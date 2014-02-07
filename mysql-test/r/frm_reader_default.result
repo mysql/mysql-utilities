@@ -145,7 +145,7 @@ Helpful Hints
 Enjoy!
 
 Test case 2: - Check .frm files in a db folder
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
@@ -935,7 +935,7 @@ CREATE TABLE `frm_test`.`t0001` (
 
 #...done.
 Test case 3: - Check .frm files in a db folder
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
@@ -1081,7 +1081,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #
 #...done.
 Test case 4: - Export .frm files in a db folder
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
@@ -1210,7 +1210,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #
 #...done.
 Test case 5: - User the --user option
-# Source on localhost: ... connected.
+# Source on 127.0.0.1: ... connected.
 # Spawning server with --user=JOE_USER.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files

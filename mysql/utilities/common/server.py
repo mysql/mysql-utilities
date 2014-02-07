@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -466,6 +466,8 @@ def stop_running_server(server, wait=10, drop=True):
                                                         "client/release",
                                                         mysqladmin_client))
     cmd += mysqladmin_path
+    if server.socket is None and server.host == 'localhost':
+        server.host = '127.0.0.1'
     cmd += " shutdown --user=%s --host=%s " % (server.user, server.host)
     if server.passwd:
         cmd += "--password=%s " % server.passwd

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ class test(mutlib.System_test):
         self.remove_result("# Creating replication user...")
         self.remove_result("CREATE USER 'rpl'@'localhost'")
         self.remove_result("# Granting replication access")
-        self.remove_result("# CHANGE MASTER TO MASTER_HOST = 'localhost'")
+        self.remove_result("# CHANGE MASTER TO MASTER_HOST = '127.0.0.1'")
     
     def record(self):
         # Not a comparative test, returning True

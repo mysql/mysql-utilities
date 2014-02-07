@@ -1,6 +1,6 @@
 Test case 1 - Use diff  --difftype=differ
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -18,19 +18,19 @@ Test case 1 - Use diff  --difftype=differ
 Compare failed. One or more differences found.
 Test case 2 - database doesn't exist
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 ERROR: The database does not exist: util_test1
 Test case 3 - database doesn't exist
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 ERROR: The database does not exist: util_test2
 Test case 4 - object doesn't exist
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 ERROR: The object util_test.t33 does not exist.
 Test case 5 - object doesn't exist
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 ERROR: The object util_test.t31 does not exist.
 Test case 6 - malformed argument util_test.util_test 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
@@ -54,7 +54,7 @@ Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:p
 mysqldiff: error: Cannot parse the specified database objects: 'util_test.t3:util_test..t4'. Please verify that the objects are specified in a valid format (i.e., db1[.object1]:db2[.object2]) and that backtick quotes are properly used if required. The use of backticks is required if non alphanumeric characters are used for identifier names. Parsing the specified objects results in: db1 = 'util_test', object1 = 't3', db2 = 'util_test' and object2 = 'None'.
 Test case 11 - some objects don't exist in dbs
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #        TABLE: t6
 # WARNING: Objects in server2.util_test but not in server1.util_test:

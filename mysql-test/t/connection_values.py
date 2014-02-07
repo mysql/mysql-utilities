@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ _TEST_CASES = [('Good connection string but cannot connect',
                 'root:pass@hostname.com:3306:/my.sock', True),
                ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),
                ('Good dictionary but cannot connect',
-                {'user': 'root',  'passwd': 'pass',  'host': 'localhost',
+                {'user': 'root',  'passwd': 'pass',  'host': '127.0.0.1',
                  'port': '3306', 'unix_socket': '/my.sock'}, True),
                ('Bad dictionary', {'something': 'else'}, True),
                ]

@@ -6,7 +6,8 @@ Test case 1 : show help
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>].
   --new-data=NEW_DATA   the full path to the location of the data directory
-                        for the new instance
+                        for the new instance. The path size must be smaller or
+                        equal than 200 characters.
   --new-port=NEW_PORT   the new port for the new instance - default=3307
   --new-id=NEW_ID       the server_id for the new instance - default=2
   --root-password=ROOT_PASS
@@ -26,6 +27,8 @@ Test case 1 : show help
   --start-timeout=START_TIMEOUT
                         Number of seconds to wait for server to start. Default
                         = 10.
+  --force               Ignore the maximum path length check for the --new-
+                        data option.
 Test case 2 : write command to file
 # Cloning the MySQL server running on XXXXX-XXXXX.
 # Creating new data directory...

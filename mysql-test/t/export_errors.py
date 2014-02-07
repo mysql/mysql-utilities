@@ -34,15 +34,15 @@ class test(export_basic.test):
         self.server1 = self.servers.get_server(0)
         self.server0 = self.servers.get_server(0)
         try:
-            self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+            self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
             # Need to grant some privileges to joe on util_test to be able to
             # see the database, otherwise it is as it does not exist.
             self.server1.exec_query("GRANT ALL ON util_test.* TO "
-                                    "'joe'@'localhost'")
+                                    "'joe'@'127.0.0.1'")
             self.server1.exec_query("REVOKE SELECT ON util_test.* FROM "
-                                    "'joe'@'localhost'")
+                                    "'joe'@'127.0.0.1'")
         except UtilError as err:
-            raise MUTLibError("Cannot create user joe'@'localhost' with "
+            raise MUTLibError("Cannot create user joe'@'127.0.0.1' with "
                               "necessary privileges: {0}".format(err.errmsg))
         return export_basic.test.setup(self)
 
@@ -90,14 +90,14 @@ class test(export_basic.test):
         test_num += 1
         comment = ("Test case {0} - error: cannot connect to "
                    "server").format(test_num)
-        cmd_str = ("{0} --server=nope:nada@localhost:"
+        cmd_str = ("{0} --server=nope:nada@127.0.0.1:"
                    "{1}").format(cmd, self.server0.port)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         # Watchout for Windows: it doesn't use sockets!
-        joe_conn = "--server=joe@localhost:{0}".format(self.server1.port)
+        joe_conn = "--server=joe@127.0.0.1:{0}".format(self.server1.port)
         if os.name == "posix" and self.server1.socket is not None:
             joe_conn = "{0}:{1}".format(joe_conn, self.server1.socket)
 
@@ -183,7 +183,7 @@ class test(export_basic.test):
 
     def cleanup(self):
         try:
-            self.server1.exec_query("DROP USER 'joe'@'localhost'")
+            self.server1.exec_query("DROP USER 'joe'@'127.0.0.1'")
         except UtilError:
             pass  # Ignore DROP USER failure (user may not exist).
         return export_basic.test.cleanup(self)

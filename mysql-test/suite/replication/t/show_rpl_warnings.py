@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class test(rpl_admin.test):
         self.s4_port = self.server5.port
 
         self.server5.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+                                "'rpl'@'127.0.0.1' IDENTIFIED BY 'rpl'")
 
         self.master_str = " --master={0}".format(
             self.build_connection_string(self.server1))

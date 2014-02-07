@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,16 +52,13 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Create a new instance
-        conn = {"user": "root", "passwd": "root", "host": "localhost",
-                "port": port1, "unix_socket": full_datadir + "/mysql.sock"}
-        if os.name != "posix":
-            conn["unix_socket"] = None
+        conn = {"user": "root", "passwd": "root", "host": "127.0.0.1",
+                "port": port1}
 
         server_options = {'conn_info': conn, 'role': "cloned_server_2", }
         self.new_server = Server(server_options)
         if self.new_server is None:
             return False
-
         if kill:
             # Connect to the new instance
             try:
@@ -134,6 +131,8 @@ class test(mutlib.System_test):
                             "XXXXX-XXXXX.\n")
 
         self.remove_result("# trying again...")
+        # Since it may or may not appear, depending on size of path, remove it
+        self.remove_result("# WARNING: The socket file path '")
 
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities "

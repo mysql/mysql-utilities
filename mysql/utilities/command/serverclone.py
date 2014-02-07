@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ of an existing server.
 import getpass
 import os
 import subprocess
+import tempfile
 import time
 import shlex
 import shutil
@@ -30,6 +31,9 @@ import shutil
 from mysql.utilities.common.tools import check_port_in_use, get_tool_path
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError
+
+MAX_DATADIR_SIZE = 200
+MAX_SOCKET_PATH_SIZE = 107
 
 
 def clone_server(conn_val, options):
@@ -75,11 +79,18 @@ def clone_server(conn_val, options):
     cmd_file = options.get('cmd_file', None)
     start_timeout = int(options.get('start_timeout', 10))
     mysqld_options = options.get('mysqld_options', '')
+    force = options.get('force', False)
 
     if not check_port_in_use('localhost', int(new_port)):
         raise UtilError("Port {0} in use. Please choose an "
                         "available port.".format(new_port))
 
+    # Check if path to database files is greater than MAX_DIR_SIZE char,
+    if len(new_data) > MAX_DATADIR_SIZE and not force:
+        raise UtilError("The --new-data path '{0}' is too long "
+                        "(> {1} characters). Please use a smaller one. "
+                        "You can use the --force option to skip this "
+                        "check".format(new_data, MAX_DATADIR_SIZE))
     # Clone running server
     if conn_val is not None:
         # Try to connect to the MySQL database server.
@@ -200,7 +211,6 @@ def clone_server(conn_val, options):
 
     # Wait for subprocess to finish
     res = proc.wait()
-
     # Kill subprocess just in case it didn't finish - Ok if proc doesn't exist
     if int(res) != 0:
         if os.name == "posix":
@@ -235,6 +245,18 @@ def clone_server(conn_val, options):
         subprocess.call(['chgrp', '-R', user, new_data])
 
     cmd = [mysqld_path, '--no-defaults']
+
+    socket_path = os.path.join(new_data, 'mysql.sock')
+    # If socket path is too long, use mkdtemp to create a tmp dir and
+    # use it instead to store the socket
+    if os.name == 'posix' and len(socket_path) > MAX_SOCKET_PATH_SIZE:
+        socket_path = os.path.join(tempfile.mkdtemp(), 'mysql.sock')
+        if not quiet:
+            print("# WARNING: The socket file path '{0}' is too long (>{1}), "
+                  "using '{2}' instead".format(
+                      os.path.join(new_data, 'mysql.sock'),
+                      MAX_SOCKET_PATH_SIZE, socket_path))
+
     cmd.extend([
         '--datadir={0}'.format(new_data),
         '--tmpdir={0}'.format(new_data),
@@ -242,7 +264,7 @@ def clone_server(conn_val, options):
         '--port={0}'.format(new_port),
         '--server-id={0}'.format(options.get('new_id', 2)),
         '--basedir={0}'.format(mysql_basedir),
-        '--socket={0}'.format(os.path.join(new_data, 'mysql.sock')),
+        '--socket={0}'.format(socket_path),
     ])
     if user:
         cmd.append('--user={0}'.format(user))
@@ -294,9 +316,9 @@ def clone_server(conn_val, options):
     if not quiet:
         print "# Testing connection to new instance..."
     new_sock = None
-    port_int = None
+
     if os.name == "posix":
-        new_sock = os.path.join(new_data, "mysql.sock")
+        new_sock = socket_path
     port_int = int(new_port)
 
     conn = {

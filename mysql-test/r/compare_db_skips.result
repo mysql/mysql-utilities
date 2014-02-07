@@ -1,6 +1,6 @@
 Test case 1 -  --skip-object-compare --format=csv -a 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 #                                                   Defn    Row     Data   
@@ -70,7 +70,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 2 -  --skip-row-count --format=csv -a 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -140,7 +140,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 3 -  --skip-diff --format=csv -a 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -204,7 +204,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # ...done
 Test case 4 -  --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -241,7 +241,7 @@ Test case 4 -  --skip-data-check --format=csv -a
 # ...done
 Test case 5 -   --skip-object-compare --skip-row-count --skip-diff --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 #                                                   Defn    Row     Data   

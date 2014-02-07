@@ -1,7 +1,7 @@
 Test case 1 - master as HOSTNAME.
-mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@HOSTNAME:PORT1 
 # master on HOSTNAME: ... connected.
-# slave on localhost: ... connected.
+# slave on HOSTNAME: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -18,9 +18,9 @@ Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 
 Test case 2 - master as localhost.
-mysqlrplcheck.py --master=root:root@localhost:PORT2 --slave=root:root@localhost:PORT1 
+mysqlrplcheck.py --master=root:root@localhost:PORT2 --slave=root:root@HOSTNAME:PORT1 
 # master on localhost: ... connected.
-# slave on localhost: ... connected.
+# slave on HOSTNAME: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -37,9 +37,9 @@ Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 
 Test case 3 - master as HOSTNAME.
-mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@HOSTNAME:PORT1 
 # master on HOSTNAME: ... connected.
-# slave on localhost: ... connected.
+# slave on HOSTNAME: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -56,9 +56,9 @@ Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 
 Test case 4 - master as HOSTNAME.
-mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@localhost:PORT1 
+mysqlrplcheck.py --master=root:root@HOSTNAME:PORT2 --slave=root:root@HOSTNAME:PORT1 
 # master on HOSTNAME: ... connected.
-# slave on localhost: ... connected.
+# slave on HOSTNAME: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]

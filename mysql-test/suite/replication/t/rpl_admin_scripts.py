@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@ from mysql.utilities.exception import MUTLibError
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
-                       '--enforce-gtid-consistency --report-host=localhost '
+                       '--enforce-gtid-consistency --report-host=127.0.0.1 '
                        '--report-port={0} '
                        '--sync-master-info=1 --master-info-repository=table"')
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
-                            '--report-host=localhost --report-port={0} --sync'
+                            '--report-host=127.0.0.1 --report-port={0} --sync'
                             '-master-info=1 --master-info-repository=file"')
 
 
@@ -60,10 +60,10 @@ class test(rpl_admin_gtid.test):
 
         # Remove GTIDs here because they are not deterministic when run with
         # other tests that reuse these servers.
-        self.remove_result("localhost,{0},MASTER,".format(self.m_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s1_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s2_port))
-        self.remove_result("localhost,{0},SLAVE,".format(self.s3_port))
+        self.remove_result("127.0.0.1,{0},MASTER,".format(self.m_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s1_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s2_port))
+        self.remove_result("127.0.0.1,{0},SLAVE,".format(self.s3_port))
 
         slaves = ",".join(["root:root@127.0.0.1:{0}".format(self.server2.port),
                            slave2_conn, slave3_conn])

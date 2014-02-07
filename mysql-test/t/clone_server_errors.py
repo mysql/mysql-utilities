@@ -35,10 +35,10 @@ class test(mutlib.System_test):
 
     def run(self):
         self.res_fname = "result.txt"
-        cmd_str = "mysqlserverclone.py --server={0} ".format(
-            self.build_connection_string(self.servers.get_server(0)))
-        test_num = 1
+        srv0_con_str = self.build_connection_string(self.servers.get_server(0))
+        cmd_str = "mysqlserverclone.py --server={0} ".format(srv0_con_str)
 
+        test_num = 1
         port1 = int(self.servers.get_next_port())
         newport = "--new-port={0} ".format(port1)
         comment = ("Test case {0} - error: no --new-data "
@@ -59,7 +59,7 @@ class test(mutlib.System_test):
 
         comment = "Test case {0} - error: no login".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py "
-                                    "--server=root:root@localhost:90125 "
+                                    "--server=root:root@127.0.0.1:90125 "
                                     "--new-data=/nada --delete-data "
                                     "--new-id=7 {0}".format(newport), comment)
         if not res:
@@ -68,7 +68,7 @@ class test(mutlib.System_test):
 
         comment = "Test case {0} - error: cannot connect".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py --server=nope@"
-                                    "localhost:38310 --new-data=/nada "
+                                    "127.0.0.1:38310 --new-data=/nada "
                                     "--new-id=7 --delete-data "
                                     "--root-password=nope {0}".format(newport),
                                  comment)
@@ -103,7 +103,7 @@ class test(mutlib.System_test):
 
         shutil.rmtree(new_dir, True)
 
-        cmd_str = ("mysqlserverclone.py --server=root:nope@localhost "
+        cmd_str = ("mysqlserverclone.py --server=root:nope@127.0.0.1 "
                    "--new-data={0} --new-id=7 --root-password=nope "
                    "{1}".format(new_dir, newport))
         comment = ("Test case {0} - --new-data does not exist (but cannot "
@@ -113,11 +113,10 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        cmd_str = " ".join(
-            ["mysqlserverclone.py", "--server={0}".format(
-                self.build_connection_string(self.servers.get_server(0))),
-                "--new-port={0}".format(self.servers.get_server(0).port),
-                "--new-data={0}".format(new_dir), "--root=root"])
+        cmd_str = ("mysqlserverclone.py --server={0} --new-port={1} "
+                   "--new-data={2} --root=root"
+                   "".format(srv0_con_str, self.servers.get_server(0).port,
+                             new_dir))
 
         comment = ("Test case {0} - attempt to use existing "
                    "port".format(test_num))
@@ -125,6 +124,16 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        cmd_str = ("mysqlserverclone.py --server={0} --new-port={1} "
+                   "--new-data=lo{2}ng --root=root"
+                   "".format(srv0_con_str, port1, "o"*200))
+
+        comment = ("Test case {0} - use invalid big path in --new-data"
+                   "".format(test_num))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
         # Mask known platform-dependent lines
         self.mask_result("Error 2003:", "2003", "####")
         self.mask_result("Error 1045", "1045", "####:")
@@ -147,6 +156,11 @@ class test(mutlib.System_test):
 
         self.replace_substring_portion("ERROR: Port ", "in use",
                                        "ERROR: Port ##### in use")
+
+        self.replace_substring_portion("ERROR: The --new-data path '",
+                                       " is too long",
+                                       "ERROR: The --new-data path 'XXXX' "
+                                       "is too long")
 
         return True
 

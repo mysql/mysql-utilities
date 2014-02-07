@@ -35,21 +35,21 @@ class test(copy_db.test):
             return res
             # Create users for privilege testing
         self.drop_users()
-        self.server1.exec_query("CREATE USER 'joe'@'localhost'")
-        self.server1.exec_query("CREATE USER 'sam'@'localhost'")
+        self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+        self.server1.exec_query("CREATE USER 'sam'@'127.0.0.1'")
         self.server1.exec_query(
-            "GRANT SELECT, EVENT ON util_test.* TO " + "'joe'@'localhost'")
+            "GRANT SELECT, EVENT ON util_test.* TO " + "'joe'@'127.0.0.1'")
         self.server1.exec_query(
-            "GRANT SELECT ON mysql.* TO " + "'joe'@'localhost'")
+            "GRANT SELECT ON mysql.* TO " + "'joe'@'127.0.0.1'")
         self.server1.exec_query(
-            "GRANT SHOW VIEW ON util_test.* TO " + "'joe'@'localhost'")
+            "GRANT SHOW VIEW ON util_test.* TO " + "'joe'@'127.0.0.1'")
 
-        self.server2.exec_query("CREATE USER 'joe'@'localhost'")
-        self.server2.exec_query("CREATE USER 'sam'@'localhost'")
+        self.server2.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+        self.server2.exec_query("CREATE USER 'sam'@'127.0.0.1'")
         self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
-                                "'joe'@'localhost' WITH GRANT OPTION")
+                                "'joe'@'127.0.0.1' WITH GRANT OPTION")
         self.server2.exec_query("GRANT SUPER, CREATE USER ON *.* TO "
-                                "'joe'@'localhost'")
+                                "'joe'@'127.0.0.1'")
         return True
 
     def run(self):
@@ -99,7 +99,7 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         cmd = ("mysqldbcopy.py --skip-gtid {0} "
-               "--source=nope:nada@localhost:3306").format(to_conn)
+               "--source=nope:nada@127.0.0.1:3306").format(to_conn)
 
         test_num += 1
         comment = ("Test case {0} - error: cannot connect to "
@@ -110,7 +110,7 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         cmd = ("mysqldbcopy.py --skip-gtid {0} "
-               "--destination=nope:nada@localhost:3306").format(from_conn)
+               "--destination=nope:nada@127.0.0.1:3306").format(from_conn)
 
         test_num += 1
         comment = ("Test case {0} - error: cannot connect to "
@@ -120,13 +120,13 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=joe@localhost:{0}".format(self.server1.port)
+        from_conn = "--source=joe@127.0.0.1:{0}".format(self.server1.port)
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = ("--destination=joe@localhost:{0}:"
+            to_conn = ("--destination=joe@127.0.0.1:{0}:"
                        "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = ("--destination=joe@localhost:"
+            to_conn = ("--destination=joe@127.0.0.1:"
                        "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
@@ -138,12 +138,12 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=sam@localhost:{0}".format(self.server1.port)
+        from_conn = "--source=sam@127.0.0.1:{0}".format(self.server1.port)
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = ("--destination=joe@localhost:{0}:"
+            to_conn = ("--destination=joe@127.0.0.1:{0}:"
                        "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = ("--destination=joe@localhost:"
+            to_conn = ("--destination=joe@127.0.0.1:"
                        "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
@@ -157,7 +157,7 @@ class test(copy_db.test):
 
         # Give Sam some privileges on source and retest until copy works
         self.server1.exec_query("GRANT SELECT ON util_test.* TO "
-                                "'sam'@'localhost'")
+                                "'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - source user has some privileges "
@@ -166,7 +166,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server1.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
+        self.server1.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - source user has some privileges "
@@ -176,7 +176,7 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.server1.exec_query("GRANT SHOW VIEW, EVENT ON util_test.* TO "
-                                "'sam'@'localhost'")
+                                "'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - source user has privileges "
@@ -185,13 +185,8 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Watchout for Windows: it doesn't use sockets!
-        if os.name == "posix":
-            to_conn = ("--destination=sam@localhost:{0}:"
-                       "{1}").format(self.server2.port, self.server2.socket)
-        else:
-            to_conn = ("--destination=sam@localhost:"
-                       "{0}").format(self.server2.port)
+        to_conn = ("--destination=sam@127.0.0.1:"
+                   "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
         test_num += 1
@@ -204,7 +199,7 @@ class test(copy_db.test):
 
         # Give some privileges on source and retest until copy works
         self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
-                                "'sam'@'localhost' WITH GRANT OPTION")
+                                "'sam'@'127.0.0.1' WITH GRANT OPTION")
 
         test_num += 1
         comment = ("Test case {0} - dest user has some privileges "
@@ -214,7 +209,7 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.server2.exec_query("GRANT CREATE USER ON *.* TO "
-                                "'sam'@'localhost'")
+                                "'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - dest user has some privileges "
@@ -223,7 +218,7 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'localhost'")
+        self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - dest user has privileges "
@@ -330,15 +325,16 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Mask socket for destination server
-        self.replace_result("# Destination: root@localhost:",
-                            "# Destination: root@localhost:[] ... connected\n")
-        self.replace_result("# Destination: joe@localhost:",
-                            "# Destination: joe@localhost:[] ... connected\n")
-        self.replace_result("# Destination: sam@localhost:",
-                            "# Destination: sam@localhost:[] ... connected\n")
+        self.replace_result("# Destination: root@127.0.0.1:",
+                            "# Destination: root@127.0.0.1:[] ... connected\n")
+        self.replace_result("# Destination: joe@127.0.0.1:",
+                            "# Destination: joe@127.0.0.1:[] ... connected\n")
+        self.replace_result("# Destination: sam@127.0.0.1:",
+                            "# Destination: sam@127.0.0.1:[] ... connected\n")
 
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on 127.0.0.1", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         # Replace error code.
@@ -369,19 +365,19 @@ class test(copy_db.test):
 
     def drop_users(self):
         try:
-            self.server1.exec_query("DROP USER 'joe'@'localhost'")
+            self.server1.exec_query("DROP USER 'joe'@'127.0.0.1'")
         except UtilError:
             pass
         try:
-            self.server1.exec_query("DROP USER 'sam'@'localhost'")
+            self.server1.exec_query("DROP USER 'sam'@'127.0.0.1'")
         except UtilError:
             pass
         try:
-            self.server2.exec_query("DROP USER 'joe'@'localhost'")
+            self.server2.exec_query("DROP USER 'joe'@'127.0.0.1'")
         except UtilError:
             pass
         try:
-            self.server2.exec_query("DROP USER 'sam'@'localhost'")
+            self.server2.exec_query("DROP USER 'sam'@'127.0.0.1'")
         except UtilError:
             pass
 

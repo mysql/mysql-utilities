@@ -5,8 +5,8 @@ Test Case 1 - Log file is newly created
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test Case 2 - Log file is reopened
@@ -16,8 +16,8 @@ Test Case 2 - Log file is reopened
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test Case 3 - Log file can not be written to

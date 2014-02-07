@@ -52,7 +52,7 @@ class test(check_index.test):
         comment = ("Test case {0} - error: invalid login to "
                    "server".format(test_num))
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
-                                    "--server=nope:nada@localhost:3306",
+                                    "--server=nope:nada@127.0.0.1:3306",
                                  comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

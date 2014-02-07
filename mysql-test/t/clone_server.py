@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,15 +34,12 @@ class test(mutlib.System_test):
         self.new_server = None
         return True
 
-    def check_connect(self, port, full_datadir, name="cloned_server"):
-
+    @staticmethod
+    def check_connect(port, name="cloned_server"):
         new_server = None
-        # Create a new instance
-        conn = {"user": "root", "passwd": "root", "host": "localhost",
-                "port": port,
-                "unix_socket": "{0}/mysql.sock".format(full_datadir)}
-        if os.name != "posix":
-            conn["unix_socket"] = None
+
+        conn = {"user": "root", "passwd": "root", "host": "127.0.0.1",
+                "port": port}
 
         server_options = {'conn_info': conn, 'role': name, }
         new_server = Server(server_options)
@@ -66,11 +63,13 @@ class test(mutlib.System_test):
         port1 = self.servers.get_next_port()
         cmd_str = "{0} --new-port={1} --root-password=root ".format(cmd_str,
                                                                     port1)
-
         test_num = 1
         comment = "Test case {0} - clone a running server".format(test_num)
         self.results.append(comment + "\n")
-        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port1))
+        # Create a new-dir whose size with socket file is > 107 chars
+        o_path_size = 108 - (len(os.getcwd()) + 22 + len(str(port1)))
+        full_datadir = os.path.join(os.getcwd(), "temp_{0}_lo{1}ng".format(
+            port1, 'o'*o_path_size))
         cmd_str = "{0}--new-data={1} ".format(cmd_str, full_datadir)
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:
@@ -82,7 +81,7 @@ class test(mutlib.System_test):
         if res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.new_server = self.check_connect(port1, full_datadir)
+        self.new_server = self.check_connect(port1)
 
         # Get basedir
         rows = self.server0.exec_query("SHOW VARIABLES LIKE 'basedir'")
@@ -110,8 +109,7 @@ class test(mutlib.System_test):
         if res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        server = self.check_connect(port2, full_datadir,
-                                    "cloned_server_basedir")
+        server = self.check_connect(port2, "cloned_server_basedir")
 
         self.servers.stop_server(server)
         self.servers.clear_last_port()
@@ -123,6 +121,9 @@ class test(mutlib.System_test):
         self.replace_result("#  -uroot", "#  -uroot [...]\n")
         self.replace_result("# Cloning the MySQL server located at",
                             "# Cloning the MySQL server located at XXXX\n")
+        # Since it may or may not appear, depending on size of path or Windows,
+        # remove it
+        self.remove_result("# WARNING: The socket file path '")
 
         return True
 

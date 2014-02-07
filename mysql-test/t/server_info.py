@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,8 +66,8 @@ class test(mutlib.System_test):
                             "                relay_log: XXXX\n")
         self.replace_result("            relay_log_pos:",
                             "            relay_log_pos: XXXX\n")
-        self.replace_result("                   server: localhost:",
-                            "                   server: localhost: XXXX\n")
+        self.replace_result("                   server: 127.0.0.1:",
+                            "                   server: 127.0.0.1: XXXX\n")
         self.replace_result("              general_log:",
                             "              general_log: XXXX\n")
         self.replace_result("         general_log_file:",

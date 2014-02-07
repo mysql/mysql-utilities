@@ -40,7 +40,7 @@ class test(clone_user.test):
             self.build_connection_string(self.server1))
 
         cmd_str = ("mysqluserclone.py "
-                   "--source=noone:nope@localhost:3306 {0}".format(to_conn))
+                   "--source=noone:nope@127.0.0.1:3306 {0}".format(to_conn))
 
         test_num = 1
         comment = ("Test case {0} - error: invalid login to source "
@@ -51,7 +51,7 @@ class test(clone_user.test):
 
         test_num += 1
         cmd_str = ("mysqluserclone.py "
-                   "--destination=noone:nope@localhost:3306 "
+                   "--destination=noone:nope@127.0.0.1:3306 "
                    "{0}".format(from_conn))
         comment = ("Test case {0} - error: invalid login to "
                    "destination server".format(test_num))
@@ -68,14 +68,14 @@ class test(clone_user.test):
 
         test_num += 1
         comment = "Test case {0} - error: no new user".format(test_num)
-        res = self.run_test_case(2, cmd_str + "joenopass@localhost", comment)
+        res = self.run_test_case(2, cmd_str + "joenopass@127.0.0.1", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: cannot use dump and "
                    "quiet together".format(test_num))
-        res = self.run_test_case(2, cmd_str + (" root@localhost  x@f "
+        res = self.run_test_case(2, cmd_str + (" root@127.0.0.1  x@f "
                                                "--quiet --dump"),
                                  comment)
         if not res:
@@ -86,7 +86,7 @@ class test(clone_user.test):
                    "{0} ".format(to_conn))
         comment = ("Test case {0} - error: cannot parser source "
                    "connection".format(test_num))
-        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
+        res = self.run_test_case(2, cmd_str + " root@127.0.0.1 x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -96,7 +96,7 @@ class test(clone_user.test):
 
         comment = ("Test case {0} - error: cannot parser "
                    "destination connection".format(test_num))
-        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
+        res = self.run_test_case(2, cmd_str + " root@127.0.0.1 x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -125,6 +125,7 @@ class test(clone_user.test):
 
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on 127.0.0.1", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         return True

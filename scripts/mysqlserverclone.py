@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,7 +58,9 @@ parser = setup_common_options(os.path.basename(sys.argv[0]),
 # Data directory for new instance
 parser.add_option("--new-data", action="store", dest="new_data",
                   type="string", help="the full path to the location "
-                  "of the data directory for the new instance")
+                  "of the data directory for the new instance. "
+                  "The path size must be smaller or equal than {0} "
+                  "characters.".format(serverclone.MAX_DATADIR_SIZE))
 
 # Port for the new instance
 parser.add_option("--new-port", action="store", dest="new_port",
@@ -103,6 +105,11 @@ parser.add_option("--user", action="store", dest="user", type="string",
 parser.add_option("--start-timeout", action="store", dest="start_timeout",
                   type=int, default=10, help="Number of seconds to wait for "
                   "server to start. Default = 10.")
+
+# Add force option
+parser.add_option("--force", action="store_true", dest="force", default=False,
+                  help="Ignore the maximum path length check for the"
+                       " --new-data option.")
 
 # Now we process the rest of the arguments.
 opt, args = parser.parse_args()
@@ -153,6 +160,7 @@ options = {
     'delete': opt.delete,
     'user': opt.user,
     'start_timeout': opt.start_timeout,
+    'force': opt.force,
 }
 
 # Expand user paths and resolve relative paths

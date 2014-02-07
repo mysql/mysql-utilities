@@ -1,6 +1,6 @@
 Test case 1 - create transform for objects for --changes-for=server1
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #     FUNCTION: f2
 #        EVENT: e1
@@ -66,7 +66,7 @@ ALTER VIEW util_test.v1 AS
 Compare failed. One or more differences found.
 Test case 2 - create transform for objects for --changes-for=server2
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #     FUNCTION: f2
 #        EVENT: e1
@@ -132,7 +132,7 @@ ALTER VIEW util_test.v1 AS
 Compare failed. One or more differences found.
 Test case 3 - create transform for objects for --changes-for=server1 with reverse
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #     FUNCTION: f2
 #        EVENT: e1
@@ -252,7 +252,7 @@ ALTER VIEW util_test.v1 AS
 Compare failed. One or more differences found.
 Test case 4 - create transform for objects for --changes-for=server2 with reverse
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # WARNING: Objects in server1.util_test but not in server2.util_test:
 #     FUNCTION: f2
 #        EVENT: e1
@@ -372,7 +372,7 @@ ALTER VIEW util_test.v1 AS
 Compare failed. One or more differences found.
 Test case 5 - create transform for renamed table 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Comparing util_test.t1 to util_test.t6                           [FAIL]
 # Transformation for --changes-for=server1:
 #
@@ -384,6 +384,6 @@ RENAME TO util_test.t6
 Compare failed. One or more differences found.
 Test case 6 - test transform for renamed table 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Comparing util_test.t6 to util_test.t6                           [PASS]
 Success. All objects are the same.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ class test(mutlib.System_test):
         self.replace_result("# Importing", "# Importing ... bad_engines.csv\n")
 
         # Mask known source and destination host name.
-        self.replace_substring("on localhost", "on XXXX-XXXX")
+        self.replace_substring("on 127.0.0.1", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         return True

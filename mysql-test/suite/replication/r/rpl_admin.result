@@ -3,28 +3,28 @@ Test case 1 - show health before switchover
 #
 # Replication Topology Health:
 *************************       1. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT1
       role: MASTER
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       2. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT2
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       3. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT3
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       4. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT4
       role: SLAVE
      state: UP
@@ -34,7 +34,7 @@ Test case 1 - show health before switchover
 # ...done.
 Test case 2 - switchover to slave1
 # Checking privileges.
-# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -51,10 +51,10 @@ Test case 2 - switchover to slave1
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - show health after switchover
@@ -62,28 +62,28 @@ Test case 3 - show health after switchover
 #
 # Replication Topology Health:
 *************************       1. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT2
       role: MASTER
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       2. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       3. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT3
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       4. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT4
       role: SLAVE
      state: UP
@@ -93,7 +93,7 @@ Test case 3 - show health after switchover
 # ...done.
 Test case 4 - switchover to slave2
 # Checking privileges.
-# Performing switchover from master at localhost:PORT2 to slave at localhost:PORT3.
+# Performing switchover from master at 127.0.0.1:PORT2 to slave at 127.0.0.1:PORT3.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -110,10 +110,10 @@ Test case 4 - switchover to slave2
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT3  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 5 - show health after switchover
@@ -121,28 +121,28 @@ Test case 5 - show health after switchover
 #
 # Replication Topology Health:
 *************************       1. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT3
       role: MASTER
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       2. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       3. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT2
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       4. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT4
       role: SLAVE
      state: UP
@@ -152,7 +152,7 @@ Test case 5 - show health after switchover
 # ...done.
 Test case 6 - switchover to slave3
 # Checking privileges.
-# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT4.
+# Performing switchover from master at 127.0.0.1:PORT3 to slave at 127.0.0.1:PORT4.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -169,10 +169,10 @@ Test case 6 - switchover to slave3
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT4  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 7 - show health after switchover
@@ -180,28 +180,28 @@ Test case 7 - show health after switchover
 #
 # Replication Topology Health:
 *************************       1. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT4
       role: MASTER
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       2. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT1
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       3. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT2
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       4. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT3
       role: SLAVE
      state: UP
@@ -211,8 +211,7 @@ Test case 7 - show health after switchover
 # ...done.
 Test case 8 - switchover to master
 # Checking privileges.
-# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
-# Performing switchover from master at 127.0.0.1:PORT4 to slave at localhost:PORT1.
+# Performing switchover from master at 127.0.0.1:PORT4 to slave at 127.0.0.1:PORT1.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -229,10 +228,10 @@ Test case 8 - switchover to master
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 | 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 9 - show health after switchover
@@ -240,28 +239,28 @@ Test case 9 - show health after switchover
 #
 # Replication Topology Health:
 *************************       1. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT1
       role: MASTER
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       2. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT2
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       3. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT3
       role: SLAVE
      state: UP
  gtid_mode: XXX
     health: OK
 *************************       4. row *************************
-      host: localhost
+      host: 127.0.0.1
       port: PORT4
       role: SLAVE
      state: UP
@@ -276,14 +275,14 @@ Test case 10 - health with loopback
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
 | 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 | 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 11 - health with discovery
-# Discovering slaves for master at localhost:PORT1
+# Discovering slaves for master at 127.0.0.1:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -296,7 +295,7 @@ Test case 11 - health with discovery
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
@@ -305,16 +304,16 @@ Test case 11 - health with discovery
 Test case 12 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 Ok
-#   Executing stop on slave localhost:PORT3 Ok
-#   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT3 Ok
+#   Executing stop on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 13 - run command start with --master
 # Checking privileges.
 # Performing START on all slaves.
-#   Executing start on slave localhost:PORT2 Ok
-#   Executing start on slave localhost:PORT3 Ok
-#   Executing start on slave localhost:PORT4 Ok
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 13(b) - health after start
 # Checking privileges.
@@ -323,39 +322,39 @@ Test case 13(b) - health after start
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 14 - run command stop with --master
 # Checking privileges.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 Ok
-#   Executing stop on slave localhost:PORT3 Ok
-#   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT3 Ok
+#   Executing stop on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 15 - run command reset with --master
 # Checking privileges.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT2 Ok
-#   Executing stop on slave localhost:PORT3 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT3 Ok
-#   Executing stop on slave localhost:PORT4 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT3 Ok
+#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT4 Ok
 # Performing RESET on all slaves.
-#   Executing reset on slave localhost:PORT2 Ok
-#   Executing reset on slave localhost:PORT3 Ok
-#   Executing reset on slave localhost:PORT4 Ok
+#   Executing reset on slave 127.0.0.1:PORT2 Ok
+#   Executing reset on slave 127.0.0.1:PORT3 Ok
+#   Executing reset on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 16 - run command start without --master
 # Checking privileges.
 # Performing START on all slaves.
-#   Executing start on slave localhost:PORT2 Ok
-#   Executing start on slave localhost:PORT3 Ok
-#   Executing start on slave localhost:PORT4 Ok
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 16(b) - health after start
 # Checking privileges.
@@ -364,30 +363,30 @@ Test case 16(b) - health after start
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
-| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
-| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 17 - run command stop without --master
 # Checking privileges.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 Ok
-#   Executing stop on slave localhost:PORT3 Ok
-#   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT3 Ok
+#   Executing stop on slave 127.0.0.1:PORT4 Ok
 # ...done.
 Test case 18 - run command reset without --master
 # Checking privileges.
 # Performing STOP on all slaves.
-#   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT2 Ok
-#   Executing stop on slave localhost:PORT3 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT3 Ok
-#   Executing stop on slave localhost:PORT4 WARN - slave is not connected to master
-#   Executing stop on slave localhost:PORT4 Ok
+#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT3 Ok
+#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not connected to master
+#   Executing stop on slave 127.0.0.1:PORT4 Ok
 # Performing RESET on all slaves.
-#   Executing reset on slave localhost:PORT2 Ok
-#   Executing reset on slave localhost:PORT3 Ok
-#   Executing reset on slave localhost:PORT4 Ok
+#   Executing reset on slave 127.0.0.1:PORT2 Ok
+#   Executing reset on slave 127.0.0.1:PORT3 Ok
+#   Executing reset on slave 127.0.0.1:PORT4 Ok
 # ...done.

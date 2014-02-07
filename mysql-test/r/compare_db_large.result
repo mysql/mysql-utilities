@@ -1,6 +1,6 @@
 Test case 1 - check database with No differences 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases world on server1 and world on server2
 #
 Looking for object types table, view, trigger, procedure, function, and event.
@@ -112,7 +112,7 @@ CREATE TABLE `CountryLanguage` (
 # ...done
 Test case 2 - check database with known differences 
 # server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
 # Checking databases world on server1 and world on server2
 #
 Looking for object types table, view, trigger, procedure, function, and event.

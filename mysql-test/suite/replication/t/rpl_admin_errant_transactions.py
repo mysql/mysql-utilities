@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -122,10 +122,10 @@ class test(rpl_admin.test):
                             "# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER"
                             "_GTIDS(XXXXXXXXX)\n")
         self.replace_result("# Return Code =", "# Return Code = XXX\n")
-        self.replace_result("#  - For slave 'localhost@PORT2':",
-                            "#  - For slave 'localhost@PORT2': XXXXXXXXX:1\n")
-        self.replace_result("#  - For slave 'localhost@PORT4':",
-                            "#  - For slave 'localhost@PORT4': XXXXXXXXX:1\n")
+        self.replace_result("#  - For slave '127.0.0.1@PORT2':",
+                            "#  - For slave '127.0.0.1@PORT2': XXXXXXXXX:1\n")
+        self.replace_result("#  - For slave '127.0.0.1@PORT4':",
+                            "#  - For slave '127.0.0.1@PORT4': XXXXXXXXX:1\n")
 
         return True
 

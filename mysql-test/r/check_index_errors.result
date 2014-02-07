@@ -6,7 +6,7 @@ Test case 2 - error: invalid source specified
 # Source on nohost: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
 Test case 3 - error: invalid login to server
-# Source on localhost: ... ERROR: Cannot connect to the Source server.
+# Source on 127.0.0.1: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
 Test case 4 - error: stats and best=alpha
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2

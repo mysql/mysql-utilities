@@ -27,3 +27,5 @@ ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 8 - attempt to use existing port
 ERROR: Port ##### in use. Please choose an available port.
+Test case 9 - use invalid big path in --new-data
+ERROR: The --new-data path 'XXXX' is too long (> 200 characters). Please use a smaller one. You can use the --force option to skip this check

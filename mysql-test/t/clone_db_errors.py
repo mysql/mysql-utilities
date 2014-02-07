@@ -72,15 +72,15 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+            self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
         except UtilDBError as err:
             raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
 
         if os.name == "posix" and self.server1.socket is not None:
-            from_conn = "--source=joe@localhost:{0}:{1}".format(
+            from_conn = "--source=joe@127.0.0.1:{0}:{1}".format(
                 self.server1.port, self.server1.socket)
         else:
-            from_conn = "--source=joe@localhost:{0}".format(self.server1.port)
+            from_conn = "--source=joe@127.0.0.1:{0}".format(self.server1.port)
 
         cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
                                                                to_conn)
@@ -192,7 +192,7 @@ class test(clone_db.test):
 
     def cleanup(self):
         try:
-            self.server1.exec_query("DROP USER 'joe'@'localhost'")
+            self.server1.exec_query("DROP USER 'joe'@'127.0.0.1'")
         except UtilError:
             pass
         try:

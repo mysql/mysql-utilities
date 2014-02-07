@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -93,13 +93,11 @@ class test(mutlib.System_test):
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server1))
         conn_val = self.get_connection_values(self.server2)
-        self.server2_conn = "-u{0} -p{1} ".format(conn_val[0], conn_val[1])
+        self.server2_conn = "-u{0} -p{1} --host=127.0.0.1 ".format(conn_val[0],
+                                                                  conn_val[1])
         if conn_val[3] is not None:
             self.server2_conn = "{0}--port={1} ".format(self.server2_conn,
                                                         conn_val[3])
-        if conn_val[4] is not None:
-            self.server2_conn = "{0}--socket={1} ".format(self.server2_conn,
-                                                          conn_val[4])
 
         cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
 
