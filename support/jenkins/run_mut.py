@@ -234,10 +234,11 @@ if __name__ == '__main__':
 
     if RUN_COVERAGE:
         with working_path(MUT_HOME):
-            execute("coverage combine")
-            execute("coverage html -i")
-            execute("coverage xml")
-            shutil.move('htmlcov', os.path.join(BUILD_RESULTS, 'coverage'))
+            execute("coverage combine", False)
+            execute("coverage html -i", False)
+            execute("coverage xml", False)
+            if os.path.isdir('htmlcov'):
+                shutil.move('htmlcov', os.path.join(BUILD_RESULTS, 'coverage'))
 
     if exit_status or len(output_parser.failed_tests) > 0:
         sys.exit(1)

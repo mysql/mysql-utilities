@@ -71,14 +71,22 @@ if __name__ == '__main__':
     print("MYSQL_VERSION: {0}".format(MYSQL_VERSION))
 
     # Get oldest bundle
-    with working_path(BUNDLES_HOME):
-        bundle = min(os.listdir(BUNDLES_HOME), key=os.path.getmtime)
+    try:
+        with working_path(BUNDLES_HOME):
+            bundle = min(os.listdir(BUNDLES_HOME), key=os.path.getmtime)
+    except ValueError:
+        print("\n # ERROR: No Bundle files found in '{0}' "
+              "\n".format(BUNDLES_HOME))
+        sys.exit(2)
 
-    m = (re.compile(r'(?:^bzr-)?([^\.]*.[^@]*)@oracle.com\-\d+-([^.]+)\.'
+    m = (re.compile(r'(?:^bzr[-/])?([^\.]*.[^@]*)@oracle.com\-\d+-([^.]+)\.'
                     r'bundle$').match(bundle))
-    if not m:
-        print("# Invalid bundle name '{0}'".format(bundle))
-        sys.exit(1)
+    if not m:  # Might be manually created bundle
+        m = re.compile(r'([^@]+)@oracle.com[-_](.+?)\.bundle').match(bundle)
+        if not m:
+            print("\n #ERROR: Invalid bundle name '{0}'\n".format(bundle))
+            sys.exit(2)
+
     author = m.group(1)
     bname = m.group(2)
     workdir = os.path.join(WORKSPACE, "{0}".format(bname))
@@ -104,7 +112,7 @@ if __name__ == '__main__':
             else:
                 print("# WARNING: Could not find employees db in "
                       "'{0}".format(emp_db_path))
-        # World db only needs to be loaded for compare_db_large teste
+        # World db only needs to be loaded for compare_db_large test
         if (OVERRIDE_MUT_CMD is None or "compare_db_large" in OVERRIDE_MUT_CMD
                 or "--do-tests=compare" in OVERRIDE_MUT_CMD
                 or "--suite=main" in OVERRIDE_MUT_CMD):
@@ -122,7 +130,7 @@ if __name__ == '__main__':
 
     # Get list of tests and create the parser
     if MYSQL_VERSION == "ALL":
-        output_parser = MUTOutputParser(get_mut_test_list(WORKSPACE))
+        output_parser = MUTOutputParser(get_mut_test_list(BRANCH_HOME))
     else:
         output_parser = MUTOutputParser()
 
@@ -271,9 +279,10 @@ if __name__ == '__main__':
 
     if RUN_COVERAGE:
         with working_path(MUT_HOME):
-            execute("coverage combine")
-            execute("coverage html -i")
-            shutil.move('htmlcov', os.path.join(BUILD_RESULTS, 'coverage'))
+            execute("coverage combine", False)
+            execute("coverage html -i", False)
+            if os.path.isdir('htmlcov'):
+                shutil.move('htmlcov', os.path.join(BUILD_RESULTS, 'coverage'))
 
     if exit_status or len(output_parser.failed_tests) > 0:
         sys.exit(1)

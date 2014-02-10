@@ -88,7 +88,8 @@ class MUTOutputParser(object):
     @property
     def skipped_tests(self):
         if self._tests is None:
-            return self._skipped
+            return self._skipped - (self._failed | self._successful |
+                                    IGNORE_TESTS)
         else:
             return self._tests - (self._failed | self._successful |
                                   IGNORE_TESTS)

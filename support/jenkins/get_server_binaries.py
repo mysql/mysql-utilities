@@ -51,28 +51,28 @@ HOSTS = {
 LATEST_GA_LINUX = {
     "5.1.73": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.1.73/dist/"
               "packages/mysql-advanced-5.1.73-linux-x86_64-glibc23.tar.gz",
-    "5.5.35": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.35/dist/"
-              "packages/mysql-advanced-5.5.35-linux2.6-x86_64.tar.gz",
+    "5.5.36": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.36/dist/"
+              "packages/mysql-advanced-5.5.36-linux2.6-x86_64.tar.gz",
     "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/dist/"
                 "packages/mysql-5.6.8-rc-linux2.6-x86_64.tar.gz",
     "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/dist/"
                 "packages/mysql-5.6.9-rc-linux-glibc2.5-x86_64.tar.gz",
-    "5.6.15": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.15/dist/"
-              "packages/mysql-advanced-5.6.15-linux-glibc2.5-x86_64.tar.gz",
+    "5.6.16": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.16/dist/"
+              "packages/mysql-advanced-5.6.16-linux-glibc2.5-x86_64.tar.gz",
 
 }
 
 LATEST_GA_WIN = {
     "5.1.73": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.1.73/dist/"
               "packages/mysql-advanced-noinstall-5.1.73-winx64.zip",
-    "5.5.35": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.35/dist/"
-              "packages/mysql-advanced-5.5.35-winx64.zip",
+    "5.5.36": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.36/dist/"
+              "packages/mysql-advanced-5.5.36-winx64.zip",
     "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/dist/"
                 "packages/mysql-5.6.8-rc-winx64.zip",
     "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/dist/"
                 "packages/mysql-advanced-5.6.9-rc-winx64.zip",
-    "5.6.15": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.15/dist/"
-              "packages/mysql-advanced-5.6.15-winx64.zip",
+    "5.6.16": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.16/dist/"
+              "packages/mysql-advanced-5.6.16-winx64.zip",
 }
 
 
