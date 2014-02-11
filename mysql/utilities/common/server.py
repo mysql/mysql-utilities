@@ -1461,12 +1461,14 @@ class Server(object):
         elif action.lower() == 'enable':
             self.exec_query("SET SQL_LOG_BIN=1")
 
-    def foreign_key_checks_enabled(self):
+    def foreign_key_checks_enabled(self, force=False):
         """Check foreign key status for the connection.
+        force[in]       if True, returns the value directly from the server
+                        instead of returning the cached fkey value
 
         Returns bool - True - foreign keys are enabled
         """
-        if self.fkeys is None:
+        if self.fkeys is None or force:
             res = self.show_server_variable("foreign_key_checks")
             self.fkeys = (res is not None) and (res[0][1] == "ON")
         return self.fkeys
@@ -1477,16 +1479,16 @@ class Server(object):
         disable[in]     if True, turn off foreign key checks
                         elif False turn foreign key checks on.
         """
-        value = None
         if self.fkeys is None:
             self.foreign_key_checks_enabled()
-        if disable and self.fkeys:
-            value = "OFF"
-        elif not self.fkeys:
-            value = "ON"
-        if value is not None:
-            self.exec_query(_FOREIGN_KEY_SET.format(value),
+
+        # Only do something if foreign keys are OFF and shouldn't be disabled
+        # or if they are ON and should be disabled
+        if self.fkeys == disable:
+            val = "OFF" if disable else "ON"
+            self.exec_query(_FOREIGN_KEY_SET.format(val),
                             {'fetch': False, 'commit': False})
+            self.fkeys = not self.fkeys
 
     def autocommit_set(self):
         """Check autocommit status for the connection.

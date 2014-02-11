@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -772,7 +772,12 @@ class Table(object):
                     (new_db, self.q_tbl_name, self.q_db_name, self.q_tbl_name)
         if self.verbose and not self.quiet:
             print query_str
+
+        # Disable foreign key checks to allow data to be copied without running
+        # into foreign key referential integrity issues
+        self.server.disable_foreign_key_checks(True)
         self.server.exec_query(query_str)
+        self.server.disable_foreign_key_checks(False)
 
     def copy_data(self, destination, cloning=False, new_db=None,
                   connections=1):

@@ -875,6 +875,7 @@ class Database(object):
             workers_pool.close()
             # Wait for all task to be completed by workers.
             workers_pool.join()
+
     def get_create_statement(self, db, name, obj_type):
         """Return the create statement for the object
 

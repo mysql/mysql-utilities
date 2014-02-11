@@ -485,10 +485,12 @@ else:
 
         sys.stdout.flush()
 
-        if conn_val["port"] is not None:
-            conn_val["port"] = int(conn_val["port"])
-        else:
-            conn_val["port"] = 0
+        conn_val["port"] = int(conn_val["port"])
+
+        # Remove unix socket from connection dictionary to avoid issue with
+        # tests using the base server. Unix sockets are no longer used by MUT.
+        if "unix_socket" in conn_val:
+            conn_val.pop("unix_socket")
 
         server_options = {
             'conn_info': conn_val,
