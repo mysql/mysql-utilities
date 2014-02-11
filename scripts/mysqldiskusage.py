@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -132,10 +132,21 @@ except UtilError:
     _, e, _ = sys.exc_info()
     parser.error(e.errmsg)
 
-if not os.access(datadir, os.R_OK):
-    print("\nNOTICE: Your user account does not have read access to the "
+# Flag for testing if is a remote server
+is_remote = not servers[0].is_alias("localhost")
+
+# Flag for read access to the datadir
+have_read = True
+
+if is_remote:
+    print("\nWARNING: You are using a remote server and the datadir cannot be "
+          "accessed. Some features may be unavailable.\n")
+    have_read = False
+elif not os.access(datadir, os.R_OK):
+    print("\nWARNING: Your user account does not have read access to the "
           "datadir. Data sizes will be calculated and actual file sizes "
           "may be omitted. Some features may be unavailable.\n")
+    have_read = False
 
 # Set options for database operations.
 options = {
@@ -143,7 +154,8 @@ options = {
     "no_headers": opt.no_headers,
     "verbosity": opt.verbosity,
     "debug": opt.verbosity >= 3,
-    "have_read": os.access(datadir, os.R_OK),
+    "have_read": have_read,
+    "is_remote": is_remote,
     "do_empty": opt.do_empty,
     "do_all": opt.do_all,
     "quiet": opt.quiet

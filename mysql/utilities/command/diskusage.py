@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -215,7 +215,7 @@ def _build_logfile_list(server, log_name, suffix='_file'):
     return None, 0, 0
 
 
-def _get_log_information(server, log_name, suffix='_file'):
+def _get_log_information(server, log_name, suffix='_file', is_remote=False):
     """Get information about a specific log.
 
     This method checks the system variable of the log_name passed to see if
@@ -226,9 +226,15 @@ def _get_log_information(server, log_name, suffix='_file'):
     log_name[in]      Variable name for the log (e.g. slow_query_log)
     suffix[in]        Suffix of log variable name (e.g. slow_query_log_file)
                       default = '_file'
+    is_remote[in]     True is a remote server
 
     returns (tuple) (log files, total size)
     """
+    if is_remote:
+        print("# {0} information not accessible from a remote host."
+              "".format(log_name))
+        return (None, 0,)
+
     res = server.show_server_variable(log_name)
     if res != [] and res[0][1].upper() == 'OFF':
         print "# The %s is turned off on the server." % log_name
@@ -332,7 +338,8 @@ def _build_innodb_list(per_table, folder, datadir, specs, verbosity=0):
 
 
 def _build_db_list(server, rows, include_list, datadir, fmt=False,
-                   have_read=False, verbosity=0, include_empty=True):
+                   have_read=False, verbosity=0, include_empty=True,
+                   is_remote=False):
     """Build a list of all databases and their totals.
 
     This method reads a list of databases and their calculated sizes
@@ -363,6 +370,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
     have_read[in]     If True, user has read access to datadir path
     verbosity[in]     Controls how much data is shown
     include_empty[in] Include empty databases in list
+    is_remote[in]     True is a remote server
 
     return (tuple) (column headers, rows, total size)
     """
@@ -374,7 +382,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
     # build the list
     for row in rows:
         # If user can read the datadir, calculate actual and misc file totals
-        if have_read:
+        if have_read and not is_remote:
             # Encode database name (with strange characters) to the
             # corresponding directory name.
             db_dir = encode(row[0])
@@ -394,7 +402,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
         # Count total for all databases
         total += data_size + misc_files
 
-        if have_read:
+        if have_read and not is_remote:
             if verbosity >= 2:  # get all columns
                 results.append((row[0], dbdir_size, data_size, misc_files,
                                 db_total))
@@ -405,7 +413,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
         else:
             results.append((row[0], db_total))
 
-    if have_read and verbosity > 0:
+    if have_read and not is_remote and verbosity > 0:
         num_cols = min(verbosity + 2, 4)
     else:
         num_cols = 1
@@ -513,6 +521,7 @@ def show_database_usage(server, datadir, dblist, options):
     no_headers = options.get("no_headers", False)
     verbosity = options.get("verbosity", 0)
     have_read = options.get("have_read", False)
+    is_remote = options.get("is_remote", False)
     include_empty = options.get("do_empty", True)
     do_all = options.get("do_all", True)
     quiet = options.get("quiet", False)
@@ -542,7 +551,8 @@ def show_database_usage(server, datadir, dblist, options):
     columns, rows, db_total = _build_db_list(server, res, dblist, datadir,
                                              fmt == "grid",
                                              have_read, verbosity,
-                                             include_empty or do_all)
+                                             include_empty or do_all,
+                                             is_remote)
 
     if not quiet:
         print "# Database totals:"
@@ -567,6 +577,7 @@ def show_logfile_usage(server, options):
     """
     fmt = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
+    is_remote = options.get("is_remote", False)
     quiet = options.get("quiet", False)
 
     if not quiet:
@@ -579,7 +590,8 @@ def show_logfile_usage(server, options):
     ]
     logs = []
     for log_name in _LOG_NAMES:
-        log, size = _get_log_information(server, log_name[0], log_name[1])
+        (log, size,) = _get_log_information(server, log_name[0], log_name[1],
+                                            is_remote)
         if log is not None:
             logs.append((log, size))
         total += size
@@ -665,6 +677,8 @@ def show_log_usage(server, datadir, options):
     return True or raise exception on error
     """
     log_type = options.get("log_type", "binary log")
+    have_read = options.get("have_read", False)
+    is_remote = options.get("is_remote", False)
     quiet = options.get("quiet", False)
 
     # Check privileges to execute required queries: SUPER or REPLICATION CLIENT
@@ -681,7 +695,7 @@ def show_log_usage(server, datadir, options):
             print("# Binary logging is turned off on the server.")
             return True
         # Check required privileges according to the access to the datadir.
-        if os.access(datadir, os.R_OK):
+        if not is_remote and have_read:
             # Requires SUPER or REPLICATION CLIENT to execute:
             # SHOW MASTER STATUS.
             if not has_super and not has_rpl_client:
@@ -711,14 +725,13 @@ def show_log_usage(server, datadir, options):
                   "privilege.".format(log_type.capitalize()))
             return True
         # Can only retrieve usage information from the localhost filesystem.
-        if not os.access(datadir, os.R_OK):
-            if not server.is_alias("localhost"):
-                print("# {0} information not accessible from a remote "
-                      "host.".format(log_type.capitalize()))
-            else:
-                print("# {0} information not accessible. Check your "
-                      "permissions to {1}.".format(log_type.capitalize(),
-                                                   datadir))
+        if is_remote:
+            print("# {0} information not accessible from a remote host."
+                  "".format(log_type.capitalize()))
+            return True
+        elif not have_read:
+            print("# {0} information not accessible. Check your permissions "
+                  "to {1}.".format(log_type.capitalize(), datadir))
             return True
 
     # Check server status and availability of specified log file type.
@@ -749,7 +762,7 @@ def show_log_usage(server, datadir, options):
         print("# {0} information:".format(log_type.capitalize()))
         print("Current {0} file = {1}".format(log_type, current_log))
 
-    if log_type == 'binary log' and not os.access(datadir, os.R_OK):
+    if log_type == 'binary log' and (is_remote or not have_read):
         # Retrieve binlog usage info from SHOW BINARY LOGS.
         try:
             logs = server.exec_query("SHOW BINARY LOGS")
@@ -804,6 +817,7 @@ def show_innodb_usage(server, datadir, options):
     """
     fmt = options.get("format", "grid")
     no_headers = options.get("no_headers", False)
+    is_remote = options.get("is_remote", False)
     verbosity = options.get("verbosity", 0)
     quiet = options.get("quiet", False)
 
@@ -836,7 +850,7 @@ def show_innodb_usage(server, datadir, options):
     else:
         innodb_dir = datadir
 
-    if os.access(innodb_dir, os.R_OK):
+    if not is_remote and os.access(innodb_dir, os.R_OK):
         if not quiet:
             print "# InnoDB tablespace information:"
 
@@ -897,6 +911,8 @@ def show_innodb_usage(server, datadir, options):
                         print "Tablespace %s can be " % tablespace[3] + \
                               "extended by using %s:%sM[...]\n" % \
                               (parts[0], size)
+    elif is_remote:
+        print("# InnoDB data information not accessible from a remote host.")
     else:
         print "# InnoDB data file information is not accessible. " + \
               "Check your permissions."
