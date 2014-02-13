@@ -603,3 +603,582 @@ Test case 14 - compare a database with objects of different types with the same 
 # Database consistency check failed.
 #
 # ...done
+Test case 15 - Test automatically picks up the not nullable unique index (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass    
+# TABLE     nonix_1_simple                          pass    pass    pass    
+# TABLE     nonix_2_nix_2                           pass    pass    pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 16 - real not nullable unique index for a specific table using --use-indexes (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass    
+# TABLE     nonix_1_simple                          pass    pass    pass    
+# TABLE     nonix_2_nix_2                           pass    pass    pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 17 - compare using--use-indexes for two tables (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass    
+# TABLE     nonix_1_simple                          pass    pass    pass    
+# TABLE     nonix_2_nix_2                           pass    pass    pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 18 - using --use-indexes for same table (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass    
+# TABLE     nonix_1_simple                          pass    pass    pass    
+# TABLE     nonix_2_nix_2                           pass    pass    pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 19 - using --use-indexes for same table verbose unique index over primary key (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 5
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_1_nix_2:
+CREATE TABLE `nonix_1_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_1_nix_2:
+CREATE TABLE `nonix_1_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_1_nix_2 the index `uk_nonulls` is used to compare.
+
+# TABLE     nonix_1_simple                          pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_1_simple:
+CREATE TABLE `nonix_1_simple` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonullclmns` (`c6`),
+  KEY `ix_nonull` (`c4`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_1_simple:
+CREATE TABLE `nonix_1_simple` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonullclmns` (`c6`),
+  KEY `ix_nonull` (`c4`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# Warning: Specified index `ix_nonull` for table no_primary_keys.nonix_1_simple cannot be used. It contains at least one column that accepts null values.
+# Warning: Specified index `ix_nonull` for table no_primary_keys.nonix_1_simple cannot be used. It contains at least one column that accepts null values.
+# INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
+
+# TABLE     nonix_2_nix_2                           pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_2_nix_2:
+CREATE TABLE `nonix_2_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c3`,`c4`),
+  UNIQUE KEY `uk2_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c3`,`c4`),
+  KEY `ix_nonulls_2` (`c6`,`c2`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_2_nix_2:
+CREATE TABLE `nonix_2_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c3`,`c4`),
+  UNIQUE KEY `uk2_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c3`,`c4`),
+  KEY `ix_nonulls_2` (`c6`,`c2`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_2_nix_2 the index `uk2_nonulls` is used to compare.
+
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_2_nix_2_pk:
+CREATE TABLE `nonix_2_nix_2_pk` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  PRIMARY KEY (`c2`,`c6`),
+  UNIQUE KEY `uk_nonulls` (`c3`,`c2`),
+  UNIQUE KEY `uk2_nonulls` (`c4`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_2_nix_2_pk:
+CREATE TABLE `nonix_2_nix_2_pk` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  PRIMARY KEY (`c2`,`c6`),
+  UNIQUE KEY `uk_nonulls` (`c3`,`c2`),
+  UNIQUE KEY `uk2_nonulls` (`c4`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_2_nix_2_pk the index `uk2_nonulls` is used to compare.
+
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_`2_nix_`2:
+CREATE TABLE `nonix_``2_nix_``2` (
+  `c``1` int(11) DEFAULT NULL,
+  `c``2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_no``nulls` (`c``2`,`c6`),
+  UNIQUE KEY `ix``_c` (`c``1`,`c``2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_no``nulls` (`c3`,`c4`),
+  KEY `ix_no``nulls_``2` (`c6`,`c``2`),
+  KEY `ix_nulls` (`c``1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_`2_nix_`2:
+CREATE TABLE `nonix_``2_nix_``2` (
+  `c``1` int(11) DEFAULT NULL,
+  `c``2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_no``nulls` (`c``2`,`c6`),
+  UNIQUE KEY `ix``_c` (`c``1`,`c``2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_no``nulls` (`c3`,`c4`),
+  KEY `ix_no``nulls_``2` (`c6`,`c``2`),
+  KEY `ix_nulls` (`c``1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_`2_nix_`2 the index uk_no`nulls is used to compare.
+
+
+# Databases are consistent.
+#
+# ...done
+Test case 20 - using --use-indexes with backticks verbose (No differences)
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+Looking for object types table, view, trigger, procedure, function, and event.
+Object types found common to both databases:
+     FUNCTION : 0
+      TRIGGER : 0
+        TABLE : 5
+        EVENT : 0
+    PROCEDURE : 0
+         VIEW : 0
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_1_nix_2:
+CREATE TABLE `nonix_1_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_1_nix_2:
+CREATE TABLE `nonix_1_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_1_nix_2 the index uk_nonulls is used to compare.
+
+# TABLE     nonix_1_simple                          pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_1_simple:
+CREATE TABLE `nonix_1_simple` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonullclmns` (`c6`),
+  KEY `ix_nonull` (`c4`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_1_simple:
+CREATE TABLE `nonix_1_simple` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonullclmns` (`c6`),
+  KEY `ix_nonull` (`c4`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
+
+# TABLE     nonix_2_nix_2                           pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_2_nix_2:
+CREATE TABLE `nonix_2_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c3`,`c4`),
+  UNIQUE KEY `uk2_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c3`,`c4`),
+  KEY `ix_nonulls_2` (`c6`,`c2`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_2_nix_2:
+CREATE TABLE `nonix_2_nix_2` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_nonulls` (`c3`,`c4`),
+  UNIQUE KEY `uk2_nonulls` (`c2`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c3`,`c4`),
+  KEY `ix_nonulls_2` (`c6`,`c2`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_2_nix_2 the index uk_nonulls is used to compare.
+
+# TABLE     nonix_2_nix_2_pk                        pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_2_nix_2_pk:
+CREATE TABLE `nonix_2_nix_2_pk` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  PRIMARY KEY (`c2`,`c6`),
+  UNIQUE KEY `uk_nonulls` (`c3`,`c2`),
+  UNIQUE KEY `uk2_nonulls` (`c4`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_2_nix_2_pk:
+CREATE TABLE `nonix_2_nix_2_pk` (
+  `c1` int(11) DEFAULT NULL,
+  `c2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  PRIMARY KEY (`c2`,`c6`),
+  UNIQUE KEY `uk_nonulls` (`c3`,`c2`),
+  UNIQUE KEY `uk2_nonulls` (`c4`,`c6`),
+  UNIQUE KEY `ix_c` (`c1`,`c2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_nonulls` (`c4`,`c3`),
+  KEY `ix_nulls` (`c1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_2_nix_2_pk the index PRIMARY is used to compare.
+
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Definition for object no_primary_keys.nonix_`2_nix_`2:
+CREATE TABLE `nonix_``2_nix_``2` (
+  `c``1` int(11) DEFAULT NULL,
+  `c``2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_no``nulls` (`c``2`,`c6`),
+  UNIQUE KEY `ix``_c` (`c``1`,`c``2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_no``nulls` (`c3`,`c4`),
+  KEY `ix_no``nulls_``2` (`c6`,`c``2`),
+  KEY `ix_nulls` (`c``1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+# Definition for object no_primary_keys.nonix_`2_nix_`2:
+CREATE TABLE `nonix_``2_nix_``2` (
+  `c``1` int(11) DEFAULT NULL,
+  `c``2` int(11) NOT NULL,
+  `c3` int(11) NOT NULL,
+  `c4` int(11) NOT NULL,
+  `c5` int(11) DEFAULT NULL,
+  `c6` int(11) NOT NULL,
+  UNIQUE KEY `uk_no``nulls` (`c``2`,`c6`),
+  UNIQUE KEY `ix``_c` (`c``1`,`c``2`),
+  UNIQUE KEY `ix_c2` (`c5`,`c6`),
+  KEY `ix_no``nulls` (`c3`,`c4`),
+  KEY `ix_no``nulls_``2` (`c6`,`c``2`),
+  KEY `ix_nulls` (`c``1`,`c5`),
+  KEY `ix_nynulss` (`c6`,`c5`),
+  KEY `ix_ynnull` (`c5`,`c6`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
+# INFO: for table nonix_`2_nix_`2 the index `uk_no``nulls` is used to compare.
+
+
+# Databases are consistent.
+#
+# ...done
+Test case 21 - using --use-indexes with backticks verbose (Differences) 
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    FAIL    
+#
+
+# Rows in `no_primary_keys`.`nonix_1_nix_2` not in `no_primary_keys`.`nonix_1_nix_2`
++-----+-----+------+-------+--------+---------+
+| c1  | c2  | c3   | c4    | c5     | c6      |
++-----+-----+------+-------+--------+---------+
+| 13  | 43  | 303  | 3003  | 30013  | 300013  |
+| 11  | 21  | 101  | 1001  | 10011  | 100011  |
+| 14  | 54  | 404  | 4004  | 40014  | 400014  |
+| 12  | 32  | 202  | 2002  | 20012  | 200012  |
++-----+-----+------+-------+--------+---------+
+
+# Rows in `no_primary_keys`.`nonix_1_nix_2` not in `no_primary_keys`.`nonix_1_nix_2`
++-----+-----+------+-------+--------+---------+
+| c1  | c2  | c3   | c4    | c5     | c6      |
++-----+-----+------+-------+--------+---------+
+| 3   | 33  | 303  | 3003  | 30003  | 300003  |
+| 4   | 44  | 404  | 4004  | 40004  | 400004  |
+| 2   | 22  | 202  | 2002  | 20002  | 200002  |
+| 1   | 11  | 101  | 1001  | 10001  | 100001  |
++-----+-----+------+-------+--------+---------+
+
+# TABLE     nonix_1_simple                          pass    pass    FAIL    
+#
+# Data differences found among rows:
+--- `no_primary_keys`.`nonix_1_simple`
++++ `no_primary_keys`.`nonix_1_simple`
+@@ -1,8 +1,8 @@
+ +-----+-----+------+-------+--------+---------+
+ | c1  | c2  | c3   | c4    | c5     | c6      |
+ +-----+-----+------+-------+--------+---------+
+-| 12  | 32  | 212  | 2002  | 20012  | 200002  |
+-| 11  | 21  | 111  | 1001  | 10011  | 100001  |
+-| 13  | 43  | 313  | 3003  | 30013  | 300003  |
+-| 14  | 54  | 414  | 4004  | 40014  | 400004  |
++| 2   | 22  | 202  | 2002  | 20002  | 200002  |
++| 1   | 11  | 101  | 1001  | 10001  | 100001  |
++| 3   | 33  | 303  | 3003  | 30003  | 300003  |
++| 4   | 44  | 404  | 4004  | 40004  | 400004  |
+ +-----+-----+------+-------+--------+---------+
+
+# TABLE     nonix_2_nix_2                           pass    pass    pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    FAIL    
+#
+
+# Rows in `no_primary_keys`.`nonix_2_nix_2_pk` not in `no_primary_keys`.`nonix_2_nix_2_pk`
++-----+-----+------+-------+--------+---------+
+| c1  | c2  | c3   | c4    | c5     | c6      |
++-----+-----+------+-------+--------+---------+
+| 13  | 43  | 303  | 3003  | 30013  | 300013  |
+| 11  | 21  | 101  | 1001  | 10011  | 100011  |
+| 14  | 54  | 404  | 4004  | 40014  | 400014  |
+| 12  | 32  | 202  | 2002  | 20012  | 200012  |
++-----+-----+------+-------+--------+---------+
+
+# Rows in `no_primary_keys`.`nonix_2_nix_2_pk` not in `no_primary_keys`.`nonix_2_nix_2_pk`
++-----+-----+------+-------+--------+---------+
+| c1  | c2  | c3   | c4    | c5     | c6      |
++-----+-----+------+-------+--------+---------+
+| 3   | 33  | 303  | 3003  | 30003  | 300003  |
+| 4   | 44  | 404  | 4004  | 40004  | 400004  |
+| 2   | 22  | 202  | 2002  | 20002  | 200002  |
+| 1   | 11  | 101  | 1001  | 10001  | 100001  |
++-----+-----+------+-------+--------+---------+
+
+# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+
+# Database consistency check failed.
+#
+# ...done

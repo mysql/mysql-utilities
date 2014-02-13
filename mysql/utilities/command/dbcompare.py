@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -298,12 +298,13 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     reporter[in]      database compare reporter class instance
     options[in]       options dictionary
 
-    Returns list of errors
+    Returns list of errors debug_msgs
     """
     direction = options.get('changes-for', 'server1')
     reverse = options.get('reverse', False)
 
     errors = []
+    debug_msgs = []
     diff_server1 = []
     diff_server2 = []
     diff_list = []
@@ -313,10 +314,12 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
             # Do the comparison based on direction
             if direction == 'server1' or reverse:
                 diff_server1 = check_consistency(server1, server2,
-                                                 obj1, obj2, options)
+                                                 obj1, obj2, options,
+                                                 diag_msgs=debug_msgs)
             if direction == 'server2' or reverse:
                 diff_server2 = check_consistency(server2, server1,
-                                                 obj2, obj1, options)
+                                                 obj2, obj1, options,
+                                                 diag_msgs=debug_msgs)
 
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
@@ -325,7 +328,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                     (not reverse and direction == 'server2' and
                      diff_server2 is None):
                 reporter.report_state('pass')
-                return errors
+                return errors, debug_msgs
 
             # Build diff list
             new_opts = options.copy()
@@ -344,7 +347,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                 reporter.report_state('FAIL')
                 errors = diff_list
         except UtilError, e:
-            if e.errmsg == "No primary key found.":
+            if e.errmsg.endswith("not have an usable Index or primary key."):
                 reporter.report_state('SKIP')
                 errors.append("# {0}".format(e.errmsg))
             else:
@@ -354,10 +357,11 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                     raise e
                 else:
                     errors.append(e.errmsg)
+
     else:
         reporter.report_state('SKIP')
 
-    return errors
+    return errors, debug_msgs
 
 
 def _check_option_defaults(options):
@@ -448,7 +452,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     # Remaining operations can occur in a loop one for each object.
     for item in in_both:
         error_list = []
-
+        debug_msgs = []
         # Set the object type
         obj_type = item[0]
 
@@ -477,8 +481,9 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
         # Check data consistency for tables
         if obj_type == 'TABLE':
-            errors = _check_data_consistency(server1, server2, q_obj1, q_obj2,
-                                             reporter, options)
+            errors, debug_msgs = _check_data_consistency(server1, server2,
+                                                         q_obj1, q_obj2,
+                                                         reporter, options)
             if len(errors) != 0:
                 error_list.extend(errors)
         else:
@@ -486,8 +491,11 @@ def database_compare(server1_val, server2_val, db1, db2, options):
 
         if options['verbosity'] > 0:
             print
-            get_create_object(server1, obj1, options, obj_type)
-            get_create_object(server2, obj2, options, obj_type)
+            get_create_object(server1, q_obj1, options, obj_type)
+            get_create_object(server2, q_obj2, options, obj_type)
+
+        if debug_msgs and options['verbosity'] > 2:
+            reporter.report_errors(debug_msgs)
 
         reporter.report_errors(error_list)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,8 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             add_character_set_option,
                                             setup_common_options)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
-                                                  remove_backtick_quoting)
+                                                  remove_backtick_quoting,
+                                                  quote_with_backticks)
 
 
 # Constants
@@ -127,13 +128,20 @@ parser.add_option("--disable-binary-logging", action="store_true",
                   "Prevents compare operations from being written to the "
                   "binary log.")
 
-# turn off binlog mode
+# add the span key option
 parser.add_option(
     "--span-key-size", action="store", default=DEFAULT_SPAN_KEY_SIZE,
     type="int", dest="span_key_size", help="changes the size of the key used"
     " for compare table contents. A higher value can help to get more "
     "accurate results comparing large databases, but may slow the algorithm."
     " Default value is {0}.".format(DEFAULT_SPAN_KEY_SIZE)
+)
+
+# add the use indexes option
+parser.add_option(
+    "--use-indexes", action="store", type="string", default='',
+    dest="use_indexes", help="for each table, indicate which index to use as "
+    "if were a primary key (each of his columns must not allow null values)."
 )
 
 # Add verbosity and quiet (silent) mode
@@ -154,6 +162,26 @@ opt, args = parser.parse_args()
 # Warn if quiet and verbosity are both specified
 check_verbosity(opt)
 
+# check unique keys
+ukey_regexp = re.compile(r'(?:(?:;){{0,1}}{0}\.{0})'
+                         ''.format(REGEXP_OBJ_NAME))
+
+db_idxes_l = None
+
+# Split the table names considering backtick quotes
+if opt.use_indexes:
+    grp = ukey_regexp.findall(opt.use_indexes)
+    if not grp:
+        parser.error("Can't parse the specified --use-indexes argument {0}"
+                     "".format(opt.use_indexes))
+    db_idxes_l = []
+    for table, index in grp:
+        table_uc = (table if is_quoted_with_backticks(table)
+                    else quote_with_backticks(table))
+        index_uc = (index if is_quoted_with_backticks(index)
+                    else quote_with_backticks(index))
+        db_idxes_l.append((table_uc, index_uc))
+
 # Set options for database operations.
 options = {
     "quiet": opt.quiet,
@@ -172,6 +200,7 @@ options = {
     "span_key_size": opt.span_key_size,
     "skip_table_opts": opt.skip_tbl_opts,
     "charset": opt.charset,
+    "use_indexes": db_idxes_l,
 }
 
 # Parse server connection values
@@ -198,7 +227,6 @@ if opt.server2:
 # Check for arguments
 if len(args) == 0:
     parser.error(PARSE_ERR_DB_MISSING_CMP)
-
 
 if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
     parser.error(

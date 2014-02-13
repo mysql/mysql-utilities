@@ -76,11 +76,12 @@ class Index(object):
         self.columns = []
         self.table = index_tuple[0]
         self.q_table = quote_with_backticks(index_tuple[0])
-        self.unique = not index_tuple[1]
+        self.unique = not int(index_tuple[1])
         self.name = index_tuple[2]
         self.q_name = quote_with_backticks(index_tuple[2])
         col = (index_tuple[4], index_tuple[7])
         self.columns.append(col)
+        self.accept_nulls = True if index_tuple[9] else False
         self.type = index_tuple[10]
         self.compared = False                    # mark as compared for speed
         self.duplicate_of = None                 # saves duplicate index
@@ -193,16 +194,19 @@ class Index(object):
         # Pass previous verification; contains all the columns of given index.
         return True
 
-    def add_column(self, column, sub_part):
+    def add_column(self, column, sub_part, accept_null):
         """Add a column to the list of columns for this index
 
         column[in]         Column to add
         sub_part[in]       Sub part of colunm e.g. a(20)
+        accept_null[in]       True to indicate the column accepts nulls
         """
 
         col = (column, sub_part)
         if sub_part > 0:
             self.column_subparts = True
+        if accept_null:
+            self.accept_nulls = True
         self.columns.append(col)
 
     def get_drop_statement(self):
@@ -353,7 +357,9 @@ class Table(object):
         self.blob_columns = []
         self.column_format = None
         self.column_names = []
+        self.column_name_type = []
         self.q_column_names = []
+        self.indexes_q_names = []
         if options.get('get_cols', False):
             self.get_column_metadata()
         self.dest_vals = None
@@ -453,12 +459,74 @@ class Table(object):
         if self.column_format is None:
             self.column_names = []
             self.q_column_names = []
-            rows = self.server.exec_query("explain %s" % self.q_table)
+            rows = self.server.exec_query("explain {0}".format(self.q_table))
             for row in rows:
                 self.column_names.append(row[0])
                 self.q_column_names.append(quote_with_backticks(row[0]))
 
         return self.q_column_names if quote_backticks else self.column_names
+
+    def get_col_names_types(self, quote_backticks=False):
+        """Get a list of tuples of column name and type.
+
+        quote_backticks[in]    If True the column name will be quoted with
+                               backticks. Default is False.
+
+        Return (list) of touple (column name, type)
+        """
+
+        self.column_name_type = []
+        rows = self.server.exec_query("explain {0}".format(self.q_table))
+        for row in rows:
+            if quote_backticks:
+                self.column_name_type.append(
+                    [quote_with_backticks(row[0])] + list(row[1:])
+                )
+            else:
+                self.column_name_type.append(row)
+
+        return self.column_name_type
+
+    def has_index(self, index_q_name):
+        """A method to determine if this table has a determinate index using
+        his name.
+
+        index_q_name[in]    the name of the index (must be quoted).
+
+        returns True if this Table has an index with the given name, otherwise
+        false.
+        """
+        if [idx_q_name for idx_q_name in self.indexes_q_names
+            if idx_q_name == index_q_name]:
+            return True
+        return False
+
+    def get_not_null_unique_indexes(self):
+        """get all the unique indexes which columns does not accepts null
+        values.
+
+        Note: You must call get_indexes() prior to calling this method.
+        Returns (list) indexes
+        """
+        no_null_idxes = []
+        no_null_idxes.extend(
+            [idx for idx in self.btree_indexes if not idx.accept_nulls and
+             idx.unique]
+        )
+        no_null_idxes.extend(
+            [idx for idx in self.hash_indexes if not idx.accept_nulls and
+             idx.unique]
+        )
+        no_null_idxes.extend(
+            [idx for idx in self.rtree_indexes if not idx.accept_nulls and
+             idx.unique]
+        )
+        no_null_idxes.extend(
+            [idx for idx in self.fulltext_indexes if not idx.accept_nulls and
+             idx.unique]
+        )
+        return no_null_idxes
+
 
     def _build_update_blob(self, row, new_db, name, blob_col):
         """Build an UPDATE statement to update blob fields.
@@ -1004,7 +1072,7 @@ class Table(object):
         """
         pri_idx = []
 
-        rows = self.server.exec_query("EXPLAIN " + self.q_table)
+        rows = self.server.exec_query("EXPLAIN {0}".format(self.q_table))
 
         # Return False if no indexes found.
         if not rows:
@@ -1018,6 +1086,23 @@ class Table(object):
 
         return pri_idx
 
+    def get_column_explanation(self, column_name):
+        """Retrieve the explain description for the given column.
+        """
+        column_exp = []
+
+        rows = self.server.exec_query("EXPLAIN {0}".format(self.q_table))
+
+        # Return False if no indexes found.
+        if not rows:
+            return column_exp
+
+        for row in rows:
+            if row[0] == column_name:
+                column_exp.append(row)
+
+        return column_exp
+
     def get_indexes(self):
         """Retrieve the indexes from the server and load them into lists
         based on type.
@@ -1029,6 +1114,7 @@ class Table(object):
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
+        self.indexes_q_names = []
 
         if self.verbose:
             print "# Getting indexes for %s" % (self.table)
@@ -1052,7 +1138,8 @@ class Table(object):
                 else:
                     self.__append(self.fulltext_indexes, idx)
             elif idx:
-                idx.add_column(row[4], row[7])
+                idx.add_column(row[4], row[7], row[9])
+            self.indexes_q_names.append(quote_with_backticks(row[2]))
         return True
 
     def check_indexes(self, show_drops=False):

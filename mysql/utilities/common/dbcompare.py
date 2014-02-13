@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -90,6 +90,13 @@ _COMPARE_SPAN_QUERY = """
     SELECT * FROM {db}.{table} WHERE {where}
 """
 
+_ERROR_NO_PRI_KEY = ("The table {tb} does not have an usable Index or "
+                     "primary key.")
+
+_WARNING_INDEX_NOT_USABLE = ("# Warning: Specified index {idx} for table {tb}"
+                             " cannot be used. It contains at least one "
+                             "column that accepts null values.")
+
 _RE_EMPTY_ALTER_TABLE = "^ALTER TABLE {0};$".format(REGEXP_QUALIFIED_OBJ_NAME)
 
 
@@ -149,7 +156,9 @@ def get_create_object(server, object_name, options, object_type):
     create_stmt = db.get_create_statement(obj[0], obj[1], object_type)
 
     if verbosity > 0 and not quiet:
-        print "\n# Definition for object {0}:".format(object_name)
+        print("\n# Definition for object {0}.{1}:"
+              "".format(remove_backtick_quoting(db_name),
+                        remove_backtick_quoting(obj_name)))
         print create_stmt
 
     return create_stmt
@@ -718,7 +727,7 @@ def _get_compare_objects(index_cols, table1,
     return (table, index_str)
 
 
-def _setup_compare(table1, table2, span_key_size):
+def _setup_compare(table1, table2, span_key_size, use_indexes=None):
     """Create and populate the compare summary tables
 
     This method creates the condensed hash table used to compare groups
@@ -730,23 +739,105 @@ def _setup_compare(table1, table2, span_key_size):
     the keys are the same (have the same columns). An error is raised if
     neither of these are met.
 
-    table1[in]        table1 Table instance
-    table2[in]        table2 Table instance
-    span_key_size[in] the size of key used for the hash.
+    table1[in]            table1 Table instance
+    table2[in]            table2 Table instance
+    span_key_size[in]     the size of key used for the hash.
+    use_indexes[in]       a tuple of the indexes names that can be used as
+                          an unique key, (for_table_1, for_table_2), they will
+                          be tested for columns that not accept null.
+    diag_msgs[out]       a list of debug and warning messages.
 
-    Returns tuple - string representations of the primary index columns
+    Returns four-tuple - string representations of the primary index columns,
+    the index_columns, the index name used and diagnostic messages.
     """
+
+    def get_column_names_types_for_index(index, table):
+        """Useful method to get the columns name and type used by an index
+        """
+        tb_columns = table.get_col_names_types()
+        table_idx = [col_row for column in index.columns
+                     for col_row in tb_columns if column[0] == col_row[0]]
+        return table_idx
+
+    def find_candidate_indexes(candidate_idexes, no_null_idxes_tb,
+                                    table_name, diag_msgs):
+        """This method search the user's candidate indexes in the given list
+        of unique indexes with no null columns. Table name is user to
+        create the warning message if the candidate index has a column that
+        accepts null values.
+        """
+        indexs_found = []
+        for cte_index in candidate_idexes:
+            for no_null_idx in no_null_idxes_tb:
+                if no_null_idx.q_name == cte_index:
+                    indexs_found.append((no_null_idx.q_name, no_null_idx))
+                    break
+            else:
+                diag_msgs.append(
+                    _WARNING_INDEX_NOT_USABLE.format(
+                        idx=cte_index, tb=table_name)
+                )
+        return indexs_found
+
+    diag_msgs = []
     server1 = table1.server
     server2 = table2.server
 
-    # Get the primary key for the tables and make sure they are the same
-    table1_idx = table1.get_primary_index()
+    # get not nullable indexes for tables
+    table1.get_indexes()
+    table2.get_indexes()
+    no_null_idxes_tb1 = table1.get_not_null_unique_indexes()
+    no_null_idxes_tb2 = table2.get_not_null_unique_indexes()
 
-    table2_idx = table2.get_primary_index()
+    # if table does not have non nullable unique keys, do not continue.
+    if not no_null_idxes_tb1 or not no_null_idxes_tb2:
+        raise UtilError(_ERROR_NO_PRI_KEY.format(tb=table1.tbl_name))
+
+    table1_idx = []
+    table2_idx = []
+    # If user specified indexes with --use-indexes
+    if use_indexes:
+        candidate_idxs_tb1, candidate_idxs_tb2 = use_indexes
+        # Check if indexes exist,
+        for cte_idx in candidate_idxs_tb1:
+            if not table1.has_index(cte_idx):
+                raise UtilError("The specified index {0} was not found in "
+                                "table {1}".format(cte_idx, table1.table))
+        for cte_idx in candidate_idxs_tb2:
+            if not table2.has_index(cte_idx):
+                raise UtilError("The specified index {0} was not found in "
+                                "table {1}".format(cte_idx, table2.table))
+
+        # Find the user index specified with --use-indexes
+        unique_indexes_tb1 = find_candidate_indexes(
+            candidate_idxs_tb1, no_null_idxes_tb1, table1.table, diag_msgs)
+
+        unique_indexes_tb2 = find_candidate_indexes(
+            candidate_idxs_tb2, no_null_idxes_tb2, table1.table, diag_msgs)
+
+        if unique_indexes_tb1:
+            table1_idx_name = unique_indexes_tb1[0][0]
+            table1_idx = get_column_names_types_for_index(
+                unique_indexes_tb1[0][1],
+                table1
+            )
+        if unique_indexes_tb2:
+            table2_idx = get_column_names_types_for_index(
+                unique_indexes_tb2[0][1],
+                table2
+            )
+
+    # If no user defined index or accepts nulls, use first unique not nullable
+    if not table1_idx:
+        table1_idx_name = no_null_idxes_tb1[0].name
+        table1_idx = get_column_names_types_for_index(no_null_idxes_tb1[0],
+                                                      table1)
+    if not table2_idx:
+        table2_idx = get_column_names_types_for_index(no_null_idxes_tb2[0],
+                                                      table2)
+
     if len(table1_idx) != len(table2_idx):
         raise UtilError("Indexes are not the same.")
-    elif table1_idx == [] or table2_idx == []:
-        raise UtilError("No primary key found.")
 
     # drop the temporary tables
     _drop_compare_object(server1, table1.db_name, table1.tbl_name)
@@ -765,7 +856,7 @@ def _setup_compare(table1, table2, span_key_size):
     server1.exec_query(tbl1_table)
     server2.exec_query(tbl2_table)
 
-    return (pri_idx1, pri_idx2)
+    return (pri_idx1, pri_idx2, table1_idx, table1_idx_name, diag_msgs)
 
 
 def _make_sum_rows(table, idx_str, span_key_size=8):
@@ -809,7 +900,7 @@ def _make_sum_rows(table, idx_str, span_key_size=8):
     return res
 
 
-def _get_rows_span(table, span):
+def _get_rows_span(table, span, index):
     """Get the rows corresponding to a list of span values
 
     This method returns the rows from the original table that match the
@@ -836,11 +927,10 @@ def _get_rows_span(table, span):
             _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                  span=row))
         pk = res1[0][2:len(res1[0]) - 1]
-        pkeys = [quote_with_backticks(col[0])
-                 for col in table.get_primary_index()]
+        ukeys = [col[0] for col in index]
         where_clause = ' AND '.join("{0} = '{1}'".
                                     format(key, col)
-                                    for key, col in zip(pkeys, pk))
+                                    for key, col in zip(ukeys, pk))
         res2 = server.exec_query(
             _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
                                        table=table.q_tbl_name,
@@ -877,7 +967,7 @@ def _get_formatted_rows(rows, table, fmt='GRID'):
 
 
 def check_consistency(server1, server2, table1_name, table2_name,
-                      options=None):
+                      options=None, diag_msgs=None):
     """Check the data consistency of two tables
 
     This method performs a comparison of the data in two tables.
@@ -943,6 +1033,10 @@ def check_consistency(server1, server2, table1_name, table2_name,
     options[in]       dictionary of options for the operation containing
                         'format'    : format for output of missing rows
                         'difftype'  : type of difference to show
+                        'unique_key': column name for pseudo-key
+    diag_msgs[out]    a list of diagnostic and warning messages.
+
+    Returns tuple - string representations of the primary index columns
 
     Returns None = data is consistent
             list of differences - data is not consistent
@@ -952,6 +1046,22 @@ def check_consistency(server1, server2, table1_name, table2_name,
     fmt = options.get('format', 'GRID')
     difftype = options.get('difftype', 'unified')
     span_key_size = options.get('span_key_size', DEFAULT_SPAN_KEY_SIZE)
+    use_indexes = options.get('use_indexes', None)
+
+    # if given get the unique_key for table_name
+    table1_use_indexes = []
+    if use_indexes:
+        table1_use_indexes.extend(
+            [u_key for tb_name, u_key in use_indexes
+             if table1_name.endswith(".{0}".format(tb_name))]
+        )
+    table2_use_indexes = []
+    if use_indexes:
+        table2_use_indexes.extend(
+            [u_key for tb_name, u_key in use_indexes
+             if table2_name.endswith(".{0}".format(tb_name))]
+        )
+
     if options.get('toggle_binlog', 'False'):
         binlog_server1 = server1.binlog_enabled()
         if binlog_server1:
@@ -973,7 +1083,17 @@ def check_consistency(server1, server2, table1_name, table2_name,
     table2 = Table(server2, table2_name)
 
     # Setup the comparative tables and calculate the hashes
-    pri_idx_str1, pri_idx_str2 = _setup_compare(table1, table2, span_key_size)
+    pri_idx_str1, pri_idx_str2, used_index, used_index_name, msgs = (
+        _setup_compare(table1, table2,
+                       span_key_size,
+                       use_indexes=(table2_use_indexes, table2_use_indexes))
+    )
+
+    # Add warnings to print them later.
+    if diag_msgs is not None and isinstance(diag_msgs, list):
+        diag_msgs.extend(msgs)
+        diag_msgs.append("# INFO: for table {0} the index {1} is used to "
+                         "compare.".format(table1.tbl_name, used_index_name))
 
     # Populate the compare tables and retrieve rows from each table
     tbl1_hash = _make_sum_rows(table1, pri_idx_str1, span_key_size)
@@ -1002,8 +1122,8 @@ def check_consistency(server1, server2, table1_name, table2_name,
 
         if len(changed_rows) > 0:
             data_diffs.append("# Data differences found among rows:")
-            tbl1_rows = _get_rows_span(table1, changed_rows)
-            tbl2_rows = _get_rows_span(table2, changed_rows)
+            tbl1_rows = _get_rows_span(table1, changed_rows, used_index)
+            tbl2_rows = _get_rows_span(table2, changed_rows, used_index)
             if difftype == 'sql':
                 data_diffs.extend(transform_data(table1, table2, "UPDATE",
                                                  (tbl1_rows, tbl2_rows)))
@@ -1016,7 +1136,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
                     data_diffs.extend(diff_str)
 
         if len(extra1) > 0:
-            rows = _get_rows_span(table1, extra1)
+            rows = _get_rows_span(table1, extra1, used_index)
             if difftype == 'sql':
                 data_diffs.extend(transform_data(table1, table2,
                                                  "DELETE", rows))
@@ -1027,7 +1147,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
                 data_diffs.extend(res)
 
         if len(extra2) > 0:
-            rows = _get_rows_span(table2, extra2)
+            rows = _get_rows_span(table2, extra2, used_index)
             if difftype == 'sql':
                 data_diffs.extend(transform_data(table1, table2,
                                                  "INSERT", rows))

@@ -40,7 +40,11 @@ Test case 9 - No pri key
 # ------------------------------------------------------------------------- 
 # TABLE     box                                     pass    pass    SKIP    
 #
-# No primary key found.
+# The table box does not have an usable Index or primary key.
+
+# TABLE     box_2                                   pass    pass    SKIP    
+#
+# The table box_2 does not have an usable Index or primary key.
 
 
 # Database consistency check failed.
@@ -49,3 +53,31 @@ Test case 9 - No pri key
 Test case 10 - Invalid --character-set
 # server1 on localhost: ... ERROR: Cannot connect to the server1 server.
 Error Character set 'unsupported_charset' unsupported.
+Test case 11 - Invalid --use-indexes and different indexes
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     box                                     SKIP    pass    SKIP    
+#
+# The table box does not have an usable Index or primary key.
+
+# TABLE     box_2                                   SKIP    pass    SKIP    
+#
+# The table box_2 does not have an usable Index or primary key.
+
+# TABLE     box_3                                   SKIP    pass    FAIL    
+#
+The specified index `invalid_index` was not found in table inventory.box_3
+
+# TABLE     box_4                                   SKIP    pass    FAIL    
+#
+Indexes are not the same.
+
+
+# Database consistency check failed.
+#
+# ...done

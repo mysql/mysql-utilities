@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,23 +48,20 @@ class test(mutlib.System_test):
                                   "{0}".format(err.errmsg))
         self.server2 = self.servers.get_server(1)
         self.drop_all()
-        data_file = os.path.normpath("./std_data/db_compare_test.sql")
-        try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
-            res = self.server2.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file"
-                              " {0}: {1}".format(data_file, err.errmsg))
 
-        # Create backtick database (with weird names)
-        data_file_backticks = os.path.normpath(
-            "./std_data/db_compare_backtick.sql")
-        try:
-            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
-            self.server2.read_and_exec_SQL(data_file_backticks, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file {0}: "
-                              "{1}".format(data_file_backticks, err.errmsg))
+        # load SQL source files
+        data_files = [
+            os.path.normpath("./std_data/db_compare_test.sql"),
+            os.path.normpath("./std_data/db_compare_backtick.sql"),
+            os.path.normpath("./std_data/db_compare_use_indexes.sql")
+        ]
+        for data_file in data_files:
+            try:
+                res = self.server1.read_and_exec_SQL(data_file, self.debug)
+                res = self.server2.read_and_exec_SQL(data_file, self.debug)
+            except UtilError as err:
+                raise MUTLibError("Failed to read commands from file"
+                                  " {0}: {1}".format(data_file, err.errmsg))
 
         # Add some data to server1 to change AUTO_INCREMENT value.
         try:
@@ -75,6 +72,21 @@ class test(mutlib.System_test):
         except UtilError as err:
             raise MUTLibError("Failed to insert data on server1: "
                               "{0}".format(err.errmsg))
+
+        # insert values to no_primary_keys
+        db = 'no_primary_keys'
+        for server in [self.server1, self.server2]:
+            for tb in ['nonix_1_simple',
+                       'nonix_1_nix_2',
+                       'nonix_2_nix_2',
+                       'nonix_2_nix_2_pk']:
+                for n in range(1, 5):
+                    server.exec_query(
+                        "INSERT INTO {db}.{tb} (c1, c2, c3, c4, c5, c6)"
+                        " VALUES ({v}, {v}{v}, {v}0{v}, {v}00{v},"
+                        " {v}000{v}, {v}0000{v});".format(db=db, tb=tb, v=n))
+                server.exec_query(
+                        "select * from {db}.{tb}".format(db=db, tb=tb,))
 
         return True
 
@@ -124,6 +136,34 @@ class test(mutlib.System_test):
                                           "WHERE cost = 10.00 AND "
                                           "type = 'cleaning'")
         except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+
+    def alter_data_2(self):
+        try:
+            # Now do some alterations...
+            res = self.server1.exec_query("USE no_primary_keys")
+            res = self.server1.exec_query(
+                "UPDATE nonix_1_simple "
+                "SET c1 = c1 + 10, c2 = c2 + 10, c3 = c3 + 10, c5 = c5 + 10"
+            )
+            res = self.server1.exec_query(
+                "UPDATE nonix_1_nix_2 "
+                "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
+            )
+            res = self.server1.exec_query(
+                "UPDATE `nonix_``2_nix_``2` "
+                "SET `c``1` = `c``1` + 10, c3 = c3 + 10, c4 = c4 + 10, "
+                "c5 = c5 + 10"
+            )
+            res = self.server1.exec_query(
+                "UPDATE nonix_2_nix_2_pk "
+                "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
+            )
+
+        except UtilError as err:
+            print("Failed to execute query: "
+                              "{0}".format(err.errmsg))
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
@@ -300,6 +340,111 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Tests for tables with no primary keys but with unique indexes 
+        # nullable and not nullable columns
+
+        # Test automatically pick up the not nullable unique indexes
+        # Note: All previews test had primary keys.
+        cmd_arg = ("no_primary_keys -a")
+        test_num += 1
+        comment = ("Test case {0} - Test automatically picks up the not "
+                   "nullable unique index (No differences)".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test given a real not nullable unique index for a specific table
+        # using --use-indexes, unique key with one column
+        cmd_arg = ("no_primary_keys "
+                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a ")
+        test_num += 1
+        comment = ("Test case {0} - real not nullable unique index for a "
+                   "specific table using --use-indexes "
+                   "(No differences)".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test given a real not nullable index for a specific table
+        # using --use-indexes for two tables, unique keys with 2 columns
+        cmd_arg = ('no_primary_keys '
+                   '--use-indexes="nonix_1_nix_2.uk_nonulls;'
+                   'nonix_2_nix_2.uk2_nonulls" -a')
+        test_num += 1
+        comment = ("Test case {0} - compare using--use-indexes for two tables "
+                   "(No differences)".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test given a real not nullable index for a specific table
+        # using --use-indexes for same table and other for dif table
+        cmd_arg = ('no_primary_keys '
+                   '--use-indexes="nonix_2_nix_2.uk2_nonulls;'
+                   'nonix_2_nix_2.uk_nonulls;'
+                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a')
+        test_num += 1
+        comment = ("Test case {0} - using --use-indexes for same table "
+                   "(No differences)".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test given a real not nullable index for a specific table
+        # using --use-indexes for same table and other for dif table vvv
+        cmd_arg = (
+            'no_primary_keys --use-indexes="nonix_2_nix_2.uk2_nonulls;'
+            'nonix_2_nix_2.uk_nonulls;nonix_1_nix_2.uk_nonulls;'
+            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv'
+        )
+        test_num += 1
+        comment = ("Test case {0} - using --use-indexes for same table "
+                   "verbose unique index over primary key (No differences)"
+                   "").format(test_num)
+        cmd = ("mysqldbcompare.py {0} {1} {2}"
+               "").format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test given a real not nullable index for a specific table
+        # using --use-indexes with backticks verbose debug
+        if os.name == 'posix':
+            cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
+                       "`uk_no``nulls`' -a -vvv")
+        else:
+            cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
+                       '`uk_no``nulls`" -a -vvv')
+        test_num += 1
+        comment = ("Test case {0} - using --use-indexes with backticks "
+                   "verbose (No differences)".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.alter_data_2()
+
+        # Test given a nullable index for a specific table
+        # using --use-indexes with backticks and Differences
+        if os.name == 'posix':
+            cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
+                       "`uk_no``nulls`' -a")
+        else:
+            cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
+                       '`uk_no``nulls`" -a')
+        test_num += 1
+        comment = ("Test case {0} - using --use-indexes with backticks "
+                   "verbose (Differences) ".format(test_num))
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True
@@ -337,6 +482,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, 'db_diff_test')
         self.drop_db(self.server1, "empty_db")
         self.drop_db(self.server2, "empty_db")
+        self.drop_db(self.server1, "no_primary_keys")
+        self.drop_db(self.server2, "no_primary_keys")
         return True
 
     def cleanup(self):

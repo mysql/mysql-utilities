@@ -128,10 +128,21 @@ class test(compare_db.test):
         self.server1.exec_query("CREATE TABLE inventory.box (a int) "
                                 "ENGINE=INNODB")
         self.server1.exec_query("INSERT INTO inventory.box VALUES (1)")
+        #index with nullable collumn
+        self.server1.exec_query("CREATE TABLE inventory.box_2 "
+                                "(a int, b int, INDEX `ix_nullable` (`a`)) "
+                                "ENGINE=INNODB")
+        self.server1.exec_query("INSERT INTO inventory.box_2 VALUES (1, 2)")
         self.server2.exec_query("CREATE DATABASE inventory")
         self.server2.exec_query("CREATE TABLE inventory.box (a int) "
                                 "ENGINE=INNODB")
         self.server2.exec_query("INSERT INTO inventory.box VALUES (2)")
+        #index with nullable collumn
+        self.server2.exec_query("CREATE TABLE inventory.box_2 "
+                                "(a int, b int, INDEX `ix_nullable` (`a`)) "
+                                "ENGINE=INNODB")
+        self.server2.exec_query("INSERT INTO inventory.box_2 VALUES (2, 1)")
+        
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
                    "".format(s1_conn, s2_conn, "inventory:inventory -a"))
@@ -146,6 +157,42 @@ class test(compare_db.test):
                    "".format(s1_conn, s2_conn, "inventory:inventory -a"))
         comment = ("Test case {0} - Invalid --character-set"
                    "".format(test_num, cmd_opts))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        #invalid index
+        self.server1.exec_query("CREATE TABLE inventory.box_3 "
+                                "(a int not null, b int, "
+                                "UNIQUE `uk_nonull` (`a`))ENGINE=INNODB")
+        self.server1.exec_query("INSERT INTO inventory.box_3 VALUES (2, 1)")
+        #invalid index
+        self.server2.exec_query("CREATE TABLE inventory.box_3 "
+                                "(a int not null, b int, UNIQUE "
+                                "`uk_nonull` (`a`)) ENGINE=INNODB")
+        self.server2.exec_query("INSERT INTO inventory.box_3 VALUES (2, 1)")
+
+        #different index
+        self.server1.exec_query("CREATE TABLE inventory.box_4 "
+            "(a int not null, b int, c int, d int not null, "
+            "UNIQUE `uk_nonull` (`d`), INDEX `ix_nonull` (`a`))ENGINE=INNODB"
+        )
+        self.server1.exec_query("INSERT INTO inventory.box_4 VALUES "
+                                "(1, 2, 3, 4)")
+        #different index
+        self.server2.exec_query("CREATE TABLE inventory.box_4 "
+            "(a int not null, b int not null, c int, d int not null, UNIQUE "
+            "`uk_nonull` (`a`, `b`)) ENGINE=INNODB"
+        )
+        self.server2.exec_query("INSERT INTO inventory.box_4 VALUES "
+                                "(2, 1, 4, 3)")
+
+        test_num += 1
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+                   "--use-indexes=box_3.invalid_index --skip-diff"
+                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+        comment = ("Test case {0} - Invalid --use-indexes and different "
+                   "indexes".format(test_num, cmd_opts))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

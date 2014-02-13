@@ -41,6 +41,10 @@ Options:
                         contents. A higher value can help to get more accurate
                         results comparing large databases, but may slow the
                         algorithm. Default value is 8.
+  --use-indexes=USE_INDEXES
+                        for each table, indicate which index to use as if were
+                        a primary key (each of his columns must not allow null
+                        values).
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
@@ -1468,6 +1472,9 @@ CREATE TABLE `supplier` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
 #
+# INFO: for table supplier the index PRIMARY is used to compare.
+
+#
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
@@ -1507,6 +1514,9 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+#
+# INFO: for table supplies the index PRIMARY is used to compare.
 
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
@@ -1582,6 +1592,9 @@ CREATE TABLE `supplier` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
 #
+# INFO: for table supplier the index PRIMARY is used to compare.
+
+#
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
@@ -1621,6 +1634,9 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+#
+# INFO: for table supplies the index PRIMARY is used to compare.
 
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
@@ -1696,6 +1712,9 @@ CREATE TABLE `supplier` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
 #
+# INFO: for table supplier the index PRIMARY is used to compare.
+
+#
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
 # Data differences found among rows:
@@ -1735,6 +1754,9 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+#
+# INFO: for table supplies the index PRIMARY is used to compare.
 
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
