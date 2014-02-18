@@ -1555,6 +1555,10 @@ class Database(object):
         if not options.get('skip_events', False):
             priv_tuple = (self.db_name, "EVENT")
             source_privs.append(priv_tuple)
+        # if triggers, we need trigger
+        if not options.get('skip_triggers', False):
+            priv_tuple = (self.db_name, "TRIGGER")
+            source_privs.append(priv_tuple)
 
         # Check permissions on source
         for priv in source_privs:
@@ -1567,7 +1571,8 @@ class Database(object):
 
         return True
 
-    def check_write_access(self, user, host, options):
+    def check_write_access(self, user, host, options, source_objects=None,
+                           do_drop=False):
         """Check access levels for creating and writing database objects
 
         This method will check the user's permission levels for copying a
@@ -1584,18 +1589,128 @@ class Database(object):
             skip_func      True = no functions processed
             skip_grants    True = no grants processed
             skip_events    True = no events processed
-
+        source_objects[in] Dictionary containing the list of objects from
+                           source database
+        do_drop[in]        True if the user is using --drop-first option
 
         Returns True if user has permissions and raises a UtilDBError if the
                      user does not have permission with a message that includes
                      the server context.
         """
+        if source_objects is None:
+            source_objects = {}
 
         dest_privs = [(self.db_name, "CREATE"),
-                      (self.db_name, "SUPER"),
-                      ("*", "SUPER")]
+                      (self.db_name, "ALTER"),
+                      (self.db_name, "SELECT"),
+                      (self.db_name, "INSERT"),
+                      (self.db_name, "UPDATE"),
+                      (self.db_name, "LOCK TABLES")]
+
+        # Check for the --drop-first
+        if do_drop:
+            dest_privs.append((self.db_name, "DROP"))
+
+        extra_privs = []
+        super_needed = False
+
+        try:
+            res = self.source.exec_query("SELECT CURRENT_USER()")
+            dest_user = res[0][0]
+        except UtilError as err:
+            raise UtilError("Unable to execute SELECT current_user(). Error: "
+                            "{0}".format(err.errmsg))
+
+        # CREATE VIEW is needed for views
+        if not options.get("skip_views", False):
+            views = source_objects.get("views", None)
+            if views:
+                extra_privs.append("CREATE VIEW")
+            for item in views:
+                # Test if DEFINER is equal to the current user
+                if item[6] != dest_user:
+                    super_needed = True
+                    break
+
+        # CREATE ROUTINE and EXECUTE are needed for procedures
+        if not options.get("skip_procs", False):
+            procs = source_objects.get("procs", None)
+            if procs:
+                extra_privs.append("CREATE ROUTINE")
+                extra_privs.append("EXECUTE")
+                if not super_needed:
+                    for item in procs:
+                        # Test if DEFINER is equal to the current user
+                        if item[11] != dest_user:
+                            super_needed = True
+                            break
+
+        # CREATE ROUTINE and EXECUTE are needed for functions
+        if not options.get("skip_funcs", False):
+            funcs = source_objects.get("funcs", None)
+            if funcs:
+                if "CREATE ROUTINE" not in extra_privs:
+                    extra_privs.append("CREATE ROUTINE")
+                if "EXECUTE" not in extra_privs:
+                    extra_privs.append("EXECUTE")
+                if not super_needed:
+                    trust_function_creators = False
+                    try:
+                        res = self.source.show_server_variable(
+                            "log_bin_trust_function_creators"
+                        )
+                        if res and isinstance(res, list) and \
+                                res[0][1] in ("ON", "1"):
+                            trust_function_creators = True
+                        # If binary log is enabled and
+                        # log_bin_trust_function_creators is 0, we need
+                        # SUPER privilege
+                        super_needed = self.source.binlog_enabled() and \
+                            not trust_function_creators
+                    except UtilError as err:
+                        raise UtilDBError("ERROR: {0}".format(err.errmsg))
+
+                    if not super_needed:
+                        for item in funcs:
+                            # Test if DEFINER is equal to the current user
+                            if item[11] != dest_user:
+                                super_needed = True
+                                break
+
+        # EVENT is needed for events
+        if not options.get("skip_events", False):
+            events = source_objects.get("events", None)
+            if events:
+                extra_privs.append("EVENT")
+                if not super_needed:
+                    for item in events:
+                        # Test if DEFINER is equal to the current user
+                        if item[3] != dest_user:
+                            super_needed = True
+                            break
+
+        # TRIGGER is needed for events
+        if not options.get("skip_triggers", False):
+            triggers = source_objects.get("triggers", None)
+            if triggers:
+                extra_privs.append("TRIGGER")
+                if not super_needed:
+                    for item in triggers:
+                        # Test if DEFINER is equal to the current user
+                        if item[18] != dest_user:
+                            super_needed = True
+                            break
+
+        # Add SUPER privilege if needed
+        if super_needed:
+            dest_privs.append(("*", "SUPER"))
+
+        # Add extra privileges needed
+        for priv in extra_privs:
+            dest_privs.append((self.db_name, priv))
+
         if not options.get('skip_grants', False):
-            priv_tuple = (self.db_name, "WITH GRANT OPTION")
+            priv_tuple = (self.db_name, "GRANT OPTION")
             dest_privs.append(priv_tuple)
 
         # Check privileges on destination

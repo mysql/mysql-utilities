@@ -37,8 +37,8 @@ class test(copy_db.test):
         self.drop_users()
         self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
         self.server1.exec_query("CREATE USER 'sam'@'127.0.0.1'")
-        self.server1.exec_query(
-            "GRANT SELECT, EVENT ON util_test.* TO " + "'joe'@'127.0.0.1'")
+        self.server1.exec_query("GRANT SELECT, EVENT, TRIGGER ON util_test.* "
+                                "TO 'joe'@'127.0.0.1'")
         self.server1.exec_query(
             "GRANT SELECT ON mysql.* TO " + "'joe'@'127.0.0.1'")
         self.server1.exec_query(
@@ -175,8 +175,8 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server1.exec_query("GRANT SHOW VIEW, EVENT ON util_test.* TO "
-                                "'sam'@'127.0.0.1'")
+        self.server1.exec_query("GRANT SHOW VIEW, EVENT, TRIGGER ON "
+                                "util_test.* TO 'sam'@'127.0.0.1'")
 
         test_num += 1
         comment = ("Test case {0} - source user has privileges "
@@ -321,6 +321,92 @@ class test(copy_db.test):
                    "zero.").format(test_num)
         cmd_str = "{0} --multiprocess=-1".format(cmd)
         res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            # Revoke all privileges to joe@localhost in destination db
+            self.server2.exec_query("REVOKE ALL PRIVILEGES, GRANT OPTION FROM "
+                                    "'joe'@'127.0.0.1'")
+            # Add all privileges needed for joe@localhost in destination db
+            self.server2.exec_query("GRANT SELECT, CREATE, ALTER, INSERT, "
+                                    "UPDATE, EXECUTE, DROP, LOCK TABLES ON "
+                                    "`util_db_clone`.* TO 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        from_conn = "--source=joe@127.0.0.1:{0}".format(self.server1.port)
+        to_conn = "--destination=joe@127.0.0.1:{0}".format(self.server2.port)
+        comment = ("Test case {0} - error: dest user is missing SUPER "
+                   "privilege").format(test_num)
+        cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
+               "{1} util_test:util_db_clone".format(from_conn, to_conn))
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query("GRANT SUPER ON *.* TO 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = ("Test case {0} - error: dest user is missing CREATE VIEW "
+                   "privilege").format(test_num)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query("GRANT CREATE VIEW ON "
+                                    "`util_db_clone`.* TO 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = ("Test case {0} - error: dest user is missing CREATE "
+                   "ROUTINE privilege").format(test_num)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query("GRANT CREATE ROUTINE ON "
+                                    "`util_db_clone`.* TO 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = ("Test case {0} - error: dest user is missing EVENT "
+                   "privilege").format(test_num)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query("GRANT EVENT ON "
+                                    "`util_db_clone`.* TO 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = ("Test case {0} - error: dest user is missing TRIGGER "
+                   "privilege").format(test_num)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query("GRANT TRIGGER ON `util_db_clone`.* TO "
+                                    "'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = ("Test case {0} - dest user has privileges "
+                   "needed").format(test_num)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

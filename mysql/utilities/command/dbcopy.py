@@ -145,6 +145,7 @@ def copy_db(src_val, dest_val, db_list, options):
     """
     verbose = options.get("verbose", False)
     quiet = options.get("quiet", False)
+    do_drop = options.get("do_drop", False)
     skip_views = options.get("skip_views", False)
     skip_procs = options.get("skip_procs", False)
     skip_funcs = options.get("skip_funcs", False)
@@ -218,13 +219,23 @@ def copy_db(src_val, dest_val, db_list, options):
             'skip_funcs': skip_funcs,
             'skip_grants': skip_grants,
             'skip_events': skip_events,
+            'skip_triggers': skip_triggers,
         }
 
         source_db.check_read_access(src_val["user"], src_val["host"],
                                     access_options)
 
+        # Make a dictionary containing the list of objects from source db
+        source_objects = {
+            "views": source_db.get_db_objects("VIEW", columns="full"),
+            "procs": source_db.get_db_objects("PROCEDURE", columns="full"),
+            "funcs": source_db.get_db_objects("FUNCTION", columns="full"),
+            "events": source_db.get_db_objects("EVENT", columns="full"),
+            "triggers": source_db.get_db_objects("TRIGGER", columns="full"),
+        }
+
         dest_db.check_write_access(dest_val['user'], dest_val['host'],
-                                   access_options)
+                                   access_options, source_objects, do_drop)
 
         # Error is source db and destination db are the same and we're cloning
         if destination == source and db_name[0] == db_name[1]:

@@ -43,6 +43,7 @@ Test case 7 - users with minimal privileges
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
 # Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 Test case 8 - source user not enough privileges needed
@@ -79,6 +80,7 @@ Test case 11 - source user has privileges needed
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
 # Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 Test case 12 - dest user not enough privileges needed
@@ -115,6 +117,7 @@ Test case 15 - dest user has privileges needed
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
 # Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 Test case 16 - cannot parse --source
@@ -156,6 +159,7 @@ WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
 # Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 Test case 21 - default storage engine missing
@@ -181,6 +185,7 @@ WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
 # Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
 Test case 22 - database listed and --all
@@ -202,3 +207,47 @@ Test case 26 - error: multiprocess value smaller than zero.
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: Number of processes '-1' must be greater or equal than zero.
+Test case 27 - error: dest user is missing SUPER privilege
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+ERROR: User joe on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+Test case 28 - error: dest user is missing CREATE VIEW privilege
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE VIEW privilege on util_db_clone.
+Test case 29 - error: dest user is missing CREATE ROUTINE privilege
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE ROUTINE privilege on util_db_clone.
+Test case 30 - error: dest user is missing EVENT privilege
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs EVENT privilege on util_db_clone.
+Test case 31 - error: dest user is missing TRIGGER privilege
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs TRIGGER privilege on util_db_clone.
+Test case 32 - dest user has privileges needed
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying TABLE util_test.t5
+# Copying TABLE util_test.tt
+# Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v1
+# Copying VIEW util_test.v2
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
+# Copying data for TABLE util_test.tt
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
+#...done.

@@ -84,6 +84,18 @@ class test(mutlib.System_test):
         except UtilError:
             raise MUTLibError("Failed to create table with blobs.")
 
+        # Create user 'joe'@'127.0.0.1' in source server
+        try:
+            self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
+
+        # Create user 'joe'@'127.0.0.1' in destination server
+        try:
+            self.server2.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+        except UtilError as err:
+            raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
+
         return True
 
     def run(self):
@@ -216,13 +228,71 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        try:
+            # Grant ALL on `util_test` for user 'joe'@'127.0.0.1' on source
+            self.server1.exec_query("GRANT ALL ON `util_test`.* "
+                                    "TO 'joe'@'127.0.0.1'")
+
+            # Revoke all privileges to 'joe'@'127.0.0.1' in destination
+            self.server2.exec_query("REVOKE ALL PRIVILEGES, GRANT OPTION FROM "
+                                    "'joe'@'127.0.0.1'")
+
+            # Add all privileges needed for 'joe'@'127.0.0.1' in destination db
+            self.server2.exec_query("GRANT SELECT, CREATE, ALTER, INSERT, "
+                                    "UPDATE, EXECUTE, DROP, LOCK TABLES, "
+                                    "EVENT, TRIGGER, CREATE ROUTINE, "
+                                    "CREATE VIEW ON `util_db_privileges`.* TO "
+                                    "'joe'@'127.0.0.1'")
+
+            # Change DEFINER in procedures and functions on the source server
+            self.server1.exec_query("UPDATE mysql.proc SET "
+                                    "DEFINER='joe@127.0.0.1' WHERE "
+                                    "DB='util_test'")
+            self.server1.exec_query("UPDATE mysql.event SET "
+                                    "DEFINER='joe@127.0.0.1' WHERE "
+                                    "DB='util_test'")
+
+            # Change DEFINER in the views on the source server
+            query = """
+                SELECT CONCAT("ALTER DEFINER='joe'@'127.0.0.1' VIEW ",
+                table_schema, ".", table_name, " AS ", view_definition)
+                FROM information_schema.views WHERE
+                table_schema='util_test'
+            """
+            res = self.server1.exec_query(query)
+            for row in res:
+                self.server1.exec_query(row[0])
+
+            # Change DEFINER in the triggers on the source server
+            self.server1.exec_query("DROP TRIGGER util_test.trg")
+            self.server1.exec_query("CREATE DEFINER='joe'@'127.0.0.1' "
+                                    "TRIGGER util_test.trg AFTER INSERT ON "
+                                    "util_test.t1 FOR EACH ROW INSERT INTO "
+                                    "util_test.t2 "
+                                    "VALUES('Test objects count')")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+
+        to_conn = "--destination=joe@127.0.0.1:{0}".format(self.server2.port)
+        comment = ("Test case {0} - copy using a user without SUPER privilege"
+                   "").format(test_num)
+        cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
+               "{1} util_test:util_db_privileges".format(from_conn, to_conn))
+        res = self.exec_util(cmd, self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTLibError("{0}: failed".format(comment))
+
         return True
 
     def get_result(self):
         msg = []
         copied_db_on_server2 = ['util_db_clone', 'util_test',
                                 'util_test_multi', 'db`:db_clone',
-                                'db`:db', 'views_test_clone']
+                                'db`:db', 'views_test_clone',
+                                'util_db_privileges']
         copied_db_on_server1 = ["util_test_default_collation_copy",
                                 "util_test_default_charset_copy"]
 
@@ -256,7 +326,7 @@ class test(mutlib.System_test):
         # Compare number of copied rows.
         dbs2compare = [
             ('`util_test`', ('`util_test`', '`util_db_clone`',
-                             '`util_test_multi`')),
+                             '`util_test_multi`', '`util_db_privileges`')),
             ('`db``:db`', ('`db``:db`', '`db``:db_clone`')),
             ('`views_test`', ('`views_test_clone`',))
         ]
@@ -340,7 +410,8 @@ class test(mutlib.System_test):
         for db in db_drops_on_server2:
             self.drop_db(self.server2, db)
 
-        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'",
+                     "DROP USER 'joe'@'127.0.0.1'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)
