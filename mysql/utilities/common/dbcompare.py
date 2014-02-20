@@ -99,6 +99,12 @@ _WARNING_INDEX_NOT_USABLE = ("# Warning: Specified index {idx} for table {tb}"
 
 _RE_EMPTY_ALTER_TABLE = "^ALTER TABLE {0};$".format(REGEXP_QUALIFIED_OBJ_NAME)
 
+_RE_DASHES_DIG = re.compile(r"^\-{3}\s\d+")
+
+_RE_ASTERISK_DIG = re.compile(r"^\*{3}\s\d+")
+
+_RE_ASTERISKS = re.compile(r"^\*{15}.{0,2}$")
+
 
 def _get_objects(server, database, options):
     """Get all objects from the database (except grants)
@@ -156,9 +162,13 @@ def get_create_object(server, object_name, options, object_type):
     create_stmt = db.get_create_statement(obj[0], obj[1], object_type)
 
     if verbosity > 0 and not quiet:
-        print("\n# Definition for object {0}.{1}:"
-              "".format(remove_backtick_quoting(db_name),
-                        remove_backtick_quoting(obj_name)))
+        if obj_name:
+            print("\n# Definition for object {0}.{1}:"
+                  "".format(remove_backtick_quoting(db_name),
+                            remove_backtick_quoting(obj_name)))
+        else:
+            print("\n# Definition for object {0}:"
+                  "".format(remove_backtick_quoting(db_name)))
         print create_stmt
 
     return create_stmt
@@ -283,7 +293,7 @@ def get_common_objects(server1, server2, db1, db2,
     return (in_both, in_db1_not_db2, in_db2_not_db1)
 
 
-def _get_diff(list1, list2, object1, object2, difftype):
+def _get_diff(list1, list2, object1, object2, difftype, compact=False):
     """Get the difference among two lists.
 
     This method finds the difference of two lists using either unified,
@@ -297,19 +307,35 @@ def _get_diff(list1, list2, object1, object2, difftype):
     object1[in]       The 'from' or source
     object2[in]       The 'to' or difference destination
     difftype[in]      Difference type
+    compact[in]       IF True, the resulting diff it will not contain all
+                      the control lines, resulting in a fewer lines.
 
     Returns list - differences or []
     """
     diff_str = []
+
     # Generate unified is SQL is specified for use in reporting errors
     if difftype in ['unified', 'sql']:
         for line in difflib.unified_diff(list1, list2,
                                          fromfile=object1, tofile=object2):
-            diff_str.append(line.strip('\n').rstrip(' '))
+            if compact:
+                if not line.startswith("@@ "):
+                    diff_str.append(line.strip('\n').rstrip(' '))
+            else:
+                diff_str.append(line.strip('\n').rstrip(' '))
     elif difftype == 'context':
         for line in difflib.context_diff(list1, list2,
                                          fromfile=object1, tofile=object2):
-            diff_str.append(line.strip('\n').rstrip(' '))
+            if compact:
+                if _RE_DASHES_DIG.match(line):
+                    diff_str.append("---")
+                elif _RE_ASTERISK_DIG.match(line):
+                    diff_str.append("***")
+                # Asterisks are used as row separators too
+                elif not _RE_ASTERISKS.match(line):
+                    diff_str.append(line.strip('\n').rstrip(' '))
+            else:
+                diff_str.append(line.strip('\n').rstrip(' '))
     else:
         has_diff = False
         for line in difflib.ndiff(list1, list2):
@@ -319,6 +345,13 @@ def _get_diff(list1, list2, object1, object2, difftype):
 
         if not has_diff:
             diff_str = []
+
+    if compact and difftype != 'differ' and difftype != 'context':
+        return diff_str[2:]
+    # If objects names are the same, avoid print them
+    elif (compact and difftype == 'context' and len(diff_str) > 0 and
+          diff_str[0].endswith(diff_str[0][3:])):
+        return diff_str[2:]
 
     return diff_str
 
@@ -408,6 +441,8 @@ def _check_tables_structure(server1, server2, object1, object2, options,
         raise UtilError("Invalid object name arguments for diff_objects(): "
                         "{0}, {1}.".format(object1, object2))
 
+    compact_diff = options.get("compact", False)
+    fmt = options.get("format", "grid")
     # If the second part of the object qualified name is None, then the format
     # is not 'db_name.obj_name' for object1 and therefore must treat it as a
     # database name.
@@ -424,7 +459,8 @@ def _check_tables_structure(server1, server2, object1, object2, options,
     # Check table options.
     table1_opts = db_1.get_table_options(db1, name1)
     table2_opts = db_2.get_table_options(db2, name2)
-    diff = _get_diff(table1_opts, table2_opts, object1, object2, diff_type)
+    diff = _get_diff(table1_opts, table2_opts, object1, object2, diff_type,
+                     compact=compact_diff)
 
     # Check if both tables have the same columns definition.
     # Discard column order.
@@ -533,10 +569,12 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     """
     quiet = options.get("quiet", False)
     difftype = options.get("difftype", "unified")
+    _format = options.get("format", "grid")
     width = options.get("width", 75)
     direction = options.get("changes-for", None)
     reverse = options.get("reverse", False)
     skip_table_opts = options.get("skip_table_opts", False)
+    compact_diff = options.get("compact", False)
 
     # Get object CREATE statement.
     # Note: Table options are discarded if option skip_table_opts=True.
@@ -561,7 +599,8 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     if direction == 'server1' or direction is None or reverse:
         diff_server1 = _get_diff(object1_create_list,
                                  object2_create_list,
-                                 object1, object2, difftype)
+                                 object1, object2, difftype,
+                                 compact=compact_diff)
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server1) > 0:
             transform_server1 = _get_transform(server1, server2,
@@ -571,7 +610,8 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     if direction == 'server2' or reverse:
         diff_server2 = _get_diff(object2_create_list,
                                  object1_create_list,
-                                 object2, object1, difftype)
+                                 object2, object1, difftype,
+                                 compact=compact_diff)
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server2) > 0:
             transform_server2 = _get_transform(server2, server1,
@@ -760,7 +800,7 @@ def _setup_compare(table1, table2, span_key_size, use_indexes=None):
         return table_idx
 
     def find_candidate_indexes(candidate_idexes, no_null_idxes_tb,
-                                    table_name, diag_msgs):
+                               table_name, diag_msgs):
         """This method search the user's candidate indexes in the given list
         of unique indexes with no null columns. Table name is user to
         create the warning message if the candidate index has a column that
@@ -1043,9 +1083,10 @@ def check_consistency(server1, server2, table1_name, table2_name,
     """
     if options is None:
         options = {}
-    fmt = options.get('format', 'GRID')
+    fmt = options.get('format', 'grid')
     difftype = options.get('difftype', 'unified')
     span_key_size = options.get('span_key_size', DEFAULT_SPAN_KEY_SIZE)
+    compact_diff = options.get("compact", False)
     use_indexes = options.get('use_indexes', None)
 
     # if given get the unique_key for table_name
@@ -1131,7 +1172,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
                 rows1 = _get_formatted_rows(tbl1_rows, table1, fmt)
                 rows2 = _get_formatted_rows(tbl2_rows, table2, fmt)
                 diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
-                                     difftype)
+                                     difftype, compact=compact_diff)
                 if len(diff_str) > 0:
                     data_diffs.extend(diff_str)
 

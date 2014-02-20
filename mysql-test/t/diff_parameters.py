@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ from mysql.utilities.exception import MUTLibError
 
 _FORMATS = ['unified', 'context', 'differ']
 _DIRECTIONS = ['server1', 'server2']
+_COMPACT_OUTPUT = ['', ' --compact']
 
 
 class test(diff.test):
@@ -56,14 +57,16 @@ class test(diff.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        for frmt in _FORMATS:
-            test_num += 1
-            cmd_opts = "--difftype={0}".format(frmt)
-            comment = "Test case {0} - Use diff {1}".format(test_num, cmd_opts)
-            cmd = "{0} {1}".format(cmd_base, cmd_opts)
-            res = self.run_test_case(1, cmd, comment)
-            if not res:
-                raise MUTLibError("{0}: failed".format(comment))
+        for compacted in _COMPACT_OUTPUT:
+            for frmt in _FORMATS:
+                test_num += 1
+                cmd_opts = "--difftype={0}{1}".format(frmt, compacted)
+                comment = "Test case {0} - Use diff {1}".format(test_num,
+                                                                   cmd_opts)
+                cmd = "{0} {1}".format(cmd_base, cmd_opts)
+                res = self.run_test_case(1, cmd, comment)
+                if not res:
+                    raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         cmd_opts = "--force"

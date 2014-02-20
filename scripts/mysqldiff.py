@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -87,6 +87,10 @@ parser.add_option("--width", action="store", dest="width",
 parser.add_option("--force", action="store_true", dest="force",
                   help="do not abort when a diff test fails")
 
+# Add compact option for resulting diff
+parser.add_option("-c", "--compact", action="store_true",
+                  dest="compact", help="compact output from a diff.")
+
 # Skip check of table options.
 parser.add_option("--skip-table-options", action="store_true",
                   dest="skip_tbl_opts",
@@ -121,6 +125,7 @@ options = {
     "changes-for": opt.changes_for,
     "reverse": opt.reverse,
     "skip_table_opts": opt.skip_tbl_opts,
+    "compact": opt.compact,
     "charset": opt.charset,
 }
 

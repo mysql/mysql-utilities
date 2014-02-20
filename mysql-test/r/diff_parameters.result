@@ -22,6 +22,7 @@ Options:
                         'character_set_client'.
   --width=WIDTH         display width
   --force               do not abort when a diff test fails
+  -c, --compact         compact output from a diff.
   --skip-table-options  skip check of all table options (e.g., AUTO_INCREMENT,
                         ENGINE, CHARSET, etc.).
   -v, --verbose         control how much information is displayed. e.g., -v =
@@ -105,7 +106,63 @@ Test case 4 - Use diff --difftype=differ
 +   `b` int(11) DEFAULT NULL
   ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 5 - Use --force 
+Test case 5 - Use diff --difftype=unified --compact
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
+# Object definitions differ. (--changes-for=server1)
+#
+
+ CREATE TABLE `t1` (
+-  `a` char(30) DEFAULT NULL
++  `a` char(30) DEFAULT NULL,
++  `b` int(11) DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Compare failed. One or more differences found.
+Test case 6 - Use diff --difftype=context --compact
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
+# Object definitions differ. (--changes-for=server1)
+#
+
+***
+  CREATE TABLE `t1` (
+!   `a` char(30) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+---
+  CREATE TABLE `t1` (
+!   `a` char(30) DEFAULT NULL,
+!   `b` int(11) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Compare failed. One or more differences found.
+Test case 7 - Use diff --difftype=differ --compact
+# server1 on localhost: ... connected.
+# server2 on 127.0.0.1: ... connected.
+# Comparing `util_test` to `util_test`                             [PASS]
+# Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
+# Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
+# Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
+# Comparing `util_test`.`t1` to `util_test`.`t1`                   [FAIL]
+# Object definitions differ. (--changes-for=server1)
+#
+
+  CREATE TABLE `t1` (
+-   `a` char(30) DEFAULT NULL
++   `a` char(30) DEFAULT NULL,
+?                            +
++   `b` int(11) DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+Compare failed. One or more differences found.
+Test case 8 - Use --force 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -142,8 +199,8 @@ Test case 5 - Use --force
 # Comparing `util_test`.`v1` to `util_test`.`v1`                   [PASS]
 # Comparing `util_test`.`v2` to `util_test`.`v2`                   [PASS]
 Compare failed. One or more differences found.
-Test case 6 - Use --quiet 
-Test case 7 - Use --width=65 
+Test case 9 - Use --quiet 
+Test case 10 - Use --width=65 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                   [PASS]
@@ -163,7 +220,7 @@ Test case 7 - Use --width=65
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 8 - Use --width=55 
+Test case 11 - Use --width=55 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`         [PASS]
@@ -183,54 +240,54 @@ Test case 8 - Use --width=55
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 9 - Use -vvv 
+Test case 12 - Use -vvv 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 
-# Definition for object `util_test`:
+# Definition for object util_test:
 CREATE DATABASE `util_test` /*!40100 DEFAULT CHARACTER SET latin1 */
 
-# Definition for object `util_test`:
+# Definition for object util_test:
 CREATE DATABASE `util_test` /*!40100 DEFAULT CHARACTER SET latin1 */
 # Comparing `util_test` to `util_test`                             [PASS]
 
-# Definition for object `util_test`.`f1`:
+# Definition for object util_test.f1:
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1)
 
-# Definition for object `util_test`.`f1`:
+# Definition for object util_test.f1:
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1)
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 
-# Definition for object `util_test`.`f2`:
+# Definition for object util_test.f2:
 CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
     DETERMINISTIC
 RETURN base_price + base_price*(tax_percentage/100)
 
-# Definition for object `util_test`.`f2`:
+# Definition for object util_test.f2:
 CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
     DETERMINISTIC
 RETURN base_price + base_price*(tax_percentage/100)
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
 
-# Definition for object `util_test`.`p1`:
+# Definition for object util_test.p1:
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50")
 
-# Definition for object `util_test`.`p1`:
+# Definition for object util_test.p1:
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50")
 # Comparing `util_test`.`p1` to `util_test`.`p1`                   [PASS]
 
-# Definition for object `util_test`.`t1`:
+# Definition for object util_test.t1:
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 
-# Definition for object `util_test`.`t1`:
+# Definition for object util_test.t1:
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL,
   `b` int(11) DEFAULT NULL
@@ -248,7 +305,7 @@ CREATE TABLE `t1` (
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 10 - Use --changes-for=server1  
+Test case 13 - Use --changes-for=server1  
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -268,7 +325,7 @@ Test case 10 - Use --changes-for=server1
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 11 - Use --changes-for=server1 --show-reverse 
+Test case 14 - Use --changes-for=server1 --show-reverse 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -302,7 +359,7 @@ Test case 11 - Use --changes-for=server1 --show-reverse
 #
 
 Compare failed. One or more differences found.
-Test case 12 - Use --changes-for=server2  
+Test case 15 - Use --changes-for=server2  
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -322,7 +379,7 @@ Test case 12 - Use --changes-for=server2
 +  `a` char(30) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 13 - Use --changes-for=server2 --show-reverse 
+Test case 16 - Use --changes-for=server2 --show-reverse 
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -356,7 +413,7 @@ Test case 13 - Use --changes-for=server2 --show-reverse
 #
 
 Compare failed. One or more differences found.
-Test case 14a - Changes for server1  (not skipping table options).
+Test case 17a - Changes for server1  (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -373,7 +430,7 @@ Test case 14a - Changes for server1  (not skipping table options).
 -) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 14b - Changes for server1  (skipping table options).
+Test case 17b - Changes for server1  (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -388,7 +445,7 @@ Test case 14b - Changes for server1  (skipping table options).
 #  DEFAULT
 #  CHARSET=latin1
 Success. All objects are the same.
-Test case 15a - Changes for server2  (not skipping table options).
+Test case 18a - Changes for server2  (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -405,7 +462,7 @@ Test case 15a - Changes for server2  (not skipping table options).
 -) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 15b - Changes for server2  (skipping table options).
+Test case 18b - Changes for server2  (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -420,7 +477,7 @@ Test case 15b - Changes for server2  (skipping table options).
 #  DEFAULT
 #  CHARSET=latin1
 Success. All objects are the same.
-Test case 16a - Changes for server1 --difftype=context (not skipping table options).
+Test case 19a - Changes for server1 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -442,7 +499,7 @@ Test case 16a - Changes for server1 --difftype=context (not skipping table optio
     PRIMARY KEY (`id`)
 ! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 16b - Changes for server1 --difftype=context (skipping table options).
+Test case 19b - Changes for server1 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -462,7 +519,7 @@ Test case 16b - Changes for server1 --difftype=context (skipping table options).
 #   DEFAULT
 #   CHARSET=latin1
 Success. All objects are the same.
-Test case 17a - Changes for server2 --difftype=context (not skipping table options).
+Test case 20a - Changes for server2 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -484,7 +541,7 @@ Test case 17a - Changes for server2 --difftype=context (not skipping table optio
     PRIMARY KEY (`id`)
 ! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
-Test case 17b - Changes for server2 --difftype=context (skipping table options).
+Test case 20b - Changes for server2 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -504,7 +561,7 @@ Test case 17b - Changes for server2 --difftype=context (skipping table options).
 #   DEFAULT
 #   CHARSET=latin1
 Success. All objects are the same.
-Test case 18a - Changes for server1 --difftype=sql (not skipping table options).
+Test case 21a - Changes for server1 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -518,7 +575,7 @@ ALTER TABLE `db_diff_test`.`table-dash`
 AUTO_INCREMENT=50000005;
 
 Compare failed. One or more differences found.
-Test case 18b - Changes for server1 --difftype=sql (skipping table options).
+Test case 21b - Changes for server1 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -533,7 +590,7 @@ Test case 18b - Changes for server1 --difftype=sql (skipping table options).
 #  DEFAULT
 #  CHARSET=latin1
 Success. All objects are the same.
-Test case 19a - Changes for server2 --difftype=sql (not skipping table options).
+Test case 22a - Changes for server2 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -547,7 +604,7 @@ ALTER TABLE `db_diff_test`.`table-dash`
 AUTO_INCREMENT=50000010;
 
 Compare failed. One or more differences found.
-Test case 19b - Changes for server2 --difftype=sql (skipping table options).
+Test case 22b - Changes for server2 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on 127.0.0.1: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]

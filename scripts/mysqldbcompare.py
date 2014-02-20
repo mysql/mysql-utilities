@@ -120,6 +120,10 @@ parser.add_option("-a", "--run-all-tests", action="store_true",
                   dest="run_all_tests",
                   help="do not abort when a diff test fails")
 
+# Add compact option for resulting diff
+parser.add_option("-c", "--compact", action="store_true",
+                  dest="compact", help="compact output from a diff.")
+
 # turn off binlog mode
 parser.add_option("--disable-binary-logging", action="store_true",
                   default="False", dest="toggle_binlog",
@@ -201,6 +205,7 @@ options = {
     "skip_table_opts": opt.skip_tbl_opts,
     "charset": opt.charset,
     "use_indexes": db_idxes_l,
+    "compact": opt.compact
 }
 
 # Parse server connection values

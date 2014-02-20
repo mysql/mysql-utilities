@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 import compare_db
 from mysql.utilities.exception import MUTLibError
 
+_COMPACT_OUTPUT = ['', ' --compact']
 _DIFF_FORMATS = ['unified', 'context', 'differ']
 _OUTPUT_FORMATS = ['grid', 'csv', 'tab', 'vertical']
 _DIRECTIONS = ['server1', 'server2']
@@ -63,12 +64,14 @@ class test(compare_db.test):
         self.server1.exec_query("DROP VIEW inventory.tools")
 
         for diff in _DIFF_FORMATS:
-            for format_ in _OUTPUT_FORMATS:
+            for fmt in _OUTPUT_FORMATS:
                 test_num += 1
-                cmd_opts = " -a --difftype={0} --format={1}".format(diff,
-                                                                    format_)
+                cmd_opts = (" -a --difftype={0} --format={1}"
+                            "").format(diff, fmt)
                 comment = "Test case {0} - Use {1}".format(test_num, cmd_opts)
-                res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+                res = self.run_test_case(1,
+                                         "{0}{1}".format(cmd_str, cmd_opts),
+                                         comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
 
@@ -129,24 +132,40 @@ class test(compare_db.test):
         cmd_base = ("mysqldbcompare.py {0} {1} "
                     "db_diff_test:db_diff_test -a --skip-row-count "
                     "--skip-data-check".format(s1_conn, s2_conn))
+
         for difftype_opt in difftype_options:
             for direct in _DIRECTIONS:
                 test_num += 1
                 comment = ("Test case {0}a - Changes for {1} {2} (not "
-                           "skipping table options).".format(test_num, direct,
-                                                             difftype_opt))
-                cmd = "{0} --changes-for={1} {2}".format(cmd_base, direct,
-                                                         difftype_opt)
+                           "skipping table options)."
+                           "").format(test_num, direct, difftype_opt)
+                cmd = ("{0} --changes-for={1} {2}"
+                       "").format(cmd_base, direct, difftype_opt)
                 res = self.run_test_case(1, cmd, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
-                comment = ("Test case {0}b - Changes for {1} {2} (skipping "
-                           "table options).".format(test_num, direct,
-                                                    difftype_opt))
+                comment = ("Test case {0}b - Changes for {1} {2} "
+                           "(skipping table options)."
+                           "").format(test_num, direct, difftype_opt)
                 cmd = ("{0} --changes-for={1} {2} "
-                       "--skip-table-options".format(cmd_base, direct,
-                                                     difftype_opt))
+                       "--skip-table-options").format(cmd_base, direct,
+                                                      difftype_opt)
                 res = self.run_test_case(0, cmd, comment)
+                if not res:
+                    raise MUTLibError("{0}: failed".format(comment))
+
+        # the compact option tests, it does not applies to differ diff fmt
+        _DIFF_FORMATS.remove('differ')
+        for diff in _DIFF_FORMATS:
+            for fmt in _OUTPUT_FORMATS:
+                test_num += 1
+                cmd_opts = (" -a --difftype={0} --format={1}{2}"
+                            "").format(diff, fmt, _COMPACT_OUTPUT[1])
+                comment = "Test case {0} - Use {1}".format(test_num,
+                                                           cmd_opts)
+                res = self.run_test_case(1,
+                                         "{0}{1}".format(cmd_str, cmd_opts),
+                                         comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
 

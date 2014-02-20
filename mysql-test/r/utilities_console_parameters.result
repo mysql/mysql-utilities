@@ -50,6 +50,7 @@ Option                     Description
                            'character_set_client'.                         
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
+-c, --compact              compact output from a diff.                     
 --skip-table-options       skip check of all table options (e.g.,          
                            AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
 -v, --verbose              control how much information is displayed. e.g.,
@@ -99,6 +100,7 @@ Option                     Description
                            'character_set_client'.                         
 --width=WIDTH              display width                                   
 --force                    do not abort when a diff test fails             
+-c, --compact              compact output from a diff.                     
 --skip-table-options       skip check of all table options (e.g.,          
                            AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
 -v, --verbose              control how much information is displayed. e.g.,
@@ -156,6 +158,7 @@ Option                     Description
 --width=WIDTH              display width               
 --force                    do not abort when a diff    
                            test fails                  
+-c, --compact              compact output from a diff. 
 --skip-table-options       skip check of all table     
                            options (e.g.,              
                            AUTO_INCREMENT, ENGINE,     
@@ -218,6 +221,7 @@ Option                     Description
                            variable 'character_set_client'.       
 --width=WIDTH              display width                          
 --force                    do not abort when a diff test fails    
+-c, --compact              compact output from a diff.            
 --skip-table-options       skip check of all table options (e.g., 
                            AUTO_INCREMENT, ENGINE, CHARSET, etc.).
 -v, --verbose              control how much information is        
