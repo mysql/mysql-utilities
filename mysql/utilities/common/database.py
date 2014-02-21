@@ -931,7 +931,7 @@ class Database(object):
             else:
                 part_opts = "{0}{1}".format(sep, part_opts)
             # Then, separate table definitions from table options.
-            create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+            create_tbl, sep, _ = create_tbl.rpartition(') ')
             # Reconstruct CREATE statement without table options.
             create_statement = "{0}{1}{2}".format(create_tbl, sep, part_opts)
 
@@ -1014,11 +1014,11 @@ class Database(object):
                               "{2}".format(q_db, q_table, err.errmsg))
 
         # First, separate partition options.
-        create_tbl, sep, part_opts = create_tbl.rpartition('\n/*')
+        create_tbl, _, part_opts = create_tbl.rpartition('\n/*')
         # Handle situation where no partition options are found.
         create_tbl = part_opts if not create_tbl else create_tbl
         # Then, separate table options from table definition.
-        create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
+        create_tbl, _, tbl_opts = create_tbl.rpartition(') ')
         table_options = tbl_opts.split()
 
         return table_options
@@ -1626,11 +1626,11 @@ class Database(object):
             views = source_objects.get("views", None)
             if views:
                 extra_privs.append("CREATE VIEW")
-            for item in views:
-                # Test if DEFINER is equal to the current user
-                if item[6] != dest_user:
-                    super_needed = True
-                    break
+                for item in views:
+                    # Test if DEFINER is equal to the current user
+                    if item[6] != dest_user:
+                        super_needed = True
+                        break
 
         # CREATE ROUTINE and EXECUTE are needed for procedures
         if not options.get("skip_procs", False):

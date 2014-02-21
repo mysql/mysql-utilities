@@ -31,8 +31,7 @@ class test(export_basic.test):
         return export_basic.test.check_prerequisites(self)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
-        self.server0 = self.servers.get_server(0)
+        export_basic.test.setup(self)
         try:
             self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
             # Need to grant some privileges to joe on util_test to be able to
@@ -44,7 +43,7 @@ class test(export_basic.test):
         except UtilError as err:
             raise MUTLibError("Cannot create user joe'@'127.0.0.1' with "
                               "necessary privileges: {0}".format(err.errmsg))
-        return export_basic.test.setup(self)
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
@@ -91,7 +90,7 @@ class test(export_basic.test):
         comment = ("Test case {0} - error: cannot connect to "
                    "server").format(test_num)
         cmd_str = ("{0} --server=nope:nada@127.0.0.1:"
-                   "{1}").format(cmd, self.server0.port)
+                   "{1}").format(cmd, self.server1.port)
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
