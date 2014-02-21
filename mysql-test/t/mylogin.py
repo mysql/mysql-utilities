@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,14 +45,15 @@ class test(mutlib.System_test):
 
     def run(self):
         # Test parse_connection with login-paths
-        con_tests = ["test_user@localhost", "test_mylogin",
+        con_tests = ["test_user@localhost:3306", "test_mylogin:3306",
                      "test_user@localhost:1000", "test_mylogin:1000",
                      "test_user@localhost:1000:/my.socket",
                      "test_mylogin:1000:/my.socket",
-                     "test_user@localhost:/my.socket",
-                     "test_mylogin:/my.socket", "test-hyphen1234#",
-                     "test-hyphen1234#:13000:my.socket", "test' \\\"-hyphen",
-                     "test' \\\"-hyphen:my.socket",
+                     "test_user@localhost:3306:/my.socket",
+                     "test_mylogin:3306:/my.socket", "test-hyphen1234#:3306",
+                     "test-hyphen1234#:13000:my.socket",
+                     "test' \\\"-hyphen:3306",
+                     "test' \\\"-hyphen:3306:my.socket",
                      "test' \\\"-hyphen:13001:my.socket"]
 
         for test_ in con_tests:

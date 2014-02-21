@@ -27,6 +27,7 @@ import commands
 import difflib
 import os
 import platform
+import re
 import string
 import subprocess
 import tempfile
@@ -679,7 +680,8 @@ class System_test(object):
                               "MySQL client tools to your "
                               "PATH.".format(err.errmsg))
 
-    def create_login_path_data(self, login_path, user, host):
+    def create_login_path_data(self, login_path, user, host, port=None,
+                               socket=None):
         """Add the specified login-path data to .mylogin.cnf.
 
         Execute mysql_config_editor tool to create a new login-path
@@ -692,13 +694,38 @@ class System_test(object):
         assert self.edit_tool_path, ("The tool mysql_config_editor is not "
                                      "accessible. First, use method "
                                      "check_mylogin_requisites.")
+        # Check version to see if it supports socket and port
+        supports_port_and_socket = False
+        minimum_version = [5, 6, 11]
+        proc = subprocess.Popen([self.edit_tool_path, "--version"],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = proc.communicate()
+        if out:
+            match = re.search(r'mysql_config_editor(?:\.exe)? ver \d+\.\d+ distrib '
+                              r'(\d+\.\d+\.\d+)', out, re.IGNORECASE)
+            if match:
+                version = map(int, match.group(1).split('.'))
+                assert (len(version) == len(minimum_version),
+                        "Unsupported version")
+                # If current version is greater or equal than 5.6.11 then
+                # the tool supports the use of port and socket
+                if version >= minimum_version:
+                    supports_port_and_socket = True
 
         cmd = [self.edit_tool_path]
         cmd.append('set')
         cmd.append('--login-path={0}'.format(login_path))
-        cmd.append('--host={0}'.format(host))
-        cmd.append('--user={0}'.format(user))
+        if host:
+            cmd.append('--host={0}'.format(host))
+        if user:
+            cmd.append('--user={0}'.format(user))
 
+        if supports_port_and_socket:
+            if socket:
+                cmd.append("--socket={0}".format(socket))
+            if port:
+                cmd.append("--port={0}".format(port))
         # Create a temporary file to redirect stdout
         out_file = tempfile.TemporaryFile()
 

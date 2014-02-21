@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -293,9 +293,40 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             passwd = login_path_data.get('password', None)
             host = login_path_data.get('host', None)
             if not port:
-                port = login_path_data.get('port', 3306)
+                port = login_path_data.get('port', None)
             if not socket:
                 socket = login_path_data.get('socket', None)
+
+            if os.name == "posix" and socket is not None:
+                # if we are on unix systems and used a socket, hostname can be
+                # safely assumed as being localhost so it is not required
+                required_options = ('user', 'socket')
+                host = 'localhost' if host is None else host
+            else:
+                required_options = ('user', 'host', 'port')
+
+            missing_options = [opt for opt in required_options
+                               if locals()[opt] is None]
+            # If we are on unix and port is missing, user might have specified
+            # a socket instead
+            if os.name == "posix" and "port" in missing_options:
+                i = missing_options.index("port")
+                if socket:  # If we have a socket, port is not needed
+                    missing_options.pop(i)
+                else:
+                    # if we don't have neither a port nor a socket, we need
+                    # either a port or a socket
+                    missing_options[i] = "port or socket"
+
+            if missing_options:
+                message = ",".join(missing_options)
+                if len(missing_options) > 1:
+                    comma_idx = message.rfind(",")
+                    message = "{0} and {1}".format(message[:comma_idx],
+                                                   message[comma_idx+1:])
+                pluralize = "s" if len(missing_options) > 1 else ""
+                raise UtilError("Missing connection value{0} for "
+                                "{1} option{0}".format(pluralize, message))
         else:
             raise UtilError("No login credentials found for login-path: %s. "
                             "Please review the used connection string: %s"
