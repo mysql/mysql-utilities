@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,6 +33,16 @@ _MYSQL_OPTS_NO_REPORT = ' '.join(['"--log-bin=mysql-bin',
                                   '--enforce-gtid-consistency',
                                   '--sync-master-info=1',
                                   '--master-info-repository=table"'])
+
+_MYSQL_OPTS_GTID_OFF = ' '.join(['"--log-bin=mysql-bin',
+                                 '--skip-slave-start',
+                                 '--log-slave-updates',
+                                 '--gtid-mode=off',
+                                 '--enforce-gtid-consistency',
+                                 '--report-host=localhost',
+                                 '--report-port={report_port}',
+                                 '--sync-master-info=1',
+                                 '--master-info-repository=table"'])
 
 _GRANT_QUERY = ("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'localhost' "
                 "IDENTIFIED BY 'rpl'")
@@ -70,10 +80,19 @@ class test(rpl_admin.test):
         # Server without --report-host and --report-port
         mysqld = _MYSQL_OPTS_NO_REPORT
         self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+        # Master --gtid-mode=off
+        srv_port = self.servers.view_next_port()
+        mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
+        self.server6 = self.spawn_server("rep_master_gtid_off", mysqld, True)
+        # Slave --gtid-mode=off
+        srv_port = self.servers.view_next_port()
+        mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
+        self.server7 = self.spawn_server("rep_slave_gtid_off", mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master([self.server1, self.server2, self.server3,
-                           self.server4, self.server5])
+                           self.server4, self.server5, self.server6,
+                           self.server7])
 
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
@@ -182,6 +201,37 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Reset the topology, using a slave with GTID_MODE=OFF
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5, self.server7])
+
+        test_num += 1
+        comment = ("Test case {0} - elect using a slave with "
+                   "gtid disabled.".format(test_num))
+        slave4_conn = self.build_connection_string(self.server7).strip(' ')
+        slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn,
+                               slave4_conn])
+        cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} "
+                   "elect".format(master_conn, slaves_str))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Reset the topology, using a master with GTID_MODE=OFF
+        self.reset_topology([self.server2, self.server3, self.server4,
+                             self.server5], master=self.server6)
+
+        test_num += 1
+        comment = ("Test case {0} - elect using a master with "
+                   "gtid disabled.".format(test_num))
+        master2_conn = self.build_connection_string(self.server6).strip(' ')
+        slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn])
+        cmd_str = ("mysqlrpladmin.py --master={0} --slaves={1} "
+                   "elect".format(master2_conn, slaves_str))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Reset the topology to its original state for other tests
         self.reset_topology([self.server2, self.server3, self.server4,
                              self.server5])
@@ -212,6 +262,7 @@ class test(rpl_admin.test):
 
     def cleanup(self):
         kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
-                     'rep_slave3_gtid', 'rep_slave4_gtid']
+                     'rep_slave3_gtid', 'rep_slave4_gtid',
+                     'rep_master_gtid_off', 'rep_slave_gtid_off']
         return (rpl_admin.test.cleanup(self)
                 and self.kill_server_list(kill_list))

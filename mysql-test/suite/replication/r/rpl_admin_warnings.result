@@ -92,3 +92,11 @@ Test case 7 - warnings for switchover with offline slave
 | offline    | 1234  | SLAVE   | DOWN   |            | Cannot connect to slave.  |
 +------------+-------+---------+--------+------------+---------------------------+
 # ...done.
+Test case 8 - elect using a slave with gtid disabled.
+# Checking privileges.
+# WARNING: Slave election requires GTID_MODE=ON for all servers.
+# ...done.
+Test case 9 - elect using a master with gtid disabled.
+# Checking privileges.
+# WARNING: Slave election requires GTID_MODE=ON for all servers.
+# ...done.

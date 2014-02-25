@@ -1169,17 +1169,23 @@ class Topology(Replication):
     def gtid_enabled(self):
         """Check if topology has GTID turned on.
 
-        Returns bool - True = GTID_MODE=ON.
+        This method check if GTID mode is turned ON for all servers in the
+        replication topology, skipping the check for not available servers.
+
+        Returns bool - True = GTID_MODE=ON for all available servers (master
+        and slaves) in the replication topology..
         """
-        if self.master is not None:
-            return self.master.supports_gtid() == "ON"
+        if self.master and self.master.supports_gtid() != "ON":
+            return False  # GTID disabled or not supported.
         for slave_dict in self.slaves:
             slave = slave_dict['instance']
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
                 continue
-            return slave.supports_gtid() == "ON"
-        return False
+            if slave.supports_gtid() != "ON":
+                return False  # GTID disabled or not supported.
+        # GTID enabled for all topology (excluding not available servers).
+        return True
 
     def get_servers_with_gtid_not_on(self):
         """Get the list of servers from the topology with GTID turned off.

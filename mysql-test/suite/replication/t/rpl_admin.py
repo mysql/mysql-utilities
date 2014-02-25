@@ -291,16 +291,19 @@ class test(mutlib.System_test):
                                   "{2}".format(srv.host, srv.port, err))
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
-                       rpl_passwd='rpl'):
+                       rpl_passwd='rpl', master=None):
         if slaves_list:
             slaves = slaves_list
         else:
             # Default replication topology - 1 master, 3 slaves
             slaves = [self.server2, self.server3, self.server4]
+        if master is None:
+            master = self.server1  # Use server1 as default master.
         self.master_str = " --master={0}".format(
-            self.build_connection_string(self.server1))
+            self.build_connection_string(master)
+        )
 
-        servers = [self.server1]
+        servers = [master]
         servers.extend(slaves)
 
         # Check if all servers are alive, and if they are not,
