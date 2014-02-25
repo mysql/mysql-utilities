@@ -1078,10 +1078,14 @@ class Topology(Replication):
                         _GTID_SUBTRACT_TO_EXECUTED.format(tnx_set))
 
                     # Only consider the transaction as errant if not from the
-                    # current master
+                    # current master.
+                    # Note: server UUID can appear with mixed cases (e.g. for
+                    # 5.6.9 servers the server_uuid is lower case and appears
+                    # in upper cases in the GTID_EXECUTED set.
                     errant_set = set()
                     for tnx in errant_res:
-                        if tnx[0] and not tnx[0].startswith(master_uuid):
+                        if tnx[0] and not tnx[0].lower().startswith(
+                                master_uuid.lower()):
                             errant_set.update(tnx[0].split(',\n'))
 
                     # Errant transactions exist on only one slave, therefore if
