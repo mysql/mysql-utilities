@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,14 +26,19 @@ Methods:
 import copy
 import optparse
 import os.path
+import re
 
 from optparse import Option as CustomOption, OptionValueError
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.connector.conversion import MySQLConverter
+from mysql.utilities.common.messages import PARSE_ERR_OBJ_NAME_FORMAT
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
                                                       my_login_config_exists)
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
+                                                  remove_backtick_quoting)
 
 
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
@@ -51,6 +56,10 @@ class UtilitiesParser(optparse.OptionParser):
         """
         print self.version
         optparse.OptionParser.print_help(self, output)
+
+    def format_epilog(self, formatter):
+        return self.epilog if self.epilog is not None else ''
+
 
 def prefix_check_choice(option, opt, value):
     """Check option values using case insensitive prefix compare
@@ -109,7 +118,8 @@ class CaseInsensitiveChoicesOption(CustomOption):
 
 def setup_common_options(program_name, desc_str, usage_str,
                          append=False, server=True,
-                         server_default="root@localhost:3306"):
+                         server_default="root@localhost:3306",
+                         extended_help=None):
     """Setup option parser and options common to all MySQL Utilities.
 
     This method creates an option parser and adds options for user
@@ -125,17 +135,19 @@ def setup_common_options(program_name, desc_str, usage_str,
                        (default = True)
     server_default[in] Default value for option
                        (default = "root@localhost:3306")
+    extended_help[in]  Extended help (by default: None).
 
     Returns parser object
     """
 
-    program_name = program_name.replace(".py","")
+    program_name = program_name.replace(".py", "")
     parser = UtilitiesParser(
         version=VERSION_FRM.format(program=program_name),
         description=desc_str,
         usage=usage_str,
         add_help_option=False,
         option_class=CaseInsensitiveChoicesOption,
+        epilog=extended_help,
         prog=program_name)
     parser.add_option("--help", action="help", help="display a help message "
                       "and exit")
@@ -514,6 +526,69 @@ def check_rpl_options(parser, options):
                          "option." % (", ".join(errors), num_opt_str))
 
 
+def add_discover_slaves_option(parser):
+    """Add the --discover-slaves-login option.
+
+    This method adds the --discover-slaves-login option that is used to
+    discover the list of slaves associated to the specified login (user and
+    password).
+
+    parser[in]      the parser instance.
+    """
+    parser.add_option("--discover-slaves-login", action="store",
+                      dest="discover", default=None, type="string",
+                      help="at startup, query master for all registered "
+                      "slaves and use the user name and password specified to "
+                      "connect. Supply the user and password in the form "
+                      "<user>[:<password>] or <login-path>. For example, "
+                      "--discover-slaves-login=joe:secret will use 'joe' as "
+                      "the user and 'secret' as the password for each "
+                      "discovered slave.")
+
+
+def add_log_option(parser):
+    """Add the --log option.
+
+    This method adds the --log option that is used the specify the target file
+    for logging messages from the utility.
+
+    parser[in]      the parser instance.
+    """
+    parser.add_option("--log", action="store", dest="log_file", default=None,
+                      type="string", help="specify a log file to use for "
+                      "logging messages")
+
+
+def add_master_option(parser):
+    """Add the --master option.
+
+    This method adds the --master option that is used to specify the connection
+    string for the server with the master role.
+
+    parser[in]      the parser instance.
+    """
+    parser.add_option("--master", action="store", dest="master", default=None,
+                      type="string", help="connection information for master "
+                      "server in the form: <user>[:<password>]@<host>[:<port>]"
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]")
+
+
+def add_slaves_option(parser):
+    """Add the --slaves option.
+
+    This method adds the --slaves option that is used to specify a list of
+    slaves, more precisely their connection strings (separated by comma).
+
+    parser[in]      the parser instance.
+    """
+    parser.add_option("--slaves", action="store", dest="slaves",
+                      type="string", default=None,
+                      help="connection information for slave servers in "
+                      "the form: <user>[:<password>]@<host>[:<port>]"
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]. "
+                      "List multiple slaves in comma-separated list.")
+
+
 def add_failover_options(parser):
     """Add the common failover options.
 
@@ -543,15 +618,7 @@ def add_failover_options(parser):
                       " Valid only with failover command. List multiple slaves"
                       " in comma-separated list.")
 
-    parser.add_option("--discover-slaves-login", action="store",
-                      dest="discover", default=None, type="string",
-                      help="at startup, query master for all registered "
-                      "slaves and use the user name and password specified to "
-                      "connect. Supply the user and password in the form "
-                      "<user>[:<password>] or <login-path>. For example, "
-                      "--discover-slaves-login=joe:secret will use 'joe' as "
-                      "the user and 'secret' as the password for each "
-                      "discovered slave.")
+    add_discover_slaves_option(parser)
 
     parser.add_option("--exec-after", action="store", dest="exec_after",
                       default=None, type="string", help="name of script to "
@@ -561,19 +628,14 @@ def add_failover_options(parser):
                       default=None, type="string", help="name of script to "
                       "execute before failover or switchover")
 
-    parser.add_option("--log", action="store", dest="log_file", default=None,
-                      type="string", help="specify a log file to use for "
-                      "logging messages")
+    add_log_option(parser)
 
     parser.add_option("--log-age", action="store", dest="log_age", default=7,
                       type="int", help="specify maximum age of log entries in "
                       "days. Entries older than this will be purged on "
                       "startup. Default = 7 days.")
 
-    parser.add_option("--master", action="store", dest="master", default=None,
-                      type="string", help="connection information for master "
-                      "server in the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>]")
+    add_master_option(parser)
 
     parser.add_option("--max-position", action="store", dest="max_position",
                       default=0, type="int", help="used to detect slave "
@@ -592,12 +654,7 @@ def add_failover_options(parser):
                       "permitted before slave is considered behind the "
                       "master. Default is 0.")
 
-    parser.add_option("--slaves", action="store", dest="slaves",
-                      type="string", default=None,
-                      help="connection information for slave servers in "
-                      "the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>]. "
-                      "List multiple slaves in comma-separated list.")
+    add_slaves_option(parser)
 
     parser.add_option("--timeout", action="store", dest="timeout", default=300,
                       help="maximum timeout in seconds to wait for each "
@@ -735,3 +792,62 @@ def get_absolute_path(path):
     """ Returns the absolute path.
     """
     return os.path.abspath(os.path.expanduser(os.path.normpath(path)))
+
+
+def db_objects_list_to_dictionary(parser, obj_list, option_desc):
+    """Process database object list and convert to a dictionary.
+
+    Check the qualified name format of the given database objects and convert
+    the given list of object to a dictionary organized by database names and
+    sets of specific objects.
+
+    Note: It is assumed that the given object list is obtained from the
+    arguments or an option returned by the parser.
+
+    parser[in]      Instance of the used option/arguments parser
+    obj_list[in]    List of objects to process.
+    option_desc[in] Short description of the option for the object list (e.g.,
+                    "the --exclude option", "the database/table arguments") to
+                    refer appropriately in any parsing error.
+
+    returns a dictionary with the objects grouped by database (without
+    duplicates). None value associated to a database entry means that all
+    objects are to be considered.
+    E.g. {'db_name1': set(['table1','table2']), 'db_name2': None}.
+    """
+    db_objs_dict = {}
+    obj_name_regexp = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
+    for obj_name in obj_list:
+        m_obj = obj_name_regexp.match(obj_name)
+        if not m_obj:
+            parser.error(PARSE_ERR_OBJ_NAME_FORMAT.format(
+                obj_name=obj_name, option=option_desc
+            ))
+        else:
+            db_name, obj_name = m_obj.groups()
+            # Remove backtick quotes.
+            db_name = remove_backtick_quoting(db_name) \
+                if is_quoted_with_backticks(db_name) else db_name
+            obj_name = remove_backtick_quoting(obj_name) \
+                if obj_name and is_quoted_with_backticks(obj_name) \
+                else obj_name
+            # Add database object to result dictionary.
+            if not obj_name:
+                # If only the database is specified, then add entry with
+                # db name and value None (to include all object) even if a
+                # previous specific object was already added.
+                if db_name in db_objs_dict:
+                    if db_objs_dict[db_name]:
+                        db_objs_dict[db_name] = None
+                else:
+                    db_objs_dict[db_name] = None
+            else:
+                # If a specific object object is given add it to the set
+                # associated to the database, except if the database entry
+                # is None (meaning that all objects are included).
+                if db_name in db_objs_dict:
+                    if db_objs_dict[db_name]:
+                        db_objs_dict[db_name].add(obj_name)
+                else:
+                    db_objs_dict[db_name] = set([obj_name])
+    return db_objs_dict

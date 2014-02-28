@@ -44,11 +44,13 @@ _MASTER_INFO_COL = [
 
 _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
     _SLAVE_MASTER_LOG_FILE, _SLAVE_MASTER_LOG_FILE_POS, _SLAVE_IO_RUNNING, \
-    _SLAVE_SQL_RUNNING, _SLAVE_DO_DB, _SLAVE_IGNORE_DB, _SLAVE_DELAY, \
-    _SLAVE_REMAINING_DELAY, _SLAVE_IO_ERRORNO, _SLAVE_IO_ERROR, \
+    _SLAVE_SQL_RUNNING, _SLAVE_DO_DB, _SLAVE_IGNORE_DB, _SLAVE_DO_TABLE, \
+    _SLAVE_IGNORE_TABLE, _SLAVE_WILD_DO_TABLE, _SLAVE_WILD_IGNORE_TABLE, \
+    _SLAVE_DELAY, _SLAVE_REMAINING_DELAY, _SLAVE_IO_ERRORNO, _SLAVE_IO_ERROR, \
     _SLAVE_SQL_ERRORNO, _SLAVE_SQL_ERROR, _MASTER_UUID, _RETRIEVED_GTID_SET, \
     _EXECUTED_GTID_SET = \
-    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 32, 33, 34, 35, 36, 37, 40, 51, 52
+    0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 14, 15, 16, 17, 32, 33, 34, 35, 36, 37,\
+    40, 51, 52
 
 _PRINT_WIDTH = 75
 
@@ -82,6 +84,125 @@ def _get_list(rows, cols):
     ostream = StringIO.StringIO()
     format_tabular_list(ostream, cols, rows)
     return ostream.getvalue().splitlines()
+
+
+def get_last_server_gtid(gtid_set, server_uuid):
+    """Get the last GTID of the specified GTID set for the given server UUID.
+
+    This function retrieves the last GTID from the specified set for the
+    specified server UUID. In more detail, it returns the GTID with the greater
+    sequence value that matches the specified UUID.
+
+    Note: The method assumes that GTID sets are grouped by UUID (separated by
+    comma ',') and intervals appear in ascending order (i.e., the last one is
+    the greater one).
+
+    gtid_set[in]        GTID set to search and get last (greater) GTID value.
+    server_uuid[in]     Server UUID to match, as a GTID set might contain data
+                        for different servers (UUIDs).
+
+    Returns a string with the last GTID value in the set for the given server
+    UUID in the format 'uuid:n'. If no GTID are found in the set for the
+    specified server UUID then None is returned.
+    """
+    uuid_sets = gtid_set.split(',')
+    for uuid_set in uuid_sets:
+        uuid_set_elements = uuid_set.strip().split(':')
+        # Note: UUID are case insensitive, but can appear with mixed cases for
+        # some server versions (e.g., for 5.6.9, lower case in server_id
+        # variable and upper case in GTID_EXECUTED set).
+        if uuid_set_elements[0].lower() == server_uuid.lower():
+            last_interval = uuid_set_elements[-1]
+            try:
+                _, end_val = last_interval.split('-')
+                return '{0}:{1}'.format(server_uuid, end_val)
+            except ValueError:
+                # Error raised for single values (not an interval).
+                return '{0}:{1}'.format(server_uuid, last_interval)
+
+        else:
+            # Skip uuid_set if it does not match the current server uuid.
+            continue
+    return None
+
+
+def gtid_set_cardinality(gtid_set):
+    """Determine the cardinality of the specified GTID set.
+
+    This function counts the number of elements in the specified GTID set.
+
+    gtid_set[in]    target set of GTIDs to determine the cardinality.
+
+    Returns the number of elements of the specified GTID set.
+    """
+    count = 0
+    uuid_sets = gtid_set.split(',')
+    for uuid_set in uuid_sets:
+        intervals = uuid_set.strip().split(':')[1:]
+        for interval in intervals:
+            try:
+                start_val, end_val = interval.split('-')
+                count = int(end_val) - int(start_val) + 1
+            except ValueError:
+                # Error raised for single values (not an interval).
+                count += 1
+    return count
+
+
+def gtid_set_union(gtid_set_a, gtid_set_b):
+    """Perform the union of two GTID sets.
+
+    This method computes the union of two GTID sets and returns the result of
+    the operation.
+
+    gtid_set_a[in]      First GTID set (set A).
+    gtid_set_b[in]      Second GTID set (set B).
+
+    Returns a string with the result of the set union operation between the
+    two given GTID sets.
+    """
+    a_values = gtid_set_a.split(':')
+    b_values = gtid_set_b.split(':')
+    uuid_a = a_values[0]
+    uuid_b = b_values[0]
+    if uuid_a != uuid_b:
+        # Return the concatenation of both sets if the UUID is different.
+        return "{0},{1}".format(gtid_set_a, gtid_set_b)
+    else:
+        # Only perform the union of the intervals if the UUID is the same.
+        # Convert the intervals strings to a single list of tuples with
+        # integers, in order to be handled easily.
+        intervals_list = []
+        for values in a_values[1:]:
+            interval = values.split('-')
+            intervals_list.append((int(interval[0]), int(interval[-1])))
+        for values in b_values[1:]:
+            interval = values.split('-')
+            intervals_list.append((int(interval[0]), int(interval[-1])))
+        # Compute the union of the tuples (intervals).
+        union_set = []
+        for start, end in sorted(intervals_list):
+            # Note: no interval start before the next one (ordered list).
+            if union_set and start <= union_set[-1][1] + 1:
+                # Current interval intersects or is consecutive to the last
+                # one in the results.
+                if union_set[-1][1] < end:
+                    # If the end of the interval is greater than the last one
+                    # then augment it (set the new end), otherwise do nothing
+                    # (meaning the interval is fully included in the last one).
+                    union_set[-1] = (union_set[-1][0], end)
+            else:
+                # No interval in the results or the interval does not intersect
+                # nor is consecutive to the last one, then add it to the end of
+                # the results list.
+                union_set.append((start, end))
+        # Convert resulting union set to a valid string format.
+        union_str = ":".join(
+            ["{0}-{1}".format(vals[0], vals[1])
+             if vals[0] != vals[1] else str(vals[0]) for vals in union_set]
+        )
+        # Concatenate UUID and return the result.
+        return "{0}:{1}".format(uuid_a, union_str)
 
 
 def negotiate_rpl_connection(server, is_master=True, strict=True,
@@ -1476,6 +1597,35 @@ class Slave(Server):
         return (state, io_errorno, io_error, io_running, sql_running,
                 sql_errorno, sql_error)
 
+    def get_slave_rpl_filters(self):
+        """Get the replication filter options for the slave.
+
+        Get the replication filter information from the slave status.
+
+        Returns a tuple with the replication filter options (Replicate_Do_DB,
+        Replicate_Ignore_DB, Replicate_Do_Table, Replicate_Ignore_Table,
+        Replicate_Wild_Do_Table, Replicate_Wild_Ignore_Table). An empty tuple
+        () is returned if no filter is defined and None if the slave status is
+        not available.
+        """
+        res = self.get_status()
+        if not res:
+            return None
+
+        rpl_do_db = res[0][_SLAVE_DO_DB]
+        rpl_ignore_db = res[0][_SLAVE_IGNORE_DB]
+        rpl_do_table = res[0][_SLAVE_DO_TABLE]
+        rpl_ignore_table = res[0][_SLAVE_IGNORE_TABLE]
+        rpl_wild_do_table = res[0][_SLAVE_WILD_DO_TABLE]
+        rpl_wild_ignore_table = res[0][_SLAVE_WILD_IGNORE_TABLE]
+
+        if (rpl_do_db or rpl_ignore_db or rpl_do_table or rpl_ignore_table
+                or rpl_wild_do_table or rpl_wild_ignore_table):
+            return (rpl_do_db, rpl_ignore_db, rpl_do_table, rpl_ignore_table,
+                    rpl_wild_do_table, rpl_wild_ignore_table)
+        else:
+            return ()
+
     def show_status(self):
         """Display the slave status from the slave server
         """
@@ -1506,14 +1656,24 @@ class Slave(Server):
             return (m_host, m_passwd)
         return (None, None)
 
-    def start(self, options=None, autocommit_fix=True):
+    def start(self, options=None, autocommit_fix=True, until_gtid_set=None,
+              sql_after_gtid=True, only_sql_thread=False):
         """Start the slave.
 
-        Execute the START SLAVE statement (to start the IO and SQL threads).
+        Execute the START SLAVE statement (to start the IO and/or SQL threads),
+        according to the used parameters.
 
         options[in]         query options
         autocommit_fix[in]  If True, turn off AUTOCOMMIT before start command.
                             True by default to always apply the fix.
+        until_gtid_set[in]  GTID set to use to execute START SLAVE UNTIL. By
+                            default None, until option is not applied.
+        sql_after_gtid[in]  Indicates if the until option SQL_AFTER_GTIDS is
+                            used or in alternative SQL_BEFORE_GTIDS. Only
+                            applied if until_gtid_set is specified. By default
+                            True, SQL_AFTER_GTIDS is used.
+        only_sql_thread[in] If True only the SQL thread is started, otherwise
+                            both (by default).
         """
         if options is None:
             options = {}
@@ -1525,7 +1685,17 @@ class Slave(Server):
             if not autocommit_value:
                 self.toggle_autocommit(True)
 
-        res = self.exec_query("START SLAVE", options)
+        query = "START SLAVE"
+        if only_sql_thread:
+            query = "{0} SQL_THREAD".format(query)
+        if until_gtid_set:
+            # Use until option.
+            until_type = (
+                'SQL_AFTER_GTIDS' if sql_after_gtid else 'SQL_BEFORE_GTIDS'
+            )
+            query = "{0} UNTIL {1} = '{2}'".format(query, until_type,
+                                                   until_gtid_set)
+        res = self.exec_query(query, options)
 
         # Temporary workaround for BUG#16533802 - remove when fixed (part 2/2).
         if autocommit_fix:
@@ -1553,6 +1723,15 @@ class Slave(Server):
             options = {}
         return self.exec_query("STOP SLAVE", options)
 
+    def stop_sql_thread(self, options=None):
+        """Stop the slave SQL thread.
+
+        options[in]    query options
+        """
+        if options is None:
+            options = {}
+        return self.exec_query("STOP SLAVE SQL_THREAD", options)
+
     def reset(self, options=None):
         """Reset the slave
 
@@ -1575,6 +1754,66 @@ class Slave(Server):
         if not self.check_version_compat(5, 5, 16):
             return self.reset()
         return self.exec_query("RESET SLAVE ALL", options)
+
+    def wait_checksum_and_start(self, tbl_name, wait_timeout=30,
+                                wait_interval=3, checksum_timeout=0,
+                                options=None):
+        """Checksum specified table and start slave.
+
+        tbl_name[in]        Name of the table to perform the checksum.
+        wait_timeout[in]    Timeout value to wait for the slave to stop SQL
+                            thread (automatically stopped after catching up
+                            with master). By default 30 seconds.
+        wait_interval[in]   Wait interval to perform the next polling (check
+                            if SQL thread is stopped) By default 3 seconds..
+        options[in]     Query options.
+
+        Returns the result of the table checksum,more precisely a tuple with
+        the checksum and an error description. If the checksum is computed it
+        returns (checksum, None), otherwise (None, <skip error description>)
+        where <skip error description> is a brief description of the motive why
+        the checksum was not computed.
+        """
+        # Wait for slave to stop (if timeout > 0).
+        tick = 0
+        checksum = None
+        skip_checksum = True if wait_timeout > 0 else False
+        while tick < wait_timeout:
+            status = self.get_slaves_errors()
+            io_running = status[3].upper() == 'YES'
+            sql_running = status[4].upper() == 'YES'
+            # Only check if SQl thread is running since START SLAVE UNTIL does
+            # not stop the IO thread.
+            if sql_running:
+                time.sleep(wait_interval)
+                tick += wait_interval
+            else:
+                skip_checksum = False
+                # Report if replication was stopped due to an error.
+                if not io_running and status[2]:
+                    print("# IO thread ERROR found for {0}:{1}: {2} - "
+                          "{3}".format(self.host, self.port, status[1],
+                                       status[2]))
+                if not sql_running and status[6]:
+                    print("# SQL thread ERROR found for {0}:{1}: {2} - "
+                          "{3}".format(self.host, self.port, status[5],
+                                       status[6]))
+                break
+
+        if skip_checksum:
+            # Checksum skipped.
+            skip_error = "timeout catching up with master"
+            self.stop_sql_thread(options)
+        else:
+            # Compute checksum.
+            checksum, skip_error = self.checksum_table(
+                tbl_name, exec_timeout=checksum_timeout
+            )
+
+        # Resume replication, start slave.
+        self.start_sql_thread(options)
+
+        return checksum, skip_error
 
     def num_gtid_behind(self, master_gtids):
         """Get the number of transactions the slave is behind the master.
@@ -1602,7 +1841,7 @@ class Slave(Server):
                         # Interval has only one element
                         gtid_behind += 1
                     else:
-                        # Compute interval size and sum to total of GTIDs behind
+                        # Compute interval size and sum to total GTIDs behind.
                         num_gtids = int(interval[1]) - int(interval[0]) + 1
                         gtid_behind += num_gtids
         return gtid_behind

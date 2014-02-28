@@ -836,6 +836,33 @@ class System_test(object):
 
         return conn_str
 
+    def build_custom_connection_string(self, server, user, passwd):
+        """Return a custom connection string.
+
+        Build the connection string for the given server, replacing the user
+        and password with the given ones.
+
+        server[in]      Server object to build the connection from.
+        user[in]        Login user to use instead of the one from the server.
+        passwd[in]      Password to use instead of the one from the server.
+
+        Returns a string of the form user:password@host:port
+        """
+        conn_val = self.get_connection_values(server)
+        # Use specified user and passwd for the connection string.
+        conn_str = user
+        if passwd:
+            conn_str = "{0}:{1}".format(conn_str, passwd)
+        # Use the server values to build the remaining connection string.
+        if ":" in conn_val[2] and not "]" in conn_val[2]:
+            conn_str = "{0}@[{1}]:".format(conn_str,  conn_val[2])
+        else:
+            conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
+        if conn_val[3]:
+            conn_str = "{0}{1}".format(conn_str, conn_val[3])
+        # Remove any leading and trailing whitespace.
+        return conn_str.strip()
+
     def run_test_case(self, exp_result, command, comments, debug=False):
         """Execute a test case and save the results.
 
@@ -903,6 +930,39 @@ class System_test(object):
                 if index == 0:
                     self.results[linenum] = replacement_str
                     break
+
+    def force_lines_order(self, lines_tuple):
+        """Force the lines order of the given tuple of lines.
+
+        This method allows to mask consecutive lines that can appear in a
+        non-deterministic order, forcing the order in which they appear.
+        In more detail, the method search for the consecutive occurrence of the
+        given lines (according to the tuple size) independently of the order
+        they appear and when a match is found the lines are replaced according
+        to the given tuple order. In other words, the order of the found lines
+        is switched to always appear in the same order in the results.
+
+        lines_tuple[in]     Tuple with the lines in the desired order.
+        """
+        line_num = 0
+        while line_num < len(self.results):
+            if self.results[line_num].startswith(lines_tuple):
+                # Line matched one of the given lines.
+                match_all = True
+                # Check if next lines also match.
+                for i in xrange(1, len(lines_tuple)):
+                    # Note: same line can be repeatedly matched, i.e. it does
+                    # not guarantee that distinct line are matched.
+                    if not self.results[line_num+i].startswith(lines_tuple):
+                        match_all = False
+                        break
+                if match_all:
+                    # Replace lines to match the desired order.
+                    for l in lines_tuple:
+                        self.results[line_num] = l
+                        line_num += 1
+                    line_num -= 1
+            line_num += 1
 
     def remove_result(self, prefix):
         """Remove a string in the results.

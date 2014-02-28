@@ -1,0 +1,54 @@
+Test case 1 - sync (fail) using 'm_user' without: SUPER and REPLICATION CLIENT.
+ERROR: User 'm_user' on 'localhost@PORT1' does not have sufficient privileges to perform the synchronization check (required: SUPER or REPLICATION CLIENT, LOCK TABLES and SELECT).
+Test case 2 - sync (fail) using 'm_user' without: LOCK TABLES.
+ERROR: User 'm_user' on 'localhost@PORT1' does not have sufficient privileges to perform the synchronization check (required: SUPER or REPLICATION CLIENT, LOCK TABLES and SELECT).
+Test case 3 - sync (fail) using 'm_user' without: SELECT.
+ERROR: User 'm_user' on 'localhost@PORT1' does not have sufficient privileges to perform the synchronization check (required: SUPER or REPLICATION CLIENT, LOCK TABLES and SELECT).
+Test case 4 - sync (fail) using 's_user' without: SUPER.
+ERROR: User 's_user' on 'localhost@PORT2' does not have sufficient privileges to perform the synchronization check (required: SUPER and SELECT).
+Test case 5 - sync (fail) using 's_user' without: SELECT.
+ERROR: User 's_user' on 'localhost@PORT2' does not have sufficient privileges to perform the synchronization check (required: SUPER and SELECT).
+Test case 6 - sync (succeed) using: 'm_user' with SUPER, LOCK TABLES and SELECT; 's_user' with SUPER and SELECT.
+#
+# GTID differences between Master and Slaves:
+# - Slave 'localhost@PORT2' is up-to-date.
+#
+# Check data consistency between Servers:
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# Checking 'test_rplsync_db' database...
+# - Checking 't0' table data...
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT2'.
+# - Checking 't1' table data...
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT2'.
+# - Checking 't2' table data...
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT2'.
+# - Checking 't3' table data...
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT2'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 7 - sync (succeed) using: 'm_user' with REPLICATION CLIENT, LOCK TABLES and SELECT; 's_user' with SUPER and SELECT.
+#
+# GTID differences between Master and Slaves:
+# - Slave 'localhost@PORT2' is up-to-date.
+#
+# Check data consistency between Servers:
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# Checking 'test_rplsync_db' database...
+# - Checking 't0' table data...
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT2'.
+# - Checking 't1' table data...
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT2'.
+# - Checking 't2' table data...
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT2'.
+# - Checking 't3' table data...
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT2'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#

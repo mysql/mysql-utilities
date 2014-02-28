@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ from mysql.utilities.command.rpl_admin import RplCommands, purge_log
 from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.topology import parse_failover_connections
+from mysql.utilities.common.topology import parse_topology_connections
 from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
                                             add_failover_options,
                                             check_server_lists,
@@ -104,7 +104,7 @@ except:
 set_signal_handler(on_exit)
 
 # Setup the command parser
-program = os.path.basename(sys.argv[0]).replace(".py","")
+program = os.path.basename(sys.argv[0]).replace(".py", "")
 parser = UtilitiesParser(
     version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,
@@ -231,7 +231,7 @@ if opt.failover_mode == 'elect' and opt.candidates is None:
 
 # Parse the master, slaves, and candidates connection parameters
 try:
-    master_val, slaves_val, candidates_val = parse_failover_connections(opt)
+    master_val, slaves_val, candidates_val = parse_topology_connections(opt)
 except UtilRplError:
     _, e, _ = sys.exc_info()
     print("ERROR: %s" % e.errmsg)

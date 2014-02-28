@@ -1,0 +1,192 @@
+Test case 1 - check replication filters skip (case 1).
+# Checking users permission to perform consistency check.
+#
+# WARNING: Replication filters found on checked servers. This can lead data consistency issues depending on how statements are evaluated.
+# More information: http://dev.mysql.com/doc/en/replication-rules.html
+# Master 'localhost@PORT1':
+#   - binlog_do_db: test_rplsync_db1
+# Slave 'localhost@PORT3':
+#   - replicate_do_table: test_rplsync_db1.t1
+# Slave 'localhost@PORT4':
+#   - replicate_ignore_table: test_rplsync_db1.t2
+#   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
+#
+# GTID differences between Master and Slaves:
+# - Slave 'localhost@PORT3' is up-to-date.
+# - Slave 'localhost@PORT4' is up-to-date.
+#
+# Check data consistency between Servers:
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# Checking 'test_rplsync_db1' database...
+# [SKIP] Table 't0' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't0' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t0` checksum for server 'localhost@PORT4'.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't2' check for 'localhost@PORT3' - filtered by replication rule.
+# [SKIP] Table 't2' check for 'localhost@PORT4' - filtered by replication rule.
+# [SKIP] Table 't3' check for 'localhost@PORT3' - filtered by replication rule.
+# [SKIP] Table 't3' check for 'localhost@PORT4' - filtered by replication rule.
+# [SKIP] Database 'test_rplsync_db0' check - filtered by replication rule.
+# [SKIP] Database 'test_rplsync_db2' check - filtered by replication rule.
+# [SKIP] Database 'test_rplsync_db3' check - filtered by replication rule.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 2 - check replication filters skip (case 1) - only with slaves.
+# Checking users permission to perform consistency check.
+#
+# WARNING: Replication filters found on checked servers. This can lead data consistency issues depending on how statements are evaluated.
+# More information: http://dev.mysql.com/doc/en/replication-rules.html
+# Slave 'localhost@PORT3':
+#   - replicate_do_table: test_rplsync_db1.t1
+# Slave 'localhost@PORT4':
+#   - replicate_ignore_table: test_rplsync_db1.t2
+#   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
+#
+# Check data consistency between Servers:
+#
+# Using Slave 'localhost@PORT3' as base server for comparison.
+# Checking 'test_rplsync_db1' database...
+# [SKIP] Table 't0' - filtered by replication rule on base server.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT4'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 3 - check replication filters skip (case 2).
+# Checking users permission to perform consistency check.
+#
+# WARNING: Replication filters found on checked servers. This can lead data consistency issues depending on how statements are evaluated.
+# More information: http://dev.mysql.com/doc/en/replication-rules.html
+# Master 'localhost@PORT2':
+#   - binlog_ignore_db: test_rplsync_db2
+# Slave 'localhost@PORT3':
+#   - replicate_do_table: test_rplsync_db1.t1
+# Slave 'localhost@PORT4':
+#   - replicate_ignore_table: test_rplsync_db1.t2
+#   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
+#
+# GTID differences between Master and Slaves:
+# - Slave 'localhost@PORT3' is up-to-date.
+# - Slave 'localhost@PORT4' is up-to-date.
+#
+# Check data consistency between Servers:
+#
+# Using Master 'localhost@PORT2' as base server for comparison.
+# Checking 'test_rplsync_db1' database...
+# [SKIP] Table 't0' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't0' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t0` checksum for server 'localhost@PORT4'.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't2' check for 'localhost@PORT3' - filtered by replication rule.
+# [SKIP] Table 't2' check for 'localhost@PORT4' - filtered by replication rule.
+# [SKIP] Table 't3' check for 'localhost@PORT3' - filtered by replication rule.
+# [SKIP] Table 't3' check for 'localhost@PORT4' - filtered by replication rule.
+# Checking 'test_rplsync_db0' database...
+# [SKIP] Table 't0' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't0' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db0`.`t0` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't1' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db0`.`t1` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't2' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't2' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db0`.`t2` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't3' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't3' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db0`.`t3` checksum for server 'localhost@PORT4'.
+# Checking 'test_rplsync_db3' database...
+# [SKIP] Table 't0' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't0' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db3`.`t0` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't1' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db3`.`t1` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't2' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't2' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db3`.`t2` checksum for server 'localhost@PORT4'.
+# [SKIP] Table 't3' check for 'localhost@PORT3' - filtered by replication rule.
+# - Checking 't3' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db3`.`t3` checksum for server 'localhost@PORT4'.
+# [SKIP] Database 'test_rplsync_db2' check - filtered by replication rule.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 4 - check replication filters skip (case 2) - only with slaves.
+# Checking users permission to perform consistency check.
+#
+# WARNING: Replication filters found on checked servers. This can lead data consistency issues depending on how statements are evaluated.
+# More information: http://dev.mysql.com/doc/en/replication-rules.html
+# Slave 'localhost@PORT3':
+#   - replicate_do_table: test_rplsync_db1.t1
+# Slave 'localhost@PORT4':
+#   - replicate_ignore_table: test_rplsync_db1.t2
+#   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
+#
+# Check data consistency between Servers:
+#
+# Using Slave 'localhost@PORT3' as base server for comparison.
+# Checking 'test_rplsync_db1' database...
+# [SKIP] Table 't0' - filtered by replication rule on base server.
+# - Checking 't1' table data...
+#   Setting data synchronization point for slaves.
+#   Compute checksum on slaves (wait to catch up and resume replication).
+#   [OK] `test_rplsync_db1`.`t1` checksum for server 'localhost@PORT4'.
+# Checking 'test_rplsync_db0' database...
+# [SKIP] Table 't0' - filtered by replication rule on base server.
+# [SKIP] Table 't1' - filtered by replication rule on base server.
+# [SKIP] Table 't2' - filtered by replication rule on base server.
+# [SKIP] Table 't3' - filtered by replication rule on base server.
+# Checking 'test_rplsync_db3' database...
+# [SKIP] Table 't0' - filtered by replication rule on base server.
+# [SKIP] Table 't1' - filtered by replication rule on base server.
+# [SKIP] Table 't2' - filtered by replication rule on base server.
+# [SKIP] Table 't3' - filtered by replication rule on base server.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 5 - error using replicate-do-db.
+ERROR: Use of replicate_do_db option is not supported. There is a known issue with the use this replication filter and GTID for some server versions. Issue detected for 'localhost@PORT5'.
+Test case 6 - error using replicate-ignore-db.
+ERROR: Use of replicate_ignore_db option is not supported. There is a known issue with the use this replication filter and GTID for some server versions. Issue detected for 'localhost@PORT6'.
+Test case 7 - error using replicate-wild-do-db.
+ERROR: Use of replicate_wild_do_table option is not supported. There is a known issue with the use this replication filter and GTID for some server versions. Issue detected for 'localhost@PORT7'.

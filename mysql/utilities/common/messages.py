@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 This file contains output string messages used by MySQL Utilities.
 """
 
+
+ERROR_USER_WITHOUT_PRIVILEGES = ("User '{user}' on '{host}@{port}' does not "
+                                 "have sufficient privileges to perform "
+                                 "{operation} (required: {req_privileges}).")
 
 PARSE_ERR_DB_PAIR = ("Cannot parse the specified database(s): '{db_pair}'. "
                      "Please verify that the database(s) are specified in "
@@ -61,20 +65,35 @@ PARSE_ERR_DB_OBJ_MISSING = ("No object has been specified for "
 
 PARSE_ERR_DB_MISSING_CMP = "No databases specified to compare."
 
+PARSE_ERR_OBJ_NAME_FORMAT = ("Cannot parse the specified qualified name "
+                             "'{obj_name}' for {option}. Please verify that a "
+                             "valid format is used (i.e., <db_name>"
+                             "[.<tbl_name>]) and that backtick quotes are "
+                             "properly used if required.")
+
 PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW = (
     "The value {s_value} specified for option --span-key-size is too small "
     "and would cause inaccurate results, please retry with a bigger value "
     "or the default value of {default}.")
 
-PARSE_ERR_OPT_INVALID_CMD = ("Invalid {opt} option for '{cmd}'.")
+PARSE_ERR_OPT_INVALID_CMD = "Invalid {opt} option for '{cmd}'."
 
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
                                  % PARSE_ERR_OPT_INVALID_CMD)
+
+PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE = ("Option '{opt}' requires a "
+                                        "non-negative value.")
+
+PARSE_ERR_OPT_REQ_GREATER_VALUE = ("Option '{opt}' requires a value greater "
+                                   "than {val}.")
 
 PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
                              "{opts}.")
+
+PARSE_ERR_DISCO_REQ_MASTER = ("Option --discover-slaves-login requires use of "
+                              "--master.")
 
 PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
                              "required.")

@@ -98,6 +98,7 @@ mysqlreplicate    establish replication with a master
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
 mysqlrplshow      show slaves attached to a master                           
+mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
 mysqluserclone    clone a MySQL user account to one or more new users        
@@ -191,6 +192,7 @@ mysqlreplicate    establish replication with a master
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
 mysqlrplshow      show slaves attached to a master                           
+mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
 mysqluserclone    clone a MySQL user account to one or more new users        
@@ -217,6 +219,7 @@ mysqlreplicate    establish replication with a master
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
 mysqlrplshow      show slaves attached to a master                           
+mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
 mysqluserclone    clone a MySQL user account to one or more new users        
@@ -257,6 +260,7 @@ mysqlreplicate    establish replication with a master
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
 mysqlrplshow      show slaves attached to a master                           
+mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
 mysqluserclone    clone a MySQL user account to one or more new users        

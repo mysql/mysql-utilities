@@ -15,16 +15,18 @@ WARNING: Unable to locate utility mysqldbcopy.
 WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlrpladmin.
 WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqldbcompare.
-WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplshow.
+WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlrplcheck.
 WARNING: mysqlrplcheck failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplsync.
+WARNING: mysqlrplsync failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlauditgrep.
 WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldbexport.
 WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
-WARNING: Unable to locate utility mysqlrplshow.
-WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqldbcompare.
+WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlfailover.
 WARNING: mysqlfailover failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldiff.

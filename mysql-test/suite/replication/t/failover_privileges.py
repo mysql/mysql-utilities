@@ -17,6 +17,7 @@
 
 import failover
 
+from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError
 
 
@@ -45,54 +46,14 @@ class test(failover.test):
         # Create replication user and grant REPLICATION SLAVE privilege.
         grants = ['REPLICATION SLAVE']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=None,
-                                        disable_binlog=True, create_user=True)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=None,
+                                   disable_binlog=True, create_user=True)
 
         # Configure the replication topology for the new user.
         self.reset_topology(rpl_user='repl', rpl_passwd='repl')
 
         return True
-
-    def change_user_privileges(self, server, user_name, user_passwd, host,
-                               grant_list=None, revoke_list=None,
-                               disable_binlog=False, create_user=False):
-        """ Change the privileges of a new or existing user.
-
-        This method GRANT or REVOKE privileges to a new user (creating it) or
-        existing user.
-
-        server[in]          MySQL server instances to apply changes.
-        user_name[in]       user name to apply changes.
-        user_passwd[in]     user's password.
-        host[in]            host name associated to the user account.
-        grant_list[in]      List of privileges to GRANT.
-        revoke_list[in]     List of privileges to REVOKE.
-        disable_binlog[in]  Boolean value to determine if the binary logging
-                            will be disabled to perform this operation (and
-                            re-enabled at the end). By default: False (do not
-                            disable binary logging).
-        create_user[in]     Boolean value to determine if the user will be
-                            created before changing its privileges. By default:
-                            False (do no create user).
-        """
-        if disable_binlog:
-            server.exec_query("SET SQL_LOG_BIN=0")
-        if create_user:
-            server.exec_query("CREATE USER '{0}'@'{1}' IDENTIFIED BY "
-                              "'{2}'".format(user_name, host, user_passwd))
-        if grant_list:
-            grants_str = ", ".join(grant_list)
-            server.exec_query("GRANT {0} ON *.* TO '{1}'@'{2}' IDENTIFIED BY "
-                              "'{3}'".format(grants_str, user_name, host,
-                                             user_passwd))
-        if revoke_list:
-            revoke_str = ", ".join(revoke_list)
-            server.exec_query("REVOKE {0} ON *.* FROM '{1}'@'{2}'"
-                              "".format(revoke_str, user_name, host))
-        if disable_binlog:
-            server.exec_query("SET SQL_LOG_BIN=1")
 
     def run(self):
         # Create connection strings.
@@ -127,10 +88,9 @@ class test(failover.test):
         # Grant all required privileges except SUPER to user on slaves.
         grants = ['GRANT OPTION', 'SELECT', 'RELOAD', 'DROP', 'CREATE']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=None,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=None,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: SUPER.
         test_num += 1
@@ -147,10 +107,9 @@ class test(failover.test):
         grants = ['SUPER']
         revokes = ['DROP']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=revokes,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=revokes,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: DROP.
         test_num += 1
@@ -167,10 +126,9 @@ class test(failover.test):
         grants = ['DROP']
         revokes = ['CREATE']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=revokes,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=revokes,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: CREATE.
         test_num += 1
@@ -187,10 +145,9 @@ class test(failover.test):
         grants = ['CREATE']
         revokes = ['GRANT OPTION']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=revokes,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=revokes,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: GRANT OPTION.
         test_num += 1
@@ -207,10 +164,9 @@ class test(failover.test):
         grants = ['GRANT OPTION']
         revokes = ['SELECT']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=revokes,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=revokes,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: SELECT.
         test_num += 1
@@ -227,10 +183,9 @@ class test(failover.test):
         grants = ['SELECT']
         revokes = ['RELOAD']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=revokes,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=revokes,
+                                   disable_binlog=True, create_user=False)
 
         # Test failover using a user with missing privilege: RELOAD.
         test_num += 1
@@ -246,10 +201,9 @@ class test(failover.test):
         # Grant all required privileges to user on slaves.
         grants = ['RELOAD']
         for slave in [self.server2, self.server3, self.server4]:
-            self.change_user_privileges(slave, 'repl', 'repl',
-                                        self.server1.host,
-                                        grant_list=grants, revoke_list=None,
-                                        disable_binlog=True, create_user=False)
+            change_user_privileges(slave, 'repl', 'repl', self.server1.host,
+                                   grant_list=grants, revoke_list=None,
+                                   disable_binlog=True, create_user=False)
 
         # Apply masks.
         self.do_masks()

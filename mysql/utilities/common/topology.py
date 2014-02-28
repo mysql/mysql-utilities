@@ -24,6 +24,8 @@ import logging
 import time
 import operator
 
+from multiprocessing.pool import ThreadPool
+
 from mysql.utilities.exception import FormatError, UtilError, UtilRplError
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
@@ -57,7 +59,7 @@ _SELECT_RPL_USER_PASS_QUERY = ('SELECT user, host, grant_priv, password, '
                                'WHERE user ="%s" AND host ="%s";')
 
 
-def parse_failover_connections(options):
+def parse_topology_connections(options, parse_candidates=True):
     """Parse the --master, --slaves, and --candidates options
 
     This method returns a tuple with server connection dictionaries for
@@ -113,7 +115,7 @@ def parse_failover_connections(options):
                 raise UtilRplError(msg)
 
     candidates_val = []
-    if options.candidates:
+    if parse_candidates and options.candidates:
         candidates = options.candidates.split(",")
         for slave in candidates:
             try:
@@ -1062,7 +1064,7 @@ class Topology(Replication):
                 continue
             tnx_set = slave.get_executed_gtid_set()
 
-            # Get master UUID from salve if master is not available
+            # Get master UUID from slave if master is not available
             if use_master_uuid_from_slave:
                 master_uuid = slave.get_master_uuid()
 
@@ -1156,7 +1158,7 @@ class Topology(Replication):
 
         return True
 
-    def _remove_slave(self, slave):
+    def remove_slave(self, slave):
         """Remove a slave from the slaves dictionary list
 
         slave[in]      the dictionary for the slave to remove
@@ -1407,6 +1409,83 @@ class Topology(Replication):
                     owned.extend(gtid_data[2])
 
         return (executed, purged, owned)
+
+    def get_slaves_dict(self, skip_not_connected=True):
+        """Get a dictionary representation of the slaves in the topology.
+
+        This function converts the list of slaves in the topology to a
+        dictionary with all elements in the list, using 'host@port' as the
+        key for each element.
+
+        skip_not_connected[in]  Boolean value indicating if not available or
+                                not connected slaves should be skipped.
+                                By default 'True' (not available slaves are
+                                skipped).
+
+        Return a dictionary representation of the slaves in the
+        topology. Each element has a key with the format 'host@port' and
+        a dictionary value with the corresponding slave's data.
+        """
+        res = {}
+        for slave_dic in self.slaves:
+            slave = slave_dic['instance']
+            if skip_not_connected:
+                if slave and slave.is_alive():
+                    key = '{0}@{1}'.format(slave_dic['host'],
+                                           slave_dic['port'])
+                    res[key] = slave_dic
+            else:
+                key = '{0}@{1}'.format(slave_dic['host'], slave_dic['port'])
+                res[key] = slave_dic
+        return res
+
+    def slaves_gtid_subtract_executed(self, gtid_set, multithreading=False):
+        """Subtract GTID_EXECUTED from the given GTID set on all slaves.
+
+        Compute the difference between the given GTID set and the GTID_EXECUTED
+        set for each slave, providing the sets with the missing GTIDs from the
+        GTID_EXECUTED set that belong to the input GTID set.
+
+        gtid_set[in]        Input GTID set to find the missing element from
+                            the GTID_EXECUTED for all slaves.
+        multithreading[in]  Flag indicating if multithreading will be used,
+                            meaning that the operation will be performed
+                            concurrently on all slaves.
+                            By default True (concurrent execution).
+
+        Return a list of tuples with the result for each slave. Each tuple
+        contains the identification of the server (host and port) and a string
+        representing the set of GTIDs from the given set not in the
+        GTID_EXECUTED set of the corresponding slave.
+        """
+        if multithreading:
+            # Create a pool of threads to execute the method for each slave.
+            pool = ThreadPool(processes=len(self.slaves))
+            res_lst = []
+            for slave_dict in self.slaves:
+                slave = slave_dict['instance']
+                if slave:  # Skip non existing (not connected) slaves.
+                    thread_res = pool.apply_async(slave.gtid_subtract_executed,
+                                                  (gtid_set, ))
+                    res_lst.append((slave.host, slave.port, thread_res))
+            pool.close()
+            # Wait for all threads to finish here to avoid RuntimeErrors when
+            # waiting for the result of a thread that is already dead.
+            pool.join()
+            # Get the result from each slave and return the results.
+            res = []
+            for host, port, thread_res in res_lst:
+                res.append((host, port, thread_res.get()))
+            return res
+        else:
+            res = []
+            # Subtract gtid set on all slaves.
+            for slave_dict in self.slaves:
+                slave = slave_dict['instance']
+                if slave:  # Skip non existing (not connected) slaves.
+                    not_in_set = slave.gtid_subtract_executed(gtid_set)
+                    res.append((slave.host, slave.port, not_in_set))
+            return res
 
     def check_privileges(self, failover=False):
         """Check privileges for the master and all known servers
@@ -1779,9 +1858,9 @@ class Topology(Replication):
         self.master = m_candidate
 
         # Remove slave from list of slaves
-        self._remove_slave({'host': m_candidate.host,
-                            'port': m_candidate.port,
-                            'instance': m_candidate})
+        self.remove_slave({'host': m_candidate.host,
+                           'port': m_candidate.port,
+                           'instance': m_candidate})
 
         # Make new master forget was an slave using slave methods
         s_candidate = self._change_role(m_candidate)
@@ -2043,7 +2122,7 @@ class Topology(Replication):
         self.run_cmd_on_slaves("stop", not self.verbose)
 
         # Take the new master out of the slaves list.
-        self._remove_slave(new_master_dict)
+        self.remove_slave(new_master_dict)
 
         self._report("# Switching slaves to new master.")
         for slave_dict in self.slaves:

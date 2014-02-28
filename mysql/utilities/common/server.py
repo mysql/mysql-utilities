@@ -27,9 +27,11 @@ import socket
 import string
 import subprocess
 import tempfile
+import threading
 
 import mysql.connector
 
+from mysql.connector.errorcode import CR_SERVER_LOST
 from mysql.utilities.exception import (ConnectionValuesError, UtilError,
                                        UtilDBError, UtilRplError)
 from mysql.utilities.common.user import User
@@ -582,6 +584,7 @@ class Server(object):
         self.read_only = False
         self.aliases = []
         self.grants_enabled = None
+        self._version = None
 
     @classmethod
     def fromServer(cls, server):
@@ -822,8 +825,33 @@ class Server(object):
 
         Note: This method must be called before executing queries.
 
-
         Raises UtilError if error during connect
+        """
+        try:
+            self.db_conn = self.get_connection()
+            # If no charset provided, get it from the "character_set_client"
+            # server variable.
+            if not self.charset:
+                res = self.show_server_variable('character_set_client')
+                self.db_conn.set_charset_collation(charset=res[0][1])
+                self.charset = res[0][1]
+        except UtilError:
+            # Reset any previous value if the connection cannot be established,
+            # before raising an exception. This prevents the use of a broken
+            # database connection.
+            self.db_conn = None
+            raise
+        self.connect_error = None
+        self.read_only = self.show_server_variable("READ_ONLY")[0][1]
+
+    def get_connection(self):
+        """Return a new connection to the server.
+
+        Attempts to connect to the server as specified by the connection
+        parameters and returns a connection object.
+
+        Return the resulting MySQL connection object or raises an UtilError if
+        an error occurred during the server connection process.
         """
         try:
             parameters = {
@@ -839,21 +867,12 @@ class Server(object):
                 parameters['charset'] = self.charset
             parameters['host'] = parameters['host'].replace("[", "")
             parameters['host'] = parameters['host'].replace("]", "")
-            self.db_conn = mysql.connector.connect(**parameters)
-            # If no charset provided, get it from the "character_set_client"
-            # server variable.
-            if not self.charset:
-                res = self.show_server_variable('character_set_client')
-                self.db_conn.set_charset_collation(charset=res[0][1])
-        except mysql.connector.Error, e:
-            # Reset any previous value if the connection cannot be established,
-            # before raising an exception. This prevents the use of a broken
-            # database connection.
-            self.db_conn = None
-            raise UtilError("Cannot connect to the %s server.\n"
-                            "Error %s" % (self.role, e.msg), e.errno)
-        self.connect_error = None
-        self.read_only = self.show_server_variable("READ_ONLY")[0][1]
+            db_conn = mysql.connector.connect(**parameters)
+            # Return MySQL connection object.
+            return db_conn
+        except mysql.connector.Error as err:
+            raise UtilError("Cannot connect to the {0} server.\n"
+                            "Error {1}".format(self.role, err.msg), err.errno)
 
     def disconnect(self):
         """Disconnect from the server.
@@ -866,17 +885,27 @@ class Server(object):
     def get_version(self):
         """Return version number of the server.
 
+        Get the server version. The respective instance variable is set with
+        the result after querying the server the first time. The version is
+        immediately returned when already known, avoiding querying the server
+        at each time.
+
         Returns string - version string or None if error
         """
-        version_str = None
+        # Return the local version value if already known.
+        if self._version:
+            return self._version
+
+        # Query the server for its version.
         try:
             res = self.show_server_variable("VERSION")
             if res:
-                version_str = res[0][1]
-        except:
+                self._version = res[0][1]
+        except UtilError:
+            # Ignore errors and return _version, initialized with None.
             pass
 
-        return version_str
+        return self._version
 
     def check_version_compat(self, t_major, t_minor, t_rel):
         """Checks version of the server against requested version.
@@ -901,7 +930,7 @@ class Server(object):
                 return False
         return True
 
-    def exec_query(self, query_str, options=None):
+    def exec_query(self, query_str, options=None, exec_timeout=0):
         """Execute a query and return result set
 
         This is the singular method to execute queries. It should be the only
@@ -923,7 +952,11 @@ class Server(object):
             raw            If True, use a buffered raw cursor
                            (default is True)
             commit         Perform a commit (if needed) automatically at the
-                           end (default: True)..
+                           end (default: True).
+        exec_timeout[in]   Timeout value in seconds to kill the query execution
+                           if exceeded. Value must be greater than zero for
+                           this feature to be enabled. By default 0, meaning
+                           that the query will not be killed.
 
         Returns result set or cursor
         """
@@ -949,17 +982,39 @@ class Server(object):
             cur = self.db_conn.cursor(raw=True)
 
         # Execute query, handling parameters.
+        q_killer = None
         try:
+            if exec_timeout > 0:
+                # Spawn thread to kill query if timeout is reached.
+                # Note: set it as daemon to avoid waiting for it on exit.
+                q_killer = QueryKillerThread(self, query_str, exec_timeout)
+                q_killer.daemon = True
+                q_killer.start()
+            # Execute query.
             if params == ():
                 cur.execute(query_str)
             else:
                 cur.execute(query_str, params)
         except mysql.connector.Error as err:
             cur.close()
-            raise UtilDBError("Query failed. {0}".format(err))
+            if err.errno == CR_SERVER_LOST and exec_timeout > 0:
+                # If the connection is killed (because the execution timeout is
+                # reached), then it attempts to re-establish it (to execute
+                # further queries) and raise a specific exception to track this
+                # event.
+                # CR_SERVER_LOST = Errno 2013 Lost connection to MySQL server
+                # during query.
+                self.db_conn.reconnect()
+                raise UtilError("Timeout executing query", err.errno)
+            else:
+                raise UtilDBError("Query failed. {0}".format(err))
         except Exception:
             cur.close()
             raise UtilError("Unknown error. Command: {0}".format(query_str))
+        finally:
+            # Stop query killer thread if alive.
+            if q_killer and q_killer.is_alive():
+                q_killer.stop()
 
         # Fetch rows (only if available or fetch = True).
         if cur.with_rows:
@@ -1088,6 +1143,113 @@ class Server(object):
                "retry the {0}.").format(operation)
         raise UtilRplError(err)
 
+    def get_gtid_executed(self, skip_gtid_check=True):
+        """Get the executed GTID set of the server.
+
+        This function retrieves the (current) GTID_EXECUTED set of the server.
+
+        skip_gtid_check[in]     Flag indicating if the check for GTID support
+                                will be skipped or not. By default 'True'
+                                (check is skipped).
+
+        Returns a string with the GTID_EXECUTED set for this server.
+        """
+        if not skip_gtid_check:
+            # Check server for GTID support.
+            gtid_support = self.supports_gtid() == "NO"
+            if gtid_support == 'NO':
+                raise UtilRplError("Global Transaction IDs are not supported.")
+            elif gtid_support == 'OFF':
+                raise UtilError("Global Transaction IDs are not enabled.")
+        # Get GTID_EXECUTED.
+        try:
+            return self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0][0]
+        except UtilError:
+            if skip_gtid_check:
+                # Query likely failed because GTIDs are not supported,
+                # therefore skip error in this case.
+                return ""
+            else:
+                # If GTID check is not skipped re-raise exception.
+                raise
+        except IndexError:
+            # If no rows are returned by query then return an empty string.
+            return ''
+
+    def gtid_subtract(self, gtid_set, gtid_subset):
+        """Subtract given GTID sets.
+
+        This function invokes GTID_SUBTRACT function on the server to retrieve
+        the GTIDs from the given gtid_set that are not in the specified
+        gtid_subset.
+
+        gtid_set[in]        Base GTID set to subtract the subset from.
+        gtid_subset[in]     GTID subset to be subtracted from the base set.
+
+        Return a string with the GTID set resulting from the subtraction of the
+        specified gtid_subset from the gtid_set.
+        """
+        try:
+            return self.exec_query(
+                "SELECT GTID_SUBTRACT('{0}', '{1}')".format(gtid_set,
+                                                            gtid_subset)
+            )[0][0]
+        except IndexError:
+            # If no rows are returned by query then return an empty string.
+            return ''
+
+    def gtid_subtract_executed(self, gtid_set):
+        """Subtract GTID_EXECUTED to the given GTID set.
+
+        This function invokes GTID_SUBTRACT function on the server to retrieve
+        the GTIDs from the given gtid_set that are not in the GTID_EXECUTED
+        set.
+
+        gtid_set[in]        Base GTID set to subtract the GTID_EXECUTED.
+
+        Return a string with the GTID set resulting from the subtraction of the
+        GTID_EXECUTED set from the specified gtid_set.
+        """
+        from mysql.utilities.common.topology import _GTID_SUBTRACT_TO_EXECUTED
+        try:
+            return self.exec_query(
+                _GTID_SUBTRACT_TO_EXECUTED.format(gtid_set)
+            )[0][0]
+        except IndexError:
+            # If no rows are returned by query then return an empty string.
+            return ''
+
+    def checksum_table(self, tbl_name, exec_timeout=0):
+        """Compute checksum of specified table (CHECKSUM TABLE tbl_name).
+
+        This function executes the CHECKSUM TABLE statement for the specified
+        table and returns the result. The CHECKSUM is aborted (query killed)
+        if a timeout value (greater than zero) is specified and the execution
+        takes longer than the specified time.
+
+        tbl_name[in]        Name of the table to perform the checksum.
+        exec_timeout[in]    Maximum execution time (in seconds) of the query
+                            after which it will be killed. By default 0, no
+                            timeout.
+
+        Returns a tuple with the checksum result for the target table. The
+        first tuple element contains the result from the CHECKSUM TABLE query
+        or None if an error occurred (e.g. execution timeout reached). The
+        second element holds any error message or None if the operation was
+        successful.
+        """
+        try:
+            return self.exec_query(
+                "CHECKSUM TABLE {0}".format(tbl_name),
+                exec_timeout=exec_timeout
+            )[0], None
+        except IndexError:
+            # If no rows are returned by query then return None.
+            return None, "No data returned by CHECKSUM TABLE"
+        except UtilError as err:
+            # Return None if the query is killed (exec_timeout reached).
+            return None, err.errmsg
+
     def get_gtid_status(self):
         """Get the GTID information for the server.
 
@@ -1098,7 +1260,7 @@ class Server(object):
         Returns [list, list, list]
         """
         # Check servers for GTID support
-        if not self.supports_gtid():
+        if self.supports_gtid() == "NO":
             raise UtilError("Global Transaction IDs are not supported.")
 
         res = self.exec_query("SELECT @@GLOBAL.GTID_MODE")
@@ -1611,3 +1773,101 @@ class Server(object):
                 else:
                     self.grants_enabled = True
         return self.grants_enabled
+
+
+class QueryKillerThread(threading.Thread):
+    """Class to run a thread to kill an executing query.
+
+    This class is used to spawn a thread than will kill the execution
+    (connection) of a query upon reaching a given timeout.
+    """
+
+    def __init__(self, server, query, timeout):
+        """Constructor.
+
+        server[in]      Server instance where the target query is executed.
+        query[in]       Target query to kill.
+        timeout[in]     Timeout value in seconds used to kill the query when
+                        reached.
+        """
+        threading.Thread.__init__(self)
+        self._stop_event = threading.Event()
+        self._query = query
+        self._timeout = timeout
+        self._server = server
+        self._connection = server.get_connection()
+        server.get_version()
+
+    def run(self):
+        """Main execution of the query killer thread.
+        Stop the thread if instructed as such
+        """
+        connector_error = None
+        # Kill the query connection upon reaching the given execution timeout.
+        while not self._stop_event.is_set():
+            # Wait during the defined time.
+            self._stop_event.wait(self._timeout)
+            # If the thread was asked to stop during wait, it does not try to
+            # kill the query.
+            if not self._stop_event.is_set():
+                try:
+                    cur = self._connection.cursor(raw=True)
+
+                    # Get process information from threads table when available
+                    # (for versions > 5.6.1), since it does not require a mutex
+                    # and has minimal impact on server performance.
+                    if self._server.check_version_compat(5, 6, 1):
+                        cur.execute(
+                            "SELECT processlist_id "
+                            "FROM performance_schema.threads"
+                            " WHERE processlist_command='Query'"
+                            " AND processlist_info='{0}'".format(self._query))
+                    else:
+                        cur.execute(
+                            "SELECT id FROM information_schema.processlist"
+                            " WHERE command='Query'"
+                            " AND info='{0}'".format(self._query))
+                    result = cur.fetchall()
+
+                    try:
+                        process_id = result[0][0]
+                    except IndexError:
+                        # No rows are returned if the query ended in the
+                        # meantime.
+                        process_id = None
+
+                    # Kill the connection associated to que process id.
+                    # Note: killing the query will not work with
+                    # connector-python,since it will hang waiting for the
+                    #  query to return.
+                    if process_id:
+                        cur.execute("KILL {0}".format(process_id))
+                except mysql.connector.Error as err:
+                    # Hold error to raise at the end.
+                    connector_error = err
+                finally:
+                    # Close cursor if available.
+                    if cur:
+                        cur.close()
+                # Stop this thread.
+                self.stop()
+
+        # Close connection.
+        try:
+            self._connection.disconnect()
+        except mysql.connector.Error:
+            # Only raise error if no previous error has occurred.
+            if not connector_error:
+                raise
+        finally:
+            # Raise any previous error that already occurred.
+            if connector_error is not None:
+                # Note: ignore pylint E0702 for the next line (known issue).
+                raise connector_error
+
+    def stop(self):
+        """Stop the thread.
+
+        Set the event flag for the thread to stop as soon as possible.
+        """
+        self._stop_event.set()

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,47 @@ import re
 
 from mysql.utilities.exception import UtilError, UtilDBError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
+
+
+def change_user_privileges(server, user_name, user_passwd, host,
+                           grant_list=None, revoke_list=None,
+                           disable_binlog=False, create_user=False):
+    """ Change the privileges of a new or existing user.
+
+    This method GRANT or REVOKE privileges to a new user (creating it) or
+    existing user.
+
+    server[in]          MySQL server instances to apply changes
+                        (from mysql.utilities.common.server.Server).
+    user_name[in]       user name to apply changes.
+    user_passwd[in]     user's password.
+    host[in]            host name associated to the user account.
+    grant_list[in]      List of privileges to GRANT.
+    revoke_list[in]     List of privileges to REVOKE.
+    disable_binlog[in]  Boolean value to determine if the binary logging
+                        will be disabled to perform this operation (and
+                        re-enabled at the end). By default: False (do not
+                        disable binary logging).
+    create_user[in]     Boolean value to determine if the user will be
+                        created before changing its privileges. By default:
+                        False (do no create user).
+    """
+    if disable_binlog:
+        server.exec_query("SET SQL_LOG_BIN=0")
+    if create_user:
+        server.exec_query("CREATE USER '{0}'@'{1}' IDENTIFIED BY "
+                          "'{2}'".format(user_name, host, user_passwd))
+    if grant_list:
+        grants_str = ", ".join(grant_list)
+        server.exec_query("GRANT {0} ON *.* TO '{1}'@'{2}' IDENTIFIED BY "
+                          "'{3}'".format(grants_str, user_name, host,
+                                         user_passwd))
+    if revoke_list:
+        revoke_str = ", ".join(revoke_list)
+        server.exec_query("REVOKE {0} ON *.* FROM '{1}'@'{2}'"
+                          "".format(revoke_str, user_name, host))
+    if disable_binlog:
+        server.exec_query("SET SQL_LOG_BIN=1")
 
 
 def parse_user_host(user_name):
