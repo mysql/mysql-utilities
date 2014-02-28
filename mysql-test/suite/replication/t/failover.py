@@ -26,7 +26,7 @@ from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
 from mysql.utilities.exception import MUTLibError, UtilError
 
-_FAILOVER_LOG = "{0}fail_log.txt"
+FAILOVER_LOG = "{0}fail_log.txt"
 _TIMEOUT = 30
 
 
@@ -65,7 +65,7 @@ class test(rpl_admin_gtid.test):
         # Remove log files (leftover from previous test).
         for log in self.log_range:
             try:
-                os.unlink(_FAILOVER_LOG.format(log))
+                os.unlink(FAILOVER_LOG.format(log))
             except OSError:
                 pass
         return rpl_admin_gtid.test.setup(self)
@@ -335,30 +335,30 @@ class test(rpl_admin_gtid.test):
                         self.fail_event_script + '" --timeout=5 ')
         
         conn_str = " ".join([master_str, slaves_str])
-        str_ = failover_cmd.format(conn_str, 'auto', _FAILOVER_LOG.format('1'))
+        str_ = failover_cmd.format(conn_str, 'auto', FAILOVER_LOG.format('1'))
         str_ = "{0} --candidates={1} ".format(str_, slave1_conn)
         test_num = 1
         self.test_cases.append(
-            (self.server1, str_, True, _FAILOVER_LOG.format('1'),
+            (self.server1, str_, True, FAILOVER_LOG.format('1'),
              "Test case {0} - Simple failover with "
              "--failover=auto.".format(test_num),
              "Failover complete", False)
         )
         str_ = failover_cmd.format("--master={0}".format(slave1_conn), 'elect',
-                                   _FAILOVER_LOG.format('2'))
+                                   FAILOVER_LOG.format('2'))
         str_ = "{0} --candidates={1} ".format(str_, slave2_conn)
         test_num += 1
         self.test_cases.append(
-            (self.server2, str_, True, _FAILOVER_LOG.format('2'),
+            (self.server2, str_, True, FAILOVER_LOG.format('2'),
              "Test case {0} - Simple failover with "
              "--failover=elect.".format(test_num),
              "Failover complete", True)
         )
         str_ = failover_cmd.format("--master={0}".format(slave2_conn), 'fail',
-                                   _FAILOVER_LOG.format('3'))
+                                   FAILOVER_LOG.format('3'))
         test_num += 1
         self.test_cases.append(
-            (self.server3, str_, False, _FAILOVER_LOG.format('3'),
+            (self.server3, str_, False, FAILOVER_LOG.format('3'),
              "Test case {0} - Simple failover with "
              "--failover=fail.".format(test_num),
              "Master has failed and automatic", True)
@@ -390,7 +390,7 @@ class test(rpl_admin_gtid.test):
         failover_cmd = ("python ../scripts/mysqlfailover.py --interval=10 "
                         " --discover-slaves-login=root:root --force "
                         "--master={0} --log={1}".format(
-                            slave3_conn, _FAILOVER_LOG.format('4')))
+                            slave3_conn, FAILOVER_LOG.format('4')))
 
         if self.debug:
             print failover_cmd
@@ -460,7 +460,7 @@ class test(rpl_admin_gtid.test):
         # Remove all log files
         for log in self.log_range:
             try:
-                os.unlink(_FAILOVER_LOG.format(log))
+                os.unlink(FAILOVER_LOG.format(log))
             except OSError:
                 pass
 

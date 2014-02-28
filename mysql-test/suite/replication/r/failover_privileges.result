@@ -1,62 +1,145 @@
-Test case 1 - failover (fail) using 'repl' only with: REPLICATION SLAVE.
+Test case 1 - failover (fail) using 's_user' only with: REPLICATION SLAVE.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
 WARNING: There are slaves that had connection errors.
-ERROR: Query failed. 1227: Access denied; you need (at least one of) the SUPER privilege(s) for this operation
-Test case 2 - failover (fail) using 'repl' without: SUPER.
+# Checking privileges.
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 2 - failover (fail) using 's_user' without: SUPER.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
 WARNING: There are slaves that had connection errors.
-ERROR: Query failed. 1227: Access denied; you need (at least one of) the SUPER privilege(s) for this operation
-Test case 3 - failover (fail) using 'repl' without: DROP.
-# Discovering slaves for master at localhost:PORT1
-# Discovering slave at localhost:PORT2
-# Discovering slave at localhost:PORT3
-# Discovering slave at localhost:PORT4
-ERROR: Query failed. 1142: DROP command denied to user 'repl'@'localhost' for table 'failover_console'
-Test case 4 - failover (fail) using 'repl' without: CREATE.
+# Checking privileges.
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 3 - failover (fail) using 's_user' without: DROP.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
 # Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
-Test case 5 - failover (fail) using 'repl' without: GRANT OPTION.
+Test case 4 - failover (fail) using 's_user' without: CREATE.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
 # Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
-Test case 6 - failover (fail) using 'repl' without: SELECT.
+Test case 5 - failover (fail) using 's_user' without: GRANT OPTION.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
 # Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
-Test case 7 - failover (fail) using 'repl' without: RELOAD.
+Test case 6 - failover (fail) using 's_user' without: SELECT.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
 # Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
+Test case 7 - failover (fail) using 's_user' without: RELOAD.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 8 - failover (fail) using 's_user' without: INSERT.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+# ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 9 - failover (fail) using 'm_user' without: REPLICATION SLAVE.
+# Discovering slaves for master at localhost:PORT1
+ERROR: ('Query failed. 1227: Access denied; you need (at least one of) the REPLICATION SLAVE privilege(s) for this operation', 0)
+Test case 10 - failover (fail) using 'm_user' without: SUPER.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 11 - failover (fail) using 'm_user' without: DROP.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 12 - failover (fail) using 'm_user' without: CREATE.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 13 - failover (fail) using 'm_user' without: GRANT OPTION.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 14 - failover (fail) using 'm_user' without: SELECT.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 15 - failover (fail) using 'm_user' without: RELOAD.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 16 - failover (fail) using 'm_user' without: INSERT.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Checking privileges.
+# ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
+ERROR: Not enough privileges to execute command.
+Test case 17 - failover (succeed) using 's_user' and 'm_user' with: REPLICATION SLAVE, SUPER, GRANT OPTION, SELECT, RELOAD, DROP, CREATE, INSERT.
+Failover complete ? True

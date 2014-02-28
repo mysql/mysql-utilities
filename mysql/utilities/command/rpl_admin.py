@@ -568,6 +568,19 @@ class RplCommands(object):
                                   self.topology.get_server_uuids,
                                   self.options)
 
+        # Check privileges
+        self._report("# Checking privileges.")
+        errors = self.topology.check_privileges(failover_mode != 'fail')
+        if len(errors):
+            for error in errors:
+                msg = ("User {0} on {1}@{2} does not have sufficient "
+                       "privileges to execute the {3} command "
+                       "(required: {4}).").format(error[0], error[1], error[2],
+                                                  'failover', error[3])
+                print("# ERROR: {0}".format(msg))
+                self._report(msg, logging.CRITICAL, False)
+            raise UtilRplError("Not enough privileges to execute command.")
+
         # Unregister existing instances from slaves
         self._report("Unregistering existing instances from slaves.",
                      logging.INFO, False)
@@ -596,7 +609,7 @@ class RplCommands(object):
             time.sleep(1)
 
         try:
-            res = self.run_auto_failover(console, interval, failover_mode)
+            res = self.run_auto_failover(console, failover_mode)
         except:
             raise
         finally:
@@ -648,7 +661,7 @@ class RplCommands(object):
 
         return res
 
-    def run_auto_failover(self, console, interval, failover_mode="auto"):
+    def run_auto_failover(self, console, failover_mode="auto"):
         """Run automatic failover
 
         This method implements the automatic failover facility. It uses the
@@ -662,8 +675,7 @@ class RplCommands(object):
         2) failover to list of candidates only
         3) fail
 
-        console[in]    instance of the failover console class
-        interval[in]   time in seconds to wait to check status of servers
+        console[in]    instance of the failover console class.
 
         Returns bool - True = success, raises exception on error
         """
@@ -678,19 +690,6 @@ class RplCommands(object):
                   "and have GTID_MODE=ON."
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
-
-        # Check privileges
-        self._report("# Checking privileges.")
-        errors = self.topology.check_privileges(failover_mode != 'fail')
-        if len(errors):
-            for error in errors:
-                msg = ("User {0} on {1}@{2} does not have sufficient "
-                       "privileges to execute the {3} command "
-                       "(required: {4}).").format(error[0], error[1], error[2],
-                                                  'failover', error[3])
-                print("# ERROR: {0}".format(msg))
-                self._report(msg, logging.CRITICAL, False)
-            raise UtilRplError("Not enough privileges to execute command.")
 
         # Require --master-info-repository=TABLE for all slaves
         if not self.topology.check_master_info_type("TABLE"):

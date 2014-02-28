@@ -416,17 +416,6 @@ class FailoverDaemon(object):
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
 
-        # Check privileges
-        self._report("# Checking privileges.")
-        errors = self.rpl.topology.check_privileges(failover_mode != "fail")
-        if len(errors):
-            msg = ("User {0} on {1} does not have sufficient privileges to "
-                   "execute the {2} command.")
-            for error in errors:
-                self._report(msg.format(error[0], error[1], "failover"),
-                             logging.CRITICAL)
-            raise UtilRplError("Not enough privileges to execute command.")
-
         # Require --master-info-repository=TABLE for all slaves
         if not self.rpl.topology.check_master_info_type("TABLE"):
             msg = ("Failover requires --master-info-repository=TABLE for "
@@ -674,6 +663,18 @@ class FailoverDaemon(object):
         Runs the automatic failover, it will start the daemon if detach_process
         is True.
         """
+
+        # Check privileges
+        self._report("# Checking privileges.")
+        errors = self.rpl.topology.check_privileges(self.mode != "fail")
+        if len(errors):
+            msg = ("User {0} on {1} does not have sufficient privileges to "
+                   "execute the {2} command.")
+            for error in errors:
+                self._report(msg.format(error[0], error[1], "failover"),
+                             logging.CRITICAL)
+            raise UtilRplError("Not enough privileges to execute command.")
+
         # Check failover instances running
         self.check_instance()
 
