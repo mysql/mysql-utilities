@@ -76,13 +76,13 @@ class test(mutlib.System_test):
             self.results.append("\n")
 
         # CSV masks
-        self.mask_column_result("root:*@127.0.0.1", ",", 1, "root[...]")
+        self.mask_column_result("root:*@localhost", ",", 1, "root[...]")
         self.mask_column_result("root[...]", ",", 2, "XXXXX")
         self.mask_column_result("root[...]", ",", 4, "localhost")
         self.mask_column_result("root[...]", ",", 7, "XXXXX")
 
         # TAB masks
-        self.mask_column_result("root:*@127.0.0.1", "\t", 1, "root[...]")
+        self.mask_column_result("root:*@localhost", "\t", 1, "root[...]")
         self.mask_column_result("root[...]", "\t", 2, "XXXXX")
         self.mask_column_result("root[...]", "\t", 4, "localhost")
         self.mask_column_result("root[...]", "\t", 7, "XXXXX")

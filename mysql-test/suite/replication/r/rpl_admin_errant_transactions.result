@@ -1,67 +1,67 @@
-Test case 1 - failover to 127.0.0.1:PORT2 with errant transactions.
+Test case 1 - failover to localhost:PORT2 with errant transactions.
 # Checking privileges.
 # Checking privileges on candidates.
 # ERROR: Errant transaction(s) found on slave(s).
-#  - For slave '127.0.0.1@PORT2': XXXXXXXXX:1
-#  - For slave '127.0.0.1@PORT4': XXXXXXXXX:1
+#  - For slave 'localhost@PORT2': XXXXXXXXX:1
+#  - For slave 'localhost@PORT4': XXXXXXXXX:1
 ERROR: Errant transaction(s) found on slave(s). Note: If you want to ignore this issue, although not advised, please use the utility with the --force option.
-Test case 2 - failover to 127.0.0.1:PORT2 with errant transactions using --force option.
+Test case 2 - failover to localhost:PORT2 with errant transactions using --force option.
 # Checking privileges.
 # Checking privileges on candidates.
 # ERROR: Errant transaction(s) found on slave(s).
-#  - For slave '127.0.0.1@PORT2': XXXXXXXXX:1
-#  - For slave '127.0.0.1@PORT4': XXXXXXXXX:1
+#  - For slave 'localhost@PORT2': XXXXXXXXX:1
+#  - For slave 'localhost@PORT4': XXXXXXXXX:1
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT2 for candidate.
+# Checking eligibility of slave localhost:PORT2 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT2 will become the new master.
+# Candidate slave localhost:PORT2 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
-# Reading events in relay log for slave 127.0.0.1:PORT2
-# Reading events in relay log for slave 127.0.0.1:PORT3
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
-# Reading events in relay log for slave 127.0.0.1:PORT4
-# Missing transactions found on 127.0.0.1:PORT4. SELECT gtid_subset() = 0
+# Reading events in relay log for slave localhost:PORT2
+# Reading events in relay log for slave localhost:PORT3
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
+# Reading events in relay log for slave localhost:PORT4
+# Missing transactions found on localhost:PORT4. SELECT gtid_subset() = 0
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
-# Connecting candidate to 127.0.0.1:PORT4 as a temporary slave to retrieve unprocessed GTIDs.
-# Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Connecting candidate to localhost:PORT4 as a temporary slave to retrieve unprocessed GTIDs.
+# Change master command for localhost:PORT2
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # UNLOCK STRING: UNLOCK TABLES
-# Waiting for candidate to catch up to slave 127.0.0.1:PORT4.
-# Slave 127.0.0.1:PORT2:
+# Waiting for candidate to catch up to slave localhost:PORT4.
+# Slave localhost:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
 # Return Code = XXX
-# Slave 127.0.0.1:PORT2:
+# Slave localhost:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
 # Return Code = XXX
 # Creating replication user if it does not exist.
 # Stopping slaves.
 # Performing STOP on all slaves.
-#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT2 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT4
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT4
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT2: RESET SLAVE ALL
+# Execute on localhost:PORT2: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT4 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
 # Checking slaves for errors.
-# 127.0.0.1:PORT3 status: Ok 
-# 127.0.0.1:PORT4 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT4 status: Ok 
 # Failover complete.
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.

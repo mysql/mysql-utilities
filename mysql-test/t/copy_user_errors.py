@@ -38,7 +38,7 @@ class test(copy_user.test):
         to_conn = "--destination={0}".format(
             self.build_connection_string(self.server2))
 
-        cmd_str = ("mysqluserclone.py --source=noone:nope@127.0.0.1:3306 "
+        cmd_str = ("mysqluserclone.py --source=noone:nope@localhost:3306 "
                    "{0}".format(to_conn))
 
         test_num = 1
@@ -49,7 +49,7 @@ class test(copy_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqluserclone.py --destination=noone:nope@127.0.0.1:3306 "
+        cmd_str = ("mysqluserclone.py --destination=noone:nope@localhost:3306 "
                    "{0}".format(from_conn))
         comment = ("Test case {0} - error: invalid login to destination "
                    "server".format(test_num))
@@ -66,14 +66,14 @@ class test(copy_user.test):
 
         test_num += 1
         comment = "Test case {0} - error: no new user".format(test_num)
-        res = self.run_test_case(2, cmd_str + "joenopass@127.0.0.1", comment)
+        res = self.run_test_case(2, cmd_str + "joenopass@localhost", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: cannot use dump and quiet "
                    "together".format(test_num))
-        res = self.run_test_case(2, cmd_str + " root@127.0.0.1  x@f --quiet "
+        res = self.run_test_case(2, cmd_str + " root@localhost  x@f --quiet "
                                               "--dump", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -83,7 +83,7 @@ class test(copy_user.test):
                    "{0} ".format(to_conn))
         comment = ("Test case {0} - error: cannot parser source "
                    "connection".format(test_num))
-        res = self.run_test_case(2, cmd_str + " root@127.0.0.1 x@f", comment)
+        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -92,7 +92,7 @@ class test(copy_user.test):
                    "{0} ".format(from_conn))
         comment = ("Test case {0} - error: cannot parser destination "
                    "connection".format(test_num))
-        res = self.run_test_case(2, cmd_str + " root@127.0.0.1 x@f", comment)
+        res = self.run_test_case(2, cmd_str + " root@localhost x@f", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

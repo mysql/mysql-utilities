@@ -1,50 +1,50 @@
 Test case 1 - show topology - without list
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Test case 2 - show topology - with list
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| 127.0.0.1:PORT2  | 127.0.0.1:PORT1  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 3 - show topology - with list and quiet
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| 127.0.0.1:PORT2  | 127.0.0.1:PORT1  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 4 - show topology - with format and without list
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Test case 5 - show topology - help
   --version             show program's version number and exit
@@ -81,59 +81,59 @@ Test case 5 - show topology - help
                         the user and 'secret' as the password for each
                         discovered slave.
 Test Case 6 : Testing show topology with CSV format 
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Master,Slave
-127.0.0.1:PORT2,127.0.0.1:PORT1
+localhost:PORT2,localhost:PORT1
 Test Case 7 : Testing show topology with TAB format 
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 Master	Slave
-127.0.0.1:PORT2	127.0.0.1:PORT1
+localhost:PORT2	localhost:PORT1
 Test Case 8 : Testing show topology with GRID format 
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| 127.0.0.1:PORT2  | 127.0.0.1:PORT1  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test Case 9 : Testing show topology with VERTICAL format 
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
-127.0.0.1:PORT2 (MASTER)
+localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 *************************       1. row *************************
- Master: 127.0.0.1:PORT2
-  Slave: 127.0.0.1:PORT1
+ Master: localhost:PORT2
+  Slave: localhost:PORT1
 1 row.

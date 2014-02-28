@@ -62,7 +62,7 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Create a new instance
-        conn = {"user": "root", "passwd": "root", "host": "127.0.0.1",
+        conn = {"user": "root", "passwd": "root", "host": "localhost",
                 "port": port1}
 
         server_options = {'conn_info': conn, 'role': "cloned_server_2", }

@@ -17,18 +17,18 @@ ERROR: Not enough permissions. The user must have the REPLICATION SLAVE privileg
 Test case 4b - show topology - not enough permissions
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
 localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| localhost:PORT2  | 127.0.0.1:PORT1  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 5 - show topology - bad max-depth
 Usage: mysqlrplshow --master=root@localhost:3306 
@@ -37,18 +37,18 @@ mysqlrplshow: error: The --max-depth option needs to be >= 0.
 Test case 6 - show topology - large max-depth
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 
 # Replication Topology Graph
 localhost:PORT2 (MASTER)
    |
-   +--- 127.0.0.1:PORT1 - (SLAVE)
+   +--- localhost:PORT1 - (SLAVE)
 
 +-----------------+-----------------+
 | Master          | Slave           |
 +-----------------+-----------------+
-| localhost:PORT2  | 127.0.0.1:PORT1  |
+| localhost:PORT2  | localhost:PORT1  |
 +-----------------+-----------------+
 Test case 7 - show topology - discover-slaves-login missing
 Usage: mysqlrplshow --master=root@localhost:3306 

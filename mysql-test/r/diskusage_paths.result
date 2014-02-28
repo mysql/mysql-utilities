@@ -1,5 +1,5 @@
 Test Case 1 : Testing disk space (with paths)
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX

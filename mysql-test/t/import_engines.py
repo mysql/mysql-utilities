@@ -183,7 +183,7 @@ class test(mutlib.System_test):
         self.replace_result("# Importing", "# Importing ... bad_engines.csv\n")
 
         # Mask known source and destination host name.
-        self.replace_substring("on 127.0.0.1", "on XXXX-XXXX")
+        self.replace_substring("on localhost", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
         return True

@@ -82,10 +82,10 @@ class test(mutlib.System_test):
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        self.server1 = self.spawn_server("rep_master")
-        self.server2 = self.spawn_server("rep_slave1")
-        self.server3 = self.spawn_server("rep_slave2")
-        self.server4 = self.spawn_server("rep_slave3")
+        self.server1 = self.spawn_server("rep_master", kill=True)
+        self.server2 = self.spawn_server("rep_slave1", kill=True)
+        self.server3 = self.spawn_server("rep_slave2", kill=True)
+        self.server4 = self.spawn_server("rep_slave3", kill=True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
-        drop_dbs_s1 = ["util_test_fk", "util_test_fk2", "util_test_fk3"]
+        drop_dbs_s1 = ["util_test_fk2", "util_test_fk", "util_test_fk3"]
         drop_dbs_s2 = ["util_test_fk2_copy"]
         drop_results_s1 = []
         drop_results_s2 = []

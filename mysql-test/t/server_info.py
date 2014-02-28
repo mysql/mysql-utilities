@@ -66,8 +66,8 @@ class test(mutlib.System_test):
                             "                relay_log: XXXX\n")
         self.replace_result("            relay_log_pos:",
                             "            relay_log_pos: XXXX\n")
-        self.replace_result("                   server: 127.0.0.1:",
-                            "                   server: 127.0.0.1: XXXX\n")
+        self.replace_result("                   server: localhost:",
+                            "                   server: localhost: XXXX\n")
         self.replace_result("              general_log:",
                             "              general_log: XXXX\n")
         self.replace_result("         general_log_file:",

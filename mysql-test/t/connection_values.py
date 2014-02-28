@@ -25,7 +25,7 @@ _TEST_CASES = [('Good connection string but cannot connect',
                 'root:pass@hostname.com:3306:/my.sock', True),
                ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),
                ('Good dictionary but cannot connect',
-                {'user': 'root',  'passwd': 'pass',  'host': '127.0.0.1',
+                {'user': 'root',  'passwd': 'pass',  'host': 'localhost',
                  'port': '3306', 'unix_socket': '/my.sock'}, True),
                ('Bad dictionary', {'something': 'else'}, True),
                ]

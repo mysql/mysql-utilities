@@ -1,6 +1,6 @@
 Test case 1 - diff a sample database
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -20,7 +20,7 @@ Test case 1 - diff a sample database
 Compare failed. One or more differences found.
 Test case 2 - diff a single object - not same
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t2 to util_test.t2                           [FAIL]
 # Object definitions differ. (--changes-for=server1)
 #
@@ -35,26 +35,26 @@ Test case 2 - diff a single object - not same
 Compare failed. One or more differences found.
 Test case 3 - diff a single object - is same
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
 Success. All objects are the same.
 Test case 4 - diff multiple objects - are same
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 Success. All objects are the same.
 Test case 5 - diff multiple objects + database - some same
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -122,7 +122,7 @@ Test case 7 - diff two databases on same server
 Compare failed. One or more differences found.
 Test case 8 - diff a sample database with weird names (backticks)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
 # Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
@@ -130,12 +130,12 @@ Test case 8 - diff a sample database with weird names (backticks)
 Success. All objects are the same.
 Test case 9 - diff a single object with weird names (backticks)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
 Success. All objects are the same.
 Test case 10 - diff a sample database containing tables with weird names (no backticks) and different table options.
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -152,7 +152,7 @@ Test case 10 - diff a sample database containing tables with weird names (no bac
 Compare failed. One or more differences found.
 Test case 11 - diff a sample database containing tables with weird names (no backticks) and skipping table options.
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -167,7 +167,7 @@ Test case 11 - diff a sample database containing tables with weird names (no bac
 Success. All objects are the same.
 Test case 12 - diff a database with objects of different types with the same name (no differences)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
 # Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
@@ -176,7 +176,7 @@ Test case 12 - diff a database with objects of different types with the same nam
 Success. All objects are the same.
 Test case 13 - diff a database with objects of different types with the same name (with differences)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -191,7 +191,7 @@ Test case 13 - diff a database with objects of different types with the same nam
 Compare failed. One or more differences found.
 Test case 14 - diff specific objects of different types with the same name (with differences)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [FAIL]
 # Object definitions differ. (--changes-for=server1)

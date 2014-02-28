@@ -1,6 +1,6 @@
 Test case 1 - normal run
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -16,8 +16,8 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 2 - verbose run
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -64,8 +64,8 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 3 - with show slave status
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -123,8 +123,8 @@ Checking slave delay (seconds behind master)                         [pass]
                 Last_SQL_Error : 
 # ...done.
 Test case 4 - normal run with loopback
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -140,8 +140,8 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 5 - normal run with grant for rpl@'%'
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -157,8 +157,8 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 6 - normal run with grant with wildcard rpl@'local%'
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]

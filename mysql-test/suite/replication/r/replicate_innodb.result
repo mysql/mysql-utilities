@@ -1,6 +1,6 @@
 Test case 1 - show warnings if innodb different
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
 # master uuid = XXXXX
@@ -44,8 +44,8 @@ WARNING: The master and slave have differing storage engine configurations!
 # SQL error: None
 # ...done.
 Test case 2 - use pedantic to fail if innodb different
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 # master id = XXX
 #  slave id = XXX
 # master uuid = XXXXX

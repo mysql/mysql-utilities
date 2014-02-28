@@ -1,7 +1,7 @@
 Test case 1 - basic serverinfo 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 *************************       1. row *************************
-                   server: 127.0.0.1: XXXX
+                   server: localhost: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX
@@ -28,10 +28,10 @@ Test case 3 - re-started server prints results
 # Server is offline.
 # Checking server version ... done.
 # Starting read-only instance of the server ... done.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Shutting down server ... done.
 *************************       1. row *************************
-                   server: 127.0.0.1: XXXX
+                   server: localhost: XXXX
               config_file: XXXX
                binary_log: XXXX
            binary_log_pos: XXXX

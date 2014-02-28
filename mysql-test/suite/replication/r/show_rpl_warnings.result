@@ -1,10 +1,10 @@
 Test case 1 - warning for missing --report-host
-# master on 127.0.0.1: ... connected.
-# Finding slaves for master: 127.0.0.1:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
 WARNING: There are slaves that have not been registered with --report-host or --report-port.
 
 # Replication Topology Graph
-127.0.0.1:PORT1 (MASTER)
+localhost:PORT1 (MASTER)
    |
    +--- localhost:PORT2 - (SLAVE)
    |

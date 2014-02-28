@@ -75,7 +75,7 @@ def _shutdown_running_servers(server_list, processes, basedir):
         connection = {
             "user": "root",
             "passwd": "root",
-            "host": "127.0.0.1",
+            "host": "localhost",
             "port": None,
         }
         if os.name == "posix":

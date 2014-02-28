@@ -57,7 +57,7 @@ class test(export_parameters_def.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         ## Mask known source.
-        self.replace_result("# Source on 127.0.0.1: ... connected.",
+        self.replace_result("# Source on localhost: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Source on [::1]: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")

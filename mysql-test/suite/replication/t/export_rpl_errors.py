@@ -98,7 +98,7 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("CREATE USER imnotamouse@127.0.0.1")
+        self.server1.exec_query("CREATE USER imnotamouse@localhost")
 
         cmd_str = "mysqldbexport.py util_test --export=data {0} ".format(
             from_conn)
@@ -130,7 +130,7 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
-        self.server1.exec_query("DROP USER imnotamouse@127.0.0.1")
+        self.server1.exec_query("DROP USER imnotamouse@localhost")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
 

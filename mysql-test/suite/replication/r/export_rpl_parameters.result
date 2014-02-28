@@ -1,5 +1,5 @@
 Test case 1 : --rpl=master and --comment-rpl
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
 # Exporting metadata from util_test
@@ -74,7 +74,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 # START SLAVE;
 SET FOREIGN_KEY_CHECKS=1;
 Test case 2 : --rpl=master and --rpl-file=rpl_test.txt
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;
@@ -145,7 +145,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 : --rpl=master and --comment-rpl --rpl-file=rpl_test.txt
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 DROP DATABASE IF EXISTS `util_test`;

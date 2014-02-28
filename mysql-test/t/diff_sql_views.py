@@ -23,7 +23,7 @@ _VIEW_TESTS = [("View definition",
                 "CREATE VIEW diff_view.v1 as SELECT 1;",
                 "CREATE VIEW diff_view.v1 as SELECT 2;", 0),
                ("View definer",
-                "CREATE definer='root'@'127.0.0.1' VIEW diff_view.v1 "
+                "CREATE definer='root'@'localhost' VIEW diff_view.v1 "
                 "as SELECT 3;",
                 "CREATE definer='joe'@'otherhost' VIEW diff_view.v1 "
                 "as SELECT 3;", 0),

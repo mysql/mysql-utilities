@@ -1,5 +1,5 @@
 Test Case 1 : Errors for logs, binlog, innodb 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,db_dir_size,data_size,misc_files,total
 mysql,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX
@@ -28,7 +28,7 @@ Total size of binary logs = XXXX
 #...done.
 
 Test Case 2 : Using a user without privileges.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 
 Total database disk usage = XXXXXXX

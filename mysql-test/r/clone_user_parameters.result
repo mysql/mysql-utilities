@@ -1,6 +1,6 @@
 Test case 1 - show the grant statements
 WARNING: The --destination option is not required for '--dump' (option ignored).
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Dumping grants for user joe_nopass@user
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'

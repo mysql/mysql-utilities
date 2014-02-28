@@ -1,62 +1,62 @@
 Test case 1 - failover (fail) using 'repl' only with: REPLICATION SLAVE.
-# Discovering slaves for master at 127.0.0.1:PORT1
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+# Discovering slaves for master at localhost:PORT1
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
 WARNING: There are slaves that had connection errors.
 ERROR: Query failed. 1227: Access denied; you need (at least one of) the SUPER privilege(s) for this operation
 Test case 2 - failover (fail) using 'repl' without: SUPER.
-# Discovering slaves for master at 127.0.0.1:PORT1
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as repl@127.0.0.1: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+# Discovering slaves for master at localhost:PORT1
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
+Error connecting to a slave as repl@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
 WARNING: There are slaves that had connection errors.
 ERROR: Query failed. 1227: Access denied; you need (at least one of) the SUPER privilege(s) for this operation
 Test case 3 - failover (fail) using 'repl' without: DROP.
-# Discovering slaves for master at 127.0.0.1:PORT1
-# Discovering slave at 127.0.0.1:PORT2
-# Discovering slave at 127.0.0.1:PORT3
-# Discovering slave at 127.0.0.1:PORT4
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
 ERROR: Query failed. 1142: DROP command denied to user 'repl'@'localhost' for table 'failover_console'
 Test case 4 - failover (fail) using 'repl' without: CREATE.
-# Discovering slaves for master at 127.0.0.1:PORT1
-# Discovering slave at 127.0.0.1:PORT2
-# Discovering slave at 127.0.0.1:PORT3
-# Discovering slave at 127.0.0.1:PORT4
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on 127.0.0.1@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
 ERROR: Not enough privileges to execute command.
 Test case 5 - failover (fail) using 'repl' without: GRANT OPTION.
-# Discovering slaves for master at 127.0.0.1:PORT1
-# Discovering slave at 127.0.0.1:PORT2
-# Discovering slave at 127.0.0.1:PORT3
-# Discovering slave at 127.0.0.1:PORT4
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on 127.0.0.1@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
 ERROR: Not enough privileges to execute command.
 Test case 6 - failover (fail) using 'repl' without: SELECT.
-# Discovering slaves for master at 127.0.0.1:PORT1
-# Discovering slave at 127.0.0.1:PORT2
-# Discovering slave at 127.0.0.1:PORT3
-# Discovering slave at 127.0.0.1:PORT4
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on 127.0.0.1@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
 ERROR: Not enough privileges to execute command.
 Test case 7 - failover (fail) using 'repl' without: RELOAD.
-# Discovering slaves for master at 127.0.0.1:PORT1
-# Discovering slave at 127.0.0.1:PORT2
-# Discovering slave at 127.0.0.1:PORT3
-# Discovering slave at 127.0.0.1:PORT4
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Discovering slave at localhost:PORT4
 # Checking privileges.
-# ERROR: User repl on 127.0.0.1@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
-# ERROR: User repl on 127.0.0.1@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
+# ERROR: User repl on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE).
 ERROR: Not enough privileges to execute command.

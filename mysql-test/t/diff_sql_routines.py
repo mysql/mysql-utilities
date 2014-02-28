@@ -27,14 +27,14 @@ _PROC_TABLE = "CREATE TABLE `diff_routine`.`t1` (b char(30))"
 _ROUTINE_TESTS = [
     # Procedure tests
     ("Procedure access",
-     "CREATE definer=root@127.0.0.1 PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
      "CONTAINS SQL INSERT INTO diff_routine.t1 VALUES ('50');",
-     "CREATE definer=root@127.0.0.1 PROCEDURE diff_routine.p1(p1 CHAR(20)) NO "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) NO "
      "SQL INSERT INTO diff_routine.t1 VALUES ('50');", 0, "p1", [_PROC_TABLE]),
     ("Procedure security",
-     "CREATE definer=root@127.0.0.1 PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
      "SQL SECURITY INVOKER INSERT INTO diff_routine.t1 VALUES ('50');",
-     "CREATE definer=root@127.0.0.1 PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
      "SQL SECURITY DEFINER INSERT INTO diff_routine.t1 VALUES ('50');", 0,
      "p1", [_PROC_TABLE]),
     ("Procedure comment",
@@ -49,14 +49,14 @@ _ROUTINE_TESTS = [
      "diff_routine.t1 VALUES ('100');", 0, "p1", [_PROC_TABLE]),
     # Function tests
     ("Function access",
-     "CREATE definer=root@127.0.0.1 FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
      "CONTAINS SQL DETERMINISTIC RETURN (SELECT 1);",
-     "CREATE definer=root@127.0.0.1 FUNCTION diff_routine.f1() RETURNS INT NO "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT NO "
      "SQL DETERMINISTIC RETURN (SELECT 1);", 0, "f1", []),
     ("Function security",
-     "CREATE definer=root@127.0.0.1 FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
      "SQL SECURITY INVOKER DETERMINISTIC RETURN (SELECT 1);",
-     "CREATE definer=root@127.0.0.1 FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
      "SQL SECURITY DEFINER DETERMINISTIC RETURN (SELECT 1);", 0, "f1", []),
     ("Function comment",
      "CREATE FUNCTION diff_routine.f1() RETURNS INT COMMENT 'Test 123' "

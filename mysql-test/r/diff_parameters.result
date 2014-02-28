@@ -46,7 +46,7 @@ Options:
                         marked as comments.
 Test case 2 - Use diff --difftype=unified
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -66,7 +66,7 @@ Test case 2 - Use diff --difftype=unified
 Compare failed. One or more differences found.
 Test case 3 - Use diff --difftype=context
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -90,7 +90,7 @@ Test case 3 - Use diff --difftype=context
 Compare failed. One or more differences found.
 Test case 4 - Use diff --difftype=differ
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -108,7 +108,7 @@ Test case 4 - Use diff --difftype=differ
 Compare failed. One or more differences found.
 Test case 5 - Use diff --difftype=unified --compact
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -125,7 +125,7 @@ Test case 5 - Use diff --difftype=unified --compact
 Compare failed. One or more differences found.
 Test case 6 - Use diff --difftype=context --compact
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -146,7 +146,7 @@ Test case 6 - Use diff --difftype=context --compact
 Compare failed. One or more differences found.
 Test case 7 - Use diff --difftype=differ --compact
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -164,7 +164,7 @@ Test case 7 - Use diff --difftype=differ --compact
 Compare failed. One or more differences found.
 Test case 8 - Use --force 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -202,7 +202,7 @@ Compare failed. One or more differences found.
 Test case 9 - Use --quiet 
 Test case 10 - Use --width=65 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                   [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`         [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`         [PASS]
@@ -222,7 +222,7 @@ Test case 10 - Use --width=65
 Compare failed. One or more differences found.
 Test case 11 - Use --width=55 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`         [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`   [PASS]
@@ -242,7 +242,7 @@ Test case 11 - Use --width=55
 Compare failed. One or more differences found.
 Test case 12 - Use -vvv 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 
 # Definition for object util_test:
 CREATE DATABASE `util_test` /*!40100 DEFAULT CHARACTER SET latin1 */
@@ -307,7 +307,7 @@ CREATE TABLE `t1` (
 Compare failed. One or more differences found.
 Test case 13 - Use --changes-for=server1  
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -327,7 +327,7 @@ Test case 13 - Use --changes-for=server1
 Compare failed. One or more differences found.
 Test case 14 - Use --changes-for=server1 --show-reverse 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -361,7 +361,7 @@ Test case 14 - Use --changes-for=server1 --show-reverse
 Compare failed. One or more differences found.
 Test case 15 - Use --changes-for=server2  
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -381,7 +381,7 @@ Test case 15 - Use --changes-for=server2
 Compare failed. One or more differences found.
 Test case 16 - Use --changes-for=server2 --show-reverse 
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
 # Comparing `util_test`.`f1` to `util_test`.`f1`                   [PASS]
 # Comparing `util_test`.`f2` to `util_test`.`f2`                   [PASS]
@@ -415,7 +415,7 @@ Test case 16 - Use --changes-for=server2 --show-reverse
 Compare failed. One or more differences found.
 Test case 17a - Changes for server1  (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -432,7 +432,7 @@ Test case 17a - Changes for server1  (not skipping table options).
 Compare failed. One or more differences found.
 Test case 17b - Changes for server1  (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -447,7 +447,7 @@ Test case 17b - Changes for server1  (skipping table options).
 Success. All objects are the same.
 Test case 18a - Changes for server2  (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Object definitions differ. (--changes-for=server2)
@@ -464,7 +464,7 @@ Test case 18a - Changes for server2  (not skipping table options).
 Compare failed. One or more differences found.
 Test case 18b - Changes for server2  (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -479,7 +479,7 @@ Test case 18b - Changes for server2  (skipping table options).
 Success. All objects are the same.
 Test case 19a - Changes for server1 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -501,7 +501,7 @@ Test case 19a - Changes for server1 --difftype=context (not skipping table optio
 Compare failed. One or more differences found.
 Test case 19b - Changes for server1 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -521,7 +521,7 @@ Test case 19b - Changes for server1 --difftype=context (skipping table options).
 Success. All objects are the same.
 Test case 20a - Changes for server2 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Object definitions differ. (--changes-for=server2)
@@ -543,7 +543,7 @@ Test case 20a - Changes for server2 --difftype=context (not skipping table optio
 Compare failed. One or more differences found.
 Test case 20b - Changes for server2 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -563,7 +563,7 @@ Test case 20b - Changes for server2 --difftype=context (skipping table options).
 Success. All objects are the same.
 Test case 21a - Changes for server1 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Transformation for --changes-for=server1:
@@ -577,7 +577,7 @@ AUTO_INCREMENT=50000005;
 Compare failed. One or more differences found.
 Test case 21b - Changes for server1 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:
@@ -592,7 +592,7 @@ Test case 21b - Changes for server1 --difftype=sql (skipping table options).
 Success. All objects are the same.
 Test case 22a - Changes for server2 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [FAIL]
 # Transformation for --changes-for=server2:
@@ -606,7 +606,7 @@ AUTO_INCREMENT=50000010;
 Compare failed. One or more differences found.
 Test case 22b - Changes for server2 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
 # Comparing `db_diff_test`.`table-dash` to `db_diff_test`.`table-dash`   [PASS]
 # WARNING: Table options are ignored and differences were found:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -179,6 +179,20 @@ class test(rpl_admin_gtid.test):
         # mixing hostnames and IP addresses
         time.sleep(WARNING_SLEEP_TIME+1)
         i = 0
+
+        # Wait for logfile file to be created
+        if self.debug:
+            print("# Waiting for logfile to be created.")
+        for i in range(_TIMEOUT):
+            if os.path.exists(log_filename):
+                break
+            else:
+                time.sleep(1)
+        else:
+            raise MUTLibError("{0}: failed - timeout waiting for "
+                              "logfile '{1}' to be "
+                              "created.".format(comment, log_filename))
+
         with open(log_filename, 'r') as file_:
             while i < _TIMEOUT:
                 line = file_.readline()

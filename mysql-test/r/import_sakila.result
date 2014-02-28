@@ -1,9 +1,9 @@
 Test case 1 - Import sakila schema.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from ../support/example_data/sakila-schema.sql.
 #...done.
 Test case 2 - Import sakila data.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from ../support/example_data/sakila-data.sql.
 #...done.
 Test case 3 - Confirm import success.

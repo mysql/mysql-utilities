@@ -192,8 +192,8 @@ class test(mutlib.System_test):
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Destination on ",
                             "# Destination on XXXX-XXXX: ... connected.\n")
-        # Mask root,127.0.0.1 (should exist on all MySQL server versions).
-        self.replace_result("root,127.0.0.1", "ROOT,LOCALHOST\n")
+        # Mask root,localhost (should exist on all MySQL server versions).
+        self.replace_result("root,localhost", "ROOT,LOCALHOST\n")
         # Remove all other root users with different hosts (not localhost).
         self.remove_result("root,")
         # Remove possible leftovers from other tests.

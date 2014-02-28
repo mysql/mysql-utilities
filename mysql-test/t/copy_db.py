@@ -84,15 +84,15 @@ class test(mutlib.System_test):
         except UtilError:
             raise MUTLibError("Failed to create table with blobs.")
 
-        # Create user 'joe'@'127.0.0.1' in source server
+        # Create user 'joe'@'localhost' in source server
         try:
-            self.server1.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+            self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         except UtilError as err:
             raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
 
-        # Create user 'joe'@'127.0.0.1' in destination server
+        # Create user 'joe'@'localhost' in destination server
         try:
-            self.server2.exec_query("CREATE USER 'joe'@'127.0.0.1'")
+            self.server2.exec_query("CREATE USER 'joe'@'localhost'")
         except UtilError as err:
             raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
 
@@ -230,32 +230,32 @@ class test(mutlib.System_test):
 
         test_num += 1
         try:
-            # Grant ALL on `util_test` for user 'joe'@'127.0.0.1' on source
+            # Grant ALL on `util_test` for user 'joe'@'localhost' on source
             self.server1.exec_query("GRANT ALL ON `util_test`.* "
-                                    "TO 'joe'@'127.0.0.1'")
+                                    "TO 'joe'@'localhost'")
 
-            # Revoke all privileges to 'joe'@'127.0.0.1' in destination
+            # Revoke all privileges to 'joe'@'localhost' in destination
             self.server2.exec_query("REVOKE ALL PRIVILEGES, GRANT OPTION FROM "
-                                    "'joe'@'127.0.0.1'")
+                                    "'joe'@'localhost'")
 
-            # Add all privileges needed for 'joe'@'127.0.0.1' in destination db
+            # Add all privileges needed for 'joe'@'localhost' in destination db
             self.server2.exec_query("GRANT SELECT, CREATE, ALTER, INSERT, "
                                     "UPDATE, EXECUTE, DROP, LOCK TABLES, "
                                     "EVENT, TRIGGER, CREATE ROUTINE, "
                                     "CREATE VIEW ON `util_db_privileges`.* TO "
-                                    "'joe'@'127.0.0.1'")
+                                    "'joe'@'localhost'")
 
             # Change DEFINER in procedures and functions on the source server
             self.server1.exec_query("UPDATE mysql.proc SET "
-                                    "DEFINER='joe@127.0.0.1' WHERE "
+                                    "DEFINER='joe@localhost' WHERE "
                                     "DB='util_test'")
             self.server1.exec_query("UPDATE mysql.event SET "
-                                    "DEFINER='joe@127.0.0.1' WHERE "
+                                    "DEFINER='joe@localhost' WHERE "
                                     "DB='util_test'")
 
             # Change DEFINER in the views on the source server
             query = """
-                SELECT CONCAT("ALTER DEFINER='joe'@'127.0.0.1' VIEW ",
+                SELECT CONCAT("ALTER DEFINER='joe'@'localhost' VIEW ",
                 table_schema, ".", table_name, " AS ", view_definition)
                 FROM information_schema.views WHERE
                 table_schema='util_test'
@@ -266,7 +266,7 @@ class test(mutlib.System_test):
 
             # Change DEFINER in the triggers on the source server
             self.server1.exec_query("DROP TRIGGER util_test.trg")
-            self.server1.exec_query("CREATE DEFINER='joe'@'127.0.0.1' "
+            self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
                                     "TRIGGER util_test.trg AFTER INSERT ON "
                                     "util_test.t1 FOR EACH ROW INSERT INTO "
                                     "util_test.t2 "
@@ -275,7 +275,7 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
-        to_conn = "--destination=joe@127.0.0.1:{0}".format(self.server2.port)
+        to_conn = "--destination=joe@localhost:{0}".format(self.server2.port)
         comment = ("Test case {0} - copy using a user without SUPER privilege"
                    "").format(test_num)
         cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
@@ -411,7 +411,7 @@ class test(mutlib.System_test):
             self.drop_db(self.server2, db)
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'",
-                     "DROP USER 'joe'@'127.0.0.1'"]
+                     "DROP USER 'joe'@'localhost'"]
         for drop in drop_user:
             try:
                 self.server1.exec_query(drop)

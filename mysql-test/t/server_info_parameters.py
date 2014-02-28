@@ -116,16 +116,16 @@ class test(server_info.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqlserverinfo version",
-                "MySQL Utilities mysqlserverinfo version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqlserverinfo version",
+            "MySQL Utilities mysqlserverinfo version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         server_info.test.do_replacements(self)
 
         self.replace_result("+---", "+---------+\n")
         self.replace_result("|", "| XXXX ...|\n")
-        self.replace_result("127.0.0.1:", "localhost:XXXX [...]\n")
+        self.replace_result("localhost:", "localhost:XXXX [...]\n")
         self.remove_result("#  Process id:")
 
         return True

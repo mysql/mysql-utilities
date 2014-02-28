@@ -65,7 +65,7 @@ class test(mutlib.System_test):
         else:
             self.s2_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(
-                self.server0, self.s2_serverid,"rep_master",
+                self.server0, self.s2_serverid, "rep_master",
                 ' --mysqld="--log-bin=mysql-bin "')
             if not res:
                 raise MUTLibError("Cannot spawn replication slave server.")
@@ -105,7 +105,7 @@ class test(mutlib.System_test):
                 self.results.append(res)
         except UtilDBError as err:
             raise MUTLibError("Cannot show slave status: "
-                              "{0}".formar(err.errmsg))
+                              "{0}".format(err.errmsg))
 
         if save_for_compare:
             self.results.append(comment+"\n")
@@ -200,7 +200,7 @@ class test(mutlib.System_test):
         self.remove_result("# Creating replication user...")
         self.remove_result("CREATE USER 'rpl'@'localhost'")
         self.remove_result("# Granting replication access")
-        self.remove_result("# CHANGE MASTER TO MASTER_HOST = '127.0.0.1'")
+        self.remove_result("# CHANGE MASTER TO MASTER_HOST = 'localhost'")
     
     def record(self):
         # Not a comparative test, returning True

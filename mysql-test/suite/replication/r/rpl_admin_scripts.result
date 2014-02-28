@@ -2,69 +2,70 @@ Test case 1 - test failover scripts
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # Reading events in relay log for slave 127.0.0.1:PORT2
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# Reading events in relay log for slave 127.0.0.1:PORT3
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
-# Reading events in relay log for slave 127.0.0.1:PORT4
+# Reading events in relay log for slave localhost:PORT3
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
+# Reading events in relay log for slave localhost:PORT4
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
 # Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT4: RESET SLAVE ALL
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
+# localhost:PORT3 status: Ok 
 # Failover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
 Test case 2 - test switchover scripts
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -74,9 +75,9 @@ Test case 2 - test switchover scripts
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
@@ -85,58 +86,59 @@ Test case 2 - test switchover scripts
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT3:
+# Slave localhost:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT4:
+# Slave localhost:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
 # Executing CHANGE MASTER on 127.0.0.1:PORT2.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT3.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT4
 # new master host: 
 # new master port: 
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
-# 127.0.0.1:PORT1 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
 # Switchover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
 Test case 3 - test script exit < threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -146,9 +148,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: XXX Script failed.
@@ -158,58 +160,59 @@ ERROR: XXX Script failed.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT3:
+# Slave localhost:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT4:
+# Slave localhost:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
 # Executing CHANGE MASTER on 127.0.0.1:PORT2.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT3.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT4
 # new master host: 
 # new master port: 
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
-# 127.0.0.1:PORT1 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
 # Switchover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
 Test case 4 - test script exit = threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -219,9 +222,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX
@@ -230,10 +233,11 @@ WARNING: The operation did not complete. Depending on when the external script w
 Test case 5 - test script exit > threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -243,9 +247,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX
@@ -254,10 +258,11 @@ WARNING: The operation did not complete. Depending on when the external script w
 Test case 6 - test script exit < threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -267,9 +272,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
@@ -278,35 +283,35 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT3:
+# Slave localhost:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT4:
+# Slave localhost:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
 # Executing CHANGE MASTER on 127.0.0.1:PORT2.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT3.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT4
 # new master host: 
 # new master port: 
@@ -314,23 +319,24 @@ WARNING: You have chosen to use external script return code checking. Depending 
 ERROR: XXX Script failed.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
-# 127.0.0.1:PORT1 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
 # Switchover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
 Test case 7 - test script exit = threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -340,9 +346,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
@@ -351,35 +357,35 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT3:
+# Slave localhost:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT4:
+# Slave localhost:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
 # Executing CHANGE MASTER on 127.0.0.1:PORT2.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT3.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT4
 # new master host: 
 # new master port: 
@@ -390,10 +396,11 @@ WARNING: The operation did not complete. Depending on when the external script w
 Test case 8 - test script exit > threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT4.
+# WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
 # GTID_MODE=ON is set for all servers.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   Slave connected to master ... Ok
 #   GTID_MODE=ON ... Ok
 #   Logging filters agree ... Ok
@@ -403,9 +410,9 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT1
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Blocking writes on master.
@@ -414,35 +421,35 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT3:
+# Slave localhost:PORT3:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
-# Slave 127.0.0.1:PORT4:
+# Slave localhost:PORT4:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
 # Return Code = XXX
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
 # Executing CHANGE MASTER on 127.0.0.1:PORT2.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT3.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
-# old master host:  127.0.0.1
+# old master host:  localhost
 # old master port:  PORT4
 # new master host: 
 # new master port: 
@@ -455,21 +462,21 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: XXX Script failed.
@@ -477,36 +484,36 @@ ERROR: XXX Script failed.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
 # Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT4: RESET SLAVE ALL
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
+# localhost:PORT3 status: Ok 
 # Failover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
@@ -515,21 +522,21 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX
@@ -540,21 +547,21 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX
@@ -565,58 +572,58 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
 # Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT4: RESET SLAVE ALL
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: XXX Script failed.
 # Checking slaves for errors.
 # 127.0.0.1:PORT2 status: Ok 
-# 127.0.0.1:PORT3 status: Ok 
+# localhost:PORT3 status: Ok 
 # Failover complete.
+# Attempting to contact localhost ... Success
 # Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
-# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
 #
 # Replication Topology Health:
 # ...done.
@@ -625,48 +632,48 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
 # Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT4: RESET SLAVE ALL
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX
@@ -677,48 +684,48 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
-# Checking eligibility of slave 127.0.0.1:PORT4 for candidate.
+# Checking eligibility of slave localhost:PORT4 for candidate.
 #   GTID_MODE=ON ... Ok
 #   Replication user exists ... Ok
-# Candidate slave 127.0.0.1:PORT4 will become the new master.
+# Candidate slave localhost:PORT4 will become the new master.
 # Checking slaves status (before failover).
 # Preparing candidate for failover.
 # No missing transactions found on 127.0.0.1:PORT2. Skipping connection of candidate as slave.
-# No missing transactions found on 127.0.0.1:PORT3. Skipping connection of candidate as slave.
+# No missing transactions found on localhost:PORT3. Skipping connection of candidate as slave.
 # Creating replication user if it does not exist.
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Script completed Ok.
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
-#   Executing stop on slave 127.0.0.1:PORT3 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT3 Ok
-#   Executing stop on slave 127.0.0.1:PORT4 WARN - slave is not configured with this master
-#   Executing stop on slave 127.0.0.1:PORT4 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
 # Switching slaves to new master.
 # Change master command for 127.0.0.1:PORT2
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
-# Change master command for 127.0.0.1:PORT3
-# CHANGE MASTER TO MASTER_HOST = '127.0.0.1', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
 # Disconnecting new master as slave.
-# Execute on 127.0.0.1:PORT4: RESET SLAVE ALL
+# Execute on localhost:PORT4: RESET SLAVE ALL
 # Starting slaves.
 # Performing START on all slaves.
 #   Executing start on slave 127.0.0.1:PORT2 Ok
-#   Executing start on slave 127.0.0.1:PORT3 Ok
+#   Executing start on slave localhost:PORT3 Ok
 # Spawning external script.
 # SCRIPT EXECUTED: XXXXXXX
 # ARGUMENTS PASSED:
 # old master host:  UNKNOWN
 # old master port:  UNKNOWN
-# new master host:  127.0.0.1
+# new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
 ERROR: External script XXXXXXX

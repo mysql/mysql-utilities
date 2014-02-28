@@ -36,9 +36,7 @@ class test(mutlib.System_test):
 
     @staticmethod
     def check_connect(port, name="cloned_server"):
-        new_server = None
-
-        conn = {"user": "root", "passwd": "root", "host": "127.0.0.1",
+        conn = {"user": "root", "passwd": "root", "host": "localhost",
                 "port": port}
 
         server_options = {'conn_info': conn, 'role': name, }

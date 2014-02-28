@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -203,9 +203,9 @@ class test(diskusage_basic.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldiskusage version",
-                "MySQL Utilities mysqldiskusage version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldiskusage version",
+            "MySQL Utilities mysqldiskusage version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

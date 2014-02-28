@@ -63,7 +63,7 @@ Generating import file
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 2 - no grants
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -72,7 +72,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 3 - no events
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -81,7 +81,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 4 - no triggers
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -90,7 +90,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 0, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 5 - no views
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -99,7 +99,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 6 - no procedures
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -108,7 +108,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 7 - no functions
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -117,7 +117,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 8 - no tables
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -126,7 +126,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 9 - no create_db
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -136,7 +136,7 @@ Generating import file
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 10 - no grants
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -145,7 +145,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 11 - no events
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -154,7 +154,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 12 - no triggers
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -163,7 +163,7 @@ OBJECT COUNTS: tables = 5, views = 2, triggers = 0, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 13 - no views
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -172,7 +172,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 1, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 14 - no procedures
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -181,7 +181,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 15 - no functions
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -190,7 +190,7 @@ OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 16 - no tables
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -199,7 +199,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 17 - no create_db
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
 #...done.
 AFTER:
@@ -207,7 +207,7 @@ Database was NOT created.
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Generating import file
 Test case 18 - no events
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
@@ -290,7 +290,7 @@ INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 
 SET FOREIGN_KEY_CHECKS=1;
 #...done.
 Test case 19 - no data
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
@@ -365,7 +365,7 @@ SET FOREIGN_KEY_CHECKS=1;
 #...done.
 Test case 20 - no blobs
 # WARNING: --skip-blobs option ignored for metadata import.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
@@ -449,7 +449,7 @@ BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
 Running import...
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 #...done. (test_run.txt)
 AFTER:
@@ -459,7 +459,7 @@ BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Running export...
 Running import...
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
 #...done.
 AFTER:

@@ -75,8 +75,8 @@ class test(mutlib.System_test):
         comment = "Showing data for table {0} \n".format(tbl)
         self.results.append(comment)
         if os.name == "posix":
-            cmd = "{0} {1} util_test -e 'SELECT  * FROM {2}'".format(
-                self.mysql_path, self.server2_conn, tbl)
+            cmd = ("{0} {1} --protocol=tcp util_test -e 'SELECT  * "
+                   "FROM {2}'".format(self.mysql_path, self.server2_conn, tbl))
         else:
             cmd = '{0} {1} util_test -e "SELECT  * FROM {2}"'.format(
                 self.mysql_path, self.server2_conn, tbl)
@@ -93,8 +93,8 @@ class test(mutlib.System_test):
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server1))
         conn_val = self.get_connection_values(self.server2)
-        self.server2_conn = "-u{0} -p{1} --host=127.0.0.1 ".format(conn_val[0],
-                                                                  conn_val[1])
+        self.server2_conn = "-u{0} -p{1} --host=localhost ".format(conn_val[0],
+                                                                   conn_val[1])
         if conn_val[3] is not None:
             self.server2_conn = "{0}--port={1} ".format(self.server2_conn,
                                                         conn_val[3])
@@ -106,7 +106,8 @@ class test(mutlib.System_test):
                    "mysql monitor".format(test_num))
         cmd_str = cmd + (" --export=definitions --format=SQL --quiet  "
                          "--skip=events,grants | "
-                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
+                         "{0} {1} --protocol=tcp".format(self.mysql_path,
+                                                         self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -119,7 +120,8 @@ class test(mutlib.System_test):
                    "new server via the mysql monitor".format(test_num))
         cmd_str = cmd + (" --export=data --format=SQL --quiet  "
                          "--skip=events,grants | "
-                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
+                         "{0} {1} --protocol=tcp".format(self.mysql_path,
+                                                         self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -142,7 +144,8 @@ class test(mutlib.System_test):
                    "via the mysql monitor".format(test_num))
         cmd_str = cmd + (" --export=both --format=SQL --quiet  "
                          "--skip=events,grants | "
-                         "{0} {1} ".format(self.mysql_path, self.server2_conn))
+                         "{0} {1} --protocol=tcp".format(self.mysql_path,
+                                                         self.server2_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

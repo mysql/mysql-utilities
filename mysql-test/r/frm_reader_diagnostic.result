@@ -1,5 +1,5 @@
 Test case 1: - Check .frm files in a db folder
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
 # Reading .frm file XXXXXXX
 # The .frm file is a TABLE.
@@ -298,7 +298,7 @@ CREATE TABLE `frm_test`.`orig` (
 
 #...done.
 Test case 2: - Check .frm files in a db folder
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
 # Reading .frm file XXXXXXX
 # The .frm file is a TABLE.
@@ -421,7 +421,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 
 #...done.
 Test case 3: - Check .frm files with db option
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
 # Reading .frm file XXXXXXX
 # The .frm file is a TABLE.

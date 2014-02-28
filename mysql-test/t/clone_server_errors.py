@@ -59,7 +59,7 @@ class test(mutlib.System_test):
 
         comment = "Test case {0} - error: no login".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py "
-                                    "--server=root:root@127.0.0.1:90125 "
+                                    "--server=root:root@localhost:90125 "
                                     "--new-data=/nada --delete-data "
                                     "--new-id=7 {0}".format(newport), comment)
         if not res:
@@ -68,7 +68,7 @@ class test(mutlib.System_test):
 
         comment = "Test case {0} - error: cannot connect".format(test_num)
         res = self.run_test_case(1, "mysqlserverclone.py --server=nope@"
-                                    "127.0.0.1:38310 --new-data=/nada "
+                                    "localhost:38310 --new-data=/nada "
                                     "--new-id=7 --delete-data "
                                     "--root-password=nope {0}".format(newport),
                                  comment)
@@ -103,7 +103,7 @@ class test(mutlib.System_test):
 
         shutil.rmtree(new_dir, True)
 
-        cmd_str = ("mysqlserverclone.py --server=root:nope@127.0.0.1 "
+        cmd_str = ("mysqlserverclone.py --server=root:nope@localhost "
                    "--new-data={0} --new-id=7 --root-password=nope "
                    "{1}".format(new_dir, newport))
         comment = ("Test case {0} - --new-data does not exist (but cannot "

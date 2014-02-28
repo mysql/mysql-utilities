@@ -1,6 +1,6 @@
 Test case 1 - check a sample database generate SQL
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 #                                                   Defn    Row     Data   
@@ -17,7 +17,7 @@ Test case 1 - check a sample database generate SQL
 # ...done
 Test case 2 - check database with known differences generate SQL direction = server1 (default)
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -76,7 +76,7 @@ ALTER VIEW inventory.tools AS
 # ...done
 Test case 3 - check database with known differences generate SQL direction = server2
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -135,7 +135,7 @@ ALTER VIEW inventory.tools AS
 # ...done
 Test case 4 - check database with known differences generate SQL direction = server1 with reverse
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -227,7 +227,7 @@ ALTER VIEW inventory.tools AS
 # ...done
 Test case 5 - check database with known differences generate SQL direction = server2 with reverse
 # server1 on localhost: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:

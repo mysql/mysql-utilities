@@ -1,6 +1,6 @@
 Test case 1 - no differences.
-# server1 on 127.0.0.1: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases util_test_mysql_client on server1 and util_test_mysql_client on server2
 #
 #                                                   Defn    Row     Data   
@@ -12,8 +12,8 @@ Test case 1 - no differences.
 #
 # ...done
 Test case 2a - difference: PROCEDURE with ';' (get diff SQL).
-# server1 on 127.0.0.1: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases util_test_mysql_client on server1 and util_test_mysql_client on server2
 #
 #                                                   Defn    Row     Data   
@@ -40,8 +40,8 @@ DELIMITER ;
 #
 # ...done
 Test case 2b - difference: PROCEDURE with ';' (compare).
-# server1 on 127.0.0.1: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases util_test_mysql_client on server1 and util_test_mysql_client on server2
 #
 #                                                   Defn    Row     Data   
@@ -54,8 +54,8 @@ Test case 2b - difference: PROCEDURE with ';' (compare).
 #
 # ...done
 Test case 3a - difference: PROCEDURE DEFINER with wildcard (%) (get diff SQL).
-# server1 on 127.0.0.1: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases util_test_mysql_client on server1 and util_test_mysql_client on server2
 #
 #                                                   Defn    Row     Data   
@@ -82,8 +82,8 @@ DELIMITER ;
 #
 # ...done
 Test case 3b - difference: PROCEDURE DEFINER with wildcard (%) (compare).
-# server1 on 127.0.0.1: ... connected.
-# server2 on 127.0.0.1: ... connected.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases util_test_mysql_client on server1 and util_test_mysql_client on server2
 #
 #                                                   Defn    Row     Data   

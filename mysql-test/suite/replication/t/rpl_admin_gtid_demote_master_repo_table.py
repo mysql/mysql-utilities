@@ -21,7 +21,7 @@ from mysql.utilities.exception import MUTLibError
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
-                       '--enforce-gtid-consistency --report-host=127.0.0.1 '
+                       '--enforce-gtid-consistency --report-host=localhost '
                        '--report-port={0} '
                        '--master-info-repository=table"')
 
@@ -128,7 +128,7 @@ class test(rpl_admin.test):
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(",
                             "# QUERY = SELECT "
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
-        self.replace_substring("127.0.0.1", "XXXXXXXXX")
+        self.replace_substring("localhost", "XXXXXXXXX")
 
         self.remove_result_and_lines_before("WARNING: There are slaves that"
                                             " had connection errors.")

@@ -1,5 +1,5 @@
 Test Case 1 : Testing disk space with CSV format 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX
@@ -8,7 +8,7 @@ Total database disk usage = XXXXXXX
 
 #...done.
 Test Case 2 : Testing disk space with TAB format 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name	total
 util_test	XXXXXXX
@@ -17,7 +17,7 @@ Total database disk usage = XXXXXXX
 
 #...done.
 Test Case 3 : Testing disk space with GRID format 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 +------------+----------+
 | db_name    |   total  |
@@ -29,7 +29,7 @@ Total database disk usage = XXXXXXX
 
 #...done.
 Test Case 4 : Testing disk space with VERTICAL format 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 *************************       1. row *************************
  db_name: util_test

@@ -82,7 +82,7 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server2.exec_query("DROP USER rpl@127.0.0.1")
+        self.server2.exec_query("DROP USER rpl@localhost")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@'%' "
                                 "IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")
@@ -96,7 +96,7 @@ class test(replicate.test):
             
         self.server2.exec_query("DROP USER rpl@'%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
-                                "TO rpl@'127.0%' "
+                                "TO rpl@'local%' "
                                 "IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
@@ -107,9 +107,9 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
             
-        self.server2.exec_query("DROP USER rpl@'127.0%'")
+        self.server2.exec_query("DROP USER rpl@'local%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
-                                "TO rpl@127.0.0.1 "
+                                "TO rpl@localhost "
                                 "IDENTIFIED BY 'rpl'")
         self.server2.exec_query("FLUSH PRIVILEGES")
 

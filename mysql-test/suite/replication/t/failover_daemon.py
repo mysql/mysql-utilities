@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,20 @@ class test(failover.test):
         if self.debug:
             print("Waiting for failover daemon to register master and start "
                   "its monitoring process")
+
+        # Wait for logfile file to be created
+        if self.debug:
+            print("# Waiting for logfile to be created.")
+        for i in range(_TIMEOUT):
+            if os.path.exists(logfile):
+                break
+            else:
+                time.sleep(1)
+        else:
+            raise MUTLibError("{0}: failed - timeout waiting for "
+                              "logfile '{1}' to be "
+                              "created.".format(comment, logfile))
+
         i = 0
         with open(logfile, "r") as f:
             while i < _TIMEOUT:

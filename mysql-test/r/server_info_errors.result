@@ -12,10 +12,10 @@ Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 mysqlserverinfo: error: option --format: invalid choice: 'ASDASDASD' (choose from 'grid', 'tab', 'csv', 'vertical')
 
 Test case 4 - wrong password
-ERROR: Access denied for user 'root'@'127.0.0.1' using password: YES
+ERROR: Access denied for user 'root'@'localhost' using password: YES
 
 Test case 5 - no password
-ERROR: Access denied for user 'root'@'127.0.0.1' using password: NO
+ERROR: Access denied for user 'root'@'localhost' using password: NO
 
 Test case 6 - offline server without start, basedir, datadir option
 ERROR: Server is offline. To connect, you must also provide basedir, datadir and the start option

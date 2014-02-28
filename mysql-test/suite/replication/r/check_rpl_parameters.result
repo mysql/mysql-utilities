@@ -22,8 +22,8 @@ Test case 1 - show help
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
 Test case 2 - master_info
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -54,8 +54,8 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 3 - width
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                           Status
 -----------------------------------------------------------------
 Checking for binary logging on master                      [pass]
@@ -74,8 +74,8 @@ Test case 4 - quiet
 Test case 5 - test failure with quiet
 Test: Check master information file failed. Error: Cannot find master information file: m.info.
 Test case 6 - test warning without quiet
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]
@@ -105,8 +105,8 @@ WARNING: Are there binlog exceptions?
 | slave   |        | t123       |
 +---------+--------+------------+
 Test case 8 - test suppress warning without quiet
-# master on 127.0.0.1: ... connected.
-# slave on 127.0.0.1: ... connected.
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
 Test Description                                                     Status
 ---------------------------------------------------------------------------
 Checking for binary logging on master                                [pass]

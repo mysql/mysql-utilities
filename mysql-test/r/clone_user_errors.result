@@ -17,11 +17,11 @@ Test case 5 - error: cannot use dump and quiet together
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: You cannot use --quiet and --dump together.
-Test case 6 - error: cannot parser source connection
+Test case 6 - error: cannot parse source connection
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Source connection values invalid
-Test case 7 - error: cannot parser destination connection
+Test case 7 - error: cannot parse destination connection
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Destination connection values invalid

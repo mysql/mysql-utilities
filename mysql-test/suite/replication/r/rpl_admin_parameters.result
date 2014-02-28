@@ -97,7 +97,7 @@ Available Commands:
         start, stop and reset require --slaves (and --master is optional)
 
 Test case 2 - test slave discovery
-# Discovering slaves for master at 127.0.0.1:PORT1
+# Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -110,7 +110,7 @@ Test case 2 - test slave discovery
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
 | localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
@@ -118,7 +118,7 @@ Test case 2 - test slave discovery
 # ...done.
 Test case 3 - switchover with verbosity
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
-# Discovering slaves for master at 127.0.0.1:PORT1
+# Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -126,9 +126,9 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Discovering slave at localhost:PORT4
 # Found slave: localhost:PORT4
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
-# Checking eligibility of slave 127.0.0.1:PORT2 for candidate.
+# Checking eligibility of slave localhost:PORT2 for candidate.
 #   Slave connected to master ... Ok
 #   Slave not behind master ... Ok
 #   Logging filters agree ... Ok
@@ -152,17 +152,17 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # CHANGE MASTER TO MASTER_HOST [...]
 # Executing CHANGE MASTER on localhost:PORT4.
 # CHANGE MASTER TO MASTER_HOST [...]
-# Executing CHANGE MASTER on 127.0.0.1:PORT1.
+# Executing CHANGE MASTER on localhost:PORT1.
 # CHANGE MASTER TO MASTER_HOST [...]
 # Starting all slaves.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT3 Ok
 #   Executing start on slave localhost:PORT4 Ok
-#   Executing start on slave 127.0.0.1:PORT1 Ok
+#   Executing start on slave localhost:PORT1 Ok
 # Checking slaves for errors.
 # localhost:PORT3 status: Ok 
 # localhost:PORT4 status: Ok 
-# 127.0.0.1:PORT1 status: Ok 
+# localhost:PORT1 status: Ok 
 # Switchover complete.
 # ...done.
 Test case 4 - switchover with quiet
@@ -176,8 +176,8 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| 127.0.0.1  | PORT1  | MASTER  | UP     | XXX        | OK      |
-| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
@@ -185,7 +185,7 @@ Switchover has written to the log.
 There are (before) 2 entries in the log.
 Test case 5 - switchover with logs
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
-# Discovering slaves for master at 127.0.0.1:PORT1
+# Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -193,7 +193,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Discovering slave at localhost:PORT4
 # Found slave: localhost:PORT4
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT1 to slave at 127.0.0.1:PORT2.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
 # Waiting for slaves to catch up to old master.
@@ -210,8 +210,8 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| 127.0.0.1  | PORT2  | MASTER  | UP     | XXX        | OK      |
-| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
@@ -220,7 +220,7 @@ There are additional entries in the log.
 Test case 6 - attempt switchover with stranger server without using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT3 to slave at 127.0.0.1:PORT5.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
 ERROR: Candidate is not connected to the correct master.
@@ -230,23 +230,23 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+------------------------------------+
 | host       | port  | role    | state  | gtid_mode  | health                             |
 +------------+-------+---------+--------+------------+------------------------------------+
-| 127.0.0.1  | PORT3  | MASTER  | UP     | XXX        | OK                                 |
-| 127.0.0.1  | PORT1  | SLAVE   | WARN   |            | Slave is not connected to master.  |
-| 127.0.0.1  | PORT2  | SLAVE   | WARN   |            | Slave is not connected to master.  |
-| 127.0.0.1  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT3  | MASTER  | UP     | XXX        | OK                                 |
+| localhost  | PORT1  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT2  | SLAVE   | WARN   |            | Slave is not connected to master.  |
+| localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
 +------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
 Test case 7 - attempt switchover with stranger server using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
-# Performing switchover from master at 127.0.0.1:PORT3 to slave at 127.0.0.1:PORT5.
+# Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
 ERROR: Candidate is not connected to the correct master.
 # Checking slaves configuration to master.
-# ERROR: Slave 127.0.0.1:PORT1 is not configured with master 127.0.0.1:PORT3.
-# ERROR: Slave 127.0.0.1:PORT2 is not configured with master 127.0.0.1:PORT3.
-# ERROR: Slave 127.0.0.1:PORT4 is not configured with master 127.0.0.1:PORT3.
+# ERROR: Slave localhost:PORT1 is not configured with master localhost:PORT3.
+# ERROR: Slave localhost:PORT2 is not configured with master localhost:PORT3.
+# ERROR: Slave localhost:PORT4 is not configured with master localhost:PORT3.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.
@@ -260,13 +260,13 @@ ERROR: Candidate is not connected to the correct master.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
-| 127.0.0.1  | PORT5  | MASTER  | UP     | XXX        | OK      |
-| 127.0.0.1  | PORT1  | SLAVE   | UP     | XXX        | OK      |
-| 127.0.0.1  | PORT2  | SLAVE   | UP     | XXX        | OK      |
-| 127.0.0.1  | PORT4  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT5  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 8 - attempt master switchover it self
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: The specified new master 127.0.0.1:PORT5 is the same as the actual master 127.0.0.1:PORT5.
+mysqlrpladmin: error: The specified new master localhost:PORT5 is the same as the actual master localhost:PORT5.

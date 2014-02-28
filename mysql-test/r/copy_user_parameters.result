@@ -39,7 +39,7 @@ Options:
   -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the quiet parameter
 Test case 4 - use --dump and --list to show all users
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # All Users:
 user,host
 jack,user

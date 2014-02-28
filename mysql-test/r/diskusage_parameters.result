@@ -27,7 +27,7 @@ Options:
   -q, --quiet           turn off all messages for quiet execution.
 
 Test Case 2 : No headers 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 util_test,XXXXXXX
 
@@ -36,7 +36,7 @@ Total database disk usage = XXXXXXX
 #...done.
 
 Test Case 3 : Show binlog usage 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX
@@ -54,7 +54,7 @@ Total size of binary logs = XXXX
 #...done.
 
 Test Case 4 : Show log usage 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX
@@ -72,7 +72,7 @@ Total size of logs = XXXX
 #...done.
 
 Test Case 5 : Show InnoDB usage 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 util_test,XXXXXXX
@@ -92,7 +92,7 @@ InnoDB freespace = XXXXXXXX
 #...done.
 
 Test Case 6 : Include empty database 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 mt_db,0
@@ -103,7 +103,7 @@ Total database disk usage = XXXXXXX
 #...done.
 
 Test Case 7 : Show all usage 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 mt_db,0
@@ -142,7 +142,7 @@ InnoDB freespace = XXXXXXXX
 #...done.
 
 Test Case 8 : Show all plus verbose 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,db_dir_size,data_size,misc_files,total
 mt_db,0,0,0,0
@@ -183,7 +183,7 @@ InnoDB freespace = XXXXXXXX
 #...done.
 
 Test Case 9 : Show all plus quiet 
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 db_name,total
 mt_db,0
 mysql,XXXXXXX
@@ -202,7 +202,7 @@ ib_logfile1,XXXXXXXX
 ibdata1,XXXXXXXX
 
 Test Case 10 : Database name with strange characters.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 db_name,total
 mysql,XXXXXXX
@@ -214,7 +214,7 @@ Total database disk usage = XXXXXXX
 #...done.
 
 Test Case 11 : Use a user only with SUPER privilege.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 
 Total database disk usage = XXXXXXX
@@ -247,7 +247,7 @@ Total size of InnoDB files = XXXXXXXX
 #...done.
 
 Test Case 12 : Use a user only with REPLICATION CLIENT privilege.
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 # Database totals:
 
 Total database disk usage = XXXXXXX

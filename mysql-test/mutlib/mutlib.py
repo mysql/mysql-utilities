@@ -290,10 +290,6 @@ class ServerList(object):
             "host": self.cloning_host,
             "port": port,
         }
-        # to work properly with ports, we must convert "localhost" to
-        # "127.0.0.1"
-        if conn["host"] == "localhost":
-            conn["host"] = "127.0.0.1"
 
         server_options = {
             'conn_info': conn,
@@ -702,12 +698,12 @@ class System_test(object):
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = proc.communicate()
         if out:
-            match = re.search(r'mysql_config_editor(?:\.exe)? ver \d+\.\d+ distrib '
-                              r'(\d+\.\d+\.\d+)', out, re.IGNORECASE)
+            match = re.search(r'mysql_config_editor(?:\.exe)? ver \d+\.\d+ '
+                              r'distrib (\d+\.\d+\.\d+)', out, re.IGNORECASE)
             if match:
                 version = map(int, match.group(1).split('.'))
-                assert (len(version) == len(minimum_version),
-                        "Unsupported version")
+                assert len(version) == len(minimum_version), \
+                    "Unsupported version"
                 # If current version is greater or equal than 5.6.11 then
                 # the tool supports the use of port and socket
                 if version >= minimum_version:

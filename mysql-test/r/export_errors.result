@@ -11,16 +11,16 @@ Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: Server connection values invalid
 Test case 5 - error: cannot connect to server
-# Source on 127.0.0.1: ... ERROR: Cannot connect to the Source server.
+# Source on localhost: ... ERROR: Cannot connect to the Source server.
 Error Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: not enough privileges
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 7 - database does not exist
 # Source on localhost: ... connected.
 ERROR: Source database does not exist - notthereatall
 Test case 8 - error: not enough privileges
-# Source on 127.0.0.1: ... connected.
+# Source on localhost: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
 Test case 9 - error: db list and --all
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
