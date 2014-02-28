@@ -39,22 +39,19 @@ class test(replicate.test):
         result = replicate.test.setup(self)
 
         index = self.servers.find_server_by_name("new_server1")
+        # If server exists, kill it
         if index >= 0:
-            self.server3 = self.servers.get_server(index)
-            try:
-                res = self.server3.show_server_variable("server_id")
-            except MUTLibError as err:
-                raise MUTLibError("Cannot get new server server_id: "
-                                  "{0}".format(err.errmsg))
-            self.s3_serverid = int(res[0][1])
-        else:
-            self.s3_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
-                                                "new_server1")
-            if not res:
-                raise MUTLibError("Cannot spawn replication new server.")
-            self.server3 = res[0]
-            self.servers.add_new_server(self.server3, True)
+            server = self.servers.get_server(index)
+            self.servers.stop_server(server)
+            self.servers.remove_server(server)
+
+        self.s3_serverid = self.servers.get_next_id()
+        res = self.servers.spawn_new_server(self.server0, self.s1_serverid,
+                                            "new_server1")
+        if not res:
+            raise MUTLibError("Cannot spawn replication new server.")
+        self.server3 = res[0]
+        self.servers.add_new_server(self.server3, True)
 
         # Create util_test database to avoid not exist error.
         self.server1.exec_query("DROP DATABASE IF EXISTS util_test")
@@ -131,6 +128,9 @@ class test(replicate.test):
         test_num += 1
 
         self.server1.exec_query("DROP USER imnotamouse@localhost")
+
+        self.server1.exec_query("STOP SLAVE")
+        self.server1.exec_query("RESET SLAVE")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
 

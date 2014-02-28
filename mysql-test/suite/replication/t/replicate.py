@@ -35,42 +35,36 @@ class test(mutlib.System_test):
         self.s2_serverid = None
 
         index = self.servers.find_server_by_name("rep_slave")
+        # If server exists, kill it
         if index >= 0:
-            self.server1 = self.servers.get_server(index)
-            try:
-                res = self.server1.show_server_variable("server_id")
-            except MUTLibError as err:
-                raise MUTLibError("Cannot get replication slave "
-                                  "server_id: {0}".format(err.errmsg))
-            self.s1_serverid = int(res[0][1])
-        else:
-            self.s1_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(
-                self.server0, self.s1_serverid, "rep_slave",
-                ' --mysqld="--log-bin=mysql-bin "')
-            if not res:
-                raise MUTLibError("Cannot spawn replication slave server.")
-            self.server1 = res[0]
-            self.servers.add_new_server(self.server1, True)
+            server = self.servers.get_server(index)
+            self.servers.stop_server(server)
+            self.servers.remove_server(server.role)
+
+        self.s1_serverid = self.servers.get_next_id()
+        res = self.servers.spawn_new_server(
+            self.server0, self.s1_serverid, "rep_slave",
+            ' --mysqld="--log-bin=mysql-bin "')
+        if not res:
+            raise MUTLibError("Cannot spawn replication slave server.")
+        self.server1 = res[0]
+        self.servers.add_new_server(self.server1, True)
 
         index = self.servers.find_server_by_name("rep_master")
+        # If server exists, kill it
         if index >= 0:
-            self.server2 = self.servers.get_server(index)
-            try:
-                res = self.server2.show_server_variable("server_id")
-            except MUTLibError as err:
-                raise MUTLibError("Cannot get replication master "
-                                  "server_id: {0}".format(err.errmsg))
-            self.s2_serverid = int(res[0][1])
-        else:
-            self.s2_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(
-                self.server0, self.s2_serverid, "rep_master",
-                ' --mysqld="--log-bin=mysql-bin "')
-            if not res:
-                raise MUTLibError("Cannot spawn replication slave server.")
-            self.server2 = res[0]
-            self.servers.add_new_server(self.server2, True)
+            server = self.servers.get_server(index)
+            self.servers.stop_server(server)
+            self.servers.remove_server(server.role)
+
+        self.s2_serverid = self.servers.get_next_id()
+        res = self.servers.spawn_new_server(
+            self.server0, self.s2_serverid, "rep_master",
+            ' --mysqld="--log-bin=mysql-bin "')
+        if not res:
+            raise MUTLibError("Cannot spawn replication slave server.")
+        self.server2 = res[0]
+        self.servers.add_new_server(self.server2, True)
             
         return True
     
