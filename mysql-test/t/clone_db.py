@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file, err.errmsg))
@@ -44,11 +44,21 @@ class test(mutlib.System_test):
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file_backticks,
-                                                 self.debug)
+            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file_backticks, err.errmsg))
+
+        # Create database with test views (with dependencies)
+        data_file_db_copy_views = os.path.normpath(
+            "./std_data/db_copy_views.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_db_copy_views,
+                                           self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_db_copy_views,
+                                                err.errmsg))
 
         return True
 
@@ -82,7 +92,34 @@ class test(mutlib.System_test):
             raise MUTLibError(
                 "'{0}' failed. Return code: {1}".format(cmd, res))
 
+        # Test case 3 - clone a sample database with views dependencies
+        cmd = cmd_base.format(from_conn, to_conn,
+                              "views_test:views_test_clone")
+        res = self.exec_util(cmd, self.res_fname)
+        self.results.append(res)
+        if res:  # i.e., res != 0
+            raise MUTLibError(
+                "'{0}' failed. Return code: {1}".format(cmd, res))
+
         return True
+
+    def compare_object_counts(self, server, db1, db2):
+        """Compare the object counts between databases
+
+        server[in]   Server object
+        db1[in]      Name of the first database
+        db2[in]      Name of the second database
+
+        Returns a message with the result failure if not equal or None if equal
+        """
+        db1_objects_str = self.check_objects(server, db1)
+        db2_objects_str = self.check_objects(server, db2)
+        if db1_objects_str != db2_objects_str:
+            return ("Result failure.\n"
+                    "The object counts in the databases differ.\n"
+                    "'{0}': {1}'{2}': {3}".format(db1, db1_objects_str,
+                                                  db2, db2_objects_str))
+        return None
 
     def get_result(self):
         if self.server1:
@@ -95,6 +132,11 @@ class test(mutlib.System_test):
                 return (False, ("Result failure.\n",
                                 "Database clone 'util_db_clone' not found.\n"))
 
+            res = self.compare_object_counts(self.server1, "util_test",
+                                             "util_db_clone")
+            if res:
+                return (False, res)
+
             query = "SHOW DATABASES LIKE 'db`:db_clone'"
             try:
                 res = self.server1.exec_query(query)
@@ -103,6 +145,26 @@ class test(mutlib.System_test):
             if not res and res[0][0] != 'db`:db_clone':
                 return (False, ("Result failure.\n",
                                 "Database clone 'db`:db_clone' not found.\n"))
+
+            res = self.compare_object_counts(self.server1, "db`:db",
+                                             "db`:db_clone")
+            if res:
+                return (False, res)
+
+            query = "SHOW DATABASES LIKE 'views_test_clone'"
+            try:
+                res = self.server1.exec_query(query)
+            except UtilDBError as err:
+                raise MUTLibError(err.errmsg)
+            if not res and res[0][0] != 'views_test_clone':
+                return (False, ("Result failure.\n"
+                                "Database clone 'views_test_clone' "
+                                "not found.\n"))
+
+            res = self.compare_object_counts(self.server1, "views_test",
+                                             "views_test_clone")
+            if res:
+                return (False, res)
         else:
             return False, ("Result failure.\n",
                            ("Test server no longer available to verify "
@@ -118,6 +180,8 @@ class test(mutlib.System_test):
         res = res and self.drop_db(self.server1, 'db`:db')
         res = res and self.drop_db(self.server1, "util_db_clone")
         res = res and self.drop_db(self.server1, "db`:db_clone")
+        res = res and self.drop_db(self.server1, "views_test")
+        res = res and self.drop_db(self.server1, "views_test_clone")
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:

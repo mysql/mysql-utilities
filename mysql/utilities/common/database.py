@@ -411,6 +411,52 @@ class Database(object):
                 )
         return create_str
 
+    def _get_views_sorted_by_dependencies(self, views, columns,
+                                          need_backtick=True):
+        """Get a list of views sorted by their dependencies.
+
+        views[in]          List of views objects
+        columns[in]        Column mode - names (default), brief, or full
+        need_backtick[in]  True if view need backticks in the name
+
+        Returns the list of view sorted by their dependencies
+        """
+        if columns == "names":
+            name_idx = 0
+        elif columns == "full":
+            name_idx = 2
+        else:
+            name_idx = 1
+
+        def views_cmp(v1, v2):
+            """Custom comparison function of two views
+
+            This method tries to find v1 name in v2 definition, if found means
+            that there is dependency (v2 depends of v1).
+
+            v1[in]  Tuple containing the columns of the first view
+            v2[in]  Tuple containing the columns of the second view
+
+            Returns -1 if v1 name is in v2 definition.
+            """
+            # Get the create statement of the view
+            stmt = self.get_create_statement(self.db_name, v2[name_idx], _VIEW)
+            # Name of the view with backticks to be found
+            search = quote_with_backticks(v1[name_idx]) \
+                if need_backtick else v1[name_idx]
+            index = stmt.find(search)
+            if index >= 0:
+                return -1  # Found
+            else:
+                return 0  # Not found
+
+        # Returns without columns names
+        if isinstance(views[0], tuple):
+            return sorted(views, cmp=views_cmp)
+
+        # Returns the tuple reconstructed with views sorted
+        return (views[0], sorted(views[1], cmp=views_cmp),)
+
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.
 
@@ -1499,6 +1545,10 @@ class Database(object):
 
                 # set new result with with required data quoted with backticks
                 res = (res[0], new_rows)
+
+            if res and obj_type == _VIEW:
+                res = self._get_views_sorted_by_dependencies(res, columns,
+                                                             not need_backtick)
 
             return res
 

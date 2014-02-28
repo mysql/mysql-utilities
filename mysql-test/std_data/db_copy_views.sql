@@ -17,3 +17,7 @@ CREATE VIEW `views_test`.`v8` AS SELECT `views_test`.`t1`.`a`,`views_test`.`t1`.
 CREATE VIEW `views_test`.`v9` AS SELECT `views_test`.`t1`.`a`, `views_test`.`t1`.`b` FROM `views_test`.`t1`;
 CREATE VIEW `views_test`.`v10` AS SELECT `views_test`.`t1`.`a`,(`views_test`.`t1`.`b` + 1) FROM `views_test`.`t1`;
 CREATE VIEW `views_test`.`v11` AS SELECT `views_test`.`t1`.`a`, (`views_test`.`t1`.`b` + 1) FROM `views_test`.`t1`;
+# Create views with dependencies (to test copy/import order).
+CREATE VIEW `views_test`.`v13` AS SELECT 1 AS value;
+CREATE VIEW `views_test`.`v12` AS SELECT * FROM `views_test`.`v13`;
+CREATE VIEW `views_test`.`v14` AS SELECT * FROM `views_test`.`v12`;

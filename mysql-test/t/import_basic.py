@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -110,6 +110,17 @@ class test(mutlib.System_test):
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file_import, err.errmsg))
+
+        # Create database with test views (with dependencies)
+        data_file_db_copy_views = os.path.normpath(
+            "./std_data/db_copy_views.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_db_copy_views,
+                                           self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_db_copy_views,
+                                                err.errmsg))
 
         return True
 
@@ -293,6 +304,21 @@ class test(mutlib.System_test):
         csv_file = os.path.normpath("./std_data/rpl_data.csv")
         self.run_import_csv_no_data_test(0, from_conn, comment, csv_file,
                                          import_options)
+
+        # Test database with views (with dependencies)
+        for display in _DISPLAYS:
+            for frmt in _FORMATS:
+                test_num += 1
+                comment = ("Test Case {0} : Testing import with {1} format "
+                           "and {2} display (using views with dependencies)"
+                           "".format(test_num, frmt, display))
+                self.run_import_test(0, from_conn, to_conn,
+                                     'views_test',
+                                     frmt,
+                                     "BOTH", comment,
+                                     " --display={0}".format(display))
+                self.drop_db(self.server2, 'views_test')
+
         if os.name != "posix":
             self.replace_result(
                 "# Importing data from std_data\\rpl_data.csv.",
@@ -311,9 +337,11 @@ class test(mutlib.System_test):
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, 'db`:db')
         self.drop_db(self.server1, "import_test")
+        self.drop_db(self.server1, "views_test")
         self.drop_db(self.server2, "util_test")
         self.drop_db(self.server2, 'db`:db')
         self.drop_db(self.server2, "import_test")
+        self.drop_db(self.server2, "views_test")
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:

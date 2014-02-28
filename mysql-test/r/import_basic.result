@@ -223,3 +223,103 @@ CAUTION: The following 1 warning messages were included in the import file:
 # WARNING: A partial export from a server that has GTIDs enabled will by default include the GTIDs of all transactions
 # WARNING: No data was found.
 #...done.
+Test Case 22 : Testing import with SQL format and BRIEF display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 23 : Testing import with CSV format and BRIEF display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 24 : Testing import with TAB format and BRIEF display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 25 : Testing import with GRID format and BRIEF display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 26 : Testing import with VERTICAL format and BRIEF display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 27 : Testing import with SQL format and FULL display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 28 : Testing import with CSV format and FULL display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 29 : Testing import with TAB format and FULL display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 30 : Testing import with GRID format and FULL display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 31 : Testing import with VERTICAL format and FULL display (using views with dependencies)
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on 127.0.0.1: ... connected.
+# Importing definitions and data from test_run.txt.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
