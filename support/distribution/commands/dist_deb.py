@@ -26,7 +26,7 @@ import time
 from distutils import log
 from distutils.core import Command
 from distutils.file_util import copy_file, move_file
-from distutils.dir_util import create_tree, remove_tree, copy_tree
+from distutils.dir_util import remove_tree, copy_tree
 from distutils.errors import DistutilsError
 
 from support.distribution.utils import unarchive_targz, get_dist_name
@@ -324,6 +324,8 @@ class BuildCommercialDistDebian(BuildDistDebian):
         f_manpages.flush()
         f_manpages.close()
 
+        
+
         # debian/copyright
         log.info("creating debian/copyright file")
         log.info("current directory: {0}".format(os.getcwd()))
@@ -349,7 +351,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
                 self._get_orig_name()) + '.tar.gz'
             move_file(tarball, self.orig_tarball)
 
-            untared_dir = unarchive_targz(self.orig_tarball)
+            unarchive_targz(self.orig_tarball)
             self.deb_base = os.path.join(
                 tarball.replace('.tar.gz', ''), 'debian')
         elif base:

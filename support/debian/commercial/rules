@@ -54,6 +54,7 @@ override_dh_auto_install:
 			--skip-build --build-dir=$$BUILDDIR/mysql \
 			install_scripts --install-dir=$$DESTDIR/bin \
 			--build-dir=$$BUILDDIR/usr/bin --skip-build \
+			install_data --install-dir=$$DESTDIR/../ \
 			install_man --root=$$DESTDIR --srcdir=$$BUILDDIR/ \
 			--prefix=/share/man \
 			install_egg_info --install-dir=$$DESTDIR/lib/python$$pyvers/dist-packages; \

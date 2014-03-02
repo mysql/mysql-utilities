@@ -17,12 +17,12 @@
 """Module containing distutils commands for commercial packaging"""
 
 
-import sys
 import os
+
 from datetime import date
 from distutils import log
 from distutils.errors import DistutilsError
-from distutils.sysconfig import get_python_version
+
 
 GPL_NOTICE_LINENR = 12
 
@@ -63,15 +63,19 @@ COMMERCIAL_SETUP_PY = """#!/usr/bin/env python
 # MySQL Utilities - Command-line tools for MySQL Administration.
 # Copyright (c) 2012, %d, Oracle and/or its affiliates. All rights reserved.
 
+import glob
 import os
+
 from distutils.command.build import build
 from distutils.command.build_scripts import build_scripts as _build_scripts
 from distutils.command.install import install as _install
+from distutils.command.install_data import install_data as _install_data
 from distutils.command.install_scripts import \
     install_scripts as _install_scripts
 from distutils.core import Command
 from distutils.core import setup
 from distutils.dir_util import copy_tree
+from distutils import log, util
 
 COMMANDS = {{
     'cmdclass': {{
@@ -279,7 +283,7 @@ class build_scripts(_build_scripts):
         saved_scripts = self.scripts
         self.scripts = []
         for script in saved_scripts:
-            script = distutils.util.convert_path(script)
+            script = util.convert_path(script)
             script_copy, script_ext = os.path.splitext(script)
 
             if script_ext != '.py':
@@ -291,6 +295,8 @@ class build_scripts(_build_scripts):
                 self.scripts.append(script_copy)
         # distutils is compatible with 2.1 so we cannot use super() to
         # call it.
+        if not self.scripts:
+            self.scripts = saved_scripts
         _build_scripts.run(self)
         self.outfiles = self.scripts
         self.scripts = saved_scripts
@@ -299,56 +305,68 @@ class build_scripts(_build_scripts):
     def get_outputs(self):
         return self.outfiles
 
+
 COMMANDS['cmdclass'].update({{
         'build': Build,
-        'install_man': install_man
+        'install_man': install_man,
         }})
 
 if os.name != "nt":
     COMMANDS['cmdclass'].update({{
         'build_scripts': build_scripts,
-        'install_man': install_man,
+        'install_man': install_man
         }})
+
+data_files_found = []
+for root, dirs, files in os.walk('etc'):
+    datafiles = []
+    for src in files:
+        datafiles.append(os.path.join('etc', 'mysql', src))
+    if datafiles:
+        data_files_found.append(('etc/mysql', datafiles))
 
 LONG_DESCRIPTION = \"\"\"
 {long_description}
 \"\"\"
 
 setup(
-    name = '{name}',
-    version = '{version}',
-    description = '{description}',
-    long_description = LONG_DESCRIPTION,
-    author = '{author}',
-    author_email = '{author_email}',
-    license = '{license}',
-    keywords = '{keywords}',
-    url = '{url}',
-    download_url = '{download_url}',
-    package_dir = {{ '': '' }},
-    packages = ['mysql', 'mysql.utilities',
-       'mysql..utilities.command', 'mysql.utilities.common'],
-    classifiers = {classifiers},
-    cmdclass = COMMANDS['cmdclass']
+    name='{name}',
+    version='{version}',
+    description='{description}',
+    long_description=LONG_DESCRIPTION,
+    author='{author}',
+    author_email='{author_email}',
+    license='{license}',
+    keywords='{keywords}',
+    url='{url}',
+    download_url='{download_url}',
+    package_dir={{ '': '' }},
+    packages=['mysql', 'mysql.utilities', 'mysql.utilities.command',
+        'mysql.utilities.common'],
+    data_files=data_files_found,
+    scripts=glob.glob('usr/bin/*'),
+    classifiers={classifiers},
+    cmdclass=COMMANDS['cmdclass']
 )
 
 """ % (date.today().year)
 
+
 def remove_gpl(pyfile, dry_run=0):
     """Remove the GPL license form a Python source file
-    
+
     Raise DistutilsError when a problem is found.
     """
     start = "# This program is free"
     end = "MA 02110-1301 USA"
 
     log.info("removing GPL license from %s" % pyfile)
-    
+
     result = []
     removed = 0
     fp = open(pyfile, "r")
     line = fp.readline()
-    have_gpl = False
+
     done = False
     while line:
         if line.strip().startswith(start) and not done:
@@ -414,4 +432,4 @@ def remove_full_gpl_cr(base_path, dry_run=0):
         fp = open(init_path, "w")
         fp.writelines(result)
         fp.close()
-    
+

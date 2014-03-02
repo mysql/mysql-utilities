@@ -75,6 +75,7 @@ class BuiltCommercial(bdist):
         self.archive_files = None
         self.tag = ''
         self.man_root = None
+        self.data_root = None
         self.man_prefix = None
         self.bin_install_dir = None
 
@@ -226,6 +227,21 @@ class BuiltCommercial(bdist):
         log.info("installing to %s" % self.bdist_dir)
         self.run_command('install_man')
         log.info('install_man finish')
+
+        #install data
+        install_data = self.reinitialize_command('install_data',
+                                                reinit_subcommands=1)
+        if self.data_root:
+            install_data.root = self.data_root
+        else:
+            install_data.root = self.bdist_dir # + "/usr/bin/"
+
+        if self.man_prefix:
+            install_data.prefix = self.man_prefix
+
+        log.info("installing to %s" % self.bdist_dir)
+        self.run_command('install_data')
+        log.info('install_data finish')
 
         #installing scripts
         log.info('===== installing script =====')

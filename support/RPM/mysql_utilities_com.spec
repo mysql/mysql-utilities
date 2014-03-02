@@ -76,16 +76,28 @@ cp -a %{bdist_dir}mysql %{buildroot}%{python_sitelib}
 cp -p %{bdist_dir}*.egg-info %{buildroot}%{python_sitelib}
 cp -a %{bdist_dir}/usr/bin %{buildroot}%{_exec_prefix}/bin
 cp -a %{bdist_dir}/docs %{buildroot}%{_mandir}
+
+if [ -d %{bdist_dir}/etc ];
+then
+    cp -a %{bdist_dir}/etc %{buildroot}
+fi
+
 rm %{buildroot}%{python_sitelib}/mysql/__init__.pyc
+touch ETC
+if [ -d %{buildroot}/etc ];
+then
+    echo "/etc/mysql" > ETC
+fi
+
 
 %clean
 
-%files
+%files -f ETC
 %defattr(-,root,root,-)
 %doc %{bdist_dir}README_com.txt
 %doc %{bdist_dir}LICENSE_com.txt
 %{python_sitelib}/mysql*egg-info
-%{python_sitelib}/mysql/utilities
+%{python_sitelib}/mysql/
 %{_mandir}/*
 %{_exec_prefix}/bin
 

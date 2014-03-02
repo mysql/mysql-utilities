@@ -170,8 +170,6 @@ INSTALL = {
     'scripts': glob.glob('scripts/*.py'),
     'requires': [
         'distutils',
-        'sphinx (>=1.0)',
-        'jinja2 (>=2.1)',
         ],
     'provides': [
         'mysql.utilities',

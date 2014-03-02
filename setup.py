@@ -21,8 +21,6 @@ from __future__ import absolute_import
 import ConfigParser
 import fnmatch
 import os
-import re
-from glob import glob
 import platform
 import sys
 
@@ -31,10 +29,8 @@ from distutils.core import setup
 from distutils.command.build_scripts import build_scripts as _build_scripts
 from distutils.command.install import install as _install
 from distutils.command.install_data import install_data as _install_data
-from distutils.command.install_scripts import \
-    install_scripts as _install_scripts
 from distutils.util import change_root
-from distutils.file_util import DistutilsFileError, write_file
+from distutils.file_util import DistutilsFileError
 from distutils import log, dir_util
 
 from info import META_INFO, INSTALL
@@ -49,20 +45,10 @@ COMMANDS = {
         },
     }
 
-# Custom bdist_rpm DistUtils command
+# Custom DistUtils command
 try:
-    from support.dist_rpm import BuiltDistRPM, BuiltCommercialRPM, SourceRPM
-except ImportError:
-    pass # Use default when not available
-else:
-    COMMANDS['cmdclass'].update({
-        'bdist_rpm': BuiltDistRPM,
-        'sdist_rpm': SourceRPM,
-        'bdist_com_rpm': BuiltCommercialRPM
-    })
-
-try:
-    from support.distribution.commands import build, bdist, sdist
+    from support.distribution.commands import (dist_deb, dist_rpm, bdist,
+                                               build, sdist)
 except ImportError:
     pass # Use default when not available
 else:
@@ -70,23 +56,20 @@ else:
         'sdist': sdist.GenericSourceGPL,
         'build': build.Build,
         'sdist_com': sdist.SourceCommercial,
-        'bdist_com': bdist.BuiltCommercial
-    })
-
-try:
-    from support.dist_deb import BuildDistDebian, BuildCommercialDistDebian
-                                  
-except ImportError:
-    pass
-else:
-    COMMANDS['cmdclass'].update({
-        'bdist_deb': BuildDistDebian,
-        'bdist_com_deb': BuildCommercialDistDebian
+        'bdist_com': bdist.BuiltCommercial,
+        'bdist_deb': dist_deb.BuildDistDebian,
+        'bdist_com_deb': dist_deb.BuildCommercialDistDebian,
+        'bdist_rpm': dist_rpm.BuiltDistRPM,
+        'sdist_rpm': dist_rpm.SourceRPM,
+        'bdist_com_rpm': dist_rpm.BuiltCommercialRPM,
     })
 
 if platform.uname()[0] == 'Darwin':
     try:
-        from support.dist_osx import BuildDistOSX, BuildDistOSXcom
+        from support.distribution.commands.dist_osx import (
+            BuildDistOSX,
+            BuildDistOSXcom
+        )
                                       
     except ImportError:
         pass
@@ -334,9 +317,14 @@ class install_data(_install_data):
     def run(self):
         from itertools import groupby
 
+        if not self.data_files:
+            log.info("no data files to install")
+            return
+
         # Set up paths to write to config file
         install_dir = self.install_dir
         install_logdir = '/var/log'
+
         if os.name == 'posix' and install_dir in ('/', '/usr'):
             install_sysconfdir = '/etc'
         elif os.name == 'nt':
