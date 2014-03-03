@@ -97,6 +97,7 @@ mysqlprocgrep     search process information
 mysqlreplicate    establish replication with a master                        
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
+mysqlrplms        establish multi-source replication                         
 mysqlrplshow      show slaves attached to a master                           
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
@@ -191,6 +192,7 @@ mysqlprocgrep     search process information
 mysqlreplicate    establish replication with a master                        
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
+mysqlrplms        establish multi-source replication                         
 mysqlrplshow      show slaves attached to a master                           
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
@@ -218,6 +220,7 @@ mysqlprocgrep     search process information
 mysqlreplicate    establish replication with a master                        
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
+mysqlrplms        establish multi-source replication                         
 mysqlrplshow      show slaves attached to a master                           
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
@@ -259,6 +262,7 @@ mysqlprocgrep     search process information
 mysqlreplicate    establish replication with a master                        
 mysqlrpladmin     administration utility for MySQL replication               
 mysqlrplcheck     check replication                                          
+mysqlrplms        establish multi-source replication                         
 mysqlrplshow      show slaves attached to a master                           
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 

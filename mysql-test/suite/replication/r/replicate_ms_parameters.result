@@ -1,0 +1,109 @@
+Test case 1 - show help
+  --version             show program's version number and exit
+  --help                display a help message and exit
+  --license             display program's license and exit
+  -i INTERVAL, --interval=INTERVAL
+                        interval in seconds for reporting health. Default = 15
+                        seconds. Lowest value is 5 seconds.
+  --switchover-interval=SWITCHOVER_INTERVAL
+                        interval in seconds for switching masters. Default =
+                        60 seconds. Lowest value is 30 seconds.
+  --slave=SLAVE         connection information for slave server in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>].
+  --masters=MASTERS     connection information for master servers in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>]. List multiple master
+                        in comma-separated list.
+  --rpl-user=RPL_USER   the user and password for the replication user
+                        requirement, in the form: <user>[:<password>] or
+                        <login-path>. E.g. rpl:passwd - By default = rpl:rpl
+  -b, --start-from-beginning
+                        start replication from the first event recorded in the
+                        binary logging of the masters.
+  --report-values=REPORT_VALUES
+                        report values used in multi-source replication. It can
+                        be health, gtid or uuid. Multiple values can be used
+                        separated by commas. The default is health.
+  -f FORMAT, --format=FORMAT
+                        display the output in either grid (default), tab, csv,
+                        or vertical format
+  --daemon=DAEMON       run on daemon mode. It can be start, stop, restart or
+                        nodetach.
+  --pidfile=PIDFILE     pidfile for running mysqlrplms as a daemon.
+  --log=LOG_FILE        specify a log file to use for logging messages
+  --log-age=LOG_AGE     specify maximum age of log entries in days. Entries
+                        older than this will be purged on startup. Default = 7
+                        days.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  -q, --quiet           turn off all messages for quiet execution.
+
+Introduction
+------------
+The mysqlrplms utility is used to setup round robin multi-source replcation.
+This technique can be a solution for aggregating streams of data from multiple
+masters for a single slave.
+
+The mysqlrplms utility follows these assumptions:
+
+  - All servers have GTIDs enabled.
+  - There are no conflicts between transactions from different sources/masters.
+    For example, there are no updates to the same object from multiple masters.
+  - Replication is asynchronous.
+
+A round-robin scheduling is used to setup replication among the masters and
+slave.
+
+The utility can be run as a daemon on POSIX systems.
+
+  # Basic multi-source replication setup.
+
+  $ mysqlrplms --slave=root:pass@host1:3306 \
+               --masters=root:pass@host2:3306,root:pass@host3:3306
+
+  # Multi-source replication setup using a different report values.
+
+  $ mysqlrplms --slave=root:pass@host1:3306 \
+               --masters=root:pass@host2:3306,root:pass@host3:3306 \
+               --report-values=health,gtid,uuid
+
+  # Start multi-source replication running as a daemon. (POSIX only)
+
+  $ mysqlrplms --slave=root:pass@host1:3306 \
+               --masters=root:pass@host2:3306,root:pass@host3:3306 \
+               --log=rplms_daemon.log --pidfile=rplms_daemon.pid \
+               --daemon=start
+
+  # Restart a multi-source replication running as a daemon.
+
+  $ mysqlrplms --slave=root:pass@host1:3306 \
+               --masters=root:pass@host2:3306,root:pass@host3:3306 \
+               --log=rplms_daemon.log --pidfile=rplms_daemon.pid \
+               --daemon=restart
+
+  # Stop a multi-source replication running as a daemon.
+
+  $ mysqlrplms --slave=root:pass@host1:3306 \
+               --masters=root:pass@host2:3306,root:pass@host3:3306 \
+               --log=rplms_daemon.log --pidfile=rplms_daemon.pid \
+               --daemon=stop
+
+
+Helpful Hints
+-------------
+  - The default report value is 'health'.
+    This value can be changed with the --report-values option. It can be
+    'health', 'gtid' or 'uuid'. Multiple values can be used separated by
+    commas.
+
+  - The default output for reporting health is 'grid'.
+    This value can be changed with the --format option. It can be 'grid',
+    'tab', 'csv' or 'vertical' format.
+
+  - The default interval for reporting health is 15 seconds.
+    This value can be changed with the --interval option.
+
+  - The default interval for switching masters is 60 seconds.
+    This value can be changed with the --switchover-interval option.
+

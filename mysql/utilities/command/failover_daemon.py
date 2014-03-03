@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import signal
 import logging
 
 from mysql.utilities.common.tools import ping_host, execute_script
+from mysql.utilities.common.messages import HOST_IP_WARNING
 from mysql.utilities.exception import UtilRplError
 
 
@@ -48,10 +49,6 @@ _DELETE_FC_TABLE = ("DELETE FROM mysql.failover_console WHERE host = '{0}' "
 _FAILOVER_ERROR = ("{0}Check server for errors and run the mysqlrpladmin "
                    "utility to perform manual failover.")
 _FAILOVER_ERRNO = 911
-_HOST_IP_WARNING = ("You may be mixing host names and IP "
-                    "addresses. This may result in negative status "
-                    "reporting if your DNS services do not support "
-                    "reverse name lookup.")
 _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
 
@@ -425,8 +422,8 @@ class FailoverDaemon(object):
 
         # Check for mixing IP and hostnames
         if not self.rpl.check_host_references():
-            print("# WARNING: {0}".format(_HOST_IP_WARNING))
-            self._report(_HOST_IP_WARNING, logging.WARN, False)
+            print("# WARNING: {0}".format(HOST_IP_WARNING))
+            self._report(HOST_IP_WARNING, logging.WARN, False)
             print("#\n# Failover daemon will start in 10 seconds.")
             time.sleep(10)
 

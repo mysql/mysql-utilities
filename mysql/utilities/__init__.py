@@ -67,6 +67,7 @@ AVAILABLE_UTILITIES = {
     'mysqlreplicate': (),
     'mysqlrpladmin': (),
     'mysqlrplcheck': (),
+    'mysqlrplms': (),
     'mysqlrplshow': (),
     'mysqlrplsync': (),
     'mysqlserverclone': (),

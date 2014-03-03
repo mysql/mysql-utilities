@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from datetime import datetime, timedelta
 
 from mysql.utilities.exception import UtilRplError
 from mysql.utilities.common.ip_parser import hostname_is_ip
-from mysql.utilities.common.messages import ERROR_SAME_MASTER
+from mysql.utilities.common.messages import ERROR_SAME_MASTER, HOST_IP_WARNING
 from mysql.utilities.common.tools import ping_host, execute_script
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.topology import Topology
@@ -76,16 +76,12 @@ _FAILOVER_ERRNO = 911
 _DATE_FORMAT = '%Y-%m-%d %H:%M:%S %p'
 _DATE_LEN = 22
 
-_HOST_IP_WARNING = "You may be mixing host names and IP " + \
-                   "addresses. This may result in negative status " + \
-                   "reporting if your DNS services do not support " + \
-                   "reverse name lookup."
-
 _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
 _GTID_ON_REQ = "Slave election requires GTID_MODE=ON for all servers."
 
 WARNING_SLEEP_TIME = 10
+
 
 def get_valid_rpl_command_text():
     """Provide list of valid command descriptions to caller.
@@ -351,8 +347,8 @@ class RplCommands(object):
 
         # Check for mixing IP and hostnames
         if not self._check_host_references():
-            print "# WARNING: %s" % _HOST_IP_WARNING
-            self._report(_HOST_IP_WARNING, logging.WARN, False)
+            print("# WARNING: {0}".format(HOST_IP_WARNING))
+            self._report(HOST_IP_WARNING, logging.WARN, False)
 
         # Check prerequisites
         if candidate is None:
@@ -385,8 +381,8 @@ class RplCommands(object):
 
         # Check for mixing IP and hostnames
         if not self._check_host_references():
-            print "# WARNING: %s" % _HOST_IP_WARNING
-            self._report(_HOST_IP_WARNING, logging.WARN, False)
+            print("# WARNING: {0}".format(HOST_IP_WARNING))
+            self._report(HOST_IP_WARNING, logging.WARN, False)
 
         candidates = self.options.get("candidates", None)
         if candidates is None or len(candidates) == 0:
@@ -700,8 +696,8 @@ class RplCommands(object):
 
         # Check for mixing IP and hostnames
         if not self._check_host_references():
-            print "# WARNING: %s" % _HOST_IP_WARNING
-            self._report(_HOST_IP_WARNING, logging.WARN, False)
+            print("# WARNING: {0}".format(HOST_IP_WARNING))
+            self._report(HOST_IP_WARNING, logging.WARN, False)
             print("#\n# Failover console will start in {0} seconds.".format(
                 WARNING_SLEEP_TIME))
             time.sleep(WARNING_SLEEP_TIME)

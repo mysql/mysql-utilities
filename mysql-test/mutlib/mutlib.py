@@ -47,6 +47,59 @@ MAX_SERVER_POOL = 10
 MAX_NUM_RETRIES = 50
 
 
+def kill_process(proc, force=False):
+    """This function tries to kill the given subprocess.
+
+    proc [in]   Popen instance of the subprocess to kill.
+    force [in]  Boolean value, if False try to kill process with SIGTERM
+                (Posix only) else kill it forcefully.
+
+    Returns True if operation was successful and False otherwise.
+    """
+    res = True
+    # get pid process pid
+    pid = proc.pid
+    if os.name == "posix":
+        if force:
+            os.kill(pid, subprocess.signal.SIGABRT)
+        else:
+            os.kill(pid, subprocess.signal.SIGTERM)
+    else:
+        with open(os.devnull, 'w') as f_out:
+            ret_code = subprocess.call("taskkill /F /T /PID {0}".format(pid),
+                                       shell=True, stdout=f_out, stdin=f_out)
+            if ret_code not in (0, 128):
+                res = False
+                print("Unable to successfully kill process with PID "
+                      "{0}".format(pid))
+    return res
+
+
+def stop_process(proc, kill=True):
+    """Stop the given process or wait for it to end.
+
+    This function kills or waits for the subprocess proc to
+    terminate, depending on the value of the kill parameter.
+    If kill is True, it kills the process, otherwise it waits
+    for it to terminate on its own.
+
+    proc [in]   Popen instance of the subprocess to kill or to wait
+                until it terminates on its own.
+    kill [in]   Boolean value, if true, kill process else
+                wait for its completion.
+
+    Returns True if operation was successful and False otherwise.
+    """
+    res = -1
+    if kill:
+        retval = kill_process(proc)
+        res = 0 if retval else -1
+    else:
+        if proc.poll() is None:
+            res = proc.wait()
+    return res
+
+
 def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
                file_in=None):
     """Execute Utility

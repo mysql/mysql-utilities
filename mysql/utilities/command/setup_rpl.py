@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2011, 2013, Oracle and/or its affiliates. All rights
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights
 # reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@ master/slave replication topology among two servers.
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.replication import Replication
+from mysql.utilities.common.replication_ms import ReplicationMultiSource
 
 
 def setup_replication(master_vals, slave_vals, rpl_user,
@@ -104,3 +105,27 @@ def setup_replication(master_vals, slave_vals, rpl_user,
         rpl.test(test_db, 10)
 
     print "# ...done."
+
+
+def start_ms_replication(slave_vals, masters_vals, options):
+    """Setup replication among a slave and multiple masters.
+
+    slave_vals[in]     Slave server connection dictionary.
+    master_vals[in]    List of master server connection dictionaries.
+    options[in]        Options dictionary.
+    """
+    rplms = ReplicationMultiSource(slave_vals, masters_vals, options)
+    daemon = options.get("daemon", None)
+    if daemon == "start":
+        rplms.start()
+    elif daemon == "stop":
+        rplms.stop()
+    elif daemon == "restart":
+        rplms.restart()
+    else:
+        try:
+            # Start in foreground
+            rplms.start(detach_process=False)
+        except KeyboardInterrupt:
+            # Stop multi-source replication
+            rplms.stop_replication()

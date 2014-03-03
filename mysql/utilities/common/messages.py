@@ -101,6 +101,9 @@ PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
 PARSE_ERR_SLAVE_DISCO_EXC = ("Options --discover-slaves-login and --slaves "
                              "cannot be used simultaneously.")
 
+PARSE_ERR_OPTS_REQ_GREATER_OR_EQUAL = ("The {opt} option requires a value "
+                                       "greater than or equal to {value}.")
+
 WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
                          "'{cmd}' (option ignored).")
 
@@ -130,3 +133,7 @@ SCRIPT_THRESHOLD_WARNING = ("WARNING: You have chosen to use external script "
                             "fails, this can leave the operation in an "
                             "undefined state. Please check your results "
                             "carefully if the operation aborts.")
+
+HOST_IP_WARNING = ("You may be mixing host names and IP addresses. This may "
+                   "result in negative status reporting if your DNS services "
+                   "do not support reverse name lookup.")

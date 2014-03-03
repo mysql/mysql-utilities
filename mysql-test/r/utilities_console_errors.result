@@ -25,6 +25,8 @@ WARNING: Unable to locate utility mysqlauditgrep.
 WARNING: mysqlauditgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldbexport.
 WARNING: mysqldbexport failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlrplms.
+WARNING: mysqlrplms failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqldbcompare.
 WARNING: mysqldbcompare failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlfailover.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2011, 2013, Oracle and/or its affiliates. All rights
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights
 # reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -90,6 +90,12 @@ class UtilTestError(UtilError):
     def __init__(self, message, errno=0, result=None):
         UtilError.__init__(self, message, errno)
         self.result = result
+
+
+class UtilDaemonError(UtilError):
+    """POSIX daemon error.
+    """
+    pass
 
 
 class FormatError(Error):

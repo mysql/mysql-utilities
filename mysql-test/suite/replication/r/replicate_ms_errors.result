@@ -1,0 +1,24 @@
+Test case 1 - error: option --slave is required
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: Option '--slave' is required.
+Test case 2 - error: at least two masters are required
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: Option '--masters' is required.
+Test case 3 - error: invalid --report-values value
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: The value for the option --report-values is not valid: 'unknown', the values allowed are 'health', 'gitd' or 'uuid'
+Test case 4 - error: invalid --format value
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: option --format: invalid choice: 'unknown' (choose from 'grid', 'tab', 'csv', 'vertical')
+Test case 5 - error: interval in seconds for reporting health is too low
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: The --interval option requires a value greater than or equal to 5.
+Test case 6 - error: switchover interval in seconds for switching masters is too low
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: The --switchover-interval option requires a value greater than or equal to 30.
