@@ -18,38 +18,38 @@ Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: You cannot list the master as a slave.
-Test case 5 - invalid integer for --rpl-timeout.
+Test case 5 - invalid slave connection.
+ERROR: Cannot connect to slave invalid_host:3306 as user 'root'.
+Test case 6 - invalid master connection.
+ERROR: Cannot connect to the master server.
+Error 2003: Can't connect to MySQL server on 'localhost'
+Test case 7 - invalid integer for --rpl-timeout.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: option --rpl-timeout: invalid integer value: '0.5'
-Test case 6 - value for --rpl-timeout must be non-negative.
+Test case 8 - value for --rpl-timeout must be non-negative.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: Option '--rpl-timeout' requires a non-negative value.
-Test case 7 - invalid integer for --checksum-timeout.
+Test case 9 - invalid integer for --checksum-timeout.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: option --checksum-timeout: invalid integer value: 'not_a_number'
-Test case 8 - value for --checksum-timeout must be non-negative.
+Test case 10 - value for --checksum-timeout must be non-negative.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: Option '--checksum-timeout' requires a non-negative value.
-Test case 9 - invalid integer for --interval.
+Test case 11 - invalid integer for --interval.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: option --interval: invalid integer value: '-0.5'
-Test case 10 - value for --interval must be greater than zero.
+Test case 12 - value for --interval must be greater than zero.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: Option '--interval' requires a value greater than zero.
-Test case 11 - invalid slave connection.
-ERROR: Cannot connect to slave invalid_host:3306 as user 'root'.
-Test case 12 - invalid master connection.
-ERROR: Cannot connect to the master server.
-Error 2003: Can't connect to MySQL server on 'localhost'

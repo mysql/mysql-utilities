@@ -74,6 +74,23 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - invalid slave connection."
+                   "").format(test_num)
+        cmd = "{0} --slaves=root@invalid_host:3306".format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - invalid master connection."
+                   "").format(test_num)
+        cmd = ("{0} --slaves=root@invalid_host:3306 "
+               "--master=not_user@localhost:999999").format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         cmd_base = "mysqlrplsync.py --slaves=root@localhost:3306"
 
         test_num += 1
@@ -121,23 +138,6 @@ class test(mutlib.System_test):
                    "zero.").format(test_num)
         cmd = "{0} --interval=-0".format(cmd_base)
         res = self.run_test_case(2, cmd, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
-        test_num += 1
-        comment = ("Test case {0} - invalid slave connection."
-                   "").format(test_num)
-        cmd = "{0} --slaves=root@invalid_host:3306".format(cmd_base)
-        res = self.run_test_case(1, cmd, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
-        test_num += 1
-        comment = ("Test case {0} - invalid master connection."
-                   "").format(test_num)
-        cmd = ("{0} --slaves=root@invalid_host:3306 "
-               "--master=not_user@localhost:3333").format(cmd_base)
-        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
