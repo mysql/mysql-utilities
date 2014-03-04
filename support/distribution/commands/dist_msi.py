@@ -78,6 +78,24 @@ class _MSIDist(bdist):
         self.product_name = 'MySQL Utilities'
         self.sub_version = ''
 
+    def are_fabric_doctrine_present(self):
+        pck_fabric = False
+        add_doczip = False
+        for pck_name in self.distribution.packages:
+            if 'fabric' in pck_name:
+                pck_fabric = True
+                log.info('-Adding Fabric')
+        if self.distribution.data_files:
+            for _, data_files in self.distribution.data_files:
+                for data_file in data_files:
+                    log.info('data_file: {0}'.format(data_file))
+                    doczip_pattern = 'data/mysql-fabric-doctrine-?.?.?.zip'
+                    if fnmatch.fnmatch(data_file, doczip_pattern):
+                        head, tail = os.path.split(data_file)
+                        add_doczip = tail or head
+                        log.info('-Adding doctrine extensions')
+        return pck_fabric, add_doczip
+
     def finalize_options(self):
         """Finalize opitons"""
         if self.plat_name is None:
@@ -227,33 +245,20 @@ class MSIBuiltDist(_MSIDist):
     python_version = get_python_version()
     wxs = 'support/MSWindows/mysql_utilities.xml'
     fix_txtfiles = ['README.txt', 'LICENSE.txt']
-    
+
     def initialize_options(self):
         """Initialize the options"""
         _MSIDist.initialize_options(self)
         self.wix_install = None
         self.include_sources = False
-    
+
     def finalize_options(self):
         """Finalize the options"""
         _MSIDist.finalize_options(self)
         if not self.wix_install:
             self.wix_install = WIX_INSTALL
-        pck_fabric = False
-        add_doczip = False
-        for pck_name in self.distribution.packages:
-            if 'fabric' in pck_name:
-                pck_fabric = True
-                log.info('-Adding Fabric')
-        if self.distribution.data_files:
-            for dest, data_files in self.distribution.data_files:
-                for data_file in data_files:
-                    log.info('data_file: {0}'.format(data_file))
-                    doczip_pattern = 'data/mysql-fabric-doctrine-?.?.?.zip'
-                    if fnmatch.fnmatch(data_file, doczip_pattern):
-                        head, tail = os.path.split(data_file)
-                        add_doczip = tail or head
-                        log.info('-Adding doctrine extensions')
+
+        pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
             base_xml_path = "support/MSWindows/mysql_utilities.xml"
             result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
@@ -356,7 +361,24 @@ class BuiltCommercialMSI(_MSIDist):
                                    ('dist_dir', 'dist_dir'),
                                    ('plat_name', 'plat_name'))
 
-        self.wxs = 'support/MSWindows/mysql_utilities_com.xml'
+        pck_fabric, add_doczip = self.are_fabric_doctrine_present()
+        if pck_fabric or add_doczip:
+            base_xml_path = "support/MSWindows/mysql_utilities_com.xml"
+            result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc_com.xml'
+            add_features(base_xml_path, result_xml_path,
+                         add_fabric=pck_fabric,
+                         add_doczip=add_doczip,
+                         log=log)
+            for root, _dirs, files in os.walk('support/MSWindows/'):
+                log.info('Checking for new msi descriptor at: {0}'.format(root))
+                for afile in files:
+                    log.info('file: {0}'.format(afile))
+                if 'mysql_utilities_fab-doc_com.xml' in files:
+                    log.info('new msi descriptor found')
+                else:
+                    log.info('new msi descriptor not found')
+            self.wxs = result_xml_path
+
         self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
         if self.tag:
             self.tag = "-{0}".format(self.tag)

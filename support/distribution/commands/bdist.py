@@ -214,6 +214,7 @@ class BuiltCommercial(bdist):
         installed_files = install.get_outputs()
 
         #install MAN pages
+        log.info('===== installing manuals =====')
         install_man = self.reinitialize_command('install_man',
                                                 reinit_subcommands=1)
         if self.man_root:
@@ -229,12 +230,17 @@ class BuiltCommercial(bdist):
         log.info('install_man finish')
 
         #install data
+        log.info('===== installing data =====')
         install_data = self.reinitialize_command('install_data',
                                                 reinit_subcommands=1)
         if self.data_root:
             install_data.root = self.data_root
         else:
-            install_data.root = self.bdist_dir # + "/usr/bin/"
+            install_data.root = self.bdist_dir
+
+        # windows uses install_data from package instead of setup.py
+        if os.name == 'nt':
+            install_data.install_dir = self.bdist_dir
 
         if self.man_prefix:
             install_data.prefix = self.man_prefix

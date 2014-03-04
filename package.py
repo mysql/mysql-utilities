@@ -102,6 +102,7 @@ from distutils.command.install_data import install_data as _install_data
 from distutils import log
 from distutils.dir_util import remove_tree, ensure_relative
 from distutils.util import change_root
+from itertools import groupby
 
 from info import find_packages
 
@@ -272,13 +273,24 @@ class InstallMan(distutils.core.Command):
 
 # We need to edit the configuration file before installing it
 class install_data(_install_data):
-    def run(self):
-        from itertools import groupby
+    def initialize_options(self):
+        _install_data.initialize_options(self)
+        self.user = None
+        self.home = None
 
+    def finalize_options(self):
+        self.set_undefined_options('install',
+                                   ('user', 'user'),
+                                   ('home', 'home'))
+        _install_data.finalize_options(self)
+
+    def run(self):
         # Set up paths to write to config file
         install_dir = self.install_dir
         install_logdir = '/var/log'
-        if os.name == 'posix':
+        if self.user or self.home:
+            install_sysconfdir = os.path.join(install_dir, 'etc')
+        elif os.name == 'posix' and install_dir in ('/', '/usr'):
             install_sysconfdir = '/etc'
         else:
             install_sysconfdir = 'scripts\\etc\\mysql'
@@ -316,8 +328,8 @@ class install_data(_install_data):
                     config.write(open(filename, "w"))
                     # change directory 'fabric'to mysql 
                     directory = os.path.join(install_sysconfdir, 'mysql')
-                    if os.name == 'nt':
-                        directory = install_sysconfdir
+                if os.name == 'nt':
+                    directory = install_sysconfdir
                 data_files.append((directory, filename))
 
         # Re-construct the data_files entry from what was provided by
@@ -330,6 +342,8 @@ class install_data(_install_data):
             (d, [ f[1] for f in fs ]) for d, fs in groupby(data_files, key=lambda x: x[0])
             ]
         self.data_files = data_files
+        log.info("package--> self.data_files {0}".format(self.data_files))
+        log.info("package.py--> self.data_files {0}".format(self.data_files))
         _install_data.run(self)
 
 
@@ -348,7 +362,8 @@ elif os.name == 'nt':
         'bdist_rpm': NotSupportedCommand,
         })
     try:
-        from support.dist_msi import BuiltCommercialMSI, MSIBuiltDist
+        from support.distribution.commands.dist_msi import (BuiltCommercialMSI,
+                                                            MSIBuiltDist)
         from support.distribution.commands import bdist, build
         import mysql.connector
     except ImportError as err:

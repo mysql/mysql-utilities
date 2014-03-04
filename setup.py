@@ -314,6 +314,17 @@ COMMANDS['cmdclass'].update({
 
 # We need to edit the configuration file before installing it
 class install_data(_install_data):
+    def initialize_options(self):
+        _install_data.initialize_options(self)
+        self.user = None
+        self.home = None
+
+    def finalize_options(self):
+        self.set_undefined_options('install',
+                                   ('user', 'user'),
+                                   ('home', 'home'))
+        _install_data.finalize_options(self)
+
     def run(self):
         from itertools import groupby
 
@@ -325,7 +336,9 @@ class install_data(_install_data):
         install_dir = self.install_dir
         install_logdir = '/var/log'
 
-        if os.name == 'posix' and install_dir in ('/', '/usr'):
+        if self.user or self.home:
+            install_sysconfdir = os.path.join(install_dir, 'etc')
+        elif os.name == 'posix' and install_dir in ('/', '/usr'):
             install_sysconfdir = '/etc'
         elif os.name == 'nt':
             install_sysconfdir = os.path.join(install_dir, 'etc')
@@ -363,7 +376,7 @@ class install_data(_install_data):
                     filename = os.path.splitext(filename)[0]
                     config.write(open(filename, "w"))
                     # change directory 'fabric'to mysql 
-                    directory = os.path.join(install_sysconfdir, 'mysql')
+                directory = os.path.join(install_sysconfdir, 'mysql')
                 data_files.append((directory, filename))
             new_data_files.extend(data_files)
 
