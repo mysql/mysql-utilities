@@ -378,6 +378,8 @@ class BuiltCommercialMSI(_MSIDist):
                 else:
                     log.info('new msi descriptor not found')
             self.wxs = result_xml_path
+        else:
+            self.wxs = 'support/MSWindows/mysql_utilities_com.xml'
 
         self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
         if self.tag:
