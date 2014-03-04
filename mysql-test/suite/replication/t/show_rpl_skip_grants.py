@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,15 +38,13 @@ class test(show_rpl.test):
                                               MASTER_MYSQLD)
         if self.server_list[1] is None:
             return False
-        next_port = self.servers.get_next_port()
-        self.servers.clear_last_port()
+        next_port = self.servers.view_next_port()
         self.server_list[2] = self.get_server(
             "slave1_no_grants", SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port)
         )
         if self.server_list[2] is None:
             return False
-        next_port = self.servers.get_next_port()
-        self.servers.clear_last_port()
+        next_port = self.servers.view_next_port()
         self.server_list[3] = self.get_server(
             "slave2_no_grants", SLAVE_MYSQLD.format(MASTER_MYSQLD, next_port)
         )

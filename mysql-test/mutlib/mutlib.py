@@ -25,9 +25,11 @@ This module contains a test framework for testing MySQL Utilities.
 from abc import abstractmethod, ABCMeta
 import commands
 import difflib
+import itertools
 import os
 import platform
 import re
+import socket
 import string
 import subprocess
 import tempfile
@@ -157,6 +159,27 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
     return ret_val
 
 
+def is_port_free(port, host="localhost", timeout=0.2):
+    """ This function checks if a port on a given host is in use or not.
+
+    port[in]        Port number to check availability.
+    host[in]        Hostname to connect to and check port availability.
+    timeout[in]     Timeout used for socket connection.
+
+    Returns True if port is available, False otherwise.
+    """
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.settimeout(timeout)
+        sock.connect((host, int(port)))
+        sock.close()
+    except socket.error:
+        return True
+    else:
+        return False
+
+
 def get_port(process_id):
     """Returns the port number where the server with pid=process_id is
     accepting new connections
@@ -225,12 +248,18 @@ class ServerList(object):
         """
 
         self.cloning_host = "localhost"
-        self.utildir = utildir      # Location of utilities being tested
-        self.new_port = startport   # Starting port for spawned servers
-        self.verbose = verbose      # Option for verbosity
-        self.new_id = 100           # Starting server id for spawned servers
-        self.server_list = servers  # List of servers available
-        self.cleanup_list = []      # List of files to remove at shutdown
+        self.utildir = utildir       # Location of utilities being tested
+        self.new_port = startport    # Starting port for spawned servers
+        self.verbose = verbose       # Option for verbosity
+        self.new_id = 100            # Starting server id for spawned servers
+        self.server_list = servers   # List of servers available
+        self.cleanup_list = []       # List of files to remove at shutdown
+        self.ports_in_use = []       # List of port numbers in use
+        self.ports_freed = []        # List of ports that were used, but are
+                                     # now free to use again
+        self._next_port = startport  # port number to start looking for new
+                                     # unused ports
+
         if servers is None:
             self.server_list = []
 
@@ -239,16 +268,46 @@ class ServerList(object):
         """
         return self.new_port
 
-    def get_next_port(self):
-        """Get the next available server port.
+    def get_free_port(self):
+        """ Returns the next available free port, trying to reuse
+        previously used ports as well.
         """
-        new_port, self.new_port = self.new_port, self.new_port + 1
+        # First check if there is a previously freed port to use and if
+        # there is use it
+        while len(self.ports_freed) > 0:
+            port_number = self.ports_freed.pop()
+            if is_port_free(port_number):
+                return port_number
+        else:
+            # Start looking for new free ports starting at _next_port
+            for port_number in itertools.count(self._next_port):
+                self._next_port = port_number
+                if is_port_free(port_number):
+                    return port_number
+
+    def get_next_port(self):
+        """ Returns the next port number to be used by spawned
+        servers and adds it to the list of ports in use.
+        Also updates the instance variable for the next free port.
+        """
+        # Check if port is still free
+        if is_port_free(self.new_port):
+            new_port = self.new_port
+        else:
+            # If it is not get a new free port
+            new_port = self.get_free_port()
+
+        # Add port to the list of ports in use
+        self.ports_in_use.append(new_port)
+
+        # now get value for self.next_free_port
+        self.new_port = self.get_free_port()
         return new_port
 
     def clear_last_port(self):
         """Return last port used to available status.
         """
-        self.new_port -= 1
+        self.ports_freed.append(self.ports_in_use.pop())
 
     def get_next_id(self):
         """Get the next available server id.

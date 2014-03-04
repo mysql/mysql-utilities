@@ -33,11 +33,10 @@ class test(mutlib.System_test):
     def get_server(self, name, mysqld_params=None):
         serverid = self.servers.get_next_id()
         if not mysqld_params:
-            new_port = self.servers.get_next_port()
+            new_port = self.servers.view_next_port()
             mysqld_params = (' --mysqld="--log-bin=mysql-bin '
                              ' --report-host=localhost '
                              '--report-port={0}"'.format(new_port))
-            self.servers.clear_last_port()
         res = self.servers.spawn_new_server(self.server_list[0], serverid,
                                             name, mysqld_params)
         if not res:
