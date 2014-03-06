@@ -18,7 +18,7 @@
 """mysql.utilities"""
 
 # Major, Minor, Patch, Status
-VERSION = (1, 4, 2, 'Beta', 0)
+VERSION = (1, 4, 2, 'RC', 0)
 # Future versions will have to include only the X, Y (no Z).
 WORKBENCH_VERSION = (6, 0, 0)
 
