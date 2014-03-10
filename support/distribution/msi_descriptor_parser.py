@@ -28,9 +28,9 @@ dir_fab_conf = ('<Directory>'
     '</Directory>'
 )
 
-file_exe_fab = ('<Component>'
-    '<File Id="exe_mysqlfabric" Name="mysqlfabric.exe"'
-    ' Source="$(var.BuildDir)\\mysqlfabric.exe" DiskId="1"/>'
+file_exe_gen = ('<Component>'
+    '<File Id="exe_{mysql_util}" Name="{mysql_util}.exe"'
+    ' Source="$(var.BuildDir)\\{mysql_util}.exe" DiskId="1"/>'
     '</Component>'
 )
 
@@ -127,6 +127,50 @@ def get_element(dom_msi, tagName, name=None, id=None):
             if element.getAttribute('Id') == id:
                 return element
 
+def add_exe_utils(xml_path, result_path, util_names=None, log=None):
+                      
+    """Adds the executable utilities to the msi package descriptor
+
+    This method adds the executable utilities XML attributes to the msi
+    package descriptor so the installer can registered them in to Windows 
+    Registry for later uninstall.
+
+    xml_path[in]       The original xml msi descriptor path
+    result_path[in]    Path to save the resulting xml
+    util_names[in]     the list of the utilities names, if not given all
+                       scripts will be added.
+    log[in]            build command log instance
+    """
+    dom_msi = parse(xml_path)
+
+    if util_names is None:
+        msg = ("Descriptor Parser: None executable was added to the"
+               "package descriptor.")
+        _print(log, msg)
+        return
+
+    print("util_names {0}".format(util_names))
+    print("set util_names {0}".format(set(util_names)))
+
+    # Add the Fabric scripts.
+    diref = get_element(dom_msi, "DirectoryRef", id='INSTALLDIR')
+    comps = diref.getElementsByTagName('Component')
+    for com in comps:
+        if com.getAttribute('Id') == 'UtilsExe':
+            for util_name in set(util_names):
+                mysql_util = os.path.splitext(os.path.split(util_name)[1])[0]
+                _print(log, "Adding Executable: {0}".format(util_name))
+                append_childs_from_unparsed_xml(
+                    com,
+                    file_exe_gen.format(mysql_util=mysql_util)
+                )
+
+    _print(log, "Executables added, Saving xml to:{0} working directory:{1}"
+           "".format(result_path, os.getcwd()))
+    f = open(result_path, "w+")
+    f.write(dom_msi.toprettyxml())
+    f.flush()
+    f.close()
 
 def add_fabric_elements(dom_msi):
     # Define the Directories structure that will be used on the installation 
@@ -134,13 +178,6 @@ def add_fabric_elements(dom_msi):
     dir_in = get_element(dom_msi, "Directory", name='MySQL Utilities',
                          id="INSTALLDIR")
     append_childs_from_unparsed_xml(dir_in, dir_fab_conf)
-
-    # Add the Fabric scripts.
-    diref = get_element(dom_msi, "DirectoryRef", id='INSTALLDIR')
-    comps = diref.getElementsByTagName('Component')
-    for com in comps:
-        if com.getAttribute('Id') == 'UtilsExe':
-            append_childs_from_unparsed_xml(com, file_exe_fab)
 
     # Define the files to be installed on DirectoryRef.
     product = dom_msi.getElementsByTagName("Product")[0]

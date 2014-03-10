@@ -2,7 +2,7 @@ Test case 1 - check empty servers.
 #
 # GTID differences between Master and Slaves:
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 #
@@ -19,7 +19,7 @@ Test case 2 - data consistency check with active replication using master and sl
 #
 # GTID differences between Master and Slaves:
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -42,7 +42,7 @@ Test case 2 - data consistency check with active replication using master and sl
 #
 Test case 3 - data consistency check with active replication only between slaves (no master).
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Slave 'localhost@PORT2' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -63,7 +63,7 @@ Test case 4 - data consistency check between master and specified slaves.
 #
 # GTID differences between Master and Slaves:
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...

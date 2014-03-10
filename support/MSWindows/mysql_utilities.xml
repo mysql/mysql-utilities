@@ -104,48 +104,6 @@
          Part="last" System="yes" Permanent="no"/>
       </Component>
       <Component Id="UtilsExe" Guid="ad3556a3-1c3c-4b9e-916f-f00792649bab">
-        <File Id="exe_mysqlauditadmin" Name="mysqlauditadmin.exe"
-         Source="$(var.BuildDir)\mysqlauditadmin.exe" DiskId="1"/>
-        <File Id="exe_mysqlauditgrep" Name="mysqlauditgrep.exe"
-         Source="$(var.BuildDir)\mysqlauditgrep.exe" DiskId="1"/>
-        <File Id="exe_mysqldbcompare" Name="mysqldbcompare.exe"
-         Source="$(var.BuildDir)\mysqldbcompare.exe" DiskId="1"/>
-        <File Id="exe_mysqldbcopy" Name="mysqldbcopy.exe"
-         Source="$(var.BuildDir)\mysqldbcopy.exe" DiskId="1"/>
-        <File Id="exe_mysqldbexport" Name="mysqldbexport.exe"
-         Source="$(var.BuildDir)\mysqldbexport.exe" DiskId="1"/>
-        <File Id="exe_mysqldbimport" Name="mysqldbimport.exe"
-         Source="$(var.BuildDir)\mysqldbimport.exe" DiskId="1"/>
-        <File Id="exe_mysqldiff" Name="mysqldiff.exe"
-         Source="$(var.BuildDir)\mysqldiff.exe" DiskId="1"/>
-        <File Id="exe_mysqldiskusage" Name="mysqldiskusage.exe"
-         Source="$(var.BuildDir)\mysqldiskusage.exe" DiskId="1"/>
-        <File Id="exe_mysqlfailover" Name="mysqlfailover.exe"
-         Source="$(var.BuildDir)\mysqlfailover.exe" DiskId="1"/>
-        <File Id="exe_mysqlfrm" Name="mysqlfrm.exe"
-         Source="$(var.BuildDir)\mysqlfrm.exe" DiskId="1"/>
-        <File Id="exe_mysqlindexcheck" Name="mysqlindexcheck.exe"
-         Source="$(var.BuildDir)\mysqlindexcheck.exe" DiskId="1"/>
-        <File Id="exe_mysqlmetagrep" Name="mysqlmetagrep.exe"
-         Source="$(var.BuildDir)\mysqlmetagrep.exe" DiskId="1"/>
-        <File Id="exe_mysqlprocgrep" Name="mysqlprocgrep.exe"
-         Source="$(var.BuildDir)\mysqlprocgrep.exe" DiskId="1"/>
-        <File Id="exe_mysqlreplicate" Name="mysqlreplicate.exe"
-         Source="$(var.BuildDir)\mysqlreplicate.exe" DiskId="1"/>
-        <File Id="exe_mysqlrpladmin" Name="mysqlrpladmin.exe"
-         Source="$(var.BuildDir)\mysqlrpladmin.exe" DiskId="1"/>
-        <File Id="exe_mysqlrplcheck" Name="mysqlrplcheck.exe"
-         Source="$(var.BuildDir)\mysqlrplcheck.exe" DiskId="1"/>
-        <File Id="exe_mysqlrplshow" Name="mysqlrplshow.exe"
-         Source="$(var.BuildDir)\mysqlrplshow.exe" DiskId="1"/>
-        <File Id="exe_mysqlserverclone" Name="mysqlserverclone.exe"
-         Source="$(var.BuildDir)\mysqlserverclone.exe" DiskId="1"/>
-        <File Id="exe_mysqlserverinfo" Name="mysqlserverinfo.exe"
-         Source="$(var.BuildDir)\mysqlserverinfo.exe" DiskId="1"/>
-        <File Id="exe_mysqluc" Name="mysqluc.exe"
-         Source="$(var.BuildDir)\mysqluc.exe" DiskId="1"/>
-        <File Id="exe_mysqluserclone" Name="mysqluserclone.exe"
-         Source="$(var.BuildDir)\mysqluserclone.exe" DiskId="1"/>
       </Component>
       <Component Id="UtilsDLL" Guid="2804c1fa-f8df-484a-9a56-47bbe82bff79">
         <File Id="dll_python" Name="python$(var.PythonMajor)$(var.PythonMinor).dll"

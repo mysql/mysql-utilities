@@ -38,7 +38,9 @@ from distutils.file_util import copy_file
 
 from mysql.utilities import RELEASE_STRING, COPYRIGHT
 from support import wix
-from support.distribution.msi_descriptor_parser import add_features
+from support.distribution.msi_descriptor_parser import (add_exe_utils,
+                                                        add_features)
+
 
 WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
 
@@ -258,11 +260,15 @@ class MSIBuiltDist(_MSIDist):
         if not self.wix_install:
             self.wix_install = WIX_INSTALL
 
+        base_xml_path = "support/MSWindows/mysql_utilities.xml"
+        result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
+        add_exe_utils(base_xml_path, result_xml_path,
+                      self.distribution.scripts ,log=log)
+
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
-            base_xml_path = "support/MSWindows/mysql_utilities.xml"
-            result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
-            add_features(base_xml_path, result_xml_path,
+            #set the resulting_xml_path from above.
+            add_features(result_xml_path, result_xml_path,
                          add_fabric=pck_fabric,
                          add_doczip=add_doczip,
                          log=log)
@@ -361,11 +367,15 @@ class BuiltCommercialMSI(_MSIDist):
                                    ('dist_dir', 'dist_dir'),
                                    ('plat_name', 'plat_name'))
 
+        base_xml_path = "support/MSWindows/mysql_utilities_com.xml"
+        result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc_com.xml'
+        add_exe_utils(base_xml_path, result_xml_path,
+                      self.distribution.scripts ,log=log)
+
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
-            base_xml_path = "support/MSWindows/mysql_utilities_com.xml"
-            result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc_com.xml'
-            add_features(base_xml_path, result_xml_path,
+            #set the resulting_xml_path from above.
+            add_features(result_xml_path, result_xml_path,
                          add_fabric=pck_fabric,
                          add_doczip=add_doczip,
                          log=log)

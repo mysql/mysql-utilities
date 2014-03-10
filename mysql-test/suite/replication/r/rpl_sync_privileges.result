@@ -13,7 +13,7 @@ Test case 6 - sync (succeed) using: 'm_user' with SUPER, LOCK TABLES and SELECT;
 # GTID differences between Master and Slaves:
 # - Slave 'localhost@PORT2' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -35,7 +35,7 @@ Test case 7 - sync (succeed) using: 'm_user' with REPLICATION CLIENT, LOCK TABLE
 # GTID differences between Master and Slaves:
 # - Slave 'localhost@PORT2' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
