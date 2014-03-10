@@ -886,7 +886,7 @@ class RPLSynchronizer(object):
                     "known issue with START SLAVE UNTIL and the "
                     "SQL_AFTER_GTIDS option.".format(slave_key))
 
-        print("# Check data consistency between Servers:\n#")
+        print("# Checking data consistency.\n#")
         base_srv_type = 'Master' if self._get_master() else 'Slave'
         print("# Using {0} '{1}' as base server for comparison."
               "".format(base_srv_type, self._base_server_key))

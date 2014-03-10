@@ -15,7 +15,7 @@ Test case 1 - check replication filters skip (case 1).
 # - Slave 'localhost@PORT3' is up-to-date.
 # - Slave 'localhost@PORT4' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db1' database...
@@ -52,7 +52,7 @@ Test case 2 - check replication filters skip (case 1) - only with slaves.
 #   - replicate_ignore_table: test_rplsync_db1.t2
 #   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Slave 'localhost@PORT3' as base server for comparison.
 # Checking 'test_rplsync_db1' database...
@@ -83,7 +83,7 @@ Test case 3 - check replication filters skip (case 2).
 # - Slave 'localhost@PORT3' is up-to-date.
 # - Slave 'localhost@PORT4' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT2' as base server for comparison.
 # Checking 'test_rplsync_db1' database...
@@ -160,7 +160,7 @@ Test case 4 - check replication filters skip (case 2) - only with slaves.
 #   - replicate_ignore_table: test_rplsync_db1.t2
 #   - replicate_wild_ignore_table: test\_rplsync\_db1.%3
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Slave 'localhost@PORT3' as base server for comparison.
 # Checking 'test_rplsync_db1' database...

@@ -108,7 +108,7 @@ Test case 2 - skip slave with GTID OFF.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -135,7 +135,7 @@ Test case 3 - skip sync for stopped slaves.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -166,7 +166,7 @@ Test case 4 - identify missing database.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -201,7 +201,7 @@ Test case 5 - identify table with different definition.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -235,7 +235,7 @@ Test case 6 - identify missing tables.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -267,7 +267,7 @@ Test case 7 - identify data differences on tables.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -299,7 +299,7 @@ Test case 8 - check a specific database.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -327,7 +327,7 @@ Test case 9 - exclude a specific database.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -345,7 +345,7 @@ Test case 10 - check a specific table.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -363,7 +363,7 @@ Test case 11 - exclude a specific table.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # [DIFF] Database NOT on base server but found on 'localhost@PORT2': only_on_slave_db
@@ -392,7 +392,7 @@ Test case 12 - include/exclude data (using backticks).
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # Checking 'test_rplsync_db' database...
@@ -413,7 +413,7 @@ Test case 13 - check a non existing database.
 # - Slave 'localhost@PORT2' is up-to-date.
 # - Slave 'localhost@PORT3' is up-to-date.
 #
-# Check data consistency between Servers:
+# Checking data consistency.
 #
 # Using Master 'localhost@PORT1' as base server for comparison.
 # WARNING: specified database to check does not exist on base server and will be skipped: no_exist_db.
