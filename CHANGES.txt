@@ -1,6 +1,7 @@
-Release 1.4.2 (Released March 04, 2014)
+Release 1.4.2 (Released March 12, 2014)
 ---------------------------------------
 
+- BUG#18388846: mysqlrplsync utility crashes when used with exclude option
 - BUG#13492195: dbcompare does not compare tables without primary keys.
 - BUG#13563798: mysqldbimport error when importing without --drop-first
 - BUG#13572814: mysqldiskusage does not detect local vs remote server
