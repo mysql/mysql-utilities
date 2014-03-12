@@ -974,7 +974,8 @@ class RPLSynchronizer(object):
                         self._base_server, self._get_slave(slave_key),
                         db_name, db_name, False, options)
                     # Process tables to include/exclude from check (on slaves).
-                    if data_to_include and data_to_include[db_name]:
+                    if (data_to_include and db_name in data_to_include
+                            and data_to_include[db_name]):
                         in_both = [
                             obj_row for obj_row in in_both
                             if obj_row[1][0] in data_to_include[db_name]
@@ -987,7 +988,8 @@ class RPLSynchronizer(object):
                             obj_row for obj_row in not_in_basesrv
                             if obj_row[1][0] in data_to_include[db_name]
                         ]
-                    if data_to_exclude and data_to_exclude[db_name]:
+                    if (data_to_exclude and db_name in data_to_exclude
+                            and data_to_exclude[db_name]):
                         in_both = [
                             obj_row for obj_row in in_both
                             if obj_row[1][0] not in data_to_exclude[db_name]

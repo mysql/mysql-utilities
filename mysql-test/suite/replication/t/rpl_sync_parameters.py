@@ -82,8 +82,11 @@ class test(rpl_sync.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         if self.debug:
-            print("\nCreate test database and tables on master.")
+            print("\nCreate test databases and tables on master.")
         rpl_sync.create_test_db(self.server1)
+        # Add another database (empty) to be replicated on all slaves and
+        # checked when using the --exclude option.
+        self.server1.exec_query('CREATE DATABASE empty_db')
 
         if self.debug:
             print("\nInsert data into test database on master.")
