@@ -193,32 +193,38 @@ class CsvPep8Report(BaseReport):
                               "", msg])
 
 
-def process_items(reporter, items):
+def process_items(reporter, items, tester):
     """Process list of modules or packages.
     """
-    # PEP8 report instance setup
-    pep8style = StyleGuide(parse_argv=False, config_file=False)
-    if reporter.name == "csv":
-        pep8style.options.report = CsvPep8Report(pep8style.options,
-                                                 reporter.writer)
-    else:
-        colorized = (reporter.name == "colorized")
-        pep8style.options.report = Pep8Report(pep8style.options,
-                                              reporter.line_format,
-                                              reporter.out,
-                                              colorized)
+    test_pylint = tester in ("pylint", "all",)
+    test_pep8 = tester in ("pep8", "all",)
+
+    if test_pep8:
+        # PEP8 report instance setup
+        pep8style = StyleGuide(parse_argv=False, config_file=False)
+        if reporter.name == "csv":
+            pep8style.options.report = CsvPep8Report(pep8style.options,
+                                                     reporter.writer)
+        else:
+            colorized = (reporter.name == "colorized")
+            pep8style.options.report = Pep8Report(pep8style.options,
+                                                  reporter.line_format,
+                                                  reporter.out,
+                                                  colorized)
 
     pylint_rc_path = os.path.join(_CURRENT_PATH, "pylint.rc")
     for item in items:
         path = os.path.join(_BASE_PATH, item)
-        # Pylint tests
-        lint.Run([path, "--rcfile={0}".format(pylint_rc_path)],
-                 reporter=reporter, exit=False)
-        # Pep8 tests
-        if item.endswith(".py"):
-            pep8style.input_file(path)
-        else:
-            pep8style.input_dir(path)
+        if test_pylint:
+            # Pylint tests
+            lint.Run([path, "--rcfile={0}".format(pylint_rc_path)],
+                     reporter=reporter, exit=False)
+        if test_pep8:
+            # Pep8 tests
+            if item.endswith(".py"):
+                pep8style.input_file(path)
+            else:
+                pep8style.input_dir(path)
 
 
 if __name__ == "__main__":
@@ -232,7 +238,10 @@ if __name__ == "__main__":
                       help="colorizes text output.")
     parser.add_option("-o", "--output", action="store", type="string",
                       dest="output", help="output file.")
-
+    parser.add_option("-t", "--tester", type="choice", dest="tester",
+                      default="all", choices=["pylint", "pep8", "all"],
+                      help="testing tool to be used. It can be pylint, pep8 "
+                      "or all (default=all).")
     (options, args) = parser.parse_args()
 
     # Set the output writer
@@ -266,7 +275,7 @@ if __name__ == "__main__":
         else:
             reporter = CustomTextReporter(output)
 
-        process_items(reporter, items)
+        process_items(reporter, items, options.tester)
     except KeyboardInterrupt:
         sys.stdout.write("\n")
     finally:
