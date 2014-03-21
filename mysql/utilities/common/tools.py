@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ import socket
 import subprocess
 import time
 
-from mysql.utilities import PYTHON_MIN_VERSION, PYTHON_MAX_VERSION
+from mysql.utilities import (PYTHON_MIN_VERSION, PYTHON_MAX_VERSION,
+                             CONNECTOR_MIN_VERSION)
 from mysql.utilities.common.format import print_list
 from mysql.utilities.exception import UtilError
 
@@ -487,13 +488,23 @@ def decode(orig_str):
     return "".join(new_parts)
 
 
-def check_connector_python(print_error=True):
-    """ Check to see if Connector/Python is installed and accessible
+def check_connector_python(print_error=True,
+                           min_version=CONNECTOR_MIN_VERSION):
 
-    print_error[in]     if True, print the error. Default True
+    """Check to see if Connector Python is installed and accessible and
+    meets minimum required version.
 
-    Prints error and returns False on failure to find connector.
+    By default this method uses constants to define the minimum
+    C/Python version required. It's possible to override this by passing  a new
+    value to ``min_version`` parameter.
+
+    print_error[in]               If True, print error else do not print
+                                  error on failure.
+    min_version[in]               Tuple with the minimum C/Python version
+                                  required (inclusive).
+
     """
+    is_compatible = True
     try:
         import mysql.connector  # pylint: disable=W0612
     except ImportError:
@@ -503,7 +514,22 @@ def check_connector_python(print_error=True):
                   "Please check your paths or download and install the "
                   "Connector/Python from http://dev.mysql.com.")
         return False
-    return True
+    else:
+        try:
+            sys_version = mysql.connector.version.VERSION[:3]
+        except AttributeError:
+            is_compatible = False
+
+    if is_compatible and sys_version >= min_version:
+        return True
+    else:
+        if print_error:
+                print("ERROR: The MYSQL Connector/Python module was found "
+                      "but it is either not properly installed or it is an "
+                      "old version. MySQL Utilities requires Connector/Python "
+                      "version > '{0}'. Download and install Connector/Python "
+                      "from http://dev.mysql.com.".format(min_version))
+        return False
 
 
 def print_elapsed_time(start_time):
