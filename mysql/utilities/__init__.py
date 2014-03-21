@@ -27,7 +27,7 @@ RELEASE_STRING = (
     VERSION_STRING +
     " (part of MySQL Workbench Distribution %s.%s.%s)" % WORKBENCH_VERSION)
 
-COPYRIGHT = "2010, 2013 Oracle and/or its affiliates. All rights reserved."
+COPYRIGHT = "2010, 2014 Oracle and/or its affiliates. All rights reserved."
 
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of
