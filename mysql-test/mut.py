@@ -21,10 +21,15 @@ tests on the MySQL Utilities.
 """
 
 import sys
-from mysql.utilities.common.tools import check_python_version
+from mysql.utilities.common.tools import (check_python_version,
+                                          check_connector_python)
 
 # Check Python version compatibility
 check_python_version(name='MySQL Utilities Test')
+
+# Check for connector/python
+if not check_connector_python():
+    sys.exit(1)
 
 import csv
 import datetime

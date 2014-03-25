@@ -161,4 +161,5 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
             os.unlink(self.path_fakeutil)
+            shutil.rmtree(self.tmp_dir)
         return True

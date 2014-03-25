@@ -27,7 +27,7 @@ RELEASE_STRING = (
     VERSION_STRING +
     " (part of MySQL Workbench Distribution %s.%s.%s)" % WORKBENCH_VERSION)
 
-COPYRIGHT = "2010, 2013 Oracle and/or its affiliates. All rights reserved."
+COPYRIGHT = "2010, 2014 Oracle and/or its affiliates. All rights reserved."
 
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -46,6 +46,7 @@ VERSION_FRM = ("MySQL Utilities {program} version {RELEASE_STRING} \n"
 LICENSE_FRM = (VERSION_FRM + "\n" + COPYRIGHT_FULL)
 PYTHON_MIN_VERSION = (2, 6, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)
+CONNECTOR_MIN_VERSION = (1, 0, 9)
 
 # This dictionary has to be updated whenever a utility is added.
 # the format to use is:

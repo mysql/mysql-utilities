@@ -5,7 +5,7 @@
 %define summary         MySQL Utilities contain a collection of scripts useful for managing and administering MySQL servers
 %define vendor          Oracle
 %define packager        Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com>
-%define copyright       Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+%define copyright       Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 
 # Following are given defined from the environment/command line:
 #  version

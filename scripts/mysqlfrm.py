@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,9 +21,18 @@ This file contains the .frm file utility for reading .frm files to construct
 CREATE TABLE commands and display diagnostic information.
 """
 
-import optparse
 import os
 import sys
+
+from mysql.utilities.common.tools import (check_python_version,
+                                          check_connector_python)
+
+# Check Python version compatibility
+check_python_version()
+
+# Check C/Python version compatibility
+if not check_connector_python():
+    sys.exit(1)
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import FormatError, UtilError
