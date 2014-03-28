@@ -14,7 +14,7 @@ Release:       1%{?dist}
 License:       %{copyright} Use is subject to license terms.  Under %{license_type} license as shown in the Description field.
 Group:         Development/Libraries
 URL:           https://dev.mysql.com/downloads/tools/utilities/
-Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-%{version}.zip
+Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-commercial-%{version}.zip
 BuildArch:     noarch
 BuildRequires: python-devel > 2.6
 Requires:      mysql-connector-python >= 1.2.1
@@ -42,7 +42,7 @@ this distribution (see the "Licenses for Third-Party Components"
 appendix) or view the online documentation at
 <http://dev.mysql.com/doc/>
 
-%package       extra%{product_suffix}
+%package       extra
 Summary:       Additional files for mysql-utilities
 Group:         Development/Libraries
 
@@ -76,7 +76,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc CHANGES.txt LICENSE_com.txt README_com.txt
+%doc CHANGES.txt LICENSE.txt README.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
 %{_bindir}/mysqlauditadmin
