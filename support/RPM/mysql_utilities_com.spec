@@ -46,7 +46,7 @@ appendix) or view the online documentation at
 Summary:       Additional files for mysql-utilities
 Group:         Development/Libraries
 
-%description   extra%{product_suffix}
+%description   extra
 This package contains additional files mysql-utilities such as a MySQL
 Fabric support for Doctrine Object Relational Mapper.
 
