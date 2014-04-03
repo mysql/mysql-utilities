@@ -490,8 +490,8 @@ def show_server_info(servers, options):
             if util_error.errno == CR_CONNECTION_ERROR:
                 socket = conn_dict.get("unix_socket", "")
                 if socket and os.path.isfile(socket):
-                    err = ["Unable to connect to server using "
-                           "socket '{0}'".format(socket)]
+                    err_msg = ["Unable to connect to server using "
+                               "socket '{0}'".format(socket)]
             # If we got errno 2003 and we do not have
             # socket, instead we check if server is localhost.
             elif (util_error.errno == CR_CONN_HOST_ERROR and
@@ -501,18 +501,20 @@ def show_server_info(servers, options):
             # notify the user if a password was used or not.
             elif util_error.errno == ER_ACCESS_DENIED_ERROR:
                 use_pass = 'YES' if conn_dict['passwd'] else 'NO'
-                er = ("Access denied for user '{0}'@'{1}' using password: {2}"
-                      ).format(conn_dict['user'], conn_dict['host'], use_pass)
+                err_msg = ("Access denied for user '{0}'@'{1}' using "
+                           "password: {2}".format(conn_dict['user'],
+                                                  conn_dict['host'],
+                                                  use_pass))
             # Use the error message from the connection attempt.
             else:
-                er = [util_error.errmsg]
+                err_msg = [util_error.errmsg]
             # To propose to start a cloned server for extract the info,
             # can not predict if the server is really off, but we can do it
             # in case of socket error, or if one of the related
             # parameter was given.
             if server_is_off or basedir or datadir or start:
-                er = ["Server is offline. To connect, "
-                      "you must also provide "]
+                err_msg = ["Server is offline. To connect, "
+                           "you must also provide "]
 
                 opts = ["basedir", "datadir", "start"]
                 for opt in tuple(opts):
@@ -522,15 +524,15 @@ def show_server_info(servers, options):
                     except KeyError:
                         pass
                 if opts:
-                    er.append(", ".join(opts[0:-1]))
+                    err_msg.append(", ".join(opts[0:-1]))
                     if len(opts) > 1:
-                        er.append(" and the ")
-                    er.append(opts[-1])
-                    er.append(" option")
-                    raise UtilError("".join(er))
+                        err_msg.append(" and the ")
+                    err_msg.append(opts[-1])
+                    err_msg.append(" option")
+                    raise UtilError("".join(err_msg))
 
             if not start:
-                raise UtilError("".join(er))
+                raise UtilError("".join(err_msg))
             else:
                 try:
                     server_val = parse_connection(server, None, options)

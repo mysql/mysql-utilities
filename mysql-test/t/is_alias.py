@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+is_alias test.
+"""
+
 import socket
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 _IPv6_LOOPBACK = "::1"
 
@@ -89,6 +96,14 @@ class test(mutlib.System_test):
     Note: this test requires server version 5.5.30 and Internet connection.
     """
 
+    server0 = None
+    server1 = None
+    server1_name = None
+    host_name = None
+    good_test_cases = None
+    bad_test_cases = None
+    old_cloning_host = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 5, 30):
             raise MUTLibError("Test requires server version 5.5.30")
@@ -127,6 +142,13 @@ class test(mutlib.System_test):
         return True
 
     def run_is_alias_test(self, server, test_num, test_case, exp_res=True):
+        """Run is_alias test.
+
+        server[in]      Server instance.
+        test_num[in]    Test number.
+        test_case[in]   Test case.
+        exp_res[in]     Expected result.
+        """
         NOT = ""
         if not exp_res:
             NOT = "not "
@@ -149,6 +171,11 @@ class test(mutlib.System_test):
         server.aliases = []
 
     def run_is_alias_test_cases(self, server, test_num):
+        """Run is_alias test cases.
+
+        server[in]     Server instance.
+        test_num[in]   Test number.
+        """
         for test_case in self.good_test_cases:
             test_num += 1
             self.run_is_alias_test(server, test_num, test_case)

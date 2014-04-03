@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ import sys
 
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.check_rpl import check_replication
-from mysql.utilities.common.options import (add_verbosity, license_callback,
-                                            setup_common_options)
+from mysql.utilities.common.options import add_verbosity, setup_common_options
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python

@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
@@ -33,6 +39,10 @@ class test(mutlib.System_test):
     """simple db copy
     This test executes copy database test cases among two servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -396,6 +406,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         # this DBs may not be created on subclasses.
         db_drops_on_server1 = ["util_test", 'db`:db', 'views_test',
                                "util_test_default_charset",

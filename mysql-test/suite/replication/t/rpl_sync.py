@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync test.
+"""
+
 import os
 import random
 import string
@@ -105,13 +109,13 @@ def load_test_data(server, db_num=1):
         )
         # Insert random data on all tables.
         random_values = string.letters + string.digits
-        for row_index in xrange(TEST_DB_NUM_ROWS):
+        for _ in xrange(TEST_DB_NUM_ROWS):
             columns = []
             values = []
             for table_index in xrange(TEST_DB_NUM_TABLES):
                 columns.append('rnd_txt{0}'.format(table_index))
                 rnd_text = "".join(
-                    [random.choice(random_values) for i in xrange(20)]
+                    [random.choice(random_values) for _ in xrange(20)]
                 )
                 values.append("'{0}'".format(rnd_text))
                 insert = ("INSERT INTO {0}.`t{1}` ({2}) VALUES ({3})"

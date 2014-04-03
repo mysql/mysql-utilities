@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_locks test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -27,6 +33,10 @@ class test(mutlib.System_test):
     This test executes a simple copy of a database on two servers using
     the locking options.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -104,6 +114,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server2, "util_test")
         self.drop_db(self.server2, "util_db_copy")

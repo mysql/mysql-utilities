@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+proc_grep test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -23,6 +30,9 @@ class test(mutlib.System_test):
     """Process grep
     This test executes the process grep tool on a single server.
     """
+
+    server1 = None
+    need_servers = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -114,6 +124,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         res = self.drop_db(self.server1, "util_test")
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]

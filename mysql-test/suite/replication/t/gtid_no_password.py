@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+gtid_no_password test.
+"""
+
 import os
-import failover
 import time
+
+import failover
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -32,12 +40,22 @@ class test(failover.test):
     This test exercises the mysqlfailover utility on slaves without passwords.
     """
 
+    server0 = None
+    server1 = None
+    server2 = None
+    master_str = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
         return self.check_num_servers(1)
 
     def _get_server(self, role, mysqld):
+        """Gets server.
+
+        role[in]      Role for finding server.
+        mysqld[in]    MySQL server options.
+        """
         if self.debug:
             print "# Spawning {0}".format(role)
         index = self.servers.find_server_by_name(role)
@@ -68,6 +86,13 @@ class test(failover.test):
         return server
 
     def _poll_console(self, start, name, proc, comment):
+        """Poll console.
+
+        start[in]      True for start.
+        name[in]       Name.
+        proc[in]       Process.
+        comment[in]    Comment.
+        """
         msg = "Timeout waiting for console {0} to {1}.".format(
             name, "start." if start else "end.")
         if self.debug:

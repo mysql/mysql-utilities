@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+failover_daemon test.
+"""
+
 import os
 import re
 import time
@@ -23,6 +28,7 @@ import failover
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _FAILOVER_LOG = "{0}fail_log.txt"
 _FAILOVER_PID = "{0}fail_pid.txt"
@@ -35,6 +41,7 @@ class test(failover.test):
     This test exercises the mysqlfailover utility failover event and modes.
     It uses the rpl_admin_gtid test for setup and teardown methods.
     """
+
     log_range = range(1, 6)
 
     def check_prerequisites(self):
@@ -43,6 +50,10 @@ class test(failover.test):
         return super(test, self).check_prerequisites()
 
     def test_failover_daemon_nodetach(self, test_case):
+        """Tests failover daemon with --nodetach option.
+
+        test_case[in]     Test case.
+        """
         server = test_case[0]
         cmd = test_case[1]
         kill_daemon = test_case[2]
@@ -231,6 +242,15 @@ class test(failover.test):
 
     def test_failover_daemon(self, comment, cmd, logfile, pidfile,
                              stop_daemon, key_phrase=None):
+        """Tests failover daemon.
+
+        comment[in]         Comment.
+        cmd[in]             Command to be executed.
+        logfile[in]         Log file.
+        pidfile[in]         PID file.
+        stop_daemon[in]     True for stopping process.
+        key_phrase[in]      Phrase to be found in the log.
+        """
         found_row = key_phrase is None
         if self.debug:
             print(comment)
@@ -280,7 +300,7 @@ class test(failover.test):
                   "its monitoring process")
         # Wait because of the warning message that may appear due to
         # mixing hostnames and IP addresses
-        time.sleep(WARNING_SLEEP_TIME+1)
+        time.sleep(WARNING_SLEEP_TIME + 1)
         i = 0
         with open(logfile, "r") as f:
             while i < _TIMEOUT:

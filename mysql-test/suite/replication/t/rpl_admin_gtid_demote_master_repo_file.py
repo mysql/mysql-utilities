@@ -15,9 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
+"""
+rpl_admin_gtid_demote_master_repo_file test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
@@ -166,8 +171,8 @@ class test(rpl_admin.test):
         # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
         comment = ("Test case {0} - demote-master switchover -vvv "
-                   "Using a different rpl user and using the --force".format(
-                   test_num))
+                   "Using a different rpl user and using the --force"
+                   "".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(slave1_conn)
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=rpluser:hispassword --demote-master "

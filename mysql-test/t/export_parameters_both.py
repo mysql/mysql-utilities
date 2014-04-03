@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_parameters_both test.
+"""
+
 import export_parameters_def
+
 from mysql.utilities.exception import MUTLibError
 
 

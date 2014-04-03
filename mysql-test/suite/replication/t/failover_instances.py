@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+failover_instances test.
+"""
+
 import os
 import time
 
@@ -22,6 +27,7 @@ import rpl_admin_gtid
 
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.exception import MUTLibError
+
 
 _FAILOVER_LOG = "fail_log.txt"
 _TIMEOUT = 30
@@ -44,7 +50,7 @@ class test(failover.test):
             print
         for log in _LOG_PREFIX:
             try:
-                os.unlink(log+_FAILOVER_LOG)
+                os.unlink(log + _FAILOVER_LOG)
             except OSError:
                 pass
         return rpl_admin_gtid.test.check_prerequisites(self)
@@ -52,8 +58,15 @@ class test(failover.test):
     def setup(self):
         self.temp_files = []
         return rpl_admin_gtid.test.setup(self)
-        
+
     def _poll_console(self, start, name, proc, comment):
+        """Poll console.
+
+        start[in]      True for start.
+        name[in]       Name.
+        proc[in]       Process.
+        comment[in]    Comment.
+        """
         msg = "Timeout waiting for console {0} to ".format(name)
         msg += "start." if start else "end."
         if self.debug:
@@ -73,8 +86,13 @@ class test(failover.test):
                 if self.debug:
                     print "#", msg
                 raise MUTLibError("{0}: {1}".format(comment, msg))
-                
+
     def _check_result(self, prefix, target):
+        """Checks the result.
+
+        prefix[in]     Log prefix.
+        target[in]     Phrase to be found.
+        """
         found_row = False
         log_file = open(prefix + _FAILOVER_LOG)
         if self.debug:
@@ -92,7 +110,7 @@ class test(failover.test):
 
     def run(self):
         self.res_fname = "result.txt"
-        
+
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
         slave2_conn = self.build_connection_string(self.server3).strip(' ')
@@ -110,13 +128,13 @@ class test(failover.test):
                                             master_str)
         failover_cmd3 += " --candidate={0}".format(slave1_conn)
         failover_cmd4 = failover_cmd.format("auto", "d" + _FAILOVER_LOG,
-                                            "--master="+slave2_conn)
-        
+                                            "--master=" + slave2_conn)
+
         # We launch one console, wait for interval, then start another,
         # wait for interval, then kill both, and finally check log of each
         # for whether each logged the correct messages for multiple instance
         # check.
-        
+
         interval = 15
         test_num = 1
         comment = ("Test case {0} : test multiple instances of failover "
@@ -125,7 +143,7 @@ class test(failover.test):
             print comment
             print "# First instance:", failover_cmd1
             print "# Second instance:", failover_cmd2
-            
+
         proc1, f_out1 = failover.test.start_process(self, failover_cmd1)
         self._poll_console(True, "first", proc1, comment)
 
@@ -146,7 +164,7 @@ class test(failover.test):
         # Check to see if second console changed modes.
         found_row = self._check_result("b", "Multiple instances of failover")
         self.results.append((comment, found_row))
-                    
+
         test_num += 1
         comment = "Test case {0} : test failed instance restart".format(
             test_num)
@@ -154,7 +172,7 @@ class test(failover.test):
             print comment
             print "# Third instance:", failover_cmd3
             print "# Fourth instance:", failover_cmd4
-            
+
         # Launch the console in stealth mode
         proc3, f_out3 = failover.test.start_process(self, failover_cmd3)
         self._poll_console(True, "third", proc3, comment)
@@ -171,13 +189,13 @@ class test(failover.test):
         res = self.server1.show_server_variable("datadir")
         datadir = res[0][1]
 
-        # Stop the server 
+        # Stop the server
         self.server1.disconnect()
-        failover.test.kill(self, pid, True)
+        failover.test.kill(pid, True)
 
         delete_directory(datadir)
         self.servers.remove_server(self.server1.role)
-        
+
         # Now wait for interval to occur.
         if self.debug:
             print "# Waiting for interval to end."
@@ -185,12 +203,12 @@ class test(failover.test):
 
         failover.test.stop_process(self, proc3, f_out3, True)
         self._poll_console(False, "third", proc3, comment)
-                
+
         # Restart the console - should not demote the failover mode.
         proc4, f_out4 = failover.test.start_process(self, failover_cmd4)
         self._poll_console(True, "fourth", proc4, comment)
-        
-        ret_val = failover.test.stop_process(self, proc4, f_out4, True)
+
+        failover.test.stop_process(self, proc4, f_out4, True)
         self._poll_console(False, "fourth", proc4, comment)
 
         found_row = self._check_result("d", "Multiple instances of failover")
@@ -209,14 +227,14 @@ class test(failover.test):
                 msg += "\n{0}\nTest case failed.".format(result[0])
                 return False, msg
         return True, ''
-    
+
     def record(self):
         return True  # Not a comparative test
-    
+
     def cleanup(self):
         for log in _LOG_PREFIX:
             try:
-                os.unlink(log+_FAILOVER_LOG)
+                os.unlink(log + _FAILOVER_LOG)
             except OSError:
                 pass
         return rpl_admin_gtid.test.cleanup(self)

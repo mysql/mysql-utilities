@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_console_errors test.
+"""
+
 import os
-import mutlib
 import shutil
 
+import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 fakeutil_help_tc_5 = """Usage: mysqlfakeutil.py --option
 
@@ -35,6 +42,12 @@ class test(mutlib.System_test):
     """ Test the warnings generated at startup for the console. Test requires
     Python 2.6.
     """
+
+    tmp_dir = None
+    path_fakeutil = None
+    fakeutility = None
+    util_needle = None
+    options = None
 
     def check_prerequisites(self):
         return True
@@ -70,8 +83,10 @@ class test(mutlib.System_test):
                              ["import sys\n", "sys.exit(1)\n"])
         return True
 
-    def write_fake_util(self, util_name, content):
-        # Write a fake utility
+    @staticmethod
+    def write_fake_util(util_name, content):
+        """Write a fake utility.
+        """
         with open(util_name, "w") as file_fakeutil:
             file_fakeutil.writelines(content)
             file_fakeutil.flush()
@@ -147,6 +162,7 @@ class test(mutlib.System_test):
                             ("The execution of the command returned: "
                              "python: can't open file ...\n"))
 
+        # pylint: disable=W1401
         self.replace_substring("\r", "")
         self.replace_substring("tmp_scripts\mysql", "tmp_scripts/mysql")
         return True

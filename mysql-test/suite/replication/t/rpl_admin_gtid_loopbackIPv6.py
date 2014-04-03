@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_gtid_loopbackIPv6 test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _IPv6_LOOPBACK = "::1"
 
@@ -34,6 +40,8 @@ class test(rpl_admin.test):
 
     Note: this test requires GTID enabled servers.
     """
+
+    old_cloning_host = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
@@ -129,7 +137,7 @@ class test(rpl_admin.test):
         test_num += 1
         comment = ("Test case {0} - loopback "
                    "([::1]) failover ".format(test_num))
-        cmd_str = "mysqlrpladmin.py "#--master=%s " % slave1_conn
+        cmd_str = "mysqlrpladmin.py "
         slaves = ",".join([slave2_conn, slave3_conn,
                            master_conn])
         cmd_opts = (" --slaves={0} --rpl-user=rpluser:hispassword "

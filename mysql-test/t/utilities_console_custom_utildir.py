@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_console_custom_utildir test.
+"""
+
 import os
 import shutil
+
 import utilities_console_base
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common import utilities as utils
 
@@ -29,6 +36,10 @@ class test(utilities_console_base.test):
     This test executes tests of commands piped into mysqluc. It uses the
     utilities_console_base for test execution.
     """
+
+    util_file = None
+    util_test = None
+    tmp_dir = None
 
     def check_prerequisites(self):
         return True
@@ -95,6 +106,7 @@ class test(utilities_console_base.test):
 
         self.do_test(test_num, comment, cmd_str.format(cmd))
 
+        # pylint: disable=W1401
         self.replace_substring("tmp_scripts\mysql", "tmp_scripts/mysql")
         return True
 

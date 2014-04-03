@@ -442,7 +442,7 @@ def _check_tables_structure(server1, server2, object1, object2, options,
                         "{0}, {1}.".format(object1, object2))
 
     compact_diff = options.get("compact", False)
-    fmt = options.get("format", "grid")
+
     # If the second part of the object qualified name is None, then the format
     # is not 'db_name.obj_name' for object1 and therefore must treat it as a
     # database name.
@@ -569,7 +569,6 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     """
     quiet = options.get("quiet", False)
     difftype = options.get("difftype", "unified")
-    _format = options.get("format", "grid")
     width = options.get("width", 75)
     direction = options.get("changes-for", None)
     reverse = options.get("reverse", False)
@@ -837,6 +836,7 @@ def _setup_compare(table1, table2, span_key_size, use_indexes=None):
     table2_idx = []
     # If user specified indexes with --use-indexes
     if use_indexes:
+        # pylint: disable=W0633
         candidate_idxs_tb1, candidate_idxs_tb2 = use_indexes
         # Check if indexes exist,
         for cte_idx in candidate_idxs_tb1:

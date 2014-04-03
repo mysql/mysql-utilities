@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+connection_values test.
+"""
+
 import mutlib
+
 from mysql.utilities.exception import (ConnectionValuesError, FormatError,
                                        UtilError)
 from mysql.utilities.common.server import (get_connection_dictionary,
@@ -25,7 +31,7 @@ _TEST_CASES = [('Good connection string but cannot connect',
                 'root:pass@hostname.com:3306:/my.sock', True),
                ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),
                ('Good dictionary but cannot connect',
-                {'user': 'root',  'passwd': 'pass',  'host': 'localhost',
+                {'user': 'root', 'passwd': 'pass', 'host': 'localhost',
                  'port': '3306', 'unix_socket': '/my.sock'}, True),
                ('Bad dictionary', {'something': 'else'}, True),
                ]
@@ -36,6 +42,8 @@ class test(mutlib.System_test):
     This test attempts to use the connect_servers method for using multiple
     parameter types for connection (dictionary, connection string, class).
     """
+
+    server0 = None
 
     def check_prerequisites(self):
         return self.check_num_servers(1)
@@ -84,7 +92,7 @@ class test(mutlib.System_test):
             if not self.results[i][0] == _TEST_CASES[i][2]:
                 msg = ("Got wrong result for test case {0}. "
                        "Expected: {1}, got: {2}.".format(
-                       i + 1, _TEST_CASES[i][2], self.results[i][0]))
+                           i + 1, _TEST_CASES[i][2], self.results[i][0]))
                 if self.results[i][1] == '':
                     errors = msg
                 else:

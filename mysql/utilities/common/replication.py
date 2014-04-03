@@ -1982,6 +1982,7 @@ class Slave(Server):
         if res == [] or not res[0]:
             return False
         res = res[0]
+        # pylint: disable=W0633
         m_host, m_port = self.get_master_host_port()
         # Suppose the state is True for "Waiting for master to send event"
         # so we can ignore it if verify_state is not given as True.

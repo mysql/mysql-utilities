@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+clone_db_rpl_errors test.
+"""
+
 import clone_db
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -37,18 +42,18 @@ class test(clone_db.test):
             raise MUTLibError("Failed to create test database :"
                               " {0}".format(err.errmsg))
         return True
-        
+
     def run(self):
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
-       
+
         from_conn = "--source={0}".format(
             self.build_connection_string(self.server1))
         to_conn = "--destination={0}".format(
             self.build_connection_string(self.server1))
 
-        test_num = 1        
-        # Check --rpl option errors        
+        test_num = 1
+        # Check --rpl option errors
         cmd_str = "mysqldbcopy.py {0} {1} util_clone:util_clone2 ".format(
             to_conn, from_conn)
         comment = "Test case {0} - error: --rpl-user=root but no --rpl".format(
@@ -68,13 +73,13 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         try:
             self.server1.exec_query("DROP DATABASE util_clone")

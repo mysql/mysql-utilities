@@ -92,11 +92,12 @@ def prefix_check_choice(option, opt, value):
     raise OptionValueError("option %s: invalid choice: %r (choose from %s)"
                            % (opt, value, choices))
 
+
 def license_callback(self, opt, value, parser, *args, **kwargs):
-        """Show license information and exit.
-        """
-        print(LICENSE_FRM.format(program=parser.prog))
-        parser.exit()
+    """Show license information and exit.
+    """
+    print(LICENSE_FRM.format(program=parser.prog))
+    parser.exit()
 
 
 class CaseInsensitiveChoicesOption(CustomOption):

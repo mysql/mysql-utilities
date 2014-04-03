@@ -323,7 +323,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 if len(missing_options) > 1:
                     comma_idx = message.rfind(",")
                     message = "{0} and {1}".format(message[:comma_idx],
-                                                   message[comma_idx+1:])
+                                                   message[comma_idx + 1:])
                 pluralize = "s" if len(missing_options) > 1 else ""
                 raise UtilError("Missing connection value{0} for "
                                 "{1} option{0}".format(pluralize, message))

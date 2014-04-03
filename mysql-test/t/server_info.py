@@ -14,8 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+server_info test.
+"""
+
 import os
 import time
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -25,6 +31,14 @@ class test(mutlib.System_test):
     """simple db serverinfo
     This test executes the serverinfo utility.
     """
+
+    server1 = None
+    server2 = None
+    server3 = None
+    need_server = False
+    res_fname_temp = None
+    basedir = None
+    datadir3 = None
 
     def check_prerequisites(self):
         # Need at least one server.
@@ -47,7 +61,8 @@ class test(mutlib.System_test):
         return True
 
     def do_replacements(self):
-        # Mask out this information to make result file deterministic
+        """Mask out this information to make result file deterministic.
+        """
         self.replace_result("                  version:",
                             "                  version: XXXX\n")
         self.replace_result("                  datadir:",
@@ -86,6 +101,11 @@ class test(mutlib.System_test):
                             " slow_query_log_file_size: XXXX\n")
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
+        """Start and stop new server.
+
+        delete_log[in]    True for delete log.
+        stop_server[in]   True for stop server.
+        """
         port = int(self.servers.get_next_port())
         res = self.servers.start_new_server(self.server1, port,
                                             self.servers.get_next_id(), "root",
@@ -110,7 +130,12 @@ class test(mutlib.System_test):
         self.servers.remove_server(self.server3.role)
         return cmd_str
 
-    def remove_logs_from_server(self, datadir):
+    @staticmethod
+    def remove_logs_from_server(datadir):
+        """Removes logs from server.
+
+        datadir[in]   Data dir.
+        """
         # restarting server fails if log is different, from the original
         # so we will delete them.
         logs = ["ib_logfile0", "ib_logfile1"]

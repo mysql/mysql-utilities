@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_user test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.common.user import User
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
@@ -24,6 +31,10 @@ class test(mutlib.System_test):
     """copy user
     This test copies a user from one server to another copying all grants.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         # Need at least one server.
@@ -54,6 +65,11 @@ class test(mutlib.System_test):
         return True
 
     def show_user_grants(self, server, user):
+        """Shou user grants.
+
+        server[in]    Server instance.
+        user[in]      User.
+        """
         query = "SHOW GRANTS FOR {0}".format(user)
         try:
             res = server.exec_query(query)
@@ -171,7 +187,13 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_user(self, user_name, server):
+    @staticmethod
+    def drop_user(user_name, server):
+        """Drops user.
+
+        user_name[in]    User.
+        server[in]       Server instance.
+        """
         user = User(server, user_name)
         if user.exists():
             res = user.drop()
@@ -180,6 +202,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all database and users created.
+        """
         user_drop_lst = ["joe_pass@'%'", "joe_pass@user",
                          "'joe_nopass'@'user'", "'amy_nopass'@'user'",
                          "'jill'@'user'", "'jack'@'user'", "'john'@'user'"]

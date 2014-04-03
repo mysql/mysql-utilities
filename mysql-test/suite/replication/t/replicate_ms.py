@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+replicate_ms test.
+"""
+
 import os
 import shlex
 import subprocess
@@ -43,6 +47,10 @@ class test(rpl_admin.test):
 
     log_range = range(1, 2)
     total_masters = 2
+    server0 = None
+    server1 = None
+    server2 = None
+    server3 = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):

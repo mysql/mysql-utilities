@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+format_list test.
+"""
+
 import os
 
 import mutlib
+
+from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.common.format import format_vertical_list
 
 
 class test(mutlib.System_test):
@@ -29,12 +37,10 @@ class test(mutlib.System_test):
         return self.check_num_servers(0)
 
     def setup(self):
-        self.test_file = open('format_test', 'w')
         return True
 
     def run(self):
-        from mysql.utilities.common.format import format_tabular_list
-        from mysql.utilities.common.format import format_vertical_list
+        test_file = open('format_test', 'w')
 
         rows_1 = [('one',), ('two',), ('three',)]
         cols_1 = ['a']
@@ -43,18 +49,18 @@ class test(mutlib.System_test):
         rows_3 = [('one', None, 31), ('two', None, 32), ('three', None, 33)]
         cols_3 = ['a', 'b', 'c']
 
-        format_tabular_list(self.test_file, cols_1, rows_1)
-        format_tabular_list(self.test_file, cols_2, rows_2)
-        format_tabular_list(self.test_file, cols_3, rows_3)
-        format_vertical_list(self.test_file, cols_1, rows_1)
-        format_vertical_list(self.test_file, cols_2, rows_2)
-        format_vertical_list(self.test_file, cols_3, rows_3)
-        self.test_file.close()
+        format_tabular_list(test_file, cols_1, rows_1)
+        format_tabular_list(test_file, cols_2, rows_2)
+        format_tabular_list(test_file, cols_3, rows_3)
+        format_vertical_list(test_file, cols_1, rows_1)
+        format_vertical_list(test_file, cols_2, rows_2)
+        format_vertical_list(test_file, cols_3, rows_3)
+        test_file.close()
 
-        self.test_file = open('format_test', 'r')
-        for line in self.test_file.readlines():
+        test_file = open('format_test', 'r')
+        for line in test_file.readlines():
             self.results.append(line)
-        self.test_file.close()
+        test_file.close()
 
         return True
 

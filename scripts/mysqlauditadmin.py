@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ if not check_connector_python():
     sys.exit(1)
 
 # Setup the command parser
-program = os.path.basename(sys.argv[0]).replace(".py","")
+program = os.path.basename(sys.argv[0]).replace(".py", "")
 parser = MyParser(
     version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,

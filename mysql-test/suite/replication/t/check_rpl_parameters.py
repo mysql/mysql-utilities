@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+check_rpl_parameters test.
+"""
+
 import check_rpl
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 class test(check_rpl.test):
     """check replication conditions
@@ -25,6 +31,9 @@ class test(check_rpl.test):
     to test various parameters. It uses the check_rpl test as a parent for
     setup and teardown methods.
     """
+
+    server3 = None
+    s3_serverid = None
 
     def check_prerequisites(self):
         return check_rpl.test.check_prerequisites(self)
@@ -73,7 +82,7 @@ class test(check_rpl.test):
         test_num = 1
         comment = "Test case {0} - show help".format(test_num)
         cmd_opts = " --help"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -85,7 +94,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - master_info".format(test_num)
         cmd_opts = " --master-info=m.info -v"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -93,7 +102,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - width".format(test_num)
         cmd_opts = " --width=65"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -101,7 +110,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - quiet".format(test_num)
         cmd_opts = " --quiet"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -109,7 +118,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - test failure with quiet".format(test_num)
         cmd_opts = " --master-info=m.info --quiet"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -128,7 +137,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - test warning without quiet".format(test_num)
         cmd_opts = " "
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -136,7 +145,7 @@ class test(check_rpl.test):
         test_num += 1
         comment = "Test case {0} - test warning with quiet".format(test_num)
         cmd_opts = " --quiet"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -145,7 +154,7 @@ class test(check_rpl.test):
         comment = "Test case {0} - test suppress warning without quiet".format(
             test_num)
         cmd_opts = " --suppress"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -154,7 +163,7 @@ class test(check_rpl.test):
         comment = "Test case {0} - test suppress warning with quiet".format(
             test_num)
         cmd_opts = " --suppress --quiet"
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

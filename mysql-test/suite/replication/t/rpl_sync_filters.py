@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync_filters test.
+"""
+
 import os
 
 import rpl_sync
@@ -52,6 +56,10 @@ class test(rpl_sync.test):
 
     NOTE: Test extend the base rpl_sync test and it has the same prerequisites.
     """
+
+    server5 = None
+    server6 = None
+    server7 = None
 
     def setup(self):
         self.res_fname = "result.txt"
@@ -252,6 +260,7 @@ class test(rpl_sync.test):
         self.replace_substring(str(self.server7.port), "PORT7")
 
         # Force order of filters results (non-deterministic dictionary order).
+        # pylint: disable=W1401
         self.force_lines_order(
             ("# Slave 'localhost@PORT3':\n",
              "#   - replicate_do_table: test_rplsync_db1.t1\n",
@@ -261,6 +270,7 @@ class test(rpl_sync.test):
         )
 
         # Force order of checksum results (due to multiprocessing).
+        # pylint: disable=W1401
         self.force_lines_order(
             ("#   [OK] `test_rplsync_db1`.`t1` checksum for server "
              "'localhost@PORT3'.\n",

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,12 +15,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_failover_error test.
+"""
+
 import os
 
 import rpl_admin
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--skip-slave-start',
@@ -57,6 +62,14 @@ class test(rpl_admin.test):
 
     Note: this test requires GTID enabled servers.
     """
+
+    master_conn = None
+    slave1_conn = None
+    slave2_conn = None
+    slave3_conn = None
+    slave4_conn = None
+    server5 = None
+    s4_port = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
@@ -186,7 +199,13 @@ class test(rpl_admin.test):
 
         return True
 
-    def wait_for_slave(self, master, slave):
+    @staticmethod
+    def wait_for_slave(master, slave):
+        """Waits for slave.
+
+        master[in]     Master instance.
+        slave[in]      Slave instance.
+        """
         master_gtid = master.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")
         master_gtids = master_gtid[0][0].split('\n')
         for gtid in master_gtids:

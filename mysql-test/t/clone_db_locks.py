@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_db_locks test.
+"""
+
 import os
 
 import mutlib
@@ -29,6 +34,8 @@ class test(mutlib.System_test):
     the locking options.
     """
 
+    server1 = None
+
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
@@ -39,7 +46,7 @@ class test(mutlib.System_test):
         data_file = os.path.normpath("./std_data/basic_data.sql")
         self.drop_all()
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except MUTLibError, err:
             raise MUTLibError(
                 "Failed to read commands from file {0}{1}: ".format(
@@ -76,7 +83,6 @@ class test(mutlib.System_test):
         return True
 
     def get_result(self):
-        msg = None
         for result in self.results:
             if self.server1 and result == 0:
                 query = "SHOW DATABASES LIKE 'util_%'"
@@ -97,6 +103,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         res1 = self.drop_db(self.server1, "util_test")
         res2 = self.drop_db(self.server1, "util_db_clone")
 

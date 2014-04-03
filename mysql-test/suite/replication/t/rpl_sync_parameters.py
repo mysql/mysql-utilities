@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync_parameters test.
+"""
+
 import os
 
 import rpl_sync
@@ -156,7 +160,7 @@ class test(rpl_sync.test):
 
         if self.debug:
             print("\nRemove tables on master and slave.")
-        last_tbl = '`t{0}`'.format(rpl_sync.TEST_DB_NUM_TABLES-1)
+        last_tbl = '`t{0}`'.format(rpl_sync.TEST_DB_NUM_TABLES - 1)
         self.server1.exec_query('SET SQL_LOG_BIN=0')
         self.server1.exec_query('DROP TABLE `test_rplsync_db`.'
                                 '{0}'.format(last_tbl))

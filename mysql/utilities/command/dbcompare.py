@@ -456,8 +456,6 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         # Set the object type
         obj_type = item[0]
 
-        obj1 = "{0}.{1}".format(db1, item[1][0])
-        obj2 = "{0}.{1}".format(db2, item[1][0])
         q_obj1 = "{0}.{1}".format(quote_with_backticks(db1),
                                   quote_with_backticks(item[1][0]))
         q_obj2 = "{0}.{1}".format(quote_with_backticks(db2),

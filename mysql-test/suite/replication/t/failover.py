@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+failover test.
+"""
+
 import os
 import subprocess
 import tempfile
@@ -25,6 +30,7 @@ from mysql.utilities.common.server import get_local_servers
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 FAILOVER_LOG = "{0}fail_log.txt"
 _TIMEOUT = 30
@@ -41,6 +47,13 @@ class test(rpl_admin_gtid.test):
     # TODO: Perform analysis as to whether any of these methods need to be
     #       generalized and placed in the mutlib for all tests to access.
 
+    temp_files = None
+    test_results = None
+    failover_dir = None
+    test_cases = None
+    fail_event_script = None
+
+    # pylint: disable=W0221
     def is_long(self):
         # This test is a long running test
         return True
@@ -71,6 +84,10 @@ class test(rpl_admin_gtid.test):
         return rpl_admin_gtid.test.setup(self)
 
     def start_process(self, cmd):
+        """Starts a process.
+
+        cmd[in]     Command to be executed.
+        """
         if self.debug:
             f_out = tempfile.TemporaryFile()
             self.temp_files.append(f_out)
@@ -84,7 +101,13 @@ class test(rpl_admin_gtid.test):
             proc = subprocess.Popen(cmd, stdout=f_out, stderr=f_out)
         return proc, f_out
 
-    def kill(self, pid, force=False):
+    @staticmethod
+    def kill(pid, force=False):
+        """Kills a proccess.
+
+        pid[in]     Process ID.
+        force[in]   True for signal.SIGABBRT.
+        """
         res = True
         if os.name == "posix":
             if force:
@@ -103,6 +126,12 @@ class test(rpl_admin_gtid.test):
         return res
 
     def stop_process(self, proc, f_out, kill=True):
+        """Stops a process.
+
+        proc[in]      Process.
+        f_out[in]     File handler.
+        kill[in]      True for kill process.
+        """
         res = -1
         if kill:
             retval = self.kill(proc.pid)
@@ -114,7 +143,14 @@ class test(rpl_admin_gtid.test):
             f_out.close()
         return res
 
-    def is_process_alive(self, pid, start, end):
+    @staticmethod
+    def is_process_alive(pid, start, end):
+        """Tests if process is alive.
+
+        pid[in]       Process ID.
+        start[in]     For Windows/NT systems: Starting port value to search.
+        end[in]       For Windows/NT systems: Ending port value to search.
+        """
         mysqld_procs = get_local_servers(False, start, end)
         for proc in mysqld_procs:
             if int(pid) == int(proc[0]):
@@ -122,6 +158,10 @@ class test(rpl_admin_gtid.test):
         return False
 
     def test_failover_console(self, test_case):
+        """Tests failover console.
+
+        test_case[in]     Test case.
+        """
         server = test_case[0]
         cmd = test_case[1]
         kill_console = test_case[2]
@@ -177,7 +217,7 @@ class test(rpl_admin_gtid.test):
                   "its monitoring process")
         # Wait because of the warning message that may appear due to
         # mixing hostnames and IP addresses
-        time.sleep(WARNING_SLEEP_TIME+1)
+        time.sleep(WARNING_SLEEP_TIME + 1)
         i = 0
 
         # Wait for logfile file to be created
@@ -230,8 +270,8 @@ class test(rpl_admin_gtid.test):
         if self.debug:
             print("# Waiting for master to stop.")
         i = 0
-        while self.is_process_alive(pid, int(server.port)-1,
-                                    int(server.port)+1):
+        while self.is_process_alive(pid, int(server.port) - 1,
+                                    int(server.port) + 1):
             time.sleep(1)
             i += 1
             if i > _TIMEOUT:
@@ -289,7 +329,7 @@ class test(rpl_admin_gtid.test):
             if key_phrase in row:
                 found_row = True
                 if self.debug:
-                    print("# Found in row = '{0}'.".format(row[:len(row)-1]))
+                    print("# Found in row = '{0}'.".format(row[:len(row) - 1]))
         log_file.close()
 
         if not found_row:
@@ -333,7 +373,7 @@ class test(rpl_admin_gtid.test):
                         " --discover-slaves-login=root:root {0} --failover-"
                         'mode={1} --log={2} --exec-post-fail="' +
                         self.fail_event_script + '" --timeout=5 ')
-        
+
         conn_str = " ".join([master_str, slaves_str])
         str_ = failover_cmd.format(conn_str, 'auto', FAILOVER_LOG.format('1'))
         str_ = "{0} --candidates={1} ".format(str_, slave1_conn)

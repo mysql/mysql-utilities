@@ -15,8 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+copy_db_rpl_errors test.
+"""
+
 import export_rpl_errors
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -84,11 +89,11 @@ class test(export_rpl_errors.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
-        
+
         self.server1.exec_query("DROP USER imnotamouse@localhost")
         self.server2.exec_query("STOP SLAVE")
         self.server2.exec_query("RESET SLAVE")
-        
+
         comment = "Test case {0} - error: slave not connected".format(
             test_num)
         option = " --rpl=slave "
@@ -101,10 +106,10 @@ class test(export_rpl_errors.test):
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server3))
         self.server3.exec_query("CREATE DATABASE util_test")
-        
+
         cmd_str = ("mysqldbexport.py util_test --export=both "
                    "--rpl-user=rpl:rpl {0} ".format(from_conn))
-        
+
         comment = "Test case {0} - error: no binlog".format(test_num)
         option = " --rpl=master "
         res = mutlib.System_test.run_test_case(self, 1, cmd_str + option,

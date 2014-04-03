@@ -15,9 +15,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+export_rpl_errors test.
+"""
+
 import replicate
 import mutlib
-from mysql.utilities.exception import MUTLibError, UtilError
+
+from mysql.utilities.exception import MUTLibError
+
 
 _RPL_OPTIONS = ["--rpl-file=test.txt", "--comment-rpl", "--rpl-user=root"]
 
@@ -28,6 +34,9 @@ class test(replicate.test):
     server using a variety of replication options exercising the errors
     associated with the --rpl commands and processing.
     """
+
+    server3 = None
+    s3_serverid = None
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be 5.1.0 or higher

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_unsupported_server_version test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -25,6 +32,11 @@ class test(mutlib.System_test):
     It test the message for the unsupported version of the First server passed
     as parameter and passed as the second parameter.
     """
+
+    server1 = None
+    server2 = None
+    old_server = None
+    new_server = None
 
     def check_prerequisites(self):
         ok = self.check_num_servers(2)

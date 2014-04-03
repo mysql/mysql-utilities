@@ -15,12 +15,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+replicate_ms_privileges test.
+"""
+
 import os
 import time
 
 import replicate_ms
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _RPLMS_LOG = "{0}rplms_log.txt"
 _TIMEOUT = 30
@@ -189,6 +194,8 @@ class test(replicate_ms.test):
             raise MUTLibError("Failed grant privileges.")
 
     def drop_users(self):
+        """Drops all users created.
+        """
         try:
             self.server1.exec_query("DROP USER 'rpltest'@'localhost'")
         except UtilError:

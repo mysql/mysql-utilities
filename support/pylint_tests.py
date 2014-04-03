@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 This file contains pylint and pep8 tests.
 
 Requirements:
-  pylint>=1.0.0
+  pylint>=1.1.0
   pep8>=1.4.6
 """
 
@@ -45,12 +45,23 @@ except ImportError:
     sys.exit(1)
 
 
-_PYLINT_MIN_VERSION = "1.0.0"
+_PYLINT_MIN_VERSION = "1.1.0"
 _PEP8_MIN_VERSION = "1.4.6"
-_PACKAGES = (os.path.join('mysql', 'utilities'),)
+_PACKAGES = (
+    os.path.join("mysql", "utilities"),
+    os.path.join("mysql-test", "mutlib"),
+    os.path.join("mysql-test", "t"),
+    os.path.join("mysql-test", "suite", "experimental", "t"),
+    os.path.join("mysql-test", "suite", "performance", "t"),
+    os.path.join("mysql-test", "suite", "replication", "t"),
+)
 _CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 (_BASE_PATH, _,) = os.path.split(_CURRENT_PATH)
 
+
+# Add base path and mysql-test to sys.path
+sys.path.append(_BASE_PATH)
+sys.path.append(os.path.join(_BASE_PATH, "mysql-test", "mutlib"))
 
 if pylint_version.split(".") < _PYLINT_MIN_VERSION.split("."):
     sys.stdout.write("ERROR: pylint version >= {0} is required to run "

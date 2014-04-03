@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+t4 test.
+"""
+
 import t2
+
 
 class test(t2.test):
     """Experimental test #4
@@ -26,12 +32,11 @@ class test(t2.test):
 
     def check_prerequisites(self):
         return t2.test.check_prerequisites(self)
-    
+
     def setup(self):
         return t2.test.setup(self)
-    
-    def run(self):
 
+    def run(self):
         # A result list will be generated here by the callee.
         self.ret_val = []
         self.ret_val.append("Wack-a-mole 1\n")
@@ -47,6 +52,6 @@ class test(t2.test):
 
     def record(self):
         return self.save_result_file(__name__, self.ret_val)
-            
+
     def cleanup(self):
         return t2.test.cleanup(self)

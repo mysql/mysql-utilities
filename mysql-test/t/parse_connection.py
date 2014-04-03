@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,11 +16,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+parse_connection test.
+"""
+
 import os
 
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
+
 
 _TEST_RESULTS = [
     # (comment, input, expected result, fail_ok)
@@ -199,6 +205,8 @@ class test(mutlib.System_test):
     the connection parameters.
     """
 
+    conn_vals = None
+
     def check_prerequisites(self):
         return self.check_num_servers(0)
 
@@ -210,7 +218,12 @@ class test(mutlib.System_test):
         return True
 
     def test_connection(self, test_num, test_data, with_credentials=False):
+        """Test connection.
 
+        test_num[in]       Test number.
+        test_data[in]      Test data.
+        with_credentials   True if with credentials.
+        """
         if self.debug:
             print "\nTest case {0} - {1}".format(test_num + 1, test_data[0])
 
@@ -222,7 +235,7 @@ class test(mutlib.System_test):
             self.conn_vals = parse_connection(conn_string)
         except FormatError as err:
             if test_data[3]:
-                # This expected. 
+                # This expected.
                 self.results.append("FAIL")
             else:
                 raise MUTLibError("Test Case {0}: Parse failed! Error: "
@@ -252,7 +265,7 @@ class test(mutlib.System_test):
                 _TEST_RESULTS_WITH_CREDENTIALS_POSIX)
 
         for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
-            i += 1
+            i += 1  # pylint: disable=W0631
             self.test_connection(i, test_case, with_credentials=True)
             if self.debug:
                 msg = u"Comparing result for test case {0}: {1} == {2}"
@@ -270,10 +283,11 @@ class test(mutlib.System_test):
             if not self.results[i] == _TEST_RESULTS[i][2]:
                 return (False, (
                     "Got wrong result for test case {0}. Expected: {1}, got: "
-                    "{2}.".format(i+1, _TEST_RESULTS[i][2], self.results[i])))
+                    "{2}.".format(i + 1, _TEST_RESULTS[i][2],
+                                  self.results[i])))
 
         for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
-            i += 1
+            i += 1  # pylint: disable=W0631
             if not self.results[i] == test_case[2]:
                 msg = (u"Got wrong result for test case {0}. "
                        u"Expected: {1}, got: {2}.")

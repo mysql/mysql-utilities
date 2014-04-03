@@ -14,9 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_errors test.
+"""
+
 import os
 
 import copy_db
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -449,6 +455,8 @@ class test(copy_db.test):
         return self.save_result_file(__name__, self.results)
 
     def drop_users(self):
+        """Drops all users created.
+        """
         try:
             self.server1.exec_query("DROP USER 'joe'@'localhost'")
         except UtilError:

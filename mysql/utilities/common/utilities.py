@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -290,12 +290,12 @@ class Utilities(object):
             if len(utils) < 1:
                 return
 
-        # Execute the utility command using _get_util_info()
+        # Execute the utility command using get_util_info()
         # that returns --help partially parsed.
         for util_name in utils:
             if util_name in self.util_cmd_dict:
                 cmd = self.util_cmd_dict.pop(util_name)
-                util_info = self._get_util_info(list(cmd), util_name)
+                util_info = self.get_util_info(list(cmd), util_name)
                 if util_info and util_info["usage"]:
                     util_info["cmd"] = tuple(cmd)
                     self.util_list.append(util_info)
@@ -303,7 +303,7 @@ class Utilities(object):
 
         self.util_list.sort(key=lambda util_list: util_list['name'])
 
-    def _get_util_info(self, cmd, util_name):
+    def get_util_info(self, cmd, util_name):
         """Get information about utility
 
         cmd[in]        a list with the elements that conform the command

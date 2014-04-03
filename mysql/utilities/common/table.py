@@ -497,7 +497,7 @@ class Table(object):
         false.
         """
         if [idx_q_name for idx_q_name in self.indexes_q_names
-            if idx_q_name == index_q_name]:
+           if idx_q_name == index_q_name]:
             return True
         return False
 
@@ -526,7 +526,6 @@ class Table(object):
              idx.unique]
         )
         return no_null_idxes
-
 
     def _build_update_blob(self, row, new_db, name, blob_col):
         """Build an UPDATE statement to update blob fields.

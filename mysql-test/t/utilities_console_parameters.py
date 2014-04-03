@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_console_parameters test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 _BASE_COMMENT = "Test Case {0}: "
 
@@ -28,8 +36,9 @@ class test(mutlib.System_test):
     utilities_console_pipe tests.
     """
 
+    server0 = None
+
     def check_prerequisites(self):
-        self.server0 = None
         return self.check_num_servers(1)
 
     def setup(self):
@@ -37,6 +46,12 @@ class test(mutlib.System_test):
         return True
 
     def do_test(self, test_num, comment, command):
+        """Do test.
+
+        test_num[in]     Test number.
+        comment[in]      Comment.
+        command[in]      Command.
+        """
         res = self.run_test_case(0, command,
                                  _BASE_COMMENT.format(test_num) + comment)
         if not res:
@@ -83,6 +98,7 @@ class test(mutlib.System_test):
         cmd_opt = ' -e "set SERVER={0};show variables;'.format(
             self.build_connection_string(self.server0))
         if os.name == 'posix':
+            # pylint: disable=W1401
             cmd_opt = '{0}mysqldiff --server1=\$SERVER"'.format(cmd_opt)
         else:
             cmd_opt = '{0}mysqldiff --server1=$SERVER"'.format(cmd_opt)

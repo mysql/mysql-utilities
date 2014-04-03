@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_errors test.
+"""
+
 import diff
+
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _ARGUMENTS = ['util_test.util_test', 'util_test.t3:util_test',
               'util_test:util_test.t3', 'util_test.t3.t3:util_test.t3',

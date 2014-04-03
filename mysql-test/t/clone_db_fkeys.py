@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_db_fkeys test.
+"""
+
 import os
+
 import mutlib
+
 from collections import namedtuple
+
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
 
@@ -25,6 +33,10 @@ class test(mutlib.System_test):
     This test executes a simple clone of a database on a single server with
     foreign keys enabled.
     """
+
+    server1 = None
+    result_boundaries = None
+    test_num = 1
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -64,7 +76,8 @@ class test(mutlib.System_test):
 
         self.test_num = 1
         comment = ("Test case {0} - clone a sample database with foreign keys "
-                   "dependencies without multiprocessing".format(self.test_num))
+                   "dependencies without multiprocessing"
+                   "".format(self.test_num))
         cmd_opts = ["mysqldbcopy.py", "--skip-gtid", from_conn, to_conn,
                     "util_test_fk2:util_test_fk2_clone"]
         cmd = " ".join(cmd_opts)
@@ -114,6 +127,7 @@ class test(mutlib.System_test):
         try:
             res_ori = self.server1.exec_query(query_ori)
             for tpl in test_tuples:
+                # pylint: disable=E1103
                 res_clo = self.server1.exec_query(tpl.query)
                 # Check if create table statements are equal and if there were
                 # no errors in the cloning operation
@@ -127,14 +141,14 @@ class test(mutlib.System_test):
 
         # Now test output for query errors
         query_error = "Query failed"
-        for test_num in range(1, self.test_num+1):
+        for test_num in range(1, self.test_num + 1):
             start = self.result_boundaries[test_num - 1]
             end = self.result_boundaries[test_num]
             for line in self.results[start:end]:
-                    if query_error in line:
-                        return False, ("Test case {0} result failure.\nQuery "
-                                       "error found: {1}"
-                                       "\n".format(test_num, line))
+                if query_error in line:
+                    return False, ("Test case {0} result failure.\nQuery "
+                                   "error found: {1}"
+                                   "\n".format(test_num, line))
         return True, None
 
     def record(self):
@@ -142,6 +156,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases.
+        """
         drop_dbs = ['util_test_fk2', 'util_test_fk2_clone',
                     'util_test_fk2_clone_mp', 'util_test_fk',
                     'util_test_fk3']

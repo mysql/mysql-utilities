@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_gtid test.
+"""
+
 import os
+
 import mutlib
 import export_gtid
+
 from mysql.utilities.exception import UtilError, MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -32,6 +40,8 @@ class test(export_gtid.test):
     for setup and tear down methods.
     """
 
+    data_file = None
+
     def check_prerequisites(self):
         return export_gtid.test.check_prerequisites(self)
 
@@ -40,6 +50,17 @@ class test(export_gtid.test):
 
     def exec_copy(self, server1, server2, copy_cmd, test_num, test_case,
                   reset=True, load_data=True, ret_val=True):
+        """Execute copy.
+
+        server1[in]     Server instance.
+        server2[in]     Server instance.
+        copy_cmd[in]    Copy command.
+        test_num[in]    Test number.
+        test_case[in]   Test case.
+        reset[in]       True for reset.
+        load_data[in]   True for load data.
+        ret_val[in]     Return value.
+        """
         conn1 = " --source={0}".format(
             self.build_connection_string(server1))
         conn2 = " --destination={0}".format(

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+audit_log_grep test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -24,6 +31,10 @@ class test(mutlib.System_test):
     This test runs the mysqlauditgrep utility to test its features.
     Requires a server with the audit log plugin enabled.
     """
+
+    server0 = None
+    server1 = None
+    need_servers = False
 
     def check_prerequisites(self):
         # First, make sure the server to be clone has the audit log included.
@@ -311,6 +322,8 @@ class test(mutlib.System_test):
         return True
 
     def do_replacements(self):
+        """Apply masks in the result.
+        """
         server_id = self.server1.show_server_variable('server_id')[0][1]
         audit_log = self.server1.show_server_variable('audit_log_file')[0][1]
         self.replace_result("          File: " + audit_log,

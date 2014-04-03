@@ -34,7 +34,7 @@ check_python_version()
 if not check_connector_python():
     sys.exit(1)
 
-from mysql.utilities import LICENSE_FRM, VERSION_FRM
+from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.read_frm import (read_frm_files,
                                               read_frm_files_diagnostic)
@@ -171,7 +171,7 @@ Enjoy!
 """
 
 # Setup the command parser
-program = os.path.basename(sys.argv[0]).replace(".py","")
+program = os.path.basename(sys.argv[0]).replace(".py", "")
 parser = MyParser(
     version=VERSION_FRM.format(program=program),
     description=DESCRIPTION,

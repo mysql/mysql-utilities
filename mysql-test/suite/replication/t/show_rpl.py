@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+show_rpl test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import UtilError, MUTLibError
 
 
@@ -25,12 +32,20 @@ class test(mutlib.System_test):
     to print the topology.
     """
 
+    server_list = None
+    port_repl = None
+
     def check_prerequisites(self):
         self.server_list = [None, None, None, None, None, None, None]
         self.port_repl = []
         return self.check_num_servers(1)
 
     def get_server(self, name, mysqld_params=None):
+        """Gets a server instance by name.
+
+        name[in]              Name.
+        mysqld_params[in]     MySQL server parameters.
+        """
         serverid = self.servers.get_next_id()
         if not mysqld_params:
             new_port = self.servers.view_next_port()
@@ -213,6 +228,8 @@ class test(mutlib.System_test):
         return True
 
     def do_replacements(self):
+        """Do replacements in the result.
+        """
         self.replace_substring(" (28000)", "")
         self.replace_substring("127.0.0.1", "localhost")
         i = 1
@@ -234,7 +251,12 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def stop_replication(self, server):
+    @staticmethod
+    def stop_replication(server):
+        """Stops replication.
+
+        server[in]     Server instance.
+        """
         if server is not None:
             server.exec_query("STOP SLAVE")
             server.exec_query("RESET SLAVE")

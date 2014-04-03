@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_rpl_parameters test.
+"""
+
 import os
+
 import replicate
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 _RPL_FILE = "rpl_test.txt"
 _RPL_OPTIONS = ["--comment-rpl", "--rpl-file={0}".format(_RPL_FILE)]
@@ -42,7 +50,7 @@ class test(replicate.test):
         result = replicate.test.setup(self)
         if not result:
             return False
-        
+
         master_str = "--master={0}".format(
             self.build_connection_string(self.server1))
         slave_str = " --slave={0}".format(
@@ -52,7 +60,7 @@ class test(replicate.test):
         self.server2.exec_query("RESET SLAVE")
         self.server1.exec_query("STOP SLAVE")
         self.server1.exec_query("RESET SLAVE")
-        
+
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
             self.server1.exec_query("DROP DATABASE IF EXISTS util_test")
@@ -61,7 +69,7 @@ class test(replicate.test):
             self.server2.read_and_exec_SQL(data_file, self.debug)
         except MUTLibError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
-                              "{1}".format(data_file,  err.errmsg))
+                              "{1}".format(data_file, err.errmsg))
 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:

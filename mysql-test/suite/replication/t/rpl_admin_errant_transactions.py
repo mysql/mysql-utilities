@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_errant_transactions test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--skip-slave-start',
@@ -36,6 +42,11 @@ class test(rpl_admin.test):
 
     Note: this test requires GTID enabled servers.
     """
+
+    master_conn = None
+    slave1_conn = None
+    slave2_conn = None
+    slave3_conn = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):

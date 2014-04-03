@@ -14,12 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin test.
+"""
+
 import os
 import time
 
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
                        '--report-port={0} "')
@@ -33,6 +39,17 @@ class test(mutlib.System_test):
     See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
 
+    server0 = None
+    server1 = None
+    server2 = None
+    server3 = None
+    server4 = None
+    s1_port = None
+    s2_port = None
+    s3_port = None
+    m_port = None
+    master_str = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 5, 30):
             raise MUTLibError("Test requires server version 5.5.30 or later.")
@@ -41,6 +58,12 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def spawn_server(self, name, mysqld=None, kill=False):
+        """Spawns a server.
+
+        name[in]       Name of the server.
+        mysqld[in]     MySQL server options.
+        kill[in]       True for kill.
+        """
         index = self.servers.find_server_by_name(name)
         if index >= 0 and kill:
             server = self.servers.get_server(index)
@@ -105,7 +128,6 @@ class test(mutlib.System_test):
         return self.reset_topology()
 
     def run(self):
-
         cmd_str = "mysqlrpladmin.py {0} ".format(self.master_str)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -119,13 +141,12 @@ class test(mutlib.System_test):
         comment = "Test case {0} - show health before switchover".format(
             test_num)
         cmd_opts = " --slaves={0} --format=vertical health".format(slaves_str)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         # Build connection string with loopback address instead of localhost
-        slave_ports = [self.server2.port, self.server3.port, self.server4.port]
         slaves_loopback = ("root:root@127.0.0.1:{0},root:root@127.0.0.1:{1},"
                            "root:root@127.0.0.1:{2}".format(self.server2.port,
                                                             self.server3.port,
@@ -155,7 +176,7 @@ class test(mutlib.System_test):
                        "--rpl-user=rpl:rpl ".format(case[0]))
             cmd_opts = (" --new-master={0} --demote-master --slaves={1} "
                         "switchover".format(case[2], slaves_str))
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+            res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                    comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -166,7 +187,7 @@ class test(mutlib.System_test):
                 test_num)
             cmd_opts = " --slaves={0} --format=vertical health".format(
                 slaves_str)
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+            res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                    comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -248,6 +269,8 @@ class test(mutlib.System_test):
         return True
 
     def do_masks(self):
+        """Apply masks in the result.
+        """
         self.replace_substring(str(self.m_port), "PORT1")
         self.replace_substring(str(self.s1_port), "PORT2")
         self.replace_substring(str(self.s2_port), "PORT3")
@@ -276,6 +299,10 @@ class test(mutlib.System_test):
                                        "| OK      |")
 
     def reset_master(self, servers_list=None):
+        """Resets a list of masters.
+
+        server_list[in]     List with the server instances.
+        """
         servers_list = [] if servers_list is None else servers_list
         # Clear binary log and GTID_EXECUTED of given servers
         if servers_list:
@@ -292,6 +319,13 @@ class test(mutlib.System_test):
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
                        rpl_passwd='rpl', master=None):
+        """Reset topology.
+
+        server_list[in]     List with the server instances.
+        rpl_user[in]        Replication user. Default=rpl.
+        rpl_passwd[in]      Replication password. Default=rpl
+        master[in]          Master server instance.
+        """
         if slaves_list:
             slaves = slaves_list
         else:
@@ -331,6 +365,10 @@ class test(mutlib.System_test):
         return True
 
     def stop_slaves(self, slaves_list=None):
+        """Stops a list of slaves.
+
+        server_list[in]     List with the server instances.
+        """
         if slaves_list:
             slaves = slaves_list
         else:
@@ -345,6 +383,10 @@ class test(mutlib.System_test):
                                   "{2}".format(slave.host, slave.port, err))
 
     def reset_slaves(self, slaves_list=None):
+        """Resets a list of slaves.
+
+        server_list[in]     List with the server instances.
+        """
         if slaves_list:
             slaves = slaves_list
         else:

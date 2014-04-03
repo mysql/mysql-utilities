@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+compare_db test.
+"""
+
 import os
 
 import mutlib
@@ -27,6 +32,10 @@ class test(mutlib.System_test):
     This test executes a consistency check of two databases on
     separate servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -57,15 +66,15 @@ class test(mutlib.System_test):
         ]
         for data_file in data_files:
             try:
-                res = self.server1.read_and_exec_SQL(data_file, self.debug)
-                res = self.server2.read_and_exec_SQL(data_file, self.debug)
+                self.server1.read_and_exec_SQL(data_file, self.debug)
+                self.server2.read_and_exec_SQL(data_file, self.debug)
             except UtilError as err:
                 raise MUTLibError("Failed to read commands from file"
                                   " {0}: {1}".format(data_file, err.errmsg))
 
         # Add some data to server1 to change AUTO_INCREMENT value.
         try:
-            for count in range(5):
+            for _ in range(5):
                 self.server1.exec_query("INSERT INTO "
                                         "`db_diff_test`.`table-dash` "
                                         "VALUES (NULL)")
@@ -86,11 +95,13 @@ class test(mutlib.System_test):
                         " VALUES ({v}, {v}{v}, {v}0{v}, {v}00{v},"
                         " {v}000{v}, {v}0000{v});".format(db=db, tb=tb, v=n))
                 server.exec_query(
-                        "select * from {db}.{tb}".format(db=db, tb=tb,))
+                    "select * from {db}.{tb}".format(db=db, tb=tb,))
 
         return True
 
     def create_extra_table(self):
+        """Creates an extra table.
+        """
         try:
             self.server2.exec_query("USE inventory;")
             create_table = ("CREATE TABLE `inventory`.`extra_table` ("
@@ -104,6 +115,8 @@ class test(mutlib.System_test):
                               "{0}".format(err.errmsg))
 
     def drop_extra_table(self):
+        """Drops the extra table created.
+        """
         try:
             self.server2.exec_query("DROP TABLE `inventory`.`extra_table`")
         except UtilError as err:
@@ -111,59 +124,61 @@ class test(mutlib.System_test):
                               "{0}".format(err.errmsg))
 
     def alter_data(self):
+        """Alters data.
+        """
         try:
             # Now do some alterations...
-            res = self.server1.exec_query("USE inventory;")
-            res = self.server1.exec_query("DROP VIEW inventory.tools")
-            res = self.server1.exec_query("CREATE VIEW inventory.tools AS "
-                                          "SELECT * FROM inventory.supplies "
-                                          "WHERE type = 'tool'")
-            res = self.server1.exec_query("DELETE FROM inventory.supplies "
-                                          "WHERE qty > 2")
-            res = self.server1.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (2, 'Never Enough Inc.')")
+            self.server1.exec_query("USE inventory;")
+            self.server1.exec_query("DROP VIEW inventory.tools")
+            self.server1.exec_query("CREATE VIEW inventory.tools AS "
+                                    "SELECT * FROM inventory.supplies "
+                                    "WHERE type = 'tool'")
+            self.server1.exec_query("DELETE FROM inventory.supplies "
+                                    "WHERE qty > 2")
+            self.server1.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (2, 'Never Enough Inc.')")
 
-            res = self.server2.exec_query("USE inventory;")
-            res = self.server2.exec_query("DROP VIEW inventory.cleaning")
-            res = self.server2.exec_query("DROP VIEW inventory.finishing_up")
-            res = self.server2.exec_query("UPDATE inventory.supplies SET "
-                                          "cost = 10.00 WHERE cost = 9.99")
-            res = self.server2.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (2, 'Wesayso Corporation')")
-            res = self.server2.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (3, 'Never Enough Inc.')")
-            res = self.server2.exec_query("DELETE FROM inventory.supplies "
-                                          "WHERE cost = 10.00 AND "
-                                          "type = 'cleaning'")
+            self.server2.exec_query("USE inventory;")
+            self.server2.exec_query("DROP VIEW inventory.cleaning")
+            self.server2.exec_query("DROP VIEW inventory.finishing_up")
+            self.server2.exec_query("UPDATE inventory.supplies SET "
+                                    "cost = 10.00 WHERE cost = 9.99")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (2, 'Wesayso Corporation')")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (3, 'Never Enough Inc.')")
+            self.server2.exec_query("DELETE FROM inventory.supplies "
+                                    "WHERE cost = 10.00 AND "
+                                    "type = 'cleaning'")
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
     def alter_data_2(self):
+        """Alters data.
+        """
         try:
             # Now do some alterations...
-            res = self.server1.exec_query("USE no_primary_keys")
-            res = self.server1.exec_query(
+            self.server1.exec_query("USE no_primary_keys")
+            self.server1.exec_query(
                 "UPDATE nonix_1_simple "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c3 = c3 + 10, c5 = c5 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE nonix_1_nix_2 "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE `nonix_``2_nix_``2` "
                 "SET `c``1` = `c``1` + 10, c3 = c3 + 10, c4 = c4 + 10, "
                 "c5 = c5 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE nonix_2_nix_2_pk "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
             )
-
         except UtilError as err:
-            print("Failed to execute query: "
-                              "{0}".format(err.errmsg))
+            print("Failed to execute query: {0}".format(err.errmsg))
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
@@ -340,7 +355,7 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Tests for tables with no primary keys but with unique indexes 
+        # Tests for tables with no primary keys but with unique indexes
         # nullable and not nullable columns
 
         # Test automatically pick up the not nullable unique indexes
@@ -453,8 +468,11 @@ class test(mutlib.System_test):
         return self.compare(__name__, self.results)
 
     def do_replacements(self):
-        # The following are necessary due to changes in character spaces
-        # introduced with Python 2.7.X in the difflib.
+        """Do replacements in the result.
+
+        The following are necessary due to changes in character spaces
+        introduced with Python 2.7.X in the difflib.
+        """
         prefixes = ['***', '---', '+++']
         names = ['supplies', 'supplier', 'tools']
         for prefix in prefixes:
@@ -472,6 +490,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         self.drop_db(self.server1, "inventory")
         self.drop_db(self.server1, "inventory1")
         self.drop_db(self.server1, "inventory2")

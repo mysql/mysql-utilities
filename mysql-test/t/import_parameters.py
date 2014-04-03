@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+import_parameters test.
+"""
+
 import import_basic
+
 from mysql.utilities.exception import MUTLibError, UtilDBError
 
 
@@ -32,6 +37,12 @@ class test(import_basic.test):
         return import_basic.test.setup(self)
 
     def do_skip_test(self, cmd_str, comment, expected_res=0):
+        """Do skip test.
+
+        cmd_str[in]        Command string.
+        comment[in]        Comment.
+        expected_res[in]   Expected result.
+        """
         # Precheck: check db and save the results.
         self.results.append("BEFORE:\n")
         self.results.append(self.check_objects(self.server2, "util_test"))
@@ -182,9 +193,9 @@ class test(import_basic.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldbimport version",
-                "MySQL Utilities mysqldbimport version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldbimport version",
+            "MySQL Utilities mysqldbimport version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

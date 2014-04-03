@@ -1,4 +1,4 @@
-#Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+#Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +14,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+ip_parser_test test.
+"""
+
 import os
 import re
 
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import FormatError
+
 import mysql.utilities.common.ip_parser as ip_parser
 
 
@@ -177,7 +183,8 @@ class test(mutlib.System_test):
         return True
 
     def run_test_cases(self):
-
+        """Run test cases.
+        """
         test_number = 0
         for test_case in _IPv4_TEST_CASES:
             test_number += 1
@@ -222,12 +229,12 @@ class test(mutlib.System_test):
             self.run_test_case("BAD {0}".format(ip_parser.ANY_LIKE), test_case,
                                test_number)
 
+    # pylint: disable=W0221
     def run_test_case(self, test_type, test_case, test_number):
         comment = "Test case {0} - check {1} as type {2} ".format(
             test_number, test_case[0], test_type)
 
-        # Get an Exception is OK unless is not expected. 
-        #if test_case[1][0]:
+        # Get an Exception is OK unless is not expected.
         expected_exception = test_case[1][0]
         expected_host = str(test_case[1][1])
         expected_port = str(test_case[1][2])

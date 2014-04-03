@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+replicate_ms_daemon test.
+"""
+
 import os
 import re
 import time
@@ -22,6 +26,7 @@ import time
 import replicate_ms
 
 from mysql.utilities.exception import MUTLibError
+
 
 _RPLMS_LOG = "{0}rplms_log.txt"
 _RPLMS_PID = "{0}rplms_pid.txt"
@@ -70,7 +75,7 @@ class test(replicate_ms.test):
             print("# COMMAND: {0}".format(cmd))
 
         # Run command
-        proc, f_out = self.start_process(cmd)
+        proc, _ = self.start_process(cmd)
 
         # Wait for process to load
         if self.debug:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_console_startup_errors test.
+"""
+
 import os
-import mutlib
 import sys
+
+import mutlib
 
 from mysql.utilities.command.utilitiesconsole import Utilities
 
@@ -25,6 +31,9 @@ class test(mutlib.System_test):
     """ Test the warnings generated at startup for the console. Test requires
     Python 2.6.
     """
+
+    path_fakeutil = None
+    options = None
 
     def check_prerequisites(self):
         return True
@@ -51,8 +60,13 @@ class test(mutlib.System_test):
                              ["import sys\n", "sys.exit(1)\n"])
         return True
 
-    def write_fake_util(self, util_name, content):
-        # Write a fake utility
+    @staticmethod
+    def write_fake_util(util_name, content):
+        """Write a fake utility.
+
+        util_name[in]     Util name.
+        content[in]       Content.
+        """
         with open(util_name, "w") as file_fakeutil:
             file_fakeutil.writelines(content)
             file_fakeutil.flush()
@@ -69,7 +83,7 @@ class test(mutlib.System_test):
         print(comment)
         cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqlnotexst")]
         util_name = "mysqlnotexst"
-        utils._get_util_info(cmd, util_name)
+        utils.get_util_info(cmd, util_name)
 
         test_num += 1
         comment = ("Test case {0} - Test error with wrong "
@@ -79,7 +93,7 @@ class test(mutlib.System_test):
         cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqldiff.py"),
                "--unreal_option"]
         util_name = "mysqldiff"
-        utils._get_util_info(cmd, util_name)
+        utils.get_util_info(cmd, util_name)
 
         test_num += 1
         comment = ("Test case {0} - Test errorcode returned, and no "
@@ -89,7 +103,7 @@ class test(mutlib.System_test):
         cmd = ["python", os.path.join(os.getcwd(), "mysqlfakeutil.py"),
                "--unreal_option"]
         util_name = "mysqlfakeutil"
-        utils._get_util_info(cmd, util_name)
+        utils.get_util_info(cmd, util_name)
 
         test_num += 1
         self.write_fake_util(self.path_fakeutil,
@@ -101,7 +115,7 @@ class test(mutlib.System_test):
         cmd = ["python", os.path.join(os.getcwd(), "mysqlfakeutil.py"),
                "--unreal_option"]
         util_name = "mysqlfakeutil"
-        utils._get_util_info(cmd, util_name)
+        utils.get_util_info(cmd, util_name)
 
         sys.stdout.flush()
         sys.stdout.close()

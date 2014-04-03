@@ -15,8 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+show_rpl_warnings test.
+"""
+
 import mutlib
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -25,6 +30,9 @@ class test(rpl_admin.test):
     This test exercises the mysqlrplshow utility warnings concerning options.
     It uses the rpl_admin test for setup and teardown methods.
     """
+
+    server5 = None
+    s4_port = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 5):

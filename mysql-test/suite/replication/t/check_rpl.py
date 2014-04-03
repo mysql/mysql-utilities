@@ -14,8 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_rpl test.
+"""
+
 import replicate
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -41,7 +47,7 @@ class test(replicate.test):
         slave_str = " --slave={0}".format(
             self.build_connection_string(self.server1))
         conn_str = master_str + slave_str
-        
+
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
             self.exec_util(cmd, self.res_fname)
@@ -55,11 +61,11 @@ class test(replicate.test):
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         test_num += 1
         comment = "Test case {0} - verbose run".format(test_num)
         cmd_opts = " -vv"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -67,11 +73,11 @@ class test(replicate.test):
         test_num += 1
         comment = "Test case {0} - with show slave status".format(test_num)
         cmd_opts = " -s"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         self.server1.exec_query("STOP SLAVE")
         self.server1.exec_query("CHANGE MASTER TO MASTER_HOST='127.0.0.1'")
         self.server1.exec_query("START SLAVE")
@@ -93,7 +99,7 @@ class test(replicate.test):
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         self.server2.exec_query("DROP USER rpl@'%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
                                 "TO rpl@'local%' "
@@ -106,7 +112,7 @@ class test(replicate.test):
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         self.server2.exec_query("DROP USER rpl@'local%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
                                 "TO rpl@localhost "
@@ -118,7 +124,8 @@ class test(replicate.test):
         return True
 
     def do_replacements(self):
-        
+        """Do replacements in the result.
+        """
         self.replace_result(" master id = ",
                             " master id = XXXXX\n")
         self.replace_result("  slave id = ",
@@ -127,7 +134,7 @@ class test(replicate.test):
                             " master uuid = XXXXX\n")
         self.replace_result("  slave uuid = ",
                             "  slave uuid = XXXXX\n")
-            
+
         self.replace_result("               Master_Log_File :",
                             "               Master_Log_File : XXXXX\n")
         self.replace_result("           Read_Master_Log_Pos :",
@@ -136,7 +143,7 @@ class test(replicate.test):
                             "                   Master_Host : XXXXX\n")
         self.replace_result("                   Master_Port :",
                             "                   Master_Port : XXXXX\n")
-        
+
         self.replace_result("                Relay_Log_File :",
                             "                Relay_Log_File : XXXXX\n")
         self.replace_result("         Relay_Master_Log_File :",
@@ -147,7 +154,7 @@ class test(replicate.test):
                             "           Exec_Master_Log_Pos : XXXXX\n")
         self.replace_result("               Relay_Log_Space :",
                             "               Relay_Log_Space : XXXXX\n")
-        
+
         self.replace_result("  Master lower_case_table_names:",
                             "  Master lower_case_table_names: XX\n")
         self.replace_result("   Slave lower_case_table_names:",
@@ -157,12 +164,12 @@ class test(replicate.test):
         self.remove_result("                     Heartbeat :")
         self.remove_result("                          Bind :")
         self.remove_result("            Ignored_server_ids :")
-    
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         return replicate.test.cleanup(self)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+import_rpl test.
+"""
+
 import os
+
 import copy_db_rpl
+
 from mysql.utilities.exception import MUTLibError
+
 
 _RPL_FILE = "rpl_test_import.txt"
 _TEST_CASE_RESULTS = [
@@ -69,23 +77,23 @@ class test(copy_db_rpl.test):
     a master or a slave. It uses the copy_db_rpl test as a parent for testing
     methods.
     """
-    
+
     # Test Cases:
     #    - copy extra db on master
-    #      do once for each format 
+    #      do once for each format
     #    - provision a new slave from master
     #    - provision a new slave from existing slave
-        
+
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version prior to 5.6.5")
 
         return copy_db_rpl.test.check_prerequisites(self)
-        
+
     def setup(self):
         self.res_fname = "result.txt"
         return copy_db_rpl.test.setup(self)
-            
+
     def run(self):
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server1))
@@ -105,18 +113,18 @@ class test(copy_db_rpl.test):
             exp_cmd = _EXPORT_CMD.format(exp_fmt, "master", " ".join(db_list),
                                          from_conn, "", _RPL_FILE)
             cmd_list.append(exp_cmd)
-    
+
             imp_str = _IMPORT_CMD.format(to_conn, _RPL_FILE, exp_fmt, "")
-            cmd_list.append(imp_str)        
+            cmd_list.append(imp_str)
 
             res = self.run_test_case(0, test_num, self.server1, self.server1,
                                      self.server2, cmd_list, db_list,
-                                     "", comment+exp_fmt, _TEST_CASE_RESULTS,
+                                     "", comment + exp_fmt, _TEST_CASE_RESULTS,
                                      True)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
-        
+
         # Provision a new slave from master
         to_conn = "--server={0}".format(
             self.build_connection_string(self.server3))
@@ -127,18 +135,18 @@ class test(copy_db_rpl.test):
         cmd_list.append(exp_cmd)
 
         imp_str = _IMPORT_CMD.format(to_conn, _RPL_FILE, "sql", "")
-        cmd_list.append(imp_str)        
+        cmd_list.append(imp_str)
 
         comment = ("Test case {0} - Provision a new slave from the "
                    "master".format(test_num))
         res = self.run_test_case(0, test_num, self.server1, self.server1,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+" sql", _TEST_CASE_RESULTS,
-                                 True)        
+                                 "", comment + " sql", _TEST_CASE_RESULTS,
+                                 True)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
-                
+
         # Provision a new slave from existing slave
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server2))
@@ -148,25 +156,25 @@ class test(copy_db_rpl.test):
         cmd_list.append(exp_cmd)
 
         imp_str = _IMPORT_CMD.format(to_conn, _RPL_FILE, "sql", "")
-        cmd_list.append(imp_str)        
+        cmd_list.append(imp_str)
 
         comment = ("Test case {0} - Provision a new slave from existing "
                    "slave".format(test_num))
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+" sql", _TEST_CASE_RESULTS,
-                                 True)        
+                                 "", comment + " sql", _TEST_CASE_RESULTS,
+                                 True)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
-        
+
         # Now show the --skip-rpl effects
         # New rows will not appear in row count because the CM and START
         # commands are skipped.
         self.server3.exec_query("STOP SLAVE")
         self.server3.exec_query("DROP DATABASE util_test")
         self.server3.exec_query("DROP DATABASE master_db1")
-        
+
         cmd_list = []
         exp_cmd = _EXPORT_CMD.format("sql", "slave", " ".join(db_list),
                                      from_conn, "", _RPL_FILE)
@@ -179,8 +187,8 @@ class test(copy_db_rpl.test):
         comment = "Test case {0} - Use --skip-rpl on import".format(test_num)
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+" sql", _TEST_CASE_RESULTS,
-                                 False, True)        
+                                 "", comment + " sql", _TEST_CASE_RESULTS,
+                                 False, True)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
@@ -194,25 +202,25 @@ class test(copy_db_rpl.test):
         self.server3.exec_query("RESET SLAVE")
         self.server3.exec_query("DROP DATABASE util_test")
         self.server3.exec_query("DROP DATABASE master_db1")
-        
+
         cmd_list = []
         exp_cmd = _EXPORT_CMD.format("sql", "slave", " ".join(db_list),
                                      from_conn, "", _RPL_FILE)
         cmd_list.append(exp_cmd)
 
         imp_str = _IMPORT_CMD.format(to_conn, _RPL_FILE, "sql", " --skip-rpl ")
-        cmd_list.append(imp_str)        
+        cmd_list.append(imp_str)
 
         comment = "Test case {0} - Use --skip-rpl on import".format(test_num)
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, cmd_list, db_list,
-                                 "", comment+" sql", _TEST_CASE_RESULTS,
+                                 "", comment + " sql", _TEST_CASE_RESULTS,
                                  True)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         return True
-          
+
     def get_result(self):
         # Here we check the result from execution of each test case.
         for i in range(0, len(_TEST_CASE_RESULTS)):
@@ -224,12 +232,12 @@ class test(copy_db_rpl.test):
                        "{2}\n".format(self.results[i][0], self.results[i][1:],
                                       _TEST_CASE_RESULTS[i]))
                 return False, msg
-            
+
         return True, ''
-    
+
     def record(self):
         return True  # Not a comparative test
-    
+
     def cleanup(self):
         try:
             os.unlink(_RPL_FILE)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_index_low_data test.
+"""
+
 import check_index_parameters
+
 from mysql.utilities.exception import MUTLibError
 
 TEST_TABLE = ("CREATE TABLE util_test_a.test_low ("
@@ -38,6 +44,8 @@ class test(check_index_parameters.test):
     teardown methods.
     """
 
+    test_num = 1
+
     def check_prerequisites(self):
         res = check_index_parameters.test.check_prerequisites(self)
         self.test_num = 1
@@ -51,6 +59,8 @@ class test(check_index_parameters.test):
         return True
 
     def run_test_cases(self):
+        """Run test cases.
+        """
         from_conn = "--server=" + self.build_connection_string(self.server1)
         cmd_str = ("mysqlindexcheck.py {0} util_test_a.test_low "
                    "--stats -v --format=vertical ".format(from_conn))

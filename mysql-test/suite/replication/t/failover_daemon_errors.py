@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+failover_daemon_errors test.
+"""
+
 import os
 
 import rpl_admin_gtid
@@ -64,7 +69,7 @@ class test(rpl_admin_gtid.test):
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
         if not res:
-                raise MUTLibError("{0}: failed".format(comment))
+            raise MUTLibError("{0}: failed".format(comment))
 
         i += 1
         comment = "Test case {0} - Invalid --report-values value".format(i)

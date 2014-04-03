@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_sql_databases test.
+"""
+
 import test_sql_template
+
 
 # (comment, def1, def2, expected result)
 _DATABASE_TESTS = [
@@ -31,9 +37,11 @@ _DATABASE_TESTS = [
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for databases
-    
+
     This test uses the test_sql_template for testing databases.
     """
+
+    utility = None
 
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)

@@ -14,11 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+import_engines test.
+"""
+
 import os
 
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _ENGINE_QUERY = """
     SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES
@@ -33,6 +39,11 @@ class test(mutlib.System_test):
     This test executes a test for engine parameters for mysqldbimport.
     It uses the import_basic test as a parent for teardown methods.
     """
+
+    server0 = None
+    server1 = None
+    s1_serverid = None
+    need_servers = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -85,13 +96,14 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
-
         # Get the engines for the tables and save them for compare
         #
         # Note: This may show different result file if run on a server whose
         # default storage engine is set differently than version 5.1.
         #
         def _get_engines():
+            """Get engines for the tables.
+            """
             for table_name in _TABLES:
                 res = self.server1.exec_query(_ENGINE_QUERY.format(table_name))
                 if not res:
@@ -189,6 +201,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         # OK if drop_db fails - they are spawned servers.
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, 'db`:db')

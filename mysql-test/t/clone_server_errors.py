@@ -14,8 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_server_errors test.
+"""
+
 import os
 import shutil
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -127,7 +133,7 @@ class test(mutlib.System_test):
         test_num += 1
         cmd_str = ("mysqlserverclone.py --server={0} --new-port={1} "
                    "--new-data=lo{2}ng --root=root"
-                   "".format(srv0_con_str, port1, "o"*200))
+                   "".format(srv0_con_str, port1, "o" * 200))
 
         comment = ("Test case {0} - use invalid big path in --new-data"
                    "".format(test_num))

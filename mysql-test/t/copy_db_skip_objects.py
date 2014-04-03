@@ -14,16 +14,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_skips_objects test.
+"""
+
 import copy_db
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
 class test(copy_db.test):
     """check skip objects for copy/clone db
-    This test executes a series of copy database operations on two 
+    This test executes a series of copy database operations on two
     servers using a variety of skip oject parameters. It uses the
     copy_db test as a parent for setup and teardown methods.
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         return copy_db.test.check_prerequisites(self)

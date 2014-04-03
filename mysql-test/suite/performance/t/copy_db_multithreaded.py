@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_multithreaded test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -26,6 +32,11 @@ class test(mutlib.System_test):
     multiple threads.
     """
 
+    server1 = None
+    server2 = None
+    need_server = None
+
+    # pylint: disable=W0221
     def is_long(self):
         # This test is a long running test
         return True
@@ -47,8 +58,8 @@ class test(mutlib.System_test):
         except:
             pass
         if len(rows) == 0:
-            raise MUTLibError("Need employees database loaded on %s" % \
-                               self.server1.role)
+            raise MUTLibError("Need employees database loaded on "
+                              "{0}".format(self.server1.role))
         return res
 
     def setup(self):
@@ -58,31 +69,35 @@ class test(mutlib.System_test):
         self.drop_all()
         return True
 
-    
     def run(self):
         self.res_fname = "result.txt"
-        
-        from_conn = "--source=" + self.build_connection_string(self.server1)
-        to_conn = "--destination=" + self.build_connection_string(self.server2)
-       
+
+        from_conn = ("--source={0}"
+                     "".format(self.build_connection_string(self.server1)))
+        to_conn = ("--destination={0}"
+                   "".format(self.build_connection_string(self.server2)))
+
         comment = "Test case 1 - copy a sample database"
-        cmd = "mysqldbcopy.py %s %s " % (from_conn, to_conn) + \
-              " employees:emp_mt --force --threads=3 "
+        cmd = ("mysqldbcopy.py {0} {1} {2}"
+               "".format(from_conn, to_conn,
+                         "employees:emp_mt --force --threads=3"))
         res = self.run_test_case(0, cmd, comment)
         if not res:
-            raise MUTLibError("%s: failed" % comment)
+            raise MUTLibError("{0}: failed".format(comment))
 
         return True
-  
+
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         return self.drop_db(self.server2, "emp_mt")
-            
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)

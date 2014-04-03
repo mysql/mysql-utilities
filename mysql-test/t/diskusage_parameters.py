@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diskusage_parameters test.
+"""
+
 import os
+
 import diskusage_basic
+
 from mysql.utilities.exception import MUTLibError
 
 

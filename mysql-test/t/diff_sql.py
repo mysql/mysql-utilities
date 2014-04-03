@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_sql test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -24,6 +30,10 @@ class test(mutlib.System_test):
     """simple db diff
     This test executes a simple diff of two databases on separate servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 5):
@@ -37,6 +47,11 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def _load_data(self, server, data_file):
+        """Reads and executes SQL from data file.
+
+        server[in]       Server instance.
+        data_file[in]    File name containing SQL statements.
+        """
         try:
             server.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
@@ -158,6 +173,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server2, "util_test")
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]

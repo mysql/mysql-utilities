@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin_failover_missing test.
+"""
+
+import tempfile
+
 import mutlib
 import rpl_admin
-import tempfile
+
 from mysql.utilities.exception import MUTLibError, UtilRplError, UtilError
 from mysql.utilities.common.format import format_tabular_list
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin --skip-slave-start',
                                 '--log-slave-updates --gtid-mode=on',
@@ -39,6 +47,15 @@ class test(rpl_admin.test):
 
     Note: this test requires GTID enabled servers.
     """
+
+    master_conn = None
+    slave1_conn = None
+    slave2_conn = None
+    slave3_conn = None
+    slave4_conn = None
+    s4_port = None
+    server5 = None
+    servers_list = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
@@ -96,7 +113,13 @@ class test(rpl_admin.test):
 
         return True
 
-    def wait_for_slave(self, master, slave):
+    @staticmethod
+    def wait_for_slave(master, slave):
+        """Waits for slave.
+
+        master[in]     Master instance.
+        slave[in]      Slave instance.
+        """
         master_gtid = master.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")
         master_gtids = master_gtid[0][0].split('\n')
         for gtid in master_gtids:
@@ -108,6 +131,10 @@ class test(rpl_admin.test):
         return
 
     def dump_table(self, server):
+        """Dumps the test_relay table.
+
+        server[in]     Server instance.
+        """
         header = "# Dump of table test_relay.t1 for server {0}:\n".format(
             server.role)
         self.results.append(header)
@@ -123,7 +150,6 @@ class test(rpl_admin.test):
                 print row,
 
     def run(self):
-
         test_num = 1
 
         self.server2.exec_query(_SET_SQL_LOG_BIN.format('0'))
@@ -184,7 +210,7 @@ class test(rpl_admin.test):
         cmd_opts = (" --candidates={0} --slaves={1} failover -vvv "
                     "--force".format(self.slave1_conn, slaves))
 
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -206,8 +232,8 @@ class test(rpl_admin.test):
                                    self.server3.port))
         slaves = ",".join([self.slave3_conn, self.slave4_conn])
         cmd_str = ("mysqlrpladmin.py --master={0} --candidates={1} "
-                   "--slaves={2} failover -vvv".format(
-                   self.slave1_conn, self.slave2_conn, slaves))
+                   "--slaves={2} failover -vvv"
+                   "".format(self.slave1_conn, self.slave2_conn, slaves))
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

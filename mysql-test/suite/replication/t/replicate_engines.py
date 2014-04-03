@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+replicate_engines test.
+"""
+
 import os
+
 import replicate
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -25,6 +32,11 @@ class test(replicate.test):
     innodb settings are different. It uses the replicate test for
     inherited methods.
     """
+
+    server3 = None
+    server4 = None
+    s3_serverid = None
+    s4_serverid = None
 
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 5, 0):
@@ -42,7 +54,7 @@ class test(replicate.test):
         self.s4_serverid = None
 
         replicate.test.setup(self)
-        
+
         index = self.servers.find_server_by_name("rep_slave_missing_engines")
         if index >= 0:
             self.server3 = self.servers.get_server(index)
@@ -62,7 +74,7 @@ class test(replicate.test):
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server3 = res[0]
             self.servers.add_new_server(self.server3, True)
-            
+
         index = self.servers.find_server_by_name("rep_master_missing_engines")
         if index >= 0:
             self.server4 = self.servers.get_server(index)
@@ -84,18 +96,18 @@ class test(replicate.test):
             self.servers.add_new_server(self.server4, True)
 
         return True
-    
+
+    # pylint: disable=W0221
     def run_test_case(self, slave, master, s_id,
                       comment, options=None, expected_result=0):
-        
         master_str = "--master={0}".format(
             self.build_connection_string(master))
         slave_str = " --slave={0}".format(
             self.build_connection_string(slave))
         conn_str = master_str + slave_str
-        
+
         # Test case 1 - setup replication among two servers
-        self.results.append(comment+"\n")
+        self.results.append(comment + "\n")
         cmd = "mysqlreplicate.py -vvv --rpl-user=rpl:rpl {0}".format(conn_str)
         if options:
             cmd += " {0}".format(options)
@@ -105,10 +117,10 @@ class test(replicate.test):
             return False
 
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
-        
+
         test_num = 1
         comment = ("Test case {0} - show warnings if slave has different "
                    "default engines".format(test_num))
@@ -116,7 +128,7 @@ class test(replicate.test):
                                  comment, None)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         test_num += 1
         comment = ("Test case {0} - use pedantic to fail if slave has "
                    "different default engines".format(test_num))
@@ -137,7 +149,7 @@ class test(replicate.test):
                                  comment, None)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        
+
         test_num += 1
         comment = ("Test case {0} - use pedantic to fail if master has "
                    "different default engines".format(test_num))
@@ -157,15 +169,15 @@ class test(replicate.test):
         self.remove_result("# status: Queueing master event to the relay log")
         self.remove_result("# error: 0:")
         self.remove_result("# Waiting for slave to synchronize with master")
-        
+
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         if self.res_fname:
             os.unlink(self.res_fname)

@@ -1862,7 +1862,7 @@ class QueryKillerThread(threading.Thread):
         finally:
             # Raise any previous error that already occurred.
             if connector_error is not None:
-                # Note: ignore pylint E0702 for the next line (known issue).
+                # pylint: disable=E0702
                 raise connector_error
 
     def stop(self):

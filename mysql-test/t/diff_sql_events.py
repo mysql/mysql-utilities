@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+diff_sql_events test.
+"""
+
 import test_sql_template
-from mysql.utilities.exception import MUTLibError, UtilDBError
+
 
 _DIFF_TABLE = "CREATE TABLE `diff_event`.`t1` (a char(30)) ENGINE=InnoDB"
 
@@ -58,9 +62,11 @@ _EVENT_TESTS = [("Event schedule interval",
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for events
-    
+
     This test uses the test_sql_template for testing events.
     """
+
+    utility = None
 
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)

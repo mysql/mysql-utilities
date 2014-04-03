@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+compare_db_errors test.
+"""
+
 import os
+
 import compare_db
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -142,7 +149,7 @@ class test(compare_db.test):
                                 "(a int, b int, INDEX `ix_nullable` (`a`)) "
                                 "ENGINE=INNODB")
         self.server2.exec_query("INSERT INTO inventory.box_2 VALUES (2, 1)")
-        
+
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
                    "".format(s1_conn, s2_conn, "inventory:inventory -a"))
@@ -173,14 +180,16 @@ class test(compare_db.test):
         self.server2.exec_query("INSERT INTO inventory.box_3 VALUES (2, 1)")
 
         #different index
-        self.server1.exec_query("CREATE TABLE inventory.box_4 "
+        self.server1.exec_query(
+            "CREATE TABLE inventory.box_4 "
             "(a int not null, b int, c int, d int not null, "
             "UNIQUE `uk_nonull` (`d`), INDEX `ix_nonull` (`a`))ENGINE=INNODB"
         )
         self.server1.exec_query("INSERT INTO inventory.box_4 VALUES "
                                 "(1, 2, 3, 4)")
         #different index
-        self.server2.exec_query("CREATE TABLE inventory.box_4 "
+        self.server2.exec_query(
+            "CREATE TABLE inventory.box_4 "
             "(a int not null, b int not null, c int, d int not null, UNIQUE "
             "`uk_nonull` (`a`, `b`)) ENGINE=INNODB"
         )

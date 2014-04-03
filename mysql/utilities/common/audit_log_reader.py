@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from mysql.utilities.exception import UtilError
 # Import appropriate XML exception to be compatible with python 2.6.
 try:
     # Exception only available from python 2.7 (i.e., ElementTree 1.3)
+    # pylint: disable=E0611
     from xml.etree.ElementTree import ParseError
 except ImportError:
     # Instead use ExpatError for earlier python versions.

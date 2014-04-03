@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_warnings test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--log-slave-updates',
@@ -54,6 +60,10 @@ class test(rpl_admin.test):
     This test exercises the mysqlrpladmin utility warnings concerning options.
     It uses the rpl_admin test for setup and teardown methods.
     """
+
+    server5 = None
+    server6 = None
+    server7 = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):

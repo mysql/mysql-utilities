@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_sql_views test.
+"""
+
 import test_sql_template
+
 
 _TEST_VIEW_TABLE = "CREATE TABLE `diff_view`.`t1` (a int)"
 
@@ -41,9 +47,11 @@ _VIEW_TESTS = [("View definition",
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for views
-    
+
     This test uses the test_sql_template for testing views.
     """
+
+    utility = None
 
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)

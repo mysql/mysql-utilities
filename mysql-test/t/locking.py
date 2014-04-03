@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+locking test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _WARNING = ("WARNING: Lock in progress. You must call unlock() to unlock "
             "your tables.")
@@ -42,7 +50,11 @@ _LOCKTESTS = [
 class test(mutlib.System_test):
     """locking
     This test exercises the Locking class methods and errors.
+
     """
+
+    server1 = None
+    options = None
 
     def check_prerequisites(self):
         return self.check_num_servers(1)
@@ -148,6 +160,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         res1 = self.drop_db(self.server1, "util_test")
 
         res2 = self.drop_db(self.server1, "util_db_clone")

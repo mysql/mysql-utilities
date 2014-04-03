@@ -14,10 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+frm_reader_errors test.
+"""
+
 import os
 
 import frm_reader_base
+
 from mysql.utilities.exception import MUTLibError
+
 
 class test(frm_reader_base.test):
     """.frm file reader
@@ -98,7 +105,7 @@ class test(frm_reader_base.test):
 
         comment = "Test case {0}: - No server and no access".format(test_num)
         res = self.run_test_case(1, "mysqlfrm.py {0} --port=3333".format(
-            frm_file_path),  comment)
+            frm_file_path), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
@@ -124,7 +131,7 @@ class test(frm_reader_base.test):
 
         comment = "Test case {0}: - Invalid port".format(test_num)
         res = self.run_test_case(2, "{0}{1} --port={2}".format(
-            self.cmd, frm_file_path, self.server1.port),  comment)
+            self.cmd, frm_file_path, self.server1.port), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1

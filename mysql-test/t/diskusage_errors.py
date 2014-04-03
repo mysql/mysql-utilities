@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diskusage_errors test.
+"""
+
 import os
+
 import diskusage_basic
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -25,6 +32,8 @@ class test(diskusage_basic.test):
     on a single server testing error conditions.
     It uses the diskusage_basic test for setup and teardown methods.
     """
+
+    port1 = None
 
     def check_prerequisites(self):
         if self.servers.get_server(0).check_version_compat(5, 6, 2):
@@ -40,7 +49,7 @@ class test(diskusage_basic.test):
         self.error_log = os.path.join(os.getcwd(), "error_log.err")
 
         res = self.servers.start_new_server(
-            self.server0,  self.port1, self.servers.get_next_id(),
+            self.server0, self.port1, self.servers.get_next_id(),
             "root", "diskusage_none",
             '--skip-innodb --default-storage-engine=MyISAM --log-bin '
             '--log-error="{0}"'.format(self.error_log))
