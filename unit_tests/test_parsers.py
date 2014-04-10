@@ -78,28 +78,34 @@ GENERAL_LOG_ENTRIES = {
         "111102  9:48:46\t    3 Connect\troot@localhost on",
         "111102 16:48:46\t    4 Connect\troot@localhost on mysql",
         "\t\t    5 Connect\troot@localhost on mysql",
-        ),
+    ),
     'Query': (
         "111102 12:49:02\t    3 Query\tinsert into t1 values (3),(4)",
         "\t\t    3 Query\tinsert into t1 values (5),(6)",
         "111102 14:49:02\t    4 Query\tinsert into t1\nvalues (7),(8)",
-        ),
+        # Multi-line queries with blanklines.
+        "\t\t   4 Query\t# First line is a comment.\n\n"
+        "SELECT * FROM foo WHERE bar = 'Third line is a query.'",
+        "140307 19:45:11\t   5 Query\tSELECT * FROM foo WHERE a = 'line 1   "
+        "\n\nline 3'",
+    ),
     'Init DB': (
         "111102 12:49:02\t    3 Init DB\ttest",
         "\t\t    3 Init DB\ttest",
         "\t\t    4 Init DB\ttest",
-        ),
+    ),
     'Quit': (
         "111102 12:49:04\t    3 Quit\t",
         "\t\t    3 Quit\t",
         "\t\t    4 Quit\t",
-        ),
+    ),
     'Prepare': (
         "111206 18:12:23\t    35 Query\tPREPARE stmt1 FROM 'SELECT * FROM t1",
         "WHERE id = ?'",
+        # Multi-line query with blanklines.
         "\t\t    35 Prepare\tSELECT * FROM t1",
-        "WHERE id = ?",
-        ),
+        "\nWHERE id = ?",
+    ),
 }
 
 GENERAL_LOG_ENTRIES_EXP = {
@@ -148,6 +154,21 @@ GENERAL_LOG_ENTRIES_EXP = {
          'argument': 'insert into t1\nvalues (7),(8)',
          'session_id': 4,
          'datetime': datetime.datetime(2011, 11, 2, 14, 49, 2)},
+        {'host': None,
+         'command': 'Query',
+         'user': None,
+         'database': None,
+         'argument': "# First line is a comment.\n\n"
+                     "SELECT * FROM foo WHERE bar = 'Third line is a query.'",
+         'session_id': 4,
+         'datetime': datetime.datetime(2011, 11, 2, 14, 49, 2)},
+        {'host': None,
+         'command': 'Query',
+         'user': None,
+         'database': None,
+         'argument': "SELECT * FROM foo WHERE a = 'line 1   \n\nline 3'",
+         'session_id': 5,
+         'datetime': datetime.datetime(2014, 3, 7, 19, 45, 11)},
     ),
     'Init DB': (
         {'host': None,
@@ -207,7 +228,7 @@ GENERAL_LOG_ENTRIES_EXP = {
          'command': 'Prepare',
          'user': None,
          'database': None,
-         'argument': 'SELECT * FROM t1\nWHERE id = ?',
+         'argument': 'SELECT * FROM t1\n\nWHERE id = ?',
          'session_id': 35,
          'datetime': datetime.datetime(2011, 12, 6, 18, 12, 23)},
     ),

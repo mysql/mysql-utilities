@@ -402,14 +402,19 @@ class GeneralQueryLog(LogParserBase):
         # WHERE Time_zone_id = 417
         argument_parts = [argument, ]
         line = self._get_next_line()
-        while line:
+        # Next line is None if the end of the file is reached.
+        # Note: empty lines can appear and should be read (i.e., line == '').
+        while line is not None:
+            # Stop if it is a header.
             if line.endswith('started with:'):
                 self._cached_logentry = line
                 break
+            # Stop if a new log entry is found.
             info = _GENERAL_ENTRY_CRE.match(line)
             if info is not None:
                 self._cached_logentry = info.groups()
                 break
+            # Otherwise, append line and read next.
             argument_parts.append(line)
             line = self._get_next_line()
 
